@@ -21,12 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.cluster.ClusterMonitor;
@@ -171,7 +169,7 @@ public class ServicesClusterMonitorHandler {
      */
     private ClusterMonitor resolveClusterMonitor() throws Exception {
         if (isPartOfCluster()) {
-            return new MultiServerClusterMonitor(InjectorHolder.getInstance(ForeignSessionHandler.class), sessionDebug, serviceConfig, serverConfig);
+            return new MultiServerClusterMonitor(sessionDebug, serviceConfig, serverConfig);
         } else {
             return new SingleServerClusterMonitor();
         }

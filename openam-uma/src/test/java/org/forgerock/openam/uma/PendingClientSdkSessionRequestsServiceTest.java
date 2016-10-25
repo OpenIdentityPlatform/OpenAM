@@ -55,7 +55,7 @@ import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class PendingRequestsServiceTest {
+public class PendingClientSdkSessionRequestsServiceTest {
 
     private static final String PENDING_REQUEST_ID = "PENDING_REQUEST_ID";
     private static final String RESOURCE_SET_ID = "RESOURCE_SET_ID";

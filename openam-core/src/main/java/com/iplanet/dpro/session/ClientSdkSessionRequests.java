@@ -19,15 +19,9 @@ package com.iplanet.dpro.session;
 import java.net.URL;
 import java.security.AccessController;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPLLSender;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
@@ -47,63 +41,17 @@ import com.sun.identity.shared.debug.Debug;
  * values from the request.
  *
  */
-public class Requests {
+public class ClientSdkSessionRequests {
 
-    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
-    private final ForeignSessionHandler foreignSessionHandler;
     private final SessionPLLSender pllSender;
     private final Debug sessionDebug;
 
-    @Inject
-    public Requests(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                    final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
-                    final ForeignSessionHandler foreignSessionHandler,
-                    final SessionPLLSender pllSender) {
-        this.sessionDebug = debug;
-        this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
-        this.foreignSessionHandler = foreignSessionHandler;
-        this.pllSender = pllSender;
-    }
-
-    /**
-     * When used in internal request routing mode, it sends remote session
-     * request with retries. If not in internal request routing mode simply
-     * calls <code>getSessionResponseWithRetry</code>.
-     *
-     * @param svcurl Session Service URL.
-     * @param sreq Session Request object.
-     * @exception SessionException
-     *
-     */
-    public SessionResponse sendRequestWithRetry(URL svcurl, SessionRequest sreq, Session session)
-            throws SessionException {
+    public ClientSdkSessionRequests(final Debug debug, final SessionPLLSender pllSender) {
         if (SystemProperties.isServerMode()) {
-
-            try {
-                return getSessionResponseWithRetry(svcurl, sreq, session);
-            } catch (SessionException e) {
-                // attempt retry if appropriate
-                String hostServer = foreignSessionHandler.getCurrentHostServer(session.getID());
-                if (!servicesClusterMonitorHandler.checkServerUp(hostServer)) {
-                    // proceed with retry
-                    // Note that there is a small risk of repeating request
-                    // twice (e.g., normal exception followed by server failure)
-                    // This danger is insignificant because most of our requests
-                    // are idempotent. For those which are not (e.g.,
-                    // logout/destroy)
-                    // it is not critical if we get an exception attempting to
-                    // repeat this type of request again.
-
-                    URL retryURL = session.getSessionServiceURL();
-                    if (!retryURL.equals(svcurl)) {
-                        return getSessionResponseWithRetry(retryURL, sreq, session);
-                    }
-                }
-                throw e;
-            }
-        } else {
-            return getSessionResponseWithRetry(svcurl, sreq, session);
+            throw new IllegalStateException("Attempted to create ClientSdkSessionRequests in server mode");
         }
+        this.sessionDebug = debug;
+        this.pllSender = pllSender;
     }
 
     /**
@@ -113,13 +61,13 @@ public class Requests {
      * @param sreq Session Request object.
      * @exception SessionException
      */
-    public SessionResponse getSessionResponseWithRetry(URL svcurl, SessionRequest sreq, Session session) throws SessionException {
+    public SessionResponse sendRequest(URL svcurl, SessionRequest sreq, Session session) throws SessionException {
         SessionResponse sres;
         Object context = RestrictedTokenContext.getCurrent();
 
         SSOToken appSSOToken = null;
         // Client side non-authentication request which does not already have a context
-        if (!SystemProperties.isServerMode() && !session.getID().getComingFromAuth() && context == null) {
+        if (!session.getID().getComingFromAuth() && context == null) {
             appSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             session.createContext(appSSOToken);
             context = session.getContext();
@@ -165,25 +113,18 @@ public class Requests {
             if (exceptionMessage.contains(SessionBundle.getString("appTokenInvalid")))  {
                 sessionDebug.message("Requests.processSessionResponseException: AppTokenInvalid = TRUE");
 
-                if (!SystemProperties.isServerMode()) {
-                    sessionDebug.message("Requests.processSessionResponseException: Destroying AppToken");
+                sessionDebug.message("Requests.processSessionResponseException: Destroying AppToken");
 
-                    AdminTokenAction.invalid();
-                    RestrictedTokenContext.clear();
+                AdminTokenAction.invalid();
+                RestrictedTokenContext.clear();
 
-                    sessionDebug.warning("Requests.processSessionResponseException: server responded with app " +
-                            "token invalid error, refetching the app sso token");
-                    SSOToken newAppSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                sessionDebug.warning("Requests.processSessionResponseException: server responded with app " +
+                        "token invalid error, refetching the app sso token");
+                SSOToken newAppSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
 
-                    sessionDebug.message("Requests.processSessionResponseException: creating New AppToken TokenID = {}",
-                            newAppSSOToken);
-                    session.createContext(newAppSSOToken);
-                } else {
-                    sessionDebug.message("Requests.processSessionResponseException: AppToken invalid in server mode; " +
-                            "throwing exception");
-                    RestrictedTokenContext.clear();
-                    throw new SessionException(sres.getException());
-                }
+                sessionDebug.message("Requests.processSessionResponseException: creating New AppToken TokenID = {}",
+                        newAppSSOToken);
+                session.createContext(newAppSSOToken);
             } else {
                 throw new SessionException(sres.getException());
             }

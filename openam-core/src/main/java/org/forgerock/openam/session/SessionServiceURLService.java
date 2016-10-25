@@ -35,11 +35,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNaming;
@@ -137,9 +137,9 @@ public class SessionServiceURLService {
             sid.validate();
 
             SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
-            ForeignSessionHandler foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
+            ServicesClusterMonitorHandler servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
             if (sessionServerConfig.isSiteEnabled() && sessionServerConfig.isLocalSite(sid)) {
-                return getSessionServiceURL(foreignSessionHandler.getCurrentHostServer(sid));
+                return getSessionServiceURL(servicesClusterMonitorHandler.getCurrentHostServer(sid));
             }
         } else {
             primaryId = sid.getExtension().getPrimaryID();

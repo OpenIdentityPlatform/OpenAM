@@ -45,6 +45,7 @@ import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.google.inject.Key;
@@ -52,7 +53,6 @@ import com.google.inject.name.Names;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -104,7 +104,7 @@ public class SessionRequestHandler implements RequestHandler {
     private final SessionServerConfig serverConfig;
     private final StatelessSessionManager statelessSessionManager;
     private final SessionCount sessionCount;
-    private final ForeignSessionHandler foreignSessionHandler;
+    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
 
     private SSOToken clientToken = null;
 
@@ -118,7 +118,7 @@ public class SessionRequestHandler implements RequestHandler {
         serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
         statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
         sessionCount = InjectorHolder.getInstance(SessionCount.class);
-        foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
+        servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
     }
 
     /**
@@ -318,7 +318,7 @@ public class SessionRequestHandler implements RequestHandler {
             return;
         }
 
-        String hostServerID = foreignSessionHandler.getCurrentHostServer(sid);
+        String hostServerID = servicesClusterMonitorHandler.getCurrentHostServer(sid);
 
         if (!serverConfig.isLocalServer(hostServerID)) {
             try {
@@ -326,9 +326,9 @@ public class SessionRequestHandler implements RequestHandler {
                         forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req));
             } catch (SessionException se) {
                 // attempt retry
-                if (!sessionService.checkServerUp(hostServerID)) {
+                if (!servicesClusterMonitorHandler.checkServerUp(hostServerID)) {
                     // proceed with failover
-                    String retryHostServerID = foreignSessionHandler.getCurrentHostServer(sid);
+                    String retryHostServerID = servicesClusterMonitorHandler.getCurrentHostServer(sid);
                     if (retryHostServerID.equals(hostServerID)) {
                         throw se;
                     } else {

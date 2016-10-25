@@ -15,9 +15,6 @@
 */
 package org.forgerock.openam.monitoring.session;
 
-import org.forgerock.guice.core.InjectorHolder;
-
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.monitoring.SessionMonitorType;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.sun.management.snmp.SnmpStatusException;
@@ -67,7 +64,7 @@ public class RemoteSessionsImpl extends RemoteSessions {
      * Getter for the "SumRemoteSessions" variable.
      */
     public Long getSumRemoteSessions() throws SnmpStatusException {
-        return (long) InjectorHolder.getInstance(ForeignSessionHandler.class).getRemoteSessionCount();
+        return 0L;
     }
 
 }

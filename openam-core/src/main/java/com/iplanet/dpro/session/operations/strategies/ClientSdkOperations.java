@@ -26,20 +26,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.dpro.session.PartialSession;
-import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionPLLSender;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Requests;
+import com.iplanet.dpro.session.ClientSdkSessionRequests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -66,27 +63,36 @@ import com.sun.identity.shared.debug.Debug;
  * are all moved from {@link Session}. Importantly they use the SessionRequest PLL
  * mechanism for performing these operations.
  */
-@Singleton
 public class ClientSdkOperations implements SessionOperations {
     protected static final String INVALID_SESSION_STATE = "invalidSessionState";
     protected static final String UNEXPECTED_SESSION = "unexpectedSession";
 
     private final Debug debug;
-    private final Requests requests;
+    private final ClientSdkSessionRequests clientSdkSessionRequests;
     private ServicesClusterMonitorHandler servicesClusterMonitorHandler;
     private SessionServiceURLService sessionServiceURLService;
     private SessionServerConfig serverConfig;
     private HttpConnectionFactory httpConnectionFactory;
 
-    @Inject
-    public ClientSdkOperations(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                               final Requests requests,
+    public ClientSdkOperations(final Debug sessionDebug,
+                               final SessionPLLSender sessionPLLSender,
                                final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
                                final SessionServiceURLService sessionServiceURLService,
                                final SessionServerConfig serverConfig,
                                final HttpConnectionFactory httpConnectionFactory) {
-        this.debug = debug;
-        this.requests = requests;
+        this(sessionDebug, new ClientSdkSessionRequests(sessionDebug, sessionPLLSender), servicesClusterMonitorHandler,
+                sessionServiceURLService, serverConfig, httpConnectionFactory);
+    }
+
+    @VisibleForTesting
+    ClientSdkOperations(final Debug sessionDebug,
+                               final ClientSdkSessionRequests clientSdkSessionRequests,
+                               final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
+                               final SessionServiceURLService sessionServiceURLService,
+                               final SessionServerConfig serverConfig,
+                               final HttpConnectionFactory httpConnectionFactory) {
+        this.debug = sessionDebug;
+        this.clientSdkSessionRequests = clientSdkSessionRequests;
         this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
         this.sessionServiceURLService = sessionServiceURLService;
         this.serverConfig = serverConfig;
@@ -111,7 +117,7 @@ public class ClientSdkOperations implements SessionOperations {
         }
 
         SessionRequest sreq = new SessionRequest(SessionRequest.GetSession, sessionID.toString(), reset);
-        SessionResponse sres = requests.sendRequestWithRetry(session.getSessionServiceURL(), sreq, session);
+        SessionResponse sres = clientSdkSessionRequests.sendRequest(session.getSessionServiceURL(), sreq, session);
 
         if (sres.getException() != null) {
             throw new SessionException(SessionBundle.rbName,
@@ -141,7 +147,7 @@ public class ClientSdkOperations implements SessionOperations {
 
         SessionRequest sreq = new SessionRequest(SessionRequest.Logout,
                 session.getID().toString(), false);
-        requests.sendRequestWithRetry(session.getSessionServiceURL(), sreq, session);
+        clientSdkSessionRequests.sendRequest(session.getSessionServiceURL(), sreq, session);
     }
 
     @Override
@@ -160,7 +166,7 @@ public class ClientSdkOperations implements SessionOperations {
 
         URL svcurl = sessionServiceURLService.getSessionServiceURL(session.getSessionID());
 
-        SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, session);
+        SessionResponse sres = clientSdkSessionRequests.sendRequest(svcurl, sreq, session);
         Set<SessionInfo> infos = new HashSet<>(sres.getSessionInfo());
 
         return new SearchResults<>(infos.size(), infos, sres.getStatus());
@@ -187,7 +193,7 @@ public class ClientSdkOperations implements SessionOperations {
 
         SessionRequest sreq = new SessionRequest(SessionRequest.DestroySession, requester.getID().toString(), false);
         sreq.setDestroySessionID(session.getID().toString());
-        requests.sendRequestWithRetry(session.getSessionServiceURL(), sreq, session);
+        clientSdkSessionRequests.sendRequest(session.getSessionServiceURL(), sreq, session);
     }
 
     /**
@@ -225,7 +231,7 @@ public class ClientSdkOperations implements SessionOperations {
                         + "externalProtectedProperty in remote server");
             }
         }
-        requests.sendRequestWithRetry(session.getSessionServiceURL(), sreq, session);
+        clientSdkSessionRequests.sendRequest(session.getSessionServiceURL(), sreq, session);
     }
 
     @Override
@@ -239,7 +245,7 @@ public class ClientSdkOperations implements SessionOperations {
                 SessionRequest.AddSessionListener,
                 session.getSessionID().toString(), false);
         sreq.setNotificationURL(url);
-        requests.sendRequestWithRetry(sessionServiceURLService.getSessionServiceURL(session.getSessionID()), sreq, session);
+        clientSdkSessionRequests.sendRequest(sessionServiceURLService.getSessionServiceURL(session.getSessionID()), sreq, session);
     }
 
     @Override

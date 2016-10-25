@@ -31,16 +31,13 @@ import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionIDExtensions;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.cluster.MultiServerClusterMonitor.ClusterStateServiceFactory;
 import com.sun.identity.shared.debug.Debug;
 
 public class MultiServerClusterMonitorTest {
 
-    private ForeignSessionHandler mockForeignSessionHandler;
     private Debug mockDebug;
     private SessionServerConfig mockServerConfig;
     private SessionServiceConfig mockServiceConfig;
@@ -48,7 +45,6 @@ public class MultiServerClusterMonitorTest {
 
     @BeforeTest
     public void setUp() {
-        mockForeignSessionHandler = mock(ForeignSessionHandler.class);
         mockDebug = mock(Debug.class);
         mockServerConfig = mock(SessionServerConfig.class);
         mockServiceConfig = mock(SessionServiceConfig.class);
@@ -73,7 +69,7 @@ public class MultiServerClusterMonitorTest {
 
         ClusterStateService mockClusterService = mock(ClusterStateService.class);
         given(mockFactory.createClusterStateService(
-                eq(mockForeignSessionHandler), eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
+                eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
                 .willReturn(mockClusterService);
         given(mockClusterService.isUp("01")).willReturn(true);
 
@@ -85,7 +81,7 @@ public class MultiServerClusterMonitorTest {
 
         // When
         MultiServerClusterMonitor clusterMonitor = new MultiServerClusterMonitor(
-                mockForeignSessionHandler, mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
+                mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
         String currentHostServer = clusterMonitor.getCurrentHostServer(mockSessionID);
 
         // Then
@@ -116,7 +112,7 @@ public class MultiServerClusterMonitorTest {
 
         ClusterStateService mockClusterService = mock(ClusterStateService.class);
         given(mockFactory.createClusterStateService(
-                eq(mockForeignSessionHandler), eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
+                eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
                 .willReturn(mockClusterService);
         given(mockClusterService.isUp("01")).willReturn(true);
         given(mockClusterService.isUp("02")).willReturn(false);
@@ -133,7 +129,7 @@ public class MultiServerClusterMonitorTest {
 
         // When
         MultiServerClusterMonitor clusterMonitor = new MultiServerClusterMonitor(
-                mockForeignSessionHandler, mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
+                mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
         String currentHostServer = clusterMonitor.getCurrentHostServer(mockSessionID);
 
         // Then

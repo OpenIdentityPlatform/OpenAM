@@ -58,7 +58,6 @@ import javax.net.ssl.SSLSession;
 import org.forgerock.openam.utils.IOUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.Constants;
@@ -171,9 +170,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
     // server instance id 
     private static String localServerId = null;
 
-    // SessionService
-    private static volatile ForeignSessionHandler foreignSessionHandler;
-
     static {
         sessionDebug = Debug.getInstance("amSession");
 
@@ -228,7 +224,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Constructs an instance for the cluster service
-     * @param foreignSessionHandler The handler for sessions from other servers.
      * @param localServerId id of the server instance in which this ClusterStateService instance is running
      * @param timeout timeout for waiting on an individual server (millisec)
      * @param period checking cycle period (millisecs)
@@ -236,7 +231,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @param siteMembers Mapping of Site ID to URL for all Sites.
      * @throws Exception If there was an unexpected error initialising the ClusterStateService.
      */
-    protected ClusterStateService(ForeignSessionHandler foreignSessionHandler, String localServerId,
+    protected ClusterStateService(String localServerId,
                                   int timeout, long period, Map<String, String> serverMembers,
                                   Map<String, String> siteMembers) throws Exception {
         if ( (localServerId == null)||(localServerId.isEmpty()) )
@@ -247,7 +242,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
         // Ensure we Synchronize this Instantiation.
         synchronized (this) {
-            this.foreignSessionHandler = foreignSessionHandler;
             this.localServerId = localServerId;
             this.timeout = timeout;
             this.period = period;
@@ -442,7 +436,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
     public void run() {
         try {
-            boolean cleanRemoteSessions = false;
             synchronized (this) {
 
                 Collection<StateInfo> infos = new ArrayList<>();
@@ -455,15 +448,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
                     if (!info.isUp) {
                         down.add(info.id);
                     } else {
-                        if (!down.isEmpty() && down.remove(info.id)) {
-                            cleanRemoteSessions = true;
-                        }
+                        down.remove(info.id);
                     }
                 }
 
-            }
-            if (cleanRemoteSessions) {
-                foreignSessionHandler.cleanUpRemoteSessions();
             }
         } catch (Exception ex) {
             sessionDebug.error("cleanRemoteSessions Background thread has encountered an Exception: " + ex.getMessage(), ex);

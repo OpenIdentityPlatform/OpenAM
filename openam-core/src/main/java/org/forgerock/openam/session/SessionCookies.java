@@ -34,13 +34,13 @@ import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.Constants;
@@ -151,9 +151,9 @@ public class SessionCookies {
         if (RESET_LB_COOKIE_NAME) {
             if (SystemProperties.isServerMode()) {
                 SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
-                ForeignSessionHandler foreignSessionHandler = InjectorHolder.getInstance(ForeignSessionHandler.class);
+                ServicesClusterMonitorHandler servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
                 if (sessionServerConfig.isLocalSite(sid)) {
-                    cookieValue = WebtopNaming.getLBCookieValue(foreignSessionHandler.getCurrentHostServer(sid));
+                    cookieValue = WebtopNaming.getLBCookieValue(servicesClusterMonitorHandler.getCurrentHostServer(sid));
                 }
             } else {
                 Session sess = sessionCache.readSession(sid);

@@ -40,7 +40,6 @@ import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.PermutationGenerator;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -58,7 +57,6 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class MultiServerClusterMonitor implements ClusterMonitor {
 
-    private final ForeignSessionHandler foreignSessionHandler;
     private final Debug sessionDebug;
     private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
@@ -68,19 +66,17 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
 
     /**
      *
-     * @param foreignSessionHandler The handler for sessions loaded from other servers.
      * @param sessionDebug The session debug instance.
      * @param serviceConfig The configuration for the session service.
      * @param serverConfig The configuration for the session server.
      * @throws Exception
      */
     public MultiServerClusterMonitor(
-            ForeignSessionHandler foreignSessionHandler,
             Debug sessionDebug,
             SessionServiceConfig serviceConfig,
             SessionServerConfig serverConfig) throws Exception {
 
-        this(foreignSessionHandler, sessionDebug, serviceConfig, serverConfig, new ClusterStateServiceFactory());
+        this(sessionDebug, serviceConfig, serverConfig, new ClusterStateServiceFactory());
     }
 
     /**
@@ -88,13 +84,11 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      */
     @VisibleForTesting
     MultiServerClusterMonitor(
-            ForeignSessionHandler foreignSessionHandler,
             Debug sessionDebug,
             SessionServiceConfig serviceConfig,
             SessionServerConfig serverConfig,
             ClusterStateServiceFactory clusterStateServiceFactory) throws Exception {
 
-        this.foreignSessionHandler = foreignSessionHandler;
         this.sessionDebug = sessionDebug;
         this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
@@ -156,7 +150,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
         Map<String, String> siteMemberMap = getSiteMemberMap();
 
         // Instantiate the State Service.
-        clusterStateService = clusterStateServiceFactory.createClusterStateService(foreignSessionHandler, serverConfig,
+        clusterStateService = clusterStateServiceFactory.createClusterStateService(serverConfig,
                 serviceConfig, CollectionUtils.invertMap(clusterMemberMap), siteMemberMap);
 
         // Show our State Server Info Map
@@ -289,14 +283,12 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
     static class ClusterStateServiceFactory {
 
         ClusterStateService createClusterStateService(
-                ForeignSessionHandler foreignSessionHandler,
                 SessionServerConfig sessionServerConfig,
                 SessionServiceConfig sessionServiceConfig,
                 Map<String, String> serverMembers,
                 Map<String, String> siteMembers) throws Exception {
 
             return new ClusterStateService(
-                    foreignSessionHandler,
                     sessionServerConfig.getLocalServerID(),
                     sessionServiceConfig.getSessionFailoverClusterStateCheckTimeout(),
                     sessionServiceConfig.getSessionFailoverClusterStateCheckPeriod(),

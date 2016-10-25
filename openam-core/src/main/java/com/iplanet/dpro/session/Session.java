@@ -225,9 +225,8 @@ public class Session implements Blacklistable, AMSession{
             sessionCache = SessionCache.getInstance();
             sessionCookies = SessionCookies.getInstance();
             sessionServiceURLService = SessionServiceURLService.getInstance();
-            Requests requests = new Requests(sessionDebug, null, null, new SessionPLLSender(sessionCookies));
             sessionOperationStrategy = new ClientSdkSessionOperationStrategy(
-                    new ClientSdkOperations(sessionDebug, requests, null, sessionServiceURLService, null, null));
+                    new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), null, sessionServiceURLService, null, null));
         }
     }
 

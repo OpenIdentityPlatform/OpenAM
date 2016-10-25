@@ -34,7 +34,6 @@ import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionStore;
 import com.iplanet.dpro.session.service.MonitoringOperations;
@@ -56,7 +55,7 @@ public class SessionAccessManagerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        sessionAccessManager = new SessionAccessManager(mockDebug, mock(ForeignSessionHandler.class),
+        sessionAccessManager = new SessionAccessManager(mockDebug,
                 mock(SessionCache.class), internalSessionCache, mock(SessionNotificationSender.class),
                 mock(SessionAuditor.class), mock(MonitoringOperations.class),
                 sessionPersistentStore, mock(ScheduledExecutorService.class), mock(ThreadMonitor.class));

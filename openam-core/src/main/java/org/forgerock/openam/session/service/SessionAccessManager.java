@@ -15,8 +15,7 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_IDLE_TIMED_OUT;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_MAX_TIMED_OUT;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 
 import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,7 +40,6 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
@@ -57,7 +55,6 @@ import com.sun.identity.shared.debug.Debug;
 public class SessionAccessManager implements SessionPersistenceManager {
 
     private final Debug debug;
-    private final ForeignSessionHandler foreignSessionHandler;
 
     private final InternalSessionCache internalSessionCache;
     private final SessionCache sessionCache;
@@ -72,7 +69,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
     @VisibleForTesting
     @Inject
     SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                         final ForeignSessionHandler foreignSessionHandler,
                          final SessionCache sessionCache,
                          final InternalSessionCache internalSessionCache,
                          final SessionNotificationSender sessionNotificationSender,
@@ -82,7 +78,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
                          @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) final ScheduledExecutorService scheduler,
                          final ThreadMonitor threadMonitor) {
         this.debug = debug;
-        this.foreignSessionHandler = foreignSessionHandler;
         this.sessionCache = sessionCache;
         this.internalSessionCache = internalSessionCache;
         this.sessionNotificationSender = sessionNotificationSender;
@@ -156,7 +151,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
         boolean destroyed = destroySessionIfNecessary(session);
         if (!destroyed) {
             putInternalSessionIntoInternalSessionCache(session);
-            foreignSessionHandler.updateSessionMaps(session);
         }
 
         return session;
@@ -323,7 +317,6 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
 
         internalSession.setPersistenceManager(null);
-        foreignSessionHandler.remove(internalSession.getID());
 
         // Session Constraint
         if (internalSession.getState() == SessionState.VALID) {

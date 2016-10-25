@@ -31,7 +31,6 @@ package com.iplanet.dpro.session.service;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 
 import java.io.InterruptedIOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,7 +49,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 import org.forgerock.openam.utils.CrestQuery;
@@ -61,7 +59,6 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.monitoring.ForeignSessionHandler;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
@@ -105,9 +102,6 @@ public class SessionService {
     private final SessionOperationStrategy sessionOperationStrategy;
 
     private final SessionAccessManager sessionAccessManager;
-    private final ForeignSessionHandler foreignSessionHandler;
-
-    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
 
     /**
      * Private Singleton Session Service.
@@ -127,9 +121,7 @@ public class SessionService {
             final InternalSessionFactory internalSessionFactory,
             final SessionNotificationSender sessionNotificationSender,
             final SessionAccessManager sessionAccessManager,
-            final SessionOperationStrategy sessionOperationStrategy,
-            final ServicesClusterMonitorHandler servicesClusterMonitorHandler,
-            final ForeignSessionHandler foreignSessionHandler) {
+            final SessionOperationStrategy sessionOperationStrategy) {
 
         this.sessionDebug = sessionDebug;
         this.ssoTokenManager = ssoTokenManager;
@@ -142,10 +134,8 @@ public class SessionService {
         this.sessionEventBroker = sessionEventBroker;
         this.internalSessionFactory = internalSessionFactory;
         this.sessionOperationStrategy = sessionOperationStrategy;
-        this.servicesClusterMonitorHandler = servicesClusterMonitorHandler;
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionAccessManager = sessionAccessManager;
-        this.foreignSessionHandler = foreignSessionHandler;
 
         try {
 
@@ -179,6 +169,21 @@ public class SessionService {
         return sessionOperationStrategy.getOperation(sessionID).getRestrictedTokenId(sessionID, restriction);
     }
 
+    /**
+     * This method is the "server side" of the getRestrictedTokenIdRemotely()
+     *
+     * @param masterSid   SessionID
+     * @param restriction restriction
+     */
+    String handleGetRestrictedTokenIdRemotely(SessionID masterSid, TokenRestriction restriction) {
+        try {
+            return sessionOperationStrategy.getOperation(masterSid).getRestrictedTokenId(masterSid, restriction);
+        } catch (Exception ex) {
+            sessionDebug.error("Failed to create restricted token remotely", ex);
+        }
+        return null;
+    }
+
     public InternalSession newInternalSession(String domain, boolean stateless) {
         return internalSessionFactory.newInternalSession(domain, stateless);
     }
@@ -188,7 +193,7 @@ public class SessionService {
      *
      * @param sessionId Session ID
      */
-    InternalSession removeCachedInternalSession(final SessionID sessionId) {
+    private InternalSession removeCachedInternalSession(final SessionID sessionId) {
         if (null == sessionId) {
             return null;
         }
@@ -429,42 +434,6 @@ public class SessionService {
     }
 
     /**
-     * This is a key method for "internal request routing" mode It determines
-     * the server id which is currently hosting session identified by sid. In
-     * "internal request routing" mode, this method also has a side effect of
-     * releasing a session which no longer "belongs locally" (e.g., due to
-     * primary server instance restart)
-     *
-     * @param sessionId session id
-     * @return server id for the server instance determined to be the current
-     *         host
-     * @throws SessionException
-     */
-    public String getCurrentHostServer(SessionID sessionId) throws SessionException {
-        return foreignSessionHandler.getCurrentHostServer(sessionId);
-    }
-
-    /**
-     * Actively check if server identified by serverID is up
-     *
-     * @param serverID server id
-     * @return true if server is up, false otherwise
-     */
-    public boolean checkServerUp(String serverID) {
-        return servicesClusterMonitorHandler.checkServerUp(serverID);
-    }
-
-    /**
-     * Indicates that the Site is up.
-     *
-     * @param siteId A possibly null Site Id.
-     * @return True if the Site is up, False if it failed to respond to a query.
-     */
-    public boolean isSiteUp(String siteId) {
-        return servicesClusterMonitorHandler.isSiteUp(siteId);
-    }
-
-    /**
      * This method will execute all the globally set session timeout handlers
      * with the corresponding timeout event simultaneously.
      *
@@ -565,32 +534,6 @@ public class SessionService {
         }
 
         return isSuperUser;
-    }
-
-    /**
-     * This method is the "server side" of the getRestrictedTokenIdRemotely()
-     *
-     * @param masterSid   SessionID
-     * @param restriction restriction
-     */
-    String handleGetRestrictedTokenIdRemotely(SessionID masterSid,
-                                              TokenRestriction restriction) {
-        try {
-            return sessionOperationStrategy.getOperation(masterSid).getRestrictedTokenId(masterSid, restriction);
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to create restricted token remotely", ex);
-        }
-        return null;
-    }
-
-    /**
-     * Returns true if the URL is the URL of the local session service.
-     *
-     * @param svcurl the url to check
-     * @return true if the url represents the local session service.
-     */
-    public boolean isLocalSessionService(URL svcurl) {
-        return serverConfig.isLocalSessionService(svcurl);
     }
 
     /**

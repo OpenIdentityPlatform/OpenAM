@@ -15,7 +15,7 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import com.iplanet.dpro.session.Requests;
+import com.iplanet.dpro.session.ClientSdkSessionRequests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -48,7 +48,7 @@ public class ClientSdkOperationsTest {
     private ClientSdkOperations clientSdkOperations;
 
     @Mock
-    private Requests mockRequests;
+    private ClientSdkSessionRequests mockClientSdkSessionRequests;
     @Mock
     private Session mockRequester;
     @Mock
@@ -73,12 +73,12 @@ public class ClientSdkOperationsTest {
         MockitoAnnotations.initMocks(this);
         given(mockRequester.getID()).willReturn(mockRequesterId);
         given(mockSession.getID()).willReturn(mockSessionId);
-        given(mockRequests.sendRequestWithRetry(
+        given(mockClientSdkSessionRequests.sendRequest(
                 any(URL.class),
                 any(SessionRequest.class),
                 any(Session.class))).willReturn(mockResponse);
 
-        clientSdkOperations = new ClientSdkOperations(mock(Debug.class), mockRequests, mockServicesClusterMonitorHandler,
+        clientSdkOperations = new ClientSdkOperations(mock(Debug.class), mockClientSdkSessionRequests, mockServicesClusterMonitorHandler,
                 mockSessionServiceURLService, mockServerConfig, mockHttpConnectionFactor);
     }
 
@@ -133,7 +133,7 @@ public class ClientSdkOperationsTest {
         clientSdkOperations.logout(mockSession);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockClientSdkSessionRequests).sendRequest(any(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class ClientSdkOperationsTest {
         clientSdkOperations.destroy(mockRequester, mockSession);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockClientSdkSessionRequests).sendRequest(any(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 
     @Test
@@ -156,6 +156,6 @@ public class ClientSdkOperationsTest {
         clientSdkOperations.setProperty(mockSession, name, value);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockClientSdkSessionRequests).sendRequest(any(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 }
