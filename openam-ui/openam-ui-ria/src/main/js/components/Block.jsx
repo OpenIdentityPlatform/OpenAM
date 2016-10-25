@@ -25,13 +25,18 @@ import React from "react";
  * @param {string} [props.description] Text to display for the block description
  * @returns {ReactElement} Renderable React element
  */
-const Block = ({ children, header, description }) => (
-    <div className="block">
-        <h3 className="block-header">{ header }</h3>
-        <p className="block-description">{ description }</p>
-        { children }
-    </div>
-);
+const Block = ({ children, header, description }) => {
+
+    const blockDescription = description ? <p className="block-description">{ description }</p> : undefined;
+
+    return (
+        <div className="block clearfix">
+            <h3 className="block-header">{ header }</h3>
+            { blockDescription }
+            { children }
+        </div>
+    );
+};
 
 Block.propTypes = {
     children: React.PropTypes.arrayOf(React.PropTypes.node).isRequired,

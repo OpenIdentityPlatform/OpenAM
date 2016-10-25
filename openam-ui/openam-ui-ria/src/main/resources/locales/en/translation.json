@@ -286,6 +286,7 @@
             "createdAt" : "Created at",
             "createNew": "Create New",
             "search" : "Search",
+            "selectAll": "Select all",
             "submit" : "Submit",
             "actions" : "Actions",
             "complete" : "Complete",

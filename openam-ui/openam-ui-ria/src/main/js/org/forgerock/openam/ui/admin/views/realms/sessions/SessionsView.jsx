@@ -27,7 +27,7 @@ import { getByUserIdAndRealm, getByRealm, invalidateByHandles }
 import CallToAction from "components/CallToAction";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import EventManager from "org/forgerock/commons/ui/common/main/EventManager";
-import IntroAlert from "./IntroAlert";
+import PageDescription from "components/PageDescription";
 import SimplePageHeader from "components/SimplePageHeader";
 import SessionsTable from "./SessionsTable";
 import showConfirmationBeforeAction from "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction";
@@ -52,10 +52,17 @@ class SessionsView extends Component {
 
         this.handleSelectAsyncOnChange = this.handleSelectAsyncOnChange.bind(this);
         this.handleClickInvalidateAll = this.handleClickInvalidateAll.bind(this);
-
+        this.handleInvalidateSessions = this.handleInvalidateSessions.bind(this);
+        this.fetchSessionsByUserIdAndRealm = this.fetchSessionsByUserIdAndRealm.bind(this);
         this.state = {
             sessions: []
         };
+    }
+
+    handleInvalidateSessions (sessions) {
+        const handles = _.pluck(sessions, "sessionHandle");
+        invalidateByHandles(handles).then(() =>
+            this.fetchSessionsByUserIdAndRealm(this.state.userId, this.props.router.params[0]));
     }
 
     handleClickInvalidateAll () {
@@ -78,18 +85,21 @@ class SessionsView extends Component {
             t("console.sessions.invalidate"));
     }
 
+    fetchSessionsByUserIdAndRealm (userId, realm) {
+        getByUserIdAndRealm(userId, realm).then((response) => {
+            this.setState({ sessions: response });
+        });
+    }
+
     handleSelectAsyncOnChange (newValue) {
         const userId = _.get(newValue, "value");
-
         this.setState({
             sessions: [],
             userId
         });
 
         if (userId) {
-            getByUserIdAndRealm(userId, this.props.router.params[0]).then((response) =>
-                this.setState({ sessions: response })
-            );
+            this.fetchSessionsByUserIdAndRealm (userId, this.props.router.params[0]);
         }
     }
 
@@ -97,11 +107,15 @@ class SessionsView extends Component {
         let content;
 
         if (this.state.sessions.length) {
-            content = <SessionsTable data={ this.state.sessions } />;
+            content = (
+                <SessionsTable
+                    data={ this.state.sessions }
+                    onSessionsInvalidate={ this.handleInvalidateSessions }
+                    userId={ this.state.userId }
+                />
+            );
         } else if (this.state.userId) {
-            content = <CallToAction><h3>{ t("console.sessions.table.noResults") }</h3></CallToAction>;
-        } else {
-            content = <IntroAlert />;
+            content = <Panel><CallToAction><h3>{ t("console.sessions.table.noResults") }</h3></CallToAction></Panel>;
         }
 
         return (
@@ -114,25 +128,27 @@ class SessionsView extends Component {
                         { t("console.sessions.invalidateAll") }
                     </Button>
                 </SimplePageHeader>
-                <Panel>
-                    <FormGroup controlId="findAUser">
-                        <ControlLabel>{ t("console.sessions.search.title") }</ControlLabel>
-                        <Select.Async
-                            autoload={ false }
-                            inputProps={ {
-                                id: "findAUser"
-                            } }
-                            isLoading
-                            loadOptions={ fetchUsersByPartialId }
-                            noResultsText={ t("console.sessions.search.noResults") }
-                            onChange={ this.handleSelectAsyncOnChange }
-                            placeholder={ t("console.sessions.search.placeholder") }
-                            searchPromptText={ t("console.sessions.search.searchPrompt") }
-                            value={ this.state.userId }
-                        />
-                    </FormGroup>
-                    { content }
-                </Panel>
+
+                <PageDescription>{ t("console.sessions.search.intro") }</PageDescription>
+
+                <FormGroup controlId="findAUser">
+                    <ControlLabel srOnly>{ t("console.sessions.search.title") }</ControlLabel>
+                    <Select.Async
+                        autoload={ false }
+                        inputProps={ {
+                            id: "findAUser"
+                        } }
+                        isLoading
+                        loadOptions={ fetchUsersByPartialId }
+                        noResultsText={ t("console.sessions.search.noResults") }
+                        onChange={ this.handleSelectAsyncOnChange }
+                        placeholder={ t("console.sessions.search.placeholder") }
+                        searchPromptText={ t("console.sessions.search.searchPrompt") }
+                        value={ this.state.userId }
+                    />
+                </FormGroup>
+                { content }
+
             </div>
         );
     }

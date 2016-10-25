@@ -16,52 +16,114 @@
 
 import _ from "lodash";
 import { t } from "i18next";
-import { Table } from "react-bootstrap";
-import moment from "moment";
-import React, { PropTypes } from "react";
+import { Button, ButtonToolbar, ControlLabel, Panel, Table } from "react-bootstrap";
+import React, { Component, PropTypes } from "react";
+import SessionsTableRow from "./SessionsTableRow";
+import Block from "components/Block";
 
-const SessionsTable = ({ data }) => (
-    <Table>
-        <thead>
-            <tr>
-                <th>{ t("console.sessions.table.headers.0") }</th>
-                <th>{ t("console.sessions.table.headers.1") }</th>
-                <th>{ t("console.sessions.table.headers.2") }</th>
-            </tr>
-        </thead>
-        <tbody>
-            { _.map(data, ({ idleTime, sessionHandle, maxIdleExpirationTime, maxSessionExpirationTime }) =>
-                <tr key={ sessionHandle }>
-                    <td>
-                        { moment(idleTime).fromNow(true) }
-                    </td>
-                    <td
-                        title={ t("console.sessions.table.expires", {
-                            timestamp: moment(maxIdleExpirationTime).toISOString()
-                        }) }
+class SessionsTable extends Component {
+    constructor (props) {
+        super(props);
+        this.handleSelectAll = this.handleSelectAll.bind(this);
+        this.handleSelectRow = this.handleSelectRow.bind(this);
+        this.handleDeleteRow = this.handleDeleteRow.bind(this);
+        this.handleDeleteSelected = this.handleDeleteSelected.bind(this);
+        this.state = {
+            checked: []
+        };
+    }
+
+    componentWillReceiveProps (nextProps) {
+        const updated = _.findByValues(nextProps.data, "sessionHandle", _.pluck(this.state.checked, "sessionHandle"));
+        this.setState({ checked: updated });
+    }
+
+    handleDeleteRow (session) {
+        this.props.onSessionsInvalidate([session]);
+    }
+
+    handleDeleteSelected () {
+        this.props.onSessionsInvalidate(this.state.checked);
+    }
+
+    handleSelectAll (e) {
+        this.setState({ checked: e.target.checked ? this.props.data : [] });
+    }
+
+    handleSelectRow (session, checked) {
+        const updated = checked ? this.state.checked.concat(session) : _.without(this.state.checked, session);
+        this.setState({ checked: updated });
+    }
+
+    render () {
+        const numberOfChecked = this.state.checked.length ? `(${this.state.checked.length})` : undefined;
+        const isChecked = (session) => _.includes(this.state.checked, session);
+        const allChecked = (this.state.checked.length === this.props.data.length);
+
+        return (
+            <div>
+                <ButtonToolbar className="page-toolbar">
+                    <Button
+                        disabled={ !this.state.checked.length }
+                        onClick={ this.handleDeleteSelected }
                     >
-                        { moment(maxIdleExpirationTime).fromNow(true) }
-                    </td>
-                    <td
-                        title={ t("console.sessions.table.expires", {
-                            timestamp: moment(maxSessionExpirationTime).toISOString()
-                        }) }
-                    >
-                        { moment(maxSessionExpirationTime).fromNow(true) }
-                    </td>
-                </tr>
-            ) }
-        </tbody>
-    </Table>
-);
+                        <span className="fa fa-close" /> {t("common.form.delete")} { numberOfChecked }
+                    </Button>
+                </ButtonToolbar>
+
+                <Panel>
+                    <Block header={ this.props.userId }>
+                        <Table>
+                            <thead>
+                                <tr>
+                                    <th className="select-all-header-cell">
+                                        <ControlLabel
+                                            htmlFor="selectAll"
+                                            srOnly
+                                        >
+                                            { t("common.form.selectAll") }
+                                        </ControlLabel>
+                                        <input
+                                            checked={ allChecked }
+                                            id="selectAll"
+                                            onChange={ this.handleSelectAll }
+                                            type="checkbox"
+                                        />
+                                    </th>
+                                    <th>{ t("console.sessions.table.headers.0") }</th>
+                                    <th>{ t("console.sessions.table.headers.1") }</th>
+                                    <th>{ t("console.sessions.table.headers.2") }</th>
+                                    <th className="fr-col-btn-1" />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                { _.map(this.props.data, (session) =>
+                                    <SessionsTableRow
+                                        checked={ isChecked(session) }
+                                        data={ session }
+                                        onDelete={ this.handleDeleteRow }
+                                        onSelect={ this.handleSelectRow }
+                                    />
+                                ) }
+                            </tbody>
+                        </Table>
+                    </Block>
+                </Panel>
+
+            </div>
+        );
+    }
+}
 
 SessionsTable.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape({
-        idleTime: PropTypes.string.required,
-        maxIdleExpirationTime: PropTypes.string.required,
-        maxSessionExpirationTime: PropTypes.string.required,
-        sessionHandle: PropTypes.string.required
-    })).required
+        idleTime: PropTypes.string,
+        maxIdleExpirationTime: PropTypes.string,
+        maxSessionExpirationTime: PropTypes.string,
+        sessionHandle: PropTypes.string
+    })),
+    onSessionsInvalidate: PropTypes.func.isRequired,
+    userId: PropTypes.string.isRequired
 };
 
 export default SessionsTable;
