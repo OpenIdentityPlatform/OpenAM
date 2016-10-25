@@ -16,15 +16,8 @@
 
 package org.forgerock.openam.utils;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.AccessController;
 import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,10 +26,6 @@ import javax.inject.Inject;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.security.keystore.KeyStoreBuilder;
-import org.forgerock.security.keystore.KeyStoreManager;
-import org.forgerock.security.keystore.KeyStoreType;
-import org.forgerock.security.keystore.KeystoreManagerException;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.util.SystemProperties;
@@ -44,8 +33,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
@@ -57,17 +44,12 @@ import com.sun.identity.sm.ServiceConfigManager;
  * @since 12.0.0
  */
 public class OpenAMSettingsImpl implements OpenAMSettings {
-
-    private final static String DEFAULT_KEYSTORE_FILE_PROP = "com.sun.identity.saml.xmlsig.keystore";
-    private final static String DEFAULT_KEYSTORE_PASS_FILE_PROP = "com.sun.identity.saml.xmlsig.storepass";
-    private final static String DEFAULT_KEYSTORE_TYPE_PROP = "com.sun.identity.saml.xmlsig.storetype";
-    private final static String DEFAULT_PRIVATE_KEY_PASS_FILE_PROP  = "com.sun.identity.saml.xmlsig.keypass";
-
     private static final MapValueParser MAP_VALUE_PARSER = new MapValueParser();
 
     private final Debug logger = Debug.getInstance("amSMS");
     private final String serviceName;
     private final String serviceVersion;
+    private  AMKeyProvider amKeyProvider;
 
     /**
      * Constructs a new OpenAMSettingsImpl.
@@ -161,67 +143,12 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
 
     @Override
     public KeyPair getServerKeyPair(String realm, String alias) throws SMSException, SSOException {
-        //get keystore password from file
-        final String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
-        String keystorePass = null;
-        if (kspfile != null) {
-            try {
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(kspfile)));
-                    keystorePass = decodePassword(br.readLine());
-                } finally {
-                    if (br != null) {
-                        br.close();
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("Unable to read keystore password file " + kspfile, e);
-            }
-        } else {
-            logger.error("keystore password is null");
+        // we late initialize AMKeyProvider as it needs access to the config store to read the
+        // system props for storepass, etc.  If we init too early it may not be available
+        if (amKeyProvider == null) {
+            amKeyProvider = new AMKeyProvider();
         }
-
-        final String keypassfile = SystemPropertiesManager.get(DEFAULT_PRIVATE_KEY_PASS_FILE_PROP);
-        String keypass = null;
-        if (keypassfile != null) {
-            try {
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(keypassfile)));
-                    keypass = decodePassword(br.readLine());
-                } finally {
-                    if (br != null) {
-                        br.close();
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("Unable to read key password file " + keypassfile, e);
-            }
-        } else {
-            logger.error("key password is null");
-        }
-
-        String keyStoreType = SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS");
-        String keyStoreFile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP);
-        final KeyStoreManager keystoreManager;
-        try {
-            keystoreManager = new KeyStoreManager(new KeyStoreBuilder()
-                    .withKeyStoreType(KeyStoreType.valueOf(keyStoreType))
-                    .withKeyStoreFile(keyStoreFile)
-                    .withPassword(keystorePass).build());
-        } catch (FileNotFoundException e) {
-            throw new KeystoreManagerException("Could not load keystore file", e);
-        }
-
-        final PrivateKey privateKey = keystoreManager.getPrivateKey(alias, keypass);
-        final PublicKey publicKey = keystoreManager.getPublicKey(alias);
-        return new KeyPair(publicKey, privateKey);
-    }
-
-    private String decodePassword(String password)  {
-        final String decodedPassword = AccessController.doPrivileged(new DecodeAction(password));
-        return decodedPassword == null ? password : decodedPassword;
+        return amKeyProvider.getKeyPair(alias);
     }
 
     /**
