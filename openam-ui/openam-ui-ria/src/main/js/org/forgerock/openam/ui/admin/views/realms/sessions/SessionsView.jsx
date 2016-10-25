@@ -15,7 +15,7 @@
  */
 
 import _ from "lodash";
-import { Button, PageHeader, Panel, FormGroup, ControlLabel } from "react-bootstrap";
+import { Button, Panel, FormGroup, ControlLabel } from "react-bootstrap";
 import { t } from "i18next";
 import React, { Component } from "react";
 import Select from "react-select";
@@ -28,6 +28,7 @@ import CallToAction from "components/CallToAction";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import EventManager from "org/forgerock/commons/ui/common/main/EventManager";
 import IntroAlert from "./IntroAlert";
+import SimplePageHeader from "components/SimplePageHeader";
 import SessionsTable from "./SessionsTable";
 import showConfirmationBeforeAction from "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction";
 import withRouter from "org/forgerock/commons/ui/common/components/hoc/withRouter";
@@ -105,16 +106,14 @@ class SessionsView extends Component {
 
         return (
             <div>
-                <PageHeader bsClass="page-header page-header-no-border">
-                    { t("console.sessions.title") }
+                <SimplePageHeader title={ t("console.sessions.title") }>
                     <Button
                         bsStyle="danger"
-                        className="pull-right shallow-page-header-button-group"
                         onClick={ this.handleClickInvalidateAll }
                     >
                         { t("console.sessions.invalidateAll") }
                     </Button>
-                </PageHeader>
+                </SimplePageHeader>
                 <Panel>
                     <FormGroup controlId="findAUser">
                         <ControlLabel>{ t("console.sessions.search.title") }</ControlLabel>
