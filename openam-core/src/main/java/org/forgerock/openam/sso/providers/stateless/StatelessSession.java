@@ -68,7 +68,7 @@ public class StatelessSession extends Session {
     }
 
     @Override
-    public String dereferenceRestrictedTokenID(Session s, String restrictedId) throws SessionException {
+    public String dereferenceRestrictedTokenID(Session session, String restrictedId) throws SessionException {
         throw new UnsupportedOperationException(RESTRICTED_TOKENS_UNSUPPORTED);
     }
 

@@ -15,6 +15,23 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.net.URL;
+import java.util.Arrays;
+
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import com.iplanet.dpro.session.ClientSdkSessionRequests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -25,23 +42,6 @@ import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.sun.identity.shared.debug.Debug;
-
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.net.URL;
-import java.util.Arrays;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class ClientSdkOperationsTest {
 
@@ -78,8 +78,8 @@ public class ClientSdkOperationsTest {
                 any(SessionRequest.class),
                 any(Session.class))).willReturn(mockResponse);
 
-        clientSdkOperations = new ClientSdkOperations(mock(Debug.class), mockClientSdkSessionRequests, mockServicesClusterMonitorHandler,
-                mockSessionServiceURLService, mockServerConfig, mockHttpConnectionFactor);
+        clientSdkOperations = new ClientSdkOperations(mock(Debug.class), mockClientSdkSessionRequests,
+                mockSessionServiceURLService);
     }
 
     @Test

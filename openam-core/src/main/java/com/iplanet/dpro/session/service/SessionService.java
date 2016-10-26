@@ -163,25 +163,9 @@ public class SessionService {
      * @return restricted token id
      * @throws SessionException
      */
-
     public String getRestrictedTokenId(String masterSid, TokenRestriction restriction) throws SessionException {
         SessionID sessionID = new SessionID(masterSid);
         return sessionOperationStrategy.getOperation(sessionID).getRestrictedTokenId(sessionID, restriction);
-    }
-
-    /**
-     * This method is the "server side" of the getRestrictedTokenIdRemotely()
-     *
-     * @param masterSid   SessionID
-     * @param restriction restriction
-     */
-    String handleGetRestrictedTokenIdRemotely(SessionID masterSid, TokenRestriction restriction) {
-        try {
-            return sessionOperationStrategy.getOperation(masterSid).getRestrictedTokenId(masterSid, restriction);
-        } catch (Exception ex) {
-            sessionDebug.error("Failed to create restricted token remotely", ex);
-        }
-        return null;
     }
 
     public InternalSession newInternalSession(String domain, boolean stateless) {

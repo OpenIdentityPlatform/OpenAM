@@ -226,7 +226,7 @@ public class Session implements Blacklistable, AMSession{
             sessionCookies = SessionCookies.getInstance();
             sessionServiceURLService = SessionServiceURLService.getInstance();
             sessionOperationStrategy = new ClientSdkSessionOperationStrategy(
-                    new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), null, sessionServiceURLService, null, null));
+                    new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), sessionServiceURLService));
         }
     }
 
@@ -457,20 +457,20 @@ public class Session implements Blacklistable, AMSession{
      * Given a restricted token, returns the SSOTokenID of the master token
      * can only be used if the requester is an app token
      *
-     * @param s Must be an app token
+     * This functionality is only available in server mode.
+     *
+     * @param session Must be an app token
      * @param restrictedId The SSOTokenID of the restricted token
      * @return The SSOTokenID string of the master token
      * @throws SSOException If the master token cannot be dereferenced
      */
-    public String dereferenceRestrictedTokenID(Session s, String restrictedId)
-    throws SessionException {
+    public String dereferenceRestrictedTokenID(Session session, String restrictedId) throws SessionException {
         String masterSID;
 
         try {
-            SessionOperations operations = sessionOperationStrategy.getOperation(sessionID);
-            masterSID = operations.deferenceRestrictedID(s, new SessionID(restrictedId));
-        }
-        catch (Exception e) {
+            SessionOperations operations = sessionOperationStrategy.getOperation(session.getSessionID());
+            masterSID = operations.deferenceRestrictedID(session, new SessionID(restrictedId));
+        } catch (Exception e) {
             sessionDebug.error("unable to find master token for  " + restrictedId, e);
             throw new SessionException(e);
         }

@@ -319,11 +319,6 @@
         <load-on-startup>5</load-on-startup>
     </servlet>
     <servlet>
-        <description>GetHttpSession</description>
-        <servlet-name>GetHttpSession</servlet-name>
-        <servlet-class>com.iplanet.dpro.session.service.GetHttpSession</servlet-class>
-    </servlet>
-    <servlet>
         <description>pllservice</description>
         <servlet-name>pllservice</servlet-name>
         <servlet-class>com.iplanet.services.comm.server.PLLRequestServlet</servlet-class>
@@ -716,10 +711,6 @@
     <servlet-mapping>
         <servlet-name>GatewayServlet</servlet-name>
         <url-pattern>/gateway</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>GetHttpSession</servlet-name>
-        <url-pattern>/GetHttpSession</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>pllservice</servlet-name>
