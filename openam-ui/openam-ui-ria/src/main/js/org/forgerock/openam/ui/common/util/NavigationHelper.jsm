@@ -30,18 +30,6 @@ export const hideAPILinksOnAPIDescriptionsDisabled = (response) => {
     }
 };
 
-export const hideDeploymentSitesOnNoSites = (sites) => {
-    if (!sites.length) {
-        const filteredUrls = _.reject(Navigation.configuration.links.admin.urls.deployment.urls, {
-            "url": "#deployment/sites"
-        });
-
-        Navigation.configuration.links.admin.urls.deployment.urls = filteredUrls;
-
-        Navigation.reload();
-    }
-};
-
 /**
  * Reset and populate the realm dynamic links in the navigation realms dropdown
  * @param  {Object} data Result of the service call
