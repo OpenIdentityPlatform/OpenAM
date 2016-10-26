@@ -637,8 +637,7 @@ public class AttributeSchemaImpl {
                         choiceObject.setKeyValues(cvClassName);
                         choiceObject.setParentNode(n);
                     } catch (Exception e) {
-                        SMSEntry.debug.error("SMS AttributeSchema: "
-                                + "Unable to load class: " + className, e);
+                        SMSEntry.debug.warning("SMS AttributeSchema: Unable to load class: {}", className, e);
                         choiceObject = null;
                     }
                 }
