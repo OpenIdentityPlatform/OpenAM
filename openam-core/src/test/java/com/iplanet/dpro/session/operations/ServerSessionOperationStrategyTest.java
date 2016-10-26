@@ -64,7 +64,7 @@ public class ServerSessionOperationStrategyTest {
     @Test
     public void shouldUseLocalForLocalSessions() throws SessionException {
         // Given
-        given(mockLocal.checkSessionLocal(any(SessionID.class))).willReturn(true);
+        given(mockLocal.checkSessionExists(any(SessionID.class))).willReturn(true);
 
         // When
         SessionOperations operation = strategy.getOperation(mockSessionID);

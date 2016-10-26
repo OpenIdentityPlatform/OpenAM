@@ -100,12 +100,12 @@ public interface SessionOperations {
     void addSessionListener(Session session, String url) throws SessionException;
 
     /**
-     * Check that a session is a local session.
+     * Check whether a session identified by {code sessionId} can be retrieved.
      * @param sessionId the session ID to check.
      * @return returns true if the session is local
      * @throws SessionException if the session could not be accessed.
      */
-    boolean checkSessionLocal(SessionID sessionId) throws SessionException;
+    boolean checkSessionExists(SessionID sessionId) throws SessionException;
 
     /**
      * Gets the restricted token ID for a session.

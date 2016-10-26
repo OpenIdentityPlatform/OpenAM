@@ -274,8 +274,8 @@ public class SessionService {
      *
      * @return a boolean
      */
-    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
-        return sessionOperationStrategy.getOperation(sessionId).checkSessionLocal(sessionId);
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        return sessionOperationStrategy.getOperation(sessionId).checkSessionExists(sessionId);
     }
 
     /**

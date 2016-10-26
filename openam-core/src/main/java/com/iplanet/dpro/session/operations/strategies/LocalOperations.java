@@ -220,7 +220,7 @@ public class LocalOperations implements SessionOperations {
     }
 
     @Override
-    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
         // Attempt to load the session. If one is found, the InternalSesion is now local.
         return sessionAccessManager.getInternalSession(sessionId) != null;
     }

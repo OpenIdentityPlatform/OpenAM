@@ -127,8 +127,8 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
-    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
-        return sessionOperations.checkSessionLocal(sessionId); // Not monitored at present
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        return sessionOperations.checkSessionExists(sessionId); // Not monitored at present
     }
 
     @Override

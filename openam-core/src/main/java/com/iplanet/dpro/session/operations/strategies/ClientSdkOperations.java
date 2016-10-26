@@ -249,8 +249,8 @@ public class ClientSdkOperations implements SessionOperations {
     }
 
     @Override
-    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
-        return false;
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        throw new UnsupportedOperationException("This should not be used in ClientSDK mode");
     }
 
     @Override

@@ -34,7 +34,6 @@ import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
@@ -162,8 +161,8 @@ public class StatelessOperations implements SessionOperations {
     }
 
     @Override
-    public boolean checkSessionLocal(SessionID sessionId) throws SessionException {
-        return false;
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        return statelessSessionManager.containsJwt(sessionId);
     }
 
     @Override

@@ -31,7 +31,6 @@ package com.iplanet.dpro.session.service;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +43,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionPLLSender;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 
 import com.google.inject.Key;
@@ -101,24 +98,19 @@ public class SessionRequestHandler implements RequestHandler {
 
     private final SessionService sessionService;
     private final Debug sessionDebug;
-    private final SessionServerConfig serverConfig;
     private final StatelessSessionManager statelessSessionManager;
     private final SessionCount sessionCount;
-    private final ServicesClusterMonitorHandler servicesClusterMonitorHandler;
 
     private SSOToken clientToken = null;
 
-    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
     private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
     private static final SessionPLLSender sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
 
     public SessionRequestHandler() {
         sessionService = InjectorHolder.getInstance(SessionService.class);
         sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
-        serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
         statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
         sessionCount = InjectorHolder.getInstance(SessionCount.class);
-        servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
     }
 
     /**
@@ -212,8 +204,6 @@ public class SessionRequestHandler implements RequestHandler {
                         public Object run() throws Exception {
                             try {
                                 return processSessionRequest(auditor, sreq);
-                            } catch (ForwardSessionRequestException fsre) {
-                                return fsre.getResponse(); // This request needs to be forwarded to another server.
                             } catch (SessionException se) {
                                 sessionDebug.message("processSessionRequest caught exception: {}", se.getMessage(), se);
                                 return handleException(sreq, new SessionID(sreq.getSessionID()), se.getMessage());
@@ -244,7 +234,7 @@ public class SessionRequestHandler implements RequestHandler {
     }
 
     private SessionResponse processSessionRequest(PLLAuditor auditor, SessionRequest req) throws SessionException,
-            SessionRequestException, ForwardSessionRequestException {
+            SessionRequestException {
         SessionID sid = new SessionID(req.getSessionID());
 
         Session requesterSession = null;
@@ -270,7 +260,7 @@ public class SessionRequestHandler implements RequestHandler {
     }
 
     private void verifyValidRequest(SessionRequest req, Session requesterSession) throws SessionException,
-            SessionRequestException, ForwardSessionRequestException {
+            SessionRequestException {
         SessionID targetSid = requesterSession.getSessionID();
         if (req.getMethodID() == SessionRequest.DestroySession) {
             targetSid = new SessionID(req.getDestroySessionID());
@@ -301,7 +291,7 @@ public class SessionRequestHandler implements RequestHandler {
             case SessionRequest.AddSessionListener:
             case SessionRequest.SetProperty:
             case SessionRequest.DestroySession:
-                verifyTargetSessionIsLocalOrStateless(req, targetSid);
+                verifyTargetSessionExists(targetSid);
                 break;
             default:
                 throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
@@ -312,42 +302,8 @@ public class SessionRequestHandler implements RequestHandler {
      *  Verify that this server is the correct host for the session and the session can be found(or recovered) locally.
      *  This function will become much simpler with removal of home servers, or possibly no longer be required.
      */
-    private void verifyTargetSessionIsLocalOrStateless(SessionRequest req, SessionID sid) throws SessionException,
-            SessionRequestException, ForwardSessionRequestException {
-        if (statelessSessionManager.containsJwt(sid)) {
-            return;
-        }
-
-        String hostServerID = servicesClusterMonitorHandler.getCurrentHostServer(sid);
-
-        if (!serverConfig.isLocalServer(hostServerID)) {
-            try {
-                throw new ForwardSessionRequestException(
-                        forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req));
-            } catch (SessionException se) {
-                // attempt retry
-                if (!servicesClusterMonitorHandler.checkServerUp(hostServerID)) {
-                    // proceed with failover
-                    String retryHostServerID = servicesClusterMonitorHandler.getCurrentHostServer(sid);
-                    if (retryHostServerID.equals(hostServerID)) {
-                        throw se;
-                    } else {
-                        // we have a shot at retrying here
-                        // if it is remote, forward it
-                        // otherwise treat it as a case of local
-                        // case
-                        if (!serverConfig.isLocalServer(retryHostServerID)) {
-                            throw new ForwardSessionRequestException(
-                                    forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req));
-                        }
-                    }
-                } else {
-                    throw se;
-                }
-            }
-        }
-
-        if (!sessionService.checkSessionLocal(sid)) {
+    private void verifyTargetSessionExists(SessionID sid) throws SessionException, SessionRequestException {
+        if (!sessionService.checkSessionExists(sid)) {
             throw new SessionRequestException(sid, SessionBundle.getString("sessionNotObtained"));
         }
     }
@@ -427,28 +383,6 @@ public class SessionRequestHandler implements RequestHandler {
         auditor.auditAccessAttempt();
     }
 
-    private SessionResponse forward(URL svcurl, SessionRequest sreq)
-            throws SessionException {
-        try {
-            Object context = RestrictedTokenContext.getCurrent();
-
-            if (context != null) {
-                sreq.setRequester(RestrictedTokenContext.marshal(context));
-            }
-
-            SessionResponse sres = sessionPLLSender.sendPLLRequest(svcurl, sreq);
-
-            if (sres.getException() != null) {
-                throw new SessionException(sres.getException());
-            }
-            return sres;
-        } catch (SessionException se) {
-            throw se;
-        } catch (Exception ex) {
-            throw new SessionException(ex);
-        }
-    }
-
     /**
      * !!!!! IMPORTANT !!!!! DO NOT REMOVE "sid" FROM
      * EXCEPTIONMESSAGE Logic kludge in legacy Agent 2.0
@@ -481,22 +415,6 @@ public class SessionRequestHandler implements RequestHandler {
 
         public String getResponseMessage() {
             return responseMessage;
-        }
-    }
-
-    // This exception is not ideal, but will be removed when crosstalk is removed, and allows the code to better be
-    // refactored at this point in time.
-    private class ForwardSessionRequestException extends Exception {
-
-        private SessionResponse response;
-
-        public ForwardSessionRequestException(SessionResponse response) {
-
-            this.response = response;
-        }
-
-        public SessionResponse getResponse() {
-            return response;
         }
     }
 }
