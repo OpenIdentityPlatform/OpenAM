@@ -46,16 +46,6 @@ public class SessionCuller extends GeneralTaskRunnable {
     private SessionPollerPool sessionPollerPool;
     private Session session;
     private static Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
-    /**
-     * This is the time value (computed as System.currentTimeMillis()) when a DESTROYED
-     * session should be removed from the {@link SessionCache#sessionTable}.
-     *
-     * It will be set to {@link com.iplanet.dpro.session.service.SessionService#getReducedCrosstalkPurgeDelay() }
-     * minutes after the time {@link org.forgerock.openam.session.SessionCache#removeRemoteSID } is called.
-     *
-     * Value zero means the session has not been destroyed or cross-talk is not being reduced.
-     */
-    private volatile long purgeAt = 0;
 
     /**
      * This is used only in polling mode to find the polling state of this
@@ -147,29 +137,6 @@ public class SessionCuller extends GeneralTaskRunnable {
         return isPolling;
     }
 
-    /**
-     * Return the time that this session will be purged at (in millis).
-     * @return The time that this session will be purged at (in millis).
-     */
-    long getPurgeAt() {
-        return purgeAt;
-    }
-
-    /**
-     * Used to update the purge time, and reschedule if appropriate.
-     * @param purgeAt The time to purge at in milliseconds.
-     */
-    void rescheduleForPurge(long purgeAt) {
-        this.purgeAt = purgeAt;
-
-        cancel();
-        if (!isScheduled()) {
-            SystemTimerPool.getTimerPool().schedule(this, new Date(purgeAt));
-        } else {
-            sessionDebug.error("Unable to schedule destroyed session for purging");
-        }
-    }
-
     @Override
     public void run() {
         if (sessionPollerPool.isPollingEnabled()) {
@@ -214,46 +181,22 @@ public class SessionCuller extends GeneralTaskRunnable {
                 sessionDebug.error("Exception encountered while polling", ex);
             }
         } else {
-
-            String sessionRemovalDebugMessage;
-            if (purgeAt > 0) {
-                /**
-                 * Reduced crosstalk protection.
-                 *
-                 * In order to prevent sessions from being (re)created from CTS on remote servers before
-                 * the destroyed state has been propagated, remote sessions are kept in memory for a configurable
-                 * amount of time {@link CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY }.
-                 *
-                 * This delay introduced to cover the CTS replication lag is only required when running as an
-                 * OpenAM server with a 'remote' copy of a session; therefore, this feature is not required
-                 * when polling is enabled - since polling is only ever used by non-OpenAM clients.
-                 */
-                // destroyed session scheduled for purge
-                if (purgeAt > scheduledExecutionTime()) {
-                    SystemTimerPool.getTimerPool().schedule(this, new Date(purgeAt));
-                    return;
-                }
-                sessionRemovalDebugMessage = "Session Removed, Reduced Crosstalk Purge Time complete";
-            } else {
-                // schedule at the max session time
-                long expectedTime = -1;
-                if (willExpire(session.getMaxSessionTime())) {
-                    expectedTime = (session.getLatestRefreshTime() + (session.getMaxSessionTime() * 60)) * 1000;
-                }
-                if (expectedTime > scheduledExecutionTime()) {
-                    SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
-                    return;
-                }
-                sessionRemovalDebugMessage = "Session Destroyed, Caching time exceeded the Max Session Time";
+            // schedule at the max session time
+            long expectedTime = -1;
+            if (willExpire(session.getMaxSessionTime())) {
+                expectedTime = (session.getLatestRefreshTime() + (session.getMaxSessionTime() * 60)) * 1000;
             }
-
+            if (expectedTime > scheduledExecutionTime()) {
+                SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
+                return;
+            }
             try {
                 sessionCache.removeSID(session.getSessionID());
                 if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message(sessionRemovalDebugMessage);
+                    sessionDebug.message("Session Destroyed, Caching time exceeded the Max Session Time");
                 }
             } catch (Exception ex) {
-                sessionDebug.error("Exception occured while cleaning up Session Cache", ex);
+                sessionDebug.error("Exception occurred while cleaning up Session Cache", ex);
             }
         }
     }

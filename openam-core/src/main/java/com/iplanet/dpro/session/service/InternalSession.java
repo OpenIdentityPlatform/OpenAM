@@ -29,16 +29,14 @@
 package com.iplanet.dpro.session.service;
 
 import static java.util.concurrent.TimeUnit.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.*;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_CREATED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_PROPERTY_CHANGED;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -52,13 +50,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.AMSession;
-import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
-import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
-import org.forgerock.util.annotations.VisibleForTesting;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -69,12 +60,17 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.AMSession;
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.session.service.persistence.SessionPersistenceManager;
+import org.forgerock.openam.session.service.persistence.SessionPersistenceObservable;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal session.
@@ -98,14 +94,12 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /*
      * Session property names
      */
-    private static final String LOGIN_URL = "loginURL";
-    private static final String SESSION_TIMED_OUT = "SessionTimedOut";
     private static final String HOST = "Host";
     private static final String HOST_NAME = "HostName";
     private static final String AM_MAX_IDLE_TIME = "AMMaxIdleTime";
     private static final String AM_MAX_SESSION_TIME = "AMMaxSessionTime";
-    private static final String SAML2_IDP_SESSION_INDEX = "SAML2IDPSessionIndex";
     private static final String UNIVERSAL_IDENTIFIER = "sun.am.UniversalIdentifier";
+    private static final String SESSION_TIMED_OUT = "SessionTimedOut";
     private static final Set<String> protectedProperties = initialiseProtectedProperties();
 
     /*
@@ -580,7 +574,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         protectedProperties.add("FullLoginURL");
         protectedProperties.add("Role");
         protectedProperties.add("Service");
-        protectedProperties.add("SessionTimedOut");
+        protectedProperties.add(SESSION_TIMED_OUT);
         protectedProperties.add(SESSION_HANDLE_PROP);
         protectedProperties.add(TOKEN_RESTRICTION_PROP);
         protectedProperties.add(AM_MAX_IDLE_TIME);
@@ -881,7 +875,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         fireSessionEvent(eventType);
         sessionLogging.logEvent(toSessionInfo(), eventType); // TODO: Convert to InternalSessionListener (AME-12528)
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        putProperty("SessionTimedOut", String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
+        putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
         sessionService.execSessionTimeoutHandlers(sessionID, eventType); // TODO: Convert to InternalSessionListener (AME-12528)
         sessionService.destroyInternalSession(sessionID);
     }
@@ -968,32 +962,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * restricted token ids.
      * @return Map of session event URLs and their associated SessionIDs.
      */
-    Map<String, Set<SessionID>> getSessionEventURLs(SessionEventType eventType, SessionBroadcastMode logoutDestroyBroadcast) {
+    Map<String, Set<SessionID>> getSessionEventURLs() {
         Map<String, Set<SessionID>> urls = new HashMap<>();
-
-        if ((eventType == SessionEventType.DESTROY || eventType == SessionEventType.LOGOUT) &&
-                logoutDestroyBroadcast != SessionBroadcastMode.OFF) {
-            try {
-                String localServer = WebtopNaming.getLocalServer();
-                Collection<String> servers;
-                if (logoutDestroyBroadcast == SessionBroadcastMode.ALL_SITES) {
-                    servers = WebtopNaming.getPlatformServerList();
-                } else {
-                    servers = new ArrayList<>();
-                    for (String serverID : WebtopNaming.getSiteNodes(WebtopNaming.getAMServerID())) {
-                        servers.add(WebtopNaming.getServerFromID(serverID));
-                    }
-                }
-                for (String url : servers) {
-                    if (!localServer.equals(url)) {
-                        urls.put(url + "/notificationservice", new HashSet<>(Arrays.asList(this.getID())));
-                    }
-                }
-            } catch (Exception e) {
-                debug.warning("Unable to get list of servers", e);
-            }
-        }
-
         for (Map.Entry<String,Set<SessionID>> entry : sessionEventURLs.entrySet()) {
             Set<SessionID> sessionIDs = urls.get(entry.getKey());
             if (sessionIDs != null) {
@@ -1002,7 +972,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
                 urls.put(entry.getKey(), entry.getValue());
             }
         }
-
         return urls;
     }
 

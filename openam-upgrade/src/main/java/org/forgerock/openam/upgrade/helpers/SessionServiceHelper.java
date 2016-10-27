@@ -62,10 +62,6 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
             "iplanet-am-session-constraint-handler";
     private static final String SESSION_CONSTRAINT_HANDLER_OLD_ATTR =
             "iplanet-am-session-constraint-resulting-behavior";
-    private static final String SFO_USER_ATTR = "iplanet-am-session-store-username";
-    private static final String SFO_PWD_ATTR = "iplanet-am-session-store-password";
-    private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
-    private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
     private static final String STATELESS_SIGNING_ALGORITHM = "openam-session-stateless-signing-type";
     private static final List<String> ECDSA_SIGNING_ALGORITHMS = Arrays.asList("ES256", "ES384", "ES512");
     private static final String STATELESS_ENCRYPTION_TYPE = "openam-session-stateless-encryption-type";
@@ -73,13 +69,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     private static final String STATELESS_ENCRYPTION_KEY = "openam-session-stateless-encryption-aes-key";
     private static final String STATELESS_COMPRESSION_TYPE = "openam-session-stateless-compression-type";
 
-    private final static String REDUCED_CROSSTALK_ENABLED = CoreTokenConstants.IS_REDUCED_CROSSTALK_ENABLED;
-
     public SessionServiceHelper() {
-        attributes.add(SFO_USER_ATTR);
-        attributes.add(SFO_PWD_ATTR);
-        attributes.add(SFO_CPL_MAX_WAIT_TIME_ATTR);
-        attributes.add(SFO_JDBC_URL_ATTR);
         attributes.add(STATELESS_SIGNING_ALGORITHM);
         attributes.add(STATELESS_ENCRYPTION_TYPE);
         attributes.add(STATELESS_ENCRYPTION_KEY);
@@ -107,8 +97,6 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
                     break;
                 }
             }
-        } else if (REDUCED_CROSSTALK_ENABLED.equals(newAttr.getName())) {
-            updateDefaultValues(newAttr, asSet("false"));
         }
 
         return newAttr;

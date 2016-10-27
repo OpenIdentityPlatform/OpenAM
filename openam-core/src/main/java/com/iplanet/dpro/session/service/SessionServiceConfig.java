@@ -30,11 +30,12 @@
 
 package com.iplanet.dpro.session.service;
 
-import static com.iplanet.dpro.session.service.SessionBroadcastMode.*;
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
-import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -43,28 +44,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
-import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
 import com.iplanet.services.naming.ServiceListeners;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
 /**
  * Responsible for collating System Properties and amSession.xml configuration state relating to the Session Service.
@@ -127,26 +119,6 @@ public class SessionServiceConfig {
      */
 
     private volatile HotSwappableSessionServiceConfig hotSwappableSessionServiceConfig;
-
-    /**
-     * Indicates whether to use crosstalk or session persistence to resolve remote sessions.
-     * Always true when session persistence/SFO is disabled.
-     */
-    private static final boolean DEFAULT_REDUCED_CROSSTALK_ENABLED = true;
-    private volatile boolean reducedCrosstalkEnabled = DEFAULT_REDUCED_CROSSTALK_ENABLED;
-
-    /**
-     * The number of minutes to retain {@link com.iplanet.dpro.session.Session} objects in DESTROYED state
-     * while waiting for delete replication to occur if reduced cross-talk is enabled.
-     */
-    private static final long DEFAULT_REDUCED_CROSSTALK_PURGE_DELAY = 5;
-    private volatile long reducedCrosstalkPurgeDelay = DEFAULT_REDUCED_CROSSTALK_PURGE_DELAY;
-
-    /**
-     * Indicates what broadcast to undertake on session logout/destroy
-     */
-    private static final SessionBroadcastMode DEFAULT_LOGOUT_DESTROY_BROADCAST = OFF;
-    private volatile SessionBroadcastMode logoutDestroyBroadcast = DEFAULT_LOGOUT_DESTROY_BROADCAST;
 
     /**
      * Private value object for storing snapshot state of amSession.xml config settings.
@@ -346,9 +318,8 @@ public class SessionServiceConfig {
                 @Override
                 public void performUpdate() {
                     try {
-                        loadReducedCrosstalkProperties();
                         hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
-                    } catch (SSOException | SMSException e) {
+                    } catch (SMSException e) {
                         throw new IllegalStateException(e);
                     }
                 }
@@ -356,47 +327,10 @@ public class SessionServiceConfig {
             serviceListeners.config(AM_SESSION_SERVICE_NAME)
                     .global(action)
                     .schema(action).listen();
-
-            loadReducedCrosstalkProperties();
-
         } catch (Exception ex) {
             sessionDebug.error("SessionService: Initialization Failed", ex);
             // Rethrow exception rather than hobbling on with invalid configuration state
             throw new IllegalStateException("Failed to load SessionService configuration", ex);
-        }
-    }
-
-    private synchronized void loadReducedCrosstalkProperties() throws SSOException, SMSException {
-        SSOToken adminToken = AccessController.doPrivileged(dsameAdminTokenProvider);
-
-        ServiceConfigManager scm = new ServiceConfigManager(AM_SESSION_SERVICE_NAME, adminToken);
-        ServiceConfig serviceConfig = scm.getGlobalConfig(null);
-
-            /*
-             * In OpenSSO 8.0, we have switched to create sub configuration with
-             * site name. hence we need to lookup the site name based on the URL
-             */
-        String subCfgName = SiteConfiguration.getSiteIdByURL(adminToken, sessionServerConfig.getPrimaryServerURL().toString());
-        ServiceConfig subConfig = subCfgName != null ? serviceConfig.getSubConfig(subCfgName) : null;
-
-        if ((subConfig != null) && subConfig.exists()) {
-
-            Map sessionAttrs = subConfig.getAttributes();
-
-            // Determine whether crosstalk is enabled or disabled.
-            reducedCrosstalkEnabled =
-                    CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
-
-            if (reducedCrosstalkEnabled) {
-                logoutDestroyBroadcast = valueOf(
-                        CollectionHelper.getMapAttr(
-                                sessionAttrs, LOGOUT_DESTROY_BROADCAST, OFF.name()));
-            }
-
-            reducedCrosstalkPurgeDelay =
-                    CollectionHelper.getLongMapAttr(sessionAttrs,
-                            REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
-
         }
     }
 
@@ -448,15 +382,6 @@ public class SessionServiceConfig {
     }
 
     /**
-     * Returns amSession.xml property "iplanet-am-session-logout-destroy-broadcast" choice.
-     *
-     * Defaults to {@link SessionBroadcastMode#OFF }.
-     */
-    public SessionBroadcastMode getLogoutDestroyBroadcast() {
-        return logoutDestroyBroadcast;
-    }
-
-    /**
      * Returns amSession.xml property "iplanet-am-session-constraint-handler".
      *
      * This should be the fully qualified name of a class implementing
@@ -487,14 +412,6 @@ public class SessionServiceConfig {
      */
     public boolean isSessionConstraintEnabled() {
         return hotSwappableSessionServiceConfig.sessionConstraintEnabled;
-    }
-
-    /**
-     * The number of minutes to retain {@link com.iplanet.dpro.session.Session} objects in DESTROYED state while waiting
-     * for delete replication to occur if reduced cross-talk is enabled.
-     */
-    public long getReducedCrosstalkPurgeDelay() {
-        return reducedCrosstalkPurgeDelay;
     }
 
     public String getHttpSessionPropertyName() {
@@ -569,15 +486,6 @@ public class SessionServiceConfig {
      */
     public boolean isReturnAppSessionEnabled() {
         return returnAppSession;
-    }
-
-    /**
-     * Returns true if amSession.xml property "iplanet-am-session-reduced-crosstalk-enabled" is true
-     * (and session failover is enabled).
-     *
-     */
-    public boolean isReducedCrossTalkEnabled() {
-        return reducedCrosstalkEnabled;
     }
 
     /**

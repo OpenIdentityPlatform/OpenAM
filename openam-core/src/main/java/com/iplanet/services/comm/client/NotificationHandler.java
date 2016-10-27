@@ -30,6 +30,8 @@ package com.iplanet.services.comm.client;
 
 import java.util.Vector;
 
+import com.iplanet.services.comm.share.Notification;
+
 /**
  * The <code>NotificationHandler</code> interface needs to be implemented by
  * high level services and applications in order to be able to receive
@@ -49,5 +51,5 @@ public interface NotificationHandler {
      * @param notifications
      *            A Vector of Notification objects.
      */
-    public void process(Vector notifications);
+    public void process(Vector<Notification> notifications);
 }

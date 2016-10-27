@@ -776,10 +776,9 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
         }
 
         // Process the notification objects
-        public void process(Vector notifications) {
+        public void process(Vector<Notification> notifications) {
             for (int i = 0; i < notifications.size(); i++) {
-                Notification notification = (Notification) notifications
-                        .elementAt(i);
+                Notification notification = notifications.elementAt(i);
                 String content = notification.getContent();
                 if (debug.messageEnabled()) {
                     debug.message("SMSJAXRPCObject:SMSNotificationHandler: "

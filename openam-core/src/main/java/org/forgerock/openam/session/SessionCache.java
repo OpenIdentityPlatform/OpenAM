@@ -27,18 +27,11 @@
 
 package org.forgerock.openam.session;
 
-import static org.forgerock.openam.utils.Time.*;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import javax.inject.Singleton;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.dpro.session.InvalidSessionIdException;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.Reject;
-import org.forgerock.util.annotations.VisibleForTesting;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.google.inject.name.Named;
 import com.iplanet.am.util.SystemProperties;
@@ -47,12 +40,15 @@ import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * Responsible for providing a single point of contact for all Sessions stored in memory.
@@ -167,9 +163,7 @@ public class SessionCache {
             // remove from sessionTable if there is no purge delay or it has elapsed
             SessionCuller sessionCuller = getSessionCuller(sid);
             Reject.ifNull(sessionCuller);
-            if (sessionCuller.getPurgeAt() <= eventTime) {
-                deleteSession(sid);
-            }
+            deleteSession(sid);
 
             // ensure session has destroyed state and observers are notified (exactly once)
             if (session.getRemoved().compareAndSet(false, true)) {
@@ -178,59 +172,6 @@ public class SessionCache {
                 Session.invokeListeners(event);
             }
         }
-    }
-
-    /**
-     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
-     * destruction that has this server as its home server.
-     *
-     * @param info Current state of session
-     */
-    public void removeLocalSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.getSessionID());
-        removeSID(sessionID);
-    }
-
-    /**
-     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
-     * destruction from the home server.
-     *
-     * This method should only be called when the identified session has another instance
-     * of OpenAM as its home server.
-     *
-     * @param info Current state of session on home server
-     */
-    public void removeRemoteSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.getSessionID());
-
-        long purgeDelay = getPurgeDelayForReducedCrosstalk();
-
-        if (purgeDelay > 0) {
-
-            Session session = readSession(sessionID);
-            if (session == null) {
-                /**
-                 * Reduced crosstalk protection.
-                 *
-                 * As the indicated session has not yet been loaded, it will be created and added to the
-                 * {@link #sessionTable} so that it can remain there in a DESTROYED state until it is purged.
-                 */
-                session = new Session(sessionID);
-                try {
-                    session.update(info);
-                    writeSession(session);
-                } catch (SessionException e) {
-                    debug.error("Exception reading remote SessionInfo", e);
-                }
-            }
-
-            SessionCuller sessionCuller = getSessionCuller(sessionID);
-            if (sessionCuller != null) {
-                sessionCuller.rescheduleForPurge(currentTimeMillis() + (purgeDelay * 60 * 1000));
-            }
-        }
-
-        removeSID(sessionID);
     }
 
     /**
@@ -285,19 +226,7 @@ public class SessionCache {
 
         Session session = readSession(sessionID);
         if (session != null) {
-
-            /**
-             * Reduced crosstalk protection.
-             *
-             * When a user logs out, or the Session is destroyed and crosstalk is reduced, it is possible
-             * for a destroyed session to be recovered by accessing it on a remote server. Instead the
-             * session will be left in the {@link #sessionTable} until it is purged. This check will
-             * detect this condition and indicate to the caller their SessionID is invalid.
-             */
-            if (session.getState(false) == SessionState.DESTROYED && getPurgeDelayForReducedCrosstalk() > 0) {
-                throw new SessionException("Session is in a destroyed state");
-            }
-
+            
             TokenRestriction restriction = session.getRestriction();
 
             /*
@@ -358,20 +287,5 @@ public class SessionCache {
                 sessionCuller.scheduleToTimerPool();
             }
         }
-    }
-
-    /**
-     * Determines the reduce crosstalk purge delay, or defaults to 0.
-     *
-     * @return purge delay
-     */
-    private long getPurgeDelayForReducedCrosstalk() {
-        if (SystemProperties.isServerMode()) {
-            SessionServiceConfig sessionServiceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
-            if (sessionServiceConfig.isReducedCrossTalkEnabled()) {
-                return sessionServiceConfig.getReducedCrosstalkPurgeDelay();
-            }
-        }
-        return 0;
     }
 }

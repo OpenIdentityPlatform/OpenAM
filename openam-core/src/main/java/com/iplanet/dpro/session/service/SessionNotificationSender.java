@@ -75,7 +75,6 @@ public class SessionNotificationSender {
     private static final String THREAD_POOL_NAME = "amSession";
 
     private final Debug sessionDebug;
-    private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
     private final SessionInfoFactory sessionInfoFactory;
     private final ThreadPool threadPool;
@@ -91,7 +90,6 @@ public class SessionNotificationSender {
             final NotificationBroker broker) {
 
         this.sessionDebug = sessionDebug;
-        this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
         this.sessionInfoFactory = sessionInfoFactory;
         this.broker = broker;
@@ -173,7 +171,7 @@ public class SessionNotificationSender {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            this.urls = session.getSessionEventURLs(eventType, serviceConfig.getLogoutDestroyBroadcast());
+            this.urls = session.getSessionEventURLs();
 
             // The check individual URLs
             if (!urls.isEmpty()) {
@@ -186,7 +184,7 @@ public class SessionNotificationSender {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification notification =
                                         new SessionNotification(info, eventType.getCode(), currentTimeMillis());
-                                SessionNotificationHandler.handler.processLocalNotification(notification);
+                                SessionNotificationHandler.handler.processNotification(notification);
                             }
                         } else {
                             // If the Global notification is for a remote URL, it should be handled from run()
