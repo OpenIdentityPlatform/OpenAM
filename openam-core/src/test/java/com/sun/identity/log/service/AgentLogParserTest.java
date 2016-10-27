@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.log.service;
 
@@ -19,6 +19,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -33,6 +34,24 @@ public class AgentLogParserTest {
     @BeforeMethod
     public void setUp() {
         logParser = new AgentLogParser();
+    }
+
+    @DataProvider(name = "webAgentSuccessLogMessages")
+    public Object[][] createWebAgentSuccessLogMessages() {
+        return new Object[][] {
+                { "User   amadmin   was allowed access tohttp://raspi.forrest.org:80/"},
+                { "user amadmin (192.168.56.1) was allowed access to http://raspi.forrest.org:80/" },
+                { "user amadmin () was allowed access to http://raspi.forrest.org:80/" },
+                { "user   amadmin   ()   was allowed access to http://raspi.forrest.org:80/" },
+        };
+    }
+
+    @DataProvider(name = "webAgentFailureLogMessagesWhenUserIsNull")
+    public Object[][] createWebAgentFailureLogMessagesWhenUserIsNull() {
+        return new Object[][] {
+                { "user (empty) (10.100.23.41) was denied access to http://raspi.forrest.org:80/" },
+                { "user (empty) was denied access to http://raspi.forrest.org:80/" },
+        };
     }
 
     @Test
@@ -51,11 +70,8 @@ public class AgentLogParserTest {
         assertThat(logExtracts.getStatus()).isEqualTo(ResponseStatus.SUCCESSFUL);
     }
 
-    @Test
-    public void parsesWebAgentSuccessMessages() {
-        // Given
-        String message = "User   amadmin   was allowed access tohttp://raspi.forrest.org:80/";
-
+    @Test (dataProvider = "webAgentSuccessLogMessages")
+    public void parsesWebAgentSuccessMessages(String message) {
         // When
         AgentLogParser.LogExtracts logExtracts = logParser.tryParse(message);
 
@@ -93,6 +109,18 @@ public class AgentLogParserTest {
         // Then
         assertThat(logExtracts.getResourceUrl()).isEqualTo("http://raspi.forrest.org:80/");
         assertThat(logExtracts.getSubjectId()).isEqualTo("amadmin");
+        assertThat(logExtracts.getStatusCode()).isEqualTo("denied");
+        assertThat(logExtracts.getStatus()).isEqualTo(ResponseStatus.FAILED);
+    }
+
+    @Test (dataProvider = "webAgentFailureLogMessagesWhenUserIsNull")
+    public void parsesWebAgentFailureMessagesWhenUserIsNull(String message) {
+        // When
+        AgentLogParser.LogExtracts logExtracts = logParser.tryParse(message);
+
+        // Then
+        assertThat(logExtracts.getResourceUrl()).isEqualTo("http://raspi.forrest.org:80/");
+        assertThat(logExtracts.getSubjectId()).isEqualTo("(empty)");
         assertThat(logExtracts.getStatusCode()).isEqualTo("denied");
         assertThat(logExtracts.getStatus()).isEqualTo(ResponseStatus.FAILED);
     }
