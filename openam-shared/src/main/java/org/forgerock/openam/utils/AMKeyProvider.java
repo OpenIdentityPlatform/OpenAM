@@ -25,8 +25,8 @@ import static java.nio.charset.StandardCharsets.*;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.AccessController;
 import java.security.Key;
 import java.security.KeyPair;
@@ -48,6 +48,7 @@ import javax.security.auth.DestroyFailedException;
 
 import org.forgerock.openam.keystore.KeyStoreConfig;
 
+import com.iplanet.services.util.JCEEncryption;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.SecurityDebug;
@@ -159,7 +160,7 @@ public class AMKeyProvider implements KeyProvider {
         }
 
         if (storePassPath != null) {
-            keystorePass = readPasswordFile(storePassPath, false);
+            keystorePass = readPasswordFile(storePassPath);
         } else {
             logger.error("JKSKeyProvider: keystore password is null");
         }
@@ -167,35 +168,28 @@ public class AMKeyProvider implements KeyProvider {
         this.keyPassPath = SystemPropertiesManager.get(privateKeyPassFilePropName);
 
         if (keyPassPath != null) {
-            privateKeyPass = readPasswordFile(keyPassPath, false);
+            privateKeyPass = readPasswordFile(keyPassPath);
         }
     }
 
     /**
-     * Read a keystore password file (.storepass / .keypass ).
-     * @param filePath  Password file
-     * @param decodePassword  true if the password should be decoded with the per AM instance key
-     * @return The password in clear text
+     * Read a keystore password file (example: .storepass / .keypass ).
+     *
+     * @param filePath  Path to the password file
+     * @return The password in clear text, or null if an IOException occurs.
      */
-    private String readPasswordFile(String filePath, boolean decodePassword) {
-        BufferedReader br = null;
+    protected String readPasswordFile(String filePath) {
         String p = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             p = br.readLine();
-            if (decodePassword) {
+            // The password is encrypted.
+            // This is a guard that should not be required, but will catch any
+            // errors in the storepass migration process
+            if (JCEEncryption.isAMPassword(p)) {
                 p = decodePassword(p);
             }
         } catch (IOException e) {
             logger.error("Unable to read private key password file " + filePath, e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    logger.warning("Could not close file " + filePath, e);
-                }
-            }
         }
         return p;
     }
@@ -314,11 +308,7 @@ public class AMKeyProvider implements KeyProvider {
         try {
             key = (PrivateKey) ks.getKey(certAlias,
                     privateKeyPass.toCharArray());
-        } catch (KeyStoreException e) {
-            logger.error(e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage());
-        } catch (UnrecoverableKeyException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             logger.error(e.getMessage());
         }
         return key;

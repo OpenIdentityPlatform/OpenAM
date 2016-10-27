@@ -16,18 +16,25 @@
 
 package org.forgerock.openam.utils;
 
-import com.sun.identity.security.EncodeAction;
-import com.sun.identity.shared.encode.URLEncDec;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+
+import javax.crypto.SecretKey;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.iplanet.services.util.Crypt;
+import com.iplanet.services.util.JCEEncryption;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.encode.URLEncDec;
 
 public class AMKeyProviderTest {
 
@@ -123,6 +130,24 @@ public class AMKeyProviderTest {
         amKeyProvider.setSecretKeyEntry("admin", password);
         String p = amKeyProvider.getSecret("admin");
         Assert.assertEquals(password, p);
+    }
+
+    @Test
+    public void readPasswordFileDecryptsThePassword() throws IOException {
+        Path tempFile = Files.createTempFile("keyprovidertest", ".tmp");
+        String plainText = "MySuperSecret Password!";
+        String pw = Crypt.encode(plainText); // encode using Crypt util
+        Assert.assertTrue(JCEEncryption.isAMPassword(pw));
+        // Write an AMEncrytped password into this file
+        Files.write(tempFile, pw.getBytes());
+        // read it back
+        String result = amKeyProvider.readPasswordFile(tempFile.toString());
+        Assert.assertEquals(result, plainText);  // we should get the plain text back
+        // now write a plain vanilla password to the file
+        Files.write(tempFile, plainText.getBytes());
+        result = amKeyProvider.readPasswordFile(tempFile.toString());
+        Assert.assertEquals(result, plainText);
+        Files.delete(tempFile); // clean up after test
     }
 
 }

@@ -24,7 +24,7 @@
  *
  * $Id: BootstrapCreator.java,v 1.14 2009/08/03 23:32:54 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.setup;
 
@@ -37,9 +37,6 @@ import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
-
-import org.forgerock.openam.core.guice.ServletContextCache;
 import org.forgerock.openam.keystore.KeyStoreConfig;
 import org.forgerock.openam.setup.BootstrapConfig;
 import org.forgerock.openam.setup.ConfigStoreProperties;
@@ -100,62 +97,45 @@ public class BootstrapCreator {
     // This is called on every boot
     // we use this as a hook to migrate the legacy bootstrap to the env var + properties.
     // This method was previously used to write the bootstrap file -we now use it to write the boot.json
+    // todo: Rewriting the bootstrap on every boot is part of the legacy OpenAM behaviour.
+    // This is needed to capture password changes that might have occurred to update the bootstrap file.
+    // This is kludgy and should be revisited in the future once AME-12525 and OPENAM-9900 are resolved
     private void update(IDSConfigMgr dsCfg)
             throws ConfigurationException, IOException {
 
         if (!AMSetupServlet.isCurrentConfigurationValid()) {
-            return; // dont try to save bootstrap if are not in a valid state
+            return; // dont try to save bootstrap if we are not in a valid state
         }
 
         try {
-            String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
-            // AMKeyProvider amKeyProvider = new AMKeyProvider();
-
-            BootstrapConfig bootConfig = getBootstrapConfig(dsCfg);
-            // get the password properties
-            String dspw = bootConfig.getDsameUserPassword();
-            ConfigStoreProperties p = bootConfig.getConfigStoreList().get(0);
-            String configStorepw = p.getDirManagerPassword();
+            final String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
+            final BootstrapConfig bootConfig = getBootstrapConfig(dsCfg);
+            // get the passwords
+            final String dspw = bootConfig.getDsameUserPassword();
+            final ConfigStoreProperties p = bootConfig.getConfigStoreList().get(0);
+            final String configStorepw = p.getDirManagerPassword();
+            final KeyStoreConfig ksc = bootConfig.getKeyStoreConfig("default");
 
             // do migration if the old bootstrap file is exists.
-            File f = new File(baseDir + "/" + BootstrapData.BOOTSTRAP);
-            if (f.exists()) { // start migration of legacy bootstrap
-                DEBUG.message("Migrating bootstrap");
-                // open the old keystore
-                AMKeyProvider amKeyProvider = new AMKeyProvider();
-
-                // get the store password(s)
-                String keystorePass = new String(amKeyProvider.getKeystorePass());
-                String keyPassword = amKeyProvider.getPrivateKeyPass();
-                // decode so we can open keystore at boot before instance key is available
-                keystorePass = AMKeyProvider.decodePassword(keystorePass);
-                keyPassword = AMKeyProvider.decodePassword(keyPassword);
-
-                String dir = new File(amKeyProvider.getKeystoreFilePath()).getParent();
-                // create new .storepass and .keypass files to unlock the keystores
-                // the .storepass is not encrypted anymore
-                File storeFile = new File(dir + "/.storepass");
-                File keypassFile = new File(dir + "/.keypass");
-                Files.write(storeFile.toPath(), keystorePass.getBytes());
-                Files.write(keypassFile.toPath(), keyPassword.getBytes());
-                AMSetupServlet.chmodFileReadOnly(storeFile);
-                AMSetupServlet.chmodFileReadOnly(keypassFile);
-
-                // if the old keystore is a jks, we need to create a new jceks for the passwords
-                // now we can remove the old bootstrap
-                if (!f.delete()) {
-                    DEBUG.warning("Could not delete the old bootstrap file");
-                }
+            final File bootstrap = new File(baseDir + "/" + BootstrapData.BOOTSTRAP);
+            final boolean doMigrate = bootstrap.exists();
+            if (doMigrate) { // start migration of legacy bootstrap
+                migrateBootstrap(ksc);
             }
-            KeyStoreConfig ksc = bootConfig.getKeyStoreConfig("default");
-            AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
-            // add the required boot passwords to the keystore
-            // AMKeyProvider amKeyProvider = new AMKeyProvider();
+            final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
+
+            // write the required boot passwords to the keystore
             amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
             amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
             amKeyProvider.store();
 
             bootConfig.writeConfig(baseDir + "/boot.json");
+            // We delay deletion of legacy bootstrap until the very end.
+            // If there are exceptions, this will leave the bootstrap in place
+            // and make the system stil bootable.
+            if (doMigrate) {
+                bootstrap.delete();
+            }
 
         } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
             throw new ConfigurationException(e.getMessage());
@@ -216,28 +196,63 @@ public class BootstrapCreator {
         return bootstrap;
     }
 
-    // Creates a default keystore configuration using a JCEKS keystore
+    /**
+     * Migrate the old Bootstrap file
+     */
+    private void migrateBootstrap(KeyStoreConfig ksc)
+            throws IOException, KeyStoreException {
+        DEBUG.message("Migrating bootstrap");
+
+        // get the store password(s)
+        String keystorePass = new String(ksc.getKeyStorePassword());
+        String keyPassword = new String(ksc.getKeyPassword());
+
+        // decode so we can open keystore at boot before instance key is available
+        keystorePass = AMKeyProvider.decodePassword(keystorePass);
+        keyPassword = AMKeyProvider.decodePassword(keyPassword);
+
+        // the .storepass is not encrypted anymore
+        File storeFile = new File(ksc.getKeyStorePasswordFile());
+        File keypassFile = new File(ksc.getKeyPasswordFile());
+        // Remove existing files as they may be readonly and the write will fail
+        if (!storeFile.delete() || !keypassFile.delete()) {
+            // Subsequent updates to the these files may still work, so don't give up yet
+            DEBUG.warning("Could not delete .storepass / .keypass in migration process. Migration may fail");
+        }
+        // Save the keystore passwords unencrypted
+        Files.write(storeFile.toPath(), keystorePass.getBytes());
+        Files.write(keypassFile.toPath(), keyPassword.getBytes());
+        AMSetupServlet.chmodFileReadOnly(storeFile);
+        AMSetupServlet.chmodFileReadOnly(keypassFile);
+    }
+
+    // Creates a default keystore configuration
     private KeyStoreConfig createDefaultKeyStoreConfig() {
-        String installDir = SystemProperties.get(Constants.AM_INSTALL_DIR);
         KeyStoreConfig ksc = new KeyStoreConfig();
+        // Get the default keystore implementation
+        AMKeyProvider amKeyProvider = new AMKeyProvider();
+        ksc.setKeyPasswordFile(amKeyProvider.getKeyPasswordFilePath());
+        ksc.setKeyStorePasswordFile(amKeyProvider.getKeystorePasswordFilePath());
+        ksc.setKeyStoreFile(amKeyProvider.getKeystoreFilePath());
+        ksc.setKeyStoreType(amKeyProvider.getKeystoreType());
 
-        // If the config store is not up yet, we have to get the context path
-        // from the servlet context and construct a default path
-        if (installDir == null) {
-            ServletContext ctx = ServletContextCache.getStoredContext();
-            installDir = SystemProperties.get(SystemProperties.CONFIG_PATH) + ctx.getContextPath();
-
-            ksc.setKeyPasswordFile(installDir + "/.keypass");
-            ksc.setKeyStoreFile(installDir + "/keystore.jceks");
-            ksc.setKeyStorePasswordFile(installDir + "/.storepass");
+        // If a legacy JKS keystore is the default, we need to use a newer
+        // jceks. The old JKS can not store passwords.
+        // keystore.jceks should get created as part of the upgrade process.
+        // Note that this KeyStoreConfig can not be directly opened at this point
+        // because the storepass might still be encrypted
+        // The migrateBootstrap() above wil fix up the storepass
+        if (amKeyProvider.getKeystoreType().toLowerCase().equals("jks")) {
+            // install dir is sometimes not available on first boot
+            String dir = SystemProperties.get(Constants.AM_INSTALL_DIR);
+            if (dir == null) {
+                //use the current keystore path. It is very likely the user has not changed this
+                dir = amKeyProvider.getKeystoreFilePath();
+                ksc.setKeyStoreFile(dir.replace(".jks", ".jceks"));
+            } else {
+                ksc.setKeyStoreFile(dir + "/keystore.jceks");
+            }
             ksc.setKeyStoreType("JCEKS");
-        } else {
-            // system props are available, get default keystore implementation
-            AMKeyProvider amKeyProvider = new AMKeyProvider();
-            ksc.setKeyStoreFile(amKeyProvider.getKeystoreFilePath());
-            ksc.setKeyStoreType(amKeyProvider.getKeystoreType());
-            ksc.setKeyPasswordFile(amKeyProvider.getKeyPasswordFilePath());
-            ksc.setKeyStorePasswordFile(amKeyProvider.getKeystorePasswordFilePath());
         }
         return ksc;
     }
