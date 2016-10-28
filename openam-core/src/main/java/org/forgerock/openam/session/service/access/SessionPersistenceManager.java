@@ -16,16 +16,17 @@
 
 package org.forgerock.openam.session.service.access;
 
-import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
 
 /**
  * An interface for handling updates that require a session to be persisted.
  */
 public interface SessionPersistenceManager {
     /**
-     * Notify this listener of an update to a session.
-     * @param sessionID The session that was updated. Never null.
+     * Notify this listener of an update to a session. This takes the session instance in order to preserve the state
+     * which is about to be updated.
+     * @param session The session that was updated. Never null.
      */
-    void notifyUpdate(SessionID sessionID);
+    void notifyUpdate(InternalSession session);
 
 }

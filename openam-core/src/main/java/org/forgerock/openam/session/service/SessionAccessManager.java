@@ -29,6 +29,7 @@ import org.forgerock.openam.session.service.access.persistence.InternalSessionSt
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.Session;
@@ -104,7 +105,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
             return null;
         }
         try {
-            return internalSessionStore.getBySessionID(sessionId);
+            return setPersistenceManager(internalSessionStore.getBySessionID(sessionId));
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
@@ -121,7 +122,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
             return null;
         }
         try {
-            return internalSessionStore.getByHandle(sessionHandle);
+            return setPersistenceManager(internalSessionStore.getByHandle(sessionHandle));
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
@@ -134,10 +135,18 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public InternalSession getByRestrictedID(SessionID sessionID) {
         try {
-            return internalSessionStore.getByRestrictedID(sessionID);
+            return setPersistenceManager(internalSessionStore.getByRestrictedID(sessionID));
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private InternalSession setPersistenceManager(InternalSession internalSession) {
+        if (internalSession == null) {
+            return null;
+        }
+        internalSession.setPersistenceManager(this);
+        return internalSession;
     }
 
     /**
@@ -194,12 +203,8 @@ public class SessionAccessManager implements SessionPersistenceManager {
     }
 
     @Override
-    public void notifyUpdate(SessionID sessionID) {
-        InternalSession internalSession = getInternalSession(sessionID);
-        if (internalSession == null) {
-            throw new IllegalStateException(
-                    "SessionAccessManager notified of event for InternalSession it does not contain");
-        }
+    public void notifyUpdate(InternalSession internalSession) {
+        Reject.ifNull(internalSession);
         update(internalSession);
     }
 
