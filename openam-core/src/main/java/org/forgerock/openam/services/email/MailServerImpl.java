@@ -19,7 +19,7 @@
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.services.email;
@@ -46,14 +46,14 @@ public class MailServerImpl implements MailServer {
 
     protected Debug debug = null;
 
-    private static String SMTP_HOSTNAME = "forgerockEmailServiceSMTPHostName";
-    private static String SMTP_HOSTPORT = "forgerockEmailServiceSMTPHostPort";
-    private static String SMTP_USERNAME = "forgerockEmailServiceSMTPUserName";
-    private static String SMTP_USERPASSWORD = "forgerockEmailServiceSMTPUserPassword";
-    private static String SMTP_SSL_ENABLED = "forgerockEmailServiceSMTPSSLEnabled";
-    private static String FROM_ADDRESS = "forgerockEmailServiceSMTPFromAddress";
-    private static String SUBJECT = "forgerockEmailServiceSMTPSubject";
-    private static String MESSAGE = "forgerockEmailServiceSMTPMessage";
+    public static final String SMTP_HOSTNAME = "forgerockEmailServiceSMTPHostName";
+    public static final String SMTP_HOSTPORT = "forgerockEmailServiceSMTPHostPort";
+    public static final String SMTP_USERNAME = "forgerockEmailServiceSMTPUserName";
+    public static final String SMTP_USERPASSWORD = "forgerockEmailServiceSMTPUserPassword";
+    public static final String SMTP_SSL_ENABLED = "forgerockEmailServiceSMTPSSLEnabled";
+    public static final String FROM_ADDRESS = "forgerockEmailServiceSMTPFromAddress";
+    public static final String SUBJECT = "forgerockEmailServiceSMTPSubject";
+    public static final String MESSAGE = "forgerockEmailServiceSMTPMessage";
 
     private static String HTML_MIME_TYPE = "text/html";
     private static String PLAIN_MIME_TYPE = "text/plain";

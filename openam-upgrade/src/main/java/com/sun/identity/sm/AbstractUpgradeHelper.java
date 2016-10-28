@@ -42,58 +42,61 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
- * @author steve
+ * Implement this class to manually upgrade schema attributes.
  */
 public abstract class AbstractUpgradeHelper implements UpgradeHelper {
+
     private static final String DEFAULT_VALUES_BEGIN = "<"
             + SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT + ">";    
     private static final String DEFAULT_VALUES_END = "</"
             + SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT + ">";
+
+    private static final String EXAMPLE_VALUES_BEGIN = "<"
+            + SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT + ">";
+    private static final String EXAMPLE_VALUES_END = "</"
+            + SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT + ">";
+
+    private static final String IS_OPTIONAL_BEGIN = "<"
+            + SMSUtils.ATTRIBUTE_OPTIONAL + ">";
+    private static final String IS_OPTIONAL_END = "</"
+            + SMSUtils.ATTRIBUTE_OPTIONAL + ">";
+
     private static final String VALUE_BEGIN = "<" + SMSUtils.ATTRIBUTE_VALUE + ">";
     private static final String VALUE_END = "</" + SMSUtils.ATTRIBUTE_VALUE + ">";
+
+
     protected final Set<String> attributes = new HashSet<String>();
-    
-    protected AttributeSchemaImpl updateDefaultValues(AttributeSchemaImpl attribute, Set<String> defaultValues) 
-    throws UpgradeException {
-        StringBuilder sb = new StringBuilder(100);
-        
-        sb.append(DEFAULT_VALUES_BEGIN);
-        
-        for (String defaultValue : defaultValues) {
-            sb.append(VALUE_BEGIN);
-            sb.append(SMSSchema.escapeSpecialCharacters(defaultValue));
-            sb.append(VALUE_END);
+
+    /**
+     * Update the optional value of an attribute schema
+     * @param attribute the attribute schema
+     * @param isOptional true if this attribute is optional
+     * @return the attribute schema modified
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
+     */
+    protected AttributeSchemaImpl updateOptional(AttributeSchemaImpl attribute, boolean isOptional)
+            throws UpgradeException {
+        StringBuilder sb = new StringBuilder();
+
+        if (isOptional) {
+            sb.append(IS_OPTIONAL_BEGIN);
+            sb.append(IS_OPTIONAL_END);
         }
-        
-        sb.append(DEFAULT_VALUES_END);
         Document doc = XMLUtils.toDOMDocument(sb.toString(), null);
 
-        Node attributeNode = updateNode(doc, SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT, attribute.getAttributeSchemaNode());        
+        Node attributeNode = updateNode(doc, SMSUtils.ATTRIBUTE_OPTIONAL, attribute.getAttributeSchemaNode());
         attribute.update(attributeNode);
-        
+
         return attribute;
     }
 
     /**
-     * Encrypts all values in the provided set.
-     *
-     * <p>To be used when copying default values which need to be stored encrypted.</p>
-     *
-     * @param values The values to encrypt.
-     * @return A Set containing the encrypted values.
+     * Update the choice values of an attribute schema
+     * @param attribute the attribute schema
+     * @param choiceValues the new choice values
+     * @return the attribute schema modified
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
      */
-    protected Set<String> encryptValues(Set<String> values) {
-        if (values.isEmpty()) {
-            return values;
-        }
-        Set<String> encryptedValues = new HashSet<>();
-        for (String value : values) {
-            encryptedValues.add(AccessController.doPrivileged(new EncodeAction(value)));
-        }
-        return encryptedValues;
-    }
-
     protected AttributeSchemaImpl updateChoiceValues(AttributeSchemaImpl attribute, Collection<String> choiceValues)
             throws UpgradeException {
         try {
@@ -116,23 +119,113 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
         return attribute;
     }
 
-    protected static Node updateNode(Document newDefaultValueNode, String element, Node node) {
-        // NB. This method will only replace an existing child element,
-        // it does not create one if one didn't exist before
+    /**
+     * Update the default values of an attribute schema
+     * @param attribute the attribute schema
+     * @param defaultValues the new default values
+     * @return the attribute schema modified
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
+     */
+    protected AttributeSchemaImpl updateDefaultValues(AttributeSchemaImpl attribute, Set<String> defaultValues)
+            throws UpgradeException {
+        return updateListValues(attribute, defaultValues, DEFAULT_VALUES_BEGIN, DEFAULT_VALUES_END,
+                SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT);
+    }
 
-        NodeList childNodes = node.getChildNodes();
+    /**
+     * Update the example values of an attribute schema
+     * @param attribute the attribute schema
+     * @param exampleValues the new examples values
+     * @return the attribute schema modified
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
+     */
+    protected AttributeSchemaImpl updateExampleValues(AttributeSchemaImpl attribute, Set<String> exampleValues)
+            throws UpgradeException {
+        return updateListValues(attribute, exampleValues, EXAMPLE_VALUES_BEGIN, EXAMPLE_VALUES_END,
+                SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT);
+    }
+
+    private AttributeSchemaImpl updateListValues(AttributeSchemaImpl attribute, Set<String> values, String tabBegin,
+             String tabEnd, String elementName) throws UpgradeException {
+        StringBuilder sb = new StringBuilder(100);
+
+        if (!values.isEmpty()) {
+            sb.append(tabBegin);
+            for (String value : values) {
+                sb.append(VALUE_BEGIN);
+                sb.append(SMSSchema.escapeSpecialCharacters(value));
+                sb.append(VALUE_END);
+            }
+            sb.append(tabEnd);
+        }
+        Document doc = XMLUtils.toDOMDocument(sb.toString(), null);
+
+        Node attributeNode = updateNode(doc, elementName, attribute.getAttributeSchemaNode());
+        attribute.update(attributeNode);
+
+        return attribute;
+    }
+
+    /**
+     * Encrypts all values in the provided set.
+     *
+     * <p>To be used when copying default values which need to be stored encrypted.</p>
+     *
+     * @param values The values to encrypt.
+     * @return A Set containing the encrypted values.
+     */
+    protected Set<String> encryptValues(Set<String> values) {
+        if (values.isEmpty()) {
+            return values;
+        }
+        Set<String> encryptedValues = new HashSet<>();
+        for (String value : values) {
+            encryptedValues.add(AccessController.doPrivileged(new EncodeAction(value)));
+        }
+        return encryptedValues;
+    }
+
+    protected static Node updateNode(Document newValueNode, String element, Node attributeSchemaNode) {
+
+        NodeList childNodes = attributeSchemaNode.getChildNodes();
         
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
-           
+
             if (item.getNodeName().equals(element)) {
-                node.removeChild(item);
-                Node newNode = node.getOwnerDocument().importNode(newDefaultValueNode.getFirstChild(), true);
-                node.appendChild(newNode);
+                attributeSchemaNode.removeChild(item);
             }
         }
-       
-        return node;
+        if (newValueNode != null) {
+            Node newNode = attributeSchemaNode.getOwnerDocument().importNode(newValueNode.getFirstChild(), true);
+            SMSUtils.ATTRIBUTE_SCHEMA_CHILD newSchemaName = SMSUtils.ATTRIBUTE_SCHEMA_CHILD.valueOfName(element);
+            NodeList childrens = attributeSchemaNode.getChildNodes();
+
+            boolean isNewNodeInserted = false;
+
+            if (childrens.getLength() > 0) {
+                // Insert the new node in the right position: we are looking for the first element that has a higher
+                // ordinal than our's, and then we insert the node just in front of that.
+                for (int i = 0; i < childrens.getLength(); i++) {
+                    Node currentChild = childrens.item(i);
+
+                    SMSUtils.ATTRIBUTE_SCHEMA_CHILD schemaName =
+                            SMSUtils.ATTRIBUTE_SCHEMA_CHILD.valueOfName(currentChild.getNodeName());
+                    if (schemaName != null && schemaName.compareTo(newSchemaName) > 0) {
+                        attributeSchemaNode.insertBefore(newNode, currentChild);
+                        isNewNodeInserted = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!isNewNodeInserted) {
+                //By default, we insert the node at the end of the list. Happens when there are no other children
+                //elements and/or the node to be inserted would be the last one.
+                attributeSchemaNode.appendChild(newNode);
+            }
+        }
+        return attributeSchemaNode;
     }
 
     public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
