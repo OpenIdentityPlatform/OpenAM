@@ -17,6 +17,7 @@
 package org.forgerock.openam.notifications.integration;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,6 +66,15 @@ public class NotificationsGuiceModule extends PrivateModule {
     @Inject
     ExecutorService executorService(ExecutorServiceFactory factory) {
         return factory.createFixedThreadPool(1);
+    }
+
+    @Provides
+    @Inject
+    @Exposed
+    @Singleton
+    @Named("webSocketScheduledExecutorService")
+    ScheduledExecutorService scheduledExecutorService(ExecutorServiceFactory factory) {
+        return factory.createScheduledService(5);
     }
 
     @Provides

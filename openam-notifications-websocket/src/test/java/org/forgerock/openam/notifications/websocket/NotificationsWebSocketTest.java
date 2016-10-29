@@ -22,18 +22,26 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
 
+import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.Consumer;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Subscription;
 import org.forgerock.openam.notifications.Topic;
+import org.forgerock.util.time.TimeService;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -58,18 +66,27 @@ public final class NotificationsWebSocketTest {
     private Session session;
     @Mock
     private RemoteEndpoint.Basic basic;
+    @Mock
+    private RemoteEndpoint.Async async;
+    @Mock
+    private TimeService timeService;
+    @Mock
+    private ScheduledExecutorService executorService;
 
     @Captor
     private ArgumentCaptor<Consumer> consumerCaptor;
     @Captor
     private ArgumentCaptor<JsonValue> jsonCaptor;
+    @Captor
+    private ArgumentCaptor<Runnable> runnableCaptor;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        notificationsWebSocket = new NotificationsWebSocket(broker);
+        notificationsWebSocket = new NotificationsWebSocket(broker, timeService, executorService);
         when(broker.subscribe(any(Consumer.class))).thenReturn(subscription);
         when(session.getBasicRemote()).thenReturn(basic);
+        when(session.getAsyncRemote()).thenReturn(async);
     }
 
     @Test
@@ -87,6 +104,29 @@ public final class NotificationsWebSocketTest {
         notificationsWebSocket.open(session);
 
         verify(subscription, never()).bindTo(any(Topic.class));
+    }
+
+    @Test
+    public void whenConnectionOpenedAPingTaskIsCreated() throws Exception {
+        // When
+        notificationsWebSocket.open(session);
+
+        // Then
+        verify(executorService).scheduleAtFixedRate(any(Runnable.class), eq(30 * 1000L), eq(30 * 1000L),
+                eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void whenSessionIsOpenPingTaskSendsPing() throws Exception {
+        // When
+        when(session.isOpen()).thenReturn(true);
+        notificationsWebSocket.open(session);
+        verify(executorService).scheduleAtFixedRate(runnableCaptor.capture(), anyLong(), anyLong(),
+                any(TimeUnit.class));
+        runnableCaptor.getValue().run();
+
+        // Then
+        verify(async).sendPing(any(ByteBuffer.class));
     }
 
     @Test
@@ -244,12 +284,12 @@ public final class NotificationsWebSocketTest {
         assertThat(jsonCaptor.getValue()).stringAt("error").isEqualTo("\"id\" must be a string");
     }
 
-
     @Test
     public void whenConsumerReceivesNotificationIsPushedToTheWebSocket() throws Exception {
         // Given
         notificationsWebSocket.open(session);
         verify(broker).subscribe(consumerCaptor.capture());
+        when(session.isOpen()).thenReturn(true);
 
         Consumer consumer = consumerCaptor.getValue();
 
@@ -257,12 +297,64 @@ public final class NotificationsWebSocketTest {
         consumer.accept(json(object(field("some_key", "some_value"))));
 
         // Then
-        verify(basic).sendObject(jsonCaptor.capture());
+        verify(async).sendObject(jsonCaptor.capture());
         assertThat(jsonCaptor.getValue()).stringAt("some_key").isEqualTo("some_value");
     }
 
     @Test
-    public void whenTheWebSocketIsClosedTheSubscriptionIsClosed() {
+    public void whenConsumerReceivesNotificationButSessionIsNoLongerOpenNoMessageIsSent() throws Exception {
+        // Given
+        notificationsWebSocket.open(session);
+        verify(broker).subscribe(consumerCaptor.capture());
+        when(session.isOpen()).thenReturn(false);
+
+        Consumer consumer = consumerCaptor.getValue();
+
+        // When
+        consumer.accept(json(object(field("some_key", "some_value"))));
+
+        // Then
+        verify(async, never()).sendObject(any(JsonValue.class));
+    }
+
+    @Test
+    public void whenConsumerReceivesNotificationButSessionIsIdleConnectionIsClosed() throws Exception {
+        // Given
+        notificationsWebSocket.open(session);
+        verify(broker).subscribe(consumerCaptor.capture());
+        when(timeService.since(anyLong())).thenReturn(1000000L);
+        when(session.isOpen()).thenReturn(true);
+
+        Consumer consumer = consumerCaptor.getValue();
+
+        // When
+        consumer.accept(json(object(field("some_key", "some_value"))));
+
+        // Then
+        verify(session).close();
+        verify(async, never()).sendObject(any(JsonValue.class));
+    }
+
+    @Test
+    public void whenPongReceivedConnectionIsMarkedAsActive() throws Exception {
+        // Given
+        notificationsWebSocket.open(session);
+        verify(broker).subscribe(consumerCaptor.capture());
+        long time = 12345234L;
+        when(timeService.now()).thenReturn(time);
+
+        Consumer consumer = consumerCaptor.getValue();
+
+        // When
+        notificationsWebSocket.pong(mock(PongMessage.class));
+        consumer.accept(json(object(field("some_key", "some_value"))));
+
+        // Then
+        verify(timeService).since(time);
+    }
+
+    @Test
+    public void whenConnectionClosedTheSubscriptionIsClosed() {
         // Given
         notificationsWebSocket.open(session);
 
@@ -273,4 +365,19 @@ public final class NotificationsWebSocketTest {
         verify(subscription).close();
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void whenConnectionClosedPingTaskIsCancelled() {
+        // Given
+        ScheduledFuture future = mock(ScheduledFuture.class);
+        when(executorService.scheduleAtFixedRate(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class)))
+                .thenReturn(future);
+
+        // When
+        notificationsWebSocket.open(session);
+        notificationsWebSocket.close();
+
+        // Then
+        verify(future).cancel(true);
+    }
 }

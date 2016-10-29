@@ -21,14 +21,21 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.websocket.DecodeException;
 import javax.websocket.EncodeException;
-import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
+import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
@@ -38,6 +45,7 @@ import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Subscription;
 import org.forgerock.openam.notifications.Topic;
 import org.forgerock.util.Reject;
+import org.forgerock.util.time.TimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +72,14 @@ import org.slf4j.LoggerFactory;
 public final class NotificationsWebSocket {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationsWebSocket.class);
+    private static final long TIMEOUT_MILLISECONDS = 1000 * 60;
 
     private final NotificationBroker broker;
+    private final TimeService timeService;
+    private final ScheduledExecutorService executorService;
     private Subscription subscription;
+    private long lastMessageTime;
+    private ScheduledFuture<?> pingFuture;
 
     /**
      * No args constructor as required by JSR-356. Instances created
@@ -74,6 +87,8 @@ public final class NotificationsWebSocket {
      */
     public NotificationsWebSocket() {
         broker = null;
+        timeService = null;
+        executorService = null;
     }
 
     /**
@@ -82,9 +97,12 @@ public final class NotificationsWebSocket {
      * @param broker the notification broker
      */
     @Inject
-    public NotificationsWebSocket(NotificationBroker broker) {
+    public NotificationsWebSocket(NotificationBroker broker, TimeService timeService,
+            @Named("webSocketScheduledExecutorService") ScheduledExecutorService executorService) {
         Reject.ifNull(broker, "Broker must not be null");
         this.broker = broker;
+        this.timeService = timeService;
+        this.executorService = executorService;
     }
 
     /**
@@ -93,9 +111,23 @@ public final class NotificationsWebSocket {
      * @param session the websocket session
      */
     @OnOpen
-    public void open(Session session) {
+    public void open(final Session session) {
         Reject.ifNull(session, "Session must not be null");
         subscription = broker.subscribe(new WebSocketConsumer(session));
+        session.setMaxIdleTimeout(TIMEOUT_MILLISECONDS);
+        lastMessageTime = timeService.now();
+        pingFuture = executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (session.isOpen()) {
+                        session.getAsyncRemote().sendPing(ByteBuffer.wrap("ping".getBytes()));
+                    }
+                } catch (IOException e) {
+                    logger.info("Failed to send ping to client", e);
+                }
+            }
+        }, TIMEOUT_MILLISECONDS / 2, TIMEOUT_MILLISECONDS / 2, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -104,10 +136,13 @@ public final class NotificationsWebSocket {
     @OnClose
     public void close() {
         subscription.close();
+        if (pingFuture != null) {
+            pingFuture.cancel(true);
+        }
     }
 
     /**
-     * See {@link OnMessage}.
+     * Call when the server receives a normal message.
      *
      * @param session the websocket session
      * @param json the json message
@@ -116,6 +151,8 @@ public final class NotificationsWebSocket {
     public void message(Session session, JsonValue json) {
         Reject.ifNull(session, "Session must not be null");
         Reject.ifNull(json, "Json must not be null");
+
+        lastMessageTime = timeService.now();
 
         if (json.isDefined("id") && !json.get("id").isString()) {
             sendError(session, null, "\"id\" must be a string");
@@ -155,6 +192,16 @@ public final class NotificationsWebSocket {
     }
 
     /**
+     * Called when the server receives a pong.
+     *
+     * @param message Unused, but required to register the correct listener.
+     */
+    @OnMessage
+    public void pong(PongMessage message) {
+        lastMessageTime = timeService.now();
+    }
+
+    /**
      * See {@link javax.websocket.Endpoint#onError(Session, Throwable)}.
      *
      * @param session The WebSocket session.
@@ -162,7 +209,11 @@ public final class NotificationsWebSocket {
      */
     @OnError
     public void error(Session session, Throwable error) {
-        sendError(session, null, error.getMessage());
+        if (error instanceof DecodeException) {
+            sendError(session, null, error.getMessage());
+        } else {
+            logger.info("WebSocket error", error);
+        }
     }
 
     private void sendMessage(Session session, String id, String topic, String message) {
@@ -177,7 +228,7 @@ public final class NotificationsWebSocket {
 
             session.getBasicRemote().sendObject(json);
         } catch (IOException | EncodeException e) {
-            logger.error("Unable to send message to client Message was \"" + message + "\"", e);
+            logger.warn("Unable to send message to client. Message was \"" + message + "\"", e);
         }
     }
 
@@ -191,11 +242,11 @@ public final class NotificationsWebSocket {
 
             session.getBasicRemote().sendObject(json);
         } catch (IOException | EncodeException e) {
-            logger.error("Unable to send error to client. Error was \"" + message + "\"", e);
+            logger.warn("Unable to send error message to client. Error was \"" + message + "\"", e);
         }
     }
 
-    private static final class WebSocketConsumer implements Consumer {
+    private final class WebSocketConsumer implements Consumer {
 
         private final Session session;
 
@@ -207,10 +258,17 @@ public final class NotificationsWebSocket {
         public void accept(JsonValue notification) {
             Reject.ifNull(notification);
 
-            try {
-                session.getBasicRemote().sendObject(notification);
-            } catch (IOException | EncodeException e) {
-                logger.error("Unable to send notification", e);
+            if (timeService.since(lastMessageTime)  > TIMEOUT_MILLISECONDS) {
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    logger.warn("Failed to close WebSocket connection", e);
+                }
+                return;
+            }
+
+            if (session.isOpen()) {
+                session.getAsyncRemote().sendObject(notification);
             }
         }
 
