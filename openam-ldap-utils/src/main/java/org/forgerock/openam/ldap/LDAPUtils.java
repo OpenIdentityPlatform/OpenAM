@@ -51,6 +51,7 @@ import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Option;
 import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
 import org.forgerock.util.time.Duration;
@@ -72,6 +73,10 @@ import org.forgerock.util.time.Duration;
  */
 public final class LDAPUtils {
 
+    /**
+     * An {@link Option} that tells whether affinity based load balancing is enabled for the connections.
+     */
+    public static final Option<Boolean> AFFINITY_ENABLED = Option.withDefault(false);
     private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';', '='};
     private static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
     private static final String LDAP_SCOPE_ONE = "SCOPE_ONE";
@@ -147,7 +152,7 @@ public final class LDAPUtils {
             factories.add(cf);
         }
 
-        return loadBalanceFactories(factories);
+        return loadBalanceFactories(factories, ldapOptions);
     }
 
     /**
@@ -201,7 +206,7 @@ public final class LDAPUtils {
             factories.add(newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
                     ldapOptions));
         }
-        return loadBalanceFactories(factories);
+        return loadBalanceFactories(factories, ldapOptions);
     }
 
     /**
@@ -253,8 +258,12 @@ public final class LDAPUtils {
         return new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
     }
 
-    private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories) {
-        return Connections.newFailoverLoadBalancer(factories, Options.defaultOptions());
+    private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories, Options options) {
+        if (options.get(AFFINITY_ENABLED)) {
+            return Connections.newShardedRequestLoadBalancer(factories, options);
+        } else {
+            return Connections.newFailoverLoadBalancer(factories, options);
+        }
     }
 
     /**
@@ -699,7 +708,7 @@ public final class LDAPUtils {
             for (int i = 0; i < hostCount; i++) {
                 factories.add(createSingleHostConnectionFactory(hostList[i], portList[i], authDN, authPasswd, options));
             }
-            return Connections.newFailoverLoadBalancer(factories, options);
+            return loadBalanceFactories(factories, options);
         } else {
             return createSingleHostConnectionFactory(hostList[0], portList[0], authDN, authPasswd, options);
         }

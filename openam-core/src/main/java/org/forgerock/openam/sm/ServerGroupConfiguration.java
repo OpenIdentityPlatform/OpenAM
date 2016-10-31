@@ -88,4 +88,9 @@ public class ServerGroupConfiguration implements ConnectionConfig {
         }
         return ret;
     }
+
+    @Override
+    public boolean isAffinityEnabled() {
+        return false;
+    }
 }

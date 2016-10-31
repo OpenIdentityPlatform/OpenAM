@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
@@ -99,6 +99,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
 
         Options options = Options.defaultOptions()
                 .set(REQUEST_TIMEOUT, new Duration((long) timeout, TimeUnit.SECONDS));
+        options.set(LDAPUtils.AFFINITY_ENABLED, config.isAffinityEnabled());
 
         debug("Creating Embedded Factory:\nURL: {0}\nMax Connections: {1}\nHeartbeat: {2}\nOperation Timeout: {3}",
                 config.getLDAPURLs(),

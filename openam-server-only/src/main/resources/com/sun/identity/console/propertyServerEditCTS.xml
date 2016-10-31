@@ -11,7 +11,7 @@
     Header, with the fields enclosed by brackets [] replaced by your own identifying
     information: "Portions copyright [year] [name of copyright owner]".
 
-    Copyright 2013-2015 ForgeRock AS.
+    Copyright 2013-2016 ForgeRock AS.
     Portions Copyright 2016 Nomura Research Institute, Ltd.
 -->
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -56,6 +56,11 @@
         <property required="true">
             <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-cts-store-heartbeat" />
             <cc name="cscorg-forgerock-services-cts-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="affinityEnabledLabel" defaultValue="amconfig.org.forgerock.services.cts.store.affinity.enabled" labelFor="cscorg-forgerock-services-cts-store-affinity-enabled" />
+            <cc name="cscorg-forgerock-services-cts-store-affinity-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc>
+            <fieldhelp name="helpcscorg-forgerock-services-cts-store-affinity-enabled" defaultValue="amconfig.help.org.forgerock.services.cts.store.affinity.enabled" />
         </property>
     </section>
 </propertysheet>

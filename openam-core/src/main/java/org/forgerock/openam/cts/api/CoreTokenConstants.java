@@ -15,8 +15,6 @@
  */
 package org.forgerock.openam.cts.api;
 
-import com.iplanet.dpro.session.service.SessionServiceConfig;
-
 /**
  * Responsible for collecting together all constants used in the Core Token Service.
  */
@@ -116,6 +114,11 @@ public class CoreTokenConstants {
      * Default maximum number of connections to the token store.
      */
     public static final String CTS_STORE_MAX_CONNECTIONS_DEFAULT = "10";
+
+    /**
+     * Enable/disable the OpenDJ SDK's affinity based load balancing feature.
+     */
+    public static final String CTS_STORE_AFFINITY_ENABLED = "org.forgerock.services.cts.store.affinity.enabled";
 
     /**
      * The maximum duration in seconds to wait whilst placing tasks on the asynchronous work queue.

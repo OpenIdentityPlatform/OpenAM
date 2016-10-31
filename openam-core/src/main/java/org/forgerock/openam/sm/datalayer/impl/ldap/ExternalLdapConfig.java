@@ -1,4 +1,3 @@
-
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -12,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
@@ -56,6 +55,7 @@ public class ExternalLdapConfig implements ConnectionConfig {
     protected ModifiedProperty<String> maxConnections = new ModifiedProperty<String>();
     protected ModifiedProperty<Boolean> sslMode = new ModifiedProperty<Boolean>();
     protected ModifiedProperty<Integer> heartbeat = new ModifiedProperty<Integer>();
+    protected ModifiedProperty<Boolean> affinityEnabled = new ModifiedProperty<>();
 
     @Inject
     public ExternalLdapConfig(@Named(SessionConstants.SESSION_DEBUG) Debug debug) {
@@ -138,6 +138,11 @@ public class ExternalLdapConfig implements ConnectionConfig {
         return sslMode.get();
     }
 
+    @Override
+    public boolean isAffinityEnabled() {
+        return affinityEnabled.get();
+    }
+
     /**
      * @return True if the configuration is now in a changed state.
      */
@@ -147,14 +152,16 @@ public class ExternalLdapConfig implements ConnectionConfig {
                password.hasChanged() ||
                maxConnections.hasChanged() ||
                sslMode.hasChanged() ||
-               heartbeat.hasChanged();
+               heartbeat.hasChanged() ||
+               affinityEnabled.hasChanged();
     }
 
     /**
      * Causes this instance to refresh its configuration.
      */
     public void update(LdapDataLayerConfiguration config) {
-        config.updateExternalLdapConfiguration(hosts, username, password, maxConnections, sslMode, heartbeat);
+        config.updateExternalLdapConfiguration(hosts, username, password, maxConnections, sslMode, heartbeat,
+                affinityEnabled);
     }
 
     /**
@@ -197,6 +204,7 @@ public class ExternalLdapConfig implements ConnectionConfig {
                 ", maxConnections=" + maxConnections +
                 ", sslMode=" + sslMode +
                 ", heartbeat=" + heartbeat +
+                ", affinityEnabled=" + affinityEnabled +
                 '}';
     }
 }

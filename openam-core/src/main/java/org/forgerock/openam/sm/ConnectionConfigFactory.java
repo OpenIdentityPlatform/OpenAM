@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
@@ -110,6 +110,11 @@ public class ConnectionConfigFactory {
             public int getMaxConnections() {
                 return 1;
             }
+
+            @Override
+            public boolean isAffinityEnabled() {
+                return false;
+            }
         };
     }
 
@@ -139,6 +144,11 @@ public class ConnectionConfigFactory {
         @Override
         public final int getLdapHeartbeat() {
             return delegateConnectionConfig.getLdapHeartbeat();
+        }
+
+        @Override
+        public boolean isAffinityEnabled() {
+            return delegateConnectionConfig.isAffinityEnabled();
         }
     }
 }

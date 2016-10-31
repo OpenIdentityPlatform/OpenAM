@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
@@ -42,10 +42,11 @@ public abstract class LdapDataLayerConfiguration extends LDAPConfig {
          * @param maxConnections The maximum number of connections.
          * @param sslMode The SSL mode.
          * @param heartbeat The heartbeat interval.
+         * @param affinityEnabled Whether affinity based load balancing is enabled.
          */
     public abstract void updateExternalLdapConfiguration(ModifiedProperty<String> hosts,
             ModifiedProperty<String> username, ModifiedProperty<String> password,
             ModifiedProperty<String> maxConnections, ModifiedProperty<Boolean> sslMode,
-            ModifiedProperty<Integer> heartbeat);
+            ModifiedProperty<Integer> heartbeat, ModifiedProperty<Boolean> affinityEnabled);
 
 }

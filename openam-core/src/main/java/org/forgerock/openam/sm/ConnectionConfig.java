@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
@@ -62,4 +62,11 @@ public interface ConnectionConfig {
      * @return -1 if not used, or a positive number.
      */
     int getLdapHeartbeat();
+
+    /**
+     * Tells whether affinity has been enabled for this connection.
+     *
+     * @return <code>true</code> if affinity is enabled for this connection.
+     */
+    boolean isAffinityEnabled();
 }

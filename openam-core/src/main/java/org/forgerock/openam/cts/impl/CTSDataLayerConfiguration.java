@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.impl;
@@ -51,7 +51,8 @@ public class CTSDataLayerConfiguration extends LdapDataLayerConfiguration {
     @Override
     public void updateExternalLdapConfiguration(ModifiedProperty<String> hosts, ModifiedProperty<String> username,
             ModifiedProperty<String> password, ModifiedProperty<String> maxConnections,
-            ModifiedProperty<Boolean> sslMode, ModifiedProperty<Integer> heartbeat) {
+            ModifiedProperty<Boolean> sslMode, ModifiedProperty<Integer> heartbeat,
+            ModifiedProperty<Boolean> affinityEnabled) {
         hosts.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
         password.set(AMPasswordUtil.decrypt(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD)));
@@ -59,6 +60,7 @@ public class CTSDataLayerConfiguration extends LdapDataLayerConfiguration {
                 CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS, CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS_DEFAULT));
         sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_SSL_ENABLED, false));
         heartbeat.set(SystemProperties.getAsInt(Constants.LDAP_HEARTBEAT, -1));
+        affinityEnabled.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_AFFINITY_ENABLED, false));
     }
 
     @Override
