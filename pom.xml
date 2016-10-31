@@ -49,7 +49,7 @@
     <name>OpenAM Project</name>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
+    <version>14.0.0-M2</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -601,7 +601,7 @@
         <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
         <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
         <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
-      <tag>release/13.0.0</tag>
+      <tag>14.0.0-M2</tag>
   </scm>
 
     <!-- Dependency Management -->

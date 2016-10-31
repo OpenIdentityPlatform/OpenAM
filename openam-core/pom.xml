@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>14.0.0-M2</version>
     </parent>
 
     <!-- Component Definition -->
@@ -395,7 +395,7 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-i18n</artifactId>
-            <version>14.0.0-SNAPSHOT</version>
+            <version>14.0.0-M2</version>
         </dependency>
     </dependencies>
 </project>

@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>14.0.0-M2</version>
     </parent>
 
     <name>OpenAM STS Publish Service</name>
