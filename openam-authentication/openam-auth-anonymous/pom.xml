@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-authentication</artifactId>
-        <version>14.0.0-M2</version>
+        <version>14.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>openam-auth-anonymous</artifactId>
     <packaging>jar</packaging>
