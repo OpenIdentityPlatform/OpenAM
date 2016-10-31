@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>14.0.0-M1</version>
     </parent>
 
     <!-- Component Definition -->
@@ -590,7 +590,7 @@
         <profile>
             <id>suppress-upgrade</id>
             <properties>
-                <full.version.information></full.version.information>
+                <full.version.information />
             </properties>
         </profile>
     </profiles>
