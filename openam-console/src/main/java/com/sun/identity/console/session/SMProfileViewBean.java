@@ -46,6 +46,7 @@ import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMConsoleConfig;
 import com.sun.identity.console.base.AMViewConfig;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -67,6 +68,9 @@ import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
+
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 public class SMProfileViewBean
     extends SMViewBeanBase
@@ -186,48 +190,52 @@ public class SMProfileViewBean
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException
     {
-        if (validSession) {
-            super.beginDisplay(event);
-            SMProfileModel model = (SMProfileModel)getModel();
-            Map map = model.getServerNames();
-            OptionList optList = new OptionList();
-            CCDropDownMenu child = 
-                (CCDropDownMenu)getChild(CHILD_SERVER_NAME_MENU);
-            String value = (String)child.getValue();
-            if (map != null &&  !map.isEmpty()) {
-                for (Iterator iter=map.keySet().iterator(); iter.hasNext(); ) {
-                    String str = (String)iter.next();
-                    String val = (String)map.get(str);
-                    optList.add(str, val);
-                    if (value == null) {
-                        child.setValue(val);
+        if (isXuiAdminConsoleEnabled()) {
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.TOP_LEVEL_REALM_SESSIONS);
+        } else {
+            if (validSession) {
+                super.beginDisplay(event);
+                SMProfileModel model = (SMProfileModel) getModel();
+                Map map = model.getServerNames();
+                OptionList optList = new OptionList();
+                CCDropDownMenu child =
+                        (CCDropDownMenu) getChild(CHILD_SERVER_NAME_MENU);
+                String value = (String) child.getValue();
+                if (map != null && !map.isEmpty()) {
+                    for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
+                        String str = (String) iter.next();
+                        String val = (String) map.get(str);
+                        optList.add(str, val);
+                        if (value == null) {
+                            child.setValue(val);
+                        }
                     }
                 }
-            }
-            child.setOptions(optList);
-            value = (String)child.getValue();
-            model.setProfileServerName(value);
-            SMSessionCache cache = null;
-            try {
-                cache = model.getSessionCache(getFilterString());
-                if (cache != null) {
-                    populateTableModel(cache.getSessions());
-                    String errorMessage = cache.getErrorMessage();
-                    if (errorMessage != null && errorMessage.length() > 0) {
-                        setInlineAlertMessage(CCAlert.TYPE_WARNING, 
-                            "message.warning", errorMessage);
+                child.setOptions(optList);
+                value = (String) child.getValue();
+                model.setProfileServerName(value);
+                SMSessionCache cache = null;
+                try {
+                    cache = model.getSessionCache(getFilterString());
+                    if (cache != null) {
+                        populateTableModel(cache.getSessions());
+                        String errorMessage = cache.getErrorMessage();
+                        if (errorMessage != null && errorMessage.length() > 0) {
+                            setInlineAlertMessage(CCAlert.TYPE_WARNING,
+                                    "message.warning", errorMessage);
+                        }
                     }
+                } catch (AMConsoleException ae) {
+                    setInlineAlertMessage(CCAlert.TYPE_ERROR,
+                            "message.error", ae.getMessage());
                 }
-            } catch (AMConsoleException ae) {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, 
-                    "message.error", ae.getMessage());
+                if (cache == null) {
+                    populateTableModel(Collections.EMPTY_LIST);
+                }
+                setPageSessionAttribute(SERVER_NAME, value);
+                // Set our Sub-Tabs
+                addSessionsTab(model, 1);
             }
-            if (cache == null) {           
-                populateTableModel(Collections.EMPTY_LIST);
-            }
-            setPageSessionAttribute(SERVER_NAME, value);
-            // Set our Sub-Tabs
-            addSessionsTab(model,1);
         }
     }
 

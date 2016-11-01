@@ -108,15 +108,6 @@ define([
             RedirectToLegacyConsole.global.federation();
         }
     }, {
-        startEvent: Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
-        description: "",
-        dependencies: [
-            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
-        ],
-        processDescription (event, RedirectToLegacyConsole) {
-            RedirectToLegacyConsole.global.sessions();
-        }
-    }, {
         startEvent: Constants.EVENT_REDIRECT_TO_JATO_DATASTORE,
         description: "",
         dependencies: [

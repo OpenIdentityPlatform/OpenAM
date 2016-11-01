@@ -69,12 +69,12 @@ define([
         }]
     }, {
         title: "console.common.navigation.services",
-        icon:"fa-plug",
-        route:"realmsServices"
+        icon: "fa-plug",
+        route: "realmsServices"
     }, {
         title: "console.common.navigation.sessions",
         icon: "fa-ticket",
-        event: "main.navigation.EVENT_REDIRECT_TO_JATO_SESSIONS"
+        route: "realmsSessions"
     }, {
         title: "console.common.navigation.dataStores",
         icon: "fa-database",
