@@ -28,7 +28,8 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.util.Reject;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation of the request validator for the OAuth2 authorize endpoint.
@@ -38,6 +39,7 @@ import org.forgerock.util.Reject;
 @Singleton
 public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator {
 
+    private static final Debug debug = Debug.getInstance("OAuth2Provider");
     private final ClientRegistrationStore clientRegistrationStore;
     private final RedirectUriValidator redirectUriValidator;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
@@ -67,8 +69,17 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
     public void validateRequest(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, NotFoundException {
 
-        Reject.ifTrue(isEmpty(request.<String>getParameter(CLIENT_ID)), "Missing parameter, 'client_id'");
-        Reject.ifTrue(isEmpty(request.<String>getParameter(RESPONSE_TYPE)), "Missing parameter, 'response_type'");
+        if (isEmpty(request.<String>getParameter(CLIENT_ID))) {
+            String errMsg = "Missing parameter, " + CLIENT_ID;
+            debug.error(errMsg);
+            throw new InvalidRequestException(errMsg);
+        }
+
+        if (isEmpty(request.<String>getParameter(RESPONSE_TYPE))) {
+            String errMsg = "Missing parameter, " + RESPONSE_TYPE;
+            debug.error(errMsg);
+            throw new InvalidRequestException(errMsg);
+        }
 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter("client_id"),
                 request);

@@ -286,13 +286,13 @@ public class AuthorizationService {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
+        for (final AuthorizeRequestValidator requestValidator : requestValidators) {
+            requestValidator.validateRequest(request);
+        }
+
         if (csrfProtection.isCsrfAttack(request)) {
             logger.debug("Session id from consent request does not match users session");
             throw new CsrfException();
-        }
-
-        for (final AuthorizeRequestValidator requestValidator : requestValidators) {
-            requestValidator.validateRequest(request);
         }
 
         final ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
