@@ -30,10 +30,8 @@
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import java.util.Map;
-import java.util.List;
 import java.util.Set;
 
 public interface WSFedPropertiesModel extends EntityModel {
@@ -125,7 +123,11 @@ public interface WSFedPropertiesModel extends EntityModel {
     /************************************************************************
      * WSFED IDP attributes
      ************************************************************************/
-    
+
+    /**
+     * The name of the display field value that stores whether the current entity is hosted or not.
+     */
+    String IS_HOSTED = "isHosted";
     // attribute for Signing Certificate Alias
     String TFSIGNCERT_ALIAS = "signingCertAlias";
     

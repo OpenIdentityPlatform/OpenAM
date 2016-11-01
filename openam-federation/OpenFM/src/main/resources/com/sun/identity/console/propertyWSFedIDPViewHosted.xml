@@ -61,14 +61,13 @@
         <section name="nameidDomain" defaultValue="wsfedidp.provider.section.title.nameidDomain">   
             <property>
                 <label name="lblNameIDFormat"
-                       defaultValue=
-                       "wsfedidp.attribute.label.idpNameIDFormat"
+                       defaultValue= "wsfedidp.attribute.label.idpNameIDFormat"
                        labelFor="nameIdFormat" />
                 <cc name="nameIdFormat" 
-                    tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
-                    <option label="wsfed.idp.label1" value="UPN" />
-                    <option label="wsfed.idp.label2" value="Email" />
-                    <option label="wsfed.idp.label3" value="Common Name" />
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
                     <attribute name="onChange" value="SelectOne(this);" />
                 </cc>
                 <fieldhelp name="helpIDPnameIDFormatMap" defaultValue="wsfed.provider.section.title.help.idpnameIdpFormatMap" />
@@ -81,7 +80,7 @@
                        labelFor="nameIdAttribute" />                
                 <cc name="nameIdAttribute" 
                     tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
-                    <attribute name="size" value="15" />
+                    <attribute name="size" value="75" />
                     <attribute name="autoSubmit" value="false" />
                     <attribute name="localizeDisplayFieldValue" value="false" />
                 </cc>
