@@ -68,6 +68,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
     private final static String UNIX = "com.sun.identity.authentication.modules.unix.Unix";
     private final static String WSS_AUTH = "com.sun.identity.authentication.modules.wss.WSSAuthModule";
+    private final static String DEVICE_PRINT_AUTH =
+            "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule";
     private final static String ATTR = "iplanet-am-auth-authenticators";
     // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
@@ -113,6 +115,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
         defaultValues.remove(WSS_AUTH);
+        defaultValues.remove(DEVICE_PRINT_AUTH);
         newAttr = updateDefaultValues(newAttr, defaultValues);
 
         return newAttr;
