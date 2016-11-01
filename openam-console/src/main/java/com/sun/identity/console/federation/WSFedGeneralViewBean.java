@@ -24,6 +24,7 @@
  *
  * $Id: WSFedGeneralViewBean.java,v 1.6 2008/06/25 05:49:38 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package com.sun.identity.console.federation;
 
@@ -52,10 +53,12 @@ public class WSFedGeneralViewBean extends WSFedGeneralBase {
         setDefaultDisplayURL(DEFAULT_DISPLAY_URL);
     }
     
-    public void beginDisplay(DisplayEvent event)
-    throws ModelControlException {
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
         super.beginDisplay(event);
-        
+
+        setPageSessionAttribute("CCTabs.SelectedTabId", Integer.toString(1));
+        tabModel.setSelectedNode(1);
+
         //setting the Name fields
         setDisplayFieldValue(WSFedPropertiesModel.TF_REALM, realm);
         setDisplayFieldValue(WSFedPropertiesModel.TF_NAME, entityName);
