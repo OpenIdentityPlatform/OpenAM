@@ -1012,6 +1012,15 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
+     * Determine whether it is a user session.
+     *
+     * @return <code>true</code> if this is a user session, <code>false</code> otherwise.
+     */
+    public boolean isUserSession() {
+        return sessionType == SessionType.USER;
+    }
+
+    /**
      * Sets the creation time of the Internal Session, as the number of seconds
      * since midnight January 1, 1970 GMT.
      */

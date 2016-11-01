@@ -351,4 +351,24 @@ public class SessionPersistenceStore {
             throw e;
         }
     }
+
+    /**
+     * Returns all the valid sessions from the CTS server
+     *
+     * @return The collection of all valid sessions
+     * @throws CoreTokenException if the call to CTS to get valid session fails
+     */
+    public Collection<InternalSession> getValidSessions() throws CoreTokenException {
+        TokenFilter filter = new TokenFilterBuilder()
+                .withSizeLimit(sessionServiceConfig.getMaxSessionListSize())
+                .withTimeLimit(duration(10, TimeUnit.SECONDS)).and()
+                .withAttribute(SessionTokenField.SESSION_STATE.getField(), SessionState.VALID.toString())
+                .build();
+        Collection<Token> tokens = coreTokenService.query(filter);
+        List<InternalSession> results = new ArrayList<>(tokens.size());
+        for (Token token : tokens) {
+            results.add(getInternalSessionFromToken(token));
+        }
+        return results;
+    }
 }

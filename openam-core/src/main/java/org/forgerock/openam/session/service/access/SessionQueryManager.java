@@ -17,24 +17,21 @@
 package org.forgerock.openam.session.service.access;
 
 import static com.iplanet.dpro.session.service.SessionState.*;
-import static org.forgerock.openam.utils.Time.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.iplanet.dpro.session.SessionID;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceStore;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
 import org.forgerock.openam.utils.CrestQuery;
 
 import com.iplanet.dpro.session.Session;
@@ -54,7 +51,6 @@ import com.sun.identity.shared.debug.Debug;
 public class SessionQueryManager {
     private Debug debug;
     private SessionPersistenceStore sessionPersistenceStore;
-    private final InternalSessionCache internalSessionCache;
     private final SessionChangeAuthorizer sessionChangeAuthorizer;
     private final SessionServiceConfig serviceConfig;
 
@@ -62,17 +58,14 @@ public class SessionQueryManager {
      * Creates a session query manager.
      * @param debug The debug object.
      * @param sessionPersistenceStore The store which is being used for queries.
-     * @param internalSessionCache The cache which is being used for queries (TODO: AME-12496 will remove this)
      */
     @Inject
     public SessionQueryManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                                SessionPersistenceStore sessionPersistenceStore,
-                               InternalSessionCache internalSessionCache,
                                SessionChangeAuthorizer sessionChangeAuthorizer,
                                SessionServiceConfig serviceConfig) {
         this.debug = debug;
         this.sessionPersistenceStore = sessionPersistenceStore;
-        this.internalSessionCache = internalSessionCache;
         this.sessionChangeAuthorizer = sessionChangeAuthorizer;
         this.serviceConfig = serviceConfig;
     }
@@ -112,111 +105,50 @@ public class SessionQueryManager {
      * Gets all valid Internal Sessions, depending on the value of the user's
      * preferences.
      *
-     * @param s
+     * @param actingSession
      * @throws SessionException
      */
-    public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
-        if (s.getState(false) != VALID) {
-            throw new SessionException(SessionBundle
-                    .getString("invalidSessionState")
-                    + s.getID().toString());
+    public SearchResults<SessionInfo> getValidSessions(Session actingSession, String pattern) throws SessionException {
+        if (actingSession.getState(false) != VALID) {
+            throw new SessionException(SessionBundle.getString("invalidSessionState") + actingSession.getID().toString());
         }
-
         try {
+            Collection<InternalSession> sessions = sessionPersistenceStore.getValidSessions();
+            SessionID actorSessionID = actingSession.getSessionID();
+            boolean isAdmin = sessionChangeAuthorizer.hasTopLevelAdminRole(actorSessionID);
+            Set<String> orgs = sessionChangeAuthorizer.getSessionSubjectOrganisations(actorSessionID);
+            Set<SessionInfo> infos = new HashSet<>(sessions.size());
+            for (InternalSession session : sessions) {
+                boolean include = session.isUserSession() || serviceConfig.isReturnAppSessionEnabled();
+                if(include && sessionClientMatchesPattern(session, pattern)
+                        && actorCanAccessSesion(isAdmin, orgs, session)) {
+                    SessionInfo info = session.toSessionInfo();
+                    // replace session id with session handle to prevent impersonation
+                    info.setSessionID(session.getSessionHandle());
+                    infos.add(info);
+                }
 
-            SearchResults<InternalSession> sessions = getValidInternalSessions(pattern);
-
-            Collection<InternalSession> sessionsWithPermission = sessionChangeAuthorizer.filterPermissionToAccess(
-                    s.getSessionID(), sessions.getSearchResults());
-
-
-            Set<SessionInfo> infos = new HashSet<>(sessionsWithPermission.size());
-
-            for (InternalSession session : sessionsWithPermission) {
-                SessionInfo info = session.toSessionInfo();
-                // replace session id with session handle to prevent impersonation
-                info.setSessionID(session.getSessionHandle());
-                infos.add(info);
             }
-
-            return new SearchResults<>(sessions.getTotalResultCount(), infos, sessions.getErrorCode());
+            return new SearchResults<>(infos.size(), infos, SearchResults.SUCCESS);
         } catch (Exception e) {
             throw new SessionException(e);
         }
     }
 
     /**
-     * Get all valid Internal Sessions matched with pattern.
+     * Checks if the session client matches the pattern
      */
-    private SearchResults<InternalSession> getValidInternalSessions(String pattern)
-            throws SessionException {
-        Set<InternalSession> sessions = new HashSet<>();
-        int errorCode = SearchResults.SUCCESS;
-
-        if (pattern == null) {
-            pattern = "*";
-        }
-
-        try {
-            long startTime = currentTimeMillis();
-
-            pattern = pattern.toLowerCase();
-            List<InternalSession> allValidSessions = getValidInternalSessions();
-            boolean matchAll = pattern.equals("*");
-
-            for (InternalSession sess : allValidSessions) {
-                if (!matchAll) {
-                    // For application sessions, the client ID
-                    // will not be in the DN format but just uid.
-                    String clientID = (!sess.isAppSession()) ?
-                            DNUtils.DNtoName(sess.getClientID()) :
-                            sess.getClientID();
-
-                    if (clientID == null) {
-                        continue;
-                    } else {
-                        clientID = clientID.toLowerCase();
-                    }
-
-                    if (!matchFilter(clientID, pattern)) {
-                        continue;
-                    }
-                }
-
-                if (sessions.size() == serviceConfig.getMaxSessionListSize()) {
-                    errorCode = SearchResults.SIZE_LIMIT_EXCEEDED;
-                    break;
-                }
-                sessions.add(sess);
-
-                if ((currentTimeMillis() - startTime) >=
-                        serviceConfig.getSessionRetrievalTimeout()) {
-                    errorCode = SearchResults.TIME_LIMIT_EXCEEDED;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            debug.error("SessionService : "
-                    + "Unable to get Session Information ", e);
-            throw new SessionException(e);
-        }
-        return new SearchResults<>(sessions.size(), sessions, errorCode);
+    private boolean sessionClientMatchesPattern(InternalSession session, String pattern) {
+        String clientId = (!session.isAppSession()) ? DNUtils.DNtoName(session.getClientID()) : session.getClientID();
+        return clientId != null && matchFilter(clientId.toLowerCase(), pattern);
     }
 
     /**
-     * Get all valid Internal Sessions.
+     * Checks if the acting session can access to the session
+     * Derived based on the actors role and actors orgs
      */
-    private List<InternalSession> getValidInternalSessions() {
-
-        List<InternalSession> sessions = new ArrayList<>();
-        Collection<InternalSession> allSessions = getAllInternalSessions();
-        for (InternalSession session : allSessions) {
-            if (session.getState() == VALID
-                    && (!session.isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
-                sessions.add(session);
-            }
-        }
-        return sessions;
+    private boolean actorCanAccessSesion(boolean actorIsAadmin, Set<String> actorOrgs, InternalSession session) {
+        return actorIsAadmin ? true : actorOrgs == null ?  false : actorOrgs.contains(session.getClientDomain());
     }
 
     /**
@@ -267,14 +199,5 @@ public class SessionQueryManager {
             }
         }
         return false;
-    }
-
-    /**
-     * Get all sessions in the internal session cache.
-     * TODO: this method should be replaced with a call to the CTS. It may simply be able to return SessionInfos at that time.
-     * @return a collection of all internal sessions in the internal session cache.
-     */
-    private Collection<InternalSession> getAllInternalSessions() {
-        return internalSessionCache.getAllSessions();
     }
 }

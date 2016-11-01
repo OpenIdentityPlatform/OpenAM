@@ -15,22 +15,15 @@
  */
 package org.forgerock.openam.session.authorisation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.utils.CollectionUtils;
+import java.util.Collections;
+import java.util.Set;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.sso.SSOException;
@@ -44,6 +37,8 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Session Change Authorizer acts as a mini authorisation manager for changes to a session that need to be
@@ -72,36 +67,16 @@ public class SessionChangeAuthorizer {
     }
 
     /**
-     * Filter out any sessions from the collection that the actor does not have permission to access.
-     * @param actorsSessionID The id of the acting session.
-     * @param sessionsActedUpon The list of sessions that the actor is acting upon.
-     * @return The filtered collection.
-     * @throws SessionException If authorization fails.
+     *
+     * Gets the organisations assigned to the session subject
+     *
+     * @param sessionID The id of the session
+     * @return The organisations the assigned to the session subject
      */
-    public Collection<InternalSession> filterPermissionToAccess(
-            final SessionID actorsSessionID,
-            final Collection<InternalSession> sessionsActedUpon) throws SessionException {
-        Collection<InternalSession> toReturn = new ArrayList<>();
-        try {
-            if (hasTopLevelAdminRole(actorsSessionID)) {
-                toReturn.addAll(sessionsActedUpon);
-                return toReturn;
-            }
-            AMIdentity user = getUser(actorsSessionID);
-            Set orgList = user.getAttribute("iplanet-am-session-get-valid-sessions");
-            if (orgList == null) {
-                return Collections.emptySet();
-            }
-            for(InternalSession session : sessionsActedUpon) {
-                if (orgList.contains(session.getClientDomain())) {
-                    toReturn.add(session);
-                }
-            }
-        } catch (SSOException | IdRepoException e) {
-            throw new SessionException(e);
-        }
-
-        return toReturn;
+    public Set<String> getSessionSubjectOrganisations(SessionID sessionID)
+            throws SSOException, SessionException, IdRepoException {
+        AMIdentity user = getUser(sessionID);
+        return user.getAttribute("iplanet-am-session-get-valid-sessions");
     }
 
     /**
@@ -111,7 +86,7 @@ public class SessionChangeAuthorizer {
      * @throws SessionException
      * @throws SSOException
      */
-    private boolean hasTopLevelAdminRole(final SessionID actorsSessionID) throws SessionException, SSOException {
+    public boolean hasTopLevelAdminRole(final SessionID actorsSessionID) throws SessionException, SSOException {
         SSOToken ssoSession = ssoTokenManager.createSSOToken(actorsSessionID.toString());
 
         boolean topLevelAdmin = false;
