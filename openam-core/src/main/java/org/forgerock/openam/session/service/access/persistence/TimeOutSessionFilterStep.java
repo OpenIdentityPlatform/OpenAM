@@ -16,81 +16,70 @@
 
 package org.forgerock.openam.session.service.access.persistence;
 
-import javax.inject.Inject;
-
-import org.forgerock.openam.session.SessionEventType;
+import java.util.concurrent.TimeUnit;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.InternalSessionEvent;
-import com.iplanet.dpro.session.service.InternalSessionEventBroker;
-import com.iplanet.dpro.session.service.SessionState;
 
 /**
  * Checks that sessions which are being read are not timed out. Silently consumes them if they are not.
  * This should be run after any caching, so that invalid sessions are not reread every time.
+ *
+ * The filter step is not responsible for tidying up timed out sessions - the reaper will take care of that.
  */
-public class TimeOutSessionFilterStep implements InternalSessionStoreStep {
+public class TimeOutSessionFilterStep extends AbstractInternalSessionStoreStep {
 
-    private final InternalSessionEventBroker internalSessionEventBroker;
-
-    @Inject
-    public TimeOutSessionFilterStep(InternalSessionEventBroker internalSessionEventBroker) {
-        this.internalSessionEventBroker = internalSessionEventBroker;
+    @Override
+    public InternalSession getBySessionID(
+            final SessionID sessionID,
+            final InternalSessionStore next) throws SessionPersistenceException {
+        return processInternalSession(next.getBySessionID(sessionID));
     }
 
     @Override
-    public InternalSession getBySessionID(SessionID sessionID, InternalSessionStore next) throws SessionPersistenceException {
-        return processInternalSession(next.getBySessionID(sessionID), next);
+    public InternalSession getByHandle(
+            final String sessionHandle,
+            final InternalSessionStore next) throws SessionPersistenceException {
+        return processInternalSession(next.getByHandle(sessionHandle));
     }
 
     @Override
-    public InternalSession getByHandle(String sessionHandle, InternalSessionStore next) throws SessionPersistenceException {
-        return processInternalSession(next.getByHandle(sessionHandle), next);
+    public InternalSession getByRestrictedID(
+            final SessionID sessionID,
+            final InternalSessionStore next) throws SessionPersistenceException {
+        return processInternalSession(next.getByRestrictedID(sessionID));
     }
 
-    @Override
-    public InternalSession getByRestrictedID(SessionID sessionID, InternalSessionStore next) throws SessionPersistenceException {
-        return processInternalSession(next.getByRestrictedID(sessionID), next);
-    }
-
-    private InternalSession processInternalSession(InternalSession internalSession, InternalSessionStore next) throws SessionPersistenceException {
-        if (internalSession == null || destroySessionIfNecessary(internalSession, next)) {
-            return null; // If the session was destroyed, do not return it.
+    private InternalSession processInternalSession(
+            final InternalSession internalSession) throws SessionPersistenceException {
+        if (internalSession == null || isSessionTimedOut(internalSession)) {
+            // The session will not be returned if it has timed out
+            // The filter step is not responsible for tidying up timed out sessions - the reaper will take care of that
+            return null;
         }
         return internalSession;
     }
 
-    /**
-     * Checks whether the session should be destroyed or not, and if so performs the operation.
-     */
-    private boolean destroySessionIfNecessary(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
-        switch (session.checkSessionUpdate()) {
-            case NO_CHANGE:
-                return false;
-            case DESTROY:
-                next.remove(session.getSessionID());
-                session.changeStateWithoutNotify(SessionState.DESTROYED);
-                internalSessionEventBroker.onEvent(new InternalSessionEvent(session, SessionEventType.DESTROY));
-                return true;
-            case MAX_TIMEOUT:
-                session.timeoutSession(SessionEventType.MAX_TIMEOUT);
-                return false;
-            case IDLE_TIMEOUT:
-                session.timeoutSession(SessionEventType.IDLE_TIMEOUT);
-                return false;
-            default:
-                return false;
+    private boolean isSessionTimedOut(final InternalSession internalSession) {
+        // the session has already been timed out by a session monitor task
+        if (internalSession.isTimedOut()) {
+            return true;
         }
-    }
+        // the session will not time out
+        if (!internalSession.willExpire()) {
+            return false;
+        }
+        // the session has passed its maximum session life
+        if (0 >= internalSession.getTimeLeft()) {
+            return true;
+        }
+        // the session has reached its maximum idle time
+        if (internalSession.getIdleTime() >
+                TimeUnit.SECONDS.convert(internalSession.getMaxIdleTime(), TimeUnit.MINUTES)) {
+            return true;
+        }
+        // the session has not timed out
+        return false;
 
-    @Override
-    public void store(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
-        next.store(session);
-    }
-
-    @Override
-    public void remove(SessionID sessionID, InternalSessionStore next) throws SessionPersistenceException {
-        next.remove(sessionID);
     }
 }

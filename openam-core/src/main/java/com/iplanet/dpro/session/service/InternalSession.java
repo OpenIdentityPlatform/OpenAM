@@ -796,49 +796,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Checks the invalid session idle time. If this session is invalid and idle
-     * for more than 3 minutes, we will need to remove it from the session table
-     *
-     * @return <code>true</code> if the max default idle time expires
-     */
-    private boolean checkInvalidSessionDefaultIdleTime() {
-        long currentTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        long timeLeftInSeconds = creationTimeInSeconds + MINUTES.toSeconds(maxDefaultIdleTimeInMinutes) - currentTimeInSeconds;
-        return timeLeftInSeconds < 0;
-    }
-
-    /**
-     * Checks whether the session should change state and returns the state that the session should be in.
-     */
-    public StateTransition checkSessionUpdate() {
-        if (!willExpire()) {
-            return StateTransition.NO_CHANGE;
-        }
-        if (!isTimedOut()) {
-            if (isInvalid()) {
-                if (checkInvalidSessionDefaultIdleTime()) {
-                    return StateTransition.DESTROY;
-                } else {
-                    return StateTransition.NO_CHANGE;
-                }
-            }
-
-            if (getTimeLeft() == 0) {
-                return StateTransition.MAX_TIMEOUT;
-            }
-
-            if (getIdleTime() >= MINUTES.toSeconds(maxIdleTimeInMinutes)) {
-                return StateTransition.IDLE_TIMEOUT;
-            }
-
-            return StateTransition.NO_CHANGE;
-        } else {
-            // do something special for the timed out sessions
-            return StateTransition.NO_CHANGE;
-        }
-    }
-
-    /**
      * Changes the state of the session and sends Session Notification when session times out.
      */
     public void timeoutSession(SessionEventType eventType) {
@@ -846,13 +803,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
         fireSessionEvent(eventType, timedOutTimeInSeconds);
         sessionService.destroyInternalSession(this);
-    }
-
-    /**
-     * Changes the state of the session. Does not notify SessionService, or anything else using Session Notification.
-     */
-    public void changeStateWithoutNotify(SessionState state) {
-        this.sessionState = state;
     }
 
     public SessionInfo toSessionInfo() {
@@ -1196,15 +1146,5 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
     private void fireSessionEvent(SessionEventType sessionEventType, long eventTime) {
         sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType, eventTime));
-    }
-
-    /**
-     * Simple enumeration to report how the session is changing in state
-     */
-    public enum StateTransition {
-        DESTROY,
-        MAX_TIMEOUT,
-        IDLE_TIMEOUT,
-        NO_CHANGE
     }
 }

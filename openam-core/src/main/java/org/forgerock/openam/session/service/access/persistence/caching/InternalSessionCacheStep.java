@@ -47,7 +47,7 @@ public class InternalSessionCacheStep implements InternalSessionStoreStep {
         if (internalSession != null) {
             return internalSession;
         }
-        return processInternalSession(next.getBySessionID(sessionID));
+        return cacheInternalSession(next.getBySessionID(sessionID));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class InternalSessionCacheStep implements InternalSessionStoreStep {
         if (internalSession != null) {
             return internalSession;
         }
-        return processInternalSession(next.getByHandle(sessionHandle));
+        return cacheInternalSession(next.getByHandle(sessionHandle));
     }
 
     @Override
@@ -69,10 +69,10 @@ public class InternalSessionCacheStep implements InternalSessionStoreStep {
         if (internalSession != null) {
             return internalSession;
         }
-        return processInternalSession(next.getByRestrictedID(sessionID));
+        return cacheInternalSession(next.getByRestrictedID(sessionID));
     }
 
-    private InternalSession processInternalSession(InternalSession internalSession) {
+    private InternalSession cacheInternalSession(InternalSession internalSession) {
 
         if (internalSession != null) {
             sessionCache.put(internalSession);

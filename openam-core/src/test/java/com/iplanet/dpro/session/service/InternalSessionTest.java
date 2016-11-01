@@ -88,7 +88,7 @@ public class InternalSessionTest {
         final InternalSession session = createSession();
         final SSOToken clientToken = mock(SSOToken.class);
         doNothing().when(mockSessionUtils).checkPermissionToSetProperty(eq(clientToken), eq("key"), eq("value"));
-        session.changeStateWithoutNotify(SessionState.VALID);
+        session.setState(SessionState.VALID);
         given(mockSessionServiceConfig.isSendPropertyNotification(eq("key"))).willReturn(true);
 
         // When
