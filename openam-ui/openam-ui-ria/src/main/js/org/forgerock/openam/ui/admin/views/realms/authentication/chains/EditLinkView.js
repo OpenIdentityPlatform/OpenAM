@@ -116,10 +116,9 @@ define([
                                 .append(self.criteriaSelect.render().el);
 
                             dialog.getModalBody().on("click", "[data-add-option]", function (e) {
-                                var
-                                    $tr = $(e.target).closest("tr"),
-                                    optionsKey = $tr.find("#optionsKey").val(),
-                                    optionsValue = $tr.find("#optionsValue").val(),
+                                var $tr = $(e.target).closest("tr"),
+                                    optionsKey = $tr.find("#optionsKey").val().trim(),
+                                    optionsValue = $tr.find("#optionsValue").val().trim(),
                                     options = {};
 
                                 options[optionsKey] = optionsValue;
