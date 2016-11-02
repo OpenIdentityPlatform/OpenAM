@@ -27,12 +27,12 @@ import com.iplanet.dpro.session.service.InternalSession;
 /**
  * This class provides a bridge between session storage and the InternalSession persisting steps.
  */
-public class InternalSessionPersistenceStoreStep implements InternalSessionStore {
+public class InternalSessionPersistenceStore implements InternalSessionStore {
 
     private SessionPersistenceStore sessionPersistenceStore;
 
     @Inject
-    public InternalSessionPersistenceStoreStep(SessionPersistenceStore sessionPersistenceStore) {
+    public InternalSessionPersistenceStore(SessionPersistenceStore sessionPersistenceStore) {
         this.sessionPersistenceStore = sessionPersistenceStore;
     }
 
@@ -65,10 +65,10 @@ public class InternalSessionPersistenceStoreStep implements InternalSessionStore
     }
 
     @Override
-    public void remove(SessionID sessionID) throws SessionPersistenceException {
-        Reject.ifNull(sessionID);
+    public void remove(InternalSession session) throws SessionPersistenceException {
+        Reject.ifNull(session);
         try {
-            sessionPersistenceStore.delete(sessionID);
+            sessionPersistenceStore.delete(session.getSessionID());
         } catch (CoreTokenException e) {
             throw new SessionPersistenceException("Failed to delete session", e);
         }

@@ -132,8 +132,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
     }
 
     @Override
-    public void remove(final SessionID sessionID, final InternalSessionStore next) throws SessionPersistenceException {
-        InternalSession session = getCache().getIfPresent(sessionID.toString());
+    public void remove(final InternalSession session, final InternalSessionStore next) throws SessionPersistenceException {
         if (session != null) {
             // Remove all references to this session
             List<String> references = new ArrayList<>();
@@ -151,7 +150,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         }
 
         // Always ask the lower layers to remove the session even if we did not have it cached
-        next.remove(sessionID);
+        next.remove(session);
     }
 
     @VisibleForTesting

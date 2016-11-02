@@ -92,6 +92,6 @@ public class SessionAccessManagerTest {
         // When
         sessionAccessManager.removeInternalSession(mockInternalSession);
         // Then
-        verify(sessionStore).remove(mockSessionID);
+        verify(sessionStore).remove(mockInternalSession);
     }
 }

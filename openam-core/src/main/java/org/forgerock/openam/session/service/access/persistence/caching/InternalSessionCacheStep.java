@@ -88,9 +88,9 @@ public class InternalSessionCacheStep implements InternalSessionStoreStep {
     }
 
     @Override
-    public void remove(SessionID sessionID, InternalSessionStore next) throws SessionPersistenceException {
-        Reject.ifNull(sessionID);
-        sessionCache.remove(sessionID);
-        next.remove(sessionID);
+    public void remove(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+        Reject.ifNull(session);
+        sessionCache.remove(session.getSessionID());
+        next.remove(session);
     }
 }

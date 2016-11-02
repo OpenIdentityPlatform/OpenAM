@@ -56,8 +56,8 @@ public class InternalSessionStoreChain implements InternalSessionStore {
     }
 
     @Override
-    public void remove(SessionID sessionID) throws SessionPersistenceException {
-        new ChainIterator().remove(sessionID);
+    public void remove(InternalSession session) throws SessionPersistenceException {
+        new ChainIterator().remove(session);
     }
 
     private class ChainIterator implements InternalSessionStore {
@@ -101,11 +101,11 @@ public class InternalSessionStoreChain implements InternalSessionStore {
         }
 
         @Override
-        public void remove(SessionID sessionID) throws SessionPersistenceException {
+        public void remove(InternalSession session) throws SessionPersistenceException {
             if (iterator.hasNext()) {
-                iterator.next().remove(sessionID, this);
+                iterator.next().remove(session, this);
             } else {
-                store.remove(sessionID);
+                store.remove(session);
             }
         }
     }

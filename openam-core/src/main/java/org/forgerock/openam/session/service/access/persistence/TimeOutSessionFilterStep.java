@@ -80,6 +80,5 @@ public class TimeOutSessionFilterStep extends AbstractInternalSessionStoreStep {
         }
         // the session has not timed out
         return false;
-
     }
 }

@@ -92,7 +92,6 @@ public class AuthenticationSessionStore {
             throw new IllegalStateException("Attempted to promote non existent session");
         }
 
-        session.setStored(true);
         sessionAccessManager.persistInternalSession(session);
     }
 

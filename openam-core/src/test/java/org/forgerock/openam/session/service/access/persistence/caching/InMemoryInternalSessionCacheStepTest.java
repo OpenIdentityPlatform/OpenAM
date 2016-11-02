@@ -105,9 +105,9 @@ public class InMemoryInternalSessionCacheStepTest {
     }
 
     @Test
-    public void shouldAllowRemovalByMasterSessionId() throws Exception {
+    public void shouldAllowRemoval() throws Exception {
         testCache.store(mockSession, mockStore);
-        testCache.remove(SESSION_ID, mockStore);
+        testCache.remove(mockSession, mockStore);
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
     }
 
@@ -118,33 +118,7 @@ public class InMemoryInternalSessionCacheStepTest {
         testCache.store(session, mockStore);
 
         // When
-        testCache.remove(session.getID(), mockStore);
-
-        // Then
-        verifyAllReferencesRemovedFromCache(session);
-    }
-
-    @Test
-    public void shouldRemoveAllReferencesToTheSessionWhenRemovingItBySessionHandle() throws Exception {
-        // Given
-        InternalSession session = sessionWithHandleAndRestrictedTokens();
-        testCache.store(session, mockStore);
-
-        // When
-        testCache.remove(new SessionID(session.getSessionHandle()), mockStore);
-
-        // Then
-        verifyAllReferencesRemovedFromCache(session);
-    }
-
-    @Test
-    public void shouldRemoveAllReferencesToTheSessionWhenRemovingItByRestrictedToken() throws Exception {
-        // Given
-        InternalSession session = sessionWithHandleAndRestrictedTokens();
-        testCache.store(session, mockStore);
-
-        // When
-        testCache.remove(CollectionUtils.getFirstItem(session.getRestrictedTokens()), mockStore);
+        testCache.remove(session, mockStore);
 
         // Then
         verifyAllReferencesRemovedFromCache(session);

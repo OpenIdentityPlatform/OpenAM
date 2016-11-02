@@ -122,7 +122,7 @@ public class SessionAdapterTest {
         token.setAttribute(SessionTokenField.LATEST_ACCESS_TIME.getField(), latestAccessTime);
 
         // blob contents are missing the latestAccessTime value
-        token.setBlob("{\"clientDomain\":null,\"creationTime\":1376307674,\"isISStored\":true,\"maxCachingTime\":3}".getBytes());
+        token.setBlob("{\"clientDomain\":null,\"creationTime\":1376307674,\"maxCachingTime\":3}".getBytes());
 
         // need a real JSONSerialisation for this test
         ObjectMapper mapper = new ObjectMapper();

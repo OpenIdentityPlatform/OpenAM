@@ -17,10 +17,6 @@
 
 package org.forgerock.openam.core.guice;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -31,6 +27,95 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
+
+import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.auditors.SMSAuditFilter;
+import org.forgerock.openam.auditors.SMSAuditor;
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BloomFilterBlacklist;
+import org.forgerock.openam.blacklist.CTSBlacklist;
+import org.forgerock.openam.blacklist.CachingBlacklist;
+import org.forgerock.openam.blacklist.NoOpBlacklist;
+import org.forgerock.openam.core.DNWrapper;
+import org.forgerock.openam.core.realms.RealmGuiceModule;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CTSPersistentStoreImpl;
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.adapters.OAuthAdapter;
+import org.forgerock.openam.cts.adapters.SAMLAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.CTSOptions;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.impl.DeletePreReadOptionFunction;
+import org.forgerock.openam.cts.impl.ETagAssertionCTSOptionFunction;
+import org.forgerock.openam.cts.impl.LdapOptionFunction;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
+import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
+import org.forgerock.openam.cts.worker.CTSWorkerTask;
+import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
+import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
+import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
+import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
+import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionPersistenceStore;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
+import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreChain;
+import org.forgerock.openam.session.service.access.persistence.SessionPersistenceManagerStep;
+import org.forgerock.openam.session.service.access.persistence.TimeOutSessionFilterStep;
+import org.forgerock.openam.session.service.access.persistence.caching.InMemoryInternalSessionCacheStep;
+import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
+import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionStorage;
+import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.openam.sm.SMSConfigurationFactory;
+import org.forgerock.openam.sm.ServerGroupConfiguration;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
+import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
+import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction.SuperUserDelegate;
+import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.Config;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.util.Function;
+import org.forgerock.util.Option;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParser;
@@ -95,88 +180,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.ConfigAuditorFactory;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.auditors.SMSAuditFilter;
-import org.forgerock.openam.auditors.SMSAuditor;
-import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BloomFilterBlacklist;
-import org.forgerock.openam.blacklist.CTSBlacklist;
-import org.forgerock.openam.blacklist.CachingBlacklist;
-import org.forgerock.openam.blacklist.NoOpBlacklist;
-import org.forgerock.openam.core.DNWrapper;
-import org.forgerock.openam.core.realms.RealmGuiceModule;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.CTSPersistentStoreImpl;
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.adapters.OAuthAdapter;
-import org.forgerock.openam.cts.adapters.SAMLAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.CTSOptions;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.SAMLToken;
-import org.forgerock.openam.cts.impl.DeletePreReadOptionFunction;
-import org.forgerock.openam.cts.impl.ETagAssertionCTSOptionFunction;
-import org.forgerock.openam.cts.impl.LdapOptionFunction;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
-import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
-import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
-import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
-import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
-import org.forgerock.openam.cts.worker.CTSWorkerTask;
-import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
-import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
-import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
-import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
-import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
-import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
-import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
-import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
-import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionCookies;
-import org.forgerock.openam.session.SessionPollerPool;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.session.SessionURL;
-import org.forgerock.openam.session.service.access.persistence.InternalSessionPersistenceStoreStep;
-import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
-import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreChain;
-import org.forgerock.openam.session.service.access.persistence.TimeOutSessionFilterStep;
-import org.forgerock.openam.session.service.access.persistence.caching.InMemoryInternalSessionCacheStep;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionStorage;
-import org.forgerock.openam.shared.concurrency.ThreadMonitor;
-import org.forgerock.openam.sm.SMSConfigurationFactory;
-import org.forgerock.openam.sm.ServerGroupConfiguration;
-import org.forgerock.openam.sm.config.ConsoleConfigHandler;
-import org.forgerock.openam.sm.config.ConsoleConfigHandlerImpl;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.sm.datalayer.api.DataLayerException;
-import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
-import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction;
-import org.forgerock.openam.sso.providers.stateless.StatelessAdminRestriction.SuperUserDelegate;
-import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.utils.Config;
-import org.forgerock.openam.utils.OpenAMSettings;
-import org.forgerock.openam.utils.OpenAMSettingsImpl;
-import org.forgerock.util.Function;
-import org.forgerock.util.Option;
-import org.forgerock.util.promise.NeverThrowsException;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -363,14 +366,16 @@ public class CoreGuiceModule extends AbstractModule {
         install(new RealmGuiceModule());
     }
 
-
     @Provides
     @Inject
+    @Singleton
     InternalSessionStore getInternalSessionStore(TimeOutSessionFilterStep timeOutSessionFilterStep,
                                                  InMemoryInternalSessionCacheStep internalSessionCacheStep,
-                                                 InternalSessionPersistenceStoreStep internalSessionPersistenceStoreStep) {
-        return new InternalSessionStoreChain(Arrays.asList(timeOutSessionFilterStep, internalSessionCacheStep),
-                internalSessionPersistenceStoreStep);
+                                                 SessionPersistenceManagerStep sessionPersistenceManagerStep,
+                                                 InternalSessionPersistenceStore internalSessionPersistenceStore) {
+        return new InternalSessionStoreChain(
+                Arrays.asList(timeOutSessionFilterStep, internalSessionCacheStep, sessionPersistenceManagerStep),
+                internalSessionPersistenceStore);
     }
 
     @Provides @Inject @Singleton

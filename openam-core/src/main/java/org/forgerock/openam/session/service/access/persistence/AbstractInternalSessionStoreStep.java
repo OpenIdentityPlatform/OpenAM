@@ -47,8 +47,8 @@ public abstract class AbstractInternalSessionStoreStep implements InternalSessio
     }
 
     @Override
-    public void remove(SessionID sessionID, InternalSessionStore next) throws SessionPersistenceException {
-        next.remove(sessionID);
+    public void remove(InternalSession internalSession, InternalSessionStore next) throws SessionPersistenceException {
+        next.remove(internalSession);
     }
 
 }

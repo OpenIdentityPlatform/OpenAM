@@ -165,8 +165,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     private final ConcurrentMap<String, Set<SessionID>> sessionEventURLs = new ConcurrentHashMap<>();
 
-    @JsonIgnore private boolean isISStored = false;
-
     /* Session handle is used to prevent administrator from impersonating other users. */
     @JsonIgnore private String sessionHandle = null;
 
@@ -215,19 +213,14 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Default constructor required for deserialisation, and should not be used elsewhere.
      *
-     * This constructor is intentionally blank, except for setting isISStored to true (if the InternalSession is being
-     * deserialised, it is being loaded from storage).
      * When deserialised the code responsible for instantiating it will have no means of resolving dependencies.
      *
      * Instead this is deferred to
-     * {@link InternalSession#setSessionServiceDependencies(com.iplanet.dpro.session.service.SessionService,
-     * com.iplanet.dpro.session.service.SessionServiceConfig, InternalSessionEventBroker,
-     * com.iplanet.dpro.session.service.SessionLogging, com.iplanet.dpro.session.service.SessionAuditor,
-     * com.sun.identity.session.util.SessionUtilsWrapper, com.iplanet.dpro.session.service.SessionConstraint,
-     * com.sun.identity.shared.debug.Debug)}
+     * {@link InternalSession#setSessionServiceDependencies(SessionService, SessionServiceConfig,
+     *                      InternalSessionEventBroker, SessionUtilsWrapper, SessionConstraint, Debug)}
      */
     public InternalSession() {
-        isISStored = true;
+        // Intentionally left blank
     }
 
     /**
@@ -696,21 +689,13 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Set whether this InternalSession is persisted.
-     * @param isStored True if the session is persisted, false otherwise.
-     */
-    public void setStored(boolean isStored) {
-        isISStored = isStored;
-    }
-
-    /**
      * Returns whether the InternalSession represented has been stored. If this is true, changes to this object will
      * update the stored version.
      * return <code>true</code> if the internal session is stored
      *        <code>false</code> otherwise
      */
     public boolean isStored() {
-        return isISStored;
+        return persistenceManager != null;
     }
 
     /**

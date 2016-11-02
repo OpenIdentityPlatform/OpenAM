@@ -24,12 +24,10 @@ import javax.inject.Singleton;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.service.access.SessionPersistenceManager;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.Session;
@@ -46,7 +44,7 @@ import com.sun.identity.shared.debug.Debug;
  * as well as updating a stored session.
  */
 @Singleton
-public class SessionAccessManager implements SessionPersistenceManager {
+public class SessionAccessManager {
 
     private final Debug debug;
 
@@ -105,7 +103,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
             return null;
         }
         try {
-            return setPersistenceManager(internalSessionStore.getBySessionID(sessionId));
+            return internalSessionStore.getBySessionID(sessionId);
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
@@ -122,7 +120,7 @@ public class SessionAccessManager implements SessionPersistenceManager {
             return null;
         }
         try {
-            return setPersistenceManager(internalSessionStore.getByHandle(sessionHandle));
+            return internalSessionStore.getByHandle(sessionHandle);
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
@@ -135,18 +133,10 @@ public class SessionAccessManager implements SessionPersistenceManager {
      */
     public InternalSession getByRestrictedID(SessionID sessionID) {
         try {
-            return setPersistenceManager(internalSessionStore.getByRestrictedID(sessionID));
+            return internalSessionStore.getByRestrictedID(sessionID);
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private InternalSession setPersistenceManager(InternalSession internalSession) {
-        if (internalSession == null) {
-            return null;
-        }
-        internalSession.setPersistenceManager(this);
-        return internalSession;
     }
 
     /**
@@ -154,9 +144,13 @@ public class SessionAccessManager implements SessionPersistenceManager {
      * @param session The session to persist.
      */
     public void persistInternalSession(InternalSession session) {
-        session.setStored(true);
-        session.setPersistenceManager(this);
-        update(session);
+
+        try {
+            internalSessionStore.store(session);
+        } catch (SessionPersistenceException e) {
+            throw new RuntimeException(e);
+        }
+
         if (!session.willExpire()) {
             nonExpiringSessionManager.addNonExpiringSession(session);
         }
@@ -189,32 +183,14 @@ public class SessionAccessManager implements SessionPersistenceManager {
         }
 
         try {
-            internalSessionStore.remove(internalSession.getSessionID());
+            internalSessionStore.remove(internalSession);
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }
 
-        internalSession.setStored(false);
-        internalSession.setPersistenceManager(null);
         // Session Constraint
         if (internalSession.getState() == SessionState.VALID) {
             monitoringOperations.decrementActiveSessions();
-        }
-    }
-
-    @Override
-    public void notifyUpdate(InternalSession internalSession) {
-        Reject.ifNull(internalSession);
-        update(internalSession);
-    }
-
-    private void update(InternalSession session) {
-        if (session.isStored()) {
-            try {
-                internalSessionStore.store(session);
-            } catch (SessionPersistenceException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }
