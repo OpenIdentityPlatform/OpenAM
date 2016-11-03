@@ -56,18 +56,14 @@ class SessionsTable extends Component {
     }
 
     render () {
-        const numberOfChecked = this.state.checked.length ? `(${this.state.checked.length})` : undefined;
         const isChecked = (session) => _.includes(this.state.checked, session);
         const allChecked = (this.state.checked.length === this.props.data.length);
 
         return (
             <div>
                 <ButtonToolbar className="page-toolbar">
-                    <Button
-                        disabled={ !this.state.checked.length }
-                        onClick={ this.handleDeleteSelected }
-                    >
-                        <span className="fa fa-close" /> {t("common.form.delete")} { numberOfChecked }
+                    <Button disabled={ !this.state.checked.length } onClick={ this.handleDeleteSelected }>
+                        <span className="fa fa-close" /> { t("common.form.deleteSelected") }
                     </Button>
                 </ButtonToolbar>
 
@@ -77,10 +73,7 @@ class SessionsTable extends Component {
                             <thead>
                                 <tr>
                                     <th className="select-all-header-cell">
-                                        <ControlLabel
-                                            htmlFor="selectAll"
-                                            srOnly
-                                        >
+                                        <ControlLabel htmlFor="selectAll" srOnly>
                                             { t("common.form.selectAll") }
                                         </ControlLabel>
                                         <input

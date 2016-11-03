@@ -14,32 +14,19 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-import React, { PropTypes } from "react";
 import _ from "lodash";
+import { Button, ButtonGroup, ControlLabel } from "react-bootstrap";
 import { t } from "i18next";
-import { Button, ButtonGroup } from "react-bootstrap";
 import moment from "moment";
 import React, { PropTypes } from "react";
 
-
-const SessionsTableRow = ({
-    onDelete,
-    onSelect,
-    checked,
-    data
-}) => {
+const SessionsTableRow = ({ onDelete, onSelect, checked, data }) => {
     const handleDelete = () => onDelete(data);
     const handleSelect = (event) => onSelect(data, event.target.checked);
     const selectId = _.uniqueId("select");
 
-    const handleDelete = () => {
-        onDelete(data);
-    };
-    const selectId = _.unique("select");
-
     return (
         <tr className={ checked ? "selected" : undefined } >
-
             <td>
                 <ControlLabel htmlFor={ selectId } srOnly>{ t("common.form.select") }</ControlLabel>
                 <input checked={ checked } id={ selectId } onChange={ handleSelect } type="checkbox" />

@@ -21,16 +21,18 @@ import React, { Component } from "react";
 import Select from "react-select";
 
 import { getByIdStartsWith } from "org/forgerock/openam/ui/admin/services/global/UsersService";
-import { getByUserIdAndRealm, getByRealm, invalidateByHandles }
-    from "org/forgerock/openam/ui/admin/services/global/SessionsService";
-
+import {
+    getByUserIdAndRealm,
+    getByRealm,
+    invalidateByHandles
+} from "org/forgerock/openam/ui/admin/services/global/SessionsService";
 import CallToAction from "components/CallToAction";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import EventManager from "org/forgerock/commons/ui/common/main/EventManager";
 import PageDescription from "components/PageDescription";
-import SimplePageHeader from "components/SimplePageHeader";
 import SessionsTable from "./SessionsTable";
 import showConfirmationBeforeAction from "org/forgerock/openam/ui/admin/utils/form/showConfirmationBeforeAction";
+import SimplePageHeader from "components/SimplePageHeader";
 import withRouter from "org/forgerock/commons/ui/common/components/hoc/withRouter";
 import withRouterPropType from "org/forgerock/commons/ui/common/components/hoc/withRouterPropType";
 
@@ -148,7 +150,6 @@ class SessionsView extends Component {
                     />
                 </FormGroup>
                 { content }
-
             </div>
         );
     }
