@@ -30,12 +30,12 @@ define([
 ], ($, _, AbstractDelegate, Constants, JSONSchema, JSONValues, fetchUrl, Promise) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
-    const getServiceSchema = function (type) {
-        return obj.serviceCall({
+    const getServiceSchema = function (type, options) {
+        return obj.serviceCall(_.merge({
             url: fetchUrl.default(`/global-config/services/${type}?_action=schema`, { realm: false }),
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "POST"
-        }).then((response) => {
+        }, options)).then((response) => {
             return new JSONSchema(response);
         });
     };
@@ -71,13 +71,13 @@ define([
                 }).sortBy("name").value()
             );
         },
-        get (type) {
-            const getInstance = () => obj.serviceCall({
+        get (type, options) {
+            const getInstance = () => obj.serviceCall(_.merge({
                 url: fetchUrl.default(`/global-config/services/${type}`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            });
+            }, options));
 
-            return Promise.all([getServiceSchema(type), getInstance()]).then((response) => ({
+            return Promise.all([getServiceSchema(type, options), getInstance()]).then((response) => ({
                 name: response[1][0]._type.name,
                 schema: response[0],
                 values: new JSONValues(response[1][0])

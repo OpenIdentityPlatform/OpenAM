@@ -28,6 +28,7 @@
 
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
 import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
@@ -62,7 +63,8 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
     @Override
     protected void beginDisplay(DisplayEvent event, boolean setSelectedTabNode) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
-            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.GLOBAL_SERVICES);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.GLOBAL_SERVICES, authenticationRealm);
         } else {
             super.beginDisplay(event, setSelectedTabNode);
         }
@@ -97,7 +99,8 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
-            redirectToXui(getRequestContext().getRequest(), XUI_AUTHENTICATION_LOCATION);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XUI_AUTHENTICATION_LOCATION, authenticationRealm);
         } else {
             super.beginDisplay(event);
         }

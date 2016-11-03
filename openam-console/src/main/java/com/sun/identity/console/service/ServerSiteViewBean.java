@@ -31,6 +31,7 @@
  */
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
 import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
@@ -168,7 +169,8 @@ public class ServerSiteViewBean
         throws ModelControlException
     {
         if (isXuiAdminConsoleEnabled()) {
-            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.DEPLOYMENT_SERVERS);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.DEPLOYMENT_SERVERS, authenticationRealm);
         } else {
             super.beginDisplay(event);
         }
@@ -525,7 +527,8 @@ public class ServerSiteViewBean
     }
     
     public void handleBtnDefaultSettingsRequest(RequestInvocationEvent event) {
-        redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION);
+        String authenticationRealm = getAuthenticationRealm(this);
+        redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION, authenticationRealm);
     }
 
     protected String getBreadCrumbDisplayName() {

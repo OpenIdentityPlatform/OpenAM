@@ -69,6 +69,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
 
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
 import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
@@ -191,7 +192,8 @@ public class SMProfileViewBean
         throws ModelControlException
     {
         if (isXuiAdminConsoleEnabled()) {
-            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.TOP_LEVEL_REALM_SESSIONS);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.TOP_LEVEL_REALM_SESSIONS, authenticationRealm);
         } else {
             if (validSession) {
                 super.beginDisplay(event);

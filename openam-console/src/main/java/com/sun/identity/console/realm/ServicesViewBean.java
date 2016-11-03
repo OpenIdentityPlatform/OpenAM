@@ -28,10 +28,6 @@
 
 package com.sun.identity.console.realm;
 
-import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
-import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
-
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
@@ -66,6 +62,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 public class ServicesViewBean
     extends RealmPropertiesBase
@@ -135,8 +133,9 @@ public class ServicesViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
-            String redirectRealm = getRedirectRealm(this);
-            redirectToXui(getRequestContext().getRequest(), redirectRealm,
+            String redirectRealm = getAdministeredRealm(this);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm,
                     "realms/" + Uris.urlEncodePathElement(redirectRealm) + "/services");
         } else {
             super.beginDisplay(event);

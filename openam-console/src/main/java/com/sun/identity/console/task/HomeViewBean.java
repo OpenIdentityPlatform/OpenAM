@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 
@@ -58,7 +57,7 @@ public class HomeViewBean
     protected void registerChildren() {
         super.registerChildren();
     }
-    
+
     protected AMModel getModelInternal() {
         HttpServletRequest req = getRequestContext().getRequest();
         return new AMModelBase(req, getPageSessionAttributes());
@@ -67,8 +66,9 @@ public class HomeViewBean
     @Override
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            String redirectRealm = getRedirectRealm(this);
-            redirectToXui(getRequestContext().getRequest(), redirectRealm, "realms");
+            String redirectRealm = getAdministeredRealm(this);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm, "realms");
         }
     }
 }

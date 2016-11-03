@@ -29,8 +29,7 @@
  */
 package com.sun.identity.console.policy;
 
-import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
@@ -69,7 +68,7 @@ public class PolicyViewBean extends RealmPropertiesBase implements HasEntitiesTa
 
     @Override
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
-        redirectToXui(getRequestContext().getRequest(), getRedirectRealm(this),
+        redirectToXui(getRequestContext().getRequest(), getAdministeredRealm(this), getAuthenticationRealm(this),
                 MessageFormat.format("realms/{0}/authorization-policySets", getCurrentRealmEncoded()));
     }
 

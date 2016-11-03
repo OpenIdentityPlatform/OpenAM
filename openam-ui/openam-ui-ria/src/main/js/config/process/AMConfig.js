@@ -231,7 +231,9 @@ define([
 
             if (Configuration.loggedUser && Configuration.loggedUser.hasRole("ui-realm-admin")) {
                 RealmsService.realms.all().then(NavigationHelper.populateRealmsDropdown);
-                ServicesService.instance.get("rest").then(NavigationHelper.hideAPILinksOnAPIDescriptionsDisabled);
+                const suppressError = { errorsHandlers : { "Forbidden": { status: 403 } } };
+                ServicesService.instance.get("rest", suppressError)
+                    .then(NavigationHelper.hideAPILinksOnAPIDescriptionsDisabled);
             }
 
             if (Configuration.loggedUser && Configuration.globalData.xuiUserSessionValidationEnabled &&
