@@ -45,9 +45,7 @@ const SessionsTableRow = ({
                 />
             </td>
 
-            <td>
-                { moment(data.idleTime).fromNow(true) }
-            </td>
+            <td>{ moment(data.latestAccessTime).fromNow(true) }</td>
 
             <td
                 title={ t("console.sessions.table.expires", {
@@ -84,7 +82,7 @@ const SessionsTableRow = ({
 SessionsTableRow.propTypes = {
     checked: PropTypes.bool.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({
-        idleTime: PropTypes.string.isRequired,
+        latestAccessTime: PropTypes.string.isRequired,
         maxIdleExpirationTime: PropTypes.string.isRequired,
         maxSessionExpirationTime: PropTypes.string.isRequired,
         sessionHandle: PropTypes.string.isRequired
