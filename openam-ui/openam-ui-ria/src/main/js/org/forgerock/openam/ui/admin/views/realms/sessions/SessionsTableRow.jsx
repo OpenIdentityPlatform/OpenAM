@@ -15,9 +15,11 @@
  */
 
 import React, { PropTypes } from "react";
+import _ from "lodash";
 import { t } from "i18next";
 import { Button, ButtonGroup } from "react-bootstrap";
 import moment from "moment";
+import React, { PropTypes } from "react";
 
 
 const SessionsTableRow = ({
@@ -26,23 +28,21 @@ const SessionsTableRow = ({
     checked,
     data
 }) => {
-    const handleSelect = (e) => {
-        onSelect(data, e.target.checked);
-    };
+    const handleDelete = () => onDelete(data);
+    const handleSelect = (event) => onSelect(data, event.target.checked);
+    const selectId = _.uniqueId("select");
 
     const handleDelete = () => {
         onDelete(data);
     };
+    const selectId = _.unique("select");
 
     return (
-        <tr className={ checked ? "selected" : "" } >
+        <tr className={ checked ? "selected" : undefined } >
 
             <td>
-                <input
-                    checked={ checked }
-                    onChange={ handleSelect }
-                    type="checkbox"
-                />
+                <ControlLabel htmlFor={ selectId } srOnly>{ t("common.form.select") }</ControlLabel>
+                <input checked={ checked } id={ selectId } onChange={ handleSelect } type="checkbox" />
             </td>
 
             <td>{ moment(data.latestAccessTime).fromNow(true) }</td>
