@@ -18,9 +18,13 @@ package org.forgerock.openam.rest;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.providers.dpro.SSOPrincipal;
+import java.security.Principal;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.forgerock.json.resource.AbstractConnectionWrapper;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
@@ -30,10 +34,8 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 
-import javax.inject.Inject;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.Map;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 
 /**
  * CREST connection factory wrapper that elevates in coming contexts
@@ -85,7 +87,7 @@ public final class ElevatedConnectionFactoryWrapper implements ConnectionFactory
             super(connection);
 
             try {
-                SSOPrincipal ssoPrincipal = (SSOPrincipal) adminToken.getPrincipal();
+                Principal ssoPrincipal = adminToken.getPrincipal();
                 authenticationId = ssoPrincipal.getName();
                 authorisation = new HashMap<>();
                 authorisation.put("authLevel", adminToken.getAuthLevel());

@@ -15,18 +15,21 @@
  */
 package org.forgerock.openam.cts;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Singleton;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
-import java.util.concurrent.TimeUnit;
-
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-
 /**
  * Represents any configuration required for the Core Token Service.
  */
+@Singleton
 public class CoreTokenConfig {
 
     private final boolean caseSensitiveUserId;

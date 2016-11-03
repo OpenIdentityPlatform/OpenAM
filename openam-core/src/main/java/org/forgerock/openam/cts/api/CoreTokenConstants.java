@@ -15,9 +15,12 @@
  */
 package org.forgerock.openam.cts.api;
 
+import javax.inject.Singleton;
+
 /**
  * Responsible for collecting together all constants used in the Core Token Service.
  */
+@Singleton
 public class CoreTokenConstants {
 
     /**

@@ -70,18 +70,22 @@ public class AuthSessionFactory {
     /**
      * Returns the Internal Session used by the Auth Services.
      *
+     * Will create this session if it has not already been created.
+     *
      * @param domain      Authentication Domain
+     * @return Non null Authentication SSO Token
+     * @throws Exception If there was any unexpected error which prevented the token from being generated.
      */
-    public SSOToken getAuthenticationSession(String domain) {
+    public SSOToken getAuthenticationSession(String domain) throws SSOException, SessionException {
         try {
             if (authSession == null) {
                 // Create a special InternalSession for Authentication Service
                 authSession = initSsoAuthSession(initAuthSession(domain));
             }
             return authSession;
-        } catch (Exception e) {
+        } catch (SSOException | SessionException e) {
             sessionDebug.error("Error creating service session", e);
-            return null;
+            throw e;
         }
     }
 

@@ -24,17 +24,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.forgerock.guice.core.GuiceModules;
-import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.audit.AuditCoreGuiceModule;
-import org.forgerock.openam.audit.configuration.AuditConfigurationGuiceModule;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
-import org.forgerock.openam.core.guice.DataLayerGuiceModule;
-import org.forgerock.openam.notifications.NotificationBroker;
-import org.forgerock.openam.rest.RestGuiceModule;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
@@ -42,18 +32,17 @@ import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-@GuiceModules({JSONRestStatusServiceTest.TestGuiceModule.class, SharedGuiceModule.class, CoreGuiceModule.class,
-        RestGuiceModule.class, AuditCoreGuiceModule.class, AuditConfigurationGuiceModule.class,
-        DataLayerGuiceModule.class})
-public class JSONRestStatusServiceTest extends GuiceTestCase {
+public class JSONRestStatusServiceTest {
 
     private RestStatusService restStatusService;
+    private final Injector injector = Guice.createInjector();
 
     @BeforeMethod
     public void setUp() {
-        restStatusService = new JSONRestStatusService();
+        restStatusService = injector.getInstance(JSONRestStatusService.class);
     }
 
     @Test
@@ -86,15 +75,6 @@ public class JSONRestStatusServiceTest extends GuiceTestCase {
 
         //Then
         assertTrue(representation.getText().contains("\"bing\":\"bong\""));
-
-    }
-
-    public static class TestGuiceModule extends AbstractModule {
-        @Override
-        protected void configure() {
-            bind(JacksonRepresentationFactory.class);
-            bind(NotificationBroker.class).toInstance(mock(NotificationBroker.class));
-        }
 
     }
 }
