@@ -29,13 +29,42 @@
 package com.sun.identity.entitlement.opensso;
 
 import static java.util.Collections.emptySet;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.entitlement.SetupInternalNotificationSubscriptions.*;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.naming.NamingException;
+import javax.security.auth.Subject;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.opendj.ldap.DN;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.inject.Key;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
+import com.sun.identity.entitlement.PolicyEventType;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
@@ -51,27 +80,6 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.naming.NamingException;
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class *talks* to SMS to get the configuration information.
@@ -126,6 +134,8 @@ public class DataStore {
     private static SSOToken adminToken = (SSOToken)
         AccessController.doPrivileged(AdminTokenAction.getInstance());
 
+    private final NotificationBroker broker;
+
     static {
         // Initialize statistics collection
         Stats stats = Stats.getInstance("Entitlements");
@@ -134,6 +144,7 @@ public class DataStore {
     }
 
     private DataStore() {
+        broker = InjectorHolder.getInstance(Key.get(NotificationBroker.class));
     }
 
     public static DataStore getInstance() {
@@ -200,7 +211,13 @@ public class DataStore {
         return orgConf;
     }
 
-    void clearIndexCount(String realm, boolean referral) {
+    /**
+     * Clears the policy realm index.
+     *
+     * @param realm The realm for which the index to be removed.
+     * @param referral if set implies 'referral' policy handling.
+     */
+    public void clearIndexCount(String realm, boolean referral) {
         countRWLock.writeLock().lock();
         try {
             if (referral) {
@@ -450,11 +467,8 @@ public class DataStore {
             s.setAttributes(map);
             s.save();
 
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(NotificationServlet.ATTR_NAME, privilegeName);
-            params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-            Notifier.submit(NotificationServlet.PRIVILEGE_ADDED,
-                params);
+            publishInternalNotifications(privilegeName, realm, PolicyEventType.CREATE);
+
             updateIndexCount(realm, 1, false);
         } catch (JSONException e) {
             throw new EntitlementException(210, e);
@@ -465,6 +479,7 @@ public class DataStore {
         }
         return dn;
     }
+
     /**
      * Adds a referral.
      *
@@ -574,11 +589,6 @@ public class DataStore {
             s.setAttributes(map);
             s.save();
 
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(NotificationServlet.ATTR_NAME, privilegeName);
-            params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-            Notifier.submit(NotificationServlet.REFERRAL_ADDED,
-                params);
             updateIndexCount(realm, 1, true);
         } catch (SSOException e) {
             throw new EntitlementException(270, e);
@@ -619,11 +629,7 @@ public class DataStore {
                 s.delete();
                 updateIndexCount(realm, -1, false);
 
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(NotificationServlet.ATTR_NAME, name);
-                params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-                Notifier.submit(NotificationServlet.PRIVILEGE_DELETED,
-                    params);
+                publishInternalNotifications(name, realm, PolicyEventType.DELETE);
             }
         } catch (SMSException e) {
             Object[] arg = {dn};
@@ -663,13 +669,6 @@ public class DataStore {
                 SMSEntry s = new SMSEntry(token, dn);
                 s.delete();
                 updateIndexCount(realm, -1, true);
-
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(NotificationServlet.ATTR_NAME, name);
-                params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-
-                Notifier.submit(NotificationServlet.REFERRAL_DELETED,
-                    params);
             }
         } catch (SMSException e) {
             Object[] arg = {dn};
@@ -677,6 +676,14 @@ public class DataStore {
         } catch (SSOException e) {
             throw new EntitlementException(10, null, e);
         }
+    }
+
+    private void publishInternalNotifications(String policyName, String realm, PolicyEventType eventType) {
+        JsonValue notification = json(object(
+                field(MESSAGE_ATTR_NAME, policyName),
+                field(MESSAGE_ATTR_REALM, realm),
+                field(MESSAGE_ATTR_EVENT_TYPE, eventType.name())));
+        broker.publish(TOPIC_INTERNAL_POLICY, notification);
     }
 
     /**

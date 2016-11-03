@@ -372,10 +372,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>notificationservlet</servlet-name>
-        <servlet-class>com.sun.identity.entitlement.opensso.NotificationServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>entitlementmonitor</servlet-name>
         <servlet-class>com.sun.identity.entitlement.util.NetworkMonitor</servlet-class>
     </servlet>
@@ -769,10 +765,6 @@
         <url-pattern>/identity/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>notificationservlet</servlet-name>
-        <url-pattern>/notification/*</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>entitlementmonitor</servlet-name>
         <url-pattern>/entitlementmonitor/*</url-pattern>
