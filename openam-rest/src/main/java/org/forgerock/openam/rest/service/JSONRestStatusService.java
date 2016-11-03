@@ -16,14 +16,12 @@
 
 package org.forgerock.openam.rest.service;
 
-import java.util.Map;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.util.annotations.VisibleForTesting;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 
-import com.google.inject.Inject;
+import java.util.Map;
 
 /**
  * An implementation of {@code RestStatusService} that returns a {@code JacksonRepresentation}.
@@ -37,18 +35,6 @@ public class JSONRestStatusService extends RestStatusService {
      */
     public JSONRestStatusService() {
         jacksonRepresentationFactory = InjectorHolder.getInstance(JacksonRepresentationFactory.class);
-    }
-
-    /**
-     * Dependency constructor used for testing. Restlet Framework will call the default
-     * constructor {@link #JSONRestStatusService()}.
-     *
-     * @param factory non null.
-     */
-    @VisibleForTesting
-    @Inject
-    public JSONRestStatusService(JacksonRepresentationFactory factory) {
-        jacksonRepresentationFactory = factory;
     }
 
     @Override
