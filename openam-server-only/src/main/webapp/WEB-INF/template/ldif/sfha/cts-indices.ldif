@@ -36,6 +36,12 @@ objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenUserId
 ds-cfg-index-type: equality
 
+dn: ds-cfg-attribute=etag,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend-index
+ds-cfg-attribute: etag
+ds-cfg-index-type: equality
+
 dn: ds-cfg-attribute=coreTokenString01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
@@ -52,12 +58,6 @@ dn: ds-cfg-attribute=coreTokenString03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=B
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString03
-ds-cfg-index-type: equality
-
-dn: ds-cfg-attribute=coreTokenString05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: coreTokenString05
 ds-cfg-index-type: equality
 
 dn: ds-cfg-attribute=coreTokenString08,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
@@ -167,7 +167,7 @@ dn: ds-cfg-attribute=coreTokenDate02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Bac
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate02
-ds-cfg-index-type: equality
+ds-cfg-index-type: ordering
 
 dn: ds-cfg-attribute=coreTokenDate03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top
