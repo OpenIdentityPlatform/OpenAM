@@ -69,7 +69,7 @@ public final class InMemoryNotificationBrokerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         doReturn(readerFuture).when(executorService).submit(any(Runnable.class));
-        broker = new InMemoryNotificationBroker(executorService, timeService, 10L, 2);
+        broker = new InMemoryNotificationBroker(executorService, timeService, 2);
     }
 
     @Test

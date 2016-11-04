@@ -52,8 +52,8 @@ import org.slf4j.LoggerFactory;
  * a single thread for reading from it. Routing of notifications to subscriptions is done
  * on the reading thread.
  * <p>
- * The queue is a fixed size and therefore publish may block until the queue has space
- * and may eventually fail if there is not space within a given time.
+ * The queue is a fixed size and therefore notifications may be lost if the queue becomes
+ * full.
  *
  * @since 14.0.0
  */
@@ -67,7 +67,6 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
     private final TimeService timeService;
     private final Future<?> readerFuture;
 
-    private final long queueTimeoutMilliseconds;
     private volatile boolean shutdown;
 
     /**
@@ -75,18 +74,15 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
      *
      * @param executorService an executor service for creating the reading thread
      * @param timeService a time service for adding timestamps to messages
-     * @param queueTimeoutMilliseconds the maximum number of milliseconds to wait when attempting to publish a message
      * @param queueSize the number of notifications to buffer in memory
      */
     @Inject
     public InMemoryNotificationBroker(ExecutorService executorService, TimeService timeService,
-            @Named("queueTimeoutMilliseconds") long queueTimeoutMilliseconds, @Named("queueSize") int queueSize) {
+            @Named("queueSize") int queueSize) {
         Reject.ifNull(executorService, "Executor service must not be null");
         Reject.ifNull(timeService, "Time service must not be null");
-        Reject.ifTrue(queueTimeoutMilliseconds < 0, "Queue timeout must be a positive integer");
         Reject.ifTrue(queueSize < 0, "Queue size must be a positive integer");
 
-        this.queueTimeoutMilliseconds = queueTimeoutMilliseconds;
         this.timeService = timeService;
 
         queue = new ArrayBlockingQueue<>(queueSize);
@@ -104,20 +100,14 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
             return false;
         }
 
-        try {
-            NotificationEntry entry = NotificationEntry.of(topic, packageNotification(topic, notification));
+        NotificationEntry entry = NotificationEntry.of(topic, packageNotification(topic, notification));
 
-            if (!queue.offer(entry, queueTimeoutMilliseconds, TimeUnit.MILLISECONDS)) {
-                logger.warn("Failed to publish notification to queue, notification has been discarded");
-                return false;
-            }
-
-            return true;
-        } catch (InterruptedException iE) {
-            logger.warn("Failed to publish notification to queue as thread was interrupted", iE);
-            Thread.currentThread().interrupt();
+        if (!queue.offer(entry)) {
+            logger.warn("Failed to publish notification to queue, notification has been discarded");
             return false;
         }
+
+        return true;
     }
 
     private JsonValue packageNotification(Topic topic, JsonValue notification) {

@@ -51,8 +51,6 @@ public class NotificationsGuiceModule extends PrivateModule {
                 .annotatedWith(LocalOnly.class)
                 .to(InMemoryNotificationBroker.class)
                 .in(Singleton.class);
-        bindConstant().annotatedWith(Names.named("queueTimeoutMilliseconds"))
-                .to(SystemProperties.getAsLong("org.forgerock.openam.notifications.local.queueTimeoutMilliseconds", 500L));
         bindConstant().annotatedWith(Names.named("queueSize"))
                 .to(SystemProperties.getAsInt("org.forgerock.openam.notifications.local.queueSize", 10000));
         bindConstant().annotatedWith(Names.named("tokenExpirySeconds"))
