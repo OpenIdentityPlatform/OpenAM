@@ -96,6 +96,25 @@ public final class JsonValueBuilder {
     }
 
     /**
+     * Converts the passed input stream into a {@link JsonValue} represented as a list.
+     *
+     * @param json
+     *         an input stream
+     *
+     * @return a JsonValue instance represented as a list
+     *
+     * @throws JsonException
+     *         should an error occur whilst parsing the json
+     */
+    public static JsonValue toJsonArray(final InputStream json) throws JsonException {
+        try {
+            return new JsonValue(MAPPER.readValue(json, List.class));
+        } catch (IOException e) {
+            throw new JsonException("Failed to parse json", e);
+        }
+    }
+
+    /**
      * Construct a {@code JsonValue} from a classpath resource.
      * @param relativeType The type to resolve the resource from.
      * @param resource The resource path.

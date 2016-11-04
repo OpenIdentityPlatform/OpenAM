@@ -17,19 +17,20 @@
 package org.forgerock.openam.notifications.brokers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.JsonValueBuilder.toJsonArray;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.InflaterInputStream;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -37,7 +38,6 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.continuous.ChangeType;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.notifications.Consumer;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Subscription;
@@ -46,6 +46,7 @@ import org.forgerock.openam.notifications.integration.brokers.CTSNotificationBro
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -66,6 +67,13 @@ public final class CTSNotificationBrokerTest {
     private CTSPersistentStore store;
     @Mock
     private NotificationBroker localBroker;
+    @Mock
+    private ExecutorServiceFactory executorServiceFactory;
+    @Mock
+    private ScheduledExecutorService executorService;
+
+    @Captor
+    private ArgumentCaptor<Runnable> publisherTaskCaptor;
     @Captor
     private ArgumentCaptor<Token> tokenCaptor;
     @Captor
@@ -78,7 +86,8 @@ public final class CTSNotificationBrokerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        broker = new CTSNotificationBroker(store, localBroker, 600L);
+        when(executorServiceFactory.createScheduledService(anyInt())).thenReturn(executorService);
+        broker = new CTSNotificationBroker(store, localBroker, 2, 600L, 100L, executorServiceFactory);
     }
 
     @Test
@@ -87,48 +96,115 @@ public final class CTSNotificationBrokerTest {
     }
 
     @Test
-    public void whenPublishingNotificationTokenGetsPersistedToCTS() throws Exception {
+    public void whenConstructedBrokerSetsUpPublishTask() throws Exception {
+        verify(executorService).scheduleAtFixedRate(any(Runnable.class), eq(100L), eq(100L), eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void whenPublishingNotificationIsAddedToQueue() throws Exception {
         // When
         JsonValue notification = json(object(field("some-field", "some-value")));
         boolean result = broker.publish(Topic.of("test-topic"), notification);
 
         // Then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    public void whenQueueIsFullThenPublishReturnsFalse() throws Exception {
+        // When
+        JsonValue notification = json(object(field("some-field", "some-value")));
+        broker.publish(Topic.of("test-topic"), notification);
+        broker.publish(Topic.of("test-topic"), notification);
+        boolean result = broker.publish(Topic.of("test-topic"), notification);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void whenQueueIsEmptyPublisherDoesNothing() throws Exception {
+        Runnable publisher = getPublisherTask();
+        publisher.run();
+        verify(store, never()).createAsync(any(Token.class));
+    }
+
+    @Test
+    public void whenPublisherRunsNotificationTokenGetsPersistedToCTS() throws Exception {
+        Runnable publisher = getPublisherTask();
+
+        // When
+        JsonValue notification = json(object(field("some-field", "some-value")));
+        broker.publish(Topic.of("test-topic"), notification);
+        publisher.run();
+
+        // Then
         verify(store).createAsync(tokenCaptor.capture());
 
         Token token = tokenCaptor.getValue();
-        JsonValue entry = toJsonValue(token.getBlob());
+        InputStream stream = new InflaterInputStream(new ByteArrayInputStream(token.getBlob()));
+        JsonValue entries = toJsonArray(stream);
 
-        assertThat(entry.isEqualTo(json(object(field("topic", "test-topic"),
+        assertThat(entries).hasSize(1);
+        assertThat(entries.get(0).isEqualTo(json(object(field("topic", "test-topic"),
                 field("content", notification.getObject())))));
     }
 
     @Test
-    public void whenPublishingNotificationTokenGetsCorrectExpiryTime() throws Exception {
+    public void whenPublisherRunsItPublishesAllNotificationsToCTS() throws Exception {
+        Runnable publisher = getPublisherTask();
+
         // When
         JsonValue notification = json(object(field("some-field", "some-value")));
-        boolean result = broker.publish(Topic.of("test-topic"), notification);
+        broker.publish(Topic.of("test-topic"), notification);
+        broker.publish(Topic.of("test-topic"), notification);
+        publisher.run();
 
         // Then
-        assertThat(result).isTrue();
         verify(store).createAsync(tokenCaptor.capture());
 
         Token token = tokenCaptor.getValue();
-        assertThat(token.getExpiryTimestamp().getTimeInMillis()).isEqualTo(MockTimeService.NOW + TimeUnit.SECONDS.toMillis(600));
+        InputStream stream = new InflaterInputStream(new ByteArrayInputStream(token.getBlob()));
+        JsonValue entries = toJsonArray(stream);
+
+        assertThat(entries).hasSize(2);
+    }
+
+    @Test
+    public void whenPublishingNotificationTokenGetsCorrectExpiryTime() throws Exception {
+        Runnable publisher = getPublisherTask();
+
+        // When
+        JsonValue notification = json(object(field("some-field", "some-value")));
+        broker.publish(Topic.of("test-topic"), notification);
+        publisher.run();
+
+        // Then
+        verify(store).createAsync(tokenCaptor.capture());
+
+        Token token = tokenCaptor.getValue();
+        assertThat(token.getExpiryTimestamp().getTimeInMillis())
+                .isEqualTo(MockTimeService.NOW + TimeUnit.SECONDS.toMillis(600));
     }
 
     @Test
     public void whenObjectAddedToCTSBrokerDispatchesNotification() throws Exception {
         // Given
-        String notificationData = "{\"topic\":\"test-topic\",\"content\":{\"some-field\":\"some-value\"}}";
+        Runnable publisher = getPublisherTask();
         JsonValue notification = json(object(field("some-field", "some-value")));
-        verify(store).addContinuousQueryListener(listenerCaptor.capture(), any(TokenFilter.class));
-        ContinuousQueryListener<Attribute> listener = listenerCaptor.getValue();
+        broker.publish(Topic.of("test-topic"), notification);
+        publisher.run();
+        verify(store).createAsync(tokenCaptor.capture());
+        Token token = tokenCaptor.getValue();
+
+        ContinuousQueryListener<Attribute> listener = getContinuousQueryListener();
         Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValue()).willReturn(ByteString.valueOfUtf8(notificationData));
+        given(attribute.firstValue())
+                .willReturn(ByteString.valueOfBytes(token.getBlob()));
 
         // When
-        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute), ChangeType.ADD);
+        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute),
+                ChangeType.ADD);
 
         // Then
         verify(localBroker).publish(eq(Topic.of("test-topic")), jsonValueCaptor.capture());
@@ -136,48 +212,43 @@ public final class CTSNotificationBrokerTest {
     }
 
     @Test
-    public void whenObjectChangedInCTSBrokerNoActionOccurs() throws CoreTokenException {
+    public void whenObjectChangedInCTSBrokerNoActionOccurs() throws Exception {
         // Given
-        String notificationData = "{\"topic\":\"test-topic\",\"content\":{\"some-field\":\"some-value\"}}";
-        verify(store).addContinuousQueryListener(listenerCaptor.capture(), any(TokenFilter.class));
-        ContinuousQueryListener<Attribute> listener = listenerCaptor.getValue();
+        ContinuousQueryListener<Attribute> listener = getContinuousQueryListener();
         Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValue()).willReturn(ByteString.valueOfUtf8(notificationData));
 
         // When
-        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute), ChangeType.MODIFY);
+        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute),
+                ChangeType.MODIFY);
 
         // Then
         verify(localBroker, never()).publish(any(Topic.class), any(JsonValue.class));
     }
 
     @Test
-    public void whenObjectDeletedFromCTSBrokerNoActionOccurs() throws CoreTokenException {
+    public void whenObjectDeletedFromCTSBrokerNoActionOccurs() throws Exception {
         // Given
-        String notificationData = "{\"topic\":\"test-topic\",\"content\":{\"some-field\":\"some-value\"}}";
-        verify(store).addContinuousQueryListener(listenerCaptor.capture(), any(TokenFilter.class));
-        ContinuousQueryListener<Attribute> listener = listenerCaptor.getValue();
+        ContinuousQueryListener<Attribute> listener = getContinuousQueryListener();
         Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValue()).willReturn(ByteString.valueOfUtf8(notificationData));
 
         // When
-        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute), ChangeType.DELETE);
+        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute),
+                ChangeType.DELETE);
 
         // Then
         verify(localBroker, never()).publish(any(Topic.class), any(JsonValue.class));
     }
 
     @Test
-    public void whenExceptionIsThrownInCTSListenerTheExceptionIsHandled() throws CoreTokenException {
+    public void whenExceptionIsThrownInCTSListenerTheExceptionIsHandled() throws Exception {
         // Given
-        String notificationData = "{\"topic\":123,\"content\":{\"some-field\":\"some-value\"}}";
-        verify(store).addContinuousQueryListener(listenerCaptor.capture(), any(TokenFilter.class));
-        ContinuousQueryListener<Attribute> listener = listenerCaptor.getValue();
+        ContinuousQueryListener<Attribute> listener = getContinuousQueryListener();
         Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValue()).willReturn(ByteString.valueOfUtf8(notificationData));
+        given(attribute.firstValue()).willReturn(ByteString.valueOfUtf8("invalid-data"));
 
         // When
-        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute), ChangeType.ADD);
+        listener.objectChanged("1234", Collections.singletonMap(CoreTokenField.BLOB.toString(), attribute),
+                ChangeType.ADD);
 
         // Then
         verify(localBroker, never()).publish(any(Topic.class), any(JsonValue.class));
@@ -219,4 +290,14 @@ public final class CTSNotificationBrokerTest {
         verify(store).removeContinuousQueryListener(listenerCaptor.getValue(), filterCaptor.getValue());
     }
 
+    private Runnable getPublisherTask() {
+        verify(executorService).scheduleAtFixedRate(publisherTaskCaptor.capture(), anyLong(), anyLong(),
+                any(TimeUnit.class));
+        return publisherTaskCaptor.getValue();
+    }
+
+    private ContinuousQueryListener<Attribute> getContinuousQueryListener() throws Exception {
+        verify(store).addContinuousQueryListener(listenerCaptor.capture(), any(TokenFilter.class));
+        return listenerCaptor.getValue();
+    }
 }

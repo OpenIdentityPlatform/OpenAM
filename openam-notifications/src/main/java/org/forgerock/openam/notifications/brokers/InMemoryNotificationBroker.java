@@ -103,7 +103,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
         NotificationEntry entry = NotificationEntry.of(topic, packageNotification(topic, notification));
 
         if (!queue.offer(entry)) {
-            logger.warn("Failed to publish notification to queue, notification has been discarded");
+            logger.info("Failed to publish notification because queue is full. Notification discarded");
             return false;
         }
 

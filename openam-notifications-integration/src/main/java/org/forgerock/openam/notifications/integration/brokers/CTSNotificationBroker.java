@@ -16,23 +16,32 @@
 
 package org.forgerock.openam.notifications.integration.brokers;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.JsonValueBuilder.toJsonArray;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.TimeUtils.fromUnixTime;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
-import java.util.Calendar;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
-import org.forgerock.json.JsonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
@@ -50,12 +59,11 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.util.Reject;
 import org.forgerock.util.generator.IdGenerator;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Uses the CTS to propagate notifications across an OpenAM cluster.
@@ -79,24 +87,43 @@ public final class CTSNotificationBroker implements NotificationBroker {
     private final SessionNotificationListener listener;
     private final long tokenExpirySeconds;
     private final IdGenerator idGenerator;
+    private final BlockingQueue<NotificationEntry> queue;
+    private final ScheduledExecutorService executorService;
+    private volatile boolean shutdown;
 
     /**
      * Constructs a new broker.
      *
      * @param store a CTS persistent store that notifications will be written to and read from
      * @param localBroker a local-server broker used to propagate messages to local subscribers
+     * @param queueSize the size of the queue of notifications waiting to be written to the CTS
      * @param tokenExpirySeconds the number of seconds that a notification will live in the CTS before it is deleted
+     * @param publishFrequencyMilliseconds the number of milliseconds between each publish to the CTS
+     * @param executorServiceFactory an executor service factory for scheduling the publish task
      */
     @Inject
     public CTSNotificationBroker(CTSPersistentStore store,
             @Named("localBroker") NotificationBroker localBroker,
-            @Named("tokenExpirySeconds") long tokenExpirySeconds) {
+            @Named("ctsQueueSize") int queueSize,
+            @Named("tokenExpirySeconds") long tokenExpirySeconds,
+            @Named("publishFrequencyMilliseconds") long publishFrequencyMilliseconds,
+            ExecutorServiceFactory executorServiceFactory) {
+        Reject.ifNull(store, "CTS store must not be null");
+        Reject.ifNull(localBroker, "Notification broker must not be null");
+        Reject.ifNull(executorServiceFactory, "Executor service factory must not be null");
+        Reject.ifTrue(tokenExpirySeconds <= 0, "Token expiry must be a positive integer");
+        Reject.ifTrue(publishFrequencyMilliseconds <= 0, "Publish frequency must be a positive integer");
 
         this.localBroker = localBroker;
         this.store = store;
         this.tokenExpirySeconds = tokenExpirySeconds;
+        executorService = executorServiceFactory.createScheduledService(1);
         idGenerator = IdGenerator.DEFAULT;
         listener = new SessionNotificationListener();
+        queue = new ArrayBlockingQueue<>(queueSize);
+
+        executorService.scheduleAtFixedRate(new CTSPublisher(), publishFrequencyMilliseconds,
+                publishFrequencyMilliseconds, TimeUnit.MILLISECONDS);
 
         try {
             store.addContinuousQueryListener(listener, getTokenFilter());
@@ -107,26 +134,18 @@ public final class CTSNotificationBroker implements NotificationBroker {
 
     @Override
     public boolean publish(Topic topic, JsonValue notification) {
-        JsonValue entry = json(object(
-                field("topic", topic.getIdentifier()),
-                field("content", notification.getObject())));
+        Reject.ifNull(topic, "Topic must not be null");
+        Reject.ifNull(notification, "Notification must not be null");
 
-        try {
-            Token token = new Token(idGenerator.generate(), TokenType.NOTIFICATION);
-            token.setBlob(mapper.writeValueAsBytes(entry.getObject()));
-
-            long expiryTime = currentTimeMillis() + TimeUnit.SECONDS.toMillis(tokenExpirySeconds);
-            Calendar expiryTimeStamp = fromUnixTime(expiryTime, TimeUnit.MILLISECONDS);
-            token.setExpiryTimestamp(expiryTimeStamp);
-
-            store.createAsync(token);
-        } catch (CoreTokenException ctE) {
-            logger.error("Failed to write notification to CTS", ctE);
+        if (shutdown) {
+            logger.info("Not publishing notification as broker shutting down");
             return false;
-        } catch (JsonProcessingException jpE) {
-            throw new JsonException(jpE);
         }
 
+        if (!queue.offer(NotificationEntry.of(topic, notification))) {
+            logger.info("Failed to publish notification because queue is full. Notification discarded");
+            return false;
+        }
         return true;
     }
 
@@ -137,6 +156,8 @@ public final class CTSNotificationBroker implements NotificationBroker {
 
     @Override
     public void shutdown() {
+        shutdown = true;
+        executorService.shutdownNow();
         localBroker.shutdown();
 
         try {
@@ -160,12 +181,16 @@ public final class CTSNotificationBroker implements NotificationBroker {
             if (changeType == ChangeType.ADD) {
                 try {
                     ByteString entryBlob = changeSet.get(CoreTokenField.BLOB.toString()).firstValue();
-                    JsonValue entry = toJsonValue(entryBlob.toByteArray());
 
-                    String topic = entry.get("topic").asString();
-                    JsonValue content = entry.get("content");
+                    InputStream stream = new InflaterInputStream(new ByteArrayInputStream(entryBlob.toByteArray()));
+                    JsonValue entries = toJsonArray(stream);
 
-                    localBroker.publish(Topic.of(topic), content);
+                    for (JsonValue entry : entries) {
+                        String topic = entry.get("topic").asString();
+                        JsonValue content = entry.get("content");
+
+                        localBroker.publish(Topic.of(topic), content);
+                    }
                 } catch (Exception e) {
                     logger.error("Failed to publish notification to the local broker", e);
                 }
@@ -178,13 +203,68 @@ public final class CTSNotificationBroker implements NotificationBroker {
 
         @Override
         public void connectionLost() {
-            logger.error("Continuous query listener has lost its connection");
+            logger.warn("Continuous query listener has lost its connection");
         }
 
         @Override
         public void processError(DataLayerException dlE) {
             logger.error("Notification token listener error", dlE);
         }
+    }
+
+    private final class CTSPublisher implements Runnable {
+        @Override
+        public void run() {
+            List<NotificationEntry> entries = new ArrayList<>();
+            queue.drainTo(entries);
+
+            if (entries.isEmpty()) {
+                return;
+            }
+
+            List<Object> jsonEntries = new ArrayList<>(entries.size());
+            for (NotificationEntry entry : entries) {
+                jsonEntries.add(object(
+                        field("topic", entry.topic.getIdentifier()),
+                        field("content", entry.notification.getObject())
+                ));
+            }
+
+            JsonValue entry = json(jsonEntries);
+
+            try {
+                Token token = new Token(idGenerator.generate(), TokenType.NOTIFICATION);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                OutputStream dos = new DeflaterOutputStream(stream);
+                dos.write(mapper.writeValueAsBytes(entry.getObject()));
+                dos.close();
+                token.setBlob(stream.toByteArray());
+
+                long expiryTime = currentTimeMillis() + TimeUnit.SECONDS.toMillis(tokenExpirySeconds);
+                Calendar expiryTimeStamp = fromUnixTime(expiryTime, TimeUnit.MILLISECONDS);
+                token.setExpiryTimestamp(expiryTimeStamp);
+
+                store.createAsync(token);
+            } catch (CoreTokenException | IOException e) {
+                logger.info("Failed to write notification to CTS", e);
+            }
+        }
+    }
+
+    private static final class NotificationEntry {
+
+        private final Topic topic;
+        private final JsonValue notification;
+
+        private NotificationEntry(Topic topic, JsonValue notification) {
+            this.topic = topic;
+            this.notification = notification;
+        }
+
+        static NotificationEntry of(Topic topic, JsonValue notification) {
+            return new NotificationEntry(topic, notification);
+        }
+
     }
 
 }
