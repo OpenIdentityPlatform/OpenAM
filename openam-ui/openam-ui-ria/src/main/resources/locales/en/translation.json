@@ -699,7 +699,8 @@
             "name": "Name",
             "navigation": {
                 "advanced": "Advanced",
-                "agents": "Agents",
+                "webAgents": "Web Agents",
+                "javaAgents": "J2EE Agents",
                 "applications": "Applications",
                 "authentication-chains": "Authentication - Chains",
                 "authentication-modules": "Authentication - Modules",

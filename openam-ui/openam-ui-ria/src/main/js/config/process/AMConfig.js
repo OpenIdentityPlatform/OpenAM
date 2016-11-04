@@ -135,13 +135,31 @@ define([
             RedirectToLegacyConsole.realm.subjects(event);
         }
     }, {
-        startEvent: Constants.EVENT_REDIRECT_TO_JATO_AGENTS,
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_AGENTS_OAUTH20,
         description: "",
         dependencies: [
             "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
         ],
         processDescription (event, RedirectToLegacyConsole) {
-            RedirectToLegacyConsole.realm.agents(event);
+            RedirectToLegacyConsole.agents.oauth20(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_AGENTS_JAVA,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.agents.java(event);
+        }
+    }, {
+        startEvent: Constants.EVENT_REDIRECT_TO_JATO_AGENTS_WEB,
+        description: "",
+        dependencies: [
+            "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+        ],
+        processDescription (event, RedirectToLegacyConsole) {
+            RedirectToLegacyConsole.agents.web(event);
         }
     }, {
         startEvent: Constants.EVENT_REDIRECT_TO_JATO_STS,

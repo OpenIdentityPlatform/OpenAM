@@ -19,8 +19,11 @@ define([
     "org/forgerock/commons/ui/common/util/Constants"
 ], (AbstractDelegate, Constants) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`);
-    const redirector = (tab) => (realm) => {
+    const realmsRedirector = (tab) => (realm) => {
         obj.realm.redirectToTab(tab, realm);
+    };
+    const agentsRedirector = (tab) => (realm) => {
+        obj.agents.redirectToTab(tab, realm);
     };
 
     obj.global = {
@@ -63,11 +66,10 @@ define([
     };
 
     obj.realm = {
-        dataStores    : redirector(14),
-        privileges    : redirector(15),
-        subjects      : redirector(17),
-        agents        : redirector(18),
-        sts           : redirector(19),
+        dataStores    : realmsRedirector(14),
+        privileges    : realmsRedirector(15),
+        subjects      : realmsRedirector(17),
+        sts           : realmsRedirector(19),
         redirectToTab (tabIndex, realm) {
             obj.getJATOPageSession(realm).done((session) => {
                 if (session) {
@@ -80,6 +82,24 @@ define([
             });
         }
     };
+
+    obj.agents = {
+        java       : agentsRedirector(181),
+        oauth20    : agentsRedirector(183),
+        web        : agentsRedirector(180),
+        redirectToTab (tabIndex, realm) {
+            obj.getJATOPageSession(realm).done((session) => {
+                if (session) {
+                    window.location.href = `/${
+                        Constants.context}/agentconfig/Agents?Agents.tabCommon.TabHref=${
+                            tabIndex}&jato.pageSession=${session}&requester=XUI`;
+                } else {
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
+                }
+            });
+        }
+    };
+
 
     obj.getJATOPageSession = function (realm) {
         return obj.serviceCall({

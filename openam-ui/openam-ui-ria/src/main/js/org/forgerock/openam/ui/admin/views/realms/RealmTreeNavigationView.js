@@ -45,11 +45,15 @@ define([
         }, {
             title: "console.common.navigation.oauth20",
             icon: "fa-angle-right",
-            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_OAUTH20"
         }, {
-            title: "console.common.navigation.agents",
+            title: "console.common.navigation.javaAgents",
             icon: "fa-angle-right",
-            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS"
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_JAVA"
+        }, {
+            title: "console.common.navigation.webAgents",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_WEB"
         }]
     }, {
         title: "console.common.navigation.authentication",
