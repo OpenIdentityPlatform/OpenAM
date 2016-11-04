@@ -22,11 +22,7 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,6 +30,7 @@ import java.util.concurrent.Future;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.time.TimeService;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -49,14 +46,16 @@ import org.testng.annotations.Test;
  */
 public final class InMemoryNotificationBrokerTest {
 
+    private static final int CONSUMERS = 3;
+
+    @Mock
+    private ExecutorServiceFactory executorServiceFactory;
     @Mock
     private ExecutorService executorService;
     @Mock
     private Consumer consumer;
     @Mock
     private TimeService timeService;
-    @Mock
-    private Future<?> readerFuture;
 
     @Captor
     private ArgumentCaptor<Runnable> readerCapture;
@@ -68,8 +67,8 @@ public final class InMemoryNotificationBrokerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        doReturn(readerFuture).when(executorService).submit(any(Runnable.class));
-        broker = new InMemoryNotificationBroker(executorService, timeService, 2);
+        when(executorServiceFactory.createFixedThreadPool(anyInt())).thenReturn(executorService);
+        broker = new InMemoryNotificationBroker(executorServiceFactory, timeService, 2, CONSUMERS);
     }
 
     @Test
@@ -82,7 +81,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -107,7 +106,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -127,7 +126,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -149,7 +148,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -210,7 +209,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -232,14 +231,13 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
         reader.run();
 
         verify(consumer, never()).accept(any(JsonValue.class));
-        verify(readerFuture).cancel(true);
     }
 
     @Test
@@ -257,7 +255,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("another_test_topic"), anotherNotification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -280,7 +278,7 @@ public final class InMemoryNotificationBrokerTest {
         broker.publish(Topic.of("test_topic2"), notification);
 
         // Then
-        verify(executorService).submit(readerCapture.capture());
+        verify(executorService, times(CONSUMERS)).submit(readerCapture.capture());
         Runnable reader = readerCapture.getValue();
 
         broker.shutdown();
@@ -322,4 +320,10 @@ public final class InMemoryNotificationBrokerTest {
         subscription.isBoundTo(Topic.of("test_topic"));
     }
 
+    @Test
+    public void whenShuttingDownShutsDownExecutorService() throws Exception {
+        broker.shutdown();
+
+        verify(executorService).shutdownNow();
+    }
 }

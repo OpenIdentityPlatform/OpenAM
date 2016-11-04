@@ -16,10 +16,10 @@
 
 package org.forgerock.openam.notifications.brokers;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,11 +28,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.Consumer;
@@ -40,6 +36,7 @@ import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Subscription;
 import org.forgerock.openam.notifications.Topic;
 import org.forgerock.util.Reject;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.time.TimeService;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -65,29 +62,33 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
     private final BlockingQueue<NotificationEntry> queue;
     private final List<InternalSubscription> subscriptions;
     private final TimeService timeService;
-    private final Future<?> readerFuture;
 
+    private final ExecutorService executorService;
     private volatile boolean shutdown;
 
     /**
      * Constructs a new InMemoryNotificationBroker.
      *
-     * @param executorService an executor service for creating the reading thread
+     * @param executorServiceFactory an executor service factory for scheduling reader threads
      * @param timeService a time service for adding timestamps to messages
      * @param queueSize the number of notifications to buffer in memory
      */
     @Inject
-    public InMemoryNotificationBroker(ExecutorService executorService, TimeService timeService,
-            @Named("queueSize") int queueSize) {
-        Reject.ifNull(executorService, "Executor service must not be null");
+    public InMemoryNotificationBroker(ExecutorServiceFactory executorServiceFactory, TimeService timeService,
+            @Named("queueSize") int queueSize, @Named("consumers") int consumers) {
+        Reject.ifNull(executorServiceFactory, "Executor service factory must not be null");
         Reject.ifNull(timeService, "Time service must not be null");
-        Reject.ifTrue(queueSize < 0, "Queue size must be a positive integer");
+        Reject.ifTrue(queueSize <= 0, "Queue size must be a positive integer");
+        Reject.ifTrue(consumers <= 0, "Number of consumer threads must be a positive integer");
 
         this.timeService = timeService;
 
         queue = new ArrayBlockingQueue<>(queueSize);
         subscriptions = new CopyOnWriteArrayList<>();
-        readerFuture = executorService.submit(new NotificationReader());
+        executorService = executorServiceFactory.createFixedThreadPool(consumers);
+        for (int i = 0; i < consumers; i++) {
+            executorService.submit(new NotificationReader());
+        }
     }
 
     @Override
@@ -130,7 +131,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
     @Override
     public void shutdown() {
         shutdown = true;
-        readerFuture.cancel(true);
+        executorService.shutdownNow();
     }
 
     private final class NotificationReader implements Runnable {
@@ -139,7 +140,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
         public void run() {
             while (!shutdown) {
                 try {
-                    NotificationEntry entry = queue.poll(100L, TimeUnit.MILLISECONDS);
+                    NotificationEntry entry = queue.poll(10L, TimeUnit.SECONDS);
 
                     if (entry == null) {
                         continue;

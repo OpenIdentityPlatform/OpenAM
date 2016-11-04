@@ -53,6 +53,8 @@ public class NotificationsGuiceModule extends PrivateModule {
                 .in(Singleton.class);
         bindConstant().annotatedWith(Names.named("queueSize"))
                 .to(SystemProperties.getAsInt("org.forgerock.openam.notifications.local.queueSize", 10000));
+        bindConstant().annotatedWith(Names.named("consumers"))
+                .to(SystemProperties.getAsInt("org.forgerock.openam.notifications.local.consumers", 4));
         bindConstant().annotatedWith(Names.named("tokenExpirySeconds"))
                 .to(SystemProperties.getAsLong("org.forgerock.openam.notifications.cts.tokenExpirySeconds", 600L));
         bindConstant().annotatedWith(Names.named("publishFrequencyMilliseconds"))
@@ -63,12 +65,6 @@ public class NotificationsGuiceModule extends PrivateModule {
 
         expose(NotificationBroker.class).annotatedWith(LocalOnly.class);
         expose(NotificationBroker.class);
-    }
-
-    @Provides
-    @Inject
-    ExecutorService executorService(ExecutorServiceFactory factory) {
-        return factory.createFixedThreadPool(1);
     }
 
     @Provides
