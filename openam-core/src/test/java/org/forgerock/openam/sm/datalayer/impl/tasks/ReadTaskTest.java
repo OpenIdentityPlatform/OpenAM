@@ -28,6 +28,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -35,25 +36,27 @@ public class ReadTaskTest {
     private ReadTask task;
     private LdapAdapter mockAdapter;
     private String tokenId;
+    private Options options;
     private ResultHandler<Token, CoreTokenException> mockResultHandler;
 
     @BeforeMethod
     public void setup() {
         tokenId = "badger";
         mockAdapter = mock(LdapAdapter.class);
+        options = Options.defaultOptions();
         mockResultHandler = mock(ResultHandler.class);
-        task = new ReadTask(tokenId, mockResultHandler);
+        task = new ReadTask(tokenId, options, mockResultHandler);
     }
 
     @Test
     public void shouldUseAdapterForRead() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).read(eq(tokenId));
+        verify(mockAdapter).read(eq(tokenId), eq(options));
     }
 
     @Test
     public void shouldUpdateResultHandler() throws Exception {
-        given(mockAdapter.read(anyString())).willReturn(mock(Token.class));
+        given(mockAdapter.read(anyString(), eq(options))).willReturn(mock(Token.class));
         task.execute(mockAdapter);
         verify(mockResultHandler).processResults(any(Token.class));
     }
@@ -74,6 +77,6 @@ public class ReadTaskTest {
     }
 
     private void adapterWillFailOnRead() throws Exception {
-        doThrow(DataLayerException.class).when(mockAdapter).read(anyString());
+        doThrow(DataLayerException.class).when(mockAdapter).read(anyString(), eq(options));
     }
 }

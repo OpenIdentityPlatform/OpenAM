@@ -22,20 +22,25 @@ import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
+import org.forgerock.util.Options;
 
 /**
  * Responsible for creating a Token in persistence layer.
  */
 public class CreateTask extends AbstractTask {
+
     private final Token token;
+    private final Options options;
 
     /**
      * @param token Non null Token to create.
+     * @param options Non null Options for the operation.
      * @param handler Non null handler to notify.
      */
-    public CreateTask(Token token, ResultHandler<Token, ?> handler) {
+    public CreateTask(Token token, Options options, ResultHandler<Token, ?> handler) {
         super(handler);
         this.token = token;
+        this.options = options;
     }
 
     /**
@@ -48,7 +53,7 @@ public class CreateTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        Token created = adapter.create(token);
+        Token created = adapter.create(token, options);
         handler.processResults(created);
     }
 

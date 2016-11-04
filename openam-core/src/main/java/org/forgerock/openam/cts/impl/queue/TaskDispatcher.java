@@ -15,12 +15,11 @@
  */
 package org.forgerock.openam.cts.impl.queue;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -30,7 +29,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
-import org.forgerock.openam.sm.datalayer.api.OptimisticConcurrencyCheckFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
@@ -41,6 +39,7 @@ import org.forgerock.openam.sm.datalayer.impl.tasks.PartialQueryTask;
 import org.forgerock.openam.sm.datalayer.impl.tasks.QueryTask;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.util.Function;
+import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -101,13 +100,14 @@ public class TaskDispatcher {
      * @see org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration#getQueueTimeout()
      *
      * @param token Non null token to create.
+     * @param options Non null Options for the operation.
      * @param handler Non null ResultHandler to notify.
      *
      */
-    public void create(Token token, ResultHandler<Token, ?> handler) throws CoreTokenException {
-        Reject.ifNull(token);
+    public void create(Token token, Options options, ResultHandler<Token, ?> handler) throws CoreTokenException {
+        Reject.ifNull(token, options, handler);
         try {
-            taskExecutor.execute(token.getTokenId(), taskFactory.create(token, handler));
+            taskExecutor.execute(token.getTokenId(), taskFactory.create(token, options, handler));
         } catch (DataLayerException e) {
             throw new CoreTokenException("Error in data layer", e);
         }
@@ -124,14 +124,15 @@ public class TaskDispatcher {
      * @see org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration#getQueueTimeout()
      *
      * @param tokenId Non null Token ID.
+     * @param options Non null Options for the operation.
      * @param handler Non null ResultHandler to notify.
      *
      * @throws CoreTokenException If there was a problem adding the task to the queue.
      */
-    public void read(String tokenId, ResultHandler<Token, ?> handler) throws CoreTokenException {
-        Reject.ifNull(tokenId, handler);
+    public void read(String tokenId, Options options, ResultHandler<Token, ?> handler) throws CoreTokenException {
+        Reject.ifNull(tokenId, options, handler);
         try {
-            taskExecutor.execute(tokenId, taskFactory.read(tokenId, handler));
+            taskExecutor.execute(tokenId, taskFactory.read(tokenId, options, handler));
         } catch (DataLayerException e) {
             throw new CoreTokenException("Error in data layer", e);
         }
@@ -144,14 +145,15 @@ public class TaskDispatcher {
      * @see org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration#getQueueTimeout()
      *
      * @param token Non null Token.
+     * @param options Non null Options for the operation.
      * @param handler Non null ResultHandler to notify.
      *
      * @throws CoreTokenException If there was a problem adding the task to the queue.
      */
-    public void update(Token token, ResultHandler<Token, ?> handler) throws CoreTokenException {
-        Reject.ifNull(token);
+    public void update(Token token, Options options, ResultHandler<Token, ?> handler) throws CoreTokenException {
+        Reject.ifNull(token, options, handler);
         try {
-            taskExecutor.execute(token.getTokenId(), taskFactory.update(token, handler));
+            taskExecutor.execute(token.getTokenId(), taskFactory.update(token, options, handler));
         } catch (DataLayerException e) {
             throw new CoreTokenException("Error in data layer", e);
         }
@@ -170,7 +172,7 @@ public class TaskDispatcher {
      * @throws IllegalArgumentException If tokenId was null.
      */
     public void delete(String tokenId, ResultHandler<String, ?> handler) throws CoreTokenException {
-        delete(tokenId, null, handler);
+        delete(tokenId, Options.defaultOptions(), handler);
     }
 
     /**
@@ -180,16 +182,16 @@ public class TaskDispatcher {
      * @see org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration#getQueueTimeout()
      *
      * @param tokenId Non null Token ID.
-     * @param etag The ETag of the revision of the token to delete.
+     * @param options Non null Options for the operation.
      * @param handler Non null ResultHandler to notify.
      *
      * @throws CoreTokenException If there was an unexpected error during processing.
      * @throws IllegalArgumentException If tokenId was null.
      */
-    public void delete(String tokenId, String etag, ResultHandler<String, ?> handler) throws CoreTokenException {
-        Reject.ifNull(tokenId);
+    public void delete(String tokenId, Options options, ResultHandler<String, ?> handler) throws CoreTokenException {
+        Reject.ifNull(tokenId, options, handler);
         try {
-            taskExecutor.execute(tokenId, taskFactory.delete(tokenId, etag, handler));
+            taskExecutor.execute(tokenId, taskFactory.delete(tokenId, options, handler));
         } catch (DataLayerException e) {
             throw new CoreTokenException("Error in data layer", e);
         }

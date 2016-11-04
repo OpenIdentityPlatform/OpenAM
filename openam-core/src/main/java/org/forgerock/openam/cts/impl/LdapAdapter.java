@@ -16,8 +16,12 @@
 
 package org.forgerock.openam.cts.impl;
 
+import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
+import static org.forgerock.openam.tokens.CoreTokenField.ETAG;
+
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Map;
 
 import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -46,18 +50,19 @@ import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.Entries;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.controls.AssertionRequestControl;
 import org.forgerock.opendj.ldap.controls.PostReadRequestControl;
 import org.forgerock.opendj.ldap.controls.PostReadResponseControl;
+import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.requests.Request;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.util.Option;
+import org.forgerock.util.Options;
 
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
@@ -73,6 +78,7 @@ public class LdapAdapter implements TokenStorageAdapter {
     private final LdapQueryFilterVisitor queryConverter;
     private final LdapQueryFactory queryFactory;
     private final ConnectionFactory<Connection> connectionFactory;
+    private final Map<Option<?>, LdapOptionFunction> optionFunctionMap;
 
     private Connection connection;
 
@@ -86,27 +92,31 @@ public class LdapAdapter implements TokenStorageAdapter {
      */
     @Inject
     public LdapAdapter(LdapTokenAttributeConversion conversion, LdapQueryFilterVisitor queryConverter,
-                       LdapQueryFactory queryFactory, LdapConnectionFactoryProvider connectionFactoryProvider) {
+            LdapQueryFactory queryFactory, LdapConnectionFactoryProvider connectionFactoryProvider,
+            Map<Option<?>, LdapOptionFunction> optionFunctionMap) {
         this.conversion = conversion;
         this.queryConverter = queryConverter;
         this.queryFactory = queryFactory;
         this.connectionFactory = connectionFactoryProvider.createFactory();
+        this.optionFunctionMap = optionFunctionMap;
     }
 
     /**
      * Create the Token in LDAP.
      *
      * @param token Non null Token to create.
+     * @param options Non null Options for the operations.
      * @return A copy of the created {@literal} {@code Token} with the ETag set.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    public Token create(Token token) throws DataLayerException {
+    public Token create(Token token, Options options) throws DataLayerException {
         Entry entry = conversion.getEntry(token);
         try {
             getConnection();
-            Result result = connection.add(LDAPRequests
-                .newAddRequest(entry)
-                .addControl(PostReadRequestControl.newControl(true, CoreTokenField.ETAG.toString())));
+            AddRequest request = LDAPRequests.newAddRequest(entry)
+                    .addControl(PostReadRequestControl.newControl(true, ETAG.toString()));
+            request = applyOptions(request, options);
+            Result result = connection.add(request);
             return tokenWithNewEtag(token, result);
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
@@ -117,15 +127,17 @@ public class LdapAdapter implements TokenStorageAdapter {
      * Performs a read against the LDAP connection and converts the result into a Token.
      *
      * @param tokenId The id of the Token to read.
+     * @param options Non null Options for the operations.
      * @return Token if found, otherwise null.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    public Token read(String tokenId) throws DataLayerException {
+    public Token read(String tokenId, Options options) throws DataLayerException {
         DN dn = conversion.generateTokenDN(tokenId);
 
         try {
             getConnection();
-            SearchRequest request = LDAPRequests.newSingleEntrySearchRequest(dn, "*", CoreTokenField.ETAG.toString());
+            SearchRequest request = LDAPRequests.newSingleEntrySearchRequest(dn, "*", ETAG.toString());
+            request = applyOptions(request, options);
             SearchResultEntry resultEntry = connection.searchSingleEntry(request);
             return conversion.tokenFromEntry(resultEntry);
         } catch (LdapException e) {
@@ -146,11 +158,12 @@ public class LdapAdapter implements TokenStorageAdapter {
      * {@code null} value the update will be performed without any concurrency checks.</p>
      *
      * @param previous The non null previous Token to check against.
+     * @param options The non null Options for the operation.
      * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an
      * assertion on the tokens ETag. Only possible if the {@link CoreTokenField#ETAG} attribute is
      * present on the {@literal previous} token.
      */
-    public Token update(Token previous, Token updated) throws DataLayerException {
+    public Token update(Token previous, Token updated, Options options) throws DataLayerException {
         Entry currentEntry = conversion.getEntry(updated);
         LdapTokenAttributeConversion.stripObjectClass(currentEntry);
 
@@ -165,16 +178,17 @@ public class LdapAdapter implements TokenStorageAdapter {
         }
 
         request.addControl(TransactionIdControl.newControl(AuditRequestContext.createSubTransactionIdValue()))
-                .addControl(PostReadRequestControl.newControl(true, CoreTokenField.ETAG.toString()));
-        String previousEtag = previous.getAttribute(CoreTokenField.ETAG);
-        request = addEtagAssertionControl(request, previousEtag);
+                .addControl(PostReadRequestControl.newControl(true, ETAG.toString()));
+
+        request = applyOptions(request, options);
 
         try {
             getConnection();
             Result result = connection.modify(request);
             return tokenWithNewEtag(updated, result);
         } catch (AssertionFailureException e) {
-            throw new OptimisticConcurrencyCheckFailedException(updated.getTokenId(), previousEtag, e);
+            throw new OptimisticConcurrencyCheckFailedException(updated.getTokenId(),
+                    options.get(OPTIMISTIC_CONCURRENCY_CHECK_OPTION), e);
         } catch (LdapException e) {
             throw new LdapOperationFailedException(e.getResult());
         }
@@ -188,19 +202,20 @@ public class LdapAdapter implements TokenStorageAdapter {
      * be performed without any concurrency checks.</p>
      *
      * @param tokenId The non null Token ID to delete.
-     * @param etag The ETag of the revision of the token to delete.
+     * @param options The non null Options for the operation.
      * @throws DataLayerException If the operation failed, this exception will capture the reason.
      * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an assertion on the tokens ETag.
      */
-    public void delete(String tokenId, String etag) throws DataLayerException {
+    public void delete(String tokenId, Options options) throws DataLayerException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
         try {
             getConnection();
             DeleteRequest request = LDAPRequests.newDeleteRequest(dn);
-            request = addEtagAssertionControl(request, etag);
+            request = applyOptions(request, options);
             verifySuccess(connection.delete(request));
         } catch (AssertionFailureException e) {
-            throw new OptimisticConcurrencyCheckFailedException(tokenId, etag, e);
+            throw new OptimisticConcurrencyCheckFailedException(tokenId,
+                    options.get(OPTIMISTIC_CONCURRENCY_CHECK_OPTION), e);
         } catch (LdapException e) {
             Result result = e.getResult();
             if (e.getResult() != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
@@ -263,7 +278,7 @@ public class LdapAdapter implements TokenStorageAdapter {
     private Token tokenWithNewEtag(Token token, Result result) throws LdapOperationFailedException {
         verifySuccess(result);
         Token newToken = new Token(token);
-        newToken.setAttribute(CoreTokenField.ETAG, extractEtag(result));
+        newToken.setAttribute(ETAG, extractEtag(result));
         return newToken;
     }
 
@@ -279,18 +294,17 @@ public class LdapAdapter implements TokenStorageAdapter {
             PostReadResponseControl control =
                     result.getControl(PostReadResponseControl.DECODER, new DecodeOptions());
             Entry entry = control.getEntry();
-            return entry.getAttribute(CoreTokenField.ETAG.toString()).firstValueAsString();
+            return entry.getAttribute(ETAG.toString()).firstValueAsString();
         } catch (final DecodeException e) {
             throw new LdapOperationFailedException("Failed to extract the e-tag", e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends Request> T addEtagAssertionControl(T request, String etag) {
-        if (etag != null) {
-            return (T) request.addControl(AssertionRequestControl.newControl(true,
-                    Filter.equality(CoreTokenField.ETAG.toString(), etag)));
+    private <R extends Request> R applyOptions(R request, Options options) {
+        R r = request;
+        for (LdapOptionFunction optionFunction : optionFunctionMap.values()) {
+            r = optionFunction.apply(r, options);
         }
-        return request;
+        return r;
     }
 }

@@ -27,6 +27,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.Options;
 
 /**
  * Core Token Service Persistent Store is responsible for the storage and retrieval of Tokens from a persistent store.
@@ -62,6 +63,17 @@ public interface CTSPersistentStore {
     void create(Token token) throws CoreTokenException;
 
     /**
+     * Creates a Token in the persistent store synchronously.
+     *
+     * @param token Non null Token to create.
+     * @param options Non null Options for the operation.
+     * @throws CoreTokenException If there was an error while performing the different
+     * {@link TokenBlobStrategy}s on the provided Token, or if the operation itself
+     * has failed.
+     */
+    void create(Token token, Options options) throws CoreTokenException;
+
+    /**
      * Creates a Token in the persistent store asynchronously. The result of the operation (success/failure) is ignored.
      *
      * @param token Non null Token to create.
@@ -69,6 +81,16 @@ public interface CTSPersistentStore {
      * {@link TokenBlobStrategy}s on the provided Token.
      */
     void createAsync(Token token) throws CoreTokenException;
+
+    /**
+     * Creates a Token in the persistent store asynchronously. The result of the operation (success/failure) is ignored.
+     *
+     * @param token Non null Token to create.
+     * @param options Non null Options for the operation.
+     * @throws CoreTokenException If there was an error while performing the different
+     * {@link TokenBlobStrategy}s on the provided Token.
+     */
+    void createAsync(Token token, Options options) throws CoreTokenException;
 
     /**
      * Read a Token from the persistent store synchronously.
@@ -79,6 +101,17 @@ public interface CTSPersistentStore {
      * {@link TokenBlobStrategy}s on the returned Token, or if the operation itself has failed.
      */
     Token read(String tokenId) throws CoreTokenException;
+
+    /**
+     * Read a Token from the persistent store synchronously.
+     *
+     * @param tokenId The non null Token Id that the Token was created with.
+     * @param options The non null Options for the operation.
+     * @return Null if there was no matching Token. Otherwise a fully populated Token will be returned.
+     * @throws CoreTokenException If there was an error while performing the different
+     * {@link TokenBlobStrategy}s on the returned Token, or if the operation itself has failed.
+     */
+    Token read(String tokenId, Options options) throws CoreTokenException;
 
     /**
      * Updates an existing Token in the store synchronously. If the Token does not exist in the store then a Token is
@@ -96,6 +129,22 @@ public interface CTSPersistentStore {
     void update(Token token) throws CoreTokenException;
 
     /**
+     * Updates an existing Token in the store synchronously. If the Token does not exist in the store then a Token is
+     * created. If the Token did exist in the store then it is updated.
+     *
+     * Not all fields of the Token can be updated, see the Token class for more details.
+     *
+     * @see Token#isFieldReadOnly(org.forgerock.openam.tokens.CoreTokenField)
+     *
+     * @param token Non null Token to update.
+     * @param options Non null Options for the operation.
+     * @throws CoreTokenException If there was an error while performing the different
+     * {@link org.forgerock.openam.cts.utils.blob.TokenBlobStrategy}s on the provided Token, or if the operation itself
+     * has failed.
+     */
+    void update(Token token, Options options) throws CoreTokenException;
+
+    /**
      * Updates an existing Token in the store asynchronously. If the Token does not exist in the store then a Token is
      * created. If the Token did exist in the store then it is updated.
      *
@@ -108,6 +157,21 @@ public interface CTSPersistentStore {
      * {@link org.forgerock.openam.cts.utils.blob.TokenBlobStrategy}s on the provided Token.
      */
     void updateAsync(Token token) throws CoreTokenException;
+
+    /**
+     * Updates an existing Token in the store asynchronously. If the Token does not exist in the store then a Token is
+     * created. If the Token did exist in the store then it is updated.
+     *
+     * Not all fields of the Token can be updated, see the Token class for more details.
+     *
+     * @see Token#isFieldReadOnly(org.forgerock.openam.tokens.CoreTokenField)
+     *
+     * @param token Non null Token to update.
+     * @param options Non null Options for the operation.
+     * @throws CoreTokenException If there was an error while performing the different
+     * {@link org.forgerock.openam.cts.utils.blob.TokenBlobStrategy}s on the provided Token.
+     */
+    void updateAsync(Token token, Options options) throws CoreTokenException;
 
     /**
      * Delete the Token from the store synchronously.
@@ -136,6 +200,18 @@ public interface CTSPersistentStore {
     void delete(String tokenId) throws CoreTokenException;
 
     /**
+     * Delete the Token from the store synchronously based on its id.
+     *
+     * Note: It is often more efficient to delete the token based on the Id if you already have this information,
+     * rather than reading the Token first before removing it.
+     *
+     * @param tokenId The non null Token Id of the token to remove.
+     * @param options The non null Options for the operation.
+     * @throws CoreTokenException If the delete operation has failed.
+     */
+    void delete(String tokenId, Options options) throws CoreTokenException;
+
+    /**
      * Delete the Token from the store asynchronously based on its id.
      *
      * Note: It is often more efficient to delete the token based on the Id if you already
@@ -144,6 +220,17 @@ public interface CTSPersistentStore {
      * @param tokenId The non null Token Id of the token to remove.
      */
     void deleteAsync(String tokenId) throws CoreTokenException;
+
+    /**
+     * Delete the Token from the store asynchronously based on its id.
+     *
+     * Note: It is often more efficient to delete the token based on the Id if you already
+     * have this information, rather than reading the Token first before removing it.
+     *
+     * @param tokenId The non null Token Id of the token to remove.
+     * @param options The non null Options for the operation.
+     */
+    void deleteAsync(String tokenId, Options options) throws CoreTokenException;
 
     /**
      * Delete a collection of Tokens from the Token Store asynchronously using a filter to narrow down the Tokens to be

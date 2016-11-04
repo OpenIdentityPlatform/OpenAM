@@ -38,6 +38,7 @@ import org.forgerock.openam.tokens.TokenType;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionState;
+import org.forgerock.util.Options;
 
 /**
  * Delegate for {@link SessionIdleTimeExpiredProcess} and {@link MaxSessionTimeExpiredProcess} which handles
@@ -98,7 +99,7 @@ class SessionExpiryBatchHandler {
             Token token = new Token(tokenId, TokenType.SESSION);
             token.setAttribute(CoreTokenField.ETAG, partialToken.getValue(CoreTokenField.ETAG));
             token.setAttribute(SessionTokenField.SESSION_STATE.getField(), SessionState.DESTROYED.toString());
-            queue.update(token, stateChangeResultHandler);
+            queue.update(token, Options.defaultOptions(), stateChangeResultHandler);
         }
         return latch;
     }

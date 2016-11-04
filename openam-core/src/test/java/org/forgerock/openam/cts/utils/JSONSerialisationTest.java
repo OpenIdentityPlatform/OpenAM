@@ -18,6 +18,7 @@ package org.forgerock.openam.cts.utils;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.*;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;

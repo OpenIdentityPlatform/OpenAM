@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -22,6 +23,7 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,29 +31,29 @@ public class DeleteTaskTest {
     private DeleteTask task;
     private LdapAdapter mockAdapter;
     private String tokenId;
-    private String etag;
+    private Options options;
     private ResultHandler<String, ?> mockResultHandler;
 
     @BeforeMethod
     public void setup() {
         tokenId = "badger";
-        etag = "ETAG";
+        options = Options.defaultOptions().set(OPTIMISTIC_CONCURRENCY_CHECK_OPTION, "ETAG");
         mockAdapter = mock(LdapAdapter.class);
         mockResultHandler = mock(ResultHandler.class);
 
-        task = new DeleteTask(tokenId, etag, mockResultHandler);
+        task = new DeleteTask(tokenId, options, mockResultHandler);
     }
 
     @Test
     public void shouldUseAdapterForDelete() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).delete(eq(tokenId), eq(etag));
+        verify(mockAdapter).delete(eq(tokenId), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).delete(anyString(), anyString());
+                .when(mockAdapter).delete(anyString(), any(Options.class));
         task.execute(mockAdapter);
         verify(mockResultHandler).processError(any(CoreTokenException.class));
     }

@@ -22,6 +22,7 @@ import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.util.Options;
 
 /**
  * Generates instances of specific Task implementations.
@@ -37,52 +38,45 @@ public class TaskFactory {
      * Used to signal the creation of the given Token.
      *
      * @param token Non null. The token to create.
+     * @param options Non null. The Options for the operation.
      * @return Non null. Token creation Task.
      */
-    public Task create(Token token, ResultHandler<Token, ?> handler) {
-        return new CreateTask(token, handler);
+    public Task create(Token token, Options options, ResultHandler<Token, ?> handler) {
+        return new CreateTask(token, options, handler);
     }
 
     /**
      * Used to signal a read operation for the Token ID.
      *
      * @param tokenId Non null. The token ID to read.
+     * @param options Non null. The Options for the operation.
      * @param handler Required handler to notify when operation is complete.
      * @return Non null. Token read Task.
      */
-    public Task read(String tokenId, ResultHandler<Token, ?> handler) {
-        return new ReadTask(tokenId, handler);
+    public Task read(String tokenId, Options options, ResultHandler<Token, ?> handler) {
+        return new ReadTask(tokenId, options, handler);
     }
 
     /**
      * Used to signal an update operation for the given Token.
      *
      * @param token Non null. The token ID to update.
+     * @param options Non null. The Options for the operation.
      * @return Non null. Token update Task.
      */
-    public Task update(Token token, ResultHandler<Token, ?> handler) {
-        return new UpdateTask(token, handler);
+    public Task update(Token token, Options options, ResultHandler<Token, ?> handler) {
+        return new UpdateTask(token, options, handler);
     }
 
     /**
      * Used to signal a delete operation for the given Token ID.
      *
      * @param tokenId Non null. The token ID to delete.
+     * @param options Non null. The Options for the operation.
      * @return Non null. Token delete Task.
      */
-    public Task delete(String tokenId, ResultHandler<String, ?> handler) {
-        return delete(tokenId, null, handler);
-    }
-
-    /**
-     * Used to signal a delete operation for the given Token ID for a particular revision of the token.
-     *
-     * @param tokenId Non null. The token ID to delete.
-     * @param etag The ETag of the revision of the token to delete.
-     * @return Non null. Token delete Task.
-     */
-    public Task delete(String tokenId, String etag, ResultHandler<String, ?> handler) {
-        return new DeleteTask(tokenId, etag, handler);
+    public Task delete(String tokenId, Options options, ResultHandler<String, ?> handler) {
+        return new DeleteTask(tokenId, options, handler);
     }
 
     /**

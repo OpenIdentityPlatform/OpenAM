@@ -36,6 +36,7 @@ import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.Options;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -94,7 +95,7 @@ public class SessionExpiryBatchHandlerTest {
         // Given
         List<PartialToken> tokens = Collections.singletonList(partialToken("one"));
         CountDownLatch countDownLatch = handler.timeoutBatch(tokens);
-        verify(mockQueue, times(1)).update(tokenArgumentCaptor.capture(), resultHandlerArgumentCaptor.capture());
+        verify(mockQueue, times(1)).update(tokenArgumentCaptor.capture(), any(Options.class), resultHandlerArgumentCaptor.capture());
         InternalSession mockSession = mock(InternalSession.class);
         given(mockSessionAccessManager.getInternalSession(any(SessionID.class))).willReturn(mockSession);
 
@@ -107,7 +108,7 @@ public class SessionExpiryBatchHandlerTest {
     }
 
     private void assertAttemptsToUpdateSessionStateOfAllTokens(List<PartialToken> tokens, String newState) throws Exception {
-        verify(mockQueue, times(tokens.size())).update(tokenArgumentCaptor.capture(), any(ResultHandler.class));
+        verify(mockQueue, times(tokens.size())).update(tokenArgumentCaptor.capture(), any(Options.class), any(ResultHandler.class));
         Iterator<PartialToken> partialTokenIterator = tokens.iterator();
         for (final Token token : tokenArgumentCaptor.getAllValues()) {
             final String expectedTokenId = partialTokenIterator.next().getValue(CoreTokenField.TOKEN_ID);

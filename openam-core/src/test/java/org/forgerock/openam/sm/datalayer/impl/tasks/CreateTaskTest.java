@@ -26,6 +26,7 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -35,6 +36,7 @@ public class CreateTaskTest {
     private LdapAdapter mockAdapter;
     private Token mockToken;
     private Token mockCreated;
+    private Options options;
     private ResultHandler<Token, ?> mockHandler;
 
     @BeforeMethod
@@ -42,22 +44,23 @@ public class CreateTaskTest {
         mockToken = mock(Token.class);
         mockCreated = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
+        options = Options.defaultOptions();
         mockHandler = mock(ResultHandler.class);
-        given(mockAdapter.create(mockToken)).willReturn(mockCreated);
+        given(mockAdapter.create(mockToken, options)).willReturn(mockCreated);
 
-        task = new CreateTask(mockToken, mockHandler);
+        task = new CreateTask(mockToken, options, mockHandler);
     }
 
     @Test
     public void shouldUseAdapterForCreate() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).create(eq(mockToken));
+        verify(mockAdapter).create(eq(mockToken), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).create(any(Token.class));
+                .when(mockAdapter).create(any(Token.class), eq(options));
         task.execute(mockAdapter);
         verify(mockHandler).processError(any(CoreTokenException.class));
     }

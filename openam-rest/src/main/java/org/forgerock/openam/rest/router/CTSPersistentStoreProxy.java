@@ -28,6 +28,7 @@ import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.Options;
 
 /**
  * A proxy implementation of the CTSPersistentStore, which delegates all its calls to the "real" implementation.
@@ -64,8 +65,18 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
     }
 
     @Override
+    public void create(Token token, Options options) throws CoreTokenException {
+        CTSHolder.get().create(token, options);
+    }
+
+    @Override
     public void createAsync(Token token) throws CoreTokenException {
         CTSHolder.get().createAsync(token);
+    }
+
+    @Override
+    public void createAsync(Token token, Options options) throws CoreTokenException {
+        CTSHolder.get().createAsync(token, options);
     }
 
     @Override
@@ -74,13 +85,28 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
     }
 
     @Override
+    public Token read(String tokenId, Options options) throws CoreTokenException {
+        return CTSHolder.get().read(tokenId, options);
+    }
+
+    @Override
     public void update(Token token) throws CoreTokenException {
         CTSHolder.get().update(token);
     }
 
     @Override
+    public void update(Token token, Options options) throws CoreTokenException {
+        CTSHolder.get().update(token, options);
+    }
+
+    @Override
     public void updateAsync(Token token) throws CoreTokenException {
         CTSHolder.get().updateAsync(token);
+    }
+
+    @Override
+    public void updateAsync(Token token, Options options) throws CoreTokenException {
+        CTSHolder.get().updateAsync(token, options);
     }
 
     @Override
@@ -97,9 +123,20 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
     public void delete(String tokenId) throws CoreTokenException {
         CTSHolder.get().delete(tokenId);
     }
+
+    @Override
+    public void delete(String tokenId, Options options) throws CoreTokenException {
+        CTSHolder.get().delete(tokenId, options);
+    }
+
     @Override
     public void deleteAsync(String tokenId) throws CoreTokenException {
         CTSHolder.get().deleteAsync(tokenId);
+    }
+
+    @Override
+    public void deleteAsync(String tokenId, Options options) throws CoreTokenException {
+        CTSHolder.get().deleteAsync(tokenId, options);
     }
 
     @Override

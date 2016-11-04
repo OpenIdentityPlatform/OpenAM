@@ -21,6 +21,7 @@ import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
+import org.forgerock.util.Options;
 
 /**
  * Deletes a given Token from the persistence layer.
@@ -28,18 +29,17 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 public class DeleteTask extends AbstractTask {
 
     private final String tokenId;
-    private final String etag;
+    private final Options options;
 
     /**
      * @param tokenID The Token ID to delete when executed.
-     * @param etag The ETag of the revision of the token to delete,
-     *             When null prevents concurrent modification check.
+     * @param options The Options for the operation.
      * @param handler Non null result handler for signalling status of operation.
      */
-    public DeleteTask(String tokenID, String etag, ResultHandler<String, ?> handler) {
+    public DeleteTask(String tokenID, Options options, ResultHandler<String, ?> handler) {
         super(handler);
         this.tokenId = tokenID;
-        this.etag = etag;
+        this.options = options;
     }
 
     /**
@@ -51,7 +51,7 @@ public class DeleteTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.delete(tokenId, etag);
+        adapter.delete(tokenId, options);
         handler.processResults(tokenId);
     }
 

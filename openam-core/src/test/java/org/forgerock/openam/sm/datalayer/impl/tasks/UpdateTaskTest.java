@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -28,6 +29,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,6 +39,7 @@ public class UpdateTaskTest {
     private Token mockPrevious;
     private Token mockUpdated;
     private Token mockReturned;
+    private Options options;
     private ResultHandler<Token, ?> mockHandler;
 
     @BeforeMethod
@@ -45,29 +48,30 @@ public class UpdateTaskTest {
         mockPrevious = mock(Token.class);
         mockReturned = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
+        options = Options.defaultOptions().set(OPTIMISTIC_CONCURRENCY_CHECK_OPTION, "ETAG");
         mockHandler = mock(ResultHandler.class);
-        task = new UpdateTask(mockUpdated, mockHandler);
+        task = new UpdateTask(mockUpdated, options, mockHandler);
 
-        given(mockAdapter.read(anyString())).willReturn(mockPrevious);
-        given(mockAdapter.update(mockPrevious, mockUpdated)).willReturn(mockReturned);
+        given(mockAdapter.read(anyString(), eq(options))).willReturn(mockPrevious);
+        given(mockAdapter.update(mockPrevious, mockUpdated, options)).willReturn(mockReturned);
     }
 
     @Test
     public void shouldUpdateWhenTokenPresent() throws Exception {
         task.execute(mockAdapter);
-        verify(mockAdapter).update(eq(mockPrevious), eq(mockUpdated));
+        verify(mockAdapter).update(eq(mockPrevious), eq(mockUpdated), eq(options));
     }
 
     @Test
     public void shouldCreateWhenNotPresent() throws Exception {
-        given(mockAdapter.read(anyString())).willReturn(null);
+        given(mockAdapter.read(anyString(), eq(options))).willReturn(null);
         task.execute(mockAdapter);
-        verify(mockAdapter).create(eq(mockUpdated));
+        verify(mockAdapter).create(eq(mockUpdated), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
-        doThrow(DataLayerException.class).when(mockAdapter).read(anyString());
+        doThrow(DataLayerException.class).when(mockAdapter).read(anyString(), eq(options));
         task.execute(mockAdapter);
         verify(mockHandler).processError(any(CoreTokenException.class));
     }

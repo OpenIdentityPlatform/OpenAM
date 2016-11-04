@@ -22,20 +22,25 @@ import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
+import org.forgerock.util.Options;
 
 /**
  * Performs a Read against the persistence layer.
  */
 public class ReadTask extends AbstractTask {
+
     private final String tokenId;
+    private final Options options;
 
     /**
      * @param tokenId The Token ID to read.
+     * @param options The Options for the operation.
      * @param handler The ResultHandler to update with the result.
      */
-    public ReadTask(String tokenId, ResultHandler<Token, ?> handler) {
+    public ReadTask(String tokenId, Options options, ResultHandler<Token, ?> handler) {
         super(handler);
         this.tokenId = tokenId;
+        this.options = options;
     }
 
     /**
@@ -50,7 +55,7 @@ public class ReadTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        Token token = adapter.read(tokenId);
+        Token token = adapter.read(tokenId, options);
         handler.processResults(token);
     }
 

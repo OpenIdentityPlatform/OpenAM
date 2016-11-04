@@ -16,14 +16,13 @@
 
 package org.forgerock.openam.sm.datalayer.store;
 
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -34,13 +33,12 @@ import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.Options;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.sun.identity.shared.debug.Debug;
 
 public class TokenDataStoreTest {
 
@@ -54,28 +52,21 @@ public class TokenDataStoreTest {
         adapter = mock(JavaBeanAdapter.class);
         taskExecutor = mock(PooledTaskExecutor.class);
         taskFactory = mock(TaskFactory.class);
-        this.store = new TokenDataStore<Object>(adapter, taskExecutor, taskFactory, mock(Debug.class));
+        this.store = new TokenDataStore<>(adapter, taskExecutor, taskFactory, mock(Debug.class));
     }
 
     @Test
     public void testCreate() throws Exception {
         // Given
         Token token = new Token("123", TokenType.GENERIC);
-        final Task task = mock(Task.class);
         when(adapter.toToken(anyObject())).thenReturn(token);
-        when(taskFactory.create(any(Token.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(new Object());
-                return task;
-            }
-        });
+        Task task = givenCreateTaskCompletesSuccessfully();
 
         // When
         store.create(new Object());
 
         // Then
-        verify(taskFactory).create(eq(token), any(ResultHandler.class));
+        verify(taskFactory).create(eq(token), any(Options.class), any(ResultHandler.class));
         verify(taskExecutor).execute("123", task);
     }
 
@@ -83,15 +74,8 @@ public class TokenDataStoreTest {
     public void testCreateError() throws Exception {
         // Given
         Token token = new Token("123", TokenType.GENERIC);
-        final Task task = mock(Task.class);
         when(adapter.toToken(anyObject())).thenReturn(token);
-        when(taskFactory.create(any(Token.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processError(new Exception());
-                return task;
-            }
-        });
+        givenCreateTaskFailsToComplete();
 
         // When
         store.create(new Object());
@@ -105,7 +89,7 @@ public class TokenDataStoreTest {
         Token token = new Token("123", TokenType.GENERIC);
         final Task task = mock(Task.class);
         when(adapter.toToken(anyObject())).thenReturn(token);
-        when(taskFactory.create(any(Token.class), any(ResultHandler.class))).thenReturn(task);
+        when(taskFactory.create(any(Token.class), any(Options.class), any(ResultHandler.class))).thenReturn(task);
         doThrow(DataLayerException.class).when(taskExecutor).execute("123", task);
 
         // When
@@ -119,21 +103,14 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task task = mock(Task.class);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
-            @Override
-            public Task answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return task;
-            }
-        });
+        Task task = givenReadTaskCompletesSuccessfully(token);
 
         // When
         Object result = store.read("123");
 
         // Then
-        verify(taskFactory).read(eq("123"), any(ResultHandler.class));
+        verify(taskFactory).read(eq("123"), any(Options.class), any(ResultHandler.class));
         verify(taskExecutor).execute("123", task);
         assertThat(result).isSameAs(returned);
     }
@@ -143,15 +120,8 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task task = mock(Task.class);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
-            @Override
-            public Task answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(null);
-                return task;
-            }
-        });
+        givenReadTaskCompletesSuccessfully(null);
 
         // When
         store.read("123");
@@ -162,15 +132,8 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task task = mock(Task.class);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
-            @Override
-            public Task answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processError(new Exception());
-                return task;
-            }
-        });
+        givenReadTaskFailsToComplete();
 
         // When
         store.read("123");
@@ -181,15 +144,8 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task task = mock(Task.class);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
-            @Override
-            public Task answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return task;
-            }
-        });
+        givenReadTaskCompletesSuccessfully(token);
         doThrow(DataLayerException.class).when(taskExecutor).execute(anyString(), any(Task.class));
 
         // When
@@ -200,29 +156,15 @@ public class TokenDataStoreTest {
     public void testUpdate() throws Exception {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
-        final Task readTask = mock(Task.class);
-        final Task updateTask = mock(Task.class);
         when(adapter.toToken(anyObject())).thenReturn(token);
-        when(taskFactory.read(eq("123"), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return readTask;
-            }
-        });
-        when(taskFactory.update(any(Token.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return updateTask;
-            }
-        });
+        Task readTask = givenReadTaskCompletesSuccessfully("123", token);
+        Task updateTask = givenUpdateTaskCompletesSuccessfully(token);
 
         // When
         store.update(new Object());
 
         // Then
-        verify(taskFactory).update(eq(token), any(ResultHandler.class));
+        verify(taskFactory).update(eq(token), any(Options.class), any(ResultHandler.class));
         verify(taskExecutor).execute("123", readTask);
         verify(taskExecutor).execute("123", updateTask);
     }
@@ -231,15 +173,8 @@ public class TokenDataStoreTest {
     public void testUpdateNotExisting() throws Exception {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
-        final Task readTask = mock(Task.class);
         when(adapter.toToken(anyObject())).thenReturn(token);
-        when(taskFactory.read(eq("123"), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(null);
-                return readTask;
-            }
-        });
+        givenReadTaskCompletesSuccessfully("123", null);
 
         // When
         store.update(new Object());
@@ -252,24 +187,10 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task readTask = mock(Task.class);
-        final Task updateTask = mock(Task.class);
         when(adapter.toToken(any())).thenReturn(token);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(eq("123"), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return readTask;
-            }
-        });
-        when(taskFactory.update(any(Token.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processError(new Exception());
-                return updateTask;
-            }
-        });
+        givenReadTaskCompletesSuccessfully("123", token);
+        givenUpdateTaskFailsToComplete();
 
         // When
         store.update(new Object());
@@ -282,24 +203,10 @@ public class TokenDataStoreTest {
         // Given
         final Token token = new Token("123", TokenType.GENERIC);
         Object returned = new Object();
-        final Task readTask = mock(Task.class);
-        final Task updateTask = mock(Task.class);
         when(adapter.toToken(any())).thenReturn(token);
         when(adapter.fromToken(token)).thenReturn(returned);
-        when(taskFactory.read(eq("123"), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return readTask;
-            }
-        });
-        when(taskFactory.update(any(Token.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(token);
-                return updateTask;
-            }
-        });
+        givenReadTaskCompletesSuccessfully("123", token);
+        Task updateTask = givenUpdateTaskCompletesSuccessfully(token);
         doThrow(DataLayerException.class).when(taskExecutor).execute(anyString(), eq(updateTask));
 
         // When
@@ -311,34 +218,20 @@ public class TokenDataStoreTest {
     @Test
     public void testDelete() throws Exception {
         // Given
-        final Task task = mock(Task.class);
-        when(taskFactory.delete(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processResults(new Object());
-                return task;
-            }
-        });
+        Task task = givenDeleteTaskCompletesSuccessfully();
 
         // When
         store.delete("123");
 
         // Then
-        verify(taskFactory).delete(eq("123"), any(ResultHandler.class));
+        verify(taskFactory).delete(eq("123"), any(Options.class), any(ResultHandler.class));
         verify(taskExecutor).execute("123", task);
     }
 
     @Test(expectedExceptions = ServerException.class)
     public void testDeleteError() throws Exception {
         // Given
-        final Task task = mock(Task.class);
-        when(taskFactory.delete(anyString(), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultHandler) invocation.getArguments()[1]).processError(new Exception());
-                return task;
-            }
-        });
+        givenDeleteTaskFailsToComplete();
 
         // When
         store.delete("123");
@@ -350,7 +243,7 @@ public class TokenDataStoreTest {
     public void testDeleteExecutorError() throws Exception {
         // Given
         final Task task = mock(Task.class);
-        when(taskFactory.delete(anyString(), any(ResultHandler.class))).thenReturn(task);
+        when(taskFactory.delete(anyString(), any(Options.class), any(ResultHandler.class))).thenReturn(task);
         doThrow(DataLayerException.class).when(taskExecutor).execute("123", task);
 
         // When
@@ -436,5 +329,118 @@ public class TokenDataStoreTest {
         store.query(query);
 
         // Then - exception;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Task givenCreateTaskCompletesSuccessfully() {
+        final Task task = mock(Task.class);
+        when(taskFactory.create(any(Token.class), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processResults(new Object());
+                return task;
+            }
+        });
+        return task;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void givenCreateTaskFailsToComplete() {
+        final Task task = mock(Task.class);
+        when(taskFactory.create(any(Token.class), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processError(new Exception());
+                return task;
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Task givenReadTaskCompletesSuccessfully(final Token token) {
+        final Task task = mock(Task.class);
+        when(taskFactory.read(anyString(), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
+            @Override
+            public Task answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processResults(token);
+                return task;
+            }
+        });
+        return task;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Task givenReadTaskCompletesSuccessfully(String tokenId, final Token token) {
+        final Task task = mock(Task.class);
+        when(taskFactory.read(eq(tokenId), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
+            @Override
+            public Task answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processResults(token);
+                return task;
+            }
+        });
+        return task;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void givenReadTaskFailsToComplete() {
+        final Task task = mock(Task.class);
+        when(taskFactory.read(anyString(), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processError(new Exception());
+                return task;
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Task givenUpdateTaskCompletesSuccessfully(final Token token) {
+        final Task task = mock(Task.class);
+        when(taskFactory.update(any(Token.class), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Task>() {
+            @Override
+            public Task answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processResults(token);
+                return task;
+            }
+        });
+        return task;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void givenUpdateTaskFailsToComplete() {
+        final Task task = mock(Task.class);
+        when(taskFactory.update(any(Token.class), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processError(new Exception());
+                return task;
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Task givenDeleteTaskCompletesSuccessfully() {
+        final Task task = mock(Task.class);
+        when(taskFactory.delete(anyString(), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processResults(new Object());
+                return task;
+            }
+        });
+        return task;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void givenDeleteTaskFailsToComplete() {
+        final Task task = mock(Task.class);
+        when(taskFactory.delete(anyString(), any(Options.class), any(ResultHandler.class))).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                ((ResultHandler) invocation.getArguments()[2]).processError(new Exception());
+                return task;
+            }
+        });
     }
 }

@@ -15,17 +15,15 @@
  */
 package org.forgerock.openam.cts;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
-
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
@@ -38,6 +36,7 @@ import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.Options;
 
 /**
  * Implementation of the CTS (Core Token Store) persistence layer.
@@ -75,20 +74,42 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
      */
     @Override
     public void create(Token token) throws CoreTokenException {
-        final ResultHandler<Token, CoreTokenException> createHandler = adapter.create(token);
+        create(token, Options.defaultOptions());
+    }
+
+    /**
+     * This implementation blocks until we get the results, and ignores non-exception results.
+     *
+     * @param token Non null Token to create.
+     * @param options Non null Options for the operation.
+     * @throws CoreTokenException In the case of issues with
+     */
+    @Override
+    public void create(Token token, Options options) throws CoreTokenException {
+        final ResultHandler<Token, CoreTokenException> createHandler = adapter.create(token, options);
         createHandler.getResults();
         debug("Token {0} created", token.getTokenId());
     }
 
     @Override
     public void createAsync(Token token) throws CoreTokenException {
-        adapter.create(token);
+        createAsync(token, Options.defaultOptions());
+    }
+
+    @Override
+    public void createAsync(Token token, Options options) throws CoreTokenException {
+        adapter.create(token, options);
         debug("Token {0} queued for creation", token.getTokenId());
     }
 
     @Override
     public Token read(String tokenId) throws CoreTokenException {
-        Token token = adapter.read(tokenId);
+        return read(tokenId, Options.defaultOptions());
+    }
+
+    @Override
+    public Token read(String tokenId, Options options) throws CoreTokenException {
+        Token token = adapter.read(tokenId, options);
         if (token == null) {
             debug("Token {0} did not exist", tokenId);
             return null;
@@ -100,7 +121,12 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
     @Override
     public void update(Token token) throws CoreTokenException {
-        final ResultHandler<Token, CoreTokenException> updateHandler = adapter.updateOrCreate(token);
+        update(token, Options.defaultOptions());
+    }
+
+    @Override
+    public void update(Token token, Options options) throws CoreTokenException {
+        final ResultHandler<Token, CoreTokenException> updateHandler = adapter.updateOrCreate(token, options);
         //block until we get the results, and ignore non-exception results
         updateHandler.getResults();
         debug("Token {0} updated", token.getTokenId());
@@ -108,7 +134,12 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
     @Override
     public void updateAsync(Token token) throws CoreTokenException {
-        adapter.updateOrCreate(token);
+        updateAsync(token, Options.defaultOptions());
+    }
+
+    @Override
+    public void updateAsync(Token token, Options options) throws CoreTokenException {
+        adapter.updateOrCreate(token, options);
         debug("Token {0} queued for update", token.getTokenId());
     }
 
@@ -124,7 +155,12 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
     @Override
     public void delete(String tokenId) throws CoreTokenException {
-        final ResultHandler<String, CoreTokenException> deleteHandler = adapter.delete(tokenId);
+        delete(tokenId, Options.defaultOptions());
+    }
+
+    @Override
+    public void delete(String tokenId, Options options) throws CoreTokenException {
+        final ResultHandler<String, CoreTokenException> deleteHandler = adapter.delete(tokenId, options);
         //block until we get the results, and ignore non-exception results
         deleteHandler.getResults();
         debug("Token {0} deleted", tokenId);
@@ -132,7 +168,12 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
     @Override
     public void deleteAsync(String tokenId) throws CoreTokenException {
-        adapter.delete(tokenId);
+        deleteAsync(tokenId, Options.defaultOptions());
+    }
+
+    @Override
+    public void deleteAsync(String tokenId, Options options) throws CoreTokenException {
+        adapter.delete(tokenId, options);
         debug("Token {0} queued for deletion", tokenId);
     }
 
