@@ -666,7 +666,7 @@ public class AMLoginContext {
 
             if (failedUserId != null) {
                 amAccountLockout = new AMAccountLockout(authContext.getLoginState());
-                accountLocked = amAccountLockout.isLockedOut(failedUserId);
+                accountLocked = amAccountLockout.isAccountLocked(failedUserId);
                 if ((!accountLocked) && (amAccountLockout.isLockoutEnabled())) {
                     amAccountLockout.invalidPasswd(failedUserId);
                     checkWarningCount(amAccountLockout);
