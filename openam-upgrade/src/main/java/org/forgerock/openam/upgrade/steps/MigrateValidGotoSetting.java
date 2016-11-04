@@ -34,6 +34,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -119,7 +120,8 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
     @Override
     public void perform() throws UpgradeException {
         try {
-            if (!changes.isEmpty()) {
+            UpgradeProgress.reportStart("upgrade.goto.migrate.start");
+            if (CollectionUtils.isNotEmpty(changes)) {
                 final ServiceConfigManager validationService = new ServiceConfigManager(VALIDATION_SERVICE,
                         getAdminToken());
                 final ServiceConfigManager authService = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME,
@@ -129,7 +131,6 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("Starting to migrate goto domains for realm: " + realm);
                     }
-                    UpgradeProgress.reportStart("upgrade.goto.migrate.start", realm);
                     validationService.createOrganizationConfig(realm, getAttrMap(GOTO_RESOURCES, entry.getValue()));
 
                     //The settings now are migrated, we should now clear up the legacy settings
@@ -138,9 +139,13 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
                     }
                     final ServiceConfig organizationConfig = authService.getOrganizationConfig(realm, null);
                     organizationConfig.setAttributes(getAttrMap(LEGACY_GOTO_DOMAINS_SETTING, Collections.EMPTY_SET));
-                    UpgradeProgress.reportEnd("upgrade.success");
+                }
+            } else {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("No goto domains to migrate.");
                 }
             }
+            UpgradeProgress.reportEnd("upgrade.success");
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Attempting to create the delegation policy in the hidden realm");
             }
@@ -185,11 +190,15 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
         final Map<String, String> tagSwap = new HashMap<String, String>(2);
         tagSwap.put(LF, delimiter);
         final StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Set<String>> entry : changes.entrySet()) {
-            sb.append(BUNDLE.getString("upgrade.realm")).append(": ").append(entry.getKey()).append(delimiter);
-            for (String validDomain : entry.getValue()) {
-                sb.append(INDENT).append(validDomain).append(delimiter);
+        if (CollectionUtils.isNotEmpty(changes)) {
+            for (Map.Entry<String, Set<String>> entry : changes.entrySet()) {
+                sb.append(BUNDLE.getString("upgrade.realm")).append(": ").append(entry.getKey()).append(delimiter);
+                for (String validDomain : entry.getValue()) {
+                    sb.append(INDENT).append(validDomain).append(delimiter);
+                }
             }
+        } else {
+            sb.append(BUNDLE.getString("upgrade.goto.migrate.nogoto"));
         }
         tagSwap.put(GOTO_DATA, sb.toString());
         return UpgradeServices.tagSwapReport(tagSwap, "upgrade.gotoreport");
