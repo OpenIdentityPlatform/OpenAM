@@ -139,8 +139,12 @@ public class SessionQueryManager {
      * Checks if the session client matches the pattern
      */
     private boolean sessionClientMatchesPattern(InternalSession session, String pattern) {
-        String clientId = (!session.isAppSession()) ? DNUtils.DNtoName(session.getClientID()) : session.getClientID();
-        return clientId != null && matchFilter(clientId.toLowerCase(), pattern);
+        boolean matches = true;
+        if (pattern != null && !pattern.equals("*")) {
+            String clientId = (!session.isAppSession()) ? DNUtils.DNtoName(session.getClientID()) : session.getClientID();
+            matches = clientId != null && matchFilter(clientId.toLowerCase(), pattern);
+        }
+        return matches;
     }
 
     /**
@@ -159,7 +163,7 @@ public class SessionQueryManager {
      * @return true if string matches <code>filter</code>
      */
     private boolean matchFilter(String string, String pattern) {
-        if (pattern.equals("*") || pattern.equals(string)) {
+        if (pattern == null || pattern.equals("*") || pattern.equals(string)) {
             return true;
         }
 
