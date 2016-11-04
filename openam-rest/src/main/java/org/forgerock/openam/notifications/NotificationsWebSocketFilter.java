@@ -19,6 +19,8 @@ package org.forgerock.openam.notifications;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -27,14 +29,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import com.iplanet.sso.SSOToken;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.SSOTokenFactory;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 
 /**
  * Provides authentication for the WebSocket notifications endpoint.
@@ -48,13 +54,13 @@ import org.forgerock.openam.rest.SSOTokenFactory;
 public final class NotificationsWebSocketFilter implements Filter {
     private SSOTokenFactory tokenFactory;
     private AuthUtilsWrapper authUtilsWrapper;
-    private AgentIdentity agentIdentity;
+    private CoreWrapper coreWrapper;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         tokenFactory = InjectorHolder.getInstance(SSOTokenFactory.class);
         authUtilsWrapper = InjectorHolder.getInstance(AuthUtilsWrapper.class);
-        agentIdentity = InjectorHolder.getInstance(AgentIdentity.class);
+        coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
     }
 
     @Override
@@ -62,16 +68,20 @@ public final class NotificationsWebSocketFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-
         String tokenId = request.getHeader(authUtilsWrapper.getCookieName());
         if (StringUtils.isNotEmpty(tokenId)) {
             SSOToken ssoToken = tokenFactory.getTokenFromId(tokenId);
             if (ssoToken != null) {
-                if (agentIdentity.isAgent(ssoToken)) {
-                    filterChain.doFilter(request, response);
+                try {
+                    AMIdentity identity = coreWrapper.getIdentity(ssoToken);
+                    if (isJ2eeAgent(identity) || (isWebAgent(identity))) {
+                        filterChain.doFilter(request, response);
+                    } else {
+                        response.setStatus(SC_FORBIDDEN);
+                    }
                     return;
-                } else {
-                    response.setStatus(SC_FORBIDDEN);
+                } catch (SSOException | IdRepoException e) {
+                    response.setStatus(SC_UNAUTHORIZED);
                     return;
                 }
             }
@@ -82,5 +92,13 @@ public final class NotificationsWebSocketFilter implements Filter {
     @Override
     public void destroy() {
 
+    }
+
+    private boolean isJ2eeAgent(AMIdentity identity) throws IdRepoException, SSOException {
+        return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(AgentConfiguration.getAgentType(identity));
+    }
+
+    private boolean isWebAgent(AMIdentity identity) throws IdRepoException, SSOException {
+        return AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(AgentConfiguration.getAgentType(identity));
     }
 }

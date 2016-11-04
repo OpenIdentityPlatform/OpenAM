@@ -95,16 +95,19 @@ public class AgentConfiguration {
   
     static {
         localAgentProperties = new HashMap();
-        ResourceBundle rb = ResourceBundle.getBundle(AGENT_LOCAL_PROPERTIES);
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String key = (String)e.nextElement();
-            Set set = new HashSet();
-            String value = rb.getString(key);
-            StringTokenizer st = new StringTokenizer(value, ",");
-            while (st.hasMoreTokens()) {
-                set.add(st.nextToken());
+        String agentLocalPropertiesFilePath = String.format("%s.properties", AGENT_LOCAL_PROPERTIES);
+        if (AgentConfiguration.class.getClassLoader().getResource(agentLocalPropertiesFilePath) != null) {
+            ResourceBundle rb = ResourceBundle.getBundle(AGENT_LOCAL_PROPERTIES);
+            for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
+                String key = (String) e.nextElement();
+                Set set = new HashSet();
+                String value = rb.getString(key);
+                StringTokenizer st = new StringTokenizer(value, ",");
+                while (st.hasMoreTokens()) {
+                    set.add(st.nextToken());
+                }
+                localAgentProperties.put(key, set);
             }
-            localAgentProperties.put(key, set);
         }
     }
     
