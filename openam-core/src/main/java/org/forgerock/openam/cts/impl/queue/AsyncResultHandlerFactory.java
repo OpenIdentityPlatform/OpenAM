@@ -73,7 +73,7 @@ public class AsyncResultHandlerFactory implements ResultHandlerFactory {
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<String, CoreTokenException> getDeleteHandler() {
+    public ResultHandler<PartialToken, CoreTokenException> getDeleteHandler() {
         return new AsyncResultHandler<>(config, debug);
     }
 

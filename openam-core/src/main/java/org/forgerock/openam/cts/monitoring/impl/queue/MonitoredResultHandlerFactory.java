@@ -73,7 +73,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<String, CoreTokenException> getDeleteHandler() {
+    public ResultHandler<PartialToken, CoreTokenException> getDeleteHandler() {
         return new DefaultMonitoringResultHandler<>(factory.getDeleteHandler(), store, CTSOperation.DELETE);
     }
 

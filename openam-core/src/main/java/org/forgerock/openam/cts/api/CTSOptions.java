@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.cts.api;
 
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Option;
 
 /**
@@ -49,4 +50,16 @@ public final class CTSOptions {
      * @see org.forgerock.openam.cts.impl.ETagAssertionCTSOptionFunction
      */
     public static final Option<String> OPTIMISTIC_CONCURRENCY_CHECK_OPTION = Option.of(String.class, null);
+
+    /**
+     * Signals the CTS to perform a read of a CTS token on delete.
+     *
+     * <p>The value of the option will be used to determine if the token is read on the delete
+     * operation.</p>
+     *
+     * <p>Applicable for use only with the delete CTS operation.</p>
+     *
+     * @see org.forgerock.openam.cts.impl.DeletePreReadOptionFunction
+     */
+    public static final Option<CoreTokenField[]> PRE_DELETE_READ_OPTION = Option.of(CoreTokenField[].class, null);
 }

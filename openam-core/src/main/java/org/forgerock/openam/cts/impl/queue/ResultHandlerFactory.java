@@ -45,7 +45,7 @@ public interface ResultHandlerFactory {
     /**
      * @return Handler suitable for a delete operation.
      */
-    ResultHandler<String, CoreTokenException> getDeleteHandler();
+    ResultHandler<PartialToken, CoreTokenException> getDeleteHandler();
 
     /**
      * @return Handler suitable for a query operation.

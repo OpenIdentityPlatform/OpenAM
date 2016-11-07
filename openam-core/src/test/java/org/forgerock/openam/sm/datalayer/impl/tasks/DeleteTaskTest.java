@@ -23,6 +23,7 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -32,7 +33,7 @@ public class DeleteTaskTest {
     private LdapAdapter mockAdapter;
     private String tokenId;
     private Options options;
-    private ResultHandler<String, ?> mockResultHandler;
+    private ResultHandler<PartialToken, ?> mockResultHandler;
 
     @BeforeMethod
     public void setup() {
@@ -60,7 +61,9 @@ public class DeleteTaskTest {
 
     @Test
     public void shouldNotifyResultHandlerOnSuccess() throws Exception {
+        PartialToken partialToken = mock(PartialToken.class);
+        given(mockAdapter.delete(tokenId, options)).willReturn(partialToken);
         task.execute(mockAdapter);
-        verify(mockResultHandler).processResults(eq(tokenId));
+        verify(mockResultHandler).processResults(partialToken);
     }
 }

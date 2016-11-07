@@ -111,7 +111,7 @@ public class TaskDispatcherTest {
     }
 
     @Test (dataProvider = "rejectNullsOnDelete", expectedExceptions = NullPointerException.class)
-    public void shouldRejectNullStringOnDelete(String tokenId, ResultHandler<String, ?> handler)
+    public void shouldRejectNullStringOnDelete(String tokenId, ResultHandler<PartialToken, ?> handler)
             throws CoreTokenException {
         queue.delete(tokenId, handler);
     }

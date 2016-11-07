@@ -22,6 +22,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Options;
 
 /**
@@ -66,10 +67,11 @@ public interface TokenStorageAdapter {
      *
      * @param tokenId The non null Token ID to delete.
      * @param options The non null Options for the operation.
+     * @return A {@link PartialToken} containing at least the {@link CoreTokenField#TOKEN_ID}.
      * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
      * @throws OptimisticConcurrencyCheckFailedException If the operation failed due to an assertion on the tokens ETag.
      */
-    void delete(String tokenId, Options options) throws DataLayerException;
+    PartialToken delete(String tokenId, Options options) throws DataLayerException;
 
     /**
      * Performs a full-token query using the provided filter.

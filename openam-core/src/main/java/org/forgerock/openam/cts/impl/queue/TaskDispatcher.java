@@ -171,7 +171,7 @@ public class TaskDispatcher {
      * @throws CoreTokenException If there was an unexpected error during processing.
      * @throws IllegalArgumentException If tokenId was null.
      */
-    public void delete(String tokenId, ResultHandler<String, ?> handler) throws CoreTokenException {
+    public void delete(String tokenId, ResultHandler<PartialToken, ?> handler) throws CoreTokenException {
         delete(tokenId, Options.defaultOptions(), handler);
     }
 
@@ -188,7 +188,7 @@ public class TaskDispatcher {
      * @throws CoreTokenException If there was an unexpected error during processing.
      * @throws IllegalArgumentException If tokenId was null.
      */
-    public void delete(String tokenId, Options options, ResultHandler<String, ?> handler) throws CoreTokenException {
+    public void delete(String tokenId, Options options, ResultHandler<PartialToken, ?> handler) throws CoreTokenException {
         Reject.ifNull(tokenId, options, handler);
         try {
             taskExecutor.execute(tokenId, taskFactory.delete(tokenId, options, handler));

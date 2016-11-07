@@ -75,7 +75,7 @@ public class TaskFactory {
      * @param options Non null. The Options for the operation.
      * @return Non null. Token delete Task.
      */
-    public Task delete(String tokenId, Options options, ResultHandler<String, ?> handler) {
+    public Task delete(String tokenId, Options options, ResultHandler<PartialToken, ?> handler) {
         return new DeleteTask(tokenId, options, handler);
     }
 

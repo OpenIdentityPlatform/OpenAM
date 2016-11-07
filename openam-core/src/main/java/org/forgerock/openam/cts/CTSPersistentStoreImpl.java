@@ -160,7 +160,7 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
     @Override
     public void delete(String tokenId, Options options) throws CoreTokenException {
-        final ResultHandler<String, CoreTokenException> deleteHandler = adapter.delete(tokenId, options);
+        final ResultHandler<PartialToken, CoreTokenException> deleteHandler = adapter.delete(tokenId, options);
         //block until we get the results, and ignore non-exception results
         deleteHandler.getResults();
         debug("Token {0} deleted", tokenId);

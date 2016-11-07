@@ -16,17 +16,20 @@
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 
+import org.forgerock.openam.cts.api.CTSOptions;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.util.Options;
 
 /**
  * Deletes a given Token from the persistence layer.
  */
-public class DeleteTask extends AbstractTask {
+public class DeleteTask extends AbstractTask<PartialToken> {
 
     private final String tokenId;
     private final Options options;
@@ -36,7 +39,7 @@ public class DeleteTask extends AbstractTask {
      * @param options The Options for the operation.
      * @param handler Non null result handler for signalling status of operation.
      */
-    public DeleteTask(String tokenID, Options options, ResultHandler<String, ?> handler) {
+    public DeleteTask(String tokenID, Options options, ResultHandler<PartialToken, ?> handler) {
         super(handler);
         this.tokenId = tokenID;
         this.options = options;
@@ -51,8 +54,8 @@ public class DeleteTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.delete(tokenId, options);
-        handler.processResults(tokenId);
+        PartialToken token = adapter.delete(tokenId, options);
+        handler.processResults(token);
     }
 
     @Override

@@ -110,7 +110,7 @@ public class CTSWorkerDeleteProcess extends CTSWorkerBaseProcess {
          */
         public CountDownLatch deleteBatch(Collection<PartialToken> tokens) throws CoreTokenException {
             CountDownLatch latch = new CountDownLatch(tokens.size());
-            ResultHandler<String, CoreTokenException> handler = new CountDownHandler<>(latch);
+            ResultHandler<PartialToken, CoreTokenException> handler = new CountDownHandler<>(latch);
             for (PartialToken token : tokens) {
                 String tokenId = token.getValue(CoreTokenField.TOKEN_ID);
                 queue.delete(tokenId, handler);

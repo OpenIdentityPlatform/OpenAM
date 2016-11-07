@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.forgerock.api.annotations.Description;
 import org.forgerock.api.annotations.Title;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.GeneralizedTime;
@@ -391,5 +393,21 @@ public class Token {
         }
 
         return r;
+    }
+
+    /**
+     * Converts this {@code Token} into a {@link PartialToken} containing all of the populated fields.
+     *
+     * @return A {@code PartialToken}.
+     * @since 14.0.0
+     */
+    public PartialToken toPartialToken() {
+        Map<CoreTokenField, Object> partialToken = new HashMap<>();
+        for (CoreTokenField field : CoreTokenField.values()) {
+            if (get(field) != null) {
+                partialToken.put(field, get(field));
+            }
+        }
+        return new PartialToken(partialToken);
     }
 }

@@ -18,13 +18,16 @@ package org.forgerock.openam.cts.impl;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
+import static org.forgerock.openam.cts.api.CTSOptions.PRE_DELETE_READ_OPTION;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.opendj.ldap.controls.PostReadResponseControl.newControl;
 import static org.mockito.BDDMockito.*;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,9 +58,10 @@ import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.controls.AssertionRequestControl;
-import org.forgerock.opendj.ldap.controls.ControlDecoder;
 import org.forgerock.opendj.ldap.controls.PostReadRequestControl;
 import org.forgerock.opendj.ldap.controls.PostReadResponseControl;
+import org.forgerock.opendj.ldap.controls.PreReadRequestControl;
+import org.forgerock.opendj.ldap.controls.PreReadResponseControl;
 import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.DeleteRequest;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
@@ -69,7 +73,6 @@ import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.util.time.Duration;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -308,6 +311,77 @@ public class LdapAdapterTest {
     }
 
     @Test
+    public void shouldAddPreReadRequestControlWhenRequested() throws Exception {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+        CoreTokenField[] preReadAttributes = new CoreTokenField[]{CoreTokenField.STRING_ONE};
+
+        Result successResult = mockSuccessfulResult();
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+        optionFunctionMap.put(PRE_DELETE_READ_OPTION, new DeletePreReadOptionFunction());
+
+        // When
+        adapter.delete(tokenId, Options.defaultOptions().set(PRE_DELETE_READ_OPTION, preReadAttributes));
+
+        // Then
+        ArgumentCaptor<DeleteRequest> requestCaptor = ArgumentCaptor.forClass(DeleteRequest.class);
+        verify(mockConnection).delete(requestCaptor.capture());
+
+        PreReadRequestControl preReadRequestControl =
+                requestCaptor.getValue().getControl(PreReadRequestControl.DECODER, new DecodeOptions());
+        assertThat(preReadRequestControl).isNotNull();
+        assertThat(preReadRequestControl.getAttributes()).containsOnly(CoreTokenField.TOKEN_ID.toString(),
+                CoreTokenField.TOKEN_TYPE.toString(), CoreTokenField.STRING_ONE.toString());
+    }
+
+    @Test
+    public void shouldPerformPreReadWhenRequested() throws Exception {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+        Result successResult = mockSuccessfulResult();
+        CoreTokenField[] preReadAttributes = new CoreTokenField[0];
+        PreReadResponseControl preReadResponseControl = PreReadResponseControl.newControl(mock(Entry.class));
+        Token preReadToken = new Token(tokenId, TokenType.SESSION);
+        preReadToken.setAttribute(CoreTokenField.STRING_ONE, "STRING_ONE_VALUE");
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
+        optionFunctionMap.put(PRE_DELETE_READ_OPTION, new DeletePreReadOptionFunction());
+        given(mockConversion.tokenFromEntry(any(Entry.class))).willReturn(preReadToken);
+
+        given(successResult.getControl(eq(PreReadResponseControl.DECODER), any(DecodeOptions.class))).willReturn(preReadResponseControl);
+
+        // When
+        PartialToken partialToken = adapter.delete(tokenId, Options.defaultOptions().set(PRE_DELETE_READ_OPTION, preReadAttributes));
+
+        // Then
+        assertThat(partialToken).isNotNull();
+        assertThat(partialToken.getFields()).containsOnly(CoreTokenField.TOKEN_ID, CoreTokenField.TOKEN_TYPE, CoreTokenField.STRING_ONE);
+    }
+
+    @Test
+    public void shouldReturnPartialTokenWithTokenIdWhenNotPerformingPreRead() throws Exception {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+        Result successResult = mockSuccessfulResult();
+
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+        given(mockConnection.delete(any(DeleteRequest.class))).willReturn(successResult);
+
+        // When
+        PartialToken partialToken = adapter.delete(tokenId, Options.defaultOptions());
+
+        // Then
+        assertThat(partialToken).isNotNull();
+        assertThat(partialToken.getFields()).containsOnly(CoreTokenField.TOKEN_ID);
+    }
+
+    @Test
     public void shouldAddETagAssertionOnDelete() throws Exception {
         // Given
         String tokenId = "badger";
@@ -527,13 +601,12 @@ public class LdapAdapterTest {
     private static Result mockSuccessfulResult() throws DecodeException {
         Result result = mock(Result.class);
         Entry entry = mock(Entry.class);
-        PostReadResponseControl control = PostReadResponseControl.newControl(entry);
+        PostReadResponseControl control = newControl(entry);
         Attribute attribute = mock(Attribute.class);
         ResultCode resultCode = ResultCode.SUCCESS;
         given(result.addControl(any(PostReadRequestControl.class))).willReturn(result);
         given(result.getResultCode()).willReturn(resultCode);
-        given(result.getControl(Matchers.<ControlDecoder<PostReadResponseControl>>any(),
-                any(DecodeOptions.class))).willReturn(control);
+        given(result.getControl(eq(PostReadResponseControl.DECODER), any(DecodeOptions.class))).willReturn(control);
         given(entry.getAttribute(CoreTokenField.ETAG.toString())).willReturn(attribute);
         given(attribute.firstValueAsString()).willReturn(RandomStringUtils.random(4));
         return result;

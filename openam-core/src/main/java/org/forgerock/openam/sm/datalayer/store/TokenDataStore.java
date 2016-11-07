@@ -32,6 +32,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.util.Options;
@@ -157,7 +158,7 @@ public class TokenDataStore<T> {
      * @throws ServerException When an error occurs during removal.
      */
     public void delete(String id) throws NotFoundException, ServerException {
-        SyncResultHandler<String> handler = new SyncResultHandler<String>();
+        SyncResultHandler<PartialToken> handler = new SyncResultHandler<>();
         try {
             taskExecutor.execute(id, taskFactory.delete(id, Options.defaultOptions(), handler));
             handler.getResults();

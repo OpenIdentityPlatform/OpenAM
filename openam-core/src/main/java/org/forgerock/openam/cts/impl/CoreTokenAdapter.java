@@ -155,9 +155,9 @@ public class CoreTokenAdapter {
      * @return The ResultHandler for the asynchronous operation.
      * @throws CoreTokenException If there was an error while trying to remove the token with the given Id.
      */
-    public ResultHandler<String, CoreTokenException> delete(String tokenId, Options options) throws CoreTokenException {
+    public ResultHandler<PartialToken, CoreTokenException> delete(String tokenId, Options options) throws CoreTokenException {
         debug("Delete: queued delete {0}", tokenId);
-        final ResultHandler<String, CoreTokenException> deleteHandler = handlerFactory.getDeleteHandler();
+        final ResultHandler<PartialToken, CoreTokenException> deleteHandler = handlerFactory.getDeleteHandler();
         dispatcher.delete(tokenId, options, deleteHandler);
         return deleteHandler;
     }

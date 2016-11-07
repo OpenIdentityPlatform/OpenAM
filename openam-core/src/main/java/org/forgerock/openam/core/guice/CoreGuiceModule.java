@@ -116,6 +116,7 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CTSOptions;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.impl.DeletePreReadOptionFunction;
 import org.forgerock.openam.cts.impl.ETagAssertionCTSOptionFunction;
 import org.forgerock.openam.cts.impl.LdapOptionFunction;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
@@ -221,6 +222,8 @@ public class CoreGuiceModule extends AbstractModule {
                 new TypeLiteral<Option<?>>() {}, new TypeLiteral<LdapOptionFunction>() {});
         optionFunctionMapBinder.addBinding(CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION)
                 .to(ETagAssertionCTSOptionFunction.class);
+        optionFunctionMapBinder.addBinding(CTSOptions.PRE_DELETE_READ_OPTION).to(DeletePreReadOptionFunction.class);
+
         // CTS General
         bind(CTSPersistentStore.class).to(CTSPersistentStoreImpl.class);
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG))
