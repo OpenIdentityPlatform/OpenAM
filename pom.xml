@@ -2266,6 +2266,8 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
+                    <!-- Local build for MSHADE-237 and MSHADE-182 -->
+                    <version>3.0.0-forgerock-alpha-1</version>
                 </plugin>
                 <plugin>
                     <groupId>net.ju-n.maven.plugins</groupId>
