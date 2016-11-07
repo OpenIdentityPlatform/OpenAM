@@ -32,7 +32,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.iplanet.services.util.Crypt;
-import com.iplanet.services.util.JCEEncryption;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.encode.URLEncDec;
 
@@ -137,8 +136,14 @@ public class AMKeyProviderTest {
         Path tempFile = Files.createTempFile("keyprovidertest", ".tmp");
         String plainText = "MySuperSecret Password!";
         String pw = Crypt.encode(plainText); // encode using Crypt util
-        Assert.assertTrue(JCEEncryption.isAMPassword(pw));
-        // Write an AMEncrytped password into this file
+
+        // ensure that an encrypted password gets decoded
+        Assert.assertTrue(AMKeyProvider.decodePassword(pw).equals(plainText));
+        // ensure that a plain text password gets "decoded" - even if it is not encrypted
+        Assert.assertTrue(AMKeyProvider.decodePassword(plainText).equals(plainText));
+
+
+        // Write an encrypted password to a file
         Files.write(tempFile, pw.getBytes());
         // read it back
         String result = amKeyProvider.readPasswordFile(tempFile.toString());

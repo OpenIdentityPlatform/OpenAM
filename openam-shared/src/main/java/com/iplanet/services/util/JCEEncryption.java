@@ -304,16 +304,4 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
 
     private static final PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(
             ___y, ITERATION_COUNT);
-
-
-    /**
-     * Test to see if a String is a password encrypted by OpenAM. This is a heuristic,
-     *  and not a 100% guarantee, but the chance of a false positive is very rare.
-     * This is currently only used in the process of migrating they storepass/keypass from pre-AM 14 installations
-     * @since 14.0
-     * @returns true if the string is an AM encrypted password
-     */
-    public static boolean isAMPassword(String pass) {
-        return pass.startsWith("AQIC");
-    }
 }

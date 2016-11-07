@@ -48,7 +48,6 @@ import javax.security.auth.DestroyFailedException;
 
 import org.forgerock.openam.keystore.KeyStoreConfig;
 
-import com.iplanet.services.util.JCEEncryption;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.SecurityDebug;
@@ -182,12 +181,9 @@ public class AMKeyProvider implements KeyProvider {
         String p = null;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             p = br.readLine();
-            // The password is encrypted.
-            // This is a guard that should not be required, but will catch any
-            // errors in the storepass migration process
-            if (JCEEncryption.isAMPassword(p)) {
-                p = decodePassword(p);
-            }
+            // The password may or may not be encrypted.
+            // If it is not, decodePassword will just return the plain text - which is what we want
+            p = decodePassword(p);
         } catch (IOException e) {
             logger.error("Unable to read private key password file " + filePath, e);
         }
