@@ -289,7 +289,7 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
 
     private Set<String> getRealmNames() {
         try {
-            RealmUtils.getRealmNames(getAdminToken());
+            return RealmUtils.getRealmNames(getAdminToken());
         } catch (SMSException e) {
             debug.error("An error occurred while trying to retrieve the list of realms", e);
         }
