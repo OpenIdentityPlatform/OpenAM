@@ -60,6 +60,7 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.AdminSubjectContext;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.uma.UmaUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
@@ -239,19 +240,6 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         return new HashMap<String, Set<String>>((Map) searchResults.getResultAttributes().values().iterator().next());
     }
 
-    private boolean isResourceServer(Map<String, Set<String>> attrValues ) {
-        Set<String> scopes = attrValues.get(OAuth2Constants.OAuth2Client.SCOPES);
-        if (scopes != null) {
-            for (String scope : scopes) {
-                String[] scopeParts = scope.split("\\|");
-                if (scopeParts[0].contains("uma_protection")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private void createApplication(String realm, String resourceServerId) {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         try {
@@ -364,7 +352,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         String agentType =  CollectionHelper.getMapAttr(attrValues, IdConstants.AGENT_TYPE, "NO_TYPE");
         if (!AgentConfiguration.AGENT_TYPE_OAUTH2.equalsIgnoreCase(agentType)) {
             return NO_ACTION;
-        } else if (isResourceServer(attrValues)) {
+        } else if (UmaUtils.isUmaResourceServerAgent(attrValues)) {
             return CREATE_UMA_APPLICATION;
         } else {
             return REMOVE_UMA_APPLICATION;

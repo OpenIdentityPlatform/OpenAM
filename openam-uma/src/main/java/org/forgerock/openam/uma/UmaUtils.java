@@ -22,7 +22,10 @@ import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
@@ -47,4 +50,23 @@ public class UmaUtils {
         principals.add(principal);
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
+
+    /**
+     * Check if an OAuth2 agents is a UMA agent
+     * @param attrValues the agents attribute
+     * @return true if the OAuth2 agents is a UMA agent
+     */
+    public static boolean isUmaResourceServerAgent(Map<String, Set<String>> attrValues) {
+        Set<String> scopes = attrValues.get(OAuth2Constants.OAuth2Client.SCOPES);
+        if (scopes != null) {
+            for (String scope : scopes) {
+                String[] scopeParts = scope.split("\\|");
+                if (scopeParts[0].contains("uma_protection")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
