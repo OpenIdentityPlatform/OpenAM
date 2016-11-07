@@ -46,6 +46,8 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.dpro.session.PartialSessionFactory;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -90,19 +92,24 @@ public class SessionPersistenceStore {
     private final SessionAdapter tokenAdapter;
     private final TokenIdFactory tokenIdFactory;
     private final SessionServiceConfig sessionServiceConfig;
+    private final PartialSessionFactory partialSessionFactory;
+    private final IdentityUtils identityUtils;
 
     @Inject
     public SessionPersistenceStore(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
                                    final CTSPersistentStore coreTokenService,
                                    final SessionAdapter tokenAdapter,
                                    final TokenIdFactory tokenIdFactory,
-                                   final SessionServiceConfig sessionServiceConfig) {
-
+                                   final SessionServiceConfig sessionServiceConfig,
+                                   final PartialSessionFactory partialSessionFactory,
+                                   final IdentityUtils identityUtils) {
         this.debug = debug;
         this.coreTokenService = coreTokenService;
         this.tokenAdapter = tokenAdapter;
         this.tokenIdFactory = tokenIdFactory;
         this.sessionServiceConfig = sessionServiceConfig;
+        this.partialSessionFactory = partialSessionFactory;
+        this.identityUtils = identityUtils;
     }
 
     /**
@@ -188,19 +195,21 @@ public class SessionPersistenceStore {
     public Collection<PartialSession> searchPartialSessions(CrestQuery crestQuery) throws CoreTokenException {
         final QueryFilter<JsonPointer> queryFilter = crestQuery.getQueryFilter();
         Reject.ifNull(queryFilter, "Query Filter must be specified in the request");
-
         FilterAttributeBuilder filterAttributeBuilder = new TokenFilterBuilder()
                 .withSizeLimit(sessionServiceConfig.getMaxSessionListSize())
                 .withTimeLimit(duration(10, TimeUnit.SECONDS)).and();
-        queryFilter.accept(new SessionQueryFilterVisitor(), filterAttributeBuilder);
+        queryFilter.accept(new SessionQueryFilterVisitor(identityUtils), filterAttributeBuilder);
+        final TokenFilter tokenFilter = filterAttributeBuilder.build();
+        Reject.ifTrue(QueryFilter.and().equals(tokenFilter.getQuery()), "The query filter must specify the realm");
+
         filterAttributeBuilder.withAttribute(SessionTokenField.SESSION_STATE.getField(), SessionState.VALID.toString());
         addFieldsToFilter(filterAttributeBuilder, crestQuery.getFields());
         Collection<PartialSession> results;
         final Collection<PartialToken> partialTokens = coreTokenService.attributeQuery(
-                filterAttributeBuilder.build());
+                tokenFilter);
         results = new ArrayList<>(partialTokens.size());
         for (PartialToken partialToken : partialTokens) {
-            results.add(new PartialSession(partialToken));
+            results.add(partialSessionFactory.fromPartialToken(partialToken));
         }
         return results;
     }

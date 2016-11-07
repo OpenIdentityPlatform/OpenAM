@@ -28,6 +28,8 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceStore;
+import org.forgerock.openam.dpro.session.PartialSessionFactory;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
@@ -54,6 +56,8 @@ public class SessionPersistenceStoreTest extends GuiceTestCase {
     @Mock private TokenIdFactory mockTokenIdFactory;
     @Mock private Token mockToken;
     @Mock private SessionServiceConfig mockSessionServiceConfig;
+    @Mock private PartialSessionFactory mockPartialSessionFactory;
+    @Mock private IdentityUtils mockIdentityUtils;
 
     private final String TOKEN = "TOKEN";
     private final String HANDLE = "HANDLE";
@@ -65,7 +69,7 @@ public class SessionPersistenceStoreTest extends GuiceTestCase {
         MockitoAnnotations.initMocks(this);
 
         sessionPersistenceStore = new SessionPersistenceStore(mockDebug, mockCoreTokenService, mockTokenAdapter,
-                mockTokenIdFactory, mockSessionServiceConfig);
+                mockTokenIdFactory, mockSessionServiceConfig, mockPartialSessionFactory, mockIdentityUtils);
 
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockTokenIdFactory.toSessionTokenId(mockSessionID)).willReturn(TOKEN);

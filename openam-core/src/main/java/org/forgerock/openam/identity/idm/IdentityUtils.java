@@ -16,18 +16,20 @@
  */
 package org.forgerock.openam.identity.idm;
 
+import javax.inject.Singleton;
+
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Collection of helper functions for {@link AMIdentity}.
  */
-public final class IdentityUtils {
+@Singleton
+public class IdentityUtils {
 
-    /**
-     * Private constructor.
-     */
-    private IdentityUtils() {
-    }
+    private static final Debug DEBUG = Debug.getInstance("amIdm");
 
     /**
      * Returns the matching DN from the AM SDK for this entry. This utility is
@@ -42,5 +44,33 @@ public final class IdentityUtils {
         } else {
             return id.getUniversalId();
         }
+    }
+
+    /**
+     * Determines the name of the identity based on the provided universal ID.
+     *
+     * @param universalId The universal ID of the identity.
+     * @return The name of the identity, or null if the name could not be determined.
+     */
+    public String getIdentityName(String universalId) {
+        try {
+            return new AMIdentity(null, universalId).getName();
+        } catch (IdRepoException ire) {
+            DEBUG.warning("Unable to retrieve username from universal ID: {}", universalId, ire);
+        }
+
+        return null;
+    }
+
+    /**
+     * Determines the universal ID of the user based on the provided details.
+     *
+     * @param identityName The name of the identity.
+     * @param idType The type of the identity.
+     * @param realm The realm this identity belongs to.
+     * @return The universal ID based on the provided parameters.
+     */
+    public String getUniversalId(String identityName, IdType idType, String realm) {
+        return new AMIdentity(null, null, identityName, idType, realm).getUniversalId();
     }
 }

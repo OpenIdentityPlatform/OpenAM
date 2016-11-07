@@ -71,6 +71,7 @@ import org.forgerock.openam.core.rest.session.action.LogoutByHandleActionHandler
 import org.forgerock.openam.core.rest.session.action.RefreshActionHandler;
 import org.forgerock.openam.core.rest.session.action.UpdateSessionPropertiesActionHandler;
 import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.dpro.session.PartialSessionFactory;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
@@ -135,7 +136,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     @Inject
     public SessionResourceV2(final SSOTokenManager ssoTokenManager, AuthUtilsWrapper authUtilsWrapper,
             final SessionResourceUtil sessionResourceUtil, SessionPropertyWhitelist sessionPropertyWhitelist,
-            SessionService sessionService) {
+            SessionService sessionService, PartialSessionFactory partialSessionFactory) {
         this.sessionResourceUtil = sessionResourceUtil;
         this.sessionPropertyWhitelist = sessionPropertyWhitelist;
         this.sessionService = sessionService;
@@ -143,7 +144,8 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         actionHandlers.put(REFRESH_ACTION_ID,
                 new RefreshActionHandler(ssoTokenManager, sessionResourceUtil));
         actionHandlers.put(LOGOUT_ACTION_ID, new LogoutActionHandler(ssoTokenManager, authUtilsWrapper));
-        actionHandlers.put(GET_SESSION_INFO_ACTION_ID, new GetSessionInfoActionHandler(sessionResourceUtil));
+        actionHandlers.put(GET_SESSION_INFO_ACTION_ID, new GetSessionInfoActionHandler(sessionResourceUtil,
+                partialSessionFactory));
         actionHandlers.put(GET_SESSION_PROPERTIES_ACTION_ID,
                 new GetSessionPropertiesActionHandler(sessionPropertyWhitelist, sessionResourceUtil));
         actionHandlers.put(UPDATE_SESSION_PROPERTIES_ACTION_ID,
@@ -168,7 +170,6 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         @Action(
                 operationDescription = @Operation(
                     description = SESSION_RESOURCE + GET_SESSION_INFO_ACTION_ID + "." + ACTION_DESCRIPTION,
-                    parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string", description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION),
                     errors = {
                         @ApiError(
                             code = 401,
@@ -177,7 +178,7 @@ public class SessionResourceV2 implements CollectionResourceProvider {
                     }
                 ),
                 name = GET_SESSION_INFO_ACTION_ID,
-                response = @Schema(schemaResource = "SessionResource.properties.names.schema.json")
+                response = @Schema(fromType = PartialSession.class)
         ),
         @Action(
             operationDescription = @Operation(

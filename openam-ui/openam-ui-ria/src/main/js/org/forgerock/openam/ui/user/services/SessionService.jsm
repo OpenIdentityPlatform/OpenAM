@@ -20,6 +20,7 @@ import { sessionAddInfo } from "store/actions/creators";
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import store from "store/index";
+import moment from "moment";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/sessions`);
 const getSessionInfo = (token, options) => {
@@ -34,20 +35,23 @@ const getSessionInfo = (token, options) => {
 };
 
 export const getTimeLeft = (token) => {
-    return getSessionInfo(token, { suppressSpinner: true }).then((sessionInfo) => sessionInfo.maxtime);
+    return getSessionInfo(token, { suppressSpinner: true }).then((sessionInfo) => {
+        const idleExpiration = moment(sessionInfo.maxIdleExpirationTime).diff(moment(), "seconds");
+        const maxExpiration = moment(sessionInfo.maxSessionExpirationTime).diff(moment(), "seconds");
+        return _.min([idleExpiration, maxExpiration]);
+    });
 };
 
 export const updateSessionInfo = (token, options) => {
     return getSessionInfo(token, options).then((response) => {
         store.dispatch(sessionAddInfo({
-            maxidletime: response.maxidletime,
             realm: response.realm
         }));
         return response;
     });
 };
 
-export const isSessionValid = (token) => getSessionInfo(token).then((response) => _.has(response, "uid"));
+export const isSessionValid = (token) => getSessionInfo(token).then((response) => _.has(response, "username"));
 
 export const logout = (token) => {
     return obj.serviceCall({

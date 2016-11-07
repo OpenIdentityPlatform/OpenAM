@@ -19,20 +19,12 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
-import java.util.Calendar;
-
 import org.forgerock.api.annotations.Description;
 import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.utils.TimeUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -65,30 +57,15 @@ public class PartialSession {
     @Description(SESSION_RESOURCE + "schema.property.maxSessionExpirationTime." + DESCRIPTION)
     private String maxSessionExpirationTime;
 
-    public PartialSession(PartialToken partialToken) {
-        for (CoreTokenField field : partialToken.getFields()) {
-            if (field.equals(CoreTokenField.USER_ID)) {
-                universalId = partialToken.getValue(CoreTokenField.USER_ID);
-                try {
-                    username = new AMIdentity(null, universalId).getName();
-                } catch (IdRepoException ire) {
-                    DEBUG.error("Unable to retrieve username from universal ID: {}", universalId, ire);
-                }
-            } else if (field.equals(SessionTokenField.REALM.getField())) {
-                realm = partialToken.getValue(SessionTokenField.REALM.getField());
-            } else if (field.equals(SessionTokenField.SESSION_HANDLE.getField())) {
-                sessionHandle = partialToken.getValue(SessionTokenField.SESSION_HANDLE.getField());
-            } else if (field.equals(SessionTokenField.LATEST_ACCESS_TIME.getField())) {
-                latestAccessTime = DateUtils.toUTCDateFormat(TimeUtils.fromUnixTime(Long.valueOf(
-                        partialToken.<String>getValue(SessionTokenField.LATEST_ACCESS_TIME.getField()))).getTime());
-            } else if (field.equals(SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField())) {
-                maxIdleExpirationTime = DateUtils.toUTCDateFormat(partialToken.<Calendar>getValue(
-                        SessionTokenField.MAX_IDLE_EXPIRATION_TIME.getField()).getTime());
-            } else if (field.equals(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField())) {
-                maxSessionExpirationTime = DateUtils.toUTCDateFormat(partialToken.<Calendar>getValue(
-                        SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField()).getTime());
-            }
-        }
+    private PartialSession(String username, String universalId, String realm, String sessionHandle,
+            String latestAccessTime, String maxIdleExpirationTime, String maxSessionExpirationTime) {
+        this.username = username;
+        this.universalId = universalId;
+        this.realm = realm;
+        this.sessionHandle = sessionHandle;
+        this.latestAccessTime = latestAccessTime;
+        this.maxIdleExpirationTime = maxIdleExpirationTime;
+        this.maxSessionExpirationTime = maxSessionExpirationTime;
     }
 
     /**
@@ -164,5 +141,109 @@ public class PartialSession {
                 fieldIfNotNull(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME, maxIdleExpirationTime),
                 fieldIfNotNull(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME, maxSessionExpirationTime)
         ));
+    }
+
+    /**
+     * A builder to help with construction of {@link PartialSession} instances.
+     *
+     * @see PartialSessionFactory
+     */
+    @VisibleForTesting
+    public static class Builder {
+
+        private String username;
+        private String universalId;
+        private String realm;
+        private String sessionHandle;
+        private String latestAccessTime;
+        private String maxIdleExpirationTime;
+        private String maxSessionExpirationTime;
+
+        /**
+         * Set the username.
+         *
+         * @param username The username to set.
+         * @return This builder.
+         */
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        /**
+         * Set the universal ID.
+         *
+         * @param universalId The universal ID to set.
+         * @return This builder.
+         */
+        public Builder universalId(String universalId) {
+            this.universalId = universalId;
+            return this;
+        }
+
+        /**
+         * Set the realm.
+         *
+         * @param realm The realm to set.
+         * @return This builder.
+         */
+        public Builder realm(String realm) {
+            this.realm = realm;
+            return this;
+        }
+
+        /**
+         * Set the session handle.
+         *
+         * @param sessionHandle The session handle to set.
+         * @return This builder.
+         */
+        public Builder sessionHandle(String sessionHandle) {
+            this.sessionHandle = sessionHandle;
+            return this;
+        }
+
+        /**
+         * Set the latest access time.
+         *
+         * @param latestAccessTime The latest access time to set.
+         * @return This builder.
+         */
+        public Builder latestAccessTime(String latestAccessTime) {
+            this.latestAccessTime = latestAccessTime;
+            return this;
+        }
+
+        /**
+         * Set the max idle expiration time.
+         *
+         * @param maxIdleExpirationTime The max idle expiration time to set.
+         * @return This builder.
+         */
+        public Builder maxIdleExpirationTime(String maxIdleExpirationTime) {
+            this.maxIdleExpirationTime = maxIdleExpirationTime;
+            return this;
+        }
+
+        /**
+         * Set the max session expiration time.
+         *
+         * @param maxSessionExpirationTime The max session expiration time to set.
+         * @return This builder.
+         */
+        public Builder maxSessionExpirationTime(String maxSessionExpirationTime) {
+            this.maxSessionExpirationTime = maxSessionExpirationTime;
+            return this;
+        }
+
+        /**
+         * Builds a {@link PartialSession} object based on the previously provided parameters.
+         *
+         * @return The constructed {@link PartialSession} instance.
+         */
+        public PartialSession build() {
+            return new PartialSession(username, universalId, realm, sessionHandle, latestAccessTime,
+                    maxIdleExpirationTime, maxSessionExpirationTime);
+        }
     }
 }

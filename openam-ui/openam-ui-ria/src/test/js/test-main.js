@@ -35,6 +35,7 @@
             "handlebars": "/base/target/dependencies/libs/handlebars-4.0.5",
             "jquery": "/base/target/dependencies/libs/jquery-2.1.1-min",
             "lodash": "/base/target/dependencies/libs/lodash-3.10.1-min",
+            "moment": "/base/target/dependencies/libs/moment-2.8.1-min",
             "redux": "/base/target/dependencies/libs/redux-3.5.2-min",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
             "sinon": "/base/target/test-classes/libs/sinon-1.15.4",

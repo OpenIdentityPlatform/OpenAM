@@ -110,7 +110,7 @@ define([
 
         if (sessionToken) {
             return SessionService.updateSessionInfo(sessionToken, suppressError).then((data) => {
-                return UserModel.fetchById(data.uid).then(successCallback);
+                return UserModel.fetchById(data.username).then(successCallback);
             }, noSessionHandler);
         } else {
             noSessionHandler();

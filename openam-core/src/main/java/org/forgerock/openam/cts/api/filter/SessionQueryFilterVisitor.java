@@ -23,6 +23,7 @@ import java.util.List;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder.FilterAttributeBuilder;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
@@ -40,8 +41,13 @@ import com.sun.identity.idm.IdType;
  */
 public class SessionQueryFilterVisitor extends BaseQueryFilterVisitor<Void, FilterAttributeBuilder, JsonPointer> {
 
+    private final IdentityUtils identityUtils;
     private String username;
     private String realm;
+
+    public SessionQueryFilterVisitor(IdentityUtils identityUtils) {
+        this.identityUtils = identityUtils;
+    }
 
     @Override
     public Void visitAndFilter(FilterAttributeBuilder filterAttributeBuilder,
@@ -69,7 +75,7 @@ public class SessionQueryFilterVisitor extends BaseQueryFilterVisitor<Void, Filt
 
         if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(realm)) {
             filterAttributeBuilder.withPriorityAttribute(CoreTokenField.USER_ID,
-                    new AMIdentity(null, null, username, IdType.USER, realm).getUniversalId());
+                    identityUtils.getUniversalId(username, IdType.USER, realm));
         }
 
         return null;

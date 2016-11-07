@@ -21,12 +21,12 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.core.rest.session.SessionResourceUtil;
+import org.forgerock.openam.dpro.session.PartialSessionFactory;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
@@ -36,14 +36,18 @@ import org.forgerock.util.promise.Promise;
 public class GetSessionInfoActionHandler implements ActionHandler {
 
     private final SessionResourceUtil sessionResourceUtil;
+    private final PartialSessionFactory partialSessionFactory;
 
     /**
      * Constructs a GetSessionInfoActionHandler instance.
      *
      * @param sessionResourceUtil An instance of SessionResourceUtil.
+     * @param partialSessionFactory An instance of PartialSessionFactory.
      */
-    public GetSessionInfoActionHandler(SessionResourceUtil sessionResourceUtil) {
+    public GetSessionInfoActionHandler(SessionResourceUtil sessionResourceUtil,
+            PartialSessionFactory partialSessionFactory) {
         this.sessionResourceUtil = sessionResourceUtil;
+        this.partialSessionFactory = partialSessionFactory;
     }
 
     @Override
@@ -51,8 +55,8 @@ public class GetSessionInfoActionHandler implements ActionHandler {
         JsonValue content;
         try {
             SSOToken ssoToken = sessionResourceUtil.getTokenWithoutResettingIdleTime(tokenId);
-            content = sessionResourceUtil.jsonValueOf(ssoToken);
-        } catch (SSOException | IdRepoException e) {
+            content = partialSessionFactory.fromSSOToken(ssoToken).asJson();
+        } catch (SSOException e) {
             content = sessionResourceUtil.invalidSession();
         }
         return newResultPromise(newActionResponse(content));

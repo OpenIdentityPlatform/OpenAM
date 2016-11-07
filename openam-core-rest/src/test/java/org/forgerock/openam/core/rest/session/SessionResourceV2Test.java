@@ -22,7 +22,9 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.core.rest.session.SessionResourceUtil.*;
 import static org.forgerock.openam.core.rest.session.SessionResourceV2.REFRESH_ACTION_ID;
+import static org.forgerock.openam.session.SessionConstants.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -48,6 +50,8 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.dpro.session.PartialSession.Builder;
+import org.forgerock.openam.dpro.session.PartialSessionFactory;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
@@ -70,6 +74,7 @@ public class SessionResourceV2Test {
     private SessionResourceUtil sessionResourceUtil;
     private SessionPropertyWhitelist sessionPropertyWhitelist;
     private SessionService sessionService;
+    private PartialSessionFactory partialSessionFactory;
 
     private SessionResourceV2 sessionResource;
 
@@ -84,6 +89,7 @@ public class SessionResourceV2Test {
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         sessionService = mock(SessionService.class);
+        partialSessionFactory = mock(PartialSessionFactory.class);
 
         sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, sessionQueryManager, null) {
             @Override
@@ -97,7 +103,7 @@ public class SessionResourceV2Test {
             }
         };
         sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper,
-                sessionResourceUtil, sessionPropertyWhitelist, sessionService);
+                sessionResourceUtil, sessionPropertyWhitelist, sessionService, partialSessionFactory);
         given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
     }
 
@@ -208,22 +214,31 @@ public class SessionResourceV2Test {
         given(request.getAction()).willReturn("getSessionInfo");
         given(request.getAdditionalParameter("tokenId")).willReturn("tokenId");
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
-        given(ssoToken.getMaxIdleTime()).willReturn(1000l);
-        given(ssoToken.getMaxSessionTime()).willReturn(600l);
-        given(ssoToken.getTimeLeft()).willReturn(575l);
-        given(ssoToken.getIdleTime()).willReturn(25l);
+        given(partialSessionFactory.fromSSOToken(eq(ssoToken))).willReturn(
+                new Builder()
+                        .username("demo")
+                        .universalId("universalId")
+                        .realm(REALM_PATH)
+                        .sessionHandle("shandle:badger")
+                        .latestAccessTime("JUST_NOW")
+                        .maxIdleExpirationTime("CLOSE")
+                        .maxSessionExpirationTime("FAR")
+                        .build());
 
         //When
         Promise<ActionResponse, ResourceException> promise =
                 sessionResource.actionCollection(mockContext, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().stringAt(UID).isEqualTo("demo");
-        assertThat(promise).succeeded().withContent().stringAt(REALM).isEqualTo(REALM_PATH);
-        assertThat(promise).succeeded().withContent().longAt(MAX_IDLE_TIME).isEqualTo(1000);
-        assertThat(promise).succeeded().withContent().longAt(MAX_SESSION_TIME).isEqualTo(600);
-        assertThat(promise).succeeded().withContent().longAt(MAX_TIME).isEqualTo(575);
-        assertThat(promise).succeeded().withContent().longAt(IDLE_TIME).isEqualTo(25);
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_USERNAME).isEqualTo("demo");
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_UNIVERSAL_ID).isEqualTo("universalId");
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_REALM).isEqualTo(REALM_PATH);
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_HANDLE).isEqualTo("shandle:badger");
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_LATEST_ACCESS_TIME).isEqualTo("JUST_NOW");
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_MAX_IDLE_EXPIRATION_TIME)
+                .isEqualTo("CLOSE");
+        assertThat(promise).succeeded().withContent().stringAt(JSON_SESSION_MAX_SESSION_EXPIRATION_TIME)
+                .isEqualTo("FAR");
     }
 
     @Test
