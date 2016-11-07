@@ -19,13 +19,12 @@ import { Button, Panel, FormGroup, ControlLabel } from "react-bootstrap";
 import { t } from "i18next";
 import React, { Component } from "react";
 import Select from "react-select";
-
-import { getByIdStartsWith } from "org/forgerock/openam/ui/admin/services/global/UsersService";
 import {
-    getByUserIdAndRealm,
     getByRealm,
+    getByUserIdAndRealm,
     invalidateByHandles
 } from "org/forgerock/openam/ui/admin/services/global/SessionsService";
+import { getByIdStartsWith } from "org/forgerock/openam/ui/admin/services/global/UsersService";
 import CallToAction from "components/CallToAction";
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import EventManager from "org/forgerock/commons/ui/common/main/EventManager";
@@ -72,8 +71,10 @@ class SessionsView extends Component {
         showConfirmationBeforeAction(
             { message: t("console.sessions.confirmInvalidate", { realm }) },
             () => {
+                const getSessionHandles = (users) => _.map(users, (user) => user.sessionHandle);
+
                 getByRealm(realm)
-                    .then((users) => _.map(users, (user) => user.sessionHandle))
+                    .then(getSessionHandles)
                     .then(invalidateByHandles)
                     .then(() => {
                         this.setState({
@@ -101,7 +102,7 @@ class SessionsView extends Component {
         });
 
         if (userId) {
-            this.fetchSessionsByUserIdAndRealm (userId, this.props.router.params[0]);
+            this.fetchSessionsByUserIdAndRealm(userId, this.props.router.params[0]);
         }
     }
 

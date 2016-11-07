@@ -15,11 +15,15 @@
  */
 
 import _ from "lodash";
-import { t } from "i18next";
 import { Button, ButtonToolbar, ControlLabel, Panel, Table } from "react-bootstrap";
+import { t } from "i18next";
+import Block from "components/Block";
 import React, { Component, PropTypes } from "react";
 import SessionsTableRow from "./SessionsTableRow";
-import Block from "components/Block";
+import store from "store/index";
+
+const findOwnSession = (dataList) =>
+    _.find(dataList, (data) => data.sessionHandle === store.getState().session.sessionHandle);
 
 class SessionsTable extends Component {
     constructor (props) {
@@ -29,13 +33,17 @@ class SessionsTable extends Component {
         this.handleDeleteRow = this.handleDeleteRow.bind(this);
         this.handleDeleteSelected = this.handleDeleteSelected.bind(this);
         this.state = {
-            checked: []
+            checked: [],
+            ownSession: findOwnSession(this.props.data)
         };
     }
 
     componentWillReceiveProps (nextProps) {
         const updated = _.findByValues(nextProps.data, "sessionHandle", _.pluck(this.state.checked, "sessionHandle"));
-        this.setState({ checked: updated });
+        this.setState({
+            checked: updated,
+            ownSession: findOwnSession(nextProps.data)
+        });
     }
 
     handleDeleteRow (session) {
@@ -47,7 +55,11 @@ class SessionsTable extends Component {
     }
 
     handleSelectAll (e) {
-        this.setState({ checked: e.target.checked ? this.props.data : [] });
+        this.setState({
+            checked: e.target.checked
+            ? _.without(this.props.data, this.state.ownSession)
+            : []
+        });
     }
 
     handleSelectRow (session, checked) {
@@ -57,13 +69,17 @@ class SessionsTable extends Component {
 
     render () {
         const isChecked = (session) => _.includes(this.state.checked, session);
-        const allChecked = (this.state.checked.length === this.props.data.length);
+        const isAllChecked = () => {
+            const numberOfDeletableSessions =
+                this.state.ownSession ? this.props.data.length - 1 : this.props.data.length;
+            return numberOfDeletableSessions > 0 && this.state.checked.length === numberOfDeletableSessions;
+        };
 
         return (
             <div>
                 <ButtonToolbar className="page-toolbar">
                     <Button disabled={ !this.state.checked.length } onClick={ this.handleDeleteSelected }>
-                        <span className="fa fa-close" /> { t("common.form.deleteSelected") }
+                        <span className="fa fa-close" /> { t("console.sessions.invalidateSelected") }
                     </Button>
                 </ButtonToolbar>
 
@@ -77,7 +93,7 @@ class SessionsTable extends Component {
                                             { t("common.form.selectAll") }
                                         </ControlLabel>
                                         <input
-                                            checked={ allChecked }
+                                            checked={ isAllChecked() }
                                             id="selectAll"
                                             onChange={ this.handleSelectAll }
                                             type="checkbox"
@@ -96,13 +112,13 @@ class SessionsTable extends Component {
                                         data={ session }
                                         onDelete={ this.handleDeleteRow }
                                         onSelect={ this.handleSelectRow }
+                                        sessionHandle={ store.getState().session.sessionHandle }
                                     />
                                 ) }
                             </tbody>
                         </Table>
                     </Block>
                 </Panel>
-
             </div>
         );
     }

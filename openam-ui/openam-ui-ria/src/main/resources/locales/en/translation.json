@@ -1325,7 +1325,9 @@
             "invalidateAll": "Invalidate All Sessions",
             "confirmInvalidate": "Are you sure that you want to invalidate all sessions for realm __realm__?",
             "invalidationSuccessful": "All sessions were successfully invalidated",
-            "invalidate": "Invalidate"
+            "invalidate": "Invalidate",
+            "invalidateSelected": "Invalidate Selected",
+            "yourSession": "Your session"
         },
         "applications": {
             "agents": {

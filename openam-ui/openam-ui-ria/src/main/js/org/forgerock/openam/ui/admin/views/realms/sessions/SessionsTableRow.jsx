@@ -15,21 +15,34 @@
  */
 
 import _ from "lodash";
-import { Button, ButtonGroup, ControlLabel } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, ControlLabel } from "react-bootstrap";
 import { t } from "i18next";
 import moment from "moment";
 import React, { PropTypes } from "react";
 
-const SessionsTableRow = ({ onDelete, onSelect, checked, data }) => {
+const SessionsTableRow = ({ checked, data, onDelete, onSelect, sessionHandle }) => {
     const handleDelete = () => onDelete(data);
     const handleSelect = (event) => onSelect(data, event.target.checked);
     const selectId = _.uniqueId("select");
+    const rowActions = data.sessionHandle !== sessionHandle
+        ? <ButtonGroup className="pull-right">
+            <Button bsStyle="link" onClick={ handleDelete } title={ t("console.sessions.invalidate") }>
+                <i className="fa fa-close" />
+            </Button>
+        </ButtonGroup>
+        : <Badge>{ t("console.sessions.yourSession") }</Badge>;
 
     return (
         <tr className={ checked ? "selected" : undefined } >
             <td>
                 <ControlLabel htmlFor={ selectId } srOnly>{ t("common.form.select") }</ControlLabel>
-                <input checked={ checked } id={ selectId } onChange={ handleSelect } type="checkbox" />
+                <input
+                    checked={ checked }
+                    disabled={ data.sessionHandle === sessionHandle }
+                    id={ selectId }
+                    onChange={ handleSelect }
+                    type="checkbox"
+                />
             </td>
 
             <td>{ moment(data.latestAccessTime).fromNow(true) }</td>
@@ -51,17 +64,8 @@ const SessionsTableRow = ({ onDelete, onSelect, checked, data }) => {
             </td>
 
             <td className="fr-col-btn-1">
-                <ButtonGroup className="pull-right">
-                    <Button
-                        bsStyle="link"
-                        onClick={ handleDelete }
-                        title={ t("common.form.delete") }
-                    >
-                        <i className="fa fa-close" />
-                    </Button>
-                </ButtonGroup>
+                { rowActions }
             </td>
-
         </tr>
     );
 };
@@ -75,7 +79,8 @@ SessionsTableRow.propTypes = {
         sessionHandle: PropTypes.string.isRequired
     })).isRequired,
     onDelete: PropTypes.func.isRequired,
-    onSelect: PropTypes.func.isRequired
+    onSelect: PropTypes.func.isRequired,
+    sessionHandle: PropTypes.string.isRequired
 };
 
 export default SessionsTableRow;
