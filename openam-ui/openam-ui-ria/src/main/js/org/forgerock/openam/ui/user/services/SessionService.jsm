@@ -45,7 +45,8 @@ export const getTimeLeft = (token) => {
 export const updateSessionInfo = (token, options) => {
     return getSessionInfo(token, options).then((response) => {
         store.dispatch(sessionAddInfo({
-            realm: response.realm
+            realm: response.realm,
+            sessionHandle: response.sessionHandle
         }));
         return response;
     });

@@ -21,11 +21,13 @@ define([
     describe("store/actions/creators", () => {
         describe("#sessionAddInfo", () => {
             it("creates an action to add session info to store.session", () => {
-                const info = { realm: "/realmA" };
+                const realm = "/realmA";
+                const sessionHandle = "sessionHandle";
 
-                expect(creators.sessionAddInfo(info)).eql({
+                expect(creators.sessionAddInfo({ realm, sessionHandle })).eql({
                     type: types.SESSION_ADD_INFO,
-                    info
+                    realm,
+                    sessionHandle
                 });
             });
         });

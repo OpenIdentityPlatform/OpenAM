@@ -20,9 +20,10 @@ import {
     SESSION_REMOVE_INFO
 } from "./types";
 
-export const sessionAddInfo = (info) => ({
+export const sessionAddInfo = ({ realm, sessionHandle }) => ({
     type: SESSION_ADD_INFO,
-    info
+    realm,
+    sessionHandle
 });
 
 export const sessionRemoveInfo = () => ({

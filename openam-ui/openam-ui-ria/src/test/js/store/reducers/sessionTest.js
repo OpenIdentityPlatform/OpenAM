@@ -25,20 +25,24 @@ define([
             expect(
                 reducer(undefined, {})
             ).eql({
-                realm: undefined
+                realm: undefined,
+                sessionHandle: undefined
             });
         });
 
         it(`handles ${types.SESSION_ADD_INFO}`, () => {
             const realm = "/realmA";
+            const sessionHandle = "sessionHandle";
 
             expect(
                 reducer({}, {
                     type: types.SESSION_ADD_INFO,
-                    info: { realm }
+                    realm,
+                    sessionHandle
                 })
             ).eql({
-                realm: realm.toLowerCase()
+                realm: realm.toLowerCase(),
+                sessionHandle
             });
         });
 
