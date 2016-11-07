@@ -98,7 +98,7 @@ define([
     */
     function ungroupCollectionProperties (raw, groupKey) {
         const collectionProperties = _.pick(raw.properties[groupKey].properties, (value) => {
-            return value.type === "object";
+            return value.type === "object" && _.has(value, "properties");
         });
 
         if (_.isEmpty(collectionProperties)) {
