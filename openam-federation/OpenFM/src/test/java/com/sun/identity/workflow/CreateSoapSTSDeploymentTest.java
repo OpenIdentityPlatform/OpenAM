@@ -11,10 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +41,9 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /*
 To actually run this test, comment-out the <skipTests>true</skipTests> property in the pom.xml and run
@@ -78,20 +79,22 @@ public class CreateSoapSTSDeploymentTest {
 
     private static final boolean WITH_KEYSTORE_FILE = true;
     private static final boolean WITH_CUSTOM_WSDL = true;
-    @Rule
-    public TemporaryFolder temporaryFolder;
-    private final File outputWarFile;
-    private final Path inputWarFilePath;
-    private final Path customWsdlFilePath;
-    private final Path keystoreFilePath;
+    private File outputWarFile;
+    private Path inputWarFilePath;
+    private Path customWsdlFilePath;
+    private Path keystoreFilePath;
 
-    public CreateSoapSTSDeploymentTest() throws IOException {
+    @BeforeClass
+    public void setup() throws Exception {
         inputWarFilePath = Paths.get("/com", "sun", "identity", "workflow", "slim-openam-soap-sts-server.war");
         customWsdlFilePath = Paths.get("/com", "sun", "identity", "workflow", "custom.wsdl");
         keystoreFilePath = Paths.get("/com", "sun", "identity", "workflow", "keystore.jks");
-        temporaryFolder = new TemporaryFolder();
-        temporaryFolder.create();
-        outputWarFile = temporaryFolder.newFile("test-openam-soap-sts-server.war");
+        outputWarFile = Files.createTempFile("soap-sts", "war").toFile();
+    }
+
+    @AfterClass
+    public void tearDown() throws Exception {
+        outputWarFile.delete();
     }
 
     @Test

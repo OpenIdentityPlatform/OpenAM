@@ -11,32 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.JsonValueException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class RestAuthChoiceCallbackHandlerTest {
 
@@ -104,8 +102,7 @@ public class RestAuthChoiceCallbackHandlerTest {
         //Then
         assertEquals("ChoiceCallback", jsonObject.get("type").asString());
 
-        assertNotNull(jsonObject.get("output"));
-        assertEquals(3, jsonObject.get("output").size());
+        assertThat(jsonObject).hasArray("output").hasSize(3);
         assertEquals("Select choice:", jsonObject.get("output").get(0).get("value").asString());
         assertEquals("1", jsonObject.get("output").get(1).get("value").get(0).asString());
         assertEquals("34", jsonObject.get("output").get(1).get("value").get(1).asString());
@@ -113,8 +110,7 @@ public class RestAuthChoiceCallbackHandlerTest {
         assertEquals("93", jsonObject.get("output").get(1).get("value").get(3).asString());
         assertEquals(0, (int) jsonObject.get("output").get(2).get("value").asInteger());
 
-        assertNotNull(jsonObject.get("input"));
-        assertEquals(1, jsonObject.get("input").size());
+        assertThat(jsonObject).hasArray("input").hasSize(1);
         assertEquals(0, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
@@ -132,8 +128,7 @@ public class RestAuthChoiceCallbackHandlerTest {
         //Then
         assertEquals("ChoiceCallback", jsonObject.get("type").asString());
 
-        assertNotNull(jsonObject.get("output"));
-        assertEquals(3, jsonObject.get("output").size());
+        assertThat(jsonObject).hasArray("output").hasSize(3);
         assertEquals("Select choice:", jsonObject.get("output").get(0).get("value").asString());
         assertEquals("1", jsonObject.get("output").get(1).get("value").get(0).asString());
         assertEquals("34", jsonObject.get("output").get(1).get("value").get(1).asString());
@@ -141,8 +136,7 @@ public class RestAuthChoiceCallbackHandlerTest {
         assertEquals("93", jsonObject.get("output").get(1).get("value").get(3).asString());
         assertEquals(0, (int) jsonObject.get("output").get(2).get("value").asInteger());
 
-        assertNotNull(jsonObject.get("input"));
-        assertEquals(1, jsonObject.get("input").size());
+        assertThat(jsonObject).hasArray("input").hasSize(1);
         assertEquals(1, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
@@ -207,9 +201,6 @@ public class RestAuthChoiceCallbackHandlerTest {
 
         //When
         restAuthChoiceCallbackHandler.convertFromJson(choiceCallback, jsonNameCallback);
-
-        //Then
-        fail();
     }
 
     @Test
@@ -276,9 +267,6 @@ public class RestAuthChoiceCallbackHandlerTest {
 
         //When
         restAuthChoiceCallbackHandler.convertFromJson(choiceCallback, jsonNameCallback);
-
-        //Then
-        fail();
     }
 
     @Test

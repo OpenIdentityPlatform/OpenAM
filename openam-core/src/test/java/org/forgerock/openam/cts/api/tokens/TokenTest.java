@@ -15,9 +15,9 @@
  */
 package org.forgerock.openam.cts.api.tokens;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.tokens.CoreTokenField.*;
 import static org.forgerock.openam.utils.Time.*;
-import static org.junit.Assert.assertArrayEquals;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -78,7 +78,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, data);
         // Then
-        assertArrayEquals(data, token.<byte[]>getAttribute(key));
+        assertThat(data).isEqualTo(token.<byte[]>getAttribute(key));
     }
 
     @Test

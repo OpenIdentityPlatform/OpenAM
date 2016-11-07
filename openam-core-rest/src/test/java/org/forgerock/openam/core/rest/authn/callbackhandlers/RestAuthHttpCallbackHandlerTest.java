@@ -11,32 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import com.sun.identity.authentication.spi.HttpCallback;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import static junit.framework.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.sun.identity.authentication.spi.HttpCallback;
 
 public class RestAuthHttpCallbackHandlerTest {
 
@@ -189,9 +190,6 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //When
         restAuthHttpCallbackHandler.convertToJson(null, 1);
-
-        //Then
-        fail();
     }
 
     @Test (expectedExceptions = RestAuthException.class)
@@ -201,8 +199,5 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //When
         restAuthHttpCallbackHandler.convertFromJson(null, null);
-
-        //Then
-        fail();
     }
 }

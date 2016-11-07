@@ -11,33 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import junit.framework.Assert;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.security.auth.callback.NameCallback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+
+import javax.security.auth.callback.NameCallback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class RestAuthNameCallbackHandlerTest {
 
@@ -57,7 +53,7 @@ public class RestAuthNameCallbackHandlerTest {
         String callbackClassName = restAuthNameCallbackHandler.getCallbackClassName();
 
         //Then
-        assertEquals(NameCallback.class.getSimpleName(), callbackClassName);
+        assertThat(callbackClassName).isEqualTo(NameCallback.class.getSimpleName());
     }
 
     @Test
@@ -75,7 +71,7 @@ public class RestAuthNameCallbackHandlerTest {
 
         //Then
         verify(nameCallback).setName("USERNAME");
-        assertTrue(updated);
+        assertThat(updated).isTrue();
     }
 
     @Test
@@ -94,7 +90,7 @@ public class RestAuthNameCallbackHandlerTest {
 
         //Then
         verify(nameCallback, never()).setName(anyString());
-        assertFalse(updated);
+        assertThat(updated).isFalse();
     }
 
     @Test
@@ -113,7 +109,7 @@ public class RestAuthNameCallbackHandlerTest {
 
         //Then
         verify(nameCallback, never()).setName(anyString());
-        assertFalse(updated);
+        assertThat(updated).isFalse();
     }
 
     @Test
@@ -130,7 +126,7 @@ public class RestAuthNameCallbackHandlerTest {
                 originalNameCallback);
 
         //Then
-        assertEquals(originalNameCallback, nameCallback);
+        assertThat(nameCallback).isEqualTo(originalNameCallback);
     }
 
     @Test
@@ -143,13 +139,11 @@ public class RestAuthNameCallbackHandlerTest {
         JsonValue jsonObject = restAuthNameCallbackHandler.convertToJson(nameCallback, 1);
 
         //Then
-        assertEquals("NameCallback", jsonObject.get("type").asString());
-        assertNotNull(jsonObject.get("output"));
-        Assert.assertEquals(1, jsonObject.get("output").size());
-        Assert.assertEquals("Enter username:", jsonObject.get("output").get(0).get("value").asString());
-        assertNotNull(jsonObject.get("input"));
-        Assert.assertEquals(1, jsonObject.get("input").size());
-        Assert.assertEquals("", jsonObject.get("input").get(0).get("value").asString());
+        assertThat(jsonObject).stringAt("type").isEqualTo("NameCallback");
+        assertThat(jsonObject).hasArray("output").hasSize(1);
+        assertThat(jsonObject.get("output").get(0)).stringAt("value").isEqualTo("Enter username:");
+        assertThat(jsonObject).hasArray("input").hasSize(1);
+        assertThat(jsonObject.get("input").get(0)).stringAt("value").isEqualTo("");
     }
 
     @Test
@@ -170,9 +164,9 @@ public class RestAuthNameCallbackHandlerTest {
                 jsonNameCallback);
 
         //Then
-        Assert.assertEquals(nameCallback, convertedNameCallback);
-        Assert.assertEquals("Enter username:", convertedNameCallback.getPrompt());
-        Assert.assertEquals("USERNAME", convertedNameCallback.getName());
+        assertThat(convertedNameCallback).isEqualTo(nameCallback);
+        assertThat(convertedNameCallback.getPrompt()).isEqualTo("Enter username:");
+        assertThat(convertedNameCallback.getName()).isEqualTo("USERNAME");
     }
 
     @Test (expectedExceptions = RestAuthException.class)
@@ -190,9 +184,6 @@ public class RestAuthNameCallbackHandlerTest {
 
         //When
         restAuthNameCallbackHandler.convertFromJson(nameCallback, jsonNameCallback);
-
-        //Then
-        fail();
     }
 
     @Test
@@ -213,8 +204,8 @@ public class RestAuthNameCallbackHandlerTest {
                 jsonNameCallback);
 
         //Then
-        Assert.assertEquals(nameCallback, convertedNameCallback);
-        Assert.assertEquals("Enter username:", convertedNameCallback.getPrompt());
-        Assert.assertEquals("USERNAME", convertedNameCallback.getName());
+        assertThat(convertedNameCallback).isEqualTo(nameCallback);
+        assertThat(convertedNameCallback.getPrompt()).isEqualTo("Enter username:");
+        assertThat(convertedNameCallback.getName()).isEqualTo("USERNAME");
     }
 }

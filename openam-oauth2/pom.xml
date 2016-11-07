@@ -159,6 +159,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-notifications-integration</artifactId>
             <scope>test</scope>

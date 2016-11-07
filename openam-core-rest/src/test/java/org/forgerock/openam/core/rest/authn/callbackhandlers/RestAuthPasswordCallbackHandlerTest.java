@@ -11,33 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import junit.framework.Assert;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 
 public class RestAuthPasswordCallbackHandlerTest {
 
@@ -57,7 +54,7 @@ public class RestAuthPasswordCallbackHandlerTest {
         String callbackClassName = restAuthPasswordCallbackHandler.getCallbackClassName();
 
         //Then
-        assertEquals(PasswordCallback.class.getSimpleName(), callbackClassName);
+        assertThat(PasswordCallback.class.getSimpleName()).isEqualTo(callbackClassName);
     }
 
     @Test
@@ -76,7 +73,7 @@ public class RestAuthPasswordCallbackHandlerTest {
 
         //Then
         verify(passwordCallback).setPassword("PASSWORD".toCharArray());
-        assertTrue(updated);
+        assertThat(updated).isTrue();
     }
 
     @Test
@@ -96,7 +93,7 @@ public class RestAuthPasswordCallbackHandlerTest {
 
         //Then
         verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
-        assertFalse(updated);
+        assertThat(updated).isFalse();
     }
 
     @Test
@@ -116,7 +113,7 @@ public class RestAuthPasswordCallbackHandlerTest {
 
         //Then
         verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
-        assertFalse(updated);
+        assertThat(updated).isFalse();
     }
 
     @Test
@@ -133,7 +130,7 @@ public class RestAuthPasswordCallbackHandlerTest {
                 originalPasswordCallback);
 
         //Then
-        assertEquals(originalPasswordCallback, passwordCallback);
+        assertThat(passwordCallback).isEqualTo(originalPasswordCallback);
     }
 
     @Test
@@ -146,13 +143,11 @@ public class RestAuthPasswordCallbackHandlerTest {
         JsonValue jsonObject = restAuthPasswordCallbackHandler.convertToJson(passwordCallback, 1);
 
         //Then
-        assertEquals("PasswordCallback", jsonObject.get("type").asString());
-        assertNotNull(jsonObject.get("output"));
-        Assert.assertEquals(1, jsonObject.get("output").size());
-        Assert.assertEquals("Enter password:", jsonObject.get("output").get(0).get("value").asString());
-        assertNotNull(jsonObject.get("input"));
-        Assert.assertEquals(1, jsonObject.get("input").size());
-        Assert.assertEquals("", jsonObject.get("input").get(0).get("value").asString());
+        assertThat(jsonObject).stringAt("type").isEqualTo("PasswordCallback");
+        assertThat(jsonObject).hasArray("output").hasSize(1);
+        assertThat(jsonObject.get("output").get(0)).stringAt("value").isEqualTo("Enter password:");
+        assertThat(jsonObject).hasArray("input").hasSize(1);
+        assertThat(jsonObject.get("input").get(0)).stringAt("value").isEqualTo("");
     }
 
     @Test
@@ -173,9 +168,9 @@ public class RestAuthPasswordCallbackHandlerTest {
                 jsonPasswordCallback);
 
         //Then
-        Assert.assertEquals(passwordCallback, convertedPasswordCallback);
-        Assert.assertEquals("Enter password:", convertedPasswordCallback.getPrompt());
-        Assert.assertEquals("PASSWORD", new String(convertedPasswordCallback.getPassword()));
+        assertThat(passwordCallback).isEqualTo(convertedPasswordCallback);
+        assertThat(convertedPasswordCallback.getPrompt()).isEqualTo("Enter password:");
+        assertThat(new String(convertedPasswordCallback.getPassword())).isEqualTo("PASSWORD");
     }
 
     @Test (expectedExceptions = RestAuthException.class)
@@ -193,9 +188,6 @@ public class RestAuthPasswordCallbackHandlerTest {
 
         //When
         restAuthPasswordCallbackHandler.convertFromJson(passwordCallback, jsonPasswordCallback);
-
-        //Then
-        fail();
     }
 
     @Test
@@ -216,8 +208,8 @@ public class RestAuthPasswordCallbackHandlerTest {
                 jsonPasswordCallback);
 
         //Then
-        Assert.assertEquals(passwordCallback, convertedPasswordCallback);
-        Assert.assertEquals("Enter password:", convertedPasswordCallback.getPrompt());
-        Assert.assertEquals("PASSWORD", new String(convertedPasswordCallback.getPassword()));
+        assertThat(convertedPasswordCallback).isEqualTo(passwordCallback);
+        assertThat(convertedPasswordCallback.getPrompt()).isEqualTo("Enter password:");
+        assertThat(new String(convertedPasswordCallback.getPassword())).isEqualTo("PASSWORD");
     }
 }

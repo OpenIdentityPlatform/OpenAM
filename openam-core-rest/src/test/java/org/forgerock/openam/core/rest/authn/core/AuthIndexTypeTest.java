@@ -11,17 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.core;
 
-import com.sun.identity.authentication.AuthContext;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.testng.Assert.assertEquals;
+import com.sun.identity.authentication.AuthContext;
 
 public class AuthIndexTypeTest {
 
@@ -73,7 +74,7 @@ public class AuthIndexTypeTest {
         AuthContext.IndexType authContextIndexType = authIndexType.getIndexType();
 
         //Then
-        assertNull(authContextIndexType);
+        assertThat(authContextIndexType).isNull();
     }
 
     @Test
