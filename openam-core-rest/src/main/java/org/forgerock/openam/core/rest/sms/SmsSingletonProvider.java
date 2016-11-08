@@ -113,12 +113,11 @@ public class SmsSingletonProvider extends SmsResourceProvider {
         }
         this.idRepoFactory = idRepoFactory;
 
-        initDescription(schema);
-
+        description = initDescription(schema);
     }
 
-    protected void initDescription(ServiceSchema schema) {
-        description = ApiDescription.apiDescription().id("fake").version("v")
+    protected ApiDescription initDescription(ServiceSchema schema) {
+        return ApiDescription.apiDescription().id("fake").version("v")
                 .paths(Paths.paths().put("", VersionedPath.versionedPath()
                         .put(VersionedPath.UNVERSIONED, Resource.resource()
                                 .title(getI18NName())

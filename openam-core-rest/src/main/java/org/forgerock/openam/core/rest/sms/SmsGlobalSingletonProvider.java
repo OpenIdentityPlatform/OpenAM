@@ -16,6 +16,12 @@
 
 package org.forgerock.openam.core.rest.sms;
 
+import static org.forgerock.api.enums.CreateMode.ID_FROM_CLIENT;
+import static org.forgerock.api.models.Create.create;
+import static org.forgerock.api.models.Delete.delete;
+import static org.forgerock.api.models.Read.read;
+import static org.forgerock.api.models.Update.update;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +36,10 @@ import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.SingletonProvider;
 import org.forgerock.api.annotations.Update;
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.api.models.Paths;
+import org.forgerock.api.models.Resource;
+import org.forgerock.api.models.VersionedPath;
 import org.forgerock.guava.common.base.Optional;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -81,6 +91,21 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
             this.organizationConverter = null;
         }
         initDescription(globalSchema);
+    }
+
+    protected ApiDescription initDescription(ServiceSchema schema) {
+        return ApiDescription.apiDescription().id("fake").version("v")
+                .paths(Paths.paths().put("", VersionedPath.versionedPath()
+                        .put(VersionedPath.UNVERSIONED, Resource.resource()
+                                .title(getI18NName())
+                                .description(getSchemaDescription(schema.getI18NKey()))
+                                .mvccSupported(false)
+                                .resourceSchema(org.forgerock.api.models.Schema.schema().schema(
+                                        createSchema(Optional.<Context>absent())).build())
+                                .read(read().build())
+                                .update(update().build())
+                                .build()).build()
+                ).build()).build();
     }
 
     @Update(operationDescription = @Operation)
