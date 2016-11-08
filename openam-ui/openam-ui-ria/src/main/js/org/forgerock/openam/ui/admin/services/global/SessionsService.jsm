@@ -33,15 +33,6 @@ export function getByUserIdAndRealm (id, realm) {
     }).then((response) => response.result);
 }
 
-export function getByRealm (realm) {
-    const queryFilter = encodeURIComponent(`realm eq "${realm}"`);
-
-    return obj.serviceCall({
-        url: fetchUrl(`/sessions?_queryFilter=${queryFilter}`, { realm: false }),
-        headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" }
-    }).then((response) => response.result);
-}
-
 export function invalidateByHandles (handles) {
     return obj.serviceCall({
         url: fetchUrl("/sessions?_action=logoutByHandle", { realm: false }),
