@@ -22,6 +22,7 @@ import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.json.resource.Applications.simpleCrestApplication;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import java.util.ArrayList;
@@ -36,7 +37,10 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.Version;
+import org.forgerock.json.resource.Applications;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.CrestApplication;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -224,7 +228,11 @@ public class Routers {
         @Override
         void addRoute(RoutingMode mode, String uriTemplate, RequestHandler resource) {
             super.addRoute(mode, uriTemplate, resource);
-            chfRouter.addRoute(requestUriMatcher(mode, uriTemplate), Handlers.chainOf(newHttpHandler(resource), crestProtocolEnforcementFilter));
+            ConnectionFactory connectionFactory = Resources.newInternalConnectionFactory(resource);
+            CrestApplication crestApplication = simpleCrestApplication(connectionFactory, "frapi:openam", "1.0");
+
+            chfRouter.addRoute(requestUriMatcher(mode, uriTemplate), Handlers.chainOf(newHttpHandler(crestApplication),
+                    crestProtocolEnforcementFilter));
         }
     }
 
