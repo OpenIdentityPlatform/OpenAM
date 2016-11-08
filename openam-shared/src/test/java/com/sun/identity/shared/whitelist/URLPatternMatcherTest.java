@@ -325,9 +325,10 @@ public class URLPatternMatcherTest {
             {PATTERN_16, "http://www.good.com", false},
             {PATTERN_16, "http://www.good.com:80", false},
             {PATTERN_16, "http://www.good.com:80/hello/world", false},
-            {PATTERN_16, "http://www.good.com:80/abc/world", false},
-            {PATTERN_16, "http://www.good.com:80/abc", false},
-            {PATTERN_16, "http://www.good.com/abc", false},
+            {PATTERN_16, "http://www.good.com:80/abc/world", true},
+            {PATTERN_16, "http://www.good.com/abc", true},
+            {PATTERN_16, "http://www.good.com:80/abc", true},
+            {PATTERN_16, "https://www.good.com:80/abc", true},
             {PATTERN_16, "https://www.good.com", false},
             {PATTERN_16, "https://www.good.com:443", false},
             {PATTERN_16, "http://www.good.com/hello/world", false},
@@ -341,6 +342,9 @@ public class URLPatternMatcherTest {
             {PATTERN_16, "/abc", true},
             {PATTERN_16, "/acb/def/blah", false},
             {PATTERN_16, "/abc/def/blah", true},
+
+            {PATTERN_16 + "?*", "http://www.good.com/abc?key=value", true},
+            {PATTERN_16 + "?*", "http://www.good.com/abc?key=value&otherkey=othervalue", true},
 
                 //wildcard after port
             {PATTERN_17, "http://www.good.com", true},
