@@ -30,8 +30,10 @@ import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.authz.PrivilegeDefinition.Action;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.services.context.Context;
@@ -133,7 +135,7 @@ public abstract class PrivilegeAuthzModule {
             // If the subject is an agent, the realm in the context and the realm of the subject do not have to be
             // either the same, or related by parentage
             //
-            boolean isRealmValid = isCASPAorJASPA(token) || loggedIntoValidRealm(realm, loggedInRealm);
+            boolean isRealmValid = IdentityUtils.isCASPAorJASPA(token) || loggedIntoValidRealm(realm, loggedInRealm);
 
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,
                     Collections.<String, Set<String>>emptyMap()) && isRealmValid) {
@@ -159,25 +161,6 @@ public abstract class PrivilegeAuthzModule {
     protected boolean loggedIntoValidRealm(String requestedRealm, String loggedInRealm) {
         return requestedRealm.equalsIgnoreCase(loggedInRealm)
                     || RealmUtils.isParentRealm(loggedInRealm, requestedRealm);
-    }
-
-    /**
-     * @param ssoToken The user's SSO Token
-     * @return True if the user SSO Token corresponds to CASPA (C Application Server Policy Agent) or JASPA (Java
-     * Application Server Policy Agent)
-     */
-    private boolean isCASPAorJASPA(SSOToken ssoToken) {
-
-        try {
-            if (ssoToken != null) {
-                AMIdentity identity = new AMIdentity(ssoToken);
-                String agentType = AgentConfiguration.getAgentType(identity);
-                return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(agentType)
-                        || AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(agentType);
-            }
-        } catch (IdRepoException|SSOException ignored) {
-        }
-        return false;
     }
 
     /**

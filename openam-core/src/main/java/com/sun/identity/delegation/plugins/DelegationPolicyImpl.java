@@ -31,19 +31,6 @@ package com.sun.identity.delegation.plugins;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.forgerock.openam.ldap.LDAPUtils;
-
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -82,6 +69,19 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.openam.identity.idm.IdentityUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
+
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * The class <code>DelegationPolicyImpl</code> implements the interface
@@ -112,6 +112,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
     static final String READ = "READ";
     static final String DELEGATE = "DELEGATE";
     static final String GLOBALCONFIG = "globalconfig";
+    static final String SERVERINFO_VERSION = "serverinfo/version";
 
     /**
      *  To configure the delegation cache size, specify the attribute
@@ -521,12 +522,18 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             String tokenIdStr = tokenId.toString();
             Set actions = permission.getActions();
             if ((actions != null) && (!actions.isEmpty())) {
-                //If the user has delegated admin permissions in the realm they are currently logged in to,
-                //they have read access to global-config endpoints
-                if(GLOBALCONFIG.equals(permission.getConfigType()) && actions.equals(Collections.singleton(READ))) {
+                // If the user has delegated admin permissions in the realm they are currently logged in to,
+                // they have read access to global-config endpoints
+                if (GLOBALCONFIG.equals(permission.getConfigType()) && actions.equals(Collections.singleton(READ))) {
                     if (hasDelegationPermissionsForRealm(token, token.getProperty(ISAuthConstants.ORGANIZATION))) {
                         return true;
                     }
+                } else if (SERVERINFO_VERSION.equals(permission.getConfigType())
+                        && actions.equals(Collections.singleton(READ))
+                        && IdentityUtils.isCASPAorJASPA(token)) {
+
+                    // Allow the C and Java Agents read access to the serverinfo endpoint
+                    return true;
                 }
 
                 try {

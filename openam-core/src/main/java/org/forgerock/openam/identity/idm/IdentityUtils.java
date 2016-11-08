@@ -18,6 +18,9 @@ package org.forgerock.openam.identity.idm;
 
 import javax.inject.Singleton;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
@@ -72,5 +75,24 @@ public class IdentityUtils {
      */
     public String getUniversalId(String identityName, IdType idType, String realm) {
         return new AMIdentity(null, null, identityName, idType, realm).getUniversalId();
+    }
+
+    /**
+     * @param ssoToken The user's SSO Token
+     * @return True if the user SSO Token corresponds to CASPA (C Application Server Policy Agent) or JASPA (Java
+     * Application Server Policy Agent)
+     */
+    public static boolean isCASPAorJASPA(SSOToken ssoToken) {
+
+        try {
+            if (ssoToken != null) {
+                AMIdentity identity = new AMIdentity(ssoToken);
+                String agentType = AgentConfiguration.getAgentType(identity);
+                return AgentConfiguration.AGENT_TYPE_J2EE.equalsIgnoreCase(agentType)
+                        || AgentConfiguration.AGENT_TYPE_WEB.equalsIgnoreCase(agentType);
+            }
+        } catch (IdRepoException|SSOException ignored) {
+        }
+        return false;
     }
 }
