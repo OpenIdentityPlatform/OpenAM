@@ -194,28 +194,6 @@
         <!-- Place Default Profiles here to override and determine Environment. -->
 
         <profile>
-            <id>default-profile</id>
-            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
-            <activation>
-                <file>
-                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>${maven.compiler.source}</version>
-                    <scope>system</scope>
-                    <optional>true</optional>
-                    <systemPath>${toolsjar}</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>release</id>
             <activation>
                 <property>

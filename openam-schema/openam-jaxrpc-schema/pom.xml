@@ -45,13 +45,16 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <target name="jaxrpc">
-                                <property name="build.class.path" refid="maven.compile.classpath" />
+                                <path id="wscompile.path">
+                                    <path refid="maven.compile.classpath" />
+                                    <pathelement path="${env.JAVA_HOME}/lib/tools.jar" />
+                                </path>
 
                                 <mkdir dir="${project.build.directory}/classes" />
                                 <mkdir dir="${project.build.directory}/generated-sources/wscompile" />
                                 <mkdir dir="${project.build.directory}/unwanted" />
 
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}" failonerror="true">
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpathref="wscompile.path" failonerror="true">
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-keep" />
