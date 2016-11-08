@@ -1385,4 +1385,8 @@ public interface Constants {
     /** Service version for the REST APIs service. */
     String REST_APIS_SERVICE_VERSION = "1.0";
 
+    /**
+     * The name of the request attribute that tells whether this authentication happened via WS-Fed AR profile.
+     */
+    String WSFED_ACTIVE_LOGIN = "org.forgerock.openam.federation.wsfed.active.login";
 }

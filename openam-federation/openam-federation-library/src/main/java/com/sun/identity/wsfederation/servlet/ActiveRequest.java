@@ -59,6 +59,7 @@ import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.whitelist.URLPatternMatcher;
@@ -283,6 +284,7 @@ public class ActiveRequest extends WSFederationAction {
         try {
             final WsFedAuthenticator wsFedAuthenticator = Class.forName(authenticator)
                     .asSubclass(WsFedAuthenticator.class).newInstance();
+            request.setAttribute(Constants.WSFED_ACTIVE_LOGIN, true);
             return wsFedAuthenticator.authenticate(request, response, soapMessage, realm, username, password);
         } catch (ReflectiveOperationException roe) {
             DEBUG.error("An error occurred while invoking WsFedAuthenticator", roe);
