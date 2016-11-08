@@ -170,6 +170,8 @@ public class LdapAdapter implements TokenStorageAdapter {
         Entry previousEntry = conversion.getEntry(previous);
         LdapTokenAttributeConversion.stripObjectClass(previousEntry);
 
+        // OPENAM-9950 - etag is an operational attribute and must be removed from the modification request
+        previousEntry.removeAttribute(ETAG.toString());
         ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry,
             Entries.diffOptions().replaceSingleValuedAttributes());
 
