@@ -193,7 +193,7 @@ public class RestGuiceModule extends AbstractModule {
     Router getCrestRootRouter(@Named("CrestRealmRouter") Router crestRealmRouter) {
         Router crestRootRouter = new Router();
         crestRootRouter.setDefaultRoute(crestRealmRouter);
-        return crestRealmRouter;
+        return crestRootRouter;
     }
 
     @Provides
