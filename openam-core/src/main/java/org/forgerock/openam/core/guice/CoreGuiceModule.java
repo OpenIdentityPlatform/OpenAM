@@ -422,6 +422,11 @@ public class CoreGuiceModule extends AbstractModule {
         return esf.createFixedThreadPool(5);
     }
 
+    @Provides @Inject @Named(SessionTimeoutHandlerExecutor.EXECUTOR_BINDING_NAME)
+    ExecutorService getSessionTimeoutHandlerExecutorService(ExecutorServiceFactory esf) {
+        return esf.createCachedThreadPool();
+    }
+
     /**
      * The CTS Worker Pool provides a thread pool specifically for CTS usage.
      *

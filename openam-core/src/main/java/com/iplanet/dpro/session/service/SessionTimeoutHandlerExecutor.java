@@ -57,17 +57,20 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class SessionTimeoutHandlerExecutor implements InternalSessionListener {
 
+    public static final String EXECUTOR_BINDING_NAME = "SESSION_TIMEOUT_HANDLER_EXECUTOR";
     private final Debug sessionDebug;
     private final SSOTokenManager ssoTokenManager;
     private final SessionServiceConfig serviceConfig;
-    private final ExecutorService executorService = Executors.newCachedThreadPool(); // TODO: Inject from Guice
+    private final ExecutorService executorService;
 
     @Inject
     SessionTimeoutHandlerExecutor(
             final @Named(SESSION_DEBUG) Debug sessionDebug,
+            final @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService,
             final SSOTokenManager ssoTokenManager,
             final SessionServiceConfig serviceConfig) {
         this.sessionDebug = sessionDebug;
+        this.executorService = executorService;
         this.ssoTokenManager = ssoTokenManager;
         this.serviceConfig = serviceConfig;
     }
@@ -133,7 +136,7 @@ public class SessionTimeoutHandlerExecutor implements InternalSessionListener {
                 try {
                     latch.await(1000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException ignored) {
-                    // This should never happen: we can't handle it here, so propagate it.
+                    //we can't handle it here, so propagate it.
                     Thread.currentThread().interrupt();
                 }
 
