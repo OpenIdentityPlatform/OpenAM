@@ -154,6 +154,10 @@ public class LdapAdapter implements TokenStorageAdapter {
     /**
      * Update the Token based on whether there were any changes between the two.
      *
+     * It is up to the underlying ldap later to update the etag so the etag
+     * so the etag is removed from the previous and updated token before the diff is
+     * computed.
+     *
      * <p>If the {@literal previous} {@code Token} contains a non-{@code null}
      * {@link CoreTokenField#ETAG} attribute value then the update will be performed with an
      * optimistic concurrency check. If it does not contain the attribute or it contains a
@@ -172,8 +176,10 @@ public class LdapAdapter implements TokenStorageAdapter {
         Entry previousEntry = conversion.getEntry(previous);
         LdapTokenAttributeConversion.stripObjectClass(previousEntry);
 
-        // OPENAM-9950 - etag is an operational attribute and must be removed from the modification request
+        //etag should not be modified and should not be part of the modification request
+        //it is the up to the underlying ldap layer to generate etag
         previousEntry.removeAttribute(ETAG.toString());
+        currentEntry.removeAttribute(ETAG.toString());
         ModifyRequest request = Entries.diffEntries(previousEntry, currentEntry,
             Entries.diffOptions().replaceSingleValuedAttributes());
 
