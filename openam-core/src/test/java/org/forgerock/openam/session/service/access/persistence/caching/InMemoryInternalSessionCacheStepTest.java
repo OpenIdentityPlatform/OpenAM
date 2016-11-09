@@ -16,17 +16,30 @@
 
 package org.forgerock.openam.session.service.access.persistence.caching;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
+import org.forgerock.openam.session.service.access.persistence.watchers.SessionModificationListener;
+import org.forgerock.openam.session.service.access.persistence.watchers.SessionModificationWatcher;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.LinkedAttribute;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -49,16 +62,23 @@ public class InMemoryInternalSessionCacheStepTest {
     private InternalSessionStore mockStore;
 
     @Mock
+    private SessionModificationWatcher mockSessionModificationWatcher;
+
+    @Mock
     private Debug mockDebug;
 
     private InMemoryInternalSessionCacheStep testCache;
+    private SessionModificationListener sessionModificationListener;
 
     @BeforeMethod
-    public void createTestCache() {
+    public void createTestCache() throws Exception {
         MockitoAnnotations.initMocks(this);
         given(mockSessionConfig.getMaxSessionCacheSize()).willReturn(MAX_SESSIONS);
         given(mockSession.getID()).willReturn(SESSION_ID);
-        testCache = new InMemoryInternalSessionCacheStep(mockSessionConfig, mockDebug);
+
+        setupMockCTSToCaptureQueryListener(mockSessionModificationWatcher);
+
+        testCache = new InMemoryInternalSessionCacheStep(mockSessionConfig, mockDebug, mockSessionModificationWatcher);
     }
 
     @Test
@@ -108,6 +128,14 @@ public class InMemoryInternalSessionCacheStepTest {
     public void shouldAllowRemoval() throws Exception {
         testCache.store(mockSession, mockStore);
         testCache.remove(mockSession, mockStore);
+        assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
+    }
+
+    @Test
+    public void shouldRemoveOnSessionChangedEvent() throws Exception {
+        testCache.store(mockSession, mockStore);
+
+        sessionModificationListener.sessionChanged(SESSION_ID);
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
     }
 
@@ -172,6 +200,26 @@ public class InMemoryInternalSessionCacheStepTest {
         for (SessionID restrictedToken : session.getRestrictedTokens()) {
             assertThat(testCache.getByRestrictedID(restrictedToken, mockStore)).isNull();
         }
+    }
+
+    private Map<String, Attribute> newChangeSetAffectingSessionId(SessionID sessionID) {
+        Map<String, Attribute> changeSet = new HashMap<>();
+        changeSet.put(SessionTokenField.SESSION_ID.getField().toString(),
+                new LinkedAttribute("someDescription", Collections.singleton(SESSION_ID)));
+        return changeSet;
+    }
+
+    /*
+     * Populates the sessionModificationListener field with the value registered to the watcher
+     */
+    private void setupMockCTSToCaptureQueryListener(SessionModificationWatcher mockSessionModificationWatcher) throws CoreTokenException {
+        doAnswer((new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                sessionModificationListener = (SessionModificationListener) invocationOnMock.getArguments()[0];
+                return null;
+            }
+        })).when(mockSessionModificationWatcher).addListener(any(SessionModificationListener.class));
     }
 
 }

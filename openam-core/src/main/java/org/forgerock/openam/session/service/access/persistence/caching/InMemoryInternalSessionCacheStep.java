@@ -41,6 +41,8 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreStep;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
+import org.forgerock.openam.session.service.access.persistence.watchers.SessionModificationListener;
+import org.forgerock.openam.session.service.access.persistence.watchers.SessionModificationWatcher;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -65,11 +67,19 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
     @Inject
     @VisibleForTesting
     InMemoryInternalSessionCacheStep(SessionServiceConfig sessionConfig,
-            @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug) {
+                                     @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
+                                     SessionModificationWatcher watcher) {
         final int maxCacheSize = sessionConfig.getMaxSessionCacheSize();
         this.sessionConfig = sessionConfig;
         this.cache = new AtomicStampedReference<>(buildCache(maxCacheSize), maxCacheSize);
         this.debug = sessionDebug;
+
+        watcher.addListener(new SessionModificationListener() {
+            @Override
+            public void sessionChanged(SessionID sessionID) {
+                invalidateCache(sessionID);
+            }
+        });
     }
 
     @Override
@@ -133,6 +143,14 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
 
     @Override
     public void remove(final InternalSession session, final InternalSessionStore next) throws SessionPersistenceException {
+        invalidateCache(session.getID());
+
+        // Always ask the lower layers to remove the session even if we did not have it cached
+        next.remove(session);
+    }
+
+    private void invalidateCache(final SessionID sessionID) {
+        InternalSession session = getCache().getIfPresent(sessionID.toString());
         if (session != null) {
             // Remove all references to this session
             List<String> references = new ArrayList<>();
@@ -148,9 +166,6 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
 
             getCache().invalidateAll(references);
         }
-
-        // Always ask the lower layers to remove the session even if we did not have it cached
-        next.remove(session);
     }
 
     @VisibleForTesting
