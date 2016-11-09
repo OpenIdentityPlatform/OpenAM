@@ -162,7 +162,7 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //Then
         Assert.assertEquals(originalHttpCallback, httpCallback);
-        verify(request).setAttribute("http-auth-failed", true);
+        verify(request).setAttribute("http-auth-failed", "true");
     }
 
     @Test
@@ -180,7 +180,7 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //Then
         Assert.assertEquals(originalHttpCallback, httpCallback);
-        verify(request, never()).setAttribute("http-auth-failed", true);
+        verify(request, never()).setAttribute("http-auth-failed", "true");
     }
 
     @Test (expectedExceptions = RestAuthException.class)
