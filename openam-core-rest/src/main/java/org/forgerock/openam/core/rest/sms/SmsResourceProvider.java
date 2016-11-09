@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import com.sun.identity.shared.encode.URLEncDec;
 import org.forgerock.api.annotations.Action;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.models.ApiDescription;
@@ -346,7 +347,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
     }
 
     private LocalizableString getConsoleI18N(String i18nKey, LocalizableString defaultValue) {
-        return new LocalizableString(TRANSLATION_KEY_PREFIX + "amConsole" + "#"+ i18nKey, CLASS_LOADER, defaultValue);
+        return new LocalizableString(TRANSLATION_KEY_PREFIX + "amConsole" + "#" + URLEncDec.encode(i18nKey), CLASS_LOADER, defaultValue);
     }
 
     JsonValue createSchema(Optional<Context> context) {
@@ -613,7 +614,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
                 values.add(value.getKey());
                 if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())
                         || AttributeSchema.UIType.GLOBALSCRIPTSELECT.equals(attribute.getUIType())) {
-                    descriptions.add(getConsoleI18N(value.getValue(), null));
+                    descriptions.add(getConsoleI18N(value.getValue(), new LocalizableString(value.getValue())));
                 } else {
                     descriptions.add(getConsoleI18N(value.getValue(), new LocalizableString(value.getKey())));
                 }
