@@ -1694,7 +1694,7 @@ public class AMLoginContext {
             // that in the query. otherwise it means a call with a new org.
             HttpServletRequest hreq = authContext.getLoginState().getHttpServletRequest();
             boolean isTokenValid = false;
-            final boolean isFederation = hreq.getAttribute(Constants.WSFED_ACTIVE_LOGIN) != null
+            final boolean isFederation = (hreq != null && hreq.getAttribute(Constants.WSFED_ACTIVE_LOGIN) != null)
                     || (indexType == IndexType.MODULE_INSTANCE && ISAuthConstants.FEDERATION_MODULE.equals(indexName));
             if (hreq != null && !isFederation) {
                 try {
