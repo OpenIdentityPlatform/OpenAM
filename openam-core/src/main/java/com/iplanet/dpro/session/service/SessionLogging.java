@@ -104,20 +104,28 @@ public class SessionLogging implements InternalSessionListener {
         switch (eventType) {
             case SESSION_CREATION:
                 logEvent(sessionInfo, "SESSION_CREATED", timestamp);
+                break;
             case IDLE_TIMEOUT:
                 logEvent(sessionInfo, "SESSION_IDLE_TIMED_OUT", timestamp);
+                break;
             case MAX_TIMEOUT:
                 logEvent(sessionInfo, "SESSION_MAX_TIMEOUT", timestamp);
+                break;
             case LOGOUT:
                 logEvent(sessionInfo, "SESSION_LOGOUT", timestamp);
+                break;
             case DESTROY:
                 logEvent(sessionInfo, "SESSION_DESTROYED", timestamp);
+                break;
             case PROPERTY_CHANGED:
                 logEvent(sessionInfo, "SESSION_PROPERTY_CHANGED", timestamp);
+                break;
             case QUOTA_EXHAUSTED:
                 logEvent(sessionInfo, "SESSION_QUOTA_EXHAUSTED", timestamp);
+                break;
             case PROTECTED_PROPERTY:
                 logEvent(sessionInfo, "SESSION_PROTECTED_PROPERTY_ERROR", timestamp);
+                break;
             default:
                 logEvent(sessionInfo, "SESSION_UNKNOWN_EVENT", timestamp);
         }
