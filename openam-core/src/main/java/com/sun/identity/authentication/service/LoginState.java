@@ -5243,11 +5243,12 @@ public class LoginState {
         setFailureTokenId(userID);
     }
 
-    /*
+    /**
      * If the session should be persisted to the CTS, do so.
+     * Note that administrator users don't use stateless sessions.
      */
     void persistSession() {
-        if (stateless || isNoSession()) {
+        if ((stateless && !restriction.isRestricted(getUserDN()) || isNoSession())) {
             return;
         }
         authenticationSessionStore.promoteSession(sessionReference);
