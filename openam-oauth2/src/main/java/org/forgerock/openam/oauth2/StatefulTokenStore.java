@@ -25,6 +25,7 @@ import static org.forgerock.util.query.QueryFilter.equalTo;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.MessageDigest;
@@ -44,6 +45,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -271,7 +273,11 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
-        final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
+        byte[] clientSecret = null;
+        String secret = clientRegistration.getClientSecret();
+        if (StringUtils.isNotEmpty(secret)) {
+            clientSecret = secret.getBytes(Utils.CHARSET);
+        }
         final KeyPair signingKeyPair = providerSettings.getSigningKeyPair(
                 JwsAlgorithm.valueOf(signingAlgorithm.toUpperCase()));
         final Key encryptionKey = clientRegistration.getIDTokenEncryptionKey();

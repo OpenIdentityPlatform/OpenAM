@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.*;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import com.google.inject.name.Names;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -48,6 +50,7 @@ import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Interface is to define what needs to be implemented to do the OpenID Connect check session endpoint.
@@ -139,8 +142,13 @@ public class CheckSession {
      * @return {@code true} if the JWT is valid.
      */
     private boolean isJwtValid(SignedJwt jwt, ClientRegistration clientRegistration) {
+        //client_secret for newHmacSigningHandler shouldn't be null
+        String clientSecret = clientRegistration.getClientSecret();
+        if (StringUtils.isEmpty(clientSecret)) {
+            return false;
+        }
         final SigningHandler signingHandler = signingManager.newHmacSigningHandler(
-                clientRegistration.getClientSecret().getBytes(Charset.forName("UTF-8")));
+                clientSecret.getBytes(Charset.forName("UTF-8")));
         return jwt == null || !jwt.verify(signingHandler);
     }
 

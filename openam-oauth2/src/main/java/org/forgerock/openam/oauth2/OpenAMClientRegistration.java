@@ -587,13 +587,21 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
         // See http://openid.net/specs/openid-connect-core-1_0.html#Encryption for the details of this algorithm
         final String hashAlgorithm = keySize <= 256 ? "SHA-256" : keySize <= 384 ? "SHA-384" : "SHA-512";
-        final byte[] secret = getClientSecret().getBytes(StandardCharsets.UTF_8);
-        try {
-            final MessageDigest hash = MessageDigest.getInstance(hashAlgorithm);
-            final byte[] digest = Arrays.copyOfRange(hash.digest(secret), 0, keySize / 8);
-            return new SecretKeySpec(digest, "AES");
-        } catch (GeneralSecurityException e) {
-            throw new JweException(e);
+
+        byte[] secret = null;
+        String clientSecret = getClientSecret();
+        if (StringUtils.isEmpty(clientSecret)) {
+            //SecretKeySpec will throw error if algorithm is null or key is null or empty.
+            throw new IllegalArgumentException("client secret must not be null.");
+        } else {
+            secret = clientSecret.getBytes(StandardCharsets.UTF_8);
+            try {
+                final MessageDigest hash = MessageDigest.getInstance(hashAlgorithm);
+                final byte[] digest = Arrays.copyOfRange(hash.digest(secret), 0, keySize / 8);
+                return new SecretKeySpec(digest, "AES");
+            } catch (GeneralSecurityException e) {
+                throw new JweException(e);
+            }
         }
     }
 
