@@ -27,14 +27,13 @@ import org.forgerock.openam.upgrade.steps.UpgradeOAuth2ClientStep;
  * This service helper implementation ensures that the OAuth2 Client service attributes are using the correct uitype
  * in the upgraded system. As a secondary task this helper also upgrades the default policy cache mode settings for
  * both Java EE and Web Agents.
- *
- * @author Peter Major
  */
 public class AgentServiceHelper extends AbstractUpgradeHelper {
 
     private static final String POLICY_CACHE_MODE = "com.sun.identity.policy.client.cacheMode";
     private static final String FETCH_FROM_ROOT = "com.sun.identity.agents.config.fetch.from.root.resource";
     private static final String ACTION_VALUES = "com.sun.identity.policy.client.booleanActionValues";
+    private static final String FQDN_CHECK = "com.sun.identity.agents.config.fqdn.check.enable";
 
     public AgentServiceHelper() {
         attributes.addAll(UpgradeOAuth2ClientStep.CHANGED_PROPERTIES);
@@ -42,6 +41,7 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
         attributes.add(FETCH_FROM_ROOT);
         attributes.add(ACTION_VALUES);
         attributes.add(IDTOKEN_SIGNED_RESPONSE_ALG);
+        attributes.add(FQDN_CHECK);
     }
 
     @Override
@@ -58,6 +58,9 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
             //i.e. if the default value has been already updated we return null, to prevent upgrade for this attribute
             return null;
         } else if ((ACTION_VALUES.equals(newAttr.getName()) || IDTOKEN_SIGNED_RESPONSE_ALG.equals(newAttr.getName()))
+                && newAttr.getDefaultValues().equals(oldAttr.getDefaultValues())) {
+            return null;
+        } else if (FQDN_CHECK.equals(newAttr.getName())
                 && newAttr.getDefaultValues().equals(oldAttr.getDefaultValues())) {
             return null;
         }
