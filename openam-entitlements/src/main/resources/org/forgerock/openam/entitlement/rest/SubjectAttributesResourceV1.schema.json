@@ -2,8 +2,5 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "i18n:api-descriptor/SubjectAttributesResourceV1#schema.title",
   "description": "i18n:api-descriptor/SubjectAttributesResourceV1#schema.description",
-  "type": "array",
-  "items": {
-    "type": "string"
-  }
+  "type": "string"
 }

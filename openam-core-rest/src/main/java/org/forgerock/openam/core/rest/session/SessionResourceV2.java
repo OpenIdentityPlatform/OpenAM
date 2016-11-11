@@ -43,6 +43,7 @@ import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
 import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.ParameterSource;
 import org.forgerock.api.enums.QueryType;
 import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.resource.ActionRequest;
@@ -168,22 +169,27 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      */
     @Actions({
         @Action(
-                operationDescription = @Operation(
-                    description = SESSION_RESOURCE + GET_SESSION_INFO_ACTION_ID + "." + ACTION_DESCRIPTION,
-                    errors = {
-                        @ApiError(
-                            code = 401,
-                            description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                        )
-                    }
-                ),
-                name = GET_SESSION_INFO_ACTION_ID,
-                response = @Schema(fromType = PartialSession.class)
+            operationDescription = @Operation(
+                description = SESSION_RESOURCE + GET_SESSION_INFO_ACTION_ID + "." + ACTION_DESCRIPTION,
+                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string",
+                        description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION,
+                        source = ParameterSource.ADDITIONAL),
+                errors = {
+                    @ApiError(
+                        code = 401,
+                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                    )
+                }
+            ),
+            name = GET_SESSION_INFO_ACTION_ID,
+            response = @Schema(fromType = PartialSession.class)
         ),
         @Action(
             operationDescription = @Operation(
                 description = SESSION_RESOURCE + LOGOUT_ACTION_ID + "." + ACTION_DESCRIPTION,
-                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string", description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION),
+                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string",
+                        description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION,
+                        source = ParameterSource.ADDITIONAL),
                 errors = {
                     @ApiError(
                         code = 401,
@@ -197,7 +203,9 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         @Action(
             operationDescription = @Operation(
                 description = SESSION_RESOURCE + REFRESH_ACTION_ID + "." + ACTION_DESCRIPTION,
-                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string", description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION),
+                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string",
+                        description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION,
+                        source = ParameterSource.ADDITIONAL),
                 errors = {
                     @ApiError(
                         code = 401,
@@ -211,7 +219,9 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         @Action(
             operationDescription = @Operation(
                 description = SESSION_RESOURCE + GET_SESSION_PROPERTIES_ACTION_ID + "." + ACTION_DESCRIPTION,
-                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string", description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION),
+                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string",
+                        description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION,
+                        source = ParameterSource.ADDITIONAL),
                 errors = {
                     @ApiError(
                         code = 401,
@@ -225,7 +235,9 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         @Action(
             operationDescription = @Operation(
                 description = SESSION_RESOURCE + UPDATE_SESSION_PROPERTIES_ACTION_ID + "." + ACTION_DESCRIPTION,
-                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string", description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION),
+                parameters = @Parameter(name = TOKEN_PARAM_NAME, type = "string",
+                        description = SESSION_RESOURCE + TOKEN_PARAM_NAME + "." + PARAMETER_DESCRIPTION,
+                        source = ParameterSource.ADDITIONAL),
                 errors = {
                     @ApiError(
                         code = 401,

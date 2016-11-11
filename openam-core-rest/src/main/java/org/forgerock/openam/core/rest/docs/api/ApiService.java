@@ -54,7 +54,7 @@ import io.swagger.models.Path;
  */
 public class ApiService {
 
-    public static final String ROOT_URI = "/";
+    private static final String ROOT_URI = "/?_api";
     private DescribableHandler describableHandler;
     private static final String EMPTY_STRING = "";
     private static final Pattern REMOVE_VERSION = Pattern.compile(" v[0-9].[0-9]");

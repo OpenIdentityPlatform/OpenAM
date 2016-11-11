@@ -36,9 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,8 +60,6 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.openam.http.ApiDescriptorFilter;
 import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Get;
-import org.forgerock.openam.rest.ResourceRouter;
-import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.services.descriptor.Describable;
 
@@ -82,7 +78,7 @@ public class ApiDocsService implements Describable.Listener {
     private static final int TOC_LEVELS = 5;
 
     private final Asciidoctor asciidoctor;
-    private final Router realmRouter;
+    private final Router rootRouter;
     private final Debug debug;
     private volatile Future<ApiDescription> description;
     private volatile Future<File> docs;
@@ -91,15 +87,14 @@ public class ApiDocsService implements Describable.Listener {
     /**
      * Create an instance of the {@link ApiDocsService}.
      *
-     * @param realmResourceRouter The {@link ResourceRouter} that can be used to retrieve the CREST API.
+     * @param rootRouter The {@link Router} that can be used to retrieve the CREST API.
      */
     @Inject
-    public ApiDocsService(@Named("RealmResourceRouter") ResourceRouter realmResourceRouter,
-            @Named("frRest") Debug debug) {
+    public ApiDocsService(@Named("CrestRootRouter") Router rootRouter, @Named("frRest") Debug debug) {
         asciidoctor = initializeAsciidoctor();
-        this.realmRouter = realmResourceRouter.getRouter();
+        this.rootRouter = rootRouter;
         this.debug = debug;
-        realmRouter.addDescriptorListener(this);
+        this.rootRouter.addDescriptorListener(this);
     }
 
     /**
@@ -211,7 +206,7 @@ public class ApiDocsService implements Describable.Listener {
     }
 
     private ApiDescription getDescription() {
-        return realmRouter.handleApiRequest(new RootContext(), newApiRequest(ResourcePath.empty()));
+        return rootRouter.handleApiRequest(new RootContext(), newApiRequest(ResourcePath.empty()));
     }
 
     @Override
