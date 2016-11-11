@@ -24,7 +24,7 @@
  *
  * $Id: SsoServerTopologyImpl.java,v 1.2 2009/10/21 00:03:15 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.monitoring;
@@ -126,34 +126,10 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
                 if ((server != null) && (svrName != null)) {
                     server.registerMBean(ssrv, svrName);
                 }
-             } catch (Exception ex) {
-                debug.error(classModule  + svrURL, ex);
-             }
-
-            /*
-             *  fill the SsoServerSitesTable.
-             *  entries have siteid, site name, and site state
-             *  sidKeys has the serverIDs; the values are the site they
-             *  belong to.
-             *
-             *  unfortunately, SiteConfiguration.getSites(SSOToken) needs
-             *  an SSOToken, which can be gotten after the server is more
-             *  closer to being operational than when the Agent is started,
-             *  so that part will have to be updated at a later time.
-             *
-             *  where the key == value in sidKeys is the one that is the site
-             */
-            if (debug.messageEnabled()) {
-                debug.message(classModule + "svrId = " + svrId
-                        + ", siteId = " + siteId);
+            } catch (Exception ex) {
+                debug.error(classModule + svrURL, ex);
             }
-
-            try {
-                Integer.valueOf(siteId);
-            } catch (NumberFormatException nfe) {
-                debug.error(classModule + "invalid siteid ("
-                        + siteId + "): " + nfe.getMessage(), nfe);
-            }
+            debug.message( "{}: svrId = {} , siteId = {}", classModule, svrId, siteId);
         }
     }
 }
