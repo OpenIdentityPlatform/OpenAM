@@ -119,6 +119,11 @@ define([
         return _.some(requirements.callbacks, "type", "ConfirmationCallback");
     }
 
+    function getFragmentParamString () {
+        const params = URIUtils.getCurrentFragmentQueryString();
+        return _.isEmpty(params) ? "" : `&${params}`;
+    }
+
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
@@ -241,6 +246,11 @@ define([
             const addtionalArguments = args ? args[1] : undefined;
             let params = {};
             const auth = Configuration.globalData.auth;
+
+            // TODO: The first undefined argument is the deprecated realm which is defined in the
+            // CommonRoutesConfig login route. This needs to be removed as part of AME-11109.
+            this.data.args = [undefined, getFragmentParamString()];
+
 
             if (args) {
                 auth.additional = addtionalArguments;
