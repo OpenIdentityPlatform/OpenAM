@@ -570,7 +570,7 @@ public class LDAPFilterCondition implements Condition {
 
         // initialize the connection pool for the ldap server
         Options options = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.MILLISECONDS));
+                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.SECONDS));
 
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);

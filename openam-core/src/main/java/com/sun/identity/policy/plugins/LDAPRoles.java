@@ -244,7 +244,7 @@ public class LDAPRoles implements Subject {
 
         // initialize the connection pool for the ldap server
         Options options = Options.defaultOptions()
-                .set(REQUEST_TIMEOUT, new Duration((long)timeLimit, TimeUnit.MILLISECONDS));
+                .set(REQUEST_TIMEOUT, new Duration((long)timeLimit, TimeUnit.SECONDS));
 
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);

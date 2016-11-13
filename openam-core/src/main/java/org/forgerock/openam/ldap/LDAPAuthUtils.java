@@ -274,7 +274,7 @@ public class LDAPAuthUtils {
                 synchronized (connectionPools) {
                     connPool = connectionPools.get(configName);
                     Options options = Options.defaultOptions()
-                            .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.MILLISECONDS));
+                            .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.SECONDS));
 
                     if (connPool == null) {
                         if (debug.messageEnabled()) {
