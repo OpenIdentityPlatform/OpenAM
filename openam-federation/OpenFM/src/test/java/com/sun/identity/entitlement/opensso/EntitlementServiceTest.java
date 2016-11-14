@@ -29,31 +29,20 @@
 
 package com.sun.identity.entitlement.opensso;
 
-import static org.mockito.Mockito.mock;
-
-import com.google.inject.Key;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.unittest.UnittestLog;
 import java.security.AccessController;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.notifications.NotificationBroker;
 import org.testng.annotations.Test;
 
 public class EntitlementServiceTest {
-
-    private NotificationBroker broker;
-
     @Test
     public void hasEntitlementDITs() {
-        broker = mock(NotificationBroker.class);
-
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
 
-        EntitlementConfiguration ec = new EntitlementService(SubjectUtils.createSubject(adminToken), "/", broker);
+        EntitlementConfiguration ec = new EntitlementService(SubjectUtils.createSubject(adminToken), "/");
         boolean result = ec.hasEntitlementDITs();
         UnittestLog.logMessage(
             "EntitlementServiceTest.hasEntitlementDITs: returns " + result);

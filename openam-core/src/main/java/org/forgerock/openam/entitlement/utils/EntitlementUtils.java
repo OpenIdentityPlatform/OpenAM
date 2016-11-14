@@ -37,7 +37,6 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
-import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.SystemProperties;
@@ -86,7 +85,6 @@ public final class EntitlementUtils {
     public static final String APPLICATION_TYPES = "applicationTypes";
     public static final String CONFIG_RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
     public static final String APPLICATION = "application";
-    public static final NotificationBroker NULL_BROKER = new NullNotificationBroker();
 
     private EntitlementUtils() {
     }
@@ -498,7 +496,7 @@ public final class EntitlementUtils {
             return InjectorHolder.getInstance(EntitlementConfigurationFactory.class).create(subject, realm);
         }
 
-        return new EntitlementService(subject, realm, NULL_BROKER);
+        return new EntitlementService(subject, realm);
     }
 
     /**
@@ -539,5 +537,4 @@ public final class EntitlementUtils {
         }
         return realm;
     }
-
 }

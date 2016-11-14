@@ -15,8 +15,6 @@
  */
 package org.forgerock.openam.entitlement.service;
 
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.NULL_BROKER;
-
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.core.DNWrapper;
@@ -44,7 +42,7 @@ public final class ApplicationServiceFactoryImpl implements ApplicationServiceFa
         EntitlementConfigurationFactory factory = new EntitlementConfigurationFactory() {
             @Override
             public EntitlementConfiguration create(Subject subject, String realm) {
-                return new EntitlementService(subject, realm, NULL_BROKER);
+                return new EntitlementService(subject, realm);
             }
         };
 
@@ -53,5 +51,4 @@ public final class ApplicationServiceFactoryImpl implements ApplicationServiceFa
 
         return applicationService;
     }
-
 }
