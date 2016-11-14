@@ -34,6 +34,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import com.sun.identity.entitlement.DenyOverride;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 
@@ -133,6 +134,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         checkUserPrivileges(application);
         checkIfResourceTypeExists(application);
         setApplicationMetaData(application);
+        setApplicationDefaultValues(application);
         configuration.storeApplication(application);
         clearCache();
         return application;
@@ -291,6 +293,12 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setLastModifiedDate(date.getTime());
         if (principalName != null) {
             application.setLastModifiedBy(principalName);
+        }
+    }
+
+    private void setApplicationDefaultValues(Application application) {
+        if (application.getEntitlementCombiner() == null) {
+            application.setEntitlementCombiner(DenyOverride.class);
         }
     }
 

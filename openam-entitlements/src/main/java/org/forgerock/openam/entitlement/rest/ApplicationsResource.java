@@ -19,7 +19,6 @@ import static com.sun.identity.entitlement.Application.NAME_ATTRIBUTE;
 import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
 import static org.forgerock.json.resource.ResourceException.CONFLICT;
 import static org.forgerock.json.resource.ResourceException.FORBIDDEN;
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.forgerock.json.resource.ResourceException.NOT_FOUND;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils.getPrincipalNameFromSubject;
@@ -32,14 +31,10 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERR
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_403_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_404_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_409_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PARAMETER_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SCRIPT_RESOURCE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
@@ -206,10 +201,6 @@ public class ApplicationsResource extends RealmAwareResource {
                 @ApiError(
                     code = CONFLICT,
                     description = APPLICATIONS_RESOURCE + ERROR_409_DESCRIPTION
-                ),
-                @ApiError(
-                    code = INTERNAL_ERROR,
-                    description = APPLICATIONS_RESOURCE + ERROR_500_DESCRIPTION
                 )
             }
         )
