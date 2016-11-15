@@ -17,7 +17,7 @@ package org.forgerock.openam.cts.impl.query.worker.queries;
 
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 import static org.forgerock.util.query.QueryFilter.equalTo;
-import static org.forgerock.util.query.QueryFilter.lessThan;
+import static org.forgerock.util.query.QueryFilter.lessThanOrEqualTo;
 
 import java.util.Calendar;
 
@@ -62,7 +62,7 @@ public class MaxSessionTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
 
         QueryFilter<CoreTokenField> filter =
                 QueryFilter.and(
-                        lessThan(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField(), now),
+                        lessThanOrEqualTo(SessionTokenField.MAX_SESSION_EXPIRATION_TIME.getField(), now),
                         equalTo(SessionTokenField.SESSION_STATE.getField(), SessionState.VALID.toString()),
                         equalTo(CoreTokenField.TOKEN_TYPE, TokenType.SESSION));
 
@@ -71,7 +71,6 @@ public class MaxSessionTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
                 .pageResultsBy(pageSize)
                 .returnTheseAttributes(
                         CoreTokenField.TOKEN_ID,
-                        CoreTokenField.ETAG,
                         SessionTokenField.SESSION_ID.getField());
     }
 

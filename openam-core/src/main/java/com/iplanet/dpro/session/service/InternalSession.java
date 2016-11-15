@@ -53,6 +53,8 @@ import org.forgerock.openam.session.AMSession;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.access.SessionPersistenceManager;
 import org.forgerock.openam.session.service.access.SessionPersistenceObservable;
+import org.forgerock.openam.utils.Time;
+import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -781,13 +783,15 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     /**
-     * Changes the state of the session and sends Session Notification when session times out.
+     * Sets session timeout time (in millis).
+     *
+     * @param timeoutTime The timeout time (in millis).
      */
-    public void timeoutSession(SessionEventType eventType) {
-        timedOutTimeInSeconds = MILLISECONDS.toSeconds(currentTimeMillis());
-        putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds)); // TODO: Convert to InternalSessionListener (AME-12528)
-        fireSessionEvent(eventType, timedOutTimeInSeconds);
-        sessionService.destroyInternalSession(this);
+    public void setTimedOutTime(long timeoutTime) {
+        Reject.rejectStateIfTrue(!willExpire(), "Cannot timeout non-expiring session.");
+        Reject.rejectStateIfTrue(isTimedOut(), "Session already timed out.");
+        timedOutTimeInSeconds = MILLISECONDS.toSeconds(timeoutTime);
+        putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds));
     }
 
     public SessionInfo toSessionInfo() {
@@ -1131,10 +1135,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     }
 
     private void fireSessionEvent(SessionEventType sessionEventType) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType));
-    }
-
-    private void fireSessionEvent(SessionEventType sessionEventType, long eventTime) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType, eventTime));
+        sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType, Time.currentTimeMillis()));
     }
 }

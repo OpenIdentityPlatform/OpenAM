@@ -23,6 +23,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.utils.TimeTravelUtil;
 import org.forgerock.openam.utils.TimeTravelUtil.FrozenTimeService;
@@ -145,16 +147,20 @@ public class InternalSessionTest {
         verifyEvent(session, SessionEventType.SESSION_CREATION);
     }
 
+    // State management
+
     @Test
-    public void firesInternalSessionEventWhenTimingOutSession() throws Exception {
+    public void shouldSetTimedOutStateAndProperty() throws Exception {
         // Given
         final InternalSession session = createSession();
 
         // When
-        session.timeoutSession(SessionEventType.IDLE_TIMEOUT);
+        session.setTimedOutTime(SECONDS.toMillis(99));
 
         // Then
-        verifyEvent(session, SessionEventType.IDLE_TIMEOUT);
+        assertThat(session.isTimedOut()).as("session should be timed out").isTrue();
+        assertThat(session.getProperty("SessionTimedOut"))
+                .as("session should expose SessionTimedOut as property").isEqualTo("99");
     }
 
     // Timeout calculations

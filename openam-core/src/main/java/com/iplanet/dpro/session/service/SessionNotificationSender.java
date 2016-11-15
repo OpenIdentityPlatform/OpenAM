@@ -104,8 +104,6 @@ public class SessionNotificationSender implements InternalSessionListener {
     public void onEvent(final InternalSessionEvent event) {
         switch (event.getType()) {
             case SESSION_CREATION:
-            case IDLE_TIMEOUT:
-            case MAX_TIMEOUT:
             case LOGOUT:
             case DESTROY:
             case PROPERTY_CHANGED:

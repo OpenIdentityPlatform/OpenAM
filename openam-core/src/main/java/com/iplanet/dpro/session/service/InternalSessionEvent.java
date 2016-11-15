@@ -50,16 +50,6 @@ public class InternalSessionEvent {
      *
      * @param internalSession The session object which emitted this event.
      * @param eventType The event which has occurred.
-     */
-    public InternalSessionEvent(InternalSession internalSession, SessionEventType eventType) {
-        this(internalSession, eventType, Time.currentTimeMillis());
-    }
-
-    /**
-     * Creates a new event.
-     *
-     * @param internalSession The session object which emitted this event.
-     * @param eventType The event which has occurred.
      * @param eventTime The event time as UTC milliseconds from the epoch.
      */
     public InternalSessionEvent(InternalSession internalSession, SessionEventType eventType, long eventTime) {

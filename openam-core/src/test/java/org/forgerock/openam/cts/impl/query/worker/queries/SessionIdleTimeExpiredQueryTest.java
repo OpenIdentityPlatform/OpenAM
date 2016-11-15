@@ -90,7 +90,7 @@ public class SessionIdleTimeExpiredQueryTest {
     @Test
     public void shouldReturnTokenIdAndEtagAndSessionId() {
         // Given
-        MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockConnectionFactory,
+        SessionIdleTimeExpiredQuery<Connection> query = new SessionIdleTimeExpiredQuery<>(mockConnectionFactory,
                 mockFactory, mockConfig);
 
         // When

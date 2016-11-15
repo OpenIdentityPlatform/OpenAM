@@ -16,6 +16,9 @@
 package com.iplanet.dpro.session.operations.strategies;
 
 import static com.iplanet.dpro.session.service.SessionState.INVALID;
+import static org.forgerock.openam.session.SessionEventType.IDLE_TIMEOUT;
+import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -31,6 +34,8 @@ import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.session.service.access.SessionQueryManager;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.Time;
+import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -138,7 +143,31 @@ public class LocalOperations implements SessionOperations {
     }
 
     /**
-     * Destroy a Internal Session, whose session id has been specified.
+     * Timeout the Internal Session.
+     * <p>
+     * Calling this method leads to the Internal Session's state being updated and both timeout
+     * and destroy events being emitted.
+     * <p>
+     * However, as CTS Worker tasks are responsible for token deletion, this method will not
+     * attempt to delete the session's CTS token from persistent storage.
+     *
+     * @param session The InternalSession to time out.
+     * @param eventType The type of time out event (must be either {@link SessionEventType#MAX_TIMEOUT}
+     *                  or {@link SessionEventType#IDLE_TIMEOUT}.
+     */
+    public void timeout(InternalSession session, SessionEventType eventType) {
+        Reject.rejectStateIfTrue(session.isStored(),
+                "Session should be deleted from persistent storage before being timed out.");
+        Reject.ifFalse(eventType == IDLE_TIMEOUT || eventType == MAX_TIMEOUT,
+                "Only time out events permitted.");
+        long timedOutTimeInMillis = currentTimeMillis();
+        session.setTimedOutTime(timedOutTimeInMillis);
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, eventType, timedOutTimeInMillis));
+        signalRemove(session, SessionEventType.DESTROY, timedOutTimeInMillis);
+    }
+
+    /**
+     * Destroy the Internal Session.
      *
      * @param session The InternalSession to destroy.
      */
@@ -311,15 +340,14 @@ public class LocalOperations implements SessionOperations {
     /**
      * Simplifies the signalling that a Session has been removed.
      * @param session Non null InternalSession.
-     * @param event An integrate from the SessionEvent class.
+     * @param eventType An integrate from the SessionEvent class.
      */
-    private void signalRemove(InternalSession session, SessionEventType event) {
+    private void signalRemove(InternalSession session, SessionEventType eventType) {
+        signalRemove(session, eventType, Time.currentTimeMillis());
+    }
+
+    private void signalRemove(InternalSession session, SessionEventType eventType, long eventTime) {
         session.setState(SessionState.DESTROYED);
-        fireSessionEvent(session, event);
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, eventType, eventTime));
     }
-
-    private void fireSessionEvent(InternalSession session, SessionEventType sessionEventType) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(session, sessionEventType));
-    }
-
 }

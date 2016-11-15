@@ -40,6 +40,7 @@ import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.Time;
 import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.SystemProperties;
@@ -156,20 +157,6 @@ public class SessionService {
     /**
      * Destroy a Internal Session, whose session id has been specified.
      *
-     * @param internalSession The session to destroy.
-     */
-    void destroyInternalSession(InternalSession internalSession) {
-        sessionAccessManager.removeInternalSession(internalSession);
-        if (internalSession != null && internalSession.getState() != SessionState.INVALID) {
-            fireSessionEvent(internalSession, SessionEventType.DESTROY);
-            internalSession.setState(SessionState.DESTROYED);
-        }
-        sessionAccessManager.removeSessionId(internalSession.getSessionID());
-    }
-
-    /**
-     * Destroy a Internal Session, whose session id has been specified.
-     *
      * @param sessionID
      */
     public void destroyAuthenticationSession(final SessionID sessionID) {
@@ -186,7 +173,7 @@ public class SessionService {
     }
 
     private void fireSessionEvent(InternalSession session, SessionEventType sessionEventType) {
-        sessionEventBroker.onEvent(new InternalSessionEvent(session, sessionEventType));
+        sessionEventBroker.onEvent(new InternalSessionEvent(session, sessionEventType, Time.currentTimeMillis()));
     }
 
     /**

@@ -15,16 +15,17 @@
  */
 package org.forgerock.openam.sm.datalayer.api.query;
 
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.util.Reject;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.Reject;
 
 /**
  * Represents a partial CTS {@link Token}. Used to represent the result of a query
@@ -60,7 +61,7 @@ public class PartialToken {
      */
     public PartialToken(PartialToken token, CoreTokenField field, Object value) {
         Reject.ifNull(token, field, value);
-        entry = new HashMap<CoreTokenField, Object>(token.entry);
+        entry = new HashMap<>(token.entry);
         entry.put(field, value);
     }
 
@@ -83,5 +84,46 @@ public class PartialToken {
             throw new NullPointerException(field.toString() + " not assigned");
         }
         return (T)entry.get(field);
+    }
+
+    /**
+     * Check if this {@link PartialToken} can be converted into a {@link Token}.
+     *
+     * @return true if this {@code PartialToken} contains {@link CoreTokenField#TOKEN_ID} and
+     *         {@link CoreTokenField#TOKEN_TYPE}.
+     * @see #toToken()
+     * @since 14.0.0
+     */
+    public boolean canConvertToToken() {
+        return entry.containsKey(CoreTokenField.TOKEN_ID) && entry.containsKey(CoreTokenField.TOKEN_TYPE);
+    }
+
+    /**
+     * Converts this {@code PartialToken} into a {@link Token} containing all of the populated fields.
+     * <p>
+     * Callers should ensure that this {@code PartialToken} can be converted by calling {@link #canConvertToToken()}
+     * before calling this method.
+     *
+     * @return A {@code Token}.
+     * @throws IllegalStateException if this {@code PartialToken} does not contain {@link CoreTokenField#TOKEN_ID} and
+     *         {@link CoreTokenField#TOKEN_TYPE}.
+     * @see #canConvertToToken()
+     * @since 14.0.0
+     */
+    public Token toToken() {
+        Reject.rejectStateIfTrue(!entry.containsKey(CoreTokenField.TOKEN_ID), "Token requires token ID");
+        Reject.rejectStateIfTrue(!entry.containsKey(CoreTokenField.TOKEN_TYPE), "Token requires token type");
+
+        String tokenId = getValue(CoreTokenField.TOKEN_ID);
+        TokenType tokenType = getValue(CoreTokenField.TOKEN_TYPE);
+        Token token = new Token(tokenId, tokenType);
+
+        for (final Map.Entry<CoreTokenField, Object> field : entry.entrySet()) {
+            if (field.getKey() == CoreTokenField.TOKEN_ID || field.getKey() == CoreTokenField.TOKEN_TYPE) {
+                continue;
+            }
+            token.setAttribute(field.getKey(), field.getValue());
+        }
+        return token;
     }
 }

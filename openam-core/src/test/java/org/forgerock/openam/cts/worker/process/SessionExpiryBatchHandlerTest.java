@@ -16,115 +16,212 @@
 package org.forgerock.openam.cts.worker.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
+import static org.forgerock.openam.cts.api.CTSOptions.PRE_DELETE_READ_OPTION;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Provider;
-
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.cts.worker.process.SessionExpiryBatchHandler.StateChangeResultHandler;
+import org.forgerock.openam.cts.worker.process.SessionExpiryBatchHandler.StateChangeResultHandlerFactory;
 import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.sm.datalayer.api.OptimisticConcurrencyCheckFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.util.Options;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
+import com.iplanet.dpro.session.service.SessionConstraint;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.sun.identity.session.util.SessionUtilsWrapper;
+import com.sun.identity.shared.debug.Debug;
 
 public class SessionExpiryBatchHandlerTest {
 
-    private SessionExpiryBatchHandler handler;
-    private TaskDispatcher mockQueue;
-    private SessionAccessManager mockSessionAccessManager;
-
-    private ArgumentCaptor<Token> tokenArgumentCaptor;
-    private ArgumentCaptor<ResultHandler> resultHandlerArgumentCaptor;
+    @Mock private Debug mockDebug;
+    @Mock private InternalSessionEventBroker mockInternalSessionEventBroker;
+    @Mock private LocalOperations mockLocalOperations;
+    @Mock private SessionAdapter mockSessionAdapter;
+    @Mock private SessionConstraint mockSessionConstraint;
+    @Mock private SessionService mockSessionService;
+    @Mock private SessionServiceConfig mockSessionServiceConfig;
+    @Mock private SessionUtilsWrapper mockSessionUtilsWrapper;
+    @Mock private StateChangeResultHandlerFactory mockResultHandlerFactory;
+    @Mock private TaskDispatcher mockQueue;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        mockQueue = mock(TaskDispatcher.class);
-        mockSessionAccessManager = mock(SessionAccessManager.class);
-        Provider<SessionAccessManager> sessionAccessManagerProvider = mock(Provider.class);
-        given(sessionAccessManagerProvider.get()).willReturn(mockSessionAccessManager);
-
-        handler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(mockQueue, sessionAccessManagerProvider);
-
-        tokenArgumentCaptor = ArgumentCaptor.forClass(Token.class);
-        resultHandlerArgumentCaptor = ArgumentCaptor.forClass(ResultHandler.class);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void attemptsToUpdateSessionStateOfAllTokensInBatch() throws Exception {
+    public void attemptsToDeleteSessionsThatHaveReachedTheirIdleTimeOut() throws Exception {
         // Given
-        List<PartialToken> tokens = Arrays.asList(partialToken("one"), partialToken("two"), partialToken("three"));
+        List<PartialToken> tokens = Collections.singletonList(mockPartialToken("tokenId"));
 
         // When
-        handler.timeoutBatch(tokens);
+        newSessionExpiryBatchHandler(SessionEventType.IDLE_TIMEOUT).timeoutBatch(tokens);
 
         // Then
-        assertAttemptsToUpdateSessionStateOfAllTokens(tokens, "DESTROYED");
+        ArgumentCaptor<Options> optionsCaptor = ArgumentCaptor.forClass(Options.class);
+        verify(mockQueue).delete(eq("tokenId"), optionsCaptor.capture(), any(ResultHandler.class));
+        Options options = optionsCaptor.getValue();
+        assertThat(options.get(PRE_DELETE_READ_OPTION)).containsExactly(CoreTokenField.values());
+        assertThat(options.get(OPTIMISTIC_CONCURRENCY_CHECK_OPTION)).isEqualTo(etagFor("tokenId"));
     }
 
     @Test
-    public void returnsCountDownLatchForCallerToAwaitCompletionOfBatchProcessing() throws CoreTokenException {
+    public void attemptsToDeleteSessionsThatReachedTheirMaxSessionTimeOut() throws Exception {
         // Given
-        List<PartialToken> tokens = Arrays.asList(partialToken("one"), partialToken("two"), partialToken("three"));
+        List<PartialToken> tokens = Collections.singletonList(mockPartialToken("tokenId"));
 
         // When
-        CountDownLatch countDownLatch = handler.timeoutBatch(tokens);
+        newSessionExpiryBatchHandler(SessionEventType.MAX_TIMEOUT).timeoutBatch(tokens);
+
+        // Then
+        ArgumentCaptor<Options> optionsCaptor = ArgumentCaptor.forClass(Options.class);
+        verify(mockQueue).delete(eq("tokenId"), optionsCaptor.capture(), any(ResultHandler.class));
+        Options options = optionsCaptor.getValue();
+        assertThat(options.get(PRE_DELETE_READ_OPTION)).containsExactly(CoreTokenField.values());
+        assertThat(options.get(OPTIMISTIC_CONCURRENCY_CHECK_OPTION)).isNull();
+    }
+
+    @DataProvider(name = "timeoutTypes")
+    public Object[][] getTimeoutTypes() {
+        return new Object[][] {
+                { SessionEventType.MAX_TIMEOUT },
+                { SessionEventType.IDLE_TIMEOUT }
+        };
+    }
+
+    @Test(dataProvider = "timeoutTypes")
+    public void returnsCountDownLatchForCallerToAwaitCompletionOfBatchProcessing(SessionEventType eventType)
+            throws Exception {
+        // Given
+        List<PartialToken> tokens = Arrays.asList(
+                mockPartialToken("tokenId-one"),
+                mockPartialToken("tokenId-two"),
+                mockPartialToken("tokenId-three"));
+
+        // When
+        CountDownLatch countDownLatch = newSessionExpiryBatchHandler(eventType).timeoutBatch(tokens);
 
         // Then
         assertThat(countDownLatch.getCount()).isEqualTo(tokens.size());
+        verify(mockResultHandlerFactory).create(eq(eventType), eq(countDownLatch));
     }
 
-    @Test
-    public void stateChangeResultHandlerPublishesNotificationsAndAuditEventsIfSessionStateUpdateSucceeds() throws Exception {
+    @Test(dataProvider = "timeoutTypes")
+    public void resultHandlerPerformsTimeoutIfTokenDeletionSucceeds(SessionEventType eventType) throws Exception {
         // Given
-        List<PartialToken> tokens = Collections.singletonList(partialToken("one"));
-        CountDownLatch countDownLatch = handler.timeoutBatch(tokens);
-        verify(mockQueue, times(1)).update(tokenArgumentCaptor.capture(), any(Options.class), resultHandlerArgumentCaptor.capture());
-        InternalSession mockSession = mock(InternalSession.class);
-        given(mockSessionAccessManager.getInternalSession(any(SessionID.class))).willReturn(mockSession);
+        InternalSession mockInternalSession = mock(InternalSession.class);
+        given(mockSessionAdapter.fromToken(any(Token.class))).willReturn(mockInternalSession);
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        StateChangeResultHandler handler = newStateChangeResultHandler(eventType, countDownLatch);
+
+        PartialToken partialToken = new Token("tokenId", TokenType.SESSION).toPartialToken();
 
         // When
-        resultHandlerArgumentCaptor.getValue().processResults(tokenArgumentCaptor.getValue());
+        handler.processResults(partialToken);
 
         // Then
-        assertThat(countDownLatch.getCount()).isZero();
-        verify(mockSession, times(1)).timeoutSession(SessionEventType.MAX_TIMEOUT);
+        verify(mockLocalOperations).timeout(mockInternalSession, eventType);
+        assertThat(countDownLatch.getCount()).as("processResults decrements CountDownLatch").isEqualTo(0);
     }
 
-    private void assertAttemptsToUpdateSessionStateOfAllTokens(List<PartialToken> tokens, String newState) throws Exception {
-        verify(mockQueue, times(tokens.size())).update(tokenArgumentCaptor.capture(), any(Options.class), any(ResultHandler.class));
-        Iterator<PartialToken> partialTokenIterator = tokens.iterator();
-        for (final Token token : tokenArgumentCaptor.getAllValues()) {
-            final String expectedTokenId = partialTokenIterator.next().getValue(CoreTokenField.TOKEN_ID);
-            assertThat(token.getAttribute(CoreTokenField.TOKEN_ID)).isEqualTo(expectedTokenId);
-            assertThat(token.getAttribute(CoreTokenField.TOKEN_TYPE)).isEqualTo(TokenType.SESSION);
-            assertThat(token.getAttribute(CoreTokenField.ETAG)).isEqualTo("etag:" + expectedTokenId);
-            assertThat(token.getAttribute(SessionTokenField.SESSION_STATE.getField())).isEqualTo(newState);
-        }
-        assertThat(partialTokenIterator.hasNext()).isFalse();
+    @Test(dataProvider = "timeoutTypes")
+    public void resultHandlerSkipsTimeoutIfTokenAlreadyDeleted(SessionEventType eventType) throws Exception {
+        // Given
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        StateChangeResultHandler handler = newStateChangeResultHandler(eventType, countDownLatch);
+
+        PartialToken partialToken = mockPartialToken("tokenId");
+        given(partialToken.canConvertToToken()).willReturn(false);
+
+        // When
+        handler.processResults(partialToken);
+
+        // Then
+        verifyNoMoreInteractions(mockSessionAdapter, mockLocalOperations);
+        verify(mockDebug).message("Failed to delete token. Already deleted.");
+        assertThat(countDownLatch.getCount()).as("processResults decrements CountDownLatch").isEqualTo(0);
     }
 
-    private PartialToken partialToken(String sessionId) {
+    @Test(dataProvider = "timeoutTypes")
+    public void resultHandlerSkipsTimeoutIfTokenUpdatedByAnotherProcess(SessionEventType eventType) throws Exception {
+        // Given
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        StateChangeResultHandler handler = newStateChangeResultHandler(eventType, countDownLatch);
+        OptimisticConcurrencyCheckFailedException exception = mock(OptimisticConcurrencyCheckFailedException.class);
+
+        // When
+        handler.processError(exception);
+
+        // Then
+        verifyNoMoreInteractions(mockSessionAdapter, mockLocalOperations);
+        verify(mockDebug).message(eq("Failed to delete token with expired timeout. {}"), any(String.class), eq(exception));
+        assertThat(countDownLatch.getCount()).as("processError decrements CountDownLatch").isEqualTo(0);
+    }
+
+
+    /**
+     * This is almost identical to {@link #resultHandlerSkipsTimeoutIfTokenUpdatedByAnotherProcess(SessionEventType)}
+     * but asserts that error level, rather than message level, logging is used when an unexpected type of exception occurs.
+     */
+    @Test(dataProvider = "timeoutTypes")
+    public void resultHandlerSkipsTimeoutIfTokenDeletionFails(SessionEventType eventType) throws Exception {
+        // Given
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        StateChangeResultHandler handler = newStateChangeResultHandler(eventType, countDownLatch);
+        Exception exception = mock(Exception.class);
+
+        // When
+        handler.processError(exception);
+
+        // Then
+        verifyNoMoreInteractions(mockSessionAdapter, mockLocalOperations);
+        verify(mockDebug).error(eq("Failed to delete token with expired timeout. {}"), any(String.class), eq(exception));
+        assertThat(countDownLatch.getCount()).as("processError decrements CountDownLatch").isEqualTo(0);
+    }
+
+    private SessionExpiryBatchHandler newSessionExpiryBatchHandler(SessionEventType eventType) {
+        return new SessionExpiryBatchHandler(mockQueue, eventType, mockResultHandlerFactory);
+    }
+
+    private StateChangeResultHandler newStateChangeResultHandler(SessionEventType eventType, CountDownLatch latch) {
+        return new StateChangeResultHandler(
+                mockDebug, mockSessionAdapter, mockLocalOperations, eventType, latch, mockSessionService,
+                mockSessionServiceConfig, mockInternalSessionEventBroker, mockSessionUtilsWrapper,
+                mockSessionConstraint);
+    }
+
+    private PartialToken mockPartialToken(String sessionId) {
         PartialToken mockToken = mock(PartialToken.class);
         given(mockToken.getValue(CoreTokenField.TOKEN_ID)).willReturn(sessionId);
-        given(mockToken.getValue(CoreTokenField.ETAG)).willReturn("etag:" + sessionId);
+        given(mockToken.getValue(CoreTokenField.ETAG)).willReturn(etagFor(sessionId));
         return mockToken;
+    }
+
+    private String etagFor(String sessionId) {
+        return "etag:" + sessionId;
     }
 }
 

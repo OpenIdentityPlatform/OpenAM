@@ -21,59 +21,54 @@ import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Provider;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import com.google.inject.Module;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.CTSOptions;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.session.SessionEventType;
-import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.sm.datalayer.api.OptimisticConcurrencyCheckFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.CountDownHandler;
 import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.tokens.TokenType;
-
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionState;
 import org.forgerock.util.Options;
+import org.forgerock.util.Reject;
+
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.dpro.session.operations.strategies.LocalOperations;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
+import com.iplanet.dpro.session.service.SessionConstraint;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.sun.identity.session.util.SessionUtilsWrapper;
+import com.sun.identity.shared.debug.Debug;
 
 /**
- * Delegate for {@link SessionIdleTimeExpiredProcess} and {@link MaxSessionTimeExpiredProcess} which handles
- * the two stage process of changing the session CTS token state to DESTROYED and then performing logging and
- * notification if this succeeds.
+ * Delegate for {@link SessionIdleTimeExpiredProcess} and {@link MaxSessionTimeExpiredProcess}
+ * which handles the two stage process of attempting to delete the session CTS token and then
+ * processing the logout only if this low-level operation succeeds.
  */
 class SessionExpiryBatchHandler {
 
     private final TaskDispatcher queue;
-    private final Provider<SessionAccessManager> sessionAccessManager;
     private final SessionEventType sessionEventType;
+    private final StateChangeResultHandlerFactory stateChangeResultHandlerFactory;
 
-    private SessionExpiryBatchHandler(
-            final TaskDispatcher queue,
-            final Provider<SessionAccessManager> sessionAccessManager,
-            final SessionEventType sessionEventType) {
+    @Inject
+    public SessionExpiryBatchHandler(
+            TaskDispatcher queue,
+            SessionEventType sessionEventType,
+            StateChangeResultHandlerFactory stateChangeResultHandlerFactory) {
         this.queue = queue;
-        this.sessionAccessManager = sessionAccessManager;
         this.sessionEventType = sessionEventType;
-    }
-
-    /**
-     * Creates delegate for {@link MaxSessionTimeExpiredProcess}.
-     */
-    static SessionExpiryBatchHandler forMaxSessionTimeExpired(
-            final TaskDispatcher queue, final Provider<SessionAccessManager> accessManager) {
-        return new SessionExpiryBatchHandler(queue, accessManager, MAX_TIMEOUT);
-    }
-
-    /**
-     * Creates delegate for {@link SessionIdleTimeExpiredProcess}.
-     */
-    static SessionExpiryBatchHandler forSessionIdleTimeExpired(
-            final TaskDispatcher queue, final Provider<SessionAccessManager> accessManager) {
-        return new SessionExpiryBatchHandler(queue, accessManager, IDLE_TIMEOUT);
+        this.stateChangeResultHandlerFactory = stateChangeResultHandlerFactory;
     }
 
     /**
@@ -90,65 +85,136 @@ class SessionExpiryBatchHandler {
      */
     CountDownLatch timeoutBatch(Collection<PartialToken> tokenIds) throws CoreTokenException {
         CountDownLatch latch = new CountDownLatch(tokenIds.size());
-        StateChangeResultHandler stateChangeResultHandler = new StateChangeResultHandler(sessionEventType, latch);
+        StateChangeResultHandler stateChangeResultHandler = stateChangeResultHandlerFactory.create(sessionEventType,
+                latch);
 
         for (PartialToken partialToken : tokenIds) {
-            // Attempt to timeout session; if setting the session state succeeds, then
-            // stateChangeResultHandler will log audit events and send notifications
+            // Ensure session only gets timed out once by first attempting to delete the CTS token
             String tokenId = partialToken.getValue(CoreTokenField.TOKEN_ID);
-            Token token = new Token(tokenId, TokenType.SESSION);
-            token.setAttribute(CoreTokenField.ETAG, partialToken.getValue(CoreTokenField.ETAG));
-            token.setAttribute(SessionTokenField.SESSION_STATE.getField(), SessionState.DESTROYED.toString());
-            queue.update(token, Options.defaultOptions(), stateChangeResultHandler);
+            Options options = Options.defaultOptions().set(CTSOptions.PRE_DELETE_READ_OPTION, CoreTokenField.values());
+            if (sessionEventType == IDLE_TIMEOUT) {
+                // Allow idle timeout to be aborted if another process updates the token
+                String etag = partialToken.getValue(CoreTokenField.ETAG);
+                options.set(CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION, etag);
+            }
+            queue.delete(tokenId, options, stateChangeResultHandler);
         }
         return latch;
     }
 
     /**
-     * {@link ResultHandler} which publishes session timeout to audit and notification systems and then
-     * deletes the session from CTS.
+     * {@link ResultHandler} which publishes session timeout {@link SessionEventType}.
      * <p>
-     * Decrements a {@link CountDownLatch} so that a thread can await completion of a batch of results.
+     * Also, decrements a {@link CountDownLatch} as processing of each token completes
+     * so that another thread can await completion of a batch of results.
      */
-    private class StateChangeResultHandler implements ResultHandler<Token, CoreTokenException> {
+    static class StateChangeResultHandler implements ResultHandler<PartialToken, CoreTokenException> {
 
+        private final Debug debug;
+        private final SessionAdapter sessionAdapter;
+        private final LocalOperations localOperations;
         private final SessionEventType sessionEventType;
-        private final CountDownLatch latch;
+        private final CountDownLatch countDownLatch;
+        private final SessionService sessionService;
+        private final SessionServiceConfig sessionServiceConfig;
+        private final InternalSessionEventBroker internalSessionEventBroker;
+        private final SessionUtilsWrapper sessionUtilsWrapper;
+        private final SessionConstraint sessionConstraint;
 
         /**
          * Constructs a new {@link CountDownHandler}.
          *
-         * @param sessionEventType Identifies the timeout that has occurred.
-         * @param latch The {@link CountDownLatch} to update as results and errors are received.
+         * @param debug Required for debug logging
+         * @param sessionAdapter Required for adapting CTS {@link Token} to its {@link InternalSession} object.
+         * @param localOperations Required for notifying the system that the {@link InternalSession} has timed out.
+         * @param sessionEventType Identifies the type of timeout that has occurred.
+         * @param countDownLatch The {@link CountDownLatch} to update as results and errors are received.
+         * @param sessionService transitive dependency required by {@link InternalSession}.
+         * @param sessionServiceConfig transitive dependency required by {@link InternalSession}.
+         * @param internalSessionEventBroker transitive dependency required by {@link InternalSession}.
+         * @param sessionUtilsWrapper transitive dependency required by {@link InternalSession}.
+         * @param sessionConstraint transitive dependency required by {@link InternalSession}.
          */
-        private StateChangeResultHandler(
-                final SessionEventType sessionEventType,
-                final CountDownLatch latch) {
+        @Inject
+        public StateChangeResultHandler(
+                @Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
+                SessionAdapter sessionAdapter,
+                LocalOperations localOperations,
+                @Assisted final SessionEventType sessionEventType,
+                @Assisted final CountDownLatch countDownLatch,
+                SessionService sessionService,
+                SessionServiceConfig sessionServiceConfig,
+                InternalSessionEventBroker internalSessionEventBroker,
+                SessionUtilsWrapper sessionUtilsWrapper,
+                SessionConstraint sessionConstraint) {
+
+            Reject.ifFalse(sessionEventType == IDLE_TIMEOUT || sessionEventType == MAX_TIMEOUT);
+
+            this.debug = debug;
+            this.sessionAdapter = sessionAdapter;
+            this.localOperations = localOperations;
             this.sessionEventType = sessionEventType;
-            this.latch = latch;
+            this.countDownLatch = countDownLatch;
+            this.sessionService = sessionService;
+            this.sessionServiceConfig = sessionServiceConfig;
+            this.internalSessionEventBroker = internalSessionEventBroker;
+            this.sessionUtilsWrapper = sessionUtilsWrapper;
+            this.sessionConstraint = sessionConstraint;
         }
 
         @Override
-        public Token getResults() throws CoreTokenException {
+        public PartialToken getResults() throws CoreTokenException {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public void processResults(Token result) {
+        public void processResults(PartialToken result) {
             try {
-                String sessionId = result.getAttribute(SessionTokenField.SESSION_ID.getField());
-                InternalSession session = sessionAccessManager.get().getInternalSession(new SessionID(sessionId));
-                session.timeoutSession(sessionEventType);
+                if (!result.canConvertToToken()) {
+                    debug.message("Failed to delete token. Already deleted.");
+                    return;
+                }
+                Token token = result.toToken();
+                InternalSession internalSession = sessionAdapter.fromToken(token);
+                internalSession.setSessionServiceDependencies(
+                        sessionService, sessionServiceConfig, internalSessionEventBroker, sessionUtilsWrapper,
+                        sessionConstraint, debug);
+                localOperations.timeout(internalSession, sessionEventType);
             } finally {
-                latch.countDown();
+                countDownLatch.countDown();
             }
         }
 
         @Override
         public void processError(Exception error) {
-            latch.countDown();
+            countDownLatch.countDown();
+            if (error instanceof OptimisticConcurrencyCheckFailedException) {
+                debug.message("Failed to delete token with expired timeout. {}", error.getMessage(), error);
+            } else {
+                debug.error("Failed to delete token with expired timeout. {}", error.getMessage(), error);
+            }
         }
 
+    }
+
+    /**
+     * Factory interface to backed by Guice provided implementation.
+     * <p>
+     * Guice will inject all other constructor parameters for {@link StateChangeResultHandler} and
+     * use the provided {@link SessionEventType} and {@link CountDownLatch}.
+     *
+     * @see CTSWorkerProcessGuiceModule#install(Module)
+     */
+    interface StateChangeResultHandlerFactory {
+
+        /**
+         * Create a new {@link StateChangeResultHandler} with additional constructor dependencies provided by Guice.
+         *
+         * @param eventType The type of timeout to be processed.
+         * @param latch The {@link CountDownLatch} to decrement as each result or error is processed by the handler.
+         * @return A new {@link StateChangeResultHandler}.
+         */
+        StateChangeResultHandler create(SessionEventType eventType, CountDownLatch latch);
     }
 
 }

@@ -249,7 +249,8 @@ public class SessionAuditorTest {
         // Given
 
         // When
-        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.QUOTA_EXHAUSTED));
+        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.QUOTA_EXHAUSTED,
+                System.currentTimeMillis()));
 
         // Then
         verifyZeroInteractions(auditEventPublisher);
@@ -260,7 +261,8 @@ public class SessionAuditorTest {
         // Given
 
         // When
-        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.PROTECTED_PROPERTY));
+        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.PROTECTED_PROPERTY,
+                System.currentTimeMillis()));
 
         // Then
         verifyZeroInteractions(auditEventPublisher);
@@ -271,7 +273,8 @@ public class SessionAuditorTest {
         // Given
 
         // When
-        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.SESSION_MAX_LIMIT_REACHED));
+        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.SESSION_MAX_LIMIT_REACHED,
+                System.currentTimeMillis()));
 
         // Then
         verifyZeroInteractions(auditEventPublisher);
@@ -283,7 +286,8 @@ public class SessionAuditorTest {
         given(auditEventPublisher.isAuditing(FAKE_REALM_NAME, ACTIVITY_TOPIC, AM_SESSION_CREATED)).willReturn(false);
 
         // When
-        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.SESSION_CREATION));
+        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.SESSION_CREATION,
+                System.currentTimeMillis()));
 
         // Then
         verify(auditEventPublisher, times(0)).tryPublish(any(String.class), any(AuditEvent.class));

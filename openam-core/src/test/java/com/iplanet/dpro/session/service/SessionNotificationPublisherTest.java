@@ -148,7 +148,8 @@ public class SessionNotificationPublisherTest {
         // Given
 
         // When
-        sessionNotificationPublisher.onEvent(new InternalSessionEvent(session, sessionEventType));
+        sessionNotificationPublisher.onEvent(new InternalSessionEvent(session, sessionEventType,
+                System.currentTimeMillis()));
 
         // Then
         verifyZeroInteractions(notificationBroker);
@@ -159,7 +160,8 @@ public class SessionNotificationPublisherTest {
         ArgumentCaptor<JsonValue> notificationCaptor = ArgumentCaptor.forClass(JsonValue.class);
         given(notificationBroker.publish(eq(Topic.of("/agent/session")), notificationCaptor.capture())).willReturn(true);
 
-        sessionNotificationPublisher.onEvent(new InternalSessionEvent(session, sessionEventType));
+        sessionNotificationPublisher.onEvent(new InternalSessionEvent(session, sessionEventType,
+                System.currentTimeMillis()));
 
         return notificationCaptor.getAllValues();
     }

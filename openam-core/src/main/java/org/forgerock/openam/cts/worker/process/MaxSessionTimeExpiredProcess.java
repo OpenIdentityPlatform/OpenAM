@@ -20,16 +20,14 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
-import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.worker.CTSWorkerFilter;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
-import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 import com.sun.identity.shared.debug.Debug;
@@ -39,8 +37,8 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class MaxSessionTimeExpiredProcess extends CTSWorkerBaseProcess {
 
-    private Debug debug;
-    private SessionExpiryBatchHandler timeoutHandler;
+    private final Debug debug;
+    private final SessionExpiryBatchHandler timeoutHandler;
 
     /**
      * Generates a new {@link CTSWorkerDeleteProcess} which can be used across multiple {@link CTSWorkerTask},
@@ -48,11 +46,10 @@ public class MaxSessionTimeExpiredProcess extends CTSWorkerBaseProcess {
      */
     @Inject
     public MaxSessionTimeExpiredProcess(
-            final TaskDispatcher queue,
-            final Provider<SessionAccessManager> accessManager,
+            @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED) SessionExpiryBatchHandler timeoutHandler,
             @Named(CoreTokenConstants.CTS_DEBUG) final Debug debug) {
         this.debug = debug;
-        this.timeoutHandler = SessionExpiryBatchHandler.forMaxSessionTimeExpired(queue, accessManager);
+        this.timeoutHandler = timeoutHandler;
     }
 
     @Override

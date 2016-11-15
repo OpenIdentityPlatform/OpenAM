@@ -48,6 +48,7 @@ import org.forgerock.openam.cts.adapters.SAMLAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.worker.process.CTSWorkerProcessGuiceModule;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
@@ -196,9 +197,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .build(OrganizationConfigManagerFactory.class));
 
         install(new RealmGuiceModule());
-
         install(new CoreTokenServiceGuiceModule());
-
+        install(new CTSWorkerProcessGuiceModule());
         install(new SessionGuiceModule());
     }
 

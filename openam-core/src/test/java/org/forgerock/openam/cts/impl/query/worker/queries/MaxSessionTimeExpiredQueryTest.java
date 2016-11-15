@@ -88,7 +88,7 @@ public class MaxSessionTimeExpiredQueryTest {
     }
 
     @Test
-    public void shouldReturnTokenIdAndEtagAndSessionId() {
+    public void shouldReturnTokenIdAndSessionId() {
         // Given
         MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockConnectionFactory,
                 mockFactory, mockConfig);
@@ -99,7 +99,6 @@ public class MaxSessionTimeExpiredQueryTest {
         // Then
         verify(mockBuilder).returnTheseAttributes(
                 CoreTokenField.TOKEN_ID,
-                CoreTokenField.ETAG,
                 SessionTokenField.SESSION_ID.getField());
     }
 
