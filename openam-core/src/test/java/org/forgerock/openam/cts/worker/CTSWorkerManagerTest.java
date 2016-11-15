@@ -19,8 +19,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,33 +28,43 @@ import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.util.thread.ExecutorServiceFactory;
+import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.sun.identity.shared.debug.Debug;
 
-public class CTSWorkerInitTest {
+public class CTSWorkerManagerTest {
 
+    public static final int RUN_PERIOD = 600000;
     private ThreadMonitor mockMonitor;
-    private CTSWorkerInit ctsWorkerInit;
+    private CTSWorkerManager ctsWorkerManager;
+    private CoreTokenConfig mockCoreTokenConfig;
+    private ExecutorServiceFactory mockExecutorServiceFactory;
 
     @BeforeMethod
     public void setup() {
         mockMonitor = mock(ThreadMonitor.class);
+        mockCoreTokenConfig = mock(CoreTokenConfig.class);
+        mockExecutorServiceFactory = mock(ExecutorServiceFactory.class);
         CTSWorkerTaskProvider mockTaskProvider = mock(CTSWorkerTaskProvider.class);
         given(mockTaskProvider.getTasks()).willReturn(Collections.singletonList(mock(CTSWorkerTask.class)));
+        given(mockExecutorServiceFactory.createScheduledService(anyInt()))
+                .willReturn(mock(ScheduledExecutorService.class));
+        given(mockCoreTokenConfig.getRunPeriod()).willReturn(RUN_PERIOD);
 
-        ctsWorkerInit = new CTSWorkerInit(
+        ctsWorkerManager = new CTSWorkerManager(
                 mockTaskProvider,
                 mockMonitor,
-                mock(CoreTokenConfig.class),
-                mock(ScheduledExecutorService.class),
+                mockCoreTokenConfig,
+                mockExecutorServiceFactory,
                 mock(Debug.class));
     }
 
     @Test
     public void shouldUseMonitorToStartReaper() {
-        ctsWorkerInit.startTasks();
+        ctsWorkerManager.startTasks();
         verify(mockMonitor).watchScheduledThread(
                 any(ScheduledExecutorService.class),
                 any(Runnable.class),
@@ -66,26 +75,67 @@ public class CTSWorkerInitTest {
 
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void shouldPreventSubsequentStarts() {
-        ctsWorkerInit.startTasks();
-        ctsWorkerInit.startTasks();
+        ctsWorkerManager.startTasks();
+        ctsWorkerManager.startTasks();
     }
 
     @Test
     public void shouldStartMultiple() {
-        ctsWorkerInit = new CTSWorkerInit(
+        ctsWorkerManager = new CTSWorkerManager(
                 new CTSWorkerTestTaskProvider(),
                 mockMonitor,
-                mock(CoreTokenConfig.class),
-                mock(ScheduledExecutorService.class),
+                mockCoreTokenConfig,
+                mockExecutorServiceFactory,
                 mock(Debug.class));
 
-        ctsWorkerInit.startTasks();
+        ctsWorkerManager.startTasks();
 
         verify(mockMonitor, times(2)).watchScheduledThread(
                 any(ScheduledExecutorService.class),
                 any(Runnable.class),
                 anyLong(),
                 anyLong(),
+                any(TimeUnit.class));
+    }
+
+    @Test
+    public void shouldNotRestartWhenRunPeriodIsNotChanged() {
+
+        //given
+        ctsWorkerManager.startTasks();
+        Mockito.reset(mockMonitor);
+        given(mockCoreTokenConfig.getRunPeriod()).willReturn(RUN_PERIOD);
+
+        //when
+        ctsWorkerManager.configChanged();
+
+        //then
+        verify(mockMonitor, never()).watchScheduledThread(
+                any(ScheduledExecutorService.class),
+                any(Runnable.class),
+                anyLong(),
+                anyLong(),
+                any(TimeUnit.class));
+    }
+
+    @Test
+    public void shouldRestartWhenRunPeriodIsChanged() {
+
+        //given
+        ctsWorkerManager.startTasks();
+        Mockito.reset(mockMonitor);
+        int newRunPeriod = RUN_PERIOD + 10000;
+        given(mockCoreTokenConfig.getRunPeriod()).willReturn(newRunPeriod);
+
+        //when
+        ctsWorkerManager.configChanged();
+
+        //then
+        verify(mockMonitor).watchScheduledThread(
+                any(ScheduledExecutorService.class),
+                any(Runnable.class),
+                eq(((long) newRunPeriod)),
+                eq(((long) newRunPeriod)),
                 any(TimeUnit.class));
     }
 

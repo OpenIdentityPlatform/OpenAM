@@ -35,7 +35,7 @@ import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
-import org.forgerock.openam.cts.worker.CTSWorkerInit;
+import org.forgerock.openam.cts.worker.CTSWorkerManager;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -63,19 +63,19 @@ public class CoreTokenAdapter {
      * @param strategy Required for binary object transformations.
      * @param dispatcher Non null TaskDispatcher to use for CTS operations.
      * @param handlerFactory Factory used to generate ResultHandlers for CTS operations.
-     * @param reaperInit Required for starting the CTS Reaper.
-     * @param debug Required for debug logging
+     * @param ctsWorkerManager Required for starting the CTS worker tasks.
+     * @param debug Required for debug logging.
      */
     @Inject
     public CoreTokenAdapter(TokenBlobStrategy strategy, TaskDispatcher dispatcher, ResultHandlerFactory handlerFactory,
-                            CTSWorkerInit reaperInit, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+                            CTSWorkerManager ctsWorkerManager, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.strategy = strategy;
         this.handlerFactory = handlerFactory;
         this.dispatcher = dispatcher;
         this.debug = debug;
 
         dispatcher.startDispatcher();
-        reaperInit.startTasks();
+        ctsWorkerManager.startTasks();
     }
 
     /**

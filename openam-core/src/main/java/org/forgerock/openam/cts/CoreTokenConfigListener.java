@@ -13,30 +13,16 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.worker;
 
-import java.util.Collection;
+package org.forgerock.openam.cts;
 
 /**
- * Provides CTSWorkerTasks to be executed.
+ * Listener interface allowing changes to {@link CoreTokenConfig} to be observed.
  */
-public class CTSWorkerTaskProvider {
-
-    private Collection<CTSWorkerTask> tasks;
+public interface CoreTokenConfigListener {
 
     /**
-     * Constructs a new ReaperTaskProvider which will supply the provided tasks to the {@link CTSWorkerManager} service.
-     * @param tasks Collection of tasks this provider will provide.
+     * Indicates that the {@link CoreTokenConfig} has changed.
      */
-    public CTSWorkerTaskProvider(Collection<CTSWorkerTask> tasks) {
-        this.tasks = tasks;
-    }
-
-    /**
-     * Returns the collection of tasks.
-     * @return The array of tasks this provider will provide.
-     */
-    public Collection<CTSWorkerTask> getTasks() {
-        return tasks;
-    }
+    void configChanged();
 }

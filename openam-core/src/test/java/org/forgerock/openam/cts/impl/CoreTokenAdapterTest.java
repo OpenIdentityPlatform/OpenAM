@@ -29,7 +29,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
-import org.forgerock.openam.cts.worker.CTSWorkerInit;
+import org.forgerock.openam.cts.worker.CTSWorkerManager;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -47,7 +47,7 @@ public class CoreTokenAdapterTest {
     private TaskDispatcher mockTaskDispatcher;
     private ResultHandlerFactory mockResultHandlerFactory;
     private Debug mockDebug;
-    private CTSWorkerInit mockReaperInit;
+    private CTSWorkerManager mockReaperInit;
     private Options options;
 
     @BeforeMethod
@@ -55,7 +55,7 @@ public class CoreTokenAdapterTest {
         mockStrategy = mock(TokenBlobStrategy.class);
         mockTaskDispatcher = mock(TaskDispatcher.class);
         mockResultHandlerFactory = mock(ResultHandlerFactory.class);
-        mockReaperInit = mock(CTSWorkerInit.class);
+        mockReaperInit = mock(CTSWorkerManager.class);
         mockDebug = mock(Debug.class);
         options = Options.defaultOptions();
 

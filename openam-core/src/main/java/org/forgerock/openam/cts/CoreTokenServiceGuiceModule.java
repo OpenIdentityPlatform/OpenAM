@@ -41,12 +41,14 @@ import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
+import org.forgerock.openam.cts.worker.CTSWorkerManager;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.cts.worker.CTSWorkerTaskProvider;
 import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
 import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
 import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
 import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
+import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -97,7 +99,6 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
         bind(CoreTokenConstants.class);
-        bind(CoreTokenConfig.class);
 
         bind(ObjectMapper.class)
                 .annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER))
@@ -145,6 +146,11 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
         expose(ResultHandlerFactory.class);
         expose(ScheduledExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_SCHEDULED_SERVICE));
         expose(String.class).annotatedWith(Names.named(DataLayerConstants.ROOT_DN_SUFFIX));
+    }
+
+    @Provides @Singleton
+    CoreTokenConfig getCoreTokenConfig() {
+        return CoreTokenConfig.newCoreTokenConfig();
     }
 
     /**
@@ -217,4 +223,12 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
                 maxSessionTimeExpiredTask,
                 sessionIdleTimeExpiredTask));
     }
+
+    @Provides @Inject @Singleton
+    CTSWorkerManager getCTSWorkerManager(CTSWorkerTaskProvider workerTaskProvider, ThreadMonitor monitor,
+            CoreTokenConfig config, ExecutorServiceFactory executorServiceFactory,
+            @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+        return CTSWorkerManager.newCTSWorkerInit(workerTaskProvider, monitor, config, executorServiceFactory, debug);
+    }
+
 }

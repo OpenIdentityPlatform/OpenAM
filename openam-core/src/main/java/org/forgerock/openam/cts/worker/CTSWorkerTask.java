@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 
 /**
- * Class defining the base elements of a CTS worker task which may be executed by the {@link CTSWorkerInit}.
+ * Class defining the base elements of a CTS worker task which may be executed by the {@link CTSWorkerManager}.
  */
 public class CTSWorkerTask implements Runnable {
 

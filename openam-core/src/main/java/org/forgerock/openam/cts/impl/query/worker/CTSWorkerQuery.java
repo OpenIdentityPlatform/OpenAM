@@ -18,7 +18,7 @@ package org.forgerock.openam.cts.impl.query.worker;
 import java.util.Collection;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.worker.CTSWorkerInit;
+import org.forgerock.openam.cts.worker.CTSWorkerManager;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
@@ -26,7 +26,7 @@ import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
  * Defines the ability to perform a paged query. This will be used by a {@link CTSWorkerTask} to
  * identify all CTS tokens which will be processed by the task.
  *
- * @see CTSWorkerInit
+ * @see CTSWorkerManager
  */
 public interface CTSWorkerQuery extends AutoCloseable {
 

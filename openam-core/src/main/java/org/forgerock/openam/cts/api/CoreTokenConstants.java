@@ -69,7 +69,7 @@ public class CoreTokenConstants {
 
     public static final String FR_CORE_TOKEN = "frCoreToken";
     /**
-     * The name of the Scheduled Service used by the CTS Reaper.
+     * The name of the general Scheduled Service used by the CTS.
      */
     public static final String CTS_SCHEDULED_SERVICE = "CTSScheduledService";
     /**
