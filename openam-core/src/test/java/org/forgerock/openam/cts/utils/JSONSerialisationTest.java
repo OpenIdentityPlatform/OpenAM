@@ -21,29 +21,17 @@ import static org.testng.Assert.assertNotEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.core.guice.CTSObjectMapperProvider;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.name.Names;
+public class JSONSerialisationTest {
 
-public class JSONSerialisationTest extends AbstractModule {
-
-    private final Injector injector = Guice.createInjector(this);
-    private JSONSerialisation serialization = injector.getInstance(JSONSerialisation.class);
-
-    @Override
-    protected void configure() {
-        bind(ObjectMapper.class).annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER)).to(ObjectMapper.class);
-    }
+    private JSONSerialisation serialization;
 
     @BeforeMethod
     public void setup() throws Exception {
-        serialization = injector.getInstance(JSONSerialisation.class);
+        serialization = new JSONSerialisation(new CTSObjectMapperProvider().get());
     }
 
     @Test
@@ -59,7 +47,7 @@ public class JSONSerialisationTest extends AbstractModule {
     @Test
     public void shouldSerialiseAMap() {
         // Given
-        Map<String, Object> test = new HashMap<String, Object>();
+        Map<String, Object> test = new HashMap<>();
         test.put("badger", 1234);
         test.put("ferret", 4321);
 
