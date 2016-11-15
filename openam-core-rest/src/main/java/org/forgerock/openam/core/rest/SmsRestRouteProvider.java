@@ -54,6 +54,8 @@ import com.sun.identity.sm.SchemaType;
  */
 public class SmsRestRouteProvider extends AbstractRestRouteProvider {
     private static final String AM_CONSOLE_CONFIG_XML = "amConsoleConfig.xml";
+    private static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryConfiguration";
+
     private final Logger logger = LoggerFactory.getLogger("frRest");
 
     private SmsRequestHandlerFactory smsRequestHandlerFactory;
@@ -109,6 +111,11 @@ public class SmsRestRouteProvider extends AbstractRestRouteProvider {
             while (matcher.find()) {
                 tabNames.add(matcher.group(1).toLowerCase());
             }
+
+            // New tabs will not lead to the creation of a ViewBean, so will not be matched in this way.
+            // Add additional tab names here so that suitable routes are constructed.
+            tabNames.add(DIRECTORY_CONFIGURATION_TAB_NAME);
+
         } catch (IOException e) {
             logger.error("Error getting tab names", e);
         }
