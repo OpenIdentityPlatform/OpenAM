@@ -305,9 +305,6 @@ Copyright: Copyright (C) 2005, University of Maryland
 Version: jstl-1.1.2.jar
 Copyright: Copyright 1999-2004 The Apache Software Foundation.
 
-Version: log4j-1.2.16.jar
-Copyright: Copyright 2007 The Apache Software Foundation
-
 Version: maxmind-db-1.0.0.jar
 Copyright: Copyright (c) 2014 by MaxMind, Inc.
 
@@ -962,9 +959,6 @@ Copyright: Copyright 2004-2013 QOS.ch
 
 Version: slf4j-jdk14-1.7.5.jar
 Copyright: Copyright 2004-2007 QOS.ch
-
-Version: log4j-over-slf4j-1.7.5.jar
-Copyright: Copyright 2004-2013 QOS.ch
 
 Version: jcl-over-slf4j-1.7.21.jar
 Copyright:  Copyright 2001-2004 The Apache Software Foundation.

@@ -149,7 +149,6 @@
         <cc-ui.version>2008-08-08</cc-ui.version>
         <jsr311-api.version>1.1.1</jsr311-api.version>
         <jstl.version>1.1.2</jstl.version>
-        <log4j.version>1.2.16</log4j.version>
         <mail.version>1.5.1</mail.version>
         <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
         <relaxngDatatype.version>20020414</relaxngDatatype.version>
