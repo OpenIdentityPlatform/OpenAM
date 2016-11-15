@@ -138,7 +138,7 @@ public class SmsServerPropertiesResource implements Describable<ApiDescription, 
     private static final String SCHEMA_NAME = "com-sun-identity-servers";
     private static final String SERVER_CONFIG = "serverconfig";
     private static final String DIRECTORY_CONFIG_SCHEMA = "/schema/json/server-directory-configuration.json";
-    private static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryconfiguration";
+    private static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryConfiguration";
     private static final String ADVANCED_TAB_NAME = "advanced";
     private static final String GENERAL_TAB_NAME = "general";
     private static final String PARENT_SITE_PROPERTY = "singleChoiceSite";
