@@ -1152,7 +1152,7 @@ public class IdServicesImpl implements IdServices {
                } else {
                    active = idRepo.isActive(token, type, name);
                }
-               if (active) {
+               if (!active) {
                    break;
                }
            } catch (IdRepoFatalException idf) {
