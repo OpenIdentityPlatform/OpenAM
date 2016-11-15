@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import java.util.Calendar;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
 
 public class CTSWorkerPastExpiryDateQueryTest {
 
+    private ConnectionFactory<Connection> mockConnectionFactory;
     private QueryFactory<Connection, Filter> mockFactory;
     private CoreTokenConfig mockConfig;
     private QueryBuilder<Connection, Filter> mockBuilder;
@@ -41,7 +43,7 @@ public class CTSWorkerPastExpiryDateQueryTest {
 
     @BeforeMethod
     public void setup() {
-
+        mockConnectionFactory = mock(ConnectionFactory.class);
         mockBuilder = mock(QueryBuilder.class);
         given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
         given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
@@ -65,7 +67,8 @@ public class CTSWorkerPastExpiryDateQueryTest {
         // Given
         mockConfig = mock(CoreTokenConfig.class);
         given(mockConfig.getCleanupPageSize()).willReturn(9);
-        CTSWorkerPastExpiryDateQuery<Connection> query = new CTSWorkerPastExpiryDateQuery<>(mockFactory, mockConfig);
+        CTSWorkerPastExpiryDateQuery<Connection> query = new CTSWorkerPastExpiryDateQuery<>(mockConnectionFactory,
+                mockFactory, mockConfig);
 
         // When
         query.getQuery();
@@ -77,7 +80,8 @@ public class CTSWorkerPastExpiryDateQueryTest {
     @Test
     public void shouldReturnTokenId() {
         // Given
-        CTSWorkerPastExpiryDateQuery<Connection> query = new CTSWorkerPastExpiryDateQuery<>(mockFactory, mockConfig);
+        CTSWorkerPastExpiryDateQuery<Connection> query = new CTSWorkerPastExpiryDateQuery<>(mockConnectionFactory,
+                mockFactory, mockConfig);
 
         // When
         query.getQuery();

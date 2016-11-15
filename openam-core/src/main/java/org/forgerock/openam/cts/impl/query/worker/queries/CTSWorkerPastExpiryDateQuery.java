@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.util.Calendar;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
@@ -41,8 +42,9 @@ public class CTSWorkerPastExpiryDateQuery<C> extends CTSWorkerBaseQuery {
     private final int pageSize;
 
     @Inject
-    public CTSWorkerPastExpiryDateQuery(@DataLayer(ConnectionType.CTS_WORKER) QueryFactory queryFactory,
-                                        CoreTokenConfig config) {
+    public CTSWorkerPastExpiryDateQuery(@DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory,
+            @DataLayer(ConnectionType.CTS_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
+        super(factory);
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
 
         this.queryFactory = queryFactory;

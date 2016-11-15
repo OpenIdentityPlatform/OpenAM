@@ -33,9 +33,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.DeletePreReadOptionFunction;
 import org.forgerock.openam.cts.impl.ETagAssertionCTSOptionFunction;
 import org.forgerock.openam.cts.impl.LdapOptionFunction;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConstants;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
 import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
@@ -51,7 +49,6 @@ import org.forgerock.openam.cts.worker.filter.CTSWorkerSelectAllFilter;
 import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess;
 import org.forgerock.openam.cts.worker.process.MaxSessionTimeExpiredProcess;
 import org.forgerock.openam.cts.worker.process.SessionIdleTimeExpiredProcess;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -289,30 +286,9 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
         return esf.createScheduledService(1);
     }
 
-    @Provides @Inject @Named(CTSWorkerConstants.PAST_EXPIRY_DATE)
-    CTSWorkerQuery getPastExpiryDateQuery(
-            CTSWorkerPastExpiryDateQuery query,
-            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
-    CTSWorkerQuery getMaxSessionTimeExpiredQuery(
-            MaxSessionTimeExpiredQuery query,
-            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
-    @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
-    CTSWorkerQuery getSessionIdleTimeExpiredQuery(
-            SessionIdleTimeExpiredQuery query,
-            @DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory) {
-        return new CTSWorkerConnection<>(factory, query);
-    }
-
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)
     CTSWorkerTask getDeleteAllMaxExpiredReaperTask(
-            @Named(CTSWorkerConstants.PAST_EXPIRY_DATE) CTSWorkerQuery query,
+            CTSWorkerPastExpiryDateQuery query,
             CTSWorkerDeleteProcess deleteProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
         return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
@@ -320,7 +296,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
     CTSWorkerTask getMaxSessionTimeExpiredTask(
-            @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED) CTSWorkerQuery query,
+            MaxSessionTimeExpiredQuery query,
             MaxSessionTimeExpiredProcess maxSessionTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
         return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter);
@@ -328,7 +304,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
     CTSWorkerTask getSessionIdleTimeExpiredTask(
-            @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED) CTSWorkerQuery query,
+            SessionIdleTimeExpiredQuery query,
             SessionIdleTimeExpiredProcess sessionIdleTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
         return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter);

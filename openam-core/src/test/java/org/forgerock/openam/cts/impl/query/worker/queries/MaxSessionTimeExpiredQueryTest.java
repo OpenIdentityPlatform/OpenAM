@@ -24,6 +24,7 @@ import java.util.Calendar;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -35,6 +36,7 @@ import org.testng.annotations.Test;
 
 public class MaxSessionTimeExpiredQueryTest {
 
+    private ConnectionFactory<Connection> mockConnectionFactory;
     private QueryFactory<Connection, Filter> mockFactory;
     private CoreTokenConfig mockConfig;
     private QueryBuilder<Connection, Filter> mockBuilder;
@@ -42,7 +44,7 @@ public class MaxSessionTimeExpiredQueryTest {
 
     @BeforeMethod
     public void setup() {
-
+        mockConnectionFactory = mock(ConnectionFactory.class);
         mockBuilder = mock(QueryBuilder.class);
         given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
         given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
@@ -75,7 +77,8 @@ public class MaxSessionTimeExpiredQueryTest {
         // Given
         mockConfig = mock(CoreTokenConfig.class);
         given(mockConfig.getCleanupPageSize()).willReturn(9);
-        MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockFactory, mockConfig);
+        MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockConnectionFactory,
+                mockFactory, mockConfig);
 
         // When
         query.getQuery();
@@ -87,7 +90,8 @@ public class MaxSessionTimeExpiredQueryTest {
     @Test
     public void shouldReturnTokenIdAndEtagAndSessionId() {
         // Given
-        MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockFactory, mockConfig);
+        MaxSessionTimeExpiredQuery<Connection> query = new MaxSessionTimeExpiredQuery<>(mockConnectionFactory,
+                mockFactory, mockConfig);
 
         // When
         query.getQuery();

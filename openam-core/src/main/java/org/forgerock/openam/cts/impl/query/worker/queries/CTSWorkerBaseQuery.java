@@ -15,35 +15,36 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
+import java.io.Closeable;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.worker.CTSWorkerConnection;
+import org.forgerock.openam.cts.exceptions.LdapInitializationFailedException;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
-import org.forgerock.util.Reject;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Abstract class for the performing of queries related to the CTS Worker Framework.
  * <p>
- * Instances of sub-classes should always be decorated by {@link CTSWorkerConnection} for connection management.
+ * Instances of sub-classes should always be used within try-with-resources statements. The implementations may throw
+ * exceptions as part of their processing, at which point callers need to ensure they use the {@link #close()} method to
+ * clean up used resources.
  *
  * @param <C> Connection type.
  */
-public abstract class CTSWorkerBaseQuery<C> implements CTSWorkerQuery {
+public abstract class CTSWorkerBaseQuery<C extends Closeable> implements CTSWorkerQuery {
 
+    private final ConnectionFactory<C> factory;
     private Iterator<Collection<PartialToken>> results;
     private C connection;
 
-    /**
-     * @param connection Non null connection to use for query.
-     */
-    public void setConnection(C connection) {
-        Reject.ifNull(connection);
-        this.connection = connection;
+    public CTSWorkerBaseQuery(ConnectionFactory<C> factory) {
+        this.factory = factory;
     }
 
     /**
@@ -55,10 +56,18 @@ public abstract class CTSWorkerBaseQuery<C> implements CTSWorkerQuery {
      */
     @Override
     public Collection<PartialToken> nextPage() throws CoreTokenException {
-        Reject.ifTrue(connection == null, "Connection must be assigned before use");
-
-        if (results == null) {
-            results = getQuery().executeRawResults(connection, PartialToken.class);
+        // NB: this thread may be interrupted by shutdown
+        if (Thread.currentThread().isInterrupted()) {
+            close();
+            return null;
+        }
+        try {
+            if (connection == null) {
+                connection = factory.create();
+                results = getQuery().executeRawResults(connection, PartialToken.class);
+            }
+        } catch (DataLayerException e) {
+            throw new LdapInitializationFailedException(e);
         }
 
         if (isQueryComplete()) {
@@ -71,7 +80,9 @@ public abstract class CTSWorkerBaseQuery<C> implements CTSWorkerQuery {
 
     @Override
     public final void close() {
-        // intentionally left blank as connection management is left to CTSWorkerConnection (decorator)
+        IOUtils.closeIfNotNull(connection);
+        connection = null;
+        results = null;
     }
 
     /**

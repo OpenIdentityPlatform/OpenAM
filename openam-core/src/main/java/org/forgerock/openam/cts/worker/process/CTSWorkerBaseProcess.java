@@ -32,18 +32,17 @@ import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 public abstract class CTSWorkerBaseProcess implements CTSWorkerProcess {
 
     @Override
-    public final void handle(CTSWorkerQuery query, CTSWorkerFilter filter) {
+    public final void handle(CTSWorkerQuery workerQuery, CTSWorkerFilter filter) {
         // Timers for debugging
         StopWatch queryStopWatch = new StopWatch();
         StopWatch waitingStopWatch = new StopWatch();
 
-        try {
+        long total = 0;
+        waitingStopWatch.start();
+        waitingStopWatch.suspend();
+        queryStopWatch.start();
 
-            long total = 0;
-            waitingStopWatch.start();
-            waitingStopWatch.suspend();
-            queryStopWatch.start();
-
+        try (CTSWorkerQuery query = workerQuery) {
             for (Collection<PartialToken> tokens = query.nextPage(); tokens != null; tokens = query.nextPage()) {
 
                 // If the thread has been interrupted, exit all processing
@@ -70,10 +69,8 @@ public abstract class CTSWorkerBaseProcess implements CTSWorkerProcess {
 
             handleSucceeded(queryStopWatch, waitingStopWatch, total);
         } catch (CoreTokenException e) {
-            query.close();
             handleFailed(e);
         } catch (InterruptedException e) {
-            query.close();
             handleFailed(e);
             Thread.currentThread().interrupt();
         }
