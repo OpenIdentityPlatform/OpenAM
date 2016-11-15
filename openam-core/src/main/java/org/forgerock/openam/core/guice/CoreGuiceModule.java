@@ -225,17 +225,17 @@ public class CoreGuiceModule extends AbstractModule {
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getPolicyMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5);
+        return esf.createFixedThreadPool(5, "policy-monitoring-thread");
     }
 
     @Provides @Inject @Named(SessionMonitoringStore.EXECUTOR_BINDING_NAME)
     ExecutorService getSessionMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5);
+        return esf.createFixedThreadPool(5, "session-monitoring-thread");
     }
 
     @Provides @Inject @Named(SessionTimeoutHandlerExecutor.EXECUTOR_BINDING_NAME)
     ExecutorService getSessionTimeoutHandlerExecutorService(ExecutorServiceFactory esf) {
-        return esf.createCachedThreadPool();
+        return esf.createCachedThreadPool("session-timeout-handler-thread");
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)

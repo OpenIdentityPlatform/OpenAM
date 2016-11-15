@@ -278,7 +278,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5);
+        return esf.createFixedThreadPool(5, "cts-monitoring-thread");
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE)
