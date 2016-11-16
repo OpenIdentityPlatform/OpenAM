@@ -93,7 +93,9 @@ public interface TokenStorageAdapter {
      * Performs a continuous query using the provided filter.
      *
      * @param filter The non null filter specification.
+     * @throws DataLayerException If the operation failed, this exception will capture the reason.
      */
-    ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener);
+    ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener)
+            throws DataLayerException;
 
 }

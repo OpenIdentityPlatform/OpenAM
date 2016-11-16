@@ -15,6 +15,8 @@
 */
 package org.forgerock.openam.cts.continuous;
 
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+
 /**
  * Interface for ensuring that continuous queries can be controlled once configured.
  *
@@ -29,8 +31,10 @@ public interface ContinuousQuery {
 
     /**
      * Begins the continuous query on the datastore.
+     *
+     * @throws DataLayerException if there were issues creating the connection and starting the query.
      */
-    void startQuery();
+    void startQuery() throws DataLayerException;
 
     /**
      * Ends the continuous query on the datastore, removing any outstanding listeners.

@@ -65,8 +65,8 @@ public interface ContinuousQueryListener<T> {
     void connectionLost();
 
     /**
-     * If an error occurred initiating the task from the DataLayer, this method should be called with the
-     * error passed in.
+     * If an error occurred initiating the task from the DataLayer (e.g. failing to achieve a connection to the
+     * underlying data store), this method should be called with the error passed in.
      *
      * @param error Details of the issue.
      */

@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,18 +24,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.iplanet.services.ldap.event.EventService;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
@@ -52,6 +51,9 @@ import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
+
+import com.iplanet.services.ldap.event.EventService;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Constructs LDAP queries for execution of a specific {@link Filter} over a specific {@link Connection}.
@@ -93,7 +95,6 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
      *
      * @param connection The connection used to perform the request.
      * @return A non null but possibly empty collection.
-     * @throws QueryFailedException If there was an error during the query.
      */
     public <T> Iterator<Collection<T>> executeRawResults(Connection connection, Class<T> returnType) {
         if (String.class.equals(returnType) && requestedAttributes.length != 1) {
@@ -107,11 +108,11 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     @Override
-    public ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) {
+    public ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) throws DataLayerException {
 
         CTSDJLDAPv3PersistentSearchBuilder builder = new CTSDJLDAPv3PersistentSearchBuilder(connectionFactory);
 
-        CTSDJLDAPv3PersistentSearch pSearch = builder
+        ContinuousQuery pSearch = builder
                 .withSearchFilter(getLDAPFilter())
                 .returnAttributes(requestedAttributes)
                 .withRetry(EventService.RETRY_INTERVAL)

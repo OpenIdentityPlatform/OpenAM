@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.api.query;
 
-import static org.forgerock.util.time.Duration.duration;
+import static org.forgerock.util.time.Duration.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +27,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
 import org.forgerock.util.time.Duration;
@@ -210,7 +211,8 @@ public abstract class QueryBuilder<C, F> {
      * appropriate actions in response to the data returned from the connection.
      *
      * @param listener The listening class used to process the returned data.
+     * @throws DataLayerException An error forming the continuous query connection.
      */
-    public abstract ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener);
+    public abstract ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) throws DataLayerException;
 
 }

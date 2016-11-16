@@ -2099,7 +2099,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     pSearch.addMovedOrRenamedListener(this);
                 }
                 pSearch.addListener(idRepoListener, getSupportedTypes());
-                pSearch.startQuery();
+                try {
+                    pSearch.startQuery();
+                } catch (DataLayerException e) {
+                    DEBUG.warning("Persistent search failure to attach connection.", e);
+                }
                 pSearchMap.put(pSearchId, pSearch);
             } else {
                 pSearch.addListener(idRepoListener, getSupportedTypes());

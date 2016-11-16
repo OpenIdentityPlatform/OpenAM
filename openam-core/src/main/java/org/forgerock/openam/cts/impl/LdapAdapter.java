@@ -16,15 +16,15 @@
 
 package org.forgerock.openam.cts.impl;
 
-import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
-import static org.forgerock.openam.tokens.CoreTokenField.ETAG;
+import static org.forgerock.openam.cts.api.CTSOptions.*;
+import static org.forgerock.openam.tokens.CoreTokenField.*;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import com.forgerock.opendj.ldap.controls.TransactionIdControl;
+import javax.inject.Inject;
+
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -65,6 +65,8 @@ import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.util.Option;
 import org.forgerock.util.Options;
+
+import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
@@ -275,7 +277,8 @@ public class LdapAdapter implements TokenStorageAdapter {
     }
 
     @Override
-    public ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener) {
+    public ContinuousQuery startContinuousQuery(TokenFilter filter, ContinuousQueryListener listener)
+            throws DataLayerException {
         return queryFactory.createInstance()
             .returnTheseAttributes(filter.getReturnFields())
             .withFilter(filter.getQuery().accept(queryConverter, null))

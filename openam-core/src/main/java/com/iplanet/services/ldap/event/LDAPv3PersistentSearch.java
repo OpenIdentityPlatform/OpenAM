@@ -163,16 +163,25 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     /**
      * Starts the persistent search connection against the directory. The caller must ensure that calls made to
      * startPSearch and stopPsearch are properly synchronized.
+     *
+     * @throws DataLayerException if the initial connection could not be created.
      */
-    public void startQuery() {
+    public void startQuery() throws DataLayerException {
         try {
             conn = factory.create();
             startSearch(conn);
-        } catch (LdapException | DataLayerException ere) {
-            DEBUG.error("An error occurred while trying to initiate persistent search connection", ere);
+        } catch (LdapException e) { //if we cannot start the search
+            logError(e);
             DEBUG.message("Restarting persistent search");
             restartSearch();
+        } catch (DataLayerException e) { //if we cannot get a connection
+            logError(e);
+            throw e;
         }
+    }
+
+    private void logError(Throwable t) {
+        DEBUG.error("An error occurred while trying to initiate persistent search connection", t);
     }
 
     private void startSearch(Connection conn) throws LdapException {
@@ -383,7 +392,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 //everything seems to work, let's disable retryTask and reset the debug limit
                 runPeriod = -1;
                 lastLogged = 0;
-            } catch (Exception ex) {
+            } catch (DataLayerException | LdapException ex) {
                 long now = currentTimeMillis();
                 if (now - lastLogged > 60000) {
                     DEBUG.error("Unable to start persistent search: " + ex.getMessage());
