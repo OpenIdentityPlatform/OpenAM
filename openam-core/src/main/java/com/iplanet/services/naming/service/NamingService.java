@@ -57,6 +57,7 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +67,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -221,16 +223,17 @@ public class NamingService implements RequestHandler {
             ServiceSchema sc = ssmNaming.getGlobalSchema();
             Map namingAttrs = sc.getAttributeDefaults();
             sc = ssmPlatform.getGlobalSchema();
-            Map platformAttrs = sc.getAttributeDefaults();
-            Set sites = getSites(platformAttrs);
+            Map<String, Set<String>> platformAttrs = sc.getAttributeDefaults();
+            Set<String> sites = getSites(platformAttrs);
             Set servers = getServers(platformAttrs, sites);
             Set siteNamesAndIDs = getSiteNamesAndIDs();
             storeSiteNames(siteNamesAndIDs, namingAttrs);
-            
-            if ((sites != null) && !sites.isEmpty()) {
-                if (!forClient) {
-                    registFQDNMapping(sites);
-                }
+
+            if (!forClient) {
+                updateFqdnMappings(sites);
+            }
+
+            if (CollectionUtils.isNotEmpty(sites)) {
                 sites.addAll(servers);
             } else {
                 sites = servers;
@@ -552,42 +555,46 @@ public class NamingService implements RequestHandler {
         return newTab;
     }
 
-    private static void registFQDNMapping(Set sites) {
-        if ((sites == null) || sites.isEmpty()) {
-            return;
+    /**
+     * Updates the FQDN mappings in the configuration with the provided site values. This will ensure that all
+     * configured sites in the deployment are automatically considered as valid FQDNs and can be accessed by external
+     * clients. In case there is no site configured in this deployment, we still reinitialize {@link FqdnValidator} to
+     * ensure it picks up the current set of FQDN mappings that were set as advanced server properties.
+     *
+     * @param sites The primary site URLs configured in the current OpenAM deployment. May be null.
+     */
+    private static void updateFqdnMappings(Set<String> sites) {
+        if (sites == null) {
+            sites = Collections.emptySet();
         }
 
-        MessageFormat form = new MessageFormat(
-            "com.sun.identity.server.fqdnMap[{0}]");
+        MessageFormat form = new MessageFormat("com.sun.identity.server.fqdnMap[{0}]");
 
-        for (Iterator iter = sites.iterator(); iter.hasNext(); ) {
-            String entry = (String) iter.next();
-            StringTokenizer tok = new StringTokenizer(entry, "|");
-            String strUrl = tok.nextToken();
-            String strId = tok.nextToken();
-            
+        for (String site : sites) {
+            StringTokenizer tok = new StringTokenizer(site, "|");
+            String siteUrl = tok.nextToken();
+
             try {
-                URL url = new URL(strUrl);
+                URL url = new URL(siteUrl);
                 String host = url.getHost();
                 if (host != null) {
                     Object[] args = { host };
                     form.format(args);
-                    SystemProperties.initializeProperties(
-                        form.format(args), host);
+                    SystemProperties.initializeProperties(form.format(args), host);
                 }
             } catch (MalformedURLException ex) {
-                namingDebug.error("NamingService.registFQDNMapping", ex);
+                namingDebug.error("NamingService.updateFqdnMappings", ex);
             }
         }
-        
+
         FqdnValidator.getInstance().initialize();
     }
 
-    private static Set getSites(Map platformAttrs) throws Exception {
-        Set sites = null;
+    private static Set<String> getSites(Map<String, Set<String>> platformAttrs) throws Exception {
+        Set<String> sites = null;
 
         if (serviceRevNumber < SERVICE_REV_NUMBER_70) {
-            Set servers = (Set) platformAttrs.get(Constants.PLATFORM_LIST);
+            Set<String> servers = platformAttrs.get(Constants.PLATFORM_LIST);
             sites = getSitesFromSessionConfig(servers);
         } else {
             sites = SiteConfiguration.getSiteInfo(sso);
