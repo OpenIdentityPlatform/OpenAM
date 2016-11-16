@@ -34,6 +34,7 @@
       "title": "amconfig.serverconfig.xml.server.table.header",
       "propertyOrder": 1,
       "items": {
+        "type": "object",
         "required" : [
           "serverName", "hostName", "portNumber", "connectionType"
         ],
@@ -54,6 +55,7 @@
             "propertyOrder": 2
           },
           "connectionType": {
+            "type": "string",
             "enum": [
               "SIMPLE",
               "SSL"
