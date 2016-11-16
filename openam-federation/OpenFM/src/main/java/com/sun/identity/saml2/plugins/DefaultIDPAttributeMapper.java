@@ -49,10 +49,11 @@ public class DefaultIDPAttributeMapper extends DefaultLibraryIDPAttributeMapper
     /**
      * Return true if ignore profile is enabled for this realm.
      *
+     * @param session SSOToken to check the profile creation attributes.
      * @param realm realm to check the profile creation attributes.
      * @return true if ignore profile is enabled, false otherwise.
      */
-    protected boolean isIgnoredProfile(String realm) {
-        return SAML2PluginsUtils.isIgnoredProfile(realm);
+    protected boolean isIgnoredProfile(Object session, String realm) {
+        return SAML2PluginsUtils.isIgnoredProfile(session, realm);
     }
 }

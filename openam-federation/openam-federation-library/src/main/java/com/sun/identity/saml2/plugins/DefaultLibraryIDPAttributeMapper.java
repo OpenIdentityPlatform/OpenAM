@@ -162,7 +162,7 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper imp
             Map<String, byte[][]> binaryValueMap = null;
 
             // Don't try to read the attributes from the datastore if the ignored profile is enabled in this realm.
-            if (!isIgnoredProfile(realm)) {
+            if (!isIgnoredProfile(session, realm)) {
                 try {
                     // Resolve attributes to be read from the datastore.
                     Set<String> stringAttributes = new HashSet<>(configMap.size());
@@ -304,10 +304,11 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper imp
     /**
      * Return true if ignore profile is enabled for this realm.
      *
+     * @param session SSOToken to check the profile creation attributes.
      * @param realm realm to check the profile creation attributes.
      * @return true in all cases in this implementation.
      */
-    protected boolean isIgnoredProfile(String realm) {
+    protected boolean isIgnoredProfile(Object session, String realm) {
         return true;
     }
 

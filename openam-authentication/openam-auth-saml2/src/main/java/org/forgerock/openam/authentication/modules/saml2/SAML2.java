@@ -19,6 +19,7 @@ import static com.sun.identity.shared.Constants.*;
 import static org.forgerock.openam.authentication.modules.saml2.Constants.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -62,6 +63,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.sm.DNMapper;
+
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.util.Collection;
@@ -73,10 +75,12 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
@@ -725,7 +729,16 @@ public class SAML2 extends AMLoginModule {
 
         nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
         isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+
+        Object session = null;
+        try {
+            session = getLoginState("shouldPersistNameID").getSSOToken();
+        } catch (SSOException | AuthLoginException ssoe) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("SAML2 :: failed to get user's SSOToken.");
+            }
+        }
+        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(session, realm);
 
         return !isTransient && !ignoreProfile
                 && spAccountMapper.shouldPersistNameIDFormat(realm, spEntityId, entityName, nameIDFormat);

@@ -1112,7 +1112,7 @@ public class SPACSUtils {
         }
 
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(session, realm);
         String existUserName = null;
         SessionProvider sessionProvider = null;
         try {
@@ -2119,7 +2119,7 @@ public class SPACSUtils {
         }
 
         final boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(null, realm);
 
         final boolean shouldPersistNameID = !isTransient && !ignoreProfile
                 && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat);
