@@ -55,7 +55,9 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.GeneralTaskRunnable;
@@ -360,17 +362,18 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     boolean checkServerUp(String serverId) {
-        if ( (serverId == null) || (serverId.isEmpty()) ) {
-            return false;
+        if (StringUtils.isNotEmpty(serverId) && CollectionUtils.isNotEmpty(servers)) {
+            if (serverId.equalsIgnoreCase(localServerId)) {
+                return true;
+            }
+            StateInfo info = servers.get(serverId);
+            if (info != null) {
+                info.isUp = checkServerUp(info);
+                return info.isUp;
+            }
+            sessionDebug.error("Failed to check server status for non-existent server: " + serverId);
         }
-        if (serverId.equalsIgnoreCase(localServerId)) {
-            return true;
-        }
-        if ( (servers == null) || servers.isEmpty() )
-            { return false; }
-        StateInfo info = servers.get(serverId);
-        info.isUp = checkServerUp(info);
-        return info.isUp;
+        return false;
     }
 
     /**
