@@ -555,6 +555,83 @@
                     </AttributeSchema>
                 </SubSchema>
 
+                <SubSchema name="Splunk" inheritance="multiple" i18nKey="handler.name.splunk"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="authzToken" type="single"
+                                     i18nKey="audit.handlers.splunk.authzToken"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.splunk.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.splunk.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SplunkAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
                 <SubSchema name="JMS" inheritance="multiple" i18nKey="handler.name.jms" i18nFileName="audit">
                     <AttributeSchema name="RequiredValueValidator"
                                      type="validator"
@@ -1214,6 +1291,83 @@
                     <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="6100">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.ElasticsearchAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Splunk" inheritance="multiple" i18nKey="handler.name.splunk"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="authzToken" type="single"
+                                     i18nKey="audit.handlers.splunk.authzToken"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.splunk.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.splunk.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SplunkAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
