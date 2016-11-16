@@ -633,6 +633,7 @@ public class LDAP extends AMLoginModule {
                 }
                     currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                 case USER_NOT_FOUND:
+                    setFailureID(userName);
                     throw new LDAPUtilException("noUserMatchFound", (Object[])null);
                 case SERVER_DOWN:
                     throw new AuthLoginException(AM_AUTH, "LDAPex", null);
