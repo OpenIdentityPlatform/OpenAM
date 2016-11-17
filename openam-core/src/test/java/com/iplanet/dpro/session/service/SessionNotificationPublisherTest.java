@@ -19,9 +19,7 @@ package com.iplanet.dpro.session.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -125,11 +123,6 @@ public class SessionNotificationPublisherTest {
     @Test
     public void shouldIgnoreProtectedPropertyEvent() {
         assertIgnoresSessionEvent(SessionEventType.PROTECTED_PROPERTY);
-    }
-
-    @Test
-    public void shouldIgnoreMaxSessionLimitReachedEvent() {
-        assertIgnoresSessionEvent(SessionEventType.SESSION_MAX_LIMIT_REACHED);
     }
 
     private void assertSendsNotificationForSessionEvent(SessionEventType sessionEventType) {

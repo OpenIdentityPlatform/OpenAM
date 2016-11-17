@@ -16,16 +16,11 @@
 
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
-import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.CREATE;
-import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.DELETE;
-import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.UPDATE;
 import static org.forgerock.openam.audit.AuditConstants.EventName.*;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_PROPERTY_CHANGED;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 
 import java.security.PrivilegedAction;
 
@@ -262,18 +257,6 @@ public class SessionAuditorTest {
 
         // When
         sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.PROTECTED_PROPERTY,
-                System.currentTimeMillis()));
-
-        // Then
-        verifyZeroInteractions(auditEventPublisher);
-    }
-
-    @Test
-    public void shouldIgnoreMaxSessionLimitReachedEvent() {
-        // Given
-
-        // When
-        sessionAuditor.onEvent(new InternalSessionEvent(session, SessionEventType.SESSION_MAX_LIMIT_REACHED,
                 System.currentTimeMillis()));
 
         // Then

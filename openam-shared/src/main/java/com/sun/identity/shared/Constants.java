@@ -344,11 +344,6 @@ public interface Constants {
             "iplanet-am-session-constraint-max-wait-time";
 
     /**
-     * Property string for max number of sessions
-     */
-    static final String AM_SESSION_MAX_SESSIONS = "com.iplanet.am.session.maxSessions";
-
-    /**
      * Property name for maximum size of the internal session cache.
      */
     String AM_SESSION_MAX_CACHE_SIZE = "org.forgerock.openam.session.service.access.persistence.caching.maxsize";

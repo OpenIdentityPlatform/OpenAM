@@ -29,8 +29,6 @@ import org.forgerock.openam.session.service.access.persistence.InternalSessionSt
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceManagerStep;
 import org.forgerock.openam.session.service.access.persistence.TimeOutSessionFilterStep;
 import org.forgerock.openam.session.service.access.persistence.caching.InMemoryInternalSessionCacheStep;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionCache;
-import org.forgerock.openam.session.service.access.persistence.caching.InternalSessionStorage;
 import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
 import org.forgerock.openam.utils.Config;
 
@@ -68,7 +66,6 @@ public class SessionGuiceModule extends PrivateModule {
 
         bind(SessionPollerPool.class).toInstance(SessionPollerPool.getInstance());
 
-        bind(InternalSessionCache.class).to(InternalSessionStorage.class);
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
 
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
@@ -122,7 +119,6 @@ public class SessionGuiceModule extends PrivateModule {
         bind(SessionServerConfig.class);
 
         expose(Debug.class).annotatedWith(Names.named(SessionConstants.SESSION_DEBUG));
-        expose(InternalSessionCache.class);
         expose(InternalSessionStore.class);
         expose(InternalSessionEventBroker.class);
         expose(new TypeLiteral<Config<SessionService>>() {});

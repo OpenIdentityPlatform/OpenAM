@@ -335,14 +335,6 @@ public class SessionService {
     }
 
     /**
-     * Determines if the Maximum  umber of active sessions has been reached.
-     * @return true if the maximum number of sessions has ben reached.
-     */
-    public boolean hasExceededMaxSessions() {
-        return monitoringOperations.getActiveSessions() >= serviceConfig.getMaxSessions();
-    }
-
-    /**
      * Gets the AM Server ID.
      * @return the AM Server Id or null if WebtopNaming was unable to detmin the ID of this server.
      */

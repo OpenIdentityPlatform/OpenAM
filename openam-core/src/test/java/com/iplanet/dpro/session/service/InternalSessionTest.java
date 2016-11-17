@@ -101,25 +101,9 @@ public class InternalSessionTest {
     }
 
     @Test
-    public void firesInternalSessionEventWhenActivatingNonAdminUserSessionAndMaxSessionLimitReached() throws Exception {
-        // Given
-        final InternalSession session = createSession();
-        given(mockSessionService.hasExceededMaxSessions()).willReturn(true);
-        given(mockSessionService.isSuperUser(eq("userDN"))).willReturn(false);
-
-        // When
-        boolean activated = session.activate("userDN");
-
-        // Then
-        assertThat(activated).as("session should not be activated").isEqualTo(false);
-        verifyEvent(session, SessionEventType.SESSION_MAX_LIMIT_REACHED);
-    }
-
-    @Test
     public void firesInternalSessionEventWhenActivatingSessionAndUserSessionQuotaExhausted() throws Exception {
         // Given
         final InternalSession session = createSession();
-        given(mockSessionService.hasExceededMaxSessions()).willReturn(false);
         given(mockSessionServiceConfig.isSessionConstraintEnabled()).willReturn(true);
         given(mockSessionService.isSuperUser(anyString())).willReturn(false);
         given(sessionConstraint.checkQuotaAndPerformAction(eq(session))).willReturn(true);
@@ -136,7 +120,6 @@ public class InternalSessionTest {
     public void firesInternalSessionEventWhenActivatingSession() throws Exception {
         // Given
         final InternalSession session = createSession();
-        given(mockSessionService.hasExceededMaxSessions()).willReturn(false);
         given(mockSessionServiceConfig.isSessionConstraintEnabled()).willReturn(false);
 
         // When

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 /**
  *
@@ -33,8 +33,7 @@ public class ContextCacheSize {
     /**
      * Key used to obtain the maximum number of allowable concurrent sessions.
      */
-    private static final String SYSTEM_MAX_PROPS_KEY = "com.iplanet.am.session.maxSessions";
-
+    private static final String SYSTEM_MAX_PROPS_KEY = "org.forgerock.openam.radius.server.context.cache.size";
 
     /**
      * Returns the desired CONTEXT_CACHE size for the OpenAMAuthHandler.

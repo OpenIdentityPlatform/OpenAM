@@ -86,12 +86,6 @@ public class SessionServiceConfig {
      * System Properties
      */
 
-    /**
-     * Property string for max number of sessions
-     */
-    static final int DEFAULT_MAX_SESSIONS = 10000;
-    private final int maxSessions;
-
     private static final int DEFAULT_MAX_SESSION_CACHE_SIZE = 5000;
 
     private static final String LOGSTATUS_ACTIVE = "ACTIVE";
@@ -289,8 +283,6 @@ public class SessionServiceConfig {
         this.dsameAdminTokenProvider = adminTokenProvider;
 
         // Initialize values set from System properties
-        maxSessions =
-                SystemProperties.getAsInt(AM_SESSION_MAX_SESSIONS, DEFAULT_MAX_SESSIONS);
         logStatus =
                 LOGSTATUS_ACTIVE.equalsIgnoreCase(SystemProperties.get(AM_LOGSTATUS));
         httpSessionTrackingCookieName =
@@ -428,15 +420,6 @@ public class SessionServiceConfig {
 
     public String getSecurityCookieName() {
         return SECURITY_COOKIE_NAME;
-    }
-
-    /**
-     * Returns SystemProperty "com.iplanet.am.session.maxSessions".
-     *
-     * Defaults to 10,000 if not specified.
-     */
-    public int getMaxSessions() {
-        return maxSessions;
     }
 
     /**

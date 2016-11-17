@@ -724,12 +724,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
             return false;
         }
 
-        // check max session limit for this server has not been reached
-        if ((sessionService.hasExceededMaxSessions()) && !sessionService.isSuperUser(userDN)) {
-            fireSessionEvent(SessionEventType.SESSION_MAX_LIMIT_REACHED);
-            return false;
-        }
-
         // check session quota constraints
         if ((serviceConfig.isSessionConstraintEnabled()) && !shouldIgnoreSessionQuotaChecking()) {
             if (sessionConstraint.checkQuotaAndPerformAction(this)) {
