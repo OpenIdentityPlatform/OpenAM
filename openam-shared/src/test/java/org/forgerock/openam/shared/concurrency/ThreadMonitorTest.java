@@ -17,8 +17,17 @@
 package org.forgerock.openam.shared.concurrency;
 
 import static org.assertj.core.api.Fail.fail;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertEquals;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyLong;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.doAnswer;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
+import static org.testng.Assert.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -175,7 +184,7 @@ public class ThreadMonitorTest {
             executorService = Executors.newCachedThreadPool();
             final ThreadMonitor monitor = new ThreadMonitor(
                     executorService,
-                    mockShutdownWrapper,
+                    mock(ShutdownManager.class),
                     mockDebug, 0, 0);
 
             // Given
@@ -186,7 +195,6 @@ public class ThreadMonitorTest {
                 public void run() {
                     errorsCount[0]++;
                     if (errorsCount[0] >= 4) {
-                        mockShutdownWrapper.shutdown();
                         semaphore.release();
                     }
                     throw new IllegalStateException();
@@ -201,8 +209,8 @@ public class ThreadMonitorTest {
             if (!semaphore.tryAcquire(1, TimeUnit.SECONDS)) {
                 fail("ThreadMonitor did not reschedule the Runnable successfully.");
             }
-            assertEquals(monitor.getSuccessiveFailingCounter(), 3,
-                    "Expected an increase to 3 of successiveFailingCounter.");
+            assertTrue(monitor.getSuccessiveFailingCounter() >= 3,
+                    "Expected successiveFailingCounter to be at least 3.");
         } finally {
             if (executorService != null) {
                 executorService.shutdown();
