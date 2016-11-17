@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.service.access.SessionPersistenceManager;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -34,10 +35,6 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.MonitoringOperations;
-import com.iplanet.dpro.session.service.SessionState;
-import com.sun.identity.shared.debug.Debug;
-
 
 /**
  * Class for managing access to Sessions. This class handles concepts such as persisting a session for the first time,
@@ -46,26 +43,17 @@ import com.sun.identity.shared.debug.Debug;
 @Singleton
 public class SessionAccessManager {
 
-    private final Debug debug;
-
     private final SessionCache sessionCache;
-
-    private InternalSessionStore internalSessionStore;
-
-    private final MonitoringOperations monitoringOperations; // Note: there should be an increment and a decrement in this class for this to make sense
+    private final InternalSessionStore internalSessionStore;
     private final NonExpiringSessionManager nonExpiringSessionManager;
 
     @VisibleForTesting
     @Inject
-    SessionAccessManager(@Named(SessionConstants.SESSION_DEBUG) final Debug debug,
-                         final SessionCache sessionCache,
-                         final MonitoringOperations monitoringOperations,
+    SessionAccessManager(final SessionCache sessionCache,
                          @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) final ScheduledExecutorService scheduler,
                          final ThreadMonitor threadMonitor,
                          final InternalSessionStore internalSessionStore) {
-        this.debug = debug;
         this.sessionCache = sessionCache;
-        this.monitoringOperations = monitoringOperations;
         this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduler, threadMonitor);
         this.internalSessionStore = internalSessionStore;
     }
@@ -186,11 +174,6 @@ public class SessionAccessManager {
             internalSessionStore.remove(internalSession);
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
-        }
-
-        // Session Constraint
-        if (internalSession.getState() == SessionState.VALID) {
-            monitoringOperations.decrementActiveSessions();
         }
     }
 }

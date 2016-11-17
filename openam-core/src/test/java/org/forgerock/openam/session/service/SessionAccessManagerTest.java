@@ -34,7 +34,6 @@ import org.testng.annotations.Test;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionState;
 import com.sun.identity.shared.debug.Debug;
 
@@ -50,11 +49,8 @@ public class SessionAccessManagerTest {
     @BeforeMethod
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        sessionAccessManager = new SessionAccessManager(mockDebug,
-                mock(SessionCache.class), mock(MonitoringOperations.class),
-                mock(ScheduledExecutorService.class), mock(ThreadMonitor.class),
-                sessionStore);
-
+        sessionAccessManager = new SessionAccessManager(
+                mock(SessionCache.class), mock(ScheduledExecutorService.class), mock(ThreadMonitor.class), sessionStore);
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockInternalSession.getSessionID()).willReturn(mockSessionID);
 

@@ -84,7 +84,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
 
     @Override
     protected boolean activateSession(InternalSession session, LoginState loginState) throws SessionException {
-        boolean activated = session.activate(loginState.getUserDN(), true);
+        boolean activated = session.activate(loginState.getUserDN());
         if (activated) {
             // Update the session id in the login state to reflect the activated session
             loginState.setSessionID(getStatelessSessionManager().generate(session).getID());

@@ -73,9 +73,7 @@ public class SessionService {
     public static final String SESSION_SERVICE = "session";
 
     private final Debug sessionDebug;
-    private final SessionServiceConfig serviceConfig;
     private final DsameAdminTokenProvider dsameAdminTokenProvider;
-    private final MonitoringOperations monitoringOperations;
     private final InternalSessionListener sessionEventBroker;
     private final InternalSessionFactory internalSessionFactory;
     private final SessionOperationStrategy sessionOperationStrategy;
@@ -88,8 +86,6 @@ public class SessionService {
     private SessionService(
             final @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
             final DsameAdminTokenProvider dsameAdminTokenProvider,
-            final SessionServiceConfig serviceConfig,
-            final MonitoringOperations monitoringOperations,
             final InternalSessionEventBroker internalSessionEventBroker,
             final InternalSessionFactory internalSessionFactory,
             final SessionAccessManager sessionAccessManager,
@@ -97,8 +93,6 @@ public class SessionService {
 
         this.sessionDebug = sessionDebug;
         this.dsameAdminTokenProvider = dsameAdminTokenProvider;
-        this.serviceConfig = serviceConfig;
-        this.monitoringOperations = monitoringOperations;
         this.sessionEventBroker = internalSessionEventBroker;
         this.internalSessionFactory = internalSessionFactory;
         this.sessionOperationStrategy = sessionOperationStrategy;
@@ -187,39 +181,6 @@ public class SessionService {
         return sessionOperationStrategy.getOperation(sessionId).checkSessionExists(sessionId);
     }
 
-    /**
-     * Returns the Internal Session corresponding to a Session ID.
-     *
-     * @param sessionId Session Id
-     */
-    public InternalSession getInternalSession(SessionID sessionId) { // TODO Used to recover authentication session by AuthD
-
-        if (sessionId == null) {
-            return null;
-        }
-        // check if sid is actually a handle return null (in order to prevent from assuming recovery case)
-        if (sessionId.isSessionHandle()) {
-            return null;
-        }
-        return sessionAccessManager.getInternalSession(sessionId);
-    }
-
-    /**
-     * Decrements number of active sessions
-     */
-    // TODO: Remove monitoringOperations counting code in 14.0.0, replace with numSubOrdinates in 14.5.0
-    public void decrementActiveSessions() {
-        monitoringOperations.decrementActiveSessions();
-    }
-
-    /**
-     * Increments number of active sessions
-     */
-    // TODO: Remove monitoringOperations counting code in 14.0.0, replace with numSubOrdinates in 14.5.0
-    public void incrementActiveSessions() {
-        monitoringOperations.incrementActiveSessions();
-    }
-
     // The following methods are corresponding to the session requests
     // defined in the Session DTD. Those methods are being called
     // in SessionRequestHandler class
@@ -295,8 +256,7 @@ public class SessionService {
      * @param value
      * @throws SessionException
      */
-    public void setExternalProperty(SSOToken clientToken, SessionID sessionId,
-                                    String name, String value)
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value)
             throws SessionException {
         sessionOperationStrategy.getOperation(sessionId).setExternalProperty(clientToken, sessionId, name, value);
     }

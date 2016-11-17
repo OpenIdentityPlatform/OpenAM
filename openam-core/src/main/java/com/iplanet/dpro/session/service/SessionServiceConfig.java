@@ -45,7 +45,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
@@ -71,8 +70,6 @@ public class SessionServiceConfig {
     public static final String AM_SESSION_SERVICE_NAME = "iPlanetAMSessionService";
 
     private final Debug sessionDebug;
-    private final SessionServerConfig sessionServerConfig;
-    private final PrivilegedAction<SSOToken> dsameAdminTokenProvider;
 
     /*
      * Constant Properties
@@ -273,14 +270,10 @@ public class SessionServiceConfig {
     @Inject
     SessionServiceConfig(
             @Named(SessionConstants.SESSION_DEBUG) final Debug sessionDebug,
-            SessionServerConfig sessionServerConfig,
             PrivilegedAction<SSOToken> adminTokenProvider,
-            final StatelessJWTCache jwtCache,
             final ServiceListeners serviceListeners) {
 
         this.sessionDebug = sessionDebug;
-        this.sessionServerConfig = sessionServerConfig;
-        this.dsameAdminTokenProvider = adminTokenProvider;
 
         // Initialize values set from System properties
         logStatus =

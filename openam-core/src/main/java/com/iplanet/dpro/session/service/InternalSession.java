@@ -707,18 +707,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      *         after creation , <code>false</code> otherwise
      */
     public boolean activate(String userDN) {
-        return activate(userDN, false);
-    }
-
-    /**
-     * Changes the state of the session to ACTIVE after creation.
-     * @param userDN
-     * @param stateless Indicates that the log in session is a stateless session.
-     * @return <code> true </code> if the session is successfully activated
-     *         after creation , <code>false</code> otherwise
-     */
-    public boolean activate(String userDN, boolean stateless) {
-
         // check userDN was provided
         if (userDN == null) {
             return false;
@@ -738,9 +726,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         setState(SessionState.VALID);
         fireSessionEvent(SessionEventType.SESSION_CREATION);
 
-        if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
-            sessionService.incrementActiveSessions(); // TODO: Convert to InternalSessionListener (AME-12528) ?
-        }
         return true;
     }
 

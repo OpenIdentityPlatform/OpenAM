@@ -64,7 +64,6 @@ public class SessionMaxStatsSetupListener implements SetupListener {
         private final Debug debug;
         private final Stats stats;
         private final SessionAccessManager accessManager;
-        private final MonitoringOperations monitoringOperations;
         private final SessionNotificationSender notificationSender;
 
         @Inject
@@ -72,12 +71,10 @@ public class SessionMaxStatsSetupListener implements SetupListener {
                 @Named(SESSION_DEBUG) final Debug debug,
                 @Named(STATS_MASTER_TABLE) final Stats stats,
                 final SessionAccessManager sessionAccessManager,
-                final MonitoringOperations monitoringOperations,
                 final SessionNotificationSender sessionNotificationSender) {
             this.debug = debug;
             this.stats = stats;
             this.accessManager = sessionAccessManager;
-            this.monitoringOperations = monitoringOperations;
             this.notificationSender = sessionNotificationSender;
         }
 
@@ -86,7 +83,7 @@ public class SessionMaxStatsSetupListener implements SetupListener {
             try {
                 if (stats.isEnabled()) {
                     stats.addStatsListener(
-                            new SessionMaxStats(accessManager, monitoringOperations, notificationSender, stats)
+                            new SessionMaxStats(accessManager, notificationSender, stats)
                     );
                 }
             } catch (Exception ex) {

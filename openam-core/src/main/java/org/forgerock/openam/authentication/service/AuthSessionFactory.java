@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.authentication.service;
 
-import static com.sun.identity.shared.Constants.*;
-import static org.forgerock.openam.ldap.LDAPUtils.*;
+import static com.sun.identity.shared.Constants.UNIVERSAL_IDENTIFIER;
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +31,6 @@ import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.DsameAdminTokenProvider;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionFactory;
-import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.sso.SSOException;
@@ -50,19 +49,16 @@ public class AuthSessionFactory {
     private SSOToken authSession; // cached auth session
     private final Debug sessionDebug;
     private final AuthenticationSessionStore authenticationSessionStore;
-    private final MonitoringOperations monitoringOperations;
     private final InternalSessionFactory internalSessionFactory;
     private final DsameAdminTokenProvider dsameAdminTokenProvider;
 
     @Inject
     public AuthSessionFactory(final @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
                               AuthenticationSessionStore authenticationSessionStore,
-                              final MonitoringOperations monitoringOperations,
                               final InternalSessionFactory internalSessionFactory,
                               final DsameAdminTokenProvider dsameAdminTokenProvider) {
         this.sessionDebug = sessionDebug;
         this.authenticationSessionStore = authenticationSessionStore;
-        this.monitoringOperations = monitoringOperations;
         this.internalSessionFactory = internalSessionFactory;
         this.dsameAdminTokenProvider = dsameAdminTokenProvider;
     }
@@ -106,7 +102,6 @@ public class AuthSessionFactory {
         String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
         session.putProperty(UNIVERSAL_IDENTIFIER, id);
 
-        monitoringOperations.incrementActiveSessions();
         authenticationSessionStore.promoteSession(session.getSessionID());
 
         return session;

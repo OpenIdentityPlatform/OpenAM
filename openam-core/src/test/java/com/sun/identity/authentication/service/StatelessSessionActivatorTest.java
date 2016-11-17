@@ -74,7 +74,7 @@ public class StatelessSessionActivatorTest {
         testActivator.activateSession(mockSession, mockLoginState);
 
         // Then
-        verify(mockSession).activate(userDn, true);
+        verify(mockSession).activate(userDn);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class StatelessSessionActivatorTest {
         InternalSession mockSession = mock(InternalSession.class);
         String userDn = "fred";
         given(mockLoginState.getUserDN()).willReturn(userDn);
-        given(mockSession.activate(userDn, true)).willReturn(true);
+        given(mockSession.activate(userDn)).willReturn(true);
         StatelessSession mockStatelessSession = mock(StatelessSession.class);
         given(mockSessionFactory.generate(mockSession)).willReturn(mockStatelessSession);
         SessionID statelessSessionId = new SessionID("stateless");

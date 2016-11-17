@@ -64,36 +64,6 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
     }
 
     /*
-     * increment the active session counter
-     */
-    public void incSessionActiveCount() {
-        if (debug.messageEnabled()) {
-            debug.message("SsoServerSessSvcImpl.incSessionActiveCount");
-        }
-
-        long li = SessionActiveCount.longValue();
-        li++;
-        SessionActiveCount = Long.valueOf(li);
-    }
-
-    /*
-     * decrement the active session counter
-     */
-    public void decSessionActiveCount() {
-        if (debug.messageEnabled()) {
-            debug.message("SsoServerSessSvcImpl.decSessionActiveCount");
-        }
-
-        long li = SessionActiveCount.longValue();
-        li--;
-        if (li < 0) {
-            SessionActiveCount = 0L;
-        } else {
-            SessionActiveCount = Long.valueOf(li);
-        }
-    }
-
-    /*
      *  increment the created sessions counter
      *  does there need to be a destroyed sessions counter
      *  method to decrement the created sessions count?

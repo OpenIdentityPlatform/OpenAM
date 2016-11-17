@@ -42,7 +42,6 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.InternalSessionEvent;
 import com.iplanet.dpro.session.service.InternalSessionEventBroker;
-import com.iplanet.dpro.session.service.MonitoringOperations;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
@@ -61,7 +60,6 @@ public class LocalOperationsTest {
     @Mock private SessionInfoFactory sessionInfoFactory;
     @Mock private SessionServerConfig serverConfig;
     @Mock private SessionServiceConfig serviceConfig;
-    @Mock private MonitoringOperations monitoringOperations;
     @Mock private SessionCookies sessionCookies;
     @Mock private SessionChangeAuthorizer sessionChangeAuthorizer;
     @Mock private InternalSessionEventBroker internalSessionEventBroker;

@@ -65,12 +65,9 @@ public enum SessionEventType {
     /**
      * Session property protected against change
      */
-    PROTECTED_PROPERTY(8),
+    PROTECTED_PROPERTY(8);
 
-    /**
-     * User has reached their max active sessions limit
-     */
-    SESSION_MAX_LIMIT_REACHED(9);
+    // code = 9 is skipped as it used to be mapped to SESSION_MAX_LIMIT_REACHED (an event which is no longer possible)
 
     private final int code;
 

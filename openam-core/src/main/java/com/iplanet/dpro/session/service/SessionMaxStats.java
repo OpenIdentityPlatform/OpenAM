@@ -45,7 +45,6 @@ import com.sun.identity.shared.stats.StatsListener;
 public class SessionMaxStats implements StatsListener {
 
     private final SessionAccessManager sessionAccessManager;
-    private final MonitoringOperations monitoringOperations;
     private final SessionNotificationSender sessionNotificationSender;
     private final Stats stats;
     private int peakSessions = 0;
@@ -55,19 +54,16 @@ public class SessionMaxStats implements StatsListener {
    /**
     * Creates a new SessionMaxStats
     * @param sessionAccessManager session accessManagement
-    * @param monitoringOperations
     * @param sessionNotificationSender
     * @param stats
     */
    @Inject
    public SessionMaxStats(
            SessionAccessManager sessionAccessManager,
-           MonitoringOperations monitoringOperations,
            SessionNotificationSender sessionNotificationSender,
            Stats stats) {
 
        this.sessionAccessManager = sessionAccessManager;
-       this.monitoringOperations = monitoringOperations;
        this.sessionNotificationSender = sessionNotificationSender;
        this.stats = stats;
    }
@@ -81,7 +77,7 @@ public class SessionMaxStats implements StatsListener {
        if (0 != internalSessionCount) {
            
            int maxSessions = internalSessionCount;
-           int maxActiveSessions = monitoringOperations.getActiveSessions();
+           int maxActiveSessions = 0;
            int notificationQueue = sessionNotificationSender.getNotificationQueueSize();
            
            if (maxSessions > peakSessions) {
