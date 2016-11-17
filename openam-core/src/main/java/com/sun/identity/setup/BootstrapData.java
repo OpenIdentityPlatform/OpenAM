@@ -192,11 +192,11 @@ public class BootstrapData {
             String port = "" + cfp.getLdapPort(); // convert port to string
             m.put(DS_PORT, port);
             m.put(SERVER_INSTANCE, server_instance);
-            m.put(PWD, configStorePassword);
+            m.put(PWD, dsamePassword);
             m.put(DS_BASE_DN, cfp.getBaseDN());
             m.put(USER, dsame_user);
             m.put(DS_MGR, cfp.getDirManagerDN());
-            m.put(DS_PWD, dsamePassword);
+            m.put(DS_PWD, configStorePassword);
 
             String bootstrap = createBootstrapResource(m, false);
 
