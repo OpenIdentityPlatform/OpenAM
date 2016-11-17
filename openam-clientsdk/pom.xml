@@ -125,6 +125,7 @@
                             <include>org.forgerock.openam:openam-federation-library</include>
                             <include>org.forgerock.openam:OpenFM</include>
                             <include>org.forgerock.openam:openam-client-sts</include>
+                            <include>org.forgerock.openam:openam-notifications</include>
                             <include>org.json:json</include>
                             <include>org.forgerock.opendj:opendj-core</include>
                             <include>org.forgerock.opendj:opendj-grizzly</include>
@@ -352,6 +353,7 @@
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSaveIndex*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSearchIndex*</include>
                                 <include>org/forgerock/openam/entitlement/utils/EntitlementUtils*</include>
+                                <include>org/forgerock/openam/entitlement/utils/NullNotificationBroker*</include>
                                 <include>org/forgerock/openam/entitlement/conditions/**</include>
                                 <include>org/forgerock/openam/entitlement/NameAlreadyRegisteredException*</include>
                                 <include>org/forgerock/openam/entitlement/PolicyConstants*</include>

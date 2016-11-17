@@ -31,10 +31,10 @@ package com.sun.identity.entitlement.opensso;
 
 import static com.sun.identity.entitlement.ApplicationTypeManager.getAppplicationType;
 import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.openam.entitlement.PolicyConstants.DEBUG;
-import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.entitlement.PolicyConstants.*;
+import static org.forgerock.openam.entitlement.SetupInternalNotificationSubscriptions.*;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -48,10 +48,12 @@ import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.service.ApplicationQueryFilterVisitor;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.util.query.QueryFilter;
 
 import com.google.inject.assistedinject.Assisted;
@@ -62,6 +64,7 @@ import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.PolicyEventType;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -104,17 +107,20 @@ public class EntitlementService implements EntitlementConfiguration {
 
     private final Subject subject;
     private final String realm;
+    private final NotificationBroker broker;
 
     /**
      * Construct a new instance of {@link EntitlementService}.
      *
      * @param subject the calling subject
      * @param realm the realm
+     * @param broker the notification broker for notifying the policyset changes
      */
     @Inject
-    public EntitlementService(@Assisted Subject subject, @Assisted String realm) {
+    public EntitlementService(@Assisted Subject subject, @Assisted String realm, NotificationBroker broker) {
         this.subject = subject;
         this.realm = realm;
+        this.broker = broker;
     }
 
     /**
@@ -503,10 +509,7 @@ public class EntitlementService implements EntitlementConfiguration {
                     "SUCCEEDED_REMOVE_APPLICATION", logParams,
                         subject);
 
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-                Notifier.submit(
-                        NotificationServlet.APPLICATIONS_CHANGED, params);
+                publishInternalNotifications(name, realm);
             }
         } catch (SMSException ex) {
             String[] logParams = {realm, name, ex.getMessage()};
@@ -606,10 +609,7 @@ public class EntitlementService implements EntitlementConfiguration {
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "SUCCEEDED_SAVE_APPLICATION", logParams, subject);
             
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-            Notifier.submit(NotificationServlet.APPLICATIONS_CHANGED,
-                params);
+            publishInternalNotifications(appl.getName(), realm);
         } catch (SMSException ex) {
             String[] logParams = {realm, appl.getName(), ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
@@ -1044,5 +1044,13 @@ public class EntitlementService implements EntitlementConfiguration {
     @Override
     public int getPolicyWindowSize() {
         return MonitoringUtil.getPolicyWindowSize();
+    }
+
+    private void publishInternalNotifications(String policySetName, String realm) {
+        JsonValue notification = json(object(
+                field(MESSAGE_ATTR_NAME, policySetName),
+                field(MESSAGE_ATTR_REALM, realm),
+                field(MESSAGE_ATTR_EVENT_TYPE, PolicyEventType.UPDATE)));
+        broker.publish(TOPIC_INTERNAL_POLICYSET, notification);
     }
 }

@@ -29,6 +29,22 @@
 
 package com.sun.identity.entitlement;
 
+import static org.mockito.Mockito.mock;
+
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 import com.sun.identity.entitlement.opensso.EntitlementService;
@@ -37,17 +53,6 @@ import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class SubRealmGroupTest {
     private static final String APPL_NAME = "SubRealmGroupAppl";
@@ -68,6 +73,8 @@ public class SubRealmGroupTest {
     private AMIdentity group1;
     private Subject adminSubject;
     private String origGroupMembershipSearchIndexEnabled = null;
+
+    private NotificationBroker broker;
 
     @BeforeClass
     public void setup() throws Exception {
@@ -91,7 +98,9 @@ public class SubRealmGroupTest {
         group1 = IdRepoUtils.createGroup("/", GROUP1_NAME);
         group1.addMember(user1);
 
-        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/");
+        broker = mock(NotificationBroker.class);
+
+        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/", broker);
 
         Map<String, Set<String>> saccMap =
             ec.getSubjectAttributesCollectorConfiguration("OpenSSO");
@@ -125,7 +134,7 @@ public class SubRealmGroupTest {
         orgMgr.deleteSubOrganization(SUB_REALM1, true);
         orgMgr.deleteSubOrganization(SUB_REALM2, true);
 
-        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/");
+        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/", broker);
 
         Map<String, Set<String>> saccMap =
             ec.getSubjectAttributesCollectorConfiguration("OpenSSO");
