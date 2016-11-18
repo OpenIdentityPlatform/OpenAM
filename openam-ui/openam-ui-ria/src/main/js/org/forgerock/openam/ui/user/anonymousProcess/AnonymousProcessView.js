@@ -15,67 +15,59 @@
  */
 
 define([
-    "jquery",
     "lodash",
-    "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
-    "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper, EventManager, URIUtils) => {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
+    "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "store/index"
+], (_, EventManager, Router, URIUtils, AnonymousProcessView, AnonymousProcessDelegate, fetchUrl, Constants, query,
+    store) => {
 
     function getFragmentParamString () {
         const params = URIUtils.getCurrentFragmentQueryString();
         return _.isEmpty(params) ? "" : `&${params}`;
     }
 
+    function getNextRoute (endpoint) {
+        if (endpoint === Constants.SELF_SERVICE_REGISTER) {
+            return Router.configuration.routes.continueSelfRegister;
+        } else if (endpoint === Constants.SELF_SERVICE_RESET_PASSWORD) {
+            return Router.configuration.routes.continuePasswordReset;
+        }
+        return "";
+    }
+
+    function isFromEmailLink (params) {
+        return params.token;
+    }
+
     return AnonymousProcessView.extend({
 
         render () {
-            var params = Router.convertCurrentUrlToJSON().params,
-                overrideRealm = RealmHelper.getOverrideRealm(),
-                subRealm = RealmHelper.getSubRealm(),
-                endpoint = this.endpoint,
-                realmPath = "/",
-                continueRoute;
+            const fragmentParams = query.parseParameters(URIUtils.getCurrentFragmentQueryString());
+            const nextRoute = getNextRoute(this.endpoint);
+            const endpoint = fetchUrl.default(`/${this.endpoint}`, { realm: store.default.getState().server.realm });
 
-            if (endpoint === Constants.SELF_SERVICE_REGISTER) {
-                continueRoute = Router.configuration.routes.continueSelfRegister;
-            } else if (endpoint === Constants.SELF_SERVICE_RESET_PASSWORD) {
-                continueRoute = Router.configuration.routes.continuePasswordReset;
+            if (!this.delegate || Router.currentRoute !== nextRoute) {
+                this.setDelegate(`json${endpoint}`, fragmentParams.token);
             }
 
-            if (overrideRealm && overrideRealm !== "/") {
-                const slicedOverrideRealm = overrideRealm.substring(0, 1) === "/"
-                    ? overrideRealm.slice(1)
-                    : overrideRealm;
-                endpoint = `${slicedOverrideRealm}/${endpoint}`;
-                realmPath = overrideRealm;
-            } else if (!overrideRealm && subRealm) {
-                endpoint = `${subRealm}/${endpoint}`;
-                realmPath = subRealm;
-            }
-
-            realmPath = realmPath.substring(0, 1) === "/" ? realmPath : `/${realmPath}`;
-
-            if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate(`json/${endpoint}`, params.token);
-            }
-
-            if (params.token) {
-                this.submitDelegate(params, () => {
-                    Router.routeTo(continueRoute, { args: [realmPath], trigger: true });
+            if (isFromEmailLink(fragmentParams)) {
+                this.submitDelegate(fragmentParams, () => {
+                    Router.routeTo(nextRoute, { trigger: true });
                 });
-                return;
+            } else {
+                // TODO: The first undefined argument is the deprecated realm which is defined in the
+                // CommonRoutesConfig login route. This needs to be removed as part of AME-11109.
+                this.data.args = [undefined, getFragmentParamString()];
+                this.setTranslationBase();
+                this.parentRender();
             }
-
-            // TODO: The first undefined argument is the deprecated realm which is defined in the
-            // CommonRoutesConfig login route. This needs to be removed as part of AME-11109.
-            this.data.args = [undefined, getFragmentParamString()];
-            this.setTranslationBase();
-            this.parentRender();
         },
 
         restartProcess (e) {
