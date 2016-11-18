@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.audit;
 
+import static com.sun.identity.authentication.util.ISAuthConstants.SHARED_STATE_USERNAME;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
@@ -24,15 +26,23 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.LoginState;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.DNUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.DNMapper;
+
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
 
 /**
  * Abstract auditor for constructing and logging authentication events.
@@ -108,5 +118,44 @@ public abstract class AbstractAuthenticationEventAuditor {
         } catch (SSOException e) {
             return NO_REALM;
         }
+    }
+
+    /**
+     * Get the failed username from the {@Link LoginState} of the event.
+     *
+     * @param loginState The login state of the event.
+     * @return The username or null if it could not be found.
+     */
+    protected String getFailedPrincipal(LoginState loginState) {
+        if (loginState != null) {
+            String principal = loginState.getUserDN();
+            if (StringUtils.isNotEmpty(principal)) {
+                return DNUtils.DNtoName(principal);
+            }
+
+            Map sharedState = loginState == null ? emptyMap() : loginState.getSharedState();
+            if (CollectionUtils.isNotEmpty(sharedState)) {
+                principal = (String) sharedState.get(SHARED_STATE_USERNAME);
+                if (StringUtils.isNotEmpty(principal)) {
+                    return principal;
+                }
+            }
+
+            principal = loginState.getFailureTokenId();
+            if (StringUtils.isNotEmpty(principal)) {
+                return principal;
+            }
+
+            if (CollectionUtils.isNotEmpty(loginState.getAllReceivedCallbacks())) {
+                for (Callback[] cb : loginState.getAllReceivedCallbacks().values()) {
+                    for (Callback aCb : cb) {
+                        if (aCb instanceof NameCallback) {
+                            return ((NameCallback) aCb).getName();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

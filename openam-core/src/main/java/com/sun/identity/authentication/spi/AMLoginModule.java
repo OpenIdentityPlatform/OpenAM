@@ -1060,8 +1060,8 @@ public abstract class AMLoginModule implements LoginModule {
             }
             return process(callbacks, state);
         } catch (InvalidPasswordException e) {
-            setFailureState();
             setFailureID(e.getTokenId());
+            setFailureState();
             throw e;
         } catch (AuthLoginException e) {
             setFailureState();

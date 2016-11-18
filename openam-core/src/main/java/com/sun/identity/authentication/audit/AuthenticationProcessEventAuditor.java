@@ -207,33 +207,6 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
         }
     }
 
-    private String getFailedPrincipal(LoginState loginState) {
-        if (loginState == null) {
-            return null;
-        }
-
-        String principal = loginState.getUserDN();
-        if (principal != null) {
-            return DNUtils.DNtoName(principal);
-        }
-
-        principal = loginState.getFailureTokenId();
-        if (principal != null) {
-            return principal;
-        }
-
-        if (CollectionUtils.isNotEmpty(loginState.getAllReceivedCallbacks())) {
-            for (Callback[] cb : loginState.getAllReceivedCallbacks().values()) {
-                for (Callback aCb : cb) {
-                    if (aCb instanceof NameCallback) {
-                        return ((NameCallback) aCb).getName();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private AuditConstants.AuthenticationFailureReason findFailureReason(LoginState loginState) {
         String errorCode = loginState == null ? null : loginState.getErrorCode();
 
