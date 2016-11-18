@@ -261,23 +261,19 @@ public class FMSessionProvider implements SessionProvider {
             // is set and passed over
             int failureCode = SessionException.AUTH_ERROR_NOT_DEFINED;
             AuthLoginException ale = ac.getLoginException();
-            String authError = null;
-            if (ale != null) {
-                authError = ale.getErrorCode();
-            }
+            String authError = ac.getErrorCode();
+
             if (authError == null) {
                 failureCode = SessionException.AUTH_ERROR_NOT_DEFINED;
             } else if (authError.equals(AMAuthErrorCode.AUTH_USER_INACTIVE)) {
                 failureCode = SessionException.AUTH_USER_INACTIVE;
-            } else if(authError.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
+            } else if (authError.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
                 failureCode = SessionException.AUTH_USER_LOCKED;
-            } else if(authError.equals(
-                AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED))
-            {
+            } else if (authError.equals(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED)) {
                 failureCode = SessionException.AUTH_ACCOUNT_EXPIRED;
             }
-            
-            SessionException se = null;
+
+            SessionException se;
             if (ale != null) {
                 se = new SessionException(ale);
             } else {
