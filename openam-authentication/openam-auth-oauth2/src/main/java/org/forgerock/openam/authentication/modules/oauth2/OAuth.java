@@ -89,6 +89,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.json.JSONException;
@@ -99,7 +100,7 @@ public class OAuth extends AMLoginModule {
 
     public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
     public static final String OPENID_TOKEN = "OPENID_TOKEN";
-    private static Debug debug = Debug.getInstance("amLoginModule");
+    private static Debug DEBUG = Debug.getInstance("amAuthOAuth2");
     private String authenticatedUser = null;
     private Map sharedState;
     private OAuthConf config;
@@ -298,7 +299,7 @@ public class OAuth extends AMLoginModule {
                         try {
                             jwtClaims = jwtHandler.validateJwt(idToken);
                         } catch (RuntimeException | AuthLoginException e) {
-                            debug.warning("Cannot validate JWT", e);
+                            DEBUG.warning("Cannot validate JWT", e);
                             throw e;
                         }
                         if (!JwtHandler.isIntendedForAudience(config.getClientId(), jwtClaims)) {
@@ -522,7 +523,7 @@ public class OAuth extends AMLoginModule {
         try {
             return getConfiguredType(AttributeMapper.class, config.getAccountMapper());
         } catch (ClassCastException ex) {
-            debug.error("Account Mapper is not an implementation of AttributeMapper.", ex);
+            DEBUG.error("Account Mapper is not an implementation of AttributeMapper.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
         } catch (Exception ex) {
             throw new AuthLoginException("Problem when trying to instantiate the account mapper", ex);
@@ -535,7 +536,7 @@ public class OAuth extends AMLoginModule {
         try {
             return getConfiguredType(AccountProvider.class, config.getAccountProvider());
         } catch (ClassCastException ex) {
-            debug.error("Account Provider is not actually an implementation of AccountProvider.", ex);
+            DEBUG.error("Account Provider is not actually an implementation of AccountProvider.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
         } catch (Exception ex) {
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
@@ -555,7 +556,7 @@ public class OAuth extends AMLoginModule {
                 attributeMapper.init(OAuthParam.BUNDLE_NAME);
                 attributes.putAll(getAttributes(svcProfileResponse, attributeMapperConfig, attributeMapper, jwtClaims));
             } catch (ClassCastException ex) {
-                debug.error("Attribute Mapper is not actually an implementation of AttributeMapper.", ex);
+                DEBUG.error("Attribute Mapper is not actually an implementation of AttributeMapper.", ex);
             } catch (Exception ex) {
                 OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the Attribute Mapper", ex);
             }
@@ -663,12 +664,7 @@ public class OAuth extends AMLoginModule {
             OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
             throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
         } finally {
-            try {
-                in.close();
-            } catch (IOException ioe) {
-                OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
-                throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
-            }
+            IOUtils.closeIfNotNull(in);
         }
         return buf.toString();
     }
@@ -741,6 +737,7 @@ public class OAuth extends AMLoginModule {
         } catch (MalformedURLException mfe) {
             throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, mfe);
         } catch (IOException ioe) {
+            DEBUG.warning("OAuth.getContentStreamByGET URL={} caught IOException", serviceUrl, ioe);
             throw new AuthLoginException(BUNDLE_NAME,"ioe", null, ioe);
         }
     }
@@ -761,11 +758,7 @@ public class OAuth extends AMLoginModule {
             catch (IOException ioe) {
                 OAuthUtil.debugError("OAuth.getErrorStream: IOException: " + ioe.getMessage());
             } finally {
-                try {
-                    in.close();
-                } catch (IOException ioe) {
-                    OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
-                }
+                IOUtils.closeIfNotNull(in);
             }
             return buf.toString();
         }
@@ -818,6 +811,7 @@ public class OAuth extends AMLoginModule {
         } catch (MalformedURLException e) {
             throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, e);
         } catch (IOException e) {
+            DEBUG.warning("OAuth.getContentStreamByPOST URL={} caught IOException", serviceUrl, e);
             throw new AuthLoginException(BUNDLE_NAME,"ioe", null, e);
         }
 
