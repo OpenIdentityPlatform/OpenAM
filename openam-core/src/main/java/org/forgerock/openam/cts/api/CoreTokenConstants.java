@@ -15,13 +15,10 @@
  */
 package org.forgerock.openam.cts.api;
 
-import javax.inject.Singleton;
-
 /**
  * Responsible for collecting together all constants used in the Core Token Service.
  */
-@Singleton
-public class CoreTokenConstants {
+public final class CoreTokenConstants {
 
     /**
      * Debugging header, for all debug messages.
@@ -68,10 +65,6 @@ public class CoreTokenConstants {
     public static final String OBJECT_CLASS = "objectClass";
 
     public static final String FR_CORE_TOKEN = "frCoreToken";
-    /**
-     * The name of the general Scheduled Service used by the CTS.
-     */
-    public static final String CTS_SCHEDULED_SERVICE = "CTSScheduledService";
     /**
      * The name of the general purpose worker pool for the CTS.
      */
@@ -137,4 +130,8 @@ public class CoreTokenConstants {
      * Binding constant for the CTS Jackson Object Mapper.
      */
     public static final String OBJECT_MAPPER = "cts-json-object-mapper";
+
+    private CoreTokenConstants() {
+        // intentionally non-instantiable
+    }
 }
