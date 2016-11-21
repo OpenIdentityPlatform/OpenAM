@@ -616,7 +616,8 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
                         || AttributeSchema.UIType.GLOBALSCRIPTSELECT.equals(attribute.getUIType())) {
                     descriptions.add(getConsoleI18N(value.getValue(), new LocalizableString(value.getValue())));
                 } else {
-                    descriptions.add(getConsoleI18N(value.getValue(), new LocalizableString(value.getKey())));
+                    descriptions.add(getConsoleI18N(value.getValue() == null ? value.getKey() : value.getValue(),
+                            new LocalizableString(value.getKey())));
                 }
             }
             jsonValue.add(ENUM, values);
