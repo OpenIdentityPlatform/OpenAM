@@ -63,7 +63,7 @@ import org.restlet.resource.ResourceException;
  */
 public class AuthenticationServiceV1 {
 
-    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+    protected static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final ContentTypeHeader APPLICATION_JSON_CONTENT_TYPE =
             ContentTypeHeader.valueOf("application/json");
@@ -312,6 +312,7 @@ public class AuthenticationServiceV1 {
      */
     protected Response handleErrorResponse(Request request, Status status, Exception exception) {
         Reject.ifNull(status);
+        DEBUG.warning("Authentication encountered an error: ", exception);
         Response response = new Response(status);
         final Map<String, Object> rep = new HashMap<>();
         if (exception instanceof RestAuthResponseException) {

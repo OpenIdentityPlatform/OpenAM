@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.http.annotations;
@@ -34,6 +34,8 @@ import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * A method annotated with one of {@link Get}, {@link Post}, {@link Put} or {@link Delete}. This class
  * works out what parameters are going to need to be passed to the annotated method, and creates
@@ -44,6 +46,7 @@ import org.forgerock.util.promise.Promise;
  * @since 13.0.0
  */
 public class AnnotatedMethod {
+    private final static Debug DEBUG = Debug.getInstance("frRest");
     private final Object requestHandler;
     private final Method method;
     private final int requestParameter;
@@ -81,9 +84,11 @@ public class AnnotatedMethod {
             Object result = method.invoke(requestHandler, args);
             return responseAdapter.apply(result);
         } catch (IllegalAccessException e) {
+            DEBUG.warning("Could not invoke method: ", e);
             return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR)
                     .setCause(new IllegalStateException("Cannot access the annotated method: " + method.getName(), e)));
         } catch (InvocationTargetException e) {
+            DEBUG.warning("Could not invoke method: ", e);
             return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR)
                     .setCause(new IllegalStateException("Exception from invocation should be handled by promise", e)));
         }

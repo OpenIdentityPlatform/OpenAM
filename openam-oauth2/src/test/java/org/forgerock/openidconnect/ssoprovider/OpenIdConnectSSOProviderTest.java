@@ -40,6 +40,7 @@ import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.iplanet.sso.SSOException;
@@ -337,5 +338,27 @@ public class OpenIdConnectSSOProviderTest {
         ssoProvider.createSSOToken(tokenId);
 
         // Then - exception
+    }
+
+    @DataProvider
+    public Object[][] invalidJwts() {
+        return new Object[][] {
+                {"AtoZatoz0to9-_*.AtoZ.invalidCharacter"},
+                {"AtoZatoz0to9-_.wrongNumberOfComponents"},
+                {"AtoZatoz0to9-_.AtoZatoz0to9-_.AtoZatoz0to9-_..emptyComponent"}
+        };
+    }
+
+    @Test(dataProvider = "invalidJwts",
+            expectedExceptions = SSOException.class, expectedExceptionsMessageRegExp = ".*not a valid JWT.*")
+    public void parserShouldNotParseInvalidJwt(String invalidJwt) throws Exception {
+        new OpenIdConnectSSOProvider.IdTokenParser().parse(invalidJwt);
+    }
+
+    @Test
+    public void parserShouldParseValidJwt() throws Exception {
+        String validJwt =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhIn0.1pXop7_jwVZJMlpF46G0GofoKnUy29zHEtwhtaCXyXI";
+        assertThat(new OpenIdConnectSSOProvider.IdTokenParser().parse(validJwt).getSubject()).isEqualTo("a");
     }
 }

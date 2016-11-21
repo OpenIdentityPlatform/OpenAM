@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.http;
@@ -49,6 +49,7 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
     @Override
     protected Response handleErrorResponse(Request request, Status status, Exception exception) {
         Reject.ifNull(status);
+        DEBUG.warning("Authentication encountered an error: ", exception);
         Response response = new Response(status);
         if (exception instanceof RestAuthResponseException) {
             final RestAuthResponseException authResponseException = (RestAuthResponseException)exception;

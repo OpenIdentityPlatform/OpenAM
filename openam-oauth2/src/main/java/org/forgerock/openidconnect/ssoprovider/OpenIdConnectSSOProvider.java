@@ -22,6 +22,7 @@ import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 import java.security.Principal;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -292,8 +293,15 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
     }
 
     static class IdTokenParser {
+        private static final String BASE_64_URL = "[A-Za-z0-9-_]+";
+        /** JWT is 3 or 5 dot-separated base64url encoded strings */
+        private static final Pattern JWT_PATTERN = Pattern.compile("((" + BASE_64_URL + "\\.){2}){1,2}" + BASE_64_URL);
+
         public OAuth2Jwt parse(final String jwt) throws SSOException {
             try {
+                if (!JWT_PATTERN.matcher(jwt).matches()) {
+                    throw new SSOException("invalid id_token: not a valid JWT");
+                }
                 return OAuth2Jwt.create(jwt);
             } catch (InvalidJwtException e) {
                 throw new SSOException("invalid id_token: " + e.getMessage());
