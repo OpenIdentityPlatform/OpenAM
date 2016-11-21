@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
+import static org.forgerock.openam.sm.datalayer.api.ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER;
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 import static org.forgerock.util.query.QueryFilter.lessThanOrEqualTo;
@@ -48,8 +49,8 @@ public class MaxSessionTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
     private final int pageSize;
 
     @Inject
-    public MaxSessionTimeExpiredQuery(@DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory,
-            @DataLayer(ConnectionType.CTS_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
+    public MaxSessionTimeExpiredQuery(@DataLayer(CTS_MAX_SESSION_TIMEOUT_WORKER) ConnectionFactory factory,
+            @DataLayer(CTS_MAX_SESSION_TIMEOUT_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
         super(factory);
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
         this.queryFactory = queryFactory;

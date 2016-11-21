@@ -18,6 +18,9 @@ package org.forgerock.openam.sm.datalayer.api;
 import com.iplanet.am.util.SystemProperties;
 import org.forgerock.openam.cts.impl.CTSAsyncConnectionModule;
 import org.forgerock.openam.cts.impl.CTSConnectionModule;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.sm.SMSConnectionModule;
@@ -47,8 +50,19 @@ public enum ConnectionType {
     CTS_ASYNC(CTSAsyncConnectionModule.class),
     /**
      * @see CTSWorkerTask
+     * @see MaxSessionTimeExpiredQuery
      */
-    CTS_WORKER(CTSConnectionModule.class),
+    CTS_MAX_SESSION_TIMEOUT_WORKER(CTSConnectionModule.class),
+    /**
+     * @see CTSWorkerTask
+     * @see SessionIdleTimeExpiredQuery
+     */
+    CTS_SESSION_IDLE_TIMEOUT_WORKER(CTSConnectionModule.class),
+    /**
+     * @see CTSWorkerTask
+     * @see CTSWorkerPastExpiryDateQuery
+     */
+    CTS_EXPIRY_DATE_WORKER(CTSConnectionModule.class),
     /**
      * @see org.forgerock.openam.entitlement.indextree.IndexTreeService
      */

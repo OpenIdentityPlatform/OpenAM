@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
+import static org.forgerock.openam.sm.datalayer.api.ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER;
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 import static org.forgerock.util.query.QueryFilter.lessThanOrEqualTo;
@@ -48,8 +49,8 @@ public class SessionIdleTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
     private final int pageSize;
 
     @Inject
-    public SessionIdleTimeExpiredQuery(@DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory,
-            @DataLayer(ConnectionType.CTS_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
+    public SessionIdleTimeExpiredQuery(@DataLayer(CTS_SESSION_IDLE_TIMEOUT_WORKER) ConnectionFactory factory,
+            @DataLayer(CTS_SESSION_IDLE_TIMEOUT_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
         super(factory);
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
         this.queryFactory = queryFactory;

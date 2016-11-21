@@ -84,11 +84,17 @@ public class ConnectionConfigFactory {
             default:
                 throw new IllegalStateException();
         }
-        if (ConnectionType.CTS_WORKER.equals(connectionType)) {
+        if (isCtsWorkerConnectionType(connectionType)) {
             configuration = wrapCtsReaperConfiguration(configuration);
         }
         validator.validate(configuration);
         return configuration;
+    }
+
+    private boolean isCtsWorkerConnectionType(ConnectionType connectionType) {
+        return ConnectionType.CTS_EXPIRY_DATE_WORKER.equals(connectionType)
+                || ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER.equals(connectionType)
+                || ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER.equals(connectionType);
     }
 
     private ConnectionConfig getDefaultConfiguration() {

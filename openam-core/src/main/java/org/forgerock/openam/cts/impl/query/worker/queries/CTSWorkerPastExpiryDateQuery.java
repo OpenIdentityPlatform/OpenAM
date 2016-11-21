@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
+import static org.forgerock.openam.sm.datalayer.api.ConnectionType.CTS_EXPIRY_DATE_WORKER;
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 
 import javax.inject.Inject;
@@ -42,8 +43,8 @@ public class CTSWorkerPastExpiryDateQuery<C> extends CTSWorkerBaseQuery {
     private final int pageSize;
 
     @Inject
-    public CTSWorkerPastExpiryDateQuery(@DataLayer(ConnectionType.CTS_WORKER) ConnectionFactory factory,
-            @DataLayer(ConnectionType.CTS_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
+    public CTSWorkerPastExpiryDateQuery(@DataLayer(CTS_EXPIRY_DATE_WORKER) ConnectionFactory factory,
+            @DataLayer(CTS_EXPIRY_DATE_WORKER) QueryFactory queryFactory, CoreTokenConfig config) {
         super(factory);
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
 

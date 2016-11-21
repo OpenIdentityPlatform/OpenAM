@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.guice;
@@ -69,10 +69,18 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
                 new Object[]{TaskFactory.class, ConnectionType.CTS_ASYNC},
                 new Object[]{QueryFactory.class, ConnectionType.CTS_ASYNC},
                 new Object[]{ConnectionFactory.class, ConnectionType.CTS_ASYNC},
-                new Object[]{TaskExecutor.class, ConnectionType.CTS_WORKER},
-                new Object[]{TaskFactory.class, ConnectionType.CTS_WORKER},
-                new Object[]{QueryFactory.class, ConnectionType.CTS_WORKER},
-                new Object[]{ConnectionFactory.class, ConnectionType.CTS_WORKER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
                 new Object[]{TaskExecutor.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{TaskFactory.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{QueryFactory.class, ConnectionType.RESOURCE_SETS},
