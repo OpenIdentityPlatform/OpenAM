@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.InflaterInputStream;
 
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -68,7 +69,7 @@ public final class CTSNotificationBrokerTest {
     @Mock
     private NotificationBroker localBroker;
     @Mock
-    private ExecutorServiceFactory executorServiceFactory;
+    private AMExecutorServiceFactory executorServiceFactory;
     @Mock
     private ScheduledExecutorService executorService;
 
@@ -86,7 +87,7 @@ public final class CTSNotificationBrokerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(executorServiceFactory.createScheduledService(anyInt())).thenReturn(executorService);
+        when(executorServiceFactory.createScheduledService(anyInt(), anyString())).thenReturn(executorService);
         broker = new CTSNotificationBroker(store, localBroker, 2, 600L, 100L, executorServiceFactory);
     }
 

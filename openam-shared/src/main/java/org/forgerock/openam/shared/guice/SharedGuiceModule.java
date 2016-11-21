@@ -20,6 +20,7 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
@@ -49,6 +50,11 @@ public class SharedGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
         bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
         bind(KeyPairProviderFactory.class).to(KeyPairProviderFactoryImpl.class);
+    }
+
+    @Provides @Inject
+    AMExecutorServiceFactory provideAMExecutorServiceFactory(ShutdownManager manager) {
+        return new AuditRequestContextPropagatingExecutorServiceFactory(manager);
     }
 
     @Provides @Inject

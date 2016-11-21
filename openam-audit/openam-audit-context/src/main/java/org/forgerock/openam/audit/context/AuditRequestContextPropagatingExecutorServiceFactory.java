@@ -16,14 +16,13 @@
 
 package org.forgerock.openam.audit.context;
 
-import org.forgerock.util.thread.ExecutorServiceFactory;
-import org.forgerock.util.thread.listener.ShutdownManager;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * ExecutorServiceFactory decorator that ensures all ExecutorServices propagate {@link AuditRequestContext} from
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 13.0.0
  */
-public class AuditRequestContextPropagatingExecutorServiceFactory extends ExecutorServiceFactory {
+public class AuditRequestContextPropagatingExecutorServiceFactory extends AMExecutorServiceFactory {
 
     /**
      * Constructs a new {@code AuditRequestContextPropagatingExecutorServiceFactory}.
@@ -45,6 +44,11 @@ public class AuditRequestContextPropagatingExecutorServiceFactory extends Execut
     @Override
     public ScheduledExecutorService createScheduledService(int poolSize) {
         return decorate(super.createScheduledService(poolSize));
+    }
+
+    @Override
+    public ScheduledExecutorService createScheduledService(int poolSize, String threadNamePrefix) {
+        return decorate(super.createScheduledService(poolSize, threadNamePrefix));
     }
 
     @Override
