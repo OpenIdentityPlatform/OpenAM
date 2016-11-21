@@ -15,8 +15,7 @@
  */
 package org.forgerock.openam.cts;
 
-import static org.forgerock.openam.cts.api.CoreTokenConstants.CLEANUP_PERIOD;
-import static org.forgerock.openam.cts.api.CoreTokenConstants.HEALTH_CHECK_PERIOD;
+import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +35,8 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 public class CoreTokenConfig {
 
     private final CopyOnWriteArraySet<CoreTokenConfigListener> listeners = new CopyOnWriteArraySet<>();
+
+    private volatile boolean coreTokenResourceEnabled;
 
     private volatile boolean caseSensitiveUserId;
     private volatile int sessionExpiryGracePeriod;
@@ -65,6 +66,7 @@ public class CoreTokenConfig {
                 Constants.SESSION_REPOSITORY_COMPRESSION,
                 Constants.SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION,
                 Constants.SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION,
+                Constants.CORE_TOKEN_RESOURCE_ENABLED,
                 CLEANUP_PERIOD,
                 HEALTH_CHECK_PERIOD
         };
@@ -113,6 +115,9 @@ public class CoreTokenConfig {
 
         // Controls the size of pages requested for CTS Reaper
         cleanupPageSize = 1000;
+
+        // Whether or not use of the CoreTokenResource is enabled.
+        coreTokenResourceEnabled = SystemProperties.getAsBoolean(Constants.CORE_TOKEN_RESOURCE_ENABLED);
     }
 
     /**
@@ -167,6 +172,10 @@ public class CoreTokenConfig {
      */
     public int getRunPeriod() {
         return runPeriod;
+    }
+
+    public boolean isCoreTokenResourceEnabled() {
+        return coreTokenResourceEnabled;
     }
 
     /**

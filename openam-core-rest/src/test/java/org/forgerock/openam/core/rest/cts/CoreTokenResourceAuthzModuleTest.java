@@ -11,32 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.cts;
 
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
+
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 public class CoreTokenResourceAuthzModuleTest {
 
     Config<SessionService> mockConfig = mock(Config.class);
     SessionService mockService = mock(SessionService.class);
+    CoreTokenConfig mockCoreTokenConfig = mock(CoreTokenConfig.class);
     Debug mockDebug = mock(Debug.class);
 
     @BeforeTest
@@ -48,7 +50,9 @@ public class CoreTokenResourceAuthzModuleTest {
     public void shouldBlockAllAccessIfResourceDisabled() throws Exception {
 
         //given
-        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug, false);
+        given(mockCoreTokenConfig.isCoreTokenResourceEnabled()).willReturn(false);
+        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug,
+                mockCoreTokenConfig);
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
 
         //when
@@ -63,7 +67,10 @@ public class CoreTokenResourceAuthzModuleTest {
     public void shouldAuthorizeAccessToSuperUserIfResourceEnabled() throws Exception {
 
         //given
-        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug, true);
+        given(mockCoreTokenConfig.isCoreTokenResourceEnabled()).willReturn(true);
+
+        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug,
+                mockCoreTokenConfig);
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         SSOToken mockSSOToken = mock(SSOToken.class);
 
@@ -83,7 +90,9 @@ public class CoreTokenResourceAuthzModuleTest {
     public void shouldBlockAllAccessIfResourceEnabledButNonSuperUser() throws Exception {
 
         //given
-        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug, true);
+        given(mockCoreTokenConfig.isCoreTokenResourceEnabled()).willReturn(true);
+        CoreTokenResourceAuthzModule testModule = new CoreTokenResourceAuthzModule(mockConfig, mockDebug,
+                mockCoreTokenConfig);
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         SSOToken mockSSOToken = mock(SSOToken.class);
 

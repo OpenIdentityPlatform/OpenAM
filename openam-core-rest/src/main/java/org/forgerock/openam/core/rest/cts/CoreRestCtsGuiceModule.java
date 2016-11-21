@@ -20,15 +20,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.utils.Config;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for binding the CTS REST endpoints.
@@ -53,8 +53,7 @@ public class CoreRestCtsGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public CoreTokenResourceAuthzModule getCoreTokenResourceAuthzModule(
-            Config<SessionService> sessionService, @Named("frRest") Debug debug) {
-        boolean coreTokenResourceEnabled = SystemProperties.getAsBoolean(Constants.CORE_TOKEN_RESOURCE_ENABLED);
-        return new CoreTokenResourceAuthzModule(sessionService, debug, coreTokenResourceEnabled);
+            Config<SessionService> sessionService, @Named("frRest") Debug debug, CoreTokenConfig coreTokenConfig) {
+        return new CoreTokenResourceAuthzModule(sessionService, debug, coreTokenConfig);
     }
 }
