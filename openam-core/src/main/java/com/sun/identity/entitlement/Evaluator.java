@@ -45,30 +45,53 @@ import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitoringType;
 
 /**
- * The class evaluates entitlement request and provides decisions.
+ * The class evaluates entitlement request and provides decisions. The evaluation of a policy depends on the following
+ * contextual information:
+ * <ul>
+ *     <li>realm: The realm the policy needs to be evaluated in.</li>
+ *     <li>subject: The subject that attempts to access a particular resource.</li>
+ *     <li>resourceNames: The resources the subject attempts to access.</li>
+ *     <li>environment: Additional information about the environment within which the policy should be evaluated. Note
+ *     that certain environment/subject conditions may depend on certain fields to be present in this map. One such
+ *     example would be the LDAP Filter Condition having access to the {@link
+ *     com.sun.identity.policy.PolicyEvaluator#REALM_DN} field containing the realm's DN representation.</li>
+ * </ul>
+ *
+ * Additionally, the evaluation will also take into account the name of the policy set (a.k.a. application) used when
+ * creating the Evaluator instance.
+ *
  * @supported.api
  */
 public class Evaluator {
 
-    private Subject adminSubject;
-    private String applicationName =
-        ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
-
     public static final int DEFAULT_POLICY_EVAL_THREAD = 10;
-
+    private final Subject adminSubject;
+    private final String applicationName;
     private final PolicyMonitor policyMonitor;
     private final EntitlementConfigurationWrapper configWrapper;
 
     /**
-     * Constructor to create an evaluator of default service type.
+     * Constructor to create an evaluator the default service type.
      *
-     * @throws EntitlementException if any other abnormal condition occ.
+     * @param subject Subject who credential is used for performing the evaluation.
+     * @throws EntitlementException if any other abnormal condition occurred.
      */
-    private Evaluator()
-        throws EntitlementException {
+    public Evaluator(Subject subject) throws EntitlementException {
+        this(subject, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+    }
+
+    /**
+     * Constructor to create an evaluator given the service type.
+     *
+     * @param subject Subject who credential is used for performing the evaluation.
+     * @param applicationName the name of the aplication for which this evaluator can be used.
+     * @throws EntitlementException if any other abnormal condition occurred.
+     */
+    public Evaluator(Subject subject, String applicationName) throws EntitlementException {
+        adminSubject = subject;
+        this.applicationName = applicationName;
         policyMonitor = getPolicyMonitor();
         configWrapper = new EntitlementConfigurationWrapper();
-
     }
 
     private PolicyMonitor getPolicyMonitor() {
@@ -83,47 +106,13 @@ public class Evaluator {
     }
 
     /**
-     * Constructor to create an evaluator given the service type.
-     *
-     * @param subject Subject who credential is used for performing the 
-     *        evaluation.
-     * @param applicationName the name of the aplication for
-     *        which this evaluator can be used.
-     * @throws EntitlementException if any other abnormal condition occured.
-     */
-    public Evaluator(Subject subject, String applicationName)
-        throws EntitlementException {
-        adminSubject = subject;
-        this.applicationName = applicationName;
-        policyMonitor = getPolicyMonitor();
-        configWrapper = new EntitlementConfigurationWrapper();
-    }
-
-    /**
-     * Constructor to create an evaluator the default service type.
-     *
-     * @param subject Subject who credential is used for performing the 
-     *        evaluation.
-     * @throws EntitlementException if any other abnormal condition occured.
-     */
-    public Evaluator(Subject subject)
-        throws EntitlementException {
-        adminSubject = subject;
-        policyMonitor = getPolicyMonitor();
-        configWrapper = new EntitlementConfigurationWrapper();
-    }
-    
-    /**
-     * Returns <code>true</code> if the subject is granted to an
-     * entitlement.
+     * Returns <code>true</code> if the subject is granted to an entitlement.
      *
      * @param realm Realm name.
      * @param subject Subject who is under evaluation.
-     * @param e Entitlement object which describes the resource name and 
-     *          actions.
+     * @param e Entitlement object which describes the resource name and actions.
      * @param envParameters Map of environment parameters.
-     * @return <code>true</code> if the subject is granted to an
-     *         entitlement.
+     * @return <code>true</code> if the subject is granted to an entitlement.
      * @throws EntitlementException if the result cannot be determined.
      */
     public boolean hasEntitlement(
@@ -141,16 +130,16 @@ public class Evaluator {
     }
 
     /**
-     * Returns a list of entitlements for a given subject, resource names
-     * and environment.
+     * Returns a list of entitlements for a given subject, resource names and environment.
      *
      * @param realm Realm Name.
      * @param subject Subject who is under evaluation.
      * @param resourceNames Resource names.
      * @param environment Environment parameters.
-     * @return a list of entitlements for a given subject, resource name
-     *         and environment.
+     * @return a list of entitlements for a given subject, resource name and environment.
      * @throws EntitlementException if the result cannot be determined.
+     *
+     * @supported.api
      */
     public List<Entitlement> evaluate(
         String realm,
@@ -178,21 +167,15 @@ public class Evaluator {
      * Returns a list of entitlements for a given subject, resource name
      * and environment.
      *
-     * @param realm
-     *         Realm Name.
-     * @param subject
-     *         Subject who is under evaluation.
-     * @param resourceName
-     *         Resource name.
-     * @param environment
-     *         Environment parameters.
-     * @param recursive
-     *         <code>true</code> to perform evaluation on sub resources
-     *         from the given resource name.
-     * @return a list of entitlements for a given subject, resource name
-     *         and environment.
-     * @throws EntitlementException
-     *         if the result cannot be determined.
+     * @param realm Realm Name.
+     * @param subject Subject who is under evaluation.
+     * @param resourceName Resource name.
+     * @param environment Environment parameters.
+     * @param recursive <code>true</code> to perform evaluation on sub resources from the given resource name.
+     * @return a list of entitlements for a given subject, resource name and environment.
+     * @throws EntitlementException if the result cannot be determined.
+     *
+     * @supported.api
      */
     public List<Entitlement> evaluate(
             String realm,
