@@ -37,8 +37,16 @@ define([
         }
     }
 
+    /**
+     * This function encodes a path. It uses base64url encoding.
+     * @param {string} path the path
+     * @returns {string} the encoded path
+     */
     function encodePath (path) {
-        return btoa(path);
+        return btoa(path)
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
     }
 
     obj.realms = {

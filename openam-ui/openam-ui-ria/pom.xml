@@ -208,6 +208,13 @@
             <type>js</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>base64</artifactId>
+            <version>1.0.0</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
     </dependencies>
 
     <build>

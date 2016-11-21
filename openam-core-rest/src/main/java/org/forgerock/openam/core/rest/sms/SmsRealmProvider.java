@@ -94,7 +94,7 @@ import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.encode.Base64;
+import org.forgerock.util.encode.Base64url;
 import org.forgerock.util.promise.Promise;
 
 import com.iplanet.dpro.session.SessionException;
@@ -248,7 +248,7 @@ public class SmsRealmProvider {
                         description = SMS_REALM_PROVIDER + "error.unexpected.server.error." + DESCRIPTION)},
         description = SMS_REALM_PROVIDER + DELETE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> handleDelete(String realmPath, Context serverContext) {
-        String decodedPath = new String(Base64.decode(realmPath));
+        String decodedPath = new String(Base64url.decode(realmPath));
         try {
 
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), decodedPath);
@@ -333,7 +333,7 @@ public class SmsRealmProvider {
             description = SMS_REALM_PROVIDER + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> handleRead(String realmPath, Context context) {
 
-        String decodedPath = new String(Base64.decode(realmPath));
+        String decodedPath = new String(Base64url.decode(realmPath));
         try {
             JsonValue jsonResponse = getJsonValue(decodedPath);
             if (debug.messageEnabled()) {
@@ -375,7 +375,7 @@ public class SmsRealmProvider {
             String realmPath)
             throws SMSException {
         return json(object(
-                field(ResourceResponse.FIELD_CONTENT_ID, Base64.encode(realmPath.getBytes(StandardCharsets.UTF_8))),
+                field(ResourceResponse.FIELD_CONTENT_ID, Base64url.encode(realmPath.getBytes(StandardCharsets.UTF_8))),
                 field(PATH_ATTRIBUTE_NAME, parentPath),
                 field(ACTIVE_ATTRIBUTE_NAME, isActive(realmManager)),
                 field(REALM_NAME_ATTRIBUTE_NAME, realmName),
@@ -415,7 +415,7 @@ public class SmsRealmProvider {
                             description = SMS_REALM_PROVIDER + "error.unexpected.server.error." + DESCRIPTION)},
             description = SMS_REALM_PROVIDER + UPDATE_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> handleUpdate(String realmPath, Context context, UpdateRequest request) {
-        String decodedPath = new String(Base64.decode(realmPath));
+        String decodedPath = new String(Base64url.decode(realmPath));
         try {
             checkValues(request.getContent());
         } catch (BadRequestException e) {
