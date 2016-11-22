@@ -59,6 +59,7 @@ public class RefreshActionHandler implements ActionHandler {
         JsonValue content;
         try {
             SSOToken ssoToken = SSOTokenManager.createSSOToken(tokenId);
+            SSOTokenManager.refreshSession(ssoToken);
             content = sessionResourceUtil.jsonValueOf(ssoToken);
         } catch (SSOException | IdRepoException e) {
             content = sessionResourceUtil.invalidSession();
