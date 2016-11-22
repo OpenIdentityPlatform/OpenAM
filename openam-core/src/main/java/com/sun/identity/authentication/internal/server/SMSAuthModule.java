@@ -282,6 +282,9 @@ public class SMSAuthModule implements LoginModule {
                     invalidPassword = true;
                 }
                 if (invalidPassword) {
+                    if (debug.messageEnabled()) {
+                        debug.message("SMSAuthModule::login() Invalid password for username: {}", username);
+                    }
                     throw (new InvalidPasswordException("invalid password",
                             userDN));
                 }
