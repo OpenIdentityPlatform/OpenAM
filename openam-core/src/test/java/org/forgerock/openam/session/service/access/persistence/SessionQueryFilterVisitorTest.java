@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.api.filter;
+package org.forgerock.openam.session.service.access.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
@@ -22,6 +22,7 @@ import static org.mockito.BDDMockito.*;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.QueryFilters;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder.FilterAttributeBuilder;
 import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.tokens.CoreTokenField;

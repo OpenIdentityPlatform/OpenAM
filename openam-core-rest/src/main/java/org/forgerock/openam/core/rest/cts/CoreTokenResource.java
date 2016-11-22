@@ -15,19 +15,13 @@
  */
 package org.forgerock.openam.core.rest.cts;
 
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CORE_TOKEN_RESOURCE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.CREATE_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.UPDATE_DESCRIPTION;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,27 +32,39 @@ import org.forgerock.api.annotations.Delete;
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;
 import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
 import org.forgerock.api.annotations.Read;
 import org.forgerock.api.annotations.Schema;
 import org.forgerock.api.annotations.Update;
+import org.forgerock.api.enums.QueryType;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.CTSQueryFilterVisitor;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -129,7 +135,7 @@ public class CoreTokenResource {
         String json = createRequest.getContent().toString();
         Token token = serialisation.deserialise(json, Token.class);
         try {
-            store.createAsync(token);
+            store.create(token);
 
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, token.getTokenId());
@@ -168,7 +174,7 @@ public class CoreTokenResource {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
         try {
-            store.deleteAsync(tokenId);
+            store.delete(tokenId);
 
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, tokenId);
@@ -248,7 +254,7 @@ public class CoreTokenResource {
         Token newToken = serialisation.deserialise(value, Token.class);
 
         try {
-            store.updateAsync(newToken);
+            store.update(newToken);
 
             ResourceResponse resource = newResourceResponse(
                     newToken.getTokenId(),
@@ -261,6 +267,47 @@ public class CoreTokenResource {
             error(e, "UPDATE by {0}: Error updating token resource with ID: {1}", principal, tokenId);
             return generateException(e).asPromise();
         }
+    }
+
+    @Query(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 500,
+                            description = CORE_TOKEN_RESOURCE + "error.unexpected.server.error." + DESCRIPTION)},
+            description = CORE_TOKEN_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER
+    )
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
+                                                                     QueryResourceHandler handler) {
+
+        QueryFilter<JsonPointer> crestQueryFilter = request.getQueryFilter();
+        Reject.ifNull(crestQueryFilter, "Query Filter must be specified in the request");
+        QueryFilter<CoreTokenField> queryFilter;
+        try {
+            queryFilter = crestQueryFilter.accept(new CTSQueryFilterVisitor(), null);
+        } catch (IllegalArgumentException e) {
+            return new BadRequestException(e.getMessage()).asPromise();
+        }
+
+        TokenFilter tokenFilter = new TokenFilterBuilder().withQuery(queryFilter).build();
+
+        try {
+            Collection<Token> tokens = store.query(tokenFilter);
+
+            for (Token token : tokens) {
+                String json = serialisation.serialise(token);
+                ResourceResponse resource = newResourceResponse(
+                        token.getTokenId(),
+                        String.valueOf(currentTimeMillis()),
+                        JsonValueBuilder.toJsonValue(json));
+                handler.handleResource(resource);
+            }
+        } catch (CoreTokenException e) {
+            error(e, "QUERY: Error querying CTS with filter {0}", tokenFilter);
+            return generateException(e).asPromise();
+        }
+
+        return newResultPromise(newQueryResponse());
     }
 
     /**

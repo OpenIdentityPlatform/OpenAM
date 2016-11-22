@@ -38,7 +38,6 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
-import org.forgerock.openam.cts.api.filter.SessionQueryFilterVisitor;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder.FilterAttributeBuilder;

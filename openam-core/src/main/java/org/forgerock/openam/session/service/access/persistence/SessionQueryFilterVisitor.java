@@ -13,10 +13,10 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
-package org.forgerock.openam.cts.api.filter;
 
-import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_REALM;
-import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_USERNAME;
+package org.forgerock.openam.session.service.access.persistence;
+
+import static org.forgerock.openam.session.SessionConstants.*;
 
 import java.util.List;
 
@@ -29,23 +29,22 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 
-import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
 
 /**
- * A {@link org.forgerock.util.query.QueryFilterVisitor} implementation that transforms CREST Query filters to CTS
- * attribute query filters.
+ * A specialised {@link org.forgerock.util.query.QueryFilterVisitor} implementation that transforms a CREST Query filter
+ * to a CTS query, using a username value and the realm value to determine the user id if present.
  *
  * The current implementation only supports username and realm based lookups, however in order to construct the username
  * part of the filter, the realm MUST be also present in the filter.
  */
-public class SessionQueryFilterVisitor extends BaseQueryFilterVisitor<Void, FilterAttributeBuilder, JsonPointer> {
+class SessionQueryFilterVisitor extends BaseQueryFilterVisitor<Void, FilterAttributeBuilder, JsonPointer> {
 
     private final IdentityUtils identityUtils;
     private String username;
     private String realm;
 
-    public SessionQueryFilterVisitor(IdentityUtils identityUtils) {
+    SessionQueryFilterVisitor(IdentityUtils identityUtils) {
         this.identityUtils = identityUtils;
     }
 

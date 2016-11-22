@@ -16,12 +16,10 @@
 
 package org.forgerock.openam.core.rest;
 
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.rest.Routers.ssoToken;
+import static org.forgerock.openam.rest.Routers.*;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
@@ -50,6 +48,9 @@ import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.services.MailService;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * A {@link RestRouteProvider} that add routes for all the core endpoints.
@@ -132,6 +133,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         rootRouter.route("tokens")
                 .auditAs(CTS)
                 .authorizeWith(CoreTokenResourceAuthzModule.class)
+                .forVersion(1, 1)
                 .toAnnotatedCollection(CoreTokenResource.class);
 
         rootRouter.route(RecordConstants.RECORD_REST_ENDPOINT)

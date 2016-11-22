@@ -15,16 +15,15 @@
  */
 package org.forgerock.openam.core.rest.cts;
 
-import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
@@ -43,6 +42,8 @@ import org.mockito.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Unit test for {@link CoreTokenResource}.
@@ -76,7 +77,7 @@ public class CoreTokenResourceTest {
         resource.createInstance(null, request);
 
         // Then
-        verify(mockStore).createAsync(mockToken);
+        verify(mockStore).create(mockToken);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
-        doThrow(IllegalArgumentException.class).when(mockStore).createAsync(any(Token.class));
+        doThrow(IllegalArgumentException.class).when(mockStore).create(any(Token.class));
 
         // When
         Promise<ResourceResponse, ResourceException> promise = resource.createInstance(null, request);
@@ -102,7 +103,7 @@ public class CoreTokenResourceTest {
         resource.deleteInstance(null, one, mock(DeleteRequest.class));
 
         // Then
-        verify(mockStore).deleteAsync(one);
+        verify(mockStore).delete(one);
     }
 
     @Test
@@ -164,7 +165,7 @@ public class CoreTokenResourceTest {
         resource.updateInstance(null, "badger", updateRequest);
 
         // Then
-        verify(mockStore).updateAsync(any(Token.class));
+        verify(mockStore).update(any(Token.class));
     }
 
     @Test
