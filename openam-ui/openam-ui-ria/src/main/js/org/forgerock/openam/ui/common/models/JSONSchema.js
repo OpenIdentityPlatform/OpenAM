@@ -173,6 +173,9 @@ define([
             schema.defaultProperties = keys;
             return new JSONSchema(schema);
         }
+        hasDefaultProperties () {
+            return !_.isUndefined(this.raw.defaultProperties);
+        }
         getEnableKey () {
             const key = `${_.camelCase(this.raw.title)}Enabled`;
             if (this.raw.properties[key]) {

@@ -133,7 +133,13 @@ define([
         },
         getData () {
             const passwordKeys = this.options.schema.getPasswordKeys();
-            const values = new JSONValues(this.jsonEditor.getValue());
+            let values = new JSONValues(this.jsonEditor.getValue());
+
+            // Returns only the subset of values that were displayed to the user (via defaultProperties)
+            if (this.options.schema.hasDefaultProperties()) {
+                values = values.pick(this.options.schema.raw.defaultProperties);
+            }
+
             let valuesWithoutEmptyPasswords = values.omit((value, key) => {
                 if (passwordKeys.indexOf(key) !== -1 && _.isEmpty(value)) {
                     return true;
