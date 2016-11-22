@@ -21,8 +21,7 @@ import static org.forgerock.openam.authentication.modules.push.registration.Cons
 import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,6 +46,8 @@ import org.forgerock.openam.authentication.modules.push.AbstractPushModule;
 import org.forgerock.openam.authentication.modules.push.AuthenticatorPushPrincipal;
 import org.forgerock.openam.core.rest.devices.push.PushDeviceSettings;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.services.baseurl.BaseURLProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.services.push.PushNotificationException;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
@@ -61,8 +62,6 @@ import org.forgerock.util.time.TimeService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -399,23 +398,15 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
         } catch (PushNotificationException e) {
             DEBUG.error("Unable to read service addresses for Push Notification Service.");
             throw failedAsLoginException();
-        } catch (ServerEntryNotFoundException e) {
-            DEBUG.error("Unable to read site address for Push Notification Service.");
-            throw failedAsLoginException();
         }
     }
 
-    private String getMessageResponseUrl(String component) throws ServerEntryNotFoundException {
-        URL url;
-        try {
-            String serverId = WebtopNaming.getAMServerID();
-            String serverOrSiteID = WebtopNaming.getSiteID(serverId);
-            url = new URL(WebtopNaming.getServerFromID(serverOrSiteID));
-        } catch (MalformedURLException e) {
-            throw new ServerEntryNotFoundException(e);
-        }
-        String localServerURL = url.toString() + "/json";
-        return Base64url.encode((localServerURL + component).getBytes());
+    private String getMessageResponseUrl(String component) {
+        BaseURLProviderFactory baseUrlProviderFactory = InjectorHolder.getInstance(BaseURLProviderFactory.class);
+        final BaseURLProvider baseUrlProvider = baseUrlProviderFactory.get(getRequestOrg());
+
+        return Base64url.encode((baseUrlProvider.getRootURL(getHttpServletRequest()) + "/json" + component)
+                .getBytes(StandardCharsets.UTF_8));
     }
 
     private AuthLoginException failedAsLoginException() throws AuthLoginException {
