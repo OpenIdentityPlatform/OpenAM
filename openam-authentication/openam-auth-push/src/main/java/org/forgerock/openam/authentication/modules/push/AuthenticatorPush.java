@@ -167,7 +167,7 @@ public class AuthenticatorPush extends AbstractPushModule {
     private int stateWait(Callback[] callbacks) throws AuthLoginException {
         checkDeviceExists();
         if (expireTime < Time.currentTimeMillis()) {
-            throw failedAsLoginException();
+            throw failedAsPasswordException();
         }
         if (emergencyPressed(callbacks)) {
             return STATE_EMERGENCY;
