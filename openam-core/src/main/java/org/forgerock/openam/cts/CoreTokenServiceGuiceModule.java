@@ -18,7 +18,6 @@ package org.forgerock.openam.cts;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -98,8 +97,6 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
-        bind(CoreTokenConstants.class);
-
         bind(ObjectMapper.class)
                 .annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER))
                 .toProvider(CTSObjectMapperProvider.class)
@@ -144,7 +141,6 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
         expose(ExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL));
         expose(ObjectMapper.class).annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER));
         expose(ResultHandlerFactory.class);
-        expose(ScheduledExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_SCHEDULED_SERVICE));
         expose(String.class).annotatedWith(Names.named(DataLayerConstants.ROOT_DN_SUFFIX));
     }
 
@@ -182,11 +178,6 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
         return esf.createFixedThreadPool(5, "cts-monitoring-thread");
-    }
-
-    @Provides @Inject @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE)
-    ScheduledExecutorService getCTSScheduledService(ExecutorServiceFactory esf) {
-        return esf.createScheduledService(1);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)

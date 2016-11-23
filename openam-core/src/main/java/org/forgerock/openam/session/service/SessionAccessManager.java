@@ -18,18 +18,15 @@ package org.forgerock.openam.session.service;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.service.access.SessionPersistenceManager;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceException;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -49,12 +46,11 @@ public class SessionAccessManager {
 
     @VisibleForTesting
     @Inject
-    SessionAccessManager(final SessionCache sessionCache,
-                         @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) final ScheduledExecutorService scheduler,
-                         final ThreadMonitor threadMonitor,
-                         final InternalSessionStore internalSessionStore) {
+    SessionAccessManager(final SessionCache sessionCache, final ExecutorServiceFactory esf,
+            final ThreadMonitor threadMonitor, final InternalSessionStore internalSessionStore) {
         this.sessionCache = sessionCache;
-        this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduler, threadMonitor);
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
+        this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduledExecutorService, threadMonitor);
         this.internalSessionStore = internalSessionStore;
     }
 

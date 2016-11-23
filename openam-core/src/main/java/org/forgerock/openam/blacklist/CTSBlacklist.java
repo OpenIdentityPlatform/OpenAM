@@ -17,14 +17,11 @@
 package org.forgerock.openam.blacklist;
 
 import static java.util.Locale.ROOT;
-import static java.util.TimeZone.getTimeZone;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 import static org.forgerock.util.query.QueryFilter.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,11 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNamingQuery;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -49,6 +42,10 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
+
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNamingQuery;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Entry blacklist that stores blacklisted entries in the CTS until they expire. A stable ID is stored in the CTS
@@ -94,9 +91,7 @@ public final class CTSBlacklist<T extends Blacklistable> implements Blacklist<T>
     private final String localServerId;
     private final long purgeDelayMs;
 
-    @Inject
-    public CTSBlacklist(CTSPersistentStore cts, TokenType tokenType,
-            @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduler,
+    public CTSBlacklist(CTSPersistentStore cts, TokenType tokenType, ScheduledExecutorService scheduler,
             ThreadMonitor threadMonitor, WebtopNamingQuery serverConfig, long purgeDelayMs, long pollIntervalMs) {
         Reject.ifNull(cts, tokenType, scheduler, threadMonitor);
         this.cts = cts;
@@ -225,7 +220,7 @@ public final class CTSBlacklist<T extends Blacklistable> implements Blacklist<T>
 
         @Override
         public void run() {
-            DEBUG.message("CTSBlacklist: polling for new blacklisted entries");
+             DEBUG.message("CTSBlacklist: polling for new blacklisted entries");
             Collection<PartialToken> results =
                     findEntriesBlacklistedSince(lastPollTime.getAndSet(currentTimeMillis()));
             if (results != null) {

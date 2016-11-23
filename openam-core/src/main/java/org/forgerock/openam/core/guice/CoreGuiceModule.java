@@ -324,13 +324,13 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
     @Provides @Singleton @Inject
-    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts,
-            @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduler,
+    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts, ExecutorServiceFactory esf,
             ThreadMonitor threadMonitor, WebtopNamingQuery serverConfig, SessionServiceConfig serviceConfig) {
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
         long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
-        return new CTSBlacklist<>(cts, TokenType.SESSION_BLACKLIST, scheduler, threadMonitor, serverConfig,
-                purgeDelayMs, pollIntervalMs);
+        return new CTSBlacklist<>(cts, TokenType.SESSION_BLACKLIST, scheduledExecutorService, threadMonitor,
+                serverConfig, purgeDelayMs, pollIntervalMs);
     }
 
     @Provides @Singleton @Inject

@@ -140,6 +140,7 @@ import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.SubjectTypeValidator;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.forgerock.openidconnect.ssoprovider.OpenIdConnectSSOProvider;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.restlet.Restlet;
 
 import com.google.inject.AbstractModule;
@@ -433,13 +434,13 @@ public class OAuth2GuiceModule extends AbstractModule {
     }
 
     @Provides
-    public CTSBlacklist<Blacklistable> getCtsStatelessTokenBlacklist(CTSPersistentStore cts,
-            @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE) ScheduledExecutorService scheduler,
+    public CTSBlacklist<Blacklistable> getCtsStatelessTokenBlacklist(CTSPersistentStore cts, ExecutorServiceFactory esf,
             ThreadMonitor threadMonitor, WebtopNamingQuery webtopNamingQuery,OAuth2GlobalSettings globalSettings) {
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
         long purgeDelayMs = globalSettings.getBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         long pollIntervalMs = globalSettings.getBlacklistPollInterval(TimeUnit.MILLISECONDS);
-        return new CTSBlacklist<>(cts, TokenType.OAUTH_BLACKLIST, scheduler, threadMonitor, webtopNamingQuery,
-                purgeDelayMs, pollIntervalMs);
+        return new CTSBlacklist<>(cts, TokenType.OAUTH_BLACKLIST, scheduledExecutorService, threadMonitor,
+                webtopNamingQuery, purgeDelayMs, pollIntervalMs);
     }
 
     @Provides @Singleton @Inject
