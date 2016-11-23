@@ -16,8 +16,6 @@
 package org.forgerock.openam.cts.worker;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +44,8 @@ public class CTSWorkerManager {
     private final CoreTokenConfig config;
     private final ExecutorServiceFactory executorServiceFactory;
     private final Debug debug;
-    private final Set<ScheduledExecutorService> scheduledServices;
     private boolean started = false;
+    private ScheduledExecutorService scheduledService;
     private int runPeriod;
 
     /**
@@ -84,7 +82,6 @@ public class CTSWorkerManager {
         this.config = config;
         this.executorServiceFactory = executorServiceFactory;
         this.debug = debug;
-        this.scheduledServices = new HashSet<>();
     }
 
     /**
@@ -96,18 +93,16 @@ public class CTSWorkerManager {
     public synchronized void startTasks() throws IllegalStateException {
         Reject.ifTrue(started);
         runPeriod = config.getRunPeriod();
-
+        scheduledService = executorServiceFactory.createScheduledService(1);
         for (CTSWorkerTask worker : workers) {
             debug.message(CoreTokenConstants.DEBUG_HEADER + "Starting {}", worker);
 
-            final ScheduledExecutorService scheduledService = executorServiceFactory.createScheduledService(1); // TODO: Name threads
             monitor.watchScheduledThread(
                     scheduledService,
                     worker,
                     runPeriod,
                     runPeriod,
                     TimeUnit.MILLISECONDS);
-            scheduledServices.add(scheduledService);
 
             debug.message(CoreTokenConstants.DEBUG_HEADER + "Started {}", worker);
         }
@@ -122,9 +117,7 @@ public class CTSWorkerManager {
     private synchronized void stopTasks() throws IllegalStateException {
         Reject.ifFalse(started);
         debug.message(CoreTokenConstants.DEBUG_HEADER + "Shutting down CTS worker scheduled service");
-        for (final ScheduledExecutorService scheduledService : scheduledServices) {
-            scheduledService.shutdownNow();
-        }
+        scheduledService.shutdownNow();
         started = false;
     }
 
