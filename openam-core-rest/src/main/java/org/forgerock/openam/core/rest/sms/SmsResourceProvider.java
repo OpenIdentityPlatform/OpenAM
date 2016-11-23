@@ -121,6 +121,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
         AUTO_CREATED_AUTHENTICATION_MODULES.put("datastore", "datastore");
         AUTO_CREATED_AUTHENTICATION_MODULES.put("federation", "federation");
         AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("amster", "amster");
     }
 
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = asList(DECIMAL, PERCENT, DECIMAL_RANGE, DECIMAL_NUMBER);

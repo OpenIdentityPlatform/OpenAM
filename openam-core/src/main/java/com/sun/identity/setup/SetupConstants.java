@@ -742,4 +742,7 @@ public interface SetupConstants {
      * The Default value for the backing database to be used by OpenDJ.
      */
     String DJ_BACKEND_TYPE_DEFAULT = "je";
+
+    /** The user's home directory. */
+    String USER_HOME = "USER_HOME";
 }

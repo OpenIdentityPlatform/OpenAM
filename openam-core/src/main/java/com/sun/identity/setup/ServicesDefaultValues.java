@@ -110,6 +110,7 @@ public class ServicesDefaultValues {
             SetupConstants.CONFIG_VAR_BASE_DIR);
         base = base.replace('\\', '/');
         map.put(SetupConstants.CONFIG_VAR_BASE_DIR, base);
+        map.put(SetupConstants.USER_HOME, System.getProperty("user.home", ""));
 
         if (!isEncryptionKeyValid()){
             throw new ConfiguratorException("configurator.encryptkey",

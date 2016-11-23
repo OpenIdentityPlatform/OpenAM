@@ -877,6 +877,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-amster</artifactId>
+        </dependency>
+
+        <dependency>
             <artifactId>openam-auth-windowsdesktopsso</artifactId>
             <groupId>org.forgerock.openam</groupId>
         </dependency>

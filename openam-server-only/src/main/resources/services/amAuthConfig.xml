@@ -28,7 +28,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2015 ForgeRock AS.
+    Portions Copyrighted 2015-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -121,11 +121,16 @@
         <Configuration>
             <OrganizationConfiguration name="/">
                 <SubConfiguration name="Configurations">
-                    <SubConfiguration name="ldapService"
-                        id="NamedConfiguration">
+                    <SubConfiguration name="ldapService" id="NamedConfiguration">
                         <AttributeValuePair>
                             <Attribute name="iplanet-am-auth-configuration"/>
                             <Value>&lt;AttributeValuePair&gt;&lt;Value&gt;@DEFAULT_AUTH_MODULE@ REQUIRED &lt;&#47;Value&gt;&lt;&#47;AttributeValuePair&gt;</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="amsterService" id="NamedConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="iplanet-am-auth-configuration"/>
+                            <Value>&lt;AttributeValuePair&gt;&lt;Value&gt;Amster REQUIRED &lt;&#47;Value&gt;&lt;&#47;AttributeValuePair&gt;</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
