@@ -23,6 +23,11 @@ import org.forgerock.openam.cts.worker.CTSWorkerProcess;
 public final class CTSWorkerConstants {
 
     /**
+     * Past expiry date query implementation handle.
+     */
+    public static final String PAST_EXPIRY_DATE = "PastExpiryDate";
+
+    /**
      * Task name reference for deleting sessions that have expired.
      */
     public static final String DELETE_ALL_MAX_EXPIRED = "DeleteAllMaxExpired";

@@ -21,13 +21,13 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.CoreTokenConfigListener;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
@@ -44,7 +44,7 @@ public class CTSWorkerManager {
     private final Collection<CTSWorkerTask> workers;
     private final ThreadMonitor monitor;
     private final CoreTokenConfig config;
-    private final AMExecutorServiceFactory executorServiceFactory;
+    private final ExecutorServiceFactory executorServiceFactory;
     private final Debug debug;
     private final Set<ScheduledExecutorService> scheduledServices;
     private boolean started = false;
@@ -63,7 +63,7 @@ public class CTSWorkerManager {
      * @param debug Non null, required for debugging.
      */
     public static CTSWorkerManager newCTSWorkerInit(CTSWorkerTaskProvider taskProvider, ThreadMonitor monitor,
-            CoreTokenConfig config, AMExecutorServiceFactory executorServiceFactory,
+            CoreTokenConfig config, ExecutorServiceFactory executorServiceFactory,
             @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         final CTSWorkerManager manager = new CTSWorkerManager(taskProvider, monitor, config, executorServiceFactory, debug);
         manager.config.addListener(
@@ -78,7 +78,7 @@ public class CTSWorkerManager {
 
     @VisibleForTesting
     CTSWorkerManager(CTSWorkerTaskProvider workerTaskProvider, ThreadMonitor monitor, CoreTokenConfig config,
-            AMExecutorServiceFactory executorServiceFactory, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+            ExecutorServiceFactory executorServiceFactory, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.workers = workerTaskProvider.getTasks();
         this.monitor = monitor;
         this.config = config;
@@ -100,7 +100,7 @@ public class CTSWorkerManager {
         for (CTSWorkerTask worker : workers) {
             debug.message(CoreTokenConstants.DEBUG_HEADER + "Starting {}", worker);
 
-            ScheduledExecutorService scheduledService = executorServiceFactory.createScheduledService(1, worker.getName());
+            final ScheduledExecutorService scheduledService = executorServiceFactory.createScheduledService(1); // TODO: Name threads
             monitor.watchScheduledThread(
                     scheduledService,
                     worker,

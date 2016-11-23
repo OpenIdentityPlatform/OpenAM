@@ -85,7 +85,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
 
         queue = new ArrayBlockingQueue<>(queueSize);
         subscriptions = new CopyOnWriteArrayList<>();
-        executorService = executorServiceFactory.createFixedThreadPool(consumers, "InMemoryNotificationsBroker");
+        executorService = executorServiceFactory.createFixedThreadPool(consumers);
         for (int i = 0; i < consumers; i++) {
             executorService.submit(new NotificationReader());
         }

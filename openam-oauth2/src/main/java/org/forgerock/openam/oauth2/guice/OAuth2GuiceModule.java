@@ -89,7 +89,6 @@ import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.blacklist.Blacklist;
 import org.forgerock.openam.blacklist.Blacklistable;
 import org.forgerock.openam.blacklist.BloomFilterBlacklist;
@@ -435,9 +434,9 @@ public class OAuth2GuiceModule extends AbstractModule {
     }
 
     @Provides
-    public CTSBlacklist<Blacklistable> getCtsStatelessTokenBlacklist(CTSPersistentStore cts, AMExecutorServiceFactory esf,
+    public CTSBlacklist<Blacklistable> getCtsStatelessTokenBlacklist(CTSPersistentStore cts, ExecutorServiceFactory esf,
             ThreadMonitor threadMonitor, WebtopNamingQuery webtopNamingQuery,OAuth2GlobalSettings globalSettings) {
-        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1, "OAuthTokenBlacklisting");
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
         long purgeDelayMs = globalSettings.getBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         long pollIntervalMs = globalSettings.getBlacklistPollInterval(TimeUnit.MILLISECONDS);
         return new CTSBlacklist<>(cts, TokenType.OAUTH_BLACKLIST, scheduledExecutorService, threadMonitor,

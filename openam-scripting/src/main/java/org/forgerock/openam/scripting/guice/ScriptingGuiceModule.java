@@ -16,8 +16,13 @@
 
 package org.forgerock.openam.scripting.guice;
 
-import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
+import static org.forgerock.openam.scripting.ScriptConstants.AUTHENTICATION_SERVER_SIDE_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.OIDC_CLAIMS_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.POLICY_CONDITION_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.SCRIPTING_HTTP_CLIENT_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OIDC_CLAIMS;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +34,6 @@ import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
 import org.forgerock.http.client.RestletHttpClient;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -43,6 +47,7 @@ import org.forgerock.openam.scripting.api.http.GroovyHttpClient;
 import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +111,7 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(AUTHENTICATION_SERVER_SIDE_NAME)
     ScriptEvaluator getAuthenticationServerSideScriptEvaluator(
             @Named(AUTHENTICATION_SERVER_SIDE_NAME) StandardScriptEngineManager scriptEngineManager,
-            AMExecutorServiceFactory executorServiceFactory) {
+            ExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
@@ -125,7 +130,7 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(POLICY_CONDITION_NAME)
     ScriptEvaluator getPoliyConditionScriptEvaluator(
             @Named(POLICY_CONDITION_NAME) StandardScriptEngineManager scriptEngineManager,
-            AMExecutorServiceFactory executorServiceFactory) {
+            ExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
@@ -144,13 +149,13 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(OIDC_CLAIMS_NAME)
     ScriptEvaluator getOidcClaimsScriptEvaluator(
             @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
-            AMExecutorServiceFactory executorServiceFactory) {
+            ExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     private ThreadPoolScriptEvaluator createEvaluator(StandardScriptEngineManager scriptEngineManager,
-                                                      AMExecutorServiceFactory executorServiceFactory) {
+                                                      ExecutorServiceFactory executorServiceFactory) {
 
         ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
 
@@ -160,8 +165,7 @@ public class ScriptingGuiceModule extends AbstractModule {
                         configuration.getThreadPoolMaxSize(),
                         configuration.getThreadPoolIdleTimeoutSeconds(),
                         TimeUnit.SECONDS,
-                        getThreadPoolQueue(configuration.getThreadPoolQueueSize()),
-                        "ScriptEvaluator"
+                        getThreadPoolQueue(configuration.getThreadPoolQueueSize())
                 ),
                 new StandardScriptEvaluator(scriptEngineManager));
     }

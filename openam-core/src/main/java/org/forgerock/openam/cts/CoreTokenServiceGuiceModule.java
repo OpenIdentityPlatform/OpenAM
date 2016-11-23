@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.core.guice.CTSObjectMapperProvider;
 import org.forgerock.openam.cts.api.CTSOptions;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
@@ -97,6 +96,8 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
+
+        bind(CoreTokenConstants.class);
 
         bind(ObjectMapper.class)
                 .annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER))
@@ -178,7 +179,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "CTSMonitoring");
+        return esf.createFixedThreadPool(5, "cts-monitoring-thread");
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)
@@ -186,8 +187,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             CTSWorkerPastExpiryDateQuery query,
             CTSWorkerDeleteProcess deleteProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        String taskName = CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED + "Task";
-        return new CTSWorkerTask(query, deleteProcess, selectAllFilter, taskName);
+        return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
@@ -195,8 +195,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             MaxSessionTimeExpiredQuery query,
             MaxSessionTimeExpiredProcess maxSessionTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        String taskName = CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED + "Task";
-        return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter, taskName);
+        return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
@@ -204,8 +203,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             SessionIdleTimeExpiredQuery query,
             SessionIdleTimeExpiredProcess sessionIdleTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        String taskName = CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED + "Task";
-        return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter, taskName);
+        return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter);
     }
 
     @Provides @Inject
@@ -221,7 +219,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Singleton
     CTSWorkerManager getCTSWorkerManager(CTSWorkerTaskProvider workerTaskProvider, ThreadMonitor monitor,
-            CoreTokenConfig config, AMExecutorServiceFactory executorServiceFactory,
+            CoreTokenConfig config, ExecutorServiceFactory executorServiceFactory,
             @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         return CTSWorkerManager.newCTSWorkerInit(workerTaskProvider, monitor, config, executorServiceFactory, debug);
     }

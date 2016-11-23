@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,16 +41,16 @@ public class CTSWorkerManagerTest {
     private ThreadMonitor mockMonitor;
     private CTSWorkerManager ctsWorkerManager;
     private CoreTokenConfig mockCoreTokenConfig;
-    private AMExecutorServiceFactory mockExecutorServiceFactory;
+    private ExecutorServiceFactory mockExecutorServiceFactory;
 
     @BeforeMethod
     public void setup() {
         mockMonitor = mock(ThreadMonitor.class);
         mockCoreTokenConfig = mock(CoreTokenConfig.class);
-        mockExecutorServiceFactory = mock(AMExecutorServiceFactory.class);
+        mockExecutorServiceFactory = mock(ExecutorServiceFactory.class);
         CTSWorkerTaskProvider mockTaskProvider = mock(CTSWorkerTaskProvider.class);
         given(mockTaskProvider.getTasks()).willReturn(Collections.singletonList(mock(CTSWorkerTask.class)));
-        given(mockExecutorServiceFactory.createScheduledService(anyInt(), anyString()))
+        given(mockExecutorServiceFactory.createScheduledService(anyInt()))
                 .willReturn(mock(ScheduledExecutorService.class));
         given(mockCoreTokenConfig.getRunPeriod()).willReturn(RUN_PERIOD);
 

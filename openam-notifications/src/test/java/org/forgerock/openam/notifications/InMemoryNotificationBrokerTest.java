@@ -67,7 +67,7 @@ public final class InMemoryNotificationBrokerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(executorServiceFactory.createFixedThreadPool(anyInt(), anyString())).thenReturn(executorService);
+        when(executorServiceFactory.createFixedThreadPool(anyInt())).thenReturn(executorService);
         broker = new InMemoryNotificationBroker(executorServiceFactory, timeService, 2, CONSUMERS);
     }
 

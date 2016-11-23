@@ -17,6 +17,8 @@ package org.forgerock.openam.cts.worker;
 
 import java.text.MessageFormat;
 
+import javax.inject.Inject;
+
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 
 /**
@@ -27,23 +29,21 @@ public class CTSWorkerTask implements Runnable {
     private final CTSWorkerQuery query;
     private final CTSWorkerProcess process;
     private final CTSWorkerFilter filter;
-    private final String name;
 
     /**
      * Worker task constructor, requiring a query which selects elements to be processed,
      * a process defining the strategy for those elements, and a filter to remove elements to which the strategy
      * should not be applied.
+     *
      * @param query The query to be performed against the data layer.
      * @param process The process to apply to filtered results from the executed query.
      * @param filter The filter to use to reduce the set returned from the executed query.
-     * @param name The name by which this task can be identified. This is currently used to name the thread on which
-     *             this task is run.
      */
-    public CTSWorkerTask(CTSWorkerQuery query, CTSWorkerProcess process, CTSWorkerFilter filter, String name) {
+    @Inject
+    public CTSWorkerTask(CTSWorkerQuery query, CTSWorkerProcess process, CTSWorkerFilter filter) {
         this.query = query;
         this.process = process;
         this.filter = filter;
-        this.name = name;
     }
 
     @Override
@@ -51,19 +51,10 @@ public class CTSWorkerTask implements Runnable {
         process.handle(query, filter);
     }
 
-    /**
-     * Return the name of this task.
-     *
-     * @return The name of this task.
-     */
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
-        return MessageFormat.format("CTSWorker : Name = [{0}], Query = [{1}], Process = [{2}], Filter = [{3}]",
-                name, query, process, filter);
+        return MessageFormat.format("CTSWorker : Query = [{0}], Process = [{1}], Filter = [{2}]",
+                query, process, filter);
     }
 
 }

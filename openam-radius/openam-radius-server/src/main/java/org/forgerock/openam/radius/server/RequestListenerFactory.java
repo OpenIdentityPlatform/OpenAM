@@ -11,7 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
+ */
+/**
+ *
  */
 package org.forgerock.openam.radius.server;
 
@@ -23,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.guava.common.eventbus.EventBus;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServiceConfig;
 import org.forgerock.openam.radius.server.config.ThreadPoolConfig;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -41,7 +44,7 @@ public class RequestListenerFactory {
      * The executor service factory that should be used to create the ExecutorService used by the created.
      * <code>RadiusRequestListener</code>s
      */
-    private final AMExecutorServiceFactory executorServiceFactory;
+    private final ExecutorServiceFactory executorServiceFactory;
 
     /**
      * The event bus to be used by the Request Listener.
@@ -61,7 +64,7 @@ public class RequestListenerFactory {
      * @param accessRequestHandlerFactory may be used to obtain access request handlers.
      */
     @Inject
-    public RequestListenerFactory(AMExecutorServiceFactory serviceFactory,
+    public RequestListenerFactory(ExecutorServiceFactory serviceFactory,
             @Named("RadiusEventBus") EventBus eventBus,
             AccessRequestHandlerFactory accessRequestHandlerFactory) {
         this.executorServiceFactory = serviceFactory;
@@ -85,7 +88,7 @@ public class RequestListenerFactory {
 
         final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(poolConfig.getQueueSize());
         final ExecutorService executorService = executorServiceFactory.createThreadPool(coreSize, maxSize, idleTimeout,
-                TimeUnit.SECONDS, queue, "RadiusRequestHandler");
+                TimeUnit.SECONDS, queue);
         return new RadiusRequestListener(serviceConfig, executorService, eventBus, accessRequestHandlerFactory);
     }
 

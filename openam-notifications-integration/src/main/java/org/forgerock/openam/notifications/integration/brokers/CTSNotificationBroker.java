@@ -22,6 +22,8 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openam.utils.TimeUtils.fromUnixTime;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,11 +41,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -62,10 +61,9 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.util.Reject;
 import org.forgerock.util.generator.IdGenerator;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Uses the CTS to propagate notifications across an OpenAM cluster.
@@ -109,7 +107,7 @@ public final class CTSNotificationBroker implements NotificationBroker {
             @Named("ctsQueueSize") int queueSize,
             @Named("tokenExpirySeconds") long tokenExpirySeconds,
             @Named("publishFrequencyMilliseconds") long publishFrequencyMilliseconds,
-            AMExecutorServiceFactory executorServiceFactory) {
+            ExecutorServiceFactory executorServiceFactory) {
         Reject.ifNull(store, "CTS store must not be null");
         Reject.ifNull(localBroker, "Notification broker must not be null");
         Reject.ifNull(executorServiceFactory, "Executor service factory must not be null");
@@ -119,7 +117,7 @@ public final class CTSNotificationBroker implements NotificationBroker {
         this.localBroker = localBroker;
         this.store = store;
         this.tokenExpirySeconds = tokenExpirySeconds;
-        executorService = executorServiceFactory.createScheduledService(1, "CTSNotificationsBroker");
+        executorService = executorServiceFactory.createScheduledService(1);
         idGenerator = IdGenerator.DEFAULT;
         listener = new SessionNotificationListener();
         queue = new ArrayBlockingQueue<>(queueSize);

@@ -29,7 +29,6 @@ import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.file.ZipUtils;
@@ -104,8 +103,8 @@ public class DefaultDebugRecorder implements DebugRecorder {
      * Initialize the RecordDebugController.
      */
     @Inject
-    public DefaultDebugRecorder(AMExecutorServiceFactory executorServiceFactory) {
-        scheduledExecutorService = executorServiceFactory.createScheduledService(2, "DefaultDebugRecorder");
+    public DefaultDebugRecorder(ExecutorServiceFactory executorServiceFactory) {
+        scheduledExecutorService = executorServiceFactory.createScheduledService(2);
         recordReport = new RecordReport();
     }
 

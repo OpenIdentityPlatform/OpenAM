@@ -32,7 +32,6 @@ import javax.servlet.ServletContext;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.blacklist.Blacklist;
@@ -226,17 +225,17 @@ public class CoreGuiceModule extends AbstractModule {
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getPolicyMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "PolicyMonitoring");
+        return esf.createFixedThreadPool(5, "policy-monitoring-thread");
     }
 
     @Provides @Inject @Named(SessionMonitoringStore.EXECUTOR_BINDING_NAME)
     ExecutorService getSessionMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "SessionMonitoring");
+        return esf.createFixedThreadPool(5, "session-monitoring-thread");
     }
 
     @Provides @Inject @Named(SessionTimeoutHandlerExecutor.EXECUTOR_BINDING_NAME)
     ExecutorService getSessionTimeoutHandlerExecutorService(ExecutorServiceFactory esf) {
-        return esf.createCachedThreadPool("SessionTimeoutHandler");
+        return esf.createCachedThreadPool("session-timeout-handler-thread");
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)
@@ -325,9 +324,9 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
     @Provides @Singleton @Inject
-    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts, AMExecutorServiceFactory esf,
+    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts, ExecutorServiceFactory esf,
             ThreadMonitor threadMonitor, WebtopNamingQuery serverConfig, SessionServiceConfig serviceConfig) {
-        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1, "SessionBlacklistingThread");
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
         long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
         return new CTSBlacklist<>(cts, TokenType.SESSION_BLACKLIST, scheduledExecutorService, threadMonitor,

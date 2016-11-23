@@ -42,7 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -94,8 +94,7 @@ public class IdRepoPluginsCache implements ServiceListener {
             debug.message("IdRepoPluginsCache constructor called");
         }
 
-        this.scheduler = InjectorHolder.getInstance(AMExecutorServiceFactory.class)
-                .createScheduledService(1, "IdRepoPlugin");
+        this.scheduler = InjectorHolder.getInstance(ExecutorServiceFactory.class).createScheduledService(1);
 
         initializeListeners();
     }
