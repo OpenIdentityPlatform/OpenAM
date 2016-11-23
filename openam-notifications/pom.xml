@@ -38,6 +38,10 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-context</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

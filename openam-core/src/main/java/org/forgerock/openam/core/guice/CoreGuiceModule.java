@@ -32,6 +32,7 @@ import javax.servlet.ServletContext;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.blacklist.Blacklist;
@@ -69,7 +70,6 @@ import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -224,18 +224,18 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
-    ExecutorService getPolicyMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "policy-monitoring-thread");
+    ExecutorService getPolicyMonitoringExecutorService(AMExecutorServiceFactory esf) {
+        return esf.createFixedThreadPool(5, "PolicyMonitoring");
     }
 
     @Provides @Inject @Named(SessionMonitoringStore.EXECUTOR_BINDING_NAME)
-    ExecutorService getSessionMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "session-monitoring-thread");
+    ExecutorService getSessionMonitoringExecutorService(AMExecutorServiceFactory esf) {
+        return esf.createFixedThreadPool(5, "SessionMonitoring");
     }
 
     @Provides @Inject @Named(SessionTimeoutHandlerExecutor.EXECUTOR_BINDING_NAME)
-    ExecutorService getSessionTimeoutHandlerExecutorService(ExecutorServiceFactory esf) {
-        return esf.createCachedThreadPool("session-timeout-handler-thread");
+    ExecutorService getSessionTimeoutHandlerExecutorService(AMExecutorServiceFactory esf) {
+        return esf.createCachedThreadPool("SessionTimeoutHandler");
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)
@@ -324,9 +324,9 @@ public class CoreGuiceModule extends AbstractModule {
     }
 
     @Provides @Singleton @Inject
-    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts, ExecutorServiceFactory esf,
+    public CTSBlacklist<Session> getCtsSessionBlacklist(CTSPersistentStore cts, AMExecutorServiceFactory esf,
             ThreadMonitor threadMonitor, WebtopNamingQuery serverConfig, SessionServiceConfig serviceConfig) {
-        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1); // TODO: Name threads
+        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1, "SessionBlacklistingThread");
         long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
         long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
         return new CTSBlacklist<>(cts, TokenType.SESSION_BLACKLIST, scheduledExecutorService, threadMonitor,

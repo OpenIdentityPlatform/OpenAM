@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.core.guice.CTSObjectMapperProvider;
 import org.forgerock.openam.cts.api.CTSOptions;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
@@ -54,7 +55,6 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
 import org.forgerock.util.Option;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.PrivateModule;
@@ -165,7 +165,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
     @Inject
     @Named(CoreTokenConstants.CTS_WORKER_POOL)
     ExecutorService getCTSWorkerExecutorService(
-            ExecutorServiceFactory esf,
+            AMExecutorServiceFactory esf,
             @DataLayer(ConnectionType.CTS_ASYNC) QueueConfiguration queueConfiguration) {
         try {
             int size = queueConfiguration.getProcessors();
@@ -176,8 +176,8 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
     }
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
-    ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createFixedThreadPool(5, "cts-monitoring-thread");
+    ExecutorService getCTSMonitoringExecutorService(AMExecutorServiceFactory esf) {
+        return esf.createFixedThreadPool(5, "CTSMonitoring");
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED)
@@ -185,7 +185,8 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             CTSWorkerPastExpiryDateQuery query,
             CTSWorkerDeleteProcess deleteProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, deleteProcess, selectAllFilter);
+        String taskName = CTSWorkerConstants.DELETE_ALL_MAX_EXPIRED + "Task";
+        return new CTSWorkerTask(query, deleteProcess, selectAllFilter, taskName);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED)
@@ -193,7 +194,8 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             MaxSessionTimeExpiredQuery query,
             MaxSessionTimeExpiredProcess maxSessionTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter);
+        String taskName = CTSWorkerConstants.MAX_SESSION_TIME_EXPIRED + "Task";
+        return new CTSWorkerTask(query, maxSessionTimeExpiredProcess, selectAllFilter, taskName);
     }
 
     @Provides @Inject @Named(CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED)
@@ -201,7 +203,8 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
             SessionIdleTimeExpiredQuery query,
             SessionIdleTimeExpiredProcess sessionIdleTimeExpiredProcess,
             CTSWorkerSelectAllFilter selectAllFilter) {
-        return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter);
+        String taskName = CTSWorkerConstants.SESSION_IDLE_TIME_EXPIRED + "Task";
+        return new CTSWorkerTask(query, sessionIdleTimeExpiredProcess, selectAllFilter, taskName);
     }
 
     @Provides @Inject
@@ -217,7 +220,7 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
     @Provides @Inject @Singleton
     CTSWorkerManager getCTSWorkerManager(CTSWorkerTaskProvider workerTaskProvider, ThreadMonitor monitor,
-            CoreTokenConfig config, ExecutorServiceFactory executorServiceFactory,
+            CoreTokenConfig config, AMExecutorServiceFactory executorServiceFactory,
             @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         return CTSWorkerManager.newCTSWorkerInit(workerTaskProvider, monitor, config, executorServiceFactory, debug);
     }

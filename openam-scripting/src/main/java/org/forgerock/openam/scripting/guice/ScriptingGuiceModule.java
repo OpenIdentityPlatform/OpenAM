@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
 import org.forgerock.http.client.RestletHttpClient;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -47,7 +48,6 @@ import org.forgerock.openam.scripting.api.http.GroovyHttpClient;
 import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(AUTHENTICATION_SERVER_SIDE_NAME)
     ScriptEvaluator getAuthenticationServerSideScriptEvaluator(
             @Named(AUTHENTICATION_SERVER_SIDE_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory) {
+            AMExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
@@ -130,7 +130,7 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(POLICY_CONDITION_NAME)
     ScriptEvaluator getPoliyConditionScriptEvaluator(
             @Named(POLICY_CONDITION_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory) {
+            AMExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
@@ -149,13 +149,13 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(OIDC_CLAIMS_NAME)
     ScriptEvaluator getOidcClaimsScriptEvaluator(
             @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory) {
+            AMExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     private ThreadPoolScriptEvaluator createEvaluator(StandardScriptEngineManager scriptEngineManager,
-                                                      ExecutorServiceFactory executorServiceFactory) {
+                                                      AMExecutorServiceFactory executorServiceFactory) {
 
         ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
 
@@ -165,7 +165,8 @@ public class ScriptingGuiceModule extends AbstractModule {
                         configuration.getThreadPoolMaxSize(),
                         configuration.getThreadPoolIdleTimeoutSeconds(),
                         TimeUnit.SECONDS,
-                        getThreadPoolQueue(configuration.getThreadPoolQueueSize())
+                        getThreadPoolQueue(configuration.getThreadPoolQueueSize()),
+                        "ScriptEvaluator"
                 ),
                 new StandardScriptEvaluator(scriptEngineManager));
     }

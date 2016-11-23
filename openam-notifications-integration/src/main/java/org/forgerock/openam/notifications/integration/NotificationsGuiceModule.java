@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.notifications.LocalOnly;
 import org.forgerock.openam.notifications.NotificationBroker;
@@ -72,8 +73,8 @@ public class NotificationsGuiceModule extends PrivateModule {
     @Exposed
     @Singleton
     @Named("webSocketScheduledExecutorService")
-    ScheduledExecutorService scheduledExecutorService(ExecutorServiceFactory factory) {
-        return factory.createScheduledService(5);
+    ScheduledExecutorService scheduledExecutorService(AMExecutorServiceFactory factory) {
+        return factory.createScheduledService(5, "NotificationsWebSocket");
     }
 
     @Provides
@@ -85,7 +86,7 @@ public class NotificationsGuiceModule extends PrivateModule {
             @Named("ctsQueueSize") int queueSize,
             @Named("tokenExpirySeconds") long tokenExpirySeconds,
             @Named("publishFrequencyMilliseconds") long publishFrequencyMilliseconds,
-            ExecutorServiceFactory factory) {
+            AMExecutorServiceFactory factory) {
         return new CTSNotificationBroker(store, broker, queueSize, tokenExpirySeconds,
                 publishFrequencyMilliseconds, factory);
     }

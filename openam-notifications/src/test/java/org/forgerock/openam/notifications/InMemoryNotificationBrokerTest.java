@@ -17,20 +17,17 @@
 package org.forgerock.openam.notifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.notifications.brokers.InMemoryNotificationBroker;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.time.TimeService;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -49,7 +46,7 @@ public final class InMemoryNotificationBrokerTest {
     private static final int CONSUMERS = 3;
 
     @Mock
-    private ExecutorServiceFactory executorServiceFactory;
+    private AMExecutorServiceFactory executorServiceFactory;
     @Mock
     private ExecutorService executorService;
     @Mock
@@ -67,7 +64,7 @@ public final class InMemoryNotificationBrokerTest {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(executorServiceFactory.createFixedThreadPool(anyInt())).thenReturn(executorService);
+        when(executorServiceFactory.createFixedThreadPool(anyInt(), anyString())).thenReturn(executorService);
         broker = new InMemoryNotificationBroker(executorServiceFactory, timeService, 2, CONSUMERS);
     }
 

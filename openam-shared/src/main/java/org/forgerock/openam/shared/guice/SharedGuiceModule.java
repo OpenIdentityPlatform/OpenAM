@@ -15,21 +15,22 @@
  */
 package org.forgerock.openam.shared.guice;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.name.Names;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactory;
 import org.forgerock.openam.shared.security.crypto.KeyPairProviderFactoryImpl;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.name.Names;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for OpenAM shared bindings.
@@ -52,12 +53,12 @@ public class SharedGuiceModule extends AbstractModule {
     }
 
     @Provides @Inject
-    ExecutorServiceFactory provideExecutorServiceFactory(ShutdownManager manager) {
+    AMExecutorServiceFactory provideAMExecutorServiceFactory(ShutdownManager manager) {
         return new AuditRequestContextPropagatingExecutorServiceFactory(manager);
     }
 
     @Provides @Inject @Singleton
-    ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
+    ThreadMonitor provideThreadMonitor(AMExecutorServiceFactory factory,
             ShutdownManager wrapper, @Named(DEBUG_THREAD_MANAGER) Debug debug) {
         return new ThreadMonitor(factory.createCachedThreadPool(DEBUG_THREAD_MANAGER), wrapper, debug);
     }

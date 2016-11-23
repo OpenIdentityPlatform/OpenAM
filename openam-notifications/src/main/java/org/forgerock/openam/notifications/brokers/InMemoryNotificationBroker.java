@@ -18,8 +18,6 @@ package org.forgerock.openam.notifications.brokers;
 
 import static org.forgerock.json.JsonValue.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,13 +28,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.notifications.Consumer;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.notifications.Subscription;
 import org.forgerock.openam.notifications.Topic;
 import org.forgerock.util.Reject;
-import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.time.TimeService;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -74,7 +75,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
      * @param queueSize the number of notifications to buffer in memory
      */
     @Inject
-    public InMemoryNotificationBroker(ExecutorServiceFactory executorServiceFactory, TimeService timeService,
+    public InMemoryNotificationBroker(AMExecutorServiceFactory executorServiceFactory, TimeService timeService,
             @Named("queueSize") int queueSize, @Named("consumers") int consumers) {
         Reject.ifNull(executorServiceFactory, "Executor service factory must not be null");
         Reject.ifNull(timeService, "Time service must not be null");
@@ -85,7 +86,7 @@ public final class InMemoryNotificationBroker implements NotificationBroker {
 
         queue = new ArrayBlockingQueue<>(queueSize);
         subscriptions = new CopyOnWriteArrayList<>();
-        executorService = executorServiceFactory.createFixedThreadPool(consumers);
+        executorService = executorServiceFactory.createFixedThreadPool(consumers, "InMemoryNotificationsBroker");
         for (int i = 0; i < consumers; i++) {
             executorService.submit(new NotificationReader());
         }
