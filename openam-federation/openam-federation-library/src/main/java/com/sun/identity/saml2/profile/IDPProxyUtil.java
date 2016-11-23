@@ -46,6 +46,7 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.EncryptedAssertion;
 import com.sun.identity.saml2.assertion.NameID; 
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -57,6 +58,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -70,12 +72,14 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map; 
 import java.util.HashMap;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPMessage;
@@ -88,6 +92,7 @@ import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Element;
 
@@ -637,7 +642,7 @@ public class IDPProxyUtil {
             String metaAlias, ResponseInfo respInfo, Object newSession, SAML2EventLogger auditor) throws SAML2Exception {
         Response saml2Resp = respInfo.getResponse();
         String requestID = saml2Resp.getInResponseTo();
-        String nameidFormat = getNameIDFormat(saml2Resp);
+        String nameidFormat = getNameIDFormat(saml2Resp, metaAlias);
         if (nameidFormat != null && SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("NAME ID Format= " + nameidFormat);
         }
@@ -648,18 +653,35 @@ public class IDPProxyUtil {
         sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat, auditor);
     }
     
-    private static String getNameIDFormat(Response res)  
-    {
+    private static String getNameIDFormat(Response res, String metaAlias) {
+
         if (res == null) {
             return null;
         }
 
-        List assertions = res.getAssertion();
-        if ((assertions == null) || (assertions.size() == 0)) {
-            return null;
+        Assertion assertion = null;
+        List<Assertion> assertions = res.getAssertion();
+
+        if(CollectionUtils.isEmpty(assertions)){
+            // Check for Encrypted Assertions
+            List<EncryptedAssertion> encryptedAssertions = res.getEncryptedAssertion();
+            if(CollectionUtils.isEmpty(encryptedAssertions)){
+                return null;
+            } else {
+                String realm = SAML2Utils.getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
+                try {
+                    String hostEntityId = sm.getEntityByMetaAlias(metaAlias);
+                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(sm.getSPSSOConfig(realm, hostEntityId));
+                    assertion = encryptedAssertions.get(0).decrypt(decryptionKeys);
+                } catch (SAML2Exception ex) {
+                    SAML2Utils.debug.error("getNameIDFormat failed decrypting EncryptedAssertion", ex);
+                    return null;
+                }
+            }
+        } else {
+            assertion = assertions.get(0);
         }
 
-        Assertion assertion = (Assertion)assertions.get(0);
         Subject subject = assertion.getSubject();
         if (subject == null) {
             return null;
