@@ -122,6 +122,8 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
     private String realm;
 
     private RecoveryCodeGenerator recoveryCodeGenerator = InjectorHolder.getInstance(RecoveryCodeGenerator.class);
+    private final BaseURLProviderFactory baseUrlProviderFactory =
+            InjectorHolder.getInstance(BaseURLProviderFactory.class);
 
     @Override
     public void init(final Subject subject, final Map sharedState, final Map options) {
@@ -402,7 +404,6 @@ public class AuthenticatorPushRegistration extends AbstractPushModule {
     }
 
     private String getMessageResponseUrl(String component) {
-        BaseURLProviderFactory baseUrlProviderFactory = InjectorHolder.getInstance(BaseURLProviderFactory.class);
         final BaseURLProvider baseUrlProvider = baseUrlProviderFactory.get(getRequestOrg());
 
         return Base64url.encode((baseUrlProvider.getRootURL(getHttpServletRequest()) + "/json" + component)
