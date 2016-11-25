@@ -21,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.utils.ConfigListener;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.am.util.SystemProperties;
@@ -34,7 +35,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
  */
 public class CoreTokenConfig {
 
-    private final CopyOnWriteArraySet<CoreTokenConfigListener> listeners = new CopyOnWriteArraySet<>();
+    private final CopyOnWriteArraySet<ConfigListener> listeners = new CopyOnWriteArraySet<>();
 
     private volatile boolean coreTokenResourceEnabled;
 
@@ -237,12 +238,12 @@ public class CoreTokenConfig {
      *
      * @param listener the event listener to call when {@link CoreTokenConfig} changes.
      */
-    public void addListener(CoreTokenConfigListener listener) {
+    public void addListener(ConfigListener listener) {
         this.listeners.add(listener);
     }
 
     private void notifyListeners() {
-        for (final CoreTokenConfigListener listener : listeners) {
+        for (final ConfigListener listener : listeners) {
             listener.configChanged();
         }
     }
