@@ -187,8 +187,8 @@
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
 
         <!-- ForgeRock Binary License to package into the artifacts -->
-        <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
-        <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
+        <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
+        <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
         <forgerock.license.version>1.0.0</forgerock.license.version>
     </properties>
 
