@@ -54,7 +54,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>OpenAM-${project.version}</finalName>
+                            <finalName>OpenAM-Community-Edition-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
