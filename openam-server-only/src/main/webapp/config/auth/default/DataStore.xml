@@ -37,7 +37,7 @@
 
 
 <ModuleProperties moduleName="DataStore" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM" >
+    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM Community Edition" >
         <NameCallback>
             <Prompt> User Name: </Prompt>
         </NameCallback>
