@@ -37,6 +37,6 @@
 
 
 <ModuleProperties moduleName="PersistentCookie" version="1.0" >
-    <Callbacks length="0" order="1" timeout="120" header="Sign in to OpenAM" >
+    <Callbacks length="0" order="1" timeout="120" header="Sign in to OpenAM Community Edition" >
     </Callbacks>
 </ModuleProperties>
