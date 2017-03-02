@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -72,11 +72,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-common-auth-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>

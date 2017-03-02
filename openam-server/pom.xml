@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -69,12 +69,12 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-server-only</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-console</artifactId>
             <type>war</type>
         </dependency>

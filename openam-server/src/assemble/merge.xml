@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <uberwar>
   <wars>
-    <war>org.forgerock.openam:openam-server-only</war>
-    <war>org.forgerock.openam:openam-console</war>
+    <war>org.forgerock.openam-ce:openam-server-only</war>
+    <war>org.forgerock.openam-ce:openam-console</war>
   </wars>
   <merges>
     <merge>

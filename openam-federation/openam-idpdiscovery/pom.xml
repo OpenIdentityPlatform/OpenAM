@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam-federation</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -45,7 +45,7 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
     </dependencies>

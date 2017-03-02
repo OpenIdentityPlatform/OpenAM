@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>openam-auth-filter</artifactId>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <version>11.0.3</version>
     </parent>
 
@@ -31,11 +31,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-authfilter-shared</artifactId>
         </dependency>
         <dependency>
@@ -47,7 +47,7 @@
             <artifactId>forgerock-authz-filter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-forgerock-rest</artifactId>
         </dependency>
     </dependencies>

@@ -27,14 +27,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam-documentation</artifactId>
         <version>11.0.3</version>
     </parent>
 
     <name>OpenAM Generated Documentation Content</name>
     <inceptionYear>2011</inceptionYear>
-    <groupId>org.forgerock.openam</groupId>
+    <groupId>org.forgerock.openam-ce</groupId>
     <artifactId>openam-doc-content</artifactId>
     <packaging>jar</packaging>
     <description>Tools for creating/generating the core documentation.</description>
@@ -79,7 +79,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-cli-definitions</artifactId>
         </dependency>
     </dependencies>
