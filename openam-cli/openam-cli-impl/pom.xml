@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam-cli</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -81,7 +81,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.forgerock.openam</groupId>
+                        <groupId>org.forgerock.openam-ce</groupId>
                         <artifactId>openam-cli-definitions</artifactId>
                         <version>${project.version}</version>
                     </dependency>
@@ -98,15 +98,15 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-cli-definitions</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>

@@ -28,7 +28,7 @@
 
     <!-- Parent Project
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam-documentation</artifactId>
         <version>11.0.3-SNAPSHOT</version>
     </parent>-->
@@ -59,8 +59,8 @@
     </repositories>
 
     <!-- Documentation Module -->
-    <!-- Redundant: <groupId>org.forgerock.openam</groupId> -->
-    <groupId>org.forgerock.openam</groupId>
+    <!-- Redundant: <groupId>org.forgerock.openam-ce</groupId> -->
+    <groupId>org.forgerock.openam-ce</groupId>
     <artifactId>openam-doc-source</artifactId>
     <version>3.3.4</version>
 
@@ -206,7 +206,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
+                                    <groupId>org.forgerock.openam-ce</groupId>
                                     <artifactId>openam-doc-content</artifactId>
                                     <version>${project.version}</version>
                                     <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
@@ -400,7 +400,7 @@
 <!-- Ignore generated content for the reference when building 11.0.x release notes.
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-doc-content</artifactId>
         </dependency>
     </dependencies>

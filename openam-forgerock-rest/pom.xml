@@ -28,11 +28,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.forgerock.openam-ce</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
-    <groupId>org.forgerock.openam</groupId>
+    <groupId>org.forgerock.openam-ce</groupId>
     <artifactId>openam-forgerock-rest</artifactId>
     <packaging>jar</packaging>
     <name>OpenAM Forgerock REST API</name>
@@ -87,21 +87,21 @@
 
         <!-- OpenAM-CLI -->
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-cli-impl</artifactId>
         </dependency>
         <!-- OpenAM Shared -->
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
         <!-- OpenAM core -->
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-dashboard</artifactId>
         </dependency>
 
@@ -127,11 +127,11 @@
 
         <!-- OAuth2 Dependencies -->
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-oauth2-core-token-service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.forgerock.openam-ce</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
 
