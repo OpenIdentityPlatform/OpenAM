@@ -27,12 +27,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
         <version>11.0.3</version>
     </parent>
 
-    <groupId>org.forgerock.openam-ce</groupId>
+    <groupId>org.forgerock.ce.openam</groupId>
     <artifactId>openam-oauth2-openam-extension</artifactId>
     <packaging>jar</packaging>
 
@@ -49,21 +49,21 @@
         </dependency>
 	
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
         </dependency>
         
 	<!-- OpenAM -->        
 	<dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
 <!--        <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>-->
           <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
 

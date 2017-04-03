@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-auth-filter</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -41,23 +41,23 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>forgerock-jaspi-container</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-authn-filter-modules</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-resource-servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-forgerock-rest</artifactId>
         </dependency>
     </dependencies>

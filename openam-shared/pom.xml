@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -102,7 +102,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-fluent</artifactId>
         </dependency>
 
@@ -112,7 +112,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
 

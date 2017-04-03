@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-examples</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -95,7 +95,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-clientsdk</artifactId>
         </dependency>
         <dependency>

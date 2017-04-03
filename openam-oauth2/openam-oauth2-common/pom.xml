@@ -28,12 +28,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
         <version>11.0.3</version>
     </parent>
 
-    <groupId>org.forgerock.openam-ce</groupId>
+    <groupId>org.forgerock.ce.openam</groupId>
     <artifactId>openam-oauth2-common</artifactId>
     <packaging>jar</packaging>
 
@@ -74,15 +74,15 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-fluent</artifactId>
         </dependency>
 
