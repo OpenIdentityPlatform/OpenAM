@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-distribution</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -83,47 +83,47 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-saml2-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-mib-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-liberty-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-wsfederation-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
 

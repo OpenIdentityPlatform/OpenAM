@@ -28,13 +28,13 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
 
     <!-- Documentation Module -->
-    <groupId>org.forgerock.openam-ce</groupId>
+    <groupId>org.forgerock.ce.openam</groupId>
     <artifactId>openam-documentation</artifactId>
 
     <name>OpenAM Documentation</name>

@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-distribution</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -112,57 +112,57 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-installtools</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-cli-definitions</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-cli-impl</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-oauth</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-saml2-schema</artifactId>
         </dependency>
 

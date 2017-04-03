@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -76,20 +76,20 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <!-- Commons -->
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-resource</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.forgerock.ce.commons</groupId>
             <artifactId>json-resource-servlet</artifactId>
         </dependency>
         <dependency>

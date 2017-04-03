@@ -28,7 +28,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam</artifactId>
         <version>11.0.3</version>
     </parent>
@@ -43,7 +43,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.forgerock.commons</groupId>
+                <groupId>org.forgerock.ce.commons</groupId>
                 <artifactId>i18n-maven-plugin</artifactId>
                 <executions>
                     <execution>
@@ -111,7 +111,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.forgerock.openam-ce</groupId>
+                        <groupId>org.forgerock.ce.openam</groupId>
                         <artifactId>openam-build-tools</artifactId>
                         <version>${project.version}</version>
                     </dependency>
@@ -186,39 +186,39 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-coretoken</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-mib-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-ldap-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-annotations</artifactId>
         </dependency>
 

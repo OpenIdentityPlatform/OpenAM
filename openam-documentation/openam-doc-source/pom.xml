@@ -28,39 +28,28 @@
 
     <!-- Parent Project
     <parent>
-        <groupId>org.forgerock.openam-ce</groupId>
+        <groupId>org.forgerock.ce.openam</groupId>
         <artifactId>openam-documentation</artifactId>
         <version>11.0.3-SNAPSHOT</version>
     </parent>-->
 
     <parent>
-     <groupId>org.forgerock</groupId>
+     <groupId>org.forgerock.ce</groupId>
      <artifactId>forgerock-parent</artifactId>
      <version>1.1.0</version>
     </parent>
 
     <repositories>
      <repository>
-      <id>forgerock-staging-repository</id>
-      <name>ForgeRock Release Repository</name>
-      <url>http://maven.forgerock.org/repo/releases</url>
-      <snapshots>
-       <enabled>false</enabled>
-      </snapshots>
-     </repository>
-     <repository>
-      <id>forgerock-snapshots-repository</id>
-      <name>ForgeRock Snapshot Repository</name>
-      <url>http://maven.forgerock.org/repo/snapshots</url>
-      <releases>
-       <enabled>false</enabled>
-      </releases>
+      <id>forgerock-community-repository</id>
+      <name>ForgeRock Community Repository</name>
+      <url>http://maven.forgerock.org/repo/community</url>
      </repository>
     </repositories>
 
     <!-- Documentation Module -->
-    <!-- Redundant: <groupId>org.forgerock.openam-ce</groupId> -->
-    <groupId>org.forgerock.openam-ce</groupId>
+    <!-- Redundant: <groupId>org.forgerock.ce.openam</groupId> -->
+    <groupId>org.forgerock.ce.openam</groupId>
     <artifactId>openam-doc-source</artifactId>
     <version>3.3.4</version>
 
@@ -206,7 +195,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.forgerock.openam-ce</groupId>
+                                    <groupId>org.forgerock.ce.openam</groupId>
                                     <artifactId>openam-doc-content</artifactId>
                                     <version>${project.version}</version>
                                     <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
@@ -344,7 +333,7 @@
 -->
 
          <plugin>
-                <groupId>org.forgerock.commons</groupId>
+                <groupId>org.forgerock.ce.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
                 <version>2.1.5</version>
                 <configuration>
@@ -400,7 +389,7 @@
 <!-- Ignore generated content for the reference when building 11.0.x release notes.
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam-ce</groupId>
+            <groupId>org.forgerock.ce.openam</groupId>
             <artifactId>openam-doc-content</artifactId>
         </dependency>
     </dependencies>
