@@ -771,7 +771,7 @@
             </dependency>
             <!-- New RIA Client UI -->
             <dependency>
-                <groupId>org.forgerock.commons.ui</groupId>
+                <groupId>org.forgerock.ce.commons.ui</groupId>
                 <artifactId>forgerock-ui-user</artifactId>
                 <version>${forgerock-ui.version}</version>
                 <type>zip</type>
@@ -1226,13 +1226,13 @@
 
             <!-- OpenDJ API -->
             <dependency>
-                <groupId>org.forgerock.opendj-ce</groupId>
+                <groupId>org.forgerock.ce.opendj</groupId>
                 <artifactId>opendj-ldap-sdk</artifactId>
                 <version>${opendj.sdk.version}</version>
             </dependency>
             <!-- OpenDJ Server -->
             <dependency>
-                <groupId>org.forgerock.opendj-ce</groupId>
+                <groupId>org.forgerock.ce.opendj</groupId>
                 <artifactId>opendj-server</artifactId>
                 <version>${opendj.server.version}</version>
             </dependency>

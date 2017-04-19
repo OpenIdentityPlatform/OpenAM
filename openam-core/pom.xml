@@ -224,11 +224,11 @@
 
         <!-- LDAP APIs -->
         <dependency>
-            <groupId>org.forgerock.opendj-ce</groupId>
+            <groupId>org.forgerock.ce.opendj</groupId>
             <artifactId>opendj-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.opendj-ce</groupId>
+            <groupId>org.forgerock.ce.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
 

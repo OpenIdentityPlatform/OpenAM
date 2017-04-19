@@ -76,7 +76,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.opendj-ce</groupId>
+            <groupId>org.forgerock.ce.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
     </dependencies>

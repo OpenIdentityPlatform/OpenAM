@@ -318,7 +318,7 @@
                 </dependencies>
                 <configuration>
                     <unpack>
-                        <artifact>org.forgerock.openam-ce:openam-auth-deviceprint-scripts:zip</artifact>
+                        <artifact>org.forgerock.ce.openam:openam-auth-deviceprint-scripts:zip</artifact>
                         <resources>
                             <resource>
                                 <path>/**</path>
