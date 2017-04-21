@@ -27,7 +27,7 @@
         <dependencySet>
             <outputDirectory>WEB-INF/lib</outputDirectory>
             <includes>
-                <include>org.forgerock.commons:forgerock-util</include>
+                <include>org.forgerock.ce.commons:forgerock-util</include>
                 <include>org.forgerock.openam:openam-shared</include>
                 <include>org.forgerock.openam:openam-federation-library</include>
                 <include>org.forgerock.openam:openam-dtd-schema</include>
