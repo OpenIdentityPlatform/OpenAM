@@ -27,7 +27,7 @@
                 <include>org.forgerock.ce.openam:openam-saml2-schema</include>
                 <include>org.forgerock.ce.openam:openam-xacml3-schema</include>
                 <include>org.forgerock.ce.openam:openam-wsfederation-schema</include>
-                <include>org.forgerock.opendj:opendj-server</include>
+                <include>org.forgerock.ce.opendj:opendj-server</include>
                 <include>org.forgerock.ce.commons:forgerock-util</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>external:jaxrpc-impl</include>
