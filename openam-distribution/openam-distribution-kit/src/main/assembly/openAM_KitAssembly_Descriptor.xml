@@ -39,16 +39,16 @@
             <outputFileNameMapping>${artifact.build.finalName}.${artifact.extension}</outputFileNameMapping>
             <!-- Include fully packaged Modules -->
             <includes>
-                <include>org.forgerock.openam:openam-server:war</include>
-                <include>org.forgerock.openam:openam-server-only:war</include>
-                <include>org.forgerock.openam:openam-clientsdk:jar</include>
-                <include>org.forgerock.openam:openam-distauth:war</include>
-                <include>org.forgerock.openam:openam-example-clientsdk-cli:zip</include>
-                <include>org.forgerock.openam:openam-example-clientsdk-war:war</include>
-                <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
-                <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
-                <include>org.forgerock.openam:openam-distribution-ssoconfiguratortools:zip</include>
-                <include>org.forgerock.openam:openam-idpdiscovery-war:war</include>
+                <include>org.forgerock.ce.openam:openam-server:war</include>
+                <include>org.forgerock.ce.openam:openam-server-only:war</include>
+                <include>org.forgerock.ce.openam:openam-clientsdk:jar</include>
+                <include>org.forgerock.ce.openam:openam-distauth:war</include>
+                <include>org.forgerock.ce.openam:openam-example-clientsdk-cli:zip</include>
+                <include>org.forgerock.ce.openam:openam-example-clientsdk-war:war</include>
+                <include>org.forgerock.ce.openam:openam-distribution-fedlet-unconfigured:zip</include>
+                <include>org.forgerock.ce.openam:openam-distribution-ssoadmintools:zip</include>
+                <include>org.forgerock.ce.openam:openam-distribution-ssoconfiguratortools:zip</include>
+                <include>org.forgerock.ce.openam:openam-idpdiscovery-war:war</include>
             </includes>
         </dependencySet>
         <dependencySet>

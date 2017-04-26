@@ -21,7 +21,7 @@ $ mvn -Pbinary-licensing -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=n
 [INFO] ------------------------------------------------------------------------
 
 $ cd openam-documentation/openam-doc-source
-$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="11.0.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.commons:forgerock-doc-maven-plugin:release
+$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="11.0.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.ce.commons:forgerock-doc-maven-plugin:release
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
@@ -76,7 +76,7 @@ $ svn info
 
 URL: https://svn.forgerock.org/openam/fr-branches/11.x.x/openam/openam-documentation/openam-doc-source
 
-$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="3.3.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.commons:forgerock-doc-maven-plugin:release
+$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="3.3.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.ce.commons:forgerock-doc-maven-plugin:release
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
@@ -120,7 +120,7 @@ $ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DserverDocTarget
 [INFO] Final Memory: 46M/512M
 [INFO] ------------------------------------------------------------------------
 
-$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="3.3.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.commons:forgerock-doc-maven-plugin:release
+$ mvn -Dcheckstyle.skip=true -DskipTests=true -DisDraftMode=no -DreleaseVersion="3.3.0" -D"gaId=UA-23412190-14" -D"releaseDate=Software release date: November 08, 2013" org.forgerock.ce.commons:forgerock-doc-maven-plugin:release
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------

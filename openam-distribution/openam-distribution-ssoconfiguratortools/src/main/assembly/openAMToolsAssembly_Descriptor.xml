@@ -36,8 +36,8 @@
         <dependencySet>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>org.forgerock.openam:openam-configurator-tool</include>
-                <include>org.forgerock.openam:openam-upgrade-tool</include>
+                <include>org.forgerock.ce.openam:openam-configurator-tool</include>
+                <include>org.forgerock.ce.openam:openam-upgrade-tool</include>
             </includes>
         </dependencySet>
         <dependencySet>

@@ -104,23 +104,23 @@
                     -->
                     <artifactSet>
                         <includes>
-                            <include>org.forgerock.commons:forgerock-util</include>
-                            <include>org.forgerock.openam:openam-core</include>
-                            <include>org.forgerock.openam:openam-entitlements</include>
-                            <include>org.forgerock.openam:openam-shared</include>
-                            <include>org.forgerock.openam:openam-dtd-schema</include>
-                            <include>org.forgerock.openam:openam-jaxrpc-schema</include>
-                            <include>org.forgerock.openam:openam-liberty-schema</include>
-                            <include>org.forgerock.openam:openam-saml2-schema</include>
-                            <include>org.forgerock.openam:openam-xacml3-schema</include>
-                            <include>org.forgerock.openam:openam-federation-library</include>
-                            <include>org.forgerock.openam:OpenFM</include>
+                            <include>org.forgerock.ce.commons:forgerock-util</include>
+                            <include>org.forgerock.ce.openam:openam-core</include>
+                            <include>org.forgerock.ce.openam:openam-entitlements</include>
+                            <include>org.forgerock.ce.openam:openam-shared</include>
+                            <include>org.forgerock.ce.openam:openam-dtd-schema</include>
+                            <include>org.forgerock.ce.openam:openam-jaxrpc-schema</include>
+                            <include>org.forgerock.ce.openam:openam-liberty-schema</include>
+                            <include>org.forgerock.ce.openam:openam-saml2-schema</include>
+                            <include>org.forgerock.ce.openam:openam-xacml3-schema</include>
+                            <include>org.forgerock.ce.openam:openam-federation-library</include>
+                            <include>org.forgerock.ce.openam:OpenFM</include>
                             <include>org.json:json</include>
                         </includes>
                     </artifactSet>
                     <filters>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-core</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-core</artifact>
                             <includes>
                                 <include>amAuth.properties</include>
                                 <include>amAuthContext.properties</include>
@@ -283,7 +283,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-shared</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-shared</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -292,7 +292,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-jaxrpc-schema</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-jaxrpc-schema</artifact>
                             <includes>
                                 <include>com/iplanet/sso/**</include>
                                 <include>com/sun/identity/liberty/ws/security/**</include>
@@ -304,7 +304,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:OpenFM</artifact>
+                            <artifact>org.forgerock.ce.openam:OpenFM</artifact>
                             <includes>
                                 <include>META-INF/services/com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
                                 <include>famSTS.properties</include>
@@ -342,7 +342,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-federation-library</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-federation-library</artifact>
                             <includes>
                                 <include>libAuthnSvc.properties</include>
                                 <include>libBinarySecurityToken.properties</include>
@@ -431,7 +431,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-liberty-schema</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-liberty-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -440,25 +440,25 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-saml2-schema</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-saml2-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-xacml3-schema</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-xacml3-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-dtd-schema</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-dtd-schema</artifact>
                             <includes>
                                 <include>com/sun/identity/log/messageid/amLogMessage.dtd</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-entitlements</artifact>
+                            <artifact>org.forgerock.ce.openam:openam-entitlements</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
