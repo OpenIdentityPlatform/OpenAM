@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -20,30 +20,37 @@ import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.openam.rest.Routers.*;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.core.rest.cts.CoreTokenResource;
 import org.forgerock.openam.core.rest.cts.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.core.rest.dashboard.DashboardResource;
-import org.forgerock.openam.core.rest.devices.OathDevicesResource;
-import org.forgerock.openam.core.rest.devices.TrustedDevicesResource;
+import org.forgerock.openam.core.rest.devices.deviceprint.TrustedDevicesResource;
+import org.forgerock.openam.core.rest.devices.oath.OathDevicesResource;
+import org.forgerock.openam.core.rest.devices.push.PushDevicesResource;
+import org.forgerock.openam.core.rest.docs.api.ApiDocsService;
+import org.forgerock.openam.core.rest.docs.api.ApiService;
 import org.forgerock.openam.core.rest.record.RecordConstants;
 import org.forgerock.openam.core.rest.record.RecordResource;
 import org.forgerock.openam.core.rest.server.ServerInfoResource;
 import org.forgerock.openam.core.rest.server.ServerVersionResource;
 import org.forgerock.openam.core.rest.session.AnyOfAuthzModule;
 import org.forgerock.openam.core.rest.session.SessionResource;
+import org.forgerock.openam.core.rest.session.SessionResourceV2;
+import org.forgerock.openam.http.authz.HttpContextFilter;
+import org.forgerock.openam.http.authz.HttpPrivilegeAuthzModule;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
 import org.forgerock.openam.rest.ServiceRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.services.MailService;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * A {@link RestRouteProvider} that add routes for all the core endpoints.
@@ -56,19 +63,19 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("dashboard")
                 .auditAs(DASHBOARD)
-                .toCollection(DashboardResource.class);
+                .toAnnotatedCollection(DashboardResource.class);
 
         realmRouter.route("serverinfo")
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
                 .forVersion(1, 1)
-                .toCollection(ServerInfoResource.class);
+                .toAnnotatedCollection(ServerInfoResource.class);
 
         realmRouter.route("serverinfo/version")
                 .authenticateWith(ssoToken().exceptRead())
                 .auditAs(SERVER_INFO)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toSingleton(ServerVersionResource.class);
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
+                .toAnnotatedSingleton(ServerVersionResource.class);
 
         realmRouter.route("users")
                 .authenticateWith(ssoToken().exceptActions("register", "confirm", "forgotPassword",
@@ -102,29 +109,37 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
         realmRouter.route("users/{user}/devices/trusted")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
-                .toCollection(TrustedDevicesResource.class);
+                .toAnnotatedCollection(TrustedDevicesResource.class);
 
         realmRouter.route("users/{user}/devices/2fa/oath")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
-                .toCollection(OathDevicesResource.class);
+                .toAnnotatedCollection(OathDevicesResource.class);
+
+        realmRouter.route("users/{user}/devices/push")
+                .auditAs(DEVICES)
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
+                .toAnnotatedCollection(PushDevicesResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))
                 .auditAs(SESSION)
-                .authorizeWith(AnyOfAuthzModule.class)
+                .authorizeWith(Key.get(AnyOfAuthzModule.class, Names.named("SessionResourceAuthzModule")))
                 .forVersion(1, 2)
-                .toCollection(SessionResource.class);
+                .toCollection(SessionResource.class)
+                .forVersion(2, 0)
+                .toCollection(SessionResourceV2.class);
 
         rootRouter.route("tokens")
                 .auditAs(CTS)
                 .authorizeWith(CoreTokenResourceAuthzModule.class)
-                .toCollection(CoreTokenResource.class);
+                .forVersion(1, 1)
+                .toAnnotatedCollection(CoreTokenResource.class);
 
         rootRouter.route(RecordConstants.RECORD_REST_ENDPOINT)
                 .auditAs(RECORD)
                 .authorizeWith(AdminOnlyAuthzModule.class)
-                .toCollection(RecordResource.class);
+                .toAnnotatedCollection(RecordResource.class);
     }
 
     @Override
@@ -138,9 +153,23 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
     public void addServiceRoutes(ServiceRouter rootRouter, ServiceRouter realmRouter) {
         realmRouter.route("authenticate")
                 .auditAs(AUTHENTICATION)
-                .forVersion(1, 1)
+                .forVersion(1, 2)
                 .toService(EQUALS, AuthenticationServiceV1.class)
-                .forVersion(2)
+                .forVersion(2, 1)
                 .toService(EQUALS, AuthenticationServiceV2.class);
+
+        realmRouter.route("docs/api")
+                .auditAs(DOCUMENTATION)
+                .through(HttpContextFilter.class)
+                .authorizeWith(HttpPrivilegeAuthzModule.class)
+                .forVersion(1, 0)
+                .toService(EQUALS, ApiDocsService.class);
+
+        realmRouter.route("api")
+                .auditAs(DOCUMENTATION)
+                .through(HttpContextFilter.class)
+                .authorizeWith(HttpPrivilegeAuthzModule.class)
+                .forVersion(1, 0)
+                .toService(EQUALS, ApiService.class);
     }
 }

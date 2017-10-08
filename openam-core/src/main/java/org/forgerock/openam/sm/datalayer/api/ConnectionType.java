@@ -11,15 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.api;
 
 import com.iplanet.am.util.SystemProperties;
 import org.forgerock.openam.cts.impl.CTSAsyncConnectionModule;
 import org.forgerock.openam.cts.impl.CTSConnectionModule;
+import org.forgerock.openam.cts.impl.query.worker.queries.CTSWorkerPastExpiryDateQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.MaxSessionTimeExpiredQuery;
+import org.forgerock.openam.cts.impl.query.worker.queries.SessionIdleTimeExpiredQuery;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.forgerock.openam.cts.reaper.CTSReaper;
+import org.forgerock.openam.cts.worker.CTSWorkerTask;
 import org.forgerock.openam.sm.SMSConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.UmaAuditConnectionModule;
@@ -46,9 +49,20 @@ public enum ConnectionType {
      */
     CTS_ASYNC(CTSAsyncConnectionModule.class),
     /**
-     * @see CTSReaper
+     * @see CTSWorkerTask
+     * @see MaxSessionTimeExpiredQuery
      */
-    CTS_REAPER(CTSConnectionModule.class),
+    CTS_MAX_SESSION_TIMEOUT_WORKER(CTSConnectionModule.class),
+    /**
+     * @see CTSWorkerTask
+     * @see SessionIdleTimeExpiredQuery
+     */
+    CTS_SESSION_IDLE_TIMEOUT_WORKER(CTSConnectionModule.class),
+    /**
+     * @see CTSWorkerTask
+     * @see CTSWorkerPastExpiryDateQuery
+     */
+    CTS_EXPIRY_DATE_WORKER(CTSConnectionModule.class),
     /**
      * @see org.forgerock.openam.entitlement.indextree.IndexTreeService
      */

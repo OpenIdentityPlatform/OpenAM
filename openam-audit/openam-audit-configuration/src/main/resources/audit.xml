@@ -26,7 +26,7 @@
                 i18nKey="audit-description"
                 propertiesViewBeanURL="../audit/RealmAuditConfig">
             <Global>
-                <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001">
+                <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001" order="100">
                     <BooleanValues>
                         <BooleanTrueValue>true</BooleanTrueValue>
                         <BooleanFalseValue>false</BooleanFalseValue>
@@ -35,7 +35,8 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004" order="200">
+                    <IsOptional/>
                     <DefaultValues>
                         <DefaultValuesClassName
                                 className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
@@ -43,8 +44,9 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="commonAudit">
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="300">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -53,7 +55,7 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics" order="400">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -63,13 +65,13 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory">
+                    <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory" order="500">
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.file.rotationEnabled">
+                                     i18nKey="audit.handlers.file.rotationEnabled" order="600">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -78,47 +80,51 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="rotationMaxFileSize" type="single" i18nKey="audit.handlers.file.maxFileSize">
+                    <AttributeSchema name="rotationMaxFileSize" type="single"
+                                     i18nKey="audit.handlers.file.maxFileSize" order="700">
                         <DefaultValues>
                             <Value>100000000</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationFilePrefix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFilePrefix"/>
+                                     i18nKey="audit.handlers.file.rotationFilePrefix" order="800">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="rotationFileSuffix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFileSuffix">
+                                     i18nKey="audit.handlers.file.rotationFileSuffix" order="900">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>-yyyy.MM.dd-HH.mm.ss</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single"
-                                     i18nKey="audit.handlers.file.rotationInterval">
+                                     i18nKey="audit.handlers.file.rotationInterval" order="1000">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string"
-                                     i18nKey="audit.handlers.file.rotationTimes"/>
+                                     i18nKey="audit.handlers.file.rotationTimes" order="1100"/>
                     <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
-                                     i18nKey="audit.handlers.file.maxNumberOfHistoryFiles">
+                                     i18nKey="audit.handlers.file.maxNumberOfHistoryFiles" order="1200">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
-                                     i18nKey="audit.handlers.file.maxDiskSpaceToUse">
+                                     i18nKey="audit.handlers.file.maxDiskSpaceToUse" order="1300">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMinFreeSpaceRequired" type="single"
-                                     i18nKey="audit.handlers.file.minFreeSpaceRequired">
+                                     i18nKey="audit.handlers.file.minFreeSpaceRequired" order="1400">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.buffering.enabled">
+                                     i18nKey="audit.handlers.csv.buffering.enabled" order="1500">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -128,7 +134,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingAutoFlush" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.buffering.autoFlush">
+                                     i18nKey="audit.handlers.csv.buffering.autoFlush" order="1600">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -138,7 +144,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.security.enabled">
+                                     i18nKey="audit.handlers.csv.security.enabled" order="1700">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -148,20 +154,24 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityFilename" type="single"
-                                     i18nKey="audit.handlers.csv.security.filename">
+                                     i18nKey="audit.handlers.csv.security.filename" order="1800">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityPassword" type="single" syntax="password"
-                                     i18nKey="audit.handlers.csv.security.password"/>
+                                     i18nKey="audit.handlers.csv.security.password" order="1900">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="securitySignatureInterval" type="single"
-                                     i18nKey="audit.handlers.csv.security.signatureInterval">
+                                     i18nKey="audit.handlers.csv.security.signatureInterval" order="2000">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>900</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="2100">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
                         </DefaultValues>
@@ -169,7 +179,7 @@
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
-                           i18nFileName="commonAudit">
+                           i18nFileName="audit">
                     <AttributeSchema name="PositiveIntegerValidator"
                                      type="validator"
                                      syntax="string">
@@ -181,10 +191,11 @@
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="2200">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -193,7 +204,8 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice"
+                                     i18nKey="audit.handlers.all.topics" order="2300">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -204,11 +216,11 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host"
-                                     validator="HostnameValidator"/>
+                                     validator="HostnameValidator" order="2400"/>
                     <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port"
-                                     validator="PositiveIntegerValidator" />
+                                     validator="PositiveIntegerValidator" order="2500"/>
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
-                                     type="single_choice">
+                                     type="single_choice" order="2600">
                         <ChoiceValues>
                             <ChoiceValue>TCP</ChoiceValue>
                             <ChoiceValue>UDP</ChoiceValue>
@@ -218,8 +230,9 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="connectTimeout" type="single" i18nKey="audit.handlers.syslog.connectTimeout"
-                                     validator="PositiveIntegerValidator"/>
-                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility" type="single_choice">
+                                     validator="PositiveIntegerValidator" order="2700"/>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
+                                     type="single_choice" order="2800">
                         <ChoiceValues>
                             <ChoiceValue>KERN</ChoiceValue>
                             <ChoiceValue>USER</ChoiceValue>
@@ -251,7 +264,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                                     i18nKey="audit.handlers.syslog.buffering.enabled" order="2900">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -260,15 +273,16 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="3000">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
 
-                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="commonAudit">
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="3100">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -277,7 +291,8 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice"
+                                     i18nKey="audit.handlers.all.topics" order="3200">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -288,7 +303,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="databaseType" listOrder="insertion" type="single_choice" uitype="radio"
-                                     i18nKey="audit.handlers.jdbc.databaseType">
+                                     i18nKey="audit.handlers.jdbc.databaseType" order="3300">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.JdbcDatabaseTypeChoiceValues"/>
@@ -297,13 +312,14 @@
                             <Value>oracle</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="jdbcUrl" type="single" i18nKey="audit.handlers.jdbc.connectionPool.jdbcUrl"/>
+                    <AttributeSchema name="jdbcUrl" type="single"
+                                     i18nKey="audit.handlers.jdbc.connectionPool.jdbcUrl" order="3400"/>
                     <AttributeSchema name="driverClassName" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.driverClassName"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.driverClassName" order="3500"/>
                     <AttributeSchema name="username" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.username"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.username" order="3600"/>
                     <AttributeSchema name="password" type="single" syntax="password"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.password"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.password" order="3700"/>
                     <AttributeSchema name="autoCommit" type="single" syntax="boolean">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -314,30 +330,31 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="connectionTimeout" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.connectionTimeout">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.connectionTimeout" order="3800">
                         <DefaultValues>
                             <Value>30</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="idleTimeout" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.idleTimeout">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.idleTimeout" order="3900">
                         <DefaultValues>
                             <Value>600</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="maxLifetime" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.maxLifetime">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.maxLifetime" order="4000">
                         <DefaultValues>
                             <Value>1800</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="minIdle" type="single" i18nKey="audit.handlers.jdbc.connectionPool.minIdle">
+                    <AttributeSchema name="minIdle" type="single"
+                                     i18nKey="audit.handlers.jdbc.connectionPool.minIdle" order="4100">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="maxPoolSize" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.maxPoolSize">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.maxPoolSize" order="4200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -407,7 +424,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.jdbc.buffering.enabled">
+                                     i18nKey="audit.handlers.jdbc.buffering.enabled" order="4300">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -417,39 +434,338 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingMaxSize" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.maxSize">
+                                     i18nKey="audit.handlers.jdbc.buffering.maxSize" order="4400">
                         <DefaultValues>
                             <Value>100000</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingWriteInterval" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.interval">
+                                     i18nKey="audit.handlers.jdbc.buffering.interval" order="4500">
                         <DefaultValues>
                             <Value>5</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingWriterThreads" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads">
+                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads" order="4600">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingMaxBatchedEvents" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents">
+                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents" order="4700">
                         <DefaultValues>
                             <Value>100</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="4800">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.JdbcAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Elasticsearch" inheritance="multiple" i18nKey="handler.name.elasticsearch"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled" order="4900">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics" order="5000">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="index" type="single" i18nKey="audit.handlers.elasticsearch.index"
+                                     order="5400"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.elasticsearch.hostname"
+                                     order="5100" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.port" order="5200"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.elasticsearch.ssl"
+                                     order="5300" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="username" type="single" i18nKey="audit.handlers.elasticsearch.username"
+                                     order="5500"/>
+                    <AttributeSchema name="password" type="single" syntax="password"
+                                     i18nKey="audit.handlers.elasticsearch.password" order="5600"/>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingEnabled" order="5700">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingSize" order="5800">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingMaxEvents" order="5900">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingWriteInterval" order="6000">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="6100">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.ElasticsearchAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Splunk" inheritance="multiple" i18nKey="handler.name.splunk"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="authzToken" type="single"
+                                     i18nKey="audit.handlers.splunk.authzToken"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.splunk.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.splunk.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SplunkAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="JMS" inheritance="multiple" i18nKey="handler.name.jms" i18nFileName="audit">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled"
+                                     order="6200">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics"
+                                     order="6300">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deliveryMode" type="single_choice" i18nKey="audit.handlers.jms.deliveryMode"
+                                     order="6400">
+                        <ChoiceValues>
+                            <ChoiceValue>PERSISTENT</ChoiceValue>
+                            <ChoiceValue>NON_PERSISTENT</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>NON_PERSISTENT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sessionMode" type="single_choice" i18nKey="audit.handlers.jms.sessionMode"
+                                     order="6500">
+                        <ChoiceValues>
+                            <ChoiceValue>AUTO</ChoiceValue>
+                            <ChoiceValue>CLIENT</ChoiceValue>
+                            <ChoiceValue>DUPS_OK</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>AUTO</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiContextProperties" uitype="maplist" order="6600"
+                                     i18nKey="audit.handlers.jms.jndi.contextProperties">
+                        <DefaultValues>
+                            <Value>[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory</Value>
+                            <Value>[java.naming.provider.url]=tcp://localhost:61616</Value>
+                            <Value>[topic.audit]=audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiTopicName" type="single" i18nKey="audit.handlers.jms.jndi.topicName"
+                                     validator="RequiredValueValidator" order="6700">
+                        <DefaultValues>
+                            <Value>audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiConnectionFactoryName" type="single"
+                                     i18nKey="audit.handlers.jms.jndi.connectionFactoryName"
+                                     validator="RequiredValueValidator" order="6800">
+                        <DefaultValues>
+                            <Value>ConnectionFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchEnabled" type="single" syntax="boolean" order="6900"
+                                     i18nKey="audit.handlers.jms.publisher.batch.batchEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchCapacity" type="single" syntax="number" order="7000"
+                                     i18nKey="audit.handlers.jms.publisher.batch.capacity"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxBatchedEvents" type="single" syntax="number" order="7100"
+                                     i18nKey="audit.handlers.jms.publisher.batch.maxBatchedEvents"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>100</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchThreadCount" type="single" syntax="number" order="7200"
+                                     i18nKey="audit.handlers.jms.publisher.batch.threadCount"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>3</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="insertTimeoutSec" type="single" syntax="number" order="7300"
+                                     i18nKey="audit.handlers.jms.publisher.batch.insertTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="pollTimeoutSec" type="single" syntax="number" order="7400"
+                                     i18nKey="audit.handlers.jms.publisher.batch.pollTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="shutdownTimeoutSec" type="single" syntax="number" order="7500"
+                                     i18nKey="audit.handlers.jms.publisher.batch.shutdownTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory"
+                                     validator="RequiredValueValidator" order="7600">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JmsAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Global>
 
             <Organization>
-                <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001">
+                <AttributeSchema name="auditEnabled" type="single" syntax="boolean" i18nKey="a001" order="100">
                     <BooleanValues>
                         <BooleanTrueValue>true</BooleanTrueValue>
                         <BooleanFalseValue>false</BooleanFalseValue>
@@ -458,7 +774,8 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004">
+                <AttributeSchema name="fieldFilterPolicy" i18nKey="a004" order="200">
+                    <IsOptional/>
                     <DefaultValues>
                         <DefaultValuesClassName
                                 className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
@@ -466,8 +783,9 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="commonAudit">
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="300">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -476,7 +794,8 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice"
+                                     i18nKey="audit.handlers.all.topics" order="400">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -486,13 +805,13 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory">
+                    <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory" order="500">
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.file.rotationEnabled">
+                                     i18nKey="audit.handlers.file.rotationEnabled" order="600">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -501,47 +820,51 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="rotationMaxFileSize" type="single" i18nKey="audit.handlers.file.maxFileSize">
+                    <AttributeSchema name="rotationMaxFileSize" type="single"
+                                     i18nKey="audit.handlers.file.maxFileSize" order="700">
                         <DefaultValues>
                             <Value>100000000</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationFilePrefix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFilePrefix"/>
+                                     i18nKey="audit.handlers.file.rotationFilePrefix" order="800">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="rotationFileSuffix" type="single"
-                                     i18nKey="audit.handlers.file.rotationFileSuffix">
+                                     i18nKey="audit.handlers.file.rotationFileSuffix" order="900">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>-yyyy.MM.dd-HH.mm.ss</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single"
-                                     i18nKey="audit.handlers.file.rotationInterval">
+                                     i18nKey="audit.handlers.file.rotationInterval" order="1000">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationTimes" type="list" syntax="string"
-                                     i18nKey="audit.handlers.file.rotationTimes"/>
+                                     i18nKey="audit.handlers.file.rotationTimes" order="1100"/>
                     <AttributeSchema name="retentionMaxNumberOfHistoryFiles" type="single"
-                                     i18nKey="audit.handlers.file.maxNumberOfHistoryFiles">
+                                     i18nKey="audit.handlers.file.maxNumberOfHistoryFiles" order="1200">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMaxDiskSpaceToUse" type="single"
-                                     i18nKey="audit.handlers.file.maxDiskSpaceToUse">
+                                     i18nKey="audit.handlers.file.maxDiskSpaceToUse" order="1300">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="retentionMinFreeSpaceRequired" type="single"
-                                     i18nKey="audit.handlers.file.minFreeSpaceRequired">
+                                     i18nKey="audit.handlers.file.minFreeSpaceRequired" order="1400">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.buffering.enabled">
+                                     i18nKey="audit.handlers.csv.buffering.enabled" order="1500">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -551,7 +874,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingAutoFlush" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.buffering.autoFlush">
+                                     i18nKey="audit.handlers.csv.buffering.autoFlush" order="1600">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -561,7 +884,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.csv.security.enabled">
+                                     i18nKey="audit.handlers.csv.security.enabled" order="1700">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -571,20 +894,24 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityFilename" type="single"
-                                     i18nKey="audit.handlers.csv.security.filename">
+                                     i18nKey="audit.handlers.csv.security.filename" order="1800">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="securityPassword" type="single" syntax="password"
-                                     i18nKey="audit.handlers.csv.security.password"/>
+                                     i18nKey="audit.handlers.csv.security.password" order="1900">
+                        <IsOptional/>
+                    </AttributeSchema>
                     <AttributeSchema name="securitySignatureInterval" type="single"
-                                     i18nKey="audit.handlers.csv.security.signatureInterval">
+                                     i18nKey="audit.handlers.csv.security.signatureInterval" order="2000">
+                        <IsOptional/>
                         <DefaultValues>
                             <Value>900</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="2100">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.CsvAuditEventHandlerFactory</Value>
                         </DefaultValues>
@@ -592,7 +919,7 @@
                 </SubSchema>
 
                 <SubSchema name="Syslog" inheritance="multiple" i18nKey="handler.name.syslog"
-                           i18nFileName="commonAudit">
+                           i18nFileName="audit">
                     <AttributeSchema name="PositiveIntegerValidator"
                                      type="validator"
                                      syntax="string">
@@ -604,10 +931,11 @@
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.audit.validation.HostnameValidator</Value>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="2200">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -616,7 +944,8 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice"
+                                     i18nKey="audit.handlers.all.topics" order="2300">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -627,11 +956,11 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="host" type="single" i18nKey="audit.handlers.syslog.host"
-                                     validator="HostnameValidator"/>
+                                     validator="HostnameValidator" order="2400"/>
                     <AttributeSchema name="port" type="single" i18nKey="audit.handlers.syslog.port"
-                                     validator="PositiveIntegerValidator" />
+                                     validator="PositiveIntegerValidator" order="2500"/>
                     <AttributeSchema name="transportProtocol" i18nKey="audit.handlers.syslog.transportProtocol"
-                                     type="single_choice">
+                                     type="single_choice" order="2600">
                         <ChoiceValues>
                             <ChoiceValue>TCP</ChoiceValue>
                             <ChoiceValue>UDP</ChoiceValue>
@@ -641,8 +970,9 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="connectTimeout" type="single" i18nKey="audit.handlers.syslog.connectTimeout"
-                                     validator="PositiveIntegerValidator"/>
-                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility" type="single_choice">
+                                     validator="PositiveIntegerValidator" order="2700"/>
+                    <AttributeSchema name="facility" i18nKey="audit.handlers.syslog.facility"
+                                     type="single_choice" order="2800">
                         <ChoiceValues>
                             <ChoiceValue>KERN</ChoiceValue>
                             <ChoiceValue>USER</ChoiceValue>
@@ -674,7 +1004,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.syslog.buffering.enabled">
+                                     i18nKey="audit.handlers.syslog.buffering.enabled" order="2900">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -683,15 +1013,16 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="3000">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.SyslogAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
 
-                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="commonAudit">
-                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                <SubSchema name="JDBC" inheritance="multiple" i18nKey="handler.name.jdbc" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="3100">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -700,7 +1031,8 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                    <AttributeSchema name="topics" type="multiple_choice"
+                                     i18nKey="audit.handlers.all.topics" order="3200">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
@@ -711,7 +1043,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="databaseType" listOrder="insertion" type="single_choice" uitype="radio"
-                                     i18nKey="audit.handlers.jdbc.databaseType">
+                                     i18nKey="audit.handlers.jdbc.databaseType" order="3300">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.audit.configuration.JdbcDatabaseTypeChoiceValues"/>
@@ -720,13 +1052,14 @@
                             <Value>oracle</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="jdbcUrl" type="single" i18nKey="audit.handlers.jdbc.connectionPool.jdbcUrl"/>
+                    <AttributeSchema name="jdbcUrl" type="single"
+                                     i18nKey="audit.handlers.jdbc.connectionPool.jdbcUrl" order="3400"/>
                     <AttributeSchema name="driverClassName" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.driverClassName"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.driverClassName" order="3500"/>
                     <AttributeSchema name="username" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.username"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.username" order="3600"/>
                     <AttributeSchema name="password" type="single" syntax="password"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.password"/>
+                                     i18nKey="audit.handlers.jdbc.connectionPool.password" order="3700"/>
                     <AttributeSchema name="autoCommit" type="single" syntax="boolean">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
@@ -737,30 +1070,31 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="connectionTimeout" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.connectionTimeout">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.connectionTimeout" order="3800">
                         <DefaultValues>
                             <Value>30</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="idleTimeout" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.idleTimeout">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.idleTimeout" order="3900">
                         <DefaultValues>
                             <Value>600</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="maxLifetime" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.maxLifetime">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.maxLifetime" order="4000">
                         <DefaultValues>
                             <Value>1800</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="minIdle" type="single" i18nKey="audit.handlers.jdbc.connectionPool.minIdle">
+                    <AttributeSchema name="minIdle" type="single"
+                                     i18nKey="audit.handlers.jdbc.connectionPool.minIdle" order="4100">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="maxPoolSize" type="single"
-                                     i18nKey="audit.handlers.jdbc.connectionPool.maxPoolSize">
+                                     i18nKey="audit.handlers.jdbc.connectionPool.maxPoolSize" order="4200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -830,7 +1164,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
-                                     i18nKey="audit.handlers.jdbc.buffering.enabled">
+                                     i18nKey="audit.handlers.jdbc.buffering.enabled" order="4300">
                         <BooleanValues>
                             <BooleanTrueValue>true</BooleanTrueValue>
                             <BooleanFalseValue>false</BooleanFalseValue>
@@ -840,32 +1174,331 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingMaxSize" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.maxSize">
+                                     i18nKey="audit.handlers.jdbc.buffering.maxSize" order="4400">
                         <DefaultValues>
                             <Value>100000</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingWriteInterval" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.interval">
+                                     i18nKey="audit.handlers.jdbc.buffering.interval" order="4500">
                         <DefaultValues>
                             <Value>5</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingWriterThreads" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads">
+                                     i18nKey="audit.handlers.jdbc.buffering.writerThreads" order="4600">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="bufferingMaxBatchedEvents" type="single"
-                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents">
+                                     i18nKey="audit.handlers.jdbc.buffering.maxBatchedEvents" order="4700">
                         <DefaultValues>
                             <Value>100</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="4800">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.JdbcAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Elasticsearch" inheritance="multiple" i18nKey="handler.name.elasticsearch"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled" order="4900">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics" order="5000">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="index" type="single" i18nKey="audit.handlers.elasticsearch.index"
+                                     order="5400"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.elasticsearch.hostname"
+                                     order="5100" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.port" order="5200"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.elasticsearch.ssl"
+                                     order="5300" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="username" type="single" i18nKey="audit.handlers.elasticsearch.username"
+                                     order="5500"/>
+                    <AttributeSchema name="password" type="single" syntax="password"
+                                     i18nKey="audit.handlers.elasticsearch.password" order="5600"/>
+                    <AttributeSchema name="bufferingEnabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingEnabled" order="5700">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingSize" order="5800">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingMaxEvents" order="5900">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.elasticsearch.bufferingWriteInterval" order="6000">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="6100">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.ElasticsearchAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="Splunk" inheritance="multiple" i18nKey="handler.name.splunk"
+                           i18nFileName="audit">
+                    <AttributeSchema name="PositiveIntegerValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.validation.PositiveIntegerValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="HostnameValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.HostnameValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="authzToken" type="single"
+                                     i18nKey="audit.handlers.splunk.authzToken"/>
+                    <AttributeSchema name="host" type="single" i18nKey="audit.handlers.splunk.hostname"
+                                     order="10" validator="HostnameValidator"/>
+                    <AttributeSchema name="port" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.port" order="20"
+                                     validator="PositiveIntegerValidator" />
+                    <AttributeSchema name="sslEnabled" type="single" i18nKey="audit.handlers.splunk.ssl"
+                                     order="30" syntax="boolean">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchSize" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingSize" order="80">
+                        <DefaultValues>
+                            <Value>500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxEvents" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingMaxEvents" order="90">
+                        <DefaultValues>
+                            <Value>10000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="writeInterval" type="single" syntax="number"
+                                     i18nKey="audit.handlers.splunk.bufferingWriteInterval" order="100">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.SplunkAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="JMS" inheritance="multiple" i18nKey="handler.name.jms" i18nFileName="audit">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled"
+                                     order="6200">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics"
+                                     order="6300">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deliveryMode" type="single_choice" i18nKey="audit.handlers.jms.deliveryMode"
+                                     order="6400">
+                        <ChoiceValues>
+                            <ChoiceValue>PERSISTENT</ChoiceValue>
+                            <ChoiceValue>NON_PERSISTENT</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>NON_PERSISTENT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sessionMode" type="single_choice" i18nKey="audit.handlers.jms.sessionMode"
+                                     order="6500">
+                        <ChoiceValues>
+                            <ChoiceValue>AUTO</ChoiceValue>
+                            <ChoiceValue>CLIENT</ChoiceValue>
+                            <ChoiceValue>DUPS_OK</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>AUTO</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiContextProperties" uitype="maplist" order="6600"
+                                     i18nKey="audit.handlers.jms.jndi.contextProperties">
+                        <DefaultValues>
+                            <Value>[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory</Value>
+                            <Value>[java.naming.provider.url]=tcp://localhost:61616</Value>
+                            <Value>[topic.audit]=audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiTopicName" type="single" i18nKey="audit.handlers.jms.jndi.topicName"
+                                     validator="RequiredValueValidator" order="6700">
+                        <DefaultValues>
+                            <Value>audit</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="jndiConnectionFactoryName" type="single"
+                                     i18nKey="audit.handlers.jms.jndi.connectionFactoryName"
+                                     validator="RequiredValueValidator" order="6800">
+                        <DefaultValues>
+                            <Value>ConnectionFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchEnabled" type="single" syntax="boolean" order="6900"
+                                     i18nKey="audit.handlers.jms.publisher.batch.batchEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchCapacity" type="single" syntax="number" order="7000"
+                                     i18nKey="audit.handlers.jms.publisher.batch.capacity"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxBatchedEvents" type="single" syntax="number" order="7100"
+                                     i18nKey="audit.handlers.jms.publisher.batch.maxBatchedEvents"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>100</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="batchThreadCount" type="single" syntax="number" order="7200"
+                                     i18nKey="audit.handlers.jms.publisher.batch.threadCount"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>3</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="insertTimeoutSec" type="single" syntax="number" order="7300"
+                                     i18nKey="audit.handlers.jms.publisher.batch.insertTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="pollTimeoutSec" type="single" syntax="number" order="7400"
+                                     i18nKey="audit.handlers.jms.publisher.batch.pollTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="shutdownTimeoutSec" type="single" syntax="number" order="7500"
+                                     i18nKey="audit.handlers.jms.publisher.batch.shutdownTimeoutSec"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>60</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory"
+                                     validator="RequiredValueValidator" order="7600">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JmsAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

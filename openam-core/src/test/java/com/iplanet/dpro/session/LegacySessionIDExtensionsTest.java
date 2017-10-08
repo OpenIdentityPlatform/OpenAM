@@ -28,4 +28,12 @@ public class LegacySessionIDExtensionsTest {
         assertThat(result.getPrimaryID()).isEqualTo("01");
         assertThat(result.getSiteID()).isEqualTo("04");
     }
+
+    @Test
+    public void shouldAllowNullStorageKey() throws Exception {
+        String primary = "primary";
+        String site = "site";
+        LegacySessionIDExtensions result = new LegacySessionIDExtensions(primary, site, null);
+        assertThat(result.getStorageKey()).isNull();
+    }
 }

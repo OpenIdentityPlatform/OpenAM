@@ -15,27 +15,32 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-
-import java.text.MessageFormat;
+import org.forgerock.util.Options;
 
 /**
- * Responsible for creating a Token in LDAP Store.
+ * Responsible for creating a Token in persistence layer.
  */
 public class CreateTask extends AbstractTask {
+
     private final Token token;
+    private final Options options;
 
     /**
      * @param token Non null Token to create.
+     * @param options Non null Options for the operation.
      * @param handler Non null handler to notify.
      */
-    public CreateTask(Token token, ResultHandler<Token, ?> handler) {
+    public CreateTask(Token token, Options options, ResultHandler<Token, ?> handler) {
         super(handler);
         this.token = token;
+        this.options = options;
     }
 
     /**
@@ -43,14 +48,13 @@ public class CreateTask extends AbstractTask {
      *
      * Note: If the Token already exists this operation will fail.
      *
-     * @param connection Non null connection to use.
-     * @param adapter Required for LDAP operations.
+     * @param adapter Required for datalayer operations.
      * @throws DataLayerException If there was any problem creating the Token.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
-        adapter.create(connection, token);
-        handler.processResults(token);
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+        Token created = adapter.create(token, options);
+        handler.processResults(created);
     }
 
     @Override

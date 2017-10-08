@@ -28,10 +28,7 @@ import java.util.List;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-
 import org.forgerock.guava.common.collect.Lists;
-import org.forgerock.openam.utils.RealmUtils;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Form;
@@ -57,7 +54,11 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.utils.RealmUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
@@ -67,6 +68,7 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
+@Deprecated
 public class RealmContextFilter implements Filter, org.forgerock.json.resource.Filter {
 
     private final CoreWrapper coreWrapper;
@@ -198,8 +200,8 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         RealmContext newRealmContext = newContext.asContext(RealmContext.class);
         return newRealmContext != null
                 && (!originalContext.containsContext(RealmContext.class)
-                || !newRealmContext.getResolvedRealm()
-                        .equals(originalContext.asContext(RealmContext.class).getResolvedRealm()));
+                || !newRealmContext.getRealm()
+                        .equals(originalContext.asContext(RealmContext.class).getRealm()));
     }
 
     private Context evaluate(Context context, Request request) throws ResourceException {
@@ -218,6 +220,10 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
 
     private Context evaluate(Context context, String hostname, List<String> requestUri,
             List<String> overrideRealmParameter) throws ResourceException {
+
+        if (context.containsContext(RealmContext.class)) {
+            return context;
+        }
 
         if (!coreWrapper.isValidFQDN(hostname)) {
             throw new BadRequestException("FQDN \"" + hostname + "\" is not valid.");
@@ -253,13 +259,21 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
         String matchedUri = matchedUriBuilder.length() > 1 ? matchedUriBuilder.substring(1) :
                 matchedUriBuilder.toString();
 
-        RealmContext realmContext = new RealmContext(new UriRouterContext(context, matchedUri,
-                Paths.joinPath(remainingUri), Collections.<String, String>emptyMap()));
-        realmContext.setDnsAlias(hostname, dnsAliasRealm);
-        realmContext.setSubRealm(matchedUri, RealmUtils.cleanRealm(currentRealm.substring(dnsAliasRealm.length())));
-        realmContext.setOverrideRealm(overrideRealm);
-        return realmContext;
-
+        if (overrideRealm != null) {
+            try {
+                return new RealmContext(new UriRouterContext(context, matchedUri,
+                        Paths.joinPath(remainingUri), Collections.<String, String>emptyMap()), Realm.of(overrideRealm));
+            } catch (RealmLookupException e) {
+                throw new BadRequestException("Invalid realm, " + overrideRealmParameter.get(0), e);
+            }
+        } else {
+            try {
+                return new RealmContext(new UriRouterContext(context, matchedUri,
+                        Paths.joinPath(remainingUri), Collections.<String, String>emptyMap()), Realm.of(currentRealm));
+            } catch (RealmLookupException e) {
+                throw new BadRequestException("Invalid realm, " + e.getRealm(), e);
+            }
+        }
     }
 
     private String resolveRealm(SSOToken adminToken, String parentRealm, String subrealm)

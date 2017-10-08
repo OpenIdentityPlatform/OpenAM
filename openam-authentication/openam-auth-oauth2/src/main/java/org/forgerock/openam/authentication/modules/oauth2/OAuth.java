@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2016 ForgeRock AS. All rights reserved.
- * Copyright (c) 2011 Cybernetica AS.
+ * Copyright 2011-2016 ForgeRock AS.
+ * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,7 +27,9 @@
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -42,39 +44,41 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
@@ -85,9 +89,9 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.openam.xui.XUIState;
-import org.forgerock.util.encode.Base64url;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -96,7 +100,7 @@ public class OAuth extends AMLoginModule {
 
     public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
     public static final String OPENID_TOKEN = "OPENID_TOKEN";
-    private static Debug debug = Debug.getInstance("amLoginModule");
+    private static Debug DEBUG = Debug.getInstance("amAuthOAuth2");
     private String authenticatedUser = null;
     private Map sharedState;
     private OAuthConf config;
@@ -108,6 +112,10 @@ public class OAuth extends AMLoginModule {
     String userPassword = "";
     String proxyURL = "";
     private final CTSPersistentStore ctsStore;
+
+    /* default idle time for invalid sessions */
+    private static final long maxDefaultIdleTime =
+            SystemProperties.getAsLong("com.iplanet.am.session.invalidsessionmaxtime", 3);
 
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
@@ -196,6 +204,10 @@ public class OAuth extends AMLoginModule {
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
 
+                long expiryTime = currentTimeMillis() + TimeUnit.MINUTES.toMillis(maxDefaultIdleTime);
+                Calendar expiryTimeStamp = TimeUtils.fromUnixTime(expiryTime, TimeUnit.MILLISECONDS);
+                csrfStateToken.setExpiryTimestamp(expiryTimeStamp);
+
                 try {
                     ctsStore.create(csrfStateToken);
                 } catch (CoreTokenException e) {
@@ -246,16 +258,8 @@ public class OAuth extends AMLoginModule {
 
             case GET_OAUTH_TOKEN_STATE: {
 
-                final String csrfState;
-
-                if (request.getParameter("jsonContent") != null) {
-                    final JsonValue jval = JsonValueBuilder.toJsonValue(request.getParameter("jsonContent"));
-                    csrfState = jval.get("state").asString();
-                    code =jval.get(PARAM_CODE).asString();
-                } else {
-                    csrfState = request.getParameter("state");
-                    code = request.getParameter(PARAM_CODE);
-                }
+                final String csrfState = request.getParameter("state");
+                code = request.getParameter(PARAM_CODE);
 
                 if (csrfState == null) {
                     OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
@@ -266,7 +270,7 @@ public class OAuth extends AMLoginModule {
                 try {
                     Token csrfStateToken = ctsStore.read(OAuthUtil.findCookie(request, NONCE_TOKEN_ID));
                     ctsStore.deleteAsync(csrfStateToken);
-                    String expectedCsrfState = csrfStateToken.getValue(CoreTokenField.STRING_ONE);
+                    String expectedCsrfState = csrfStateToken.getAttribute(CoreTokenField.STRING_ONE);
                     if (!expectedCsrfState.equals(csrfState)) {
                         OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
                                 + "contained an unexpected value");
@@ -283,7 +287,8 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
-                    String tokenSvcResponse = getContent(config.getTokenServiceUrl(code, proxyURL), null);
+                    String tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
+                            config.getTokenServicePOSTparameters(code, proxyURL));
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     JwtClaimsSet jwtClaims = null;
@@ -294,7 +299,7 @@ public class OAuth extends AMLoginModule {
                         try {
                             jwtClaims = jwtHandler.validateJwt(idToken);
                         } catch (RuntimeException | AuthLoginException e) {
-                            debug.warning("Cannot validate JWT", e);
+                            DEBUG.warning("Cannot validate JWT", e);
                             throw e;
                         }
                         if (!JwtHandler.isIntendedForAudience(config.getClientId(), jwtClaims)) {
@@ -309,7 +314,8 @@ public class OAuth extends AMLoginModule {
 
                     String profileSvcResponse = null;
                     if (StringUtils.isNotEmpty(config.getProfileServiceUrl())) {
-                        profileSvcResponse = getContent(config.getProfileServiceUrl(), "Bearer " + token);
+                        profileSvcResponse = getContentUsingGET(config.getProfileServiceUrl(), "Bearer " + token,
+                                config.getProfileServiceGetParameters());
                         OAuthUtil.debugMessage("OAuth.process(): Profile Svc response: " + profileSvcResponse);
                     }
 
@@ -517,7 +523,7 @@ public class OAuth extends AMLoginModule {
         try {
             return getConfiguredType(AttributeMapper.class, config.getAccountMapper());
         } catch (ClassCastException ex) {
-            debug.error("Account Mapper is not an implementation of AttributeMapper.", ex);
+            DEBUG.error("Account Mapper is not an implementation of AttributeMapper.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
         } catch (Exception ex) {
             throw new AuthLoginException("Problem when trying to instantiate the account mapper", ex);
@@ -530,7 +536,7 @@ public class OAuth extends AMLoginModule {
         try {
             return getConfiguredType(AccountProvider.class, config.getAccountProvider());
         } catch (ClassCastException ex) {
-            debug.error("Account Provider is not actually an implementation of AccountProvider.", ex);
+            DEBUG.error("Account Provider is not actually an implementation of AccountProvider.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
         } catch (Exception ex) {
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
@@ -550,7 +556,7 @@ public class OAuth extends AMLoginModule {
                 attributeMapper.init(OAuthParam.BUNDLE_NAME);
                 attributes.putAll(getAttributes(svcProfileResponse, attributeMapperConfig, attributeMapper, jwtClaims));
             } catch (ClassCastException ex) {
-                debug.error("Attribute Mapper is not actually an implementation of AttributeMapper.", ex);
+                DEBUG.error("Attribute Mapper is not actually an implementation of AttributeMapper.", ex);
             } catch (Exception ex) {
                 OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the Attribute Mapper", ex);
             }
@@ -623,14 +629,31 @@ public class OAuth extends AMLoginModule {
         return dynamicUser;
     }
 
+    private String getContentUsingPOST(String serviceUrl, String authorizationHeader, Map<String, String> getParameters,
+            Map<String, String> postParameters) throws LoginException {
+        return getContent(serviceUrl, authorizationHeader, getParameters, postParameters, "POST");
+    }
 
-    // Obtain the user profile information from the OAuth 2.0 Identity Provider
-    // Profile service configured for this module, either using first GET and
-    // POST as a fall back
-    private String getContent(String serviceUrl, String authorizationHeader) throws LoginException {
+    private String getContentUsingGET(String serviceUrl, String authorizationHeader, Map<String, String> getParameters)
+            throws LoginException {
+        return getContent(serviceUrl, authorizationHeader, getParameters, null, "GET");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                getContentStreamByGET(serviceUrl, authorizationHeader)));
+    }
+
+    private String getContent(String serviceUrl, String authorizationHeader, Map<String, String> getParameters,
+            Map<String, String> postParameters, String httpMethod) throws LoginException {
+
+        InputStream inputStream;
+        if ("GET".equals(httpMethod)) {
+            inputStream = getContentStreamByGET(serviceUrl, authorizationHeader, getParameters);
+        } else if ("POST".equals(httpMethod)) {
+            inputStream = getContentStreamByPOST(serviceUrl, authorizationHeader, getParameters, postParameters);
+        } else {
+            throw new IllegalArgumentException("httpMethod='" + httpMethod + "' is not valid. Expecting POST or GET");
+        }
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+
         StringBuilder buf = new StringBuilder();
         try {
             String str;
@@ -641,12 +664,7 @@ public class OAuth extends AMLoginModule {
             OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
             throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
         } finally {
-            try {
-                in.close();
-            } catch (IOException ioe) {
-                OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
-                throw new AuthLoginException(BUNDLE_NAME, "ioe", null, ioe);
-            }
+            IOUtils.closeIfNotNull(in);
         }
         return buf.toString();
     }
@@ -673,12 +691,21 @@ public class OAuth extends AMLoginModule {
             }     
     }
 
-    public InputStream getContentStreamByGET(String serviceUrl, String authorizationHeader)
-            throws LoginException {
+    public InputStream getContentStreamByGET(String serviceUrl, String authorizationHeader,
+            Map<String, String> getParameters) throws LoginException {
 
         OAuthUtil.debugMessage("service url: " + serviceUrl);
+        OAuthUtil.debugMessage("GET parameters: " + getParameters);
         try {
             InputStream is;
+            if (!CollectionUtils.isEmpty(getParameters)) {
+                if (!serviceUrl.contains("?")) {
+                    serviceUrl += "?";
+                } else {
+                    serviceUrl += "&";
+                }
+                serviceUrl += getDataString(getParameters);
+            }
             URL urlC = new URL(serviceUrl);
 
             HttpURLConnection connection = HttpURLConnectionManager.getConnection(urlC);
@@ -701,7 +728,8 @@ public class OAuth extends AMLoginModule {
                         " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + errorStream + "\n");
                 }
-                is = getContentStreamByPOST(serviceUrl, authorizationHeader);
+                is = getContentStreamByPOST(serviceUrl, authorizationHeader, getParameters, Collections
+                .<String, String>emptyMap());
             }
 
             return is;
@@ -709,6 +737,7 @@ public class OAuth extends AMLoginModule {
         } catch (MalformedURLException mfe) {
             throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, mfe);
         } catch (IOException ioe) {
+            DEBUG.warning("OAuth.getContentStreamByGET URL={} caught IOException", serviceUrl, ioe);
             throw new AuthLoginException(BUNDLE_NAME,"ioe", null, ioe);
         }
     }
@@ -729,26 +758,31 @@ public class OAuth extends AMLoginModule {
             catch (IOException ioe) {
                 OAuthUtil.debugError("OAuth.getErrorStream: IOException: " + ioe.getMessage());
             } finally {
-                try {
-                    in.close();
-                } catch (IOException ioe) {
-                    OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
-                }
+                IOUtils.closeIfNotNull(in);
             }
             return buf.toString();
         }
     }
 
-    public InputStream getContentStreamByPOST(String serviceUrl, String authorizationHeader)
-            throws LoginException {
+    public InputStream getContentStreamByPOST(String serviceUrl, String authorizationHeader,
+            Map<String, String> getParameters, Map<String, String> postParameters) throws LoginException {
 
         InputStream is = null;
 
         try {
             OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: URL = " + serviceUrl);
+            OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: GET parameters = " + getParameters);
+            OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: POST parameters = " + postParameters);
 
+            if (!CollectionUtils.isEmpty(getParameters)) {
+                if (!serviceUrl.contains("?")) {
+                    serviceUrl += "?";
+                } else {
+                    serviceUrl += "&";
+                }
+                serviceUrl += getDataString(getParameters);
+            }
             URL url = new URL(serviceUrl);
-
             String query = url.getQuery();
             OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: Query: " + query);
 
@@ -758,10 +792,11 @@ public class OAuth extends AMLoginModule {
             if (authorizationHeader != null) {
                 connection.setRequestProperty("Authorization", authorizationHeader);
             }
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(query);
-            writer.close();
-
+            if (postParameters != null && !postParameters.isEmpty()) {
+                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+                writer.write(getDataString(postParameters));
+                writer.close();
+            }
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: HTTP Conn OK");
                 is = connection.getInputStream();
@@ -776,6 +811,7 @@ public class OAuth extends AMLoginModule {
         } catch (MalformedURLException e) {
             throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, e);
         } catch (IOException e) {
+            DEBUG.warning("OAuth.getContentStreamByPOST URL={} caught IOException", serviceUrl, e);
             throw new AuthLoginException(BUNDLE_NAME,"ioe", null, e);
         }
 
@@ -852,5 +888,24 @@ public class OAuth extends AMLoginModule {
         config = null;
         sharedState = null;
     }
-    
+
+    private String getDataString(Map<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+
+            if (first) {
+                first = false;
+            } else {
+                result.append("&");
+            }
+            // We don't need to encode the key/value as they are already encoded
+            result.append(entry.getKey());
+            result.append("=");
+            result.append(entry.getValue());
+        }
+
+        return result.toString();
+    }
+
 }

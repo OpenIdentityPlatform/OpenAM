@@ -189,7 +189,7 @@ public class SmsJsonConverterTest {
         given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(true);
 
         //When
-        JsonValue result = converter.toJson(mapRepresentation);
+        JsonValue result = converter.toJson(mapRepresentation, true);
 
         //Then
         AssertJJsonValueAssert.AbstractJsonValueAssert asserter = AssertJJsonValueAssert.assertThat(result);
@@ -232,7 +232,7 @@ public class SmsJsonConverterTest {
         given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(false);
 
         //When
-        converter.toJson(mapRepresentation);
+        converter.toJson(mapRepresentation, true);
     }
 
     @Test(expectedExceptions = JsonException.class)

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Restricts the list of Auth Services (Chains) to those that include Authentication via a Social AuthN provider.
@@ -64,21 +66,21 @@ public class ConfiguredSocialAuthServices extends ConfiguredAuthServices {
             try {
                 ServiceConfig authConfig = parentConfig.getSubConfig(config);
                 Set<String> chainConfig = (Set<String>) authConfig.getAttributes().get(AMAuthConfigUtils.ATTR_NAME);
-                AppConfigurationEntry[] chain = AMAuthConfigUtils.parseValues(chainConfig.iterator().next());
-                for (int i = 0; i < chain.length; i++) {
-                    if (getType(authMgr, chain[i]).equals(OAUTH2_TYPE)) {
-                        // There's an OAuth2 module in the chain, so this could be a social authn chain
-                        configs.add(config);
+                if (CollectionUtils.isNotEmpty(chainConfig)) {
+                    AppConfigurationEntry[] chain = AMAuthConfigUtils.parseValues(chainConfig.iterator().next());
+                    for (AppConfigurationEntry entry : chain) {
+                        if (OAUTH2_TYPE.equals(getType(authMgr, entry))) {
+                            // There's an OAuth2 module in the chain, so this could be a social authn chain
+                            configs.add(config);
+                        }
                     }
+                } else {
+                    debug.message("The auth chain was empty for authConfig: {}", authConfig);
                 }
             } catch (SMSException e) {
-                if (debug.messageEnabled()) {
-                    debug.message("Not using auth chain as couldn't get config: "+config, e);
-                }
+                debug.message("Not using auth chain as couldn't get config: {}", config, e);
             } catch (SSOException e) {
-                if (debug.warningEnabled()) {
-                    debug.warning("Invalid SSO Token when trying to get config for " + config, e);
-                }
+                debug.warning("Invalid SSO Token when trying to get config for {}", config, e);
             }
         }
         return configs;

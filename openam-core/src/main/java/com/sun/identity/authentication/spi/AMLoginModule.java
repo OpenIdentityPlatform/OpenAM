@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,49 @@
  *
  * $Id: AMLoginModule.java,v 1.22 2009/11/21 01:11:56 222713 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.spi;
 
+import static com.sun.identity.authentication.util.ISAuthConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.*;
 import static org.forgerock.openam.utils.StringUtils.*;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextInputCallback;
+import javax.security.auth.callback.TextOutputCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
+import org.forgerock.openam.identity.idm.IdentityUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
@@ -41,7 +74,6 @@ import com.iplanet.am.sdk.AMUserPasswordValidation;
 import com.iplanet.am.util.Misc;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionConstraint;
-import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -72,35 +104,6 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
-import org.forgerock.openam.ldap.LDAPUtils;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextInputCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -195,6 +198,9 @@ import java.util.Set;
  * @supported.api
  */
 public abstract class AMLoginModule implements LoginModule {
+
+    private final SessionQueryManager sessionQueryManager;
+
     // list which holds both presentation and credential callbacks
     List internal = null;
     // list which holds only credential callbacks
@@ -244,7 +250,7 @@ public abstract class AMLoginModule implements LoginModule {
     private String moduleName = null;
     private String moduleClass = null;
     private static final String bundleName = "amAuth";
-    private static AuthD ad = AuthD.getAuth();
+    private final AuthD ad;
     private Principal principal = null;
     // the authentication status
     private boolean succeeded = false;
@@ -275,6 +281,8 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public AMLoginModule() {
         auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
+        ad = AuthD.getAuth();
+        sessionQueryManager = InjectorHolder.getInstance(SessionQueryManager.class);
     }
     
     /**
@@ -464,6 +472,11 @@ public abstract class AMLoginModule implements LoginModule {
                 rc.getStatusParameter(),
                 rc.getRedirectBackUrlCookieName());
                 extCallbacks.add(copy[i]);
+            } else if (original[i] instanceof PollingWaitCallback) {
+                PollingWaitCallback pollingWaitCallback = (PollingWaitCallback) original[i];
+                copy[i] = PollingWaitCallback.makeCallback().asCopyOf(pollingWaitCallback).build();
+                extCallbacks.add(copy[i]);
+
             } else {
                 debug.error("unknown callback " + original[i]);
             }
@@ -727,13 +740,12 @@ public abstract class AMLoginModule implements LoginModule {
 
         // in internal, first Callback is always PagePropertiesCallback
         if ((infoText != null) && (infoText.length() != 0)) {
-            PagePropertiesCallback pc =
+            PagePropertiesCallback pagePropertiesCallback =
             (PagePropertiesCallback)((Callback[]) internal.get(state - 1))[0];
 
-            // substitute string
-            List<String> infoTexts = pc.getInfoText();
+            List<String> infoTexts = pagePropertiesCallback.getInfoText();
             infoTexts.set(callback, infoText);
-            pc.setInfoText(infoTexts);
+            pagePropertiesCallback.setInfoText(infoTexts);
         }     
     }
     
@@ -1048,8 +1060,8 @@ public abstract class AMLoginModule implements LoginModule {
             }
             return process(callbacks, state);
         } catch (InvalidPasswordException e) {
-            setFailureState();
             setFailureID(e.getTokenId());
+            setFailureState();
             throw e;
         } catch (AuthLoginException e) {
             setFailureState();
@@ -1096,15 +1108,10 @@ public abstract class AMLoginModule implements LoginModule {
     public final boolean login() throws AuthLoginException {
         if (moduleHasDone()) {
             debug.message("This module has already done.");
-            if (currentState == ISAuthConstants.LOGIN_SUCCEED) {
-                return true;
-            } else {
-                return false;
-            }
+            return ISAuthConstants.LOGIN_SUCCEED == currentState;
         } else {
             if (debug.messageEnabled()) {
-                debug.message("This module is not done yet. CurrentState: "
-                + currentState);
+                debug.message("This module is not done yet. CurrentState: {}", currentState);
             }
         }
         
@@ -1118,24 +1125,23 @@ public abstract class AMLoginModule implements LoginModule {
         if (noCallbacks) {
             currentState =  wrapProcess(EMPTY_CALLBACK, 1);
             // check login status
-            if (currentState == ISAuthConstants.LOGIN_SUCCEED) {
-                setSuccessModuleName(moduleName);
-                succeeded = true;
-                nullifyUsedVars();
-                return true;
-            } else if (currentState == ISAuthConstants.LOGIN_IGNORE) {
-                // index = 0;
-                setFailureModuleName(moduleName);
-                succeeded = false;
-                destroyModuleState();
-                principal = null;
-                return false;
-            } else {
-                setFailureModuleName(moduleName);
-                succeeded = false;
-                cleanup();
-                throw new AuthLoginException(bundleName, "invalidCode",
-                new Object[]{new Integer(currentState)});
+            switch (currentState) {
+                case LOGIN_SUCCEED:
+                    setSuccessModuleName(moduleName);
+                    succeeded = true;
+                    nullifyUsedVars();
+                    return true;
+                case LOGIN_IGNORE:
+                    setFailureModuleName(moduleName);
+                    succeeded = false;
+                    destroyModuleState();
+                    principal = null;
+                    return false;
+                default:
+                    setFailureModuleName(moduleName);
+                    succeeded = false;
+                    cleanup();
+                    throw new AuthLoginException(bundleName, "invalidCode", new Object[]{new Integer(currentState)});
             }
         }
         
@@ -2326,21 +2332,43 @@ public abstract class AMLoginModule implements LoginModule {
         sharedState = null;
         destroyModuleState();
     }
-    
+
     /**
-     * Stores user name password into shared state map
-     * this method should be called after successfull
-     * authentication by each individual modules.
+     * Stores user name into shared state map.
+     * This method should be called after successful authentication by each individual module
+     * if a username was supplied by that module.
      *
-     * @param user user name
-     * @param passwd user password
+     * @param username user name.
+     */
+    public void storeUsername(String username) {
+        if (isStore && sharedState != null) {
+            sharedState.put(getUserKey(), username);
+        }
+    }
+
+    /**
+     * Stores password into shared state map.
+     * This method may be called after successful authentication by each individual module.
+     *
+     * @param password user's password.
+     */
+    private void storePassword(String password) {
+        if (isStore && sharedState != null) {
+            sharedState.put(getPwdKey(), password);
+        }
+    }
+
+    /**
+     * Stores user name and password into shared state map.
+     * This method should be called after successful authentication by each individual module
+     * if both a username and a password were supplied in that module.
+     *
+     * @param user user name.
+     * @param passwd user password.
      */
     public void storeUsernamePasswd(String user, String passwd) {
-        // store only if store shared state is enabled
-        if (isStore && sharedState !=null) {
-            sharedState.put(ISAuthConstants.SHARED_STATE_USERNAME, user);
-            sharedState.put(ISAuthConstants.SHARED_STATE_PASSWORD, passwd);
-        }
+        storeUsername(user);
+        storePassword(passwd);
     }
     
     /**
@@ -2447,7 +2475,7 @@ public abstract class AMLoginModule implements LoginModule {
                  }
 
                  String userDN = null;
-                 userDN = normalizeDN(IdUtils.getDN(amIdUser));
+                 userDN = normalizeDN(IdentityUtils.getDN(amIdUser));
 
                  if (acInfo == null) {
                      acInfo = isAccountLockout.getAcInfo(userDN,amIdUser);
@@ -2649,7 +2677,7 @@ public abstract class AMLoginModule implements LoginModule {
 
             if (univId != null) {
                 sessionQuota = getSessionQuota(amIdUser);
-                sessionCount = SessionCount.getAllSessionsByUUID(univId).size();
+                sessionCount = sessionQueryManager.getAllSessionsByUUID(univId).size();
 
                 if (debug.messageEnabled()) {
                     debug.message("AMLoginModule.isSessionQuotaReached :: univId= "
@@ -2718,7 +2746,7 @@ public abstract class AMLoginModule implements LoginModule {
             String univId = IdUtils.getUniversalId(amIdUser);
 
             if (univId != null) {
-                Map<String, String> currentSessions = SessionCount.getAllSessionsByUUID(univId);
+                Map<String, Long> currentSessions = sessionQueryManager.getAllSessionsByUUID(univId);
                 SSOTokenManager manager = SSOTokenManager.getInstance();
 
                 for (String tokenID : currentSessions.keySet()) {
@@ -2801,7 +2829,7 @@ public abstract class AMLoginModule implements LoginModule {
         if (indexType != null) {
             entryDetail.addInfo(AUTH_INDEX, indexType.toString());
         }
-        entryDetail.addInfo(AUTH_LEVEL, String.valueOf(getAuthLevel()));
+        entryDetail.addInfo(AuditConstants.EntriesInfoFieldKey.AUTH_LEVEL, String.valueOf(getAuthLevel()));
         entryDetail.addInfo(MODULE_CLASS, moduleClass);
 
         return entryDetail;

@@ -91,22 +91,13 @@ public class PolicyCache implements ServiceListener {
             if ( DEBUG.messageEnabled() ) {
                 DEBUG.message("Creating singleton policy cache");
             }
+            PolicyManager.initAdminSubject();
             policyCache = new PolicyCache();
             try {
                 policyCache.token = ServiceTypeManager.getSSOToken();
                 policyCache.scm = new ServiceConfigManager(
                         PolicyManager.POLICY_SERVICE_NAME,
                         policyCache.token);
-                if (!PolicyManager.isMigratedToEntitlementService()) {
-                    policyCache.scm.addListener(policyCache);
-                } else {
-                    if ( DEBUG.messageEnabled() ) {
-                        DEBUG.message("PolicyCache.getInstance():"
-                                + " migrated to entilement service,  "
-                                + " not registering notification listener with SMS");
-                    }
-                }
-                
             } catch (SMSException smse) {
                 DEBUG.error(ResBundleUtils.getString(
                     "can_not_create_policy_cache"), smse);
@@ -136,7 +127,7 @@ public class PolicyCache implements ServiceListener {
         return policyCache;
     }
 
-	/**
+    /**
          * Gets the singleton instance of PolicyCache.
 	 * It takes into consideration of the SSOToken passed 
 	 * to this method as a parameter

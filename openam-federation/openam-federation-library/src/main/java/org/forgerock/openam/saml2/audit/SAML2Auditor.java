@@ -1,24 +1,25 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2015 ForgeRock AS.
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015-2016 ForgeRock AS.
+ */
 package org.forgerock.openam.saml2.audit;
 
 import static java.util.concurrent.TimeUnit.*;
 import static org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.StringUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import javax.servlet.http.HttpServletRequest;
@@ -73,7 +74,7 @@ public class SAML2Auditor implements SAML2EventLogger {
         this.request = request;
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
-        this.startTime = System.currentTimeMillis();
+        this.startTime = currentTimeMillis();
     }
 
     @Override
@@ -116,7 +117,7 @@ public class SAML2Auditor implements SAML2EventLogger {
         if (auditEventPublisher.isAuditing(
                 realm, AuditConstants.ACCESS_TOPIC, AuditConstants.EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
 
             AuditEvent auditEvent = getDefaultSAML2AccessAuditEventBuilder()
@@ -136,7 +137,7 @@ public class SAML2Auditor implements SAML2EventLogger {
         if (auditEventPublisher.isAuditing(
                 realm, AuditConstants.ACCESS_TOPIC, AuditConstants.EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             final JsonValue detail = json(object(field(AuditConstants.ACCESS_RESPONSE_DETAIL_REASON, message)));
             AuditEvent auditEvent = getDefaultSAML2AccessAuditEventBuilder()

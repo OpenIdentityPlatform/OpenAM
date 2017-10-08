@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/PushDevicesResource#action.validate.schema.title",
+  "description": "i18n:api-descriptor/PushDevicesResource#action.validate.schema.description",
+  "properties": {
+    "result": {
+      "constant": true,
+      "type": "string"
+    }
+  }
+}

@@ -17,6 +17,7 @@
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.security.auth.Subject;
@@ -43,16 +44,15 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -66,7 +66,6 @@ import org.json.JSONException;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
@@ -80,12 +79,12 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final Debug debug = Debug.getInstance("UmaProvider");
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final TokenStore oauth2TokenStore;
 
     private static final String UNABLE_TO_RETRIEVE_TICKET_MESSAGE = "Unable to retrieve Permission Ticket";
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
-    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
+    private final OAuth2UrisFactory oAuth2UrisFactory;
 
     private final UmaAuditLogger auditLogger;
     private final PendingRequestsService pendingRequestsService;
@@ -99,8 +98,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
      */
     @Inject
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
-            TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
-            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory,
+            TokenStore oauth2TokenStore, OAuth2RequestFactory requestFactory,
+            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, OAuth2UrisFactory oAuth2UrisFactory,
             UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
             Map<String, ClaimGatherer> claimGatherers, ExtensionFilterManager extensionFilterManager,
             UmaExceptionHandler exceptionHandler, JacksonRepresentationFactory jacksonRepresentationFactory) {
@@ -277,7 +276,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     }
 
     private boolean hasExpired(PermissionTicket permissionTicket) {
-        return permissionTicket.getExpiryTime() < System.currentTimeMillis();
+        return permissionTicket.getExpiryTime() < currentTimeMillis();
     }
 
     private boolean isEntitled(UmaProviderSettings umaProviderSettings, OAuth2ProviderSettings oauth2ProviderSettings,

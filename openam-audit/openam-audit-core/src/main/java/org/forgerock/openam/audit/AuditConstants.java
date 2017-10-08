@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.audit;
 
@@ -42,8 +42,6 @@ public final class AuditConstants {
         AM_SESSION_MAX_TIMED_OUT("AM-SESSION-MAX_TIMED_OUT"),
         /** Session logged out audit event name. */
         AM_SESSION_LOGGED_OUT("AM-SESSION-LOGGED_OUT"),
-        /** Session reactivated audit event name. */
-        AM_SESSION_REACTIVATED("AM-SESSION-REACTIVATED"),
         /** Session destroyed audit event name. */
         AM_SESSION_DESTROYED("AM-SESSION-DESTROYED"),
         /** Session property changed audit event name. */
@@ -116,7 +114,11 @@ public final class AuditConstants {
         /** Jato audit event component. */
         JATO("jato"),
         /** SAML2 audit event component. */
-        SAML2("SAML2");
+        SAML2("SAML2"),
+        /** Self Service audit event component. */
+        SELF_SERVICE("Self Service"),
+        /** Documentation audit event component. */
+        DOCUMENTATION("Documentation");
 
         private final String name;
 
@@ -167,6 +169,8 @@ public final class AuditConstants {
         OAUTH2_ACCESS,
         /** Tracking ID for Session used during authentication. */
         AUTH,
+        /** Tracking ID for an OpenID Connect ID Token. */
+        OIDC_ID_TOKEN,
         /** Radius Access Request. */
         RADIUS_ACCESS_REQUEST
     }
@@ -224,6 +228,8 @@ public final class AuditConstants {
         LOGIN_TIMEOUT,
         /** Authentication module is denied. */
         MODULE_DENIED,
+        /** Authentication module not found. */
+        MODULE_NOT_FOUND,
         /** Limit for maximum number of allowed session has been reached. */
         MAX_SESSION_REACHED,
         /** Org/Realm does not exists. */

@@ -24,13 +24,14 @@
  *
  * $Id: SubRealmGroupTest.java,v 1.3 2009/11/19 01:02:04 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
+import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -84,14 +85,13 @@ public class SubRealmGroupTest {
         // avaliableResources.add(RESOURCE2);
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1_NAME);
         group1 = IdRepoUtils.createGroup("/", GROUP1_NAME);
         group1.addMember(user1);
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/");
 
         Map<String, Set<String>> saccMap =
             ec.getSubjectAttributesCollectorConfiguration("OpenSSO");
@@ -108,7 +108,7 @@ public class SubRealmGroupTest {
 
     @AfterClass
     public void cleanup() throws Exception {
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     private void removeOrganization() throws Exception {
@@ -125,8 +125,7 @@ public class SubRealmGroupTest {
         orgMgr.deleteSubOrganization(SUB_REALM1, true);
         orgMgr.deleteSubOrganization(SUB_REALM2, true);
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = new EntitlementService(adminSubject, "/");
 
         Map<String, Set<String>> saccMap =
             ec.getSubjectAttributesCollectorConfiguration("OpenSSO");

@@ -1,0 +1,71 @@
+/*
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2016 ForgeRock AS.
+*/
+
+.subnav-container {
+    font-size: 16px;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+    -webkit-box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    min-height: 57px;
+    line-height: 55px;
+    color: #666;
+    a {
+        color: #666;
+    }
+
+    strong {
+        font-weight: 500;
+    }
+    .navbar-default {
+        min-height: 0;
+        border: 0;
+        .navbar-toggle {
+            margin: 10px 0;
+            border: inherit;
+        }
+        .navbar-collapse {
+            line-height: 20px;
+            .sidenav {
+                padding-top: 20px;
+            }
+        }
+
+    }
+}
+
+.breadcrumb {
+    padding: 0;
+    margin-bottom: 0;
+    list-style: none;
+    background-color: transparent;
+    color: #999;
+
+    >li+li:before {
+        content: "\f105";
+        padding: 0 5px;
+        color: #ccc;
+        font-family: FontAwesome;
+    }
+}
+
+.breadcrumb a:focus,
+.breadcrumb a:hover,
+.subnav-container a:focus,
+.subnav-container a:hover {
+    text-decoration: none;
+    color: #519387;
+}

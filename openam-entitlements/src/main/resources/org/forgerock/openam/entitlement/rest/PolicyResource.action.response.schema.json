@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "i18n:api-descriptor/PolicyResource#action.response.schema.title",
+  "description": "i18n:api-descriptor/PolicyResource#action.response.schema.description",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "title": "i18n:api-descriptor/PolicyResource#action.response.schema.resource.title",
+        "description": "i18n:api-descriptor/PolicyResource#action.response.schema.resource.description",
+        "type": "string"
+      },
+      "actions": {
+        "type": "object",
+        "title": "i18n:api-descriptor/PolicyResource#action.response.schema.actions.title",
+        "description": "i18n:api-descriptor/PolicyResource#action.response.schema.actions.description",
+        "additionalProperties": {
+          "type": "boolean"
+        }
+      },
+      "attributes": {
+        "type": "object",
+        "title": "i18n:api-descriptor/PolicyResource#action.response.schema.attributes.title",
+        "description": "i18n:api-descriptor/PolicyResource#action.response.schema.attributes.description",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "advices": {
+        "type": "object",
+        "title": "i18n:api-descriptor/PolicyResource#action.response.schema.advices.title",
+        "description": "i18n:api-descriptor/PolicyResource#action.response.schema.advices.description",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

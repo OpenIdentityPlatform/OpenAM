@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SessionResource#validate.response.schema.title",
+  "description": "i18n:api-descriptor/SessionResource#validate.response.schema.description",
+  "properties": {
+    "valid": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/SessionResource#validate.response.schema.valid.title",
+      "description": "i18n:api-descriptor/SessionResource#validate.response.schema.valid.description"
+    },
+    "uid": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SessionResource#validate.response.schema.uid.title",
+      "description": "i18n:api-descriptor/SessionResource#validate.response.schema.uid.description"
+    },
+    "realm": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SessionResource#validate.response.schema.realm.title",
+      "description": "i18n:api-descriptor/SessionResource#validate.response.schema.realm.description"
+    }
+  },
+  "required": [
+    "valid",
+    "uid",
+    "realm"
+  ]
+}

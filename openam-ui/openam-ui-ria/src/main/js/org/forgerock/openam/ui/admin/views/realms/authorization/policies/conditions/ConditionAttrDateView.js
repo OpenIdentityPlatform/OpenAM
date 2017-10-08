@@ -11,20 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDateView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
     "bootstrap-datetimepicker"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrDate.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
             this.parentRender(function () {
@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        initDatePickers: function () {
+        initDatePickers () {
             var options = {
                     format: "YYYY:MM:DD",
                     useCurrent: false,

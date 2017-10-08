@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
  /**
@@ -19,7 +19,7 @@
   *
   * @module org/forgerock/openam/ui/common/RouteTo
   */
-define("org/forgerock/openam/ui/common/RouteTo", [
+define([
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -27,13 +27,13 @@ define("org/forgerock/openam/ui/common/RouteTo", [
     "org/forgerock/commons/ui/common/main/SessionManager"
 ], function (Constants, EventManager, Router, Configuration, SessionManager) {
     var obj = {
-        setGoToUrlProperty: function () {
+        setGoToUrlProperty () {
             var hash = Router.getCurrentHash();
             if (!Configuration.gotoURL && !hash.match(Router.configuration.routes.login.url)) {
-                Configuration.setProperty("gotoURL", "#" + hash);
+                Configuration.setProperty("gotoURL", `#${hash}`);
             }
         },
-        forbiddenPage: function () {
+        forbiddenPage () {
             delete Configuration.globalData.authorizationFailurePending;
             return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
                 route: {
@@ -43,10 +43,10 @@ define("org/forgerock/openam/ui/common/RouteTo", [
                 fromRouter: true
             });
         },
-        forbiddenError: function () {
+        forbiddenError () {
             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
         },
-        logout: function () {
+        logout () {
             obj.setGoToUrlProperty();
 
             return SessionManager.logout().then(function () {
@@ -58,13 +58,8 @@ define("org/forgerock/openam/ui/common/RouteTo", [
                 });
             });
         },
-        loginDialog: function () {
+        loginDialog () {
             return EventManager.sendEvent(Constants.EVENT_SHOW_LOGIN_DIALOG);
-        },
-        sessionExpired: function () {
-            return EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                route: Router.configuration.routes.sessionExpired
-            });
         }
     };
 

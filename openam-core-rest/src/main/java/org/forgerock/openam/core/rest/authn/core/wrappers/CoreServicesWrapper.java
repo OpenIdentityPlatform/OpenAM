@@ -56,7 +56,7 @@ public class CoreServicesWrapper extends org.forgerock.openam.core.CoreServicesW
     public AuthContextLocalWrapper getAuthContext(HttpServletRequest request, HttpServletResponse response,
             SessionID sessionID, boolean isSessionUpgrade, boolean isBackPost) throws AuthException {
         AuthContextLocal authContextLocal = AuthUtils.getAuthContext(request, response, sessionID, isSessionUpgrade,
-                isBackPost);
+                isBackPost, false, true);
         String orgDN = AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
         authContextLocal.setOrgDN(orgDN);
         return new AuthContextLocalWrapper(authContextLocal);

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 /**
@@ -48,4 +48,7 @@
  *
  * The classes in this package are the interfaces and implementations specific to the rest-sts context.
  *
- */package org.forgerock.openam.sts.rest.token.validator;
+ * @supported.api
+ */
+
+package org.forgerock.openam.sts.rest.token.validator;

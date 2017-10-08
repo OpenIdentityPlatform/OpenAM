@@ -71,9 +71,13 @@ public class URLPatternMatcher {
             requestedURL = resourceName.canonicalize(requestedURL);
 
             // convert URI to URL if required (but not if pattern is relative)
-            if (patternLower.startsWith("http")) {
-                pattern = resourceName.canonicalize(pattern);
+            if (pattern.startsWith("/")) {
+                pattern = convertToURL(pattern, requestedURL);
+            } else if (!patternLower.startsWith("http")) {
+                pattern = convertToURL("/" + pattern, requestedURL);
             }
+
+            pattern = resourceName.canonicalize(pattern);
 
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("URLPatternMatcher.match(" + requestedURL + "): matching by pattern: " + pattern);

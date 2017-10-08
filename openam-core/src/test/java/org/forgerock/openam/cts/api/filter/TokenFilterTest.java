@@ -11,10 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.filter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.query.QueryFilter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -35,5 +40,22 @@ public class TokenFilterTest {
     @Test (expectedExceptions = NullPointerException.class)
     public void shouldPreventNullReturnAttribute() {
         filter.addReturnAttribute(null);
+    }
+
+    @Test
+    public void shouldBeEqual() {
+        //given
+        TokenFilter token1 =
+                new TokenFilterBuilder().withQuery(QueryFilter.equalTo(CoreTokenField.TOKEN_TYPE,
+                        TokenType.SESSION)).build();
+
+        TokenFilter token2 =
+                new TokenFilterBuilder().withQuery(QueryFilter.equalTo(CoreTokenField.TOKEN_TYPE,
+                        TokenType.SESSION)).build();
+        //when
+        boolean result = token1.equals(token2);
+
+        //then
+        assertThat(result).isTrue();
     }
 }

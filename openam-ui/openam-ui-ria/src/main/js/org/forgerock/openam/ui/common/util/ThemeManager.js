@@ -1,40 +1,34 @@
-/*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+/**
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Copyright 2011-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/ThemeManager", [
+define([
     "jquery",
-    "underscore",
-    "org/forgerock/openam/ui/common/util/Constants",
+    "lodash",
+    "config/ThemeConfiguration",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "config/ThemeConfiguration",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "Router"
-], function ($, _, Constants, Configuration, EventManager, ThemeConfiguration, URIUtils, Router) {
+    "org/forgerock/openam/ui/common/util/Constants",
+    "Router",
+    "store/index"
+], function ($, _, ThemeConfiguration, Configuration, EventManager, URIUtils, Constants, Router, store) {
     /**
      * @exports org/forgerock/openam/ui/common/util/ThemeManager
      */
+
     var defaultThemeName = "default",
         applyThemeToPage = function (path, icon, stylesheets) {
             // We might be switching themes (due to a realm change) and so we need to clean up the previous theme.
@@ -166,10 +160,11 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
          * clear out any previous theme.
          * @returns {Promise} a promise that is resolved when the theme has been applied.
          */
-        getTheme: function () {
+        getTheme () {
             validateConfig();
 
-            var themeName = findMatchingTheme(Configuration.globalData.realm, getAuthenticationChainName()),
+            const realm = store.default.getState().server.realm || Configuration.globalData.realm;
+            var themeName = findMatchingTheme(realm, getAuthenticationChainName()),
                 isAdminTheme = Router.currentRoute.navGroup === "admin",
                 hasThemeNameChanged = themeName !== Configuration.globalData.themeName,
                 hasAdminThemeFlagChanged = isAdminTheme !== Configuration.globalData.isAdminTheme,

@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeManagerTest.java,v 1.3 2010/01/26 20:10:16 dillidorai Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -77,8 +77,7 @@ public class PrivilegeManagerTest {
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
     private UserSubject ua1;
     private UserSubject ua2;
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup()
@@ -112,7 +111,7 @@ public class PrivilegeManagerTest {
         // appResources.add(RESOURCE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, realm, appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, realm, appl);
     }
 
     @AfterClass
@@ -127,8 +126,8 @@ public class PrivilegeManagerTest {
 
         PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.remove(PRIVILEGE_NAME);
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
-        ApplicationManager.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(adminToken, "/");
         orgMgr.deleteSubOrganization(SUB_REALM, true);
@@ -360,17 +359,6 @@ public class PrivilegeManagerTest {
         }
     }
 
-    @Test(dependsOnMethods = {"testAddPrivilege", "testAddPrivilege2"})
-    public void testGetPrivilegesXML() throws Exception {
-        PrivilegeManager prm = PrivilegeManager.getInstance("/",
-            SubjectUtils.createSubject(adminToken));
-        Set<String> names = new HashSet<String>();
-        names.add(PRIVILEGE_NAME);
-        names.add(PRIVILEGE_NAME2);
-        String xml = prm.getPrivilegesXML(names);
-        UnittestLog.logMessage("PrivilegeManagerTest.testGetPrivilegesXML():\n" + xml);
-    }
-
     @Test(dependsOnMethods = {"testAddPrivilege"})
     public void testSerializePrivilege() throws Exception {
         if (!migrated) {
@@ -430,11 +418,6 @@ public class PrivilegeManagerTest {
                     + "failed to get privilege description.");
         }
 
-        String xml = prm.getPrivilegeXML(PRIVILEGE_NAME);
-        if ((xml == null) || (xml.trim().length() == 0)) {
-            throw new Exception("PrivilegeManagerTest.testGetPrivilege: "
-                    + "failed to get privilege XML.");
-        }
     }
 
     @Test(dependsOnMethods = {"testAddPrivilege"})

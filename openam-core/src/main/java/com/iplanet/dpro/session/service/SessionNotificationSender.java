@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,21 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
+
+import java.net.URL;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
@@ -40,18 +51,6 @@ import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Responsible for sending PLL session notification events to registered listeners.
@@ -60,24 +59,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * Local listeners (i.e. this instance of AM) will be notified by calling SessionNotificationHandler directly.
  */
-/*
- * Further refactoring is warranted.
- */
 @Singleton
-public class SessionNotificationSender {
+public class SessionNotificationSender implements InternalSessionListener {
 
     private static final String THREAD_POOL_NAME = "amSession";
 
     private final Debug sessionDebug;
-    private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
     private final SessionInfoFactory sessionInfoFactory;
     private final ThreadPool threadPool;
-    /**
-     * The URL Vector for ALL session events : SESSION_CREATION, IDLE_TIMEOUT,
-     * MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY.
-     */
-    private final CopyOnWriteArraySet<String> sessionEventURLs = new CopyOnWriteArraySet<String>();
 
     @Inject
     public SessionNotificationSender(
@@ -88,7 +78,6 @@ public class SessionNotificationSender {
             final ShutdownManager shutdownManager) {
 
         this.sessionDebug = sessionDebug;
-        this.serviceConfig = serviceConfig;
         this.serverConfig = serverConfig;
         this.sessionInfoFactory = sessionInfoFactory;
 
@@ -111,25 +100,25 @@ public class SessionNotificationSender {
         return threadPool.getCurrentSize();
     }
 
-    /**
-     * Add a listener to all Internal Sessions.
-     *
-     * @param url
-     */
-    void addListenerOnAllInternalSessions(String url) {
-        sessionEventURLs.add(url);
+    @Override
+    public void onEvent(final InternalSessionEvent event) {
+        switch (event.getType()) {
+            case SESSION_CREATION:
+            case LOGOUT:
+            case DESTROY:
+            case PROPERTY_CHANGED:
+                sendEvent(event);
+                break;
+            default:
+                // ignore all other types of event
+        }
     }
 
-    /**
-     * Sends the Internal Session event to the SessionNotificationSender.
-     *
-     * @param session    Internal Session.
-     * @param eventType Event Type.
-     */
-    public void sendEvent(InternalSession session, int eventType) {
-        sessionDebug.message("Running sendEvent, type = " + eventType);
+    private void sendEvent(final InternalSessionEvent event) {
+        sessionDebug.message("Running sendEvent, type = " + event.getType().getCode());
+
         try {
-            SessionNotificationSenderTask sns = new SessionNotificationSenderTask(session, eventType);
+            SessionNotificationSenderTask sns = new SessionNotificationSenderTask(event);
             // First send local notification. sendToLocal will return
             // true if remote URL's exists than add the notification
             // to the thread pool to process remote notifications.
@@ -147,13 +136,11 @@ public class SessionNotificationSender {
      */
     private class SessionNotificationSenderTask implements Runnable {
 
-        private final InternalSession session;
-        private final int eventType;
+        private final InternalSessionEvent event;
         private Map<String, Set<SessionID>> urls;
 
-        SessionNotificationSenderTask(InternalSession session, int eventType) {
-            this.session = session;
-            this.eventType = eventType;
+        SessionNotificationSenderTask(final InternalSessionEvent event) {
+            this.event = event;
         }
 
         /**
@@ -161,32 +148,7 @@ public class SessionNotificationSender {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            this.urls = session.getSessionEventURLs(eventType, serviceConfig.getLogoutDestroyBroadcast());
-
-            // Check global URLs first
-            if (!sessionEventURLs.isEmpty()) {
-
-                SessionNotification globalNotification =
-                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
-
-                for (String globalUrl : sessionEventURLs) {
-                    try {
-                        URL parsedGlobalUrl = new URL(globalUrl);
-                        if (serverConfig.isLocalNotificationService(parsedGlobalUrl)) {
-                            SessionNotificationHandler.handler.processLocalNotification(globalNotification);
-                            // If the Global notification is processed successfully
-                            // than no need to send individual notification.
-                            urls.remove(globalUrl);
-                        } else {
-                            // If the Global notification is for a remote URL, it should be handled from run()
-                            // - This allows remote notification to be handled asynchronously from another thread
-                            remoteURLExists = true;
-                        }
-                    } catch (Exception e) {
-                        sessionDebug.error("Local Global notification to " + globalUrl, e);
-                    }
-                }
-            }
+            this.urls = event.getInternalSession().getSessionEventURLs();
 
             // The check individual URLs
             if (!urls.isEmpty()) {
@@ -196,10 +158,10 @@ public class SessionNotificationSender {
                         URL parsedUrl = new URL(url);
                         if (serverConfig.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
-                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(event.getInternalSession(), sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, System.currentTimeMillis());
-                                SessionNotificationHandler.handler.processLocalNotification(notification);
+                                        new SessionNotification(info, event.getType().getCode(), event.getTime());
+                                SessionNotificationHandler.handler.processNotification(notification);
                             }
                         } else {
                             // If the Global notification is for a remote URL, it should be handled from run()
@@ -223,28 +185,6 @@ public class SessionNotificationSender {
                 throw new IllegalStateException("Must call sendToLocal before starting thread");
             }
 
-            // Check global URLs first
-            if (!sessionEventURLs.isEmpty()) {
-
-                SessionNotification globalNotification =
-                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
-                Notification globalNotificationXml = new Notification(globalNotification.toXMLString());
-                NotificationSet globalNotificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
-                globalNotificationSet.addNotification(globalNotificationXml);
-
-                for (String globalUrl : sessionEventURLs) {
-                    try {
-                        URL parsedGlobalUrl = new URL(globalUrl);
-                        // Only send to remote URLs, local URLs should be handled by sendToLocal
-                        if (!serverConfig.isLocalNotificationService(parsedGlobalUrl)) {
-                            PLLServer.send(parsedGlobalUrl, globalNotificationSet);
-                        }
-                    } catch (Exception e) {
-                        sessionDebug.error("Remote Global notification to " + globalUrl, e);
-                    }
-                }
-            }
-
             // The check individual URLs
             if (!urls.isEmpty()) {
                 for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
@@ -255,9 +195,9 @@ public class SessionNotificationSender {
                         if (!serverConfig.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
 
-                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(event.getInternalSession(), sid);
                                 SessionNotification notification =
-                                        new SessionNotification(info, eventType, System.currentTimeMillis());
+                                        new SessionNotification(info, event.getType().getCode(), event.getTime());
                                 Notification notificationXml = new Notification(notification.toXMLString());
                                 NotificationSet notificationSet = new NotificationSet(SessionService.SESSION_SERVICE);
                                 notificationSet.addNotification(notificationXml);

@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
+
+import java.util.List;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.util.query.QueryFilter;
@@ -29,6 +31,7 @@ public class CrestQuery {
 
     private final String queryId;
     private final QueryFilter<JsonPointer> queryFilter;
+    private final List<JsonPointer> fields;
 
     /**
      * Constructs a new CrestQuery instance with the specified query id.
@@ -36,8 +39,7 @@ public class CrestQuery {
      * @param queryIdPattern The query id.
      */
     public CrestQuery(String queryIdPattern) {
-        this.queryId = queryIdPattern;
-        this.queryFilter = null;
+        this(queryIdPattern, null, null);
     }
 
     /**
@@ -46,8 +48,20 @@ public class CrestQuery {
      * @param queryFilter The query filter.
      */
     public CrestQuery(QueryFilter<JsonPointer> queryFilter) {
+        this(null, queryFilter, null);
+    }
+
+    /**
+     * Constructs a new CrestQuery instance with the specified query filter.
+     *
+     * @param queryId The query ID.
+     * @param queryFilter The query filter.
+     * @param fields The fields to return in the query results.
+     */
+    public CrestQuery(String queryId, QueryFilter<JsonPointer> queryFilter, List<JsonPointer> fields) {
+        this.queryId = queryId;
         this.queryFilter = queryFilter;
-        this.queryId = null;
+        this.fields = fields;
     }
 
     /**
@@ -69,6 +83,15 @@ public class CrestQuery {
      */
     public QueryFilter<JsonPointer> getQueryFilter() {
         return queryFilter;
+    }
+
+    /**
+     * Gets the list of CREST fields that should be returned in the query result.
+     *
+     * @return The fields to return.
+     */
+    public List<JsonPointer> getFields() {
+        return fields;
     }
 
     /**
@@ -97,9 +120,10 @@ public class CrestQuery {
      */
     @Override
     public String toString() {
-        if (hasQueryFilter()) {
-            return "[_queryFilter: " + queryFilter.toString() + "]";
-        }
-        return "[_queryId: " + queryId + "]";
+        return "CrestQuery{"
+                + "queryId='" + queryId + '\''
+                + ", queryFilter=" + queryFilter
+                + ", fields=" + fields
+                + '}';
     }
 }

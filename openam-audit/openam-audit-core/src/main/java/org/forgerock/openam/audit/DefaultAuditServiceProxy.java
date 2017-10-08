@@ -15,22 +15,38 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.api.models.ApiDescription.apiDescription;
+import static org.forgerock.api.models.Paths.paths;
+import static org.forgerock.api.models.Resource.AnnotatedTypeVariant.REQUEST_HANDLER;
+import static org.forgerock.api.models.Resource.fromAnnotatedType;
+import static org.forgerock.api.models.VersionedPath.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.models.ApiDescription;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.AuditServiceProxy;
+import org.forgerock.http.ApiProducer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Extension of the commons {@link AuditServiceProxy} that allows for OpenAM specific configuration to be exposed
@@ -38,11 +54,27 @@ import org.forgerock.util.promise.Promise;
  *
  * @since 13.0.0
  */
-public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAuditService {
+@org.forgerock.api.annotations.RequestHandler(value = @Handler(
+        title = AUDIT_SERVICE + "default." + TITLE,
+        description = AUDIT_SERVICE + "default." + DESCRIPTION,
+        mvccSupported = false,
+        resourceSchema = @Schema(schemaResource = "AuditEvent.resource.schema.json"),
+        parameters = @Parameter(
+                name = "topic",
+                description = AUDIT_SERVICE + PATH_PARAM + DESCRIPTION,
+                type = "string",
+                enumValues = {"access", "activity", "authentication", "config"},
+                enumTitles = {"Access event", "Activity event", "Authentication event", "Config event"}
+        )))
+public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAuditService,
+        Describable<ApiDescription, Request> {
 
     private static final Debug DEBUG = Debug.getInstance("amAudit");
+    private static final String FAKE_ID = "fake:id";
+    private static final String FAKE_VERSION = "fake";
 
     private volatile AMAuditServiceConfiguration auditServiceConfiguration;
+    private final ApiDescription descriptor;
 
     /**
      * Create a new instance of the {@code DefaultAuditServiceProxy}. Note that the given delegate should be started
@@ -56,8 +88,17 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
         super(delegate);
         Reject.ifNull(auditServiceConfiguration);
         this.auditServiceConfiguration = auditServiceConfiguration;
+        this.descriptor = apiDescription()
+                .id(FAKE_ID).version(FAKE_VERSION)
+                .paths(paths().put("{topic}",
+                        versionedPath().put(UNVERSIONED, fromAnnotatedType(this.getClass(), REQUEST_HANDLER,
+                                apiDescription().id(FAKE_ID).version(FAKE_VERSION).build()))
+                                .build())
+                        .build())
+                .build();
     }
 
+    @Create(operationDescription = @Operation(description = AUDIT_SERVICE + CREATE_DESCRIPTION))
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         if (!isAuditEnabled(request)) {
@@ -109,5 +150,25 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
             return true;
         }
         return !auditServiceConfiguration.isBlacklisted(eventNameJson.asString());
+    }
+
+    @Override
+    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+        return descriptor;
+    }
+
+    @Override
+    public ApiDescription handleApiRequest(Context context, Request request) {
+        return descriptor;
+    }
+
+    @Override
+    public void addDescriptorListener(Listener listener) {
+        // Doesn't change so no need to support listeners.
+    }
+
+    @Override
+    public void removeDescriptorListener(Listener listener) {
+        // Doesn't change so no need to support listeners.
     }
 }

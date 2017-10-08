@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -20,6 +20,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -55,7 +56,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
     boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
             NameCallback callback) throws RestAuthResponseException {
 
-        String username = request.getHeader(USERNAME_HEADER_KEY);
+        String username = RestUtils.getMimeHeaderValue(request, USERNAME_HEADER_KEY);
 
         if (StringUtils.isEmpty(username)) {
             DEBUG.message("username not set in request.");

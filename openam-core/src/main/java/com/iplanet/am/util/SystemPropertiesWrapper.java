@@ -11,9 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.iplanet.am.util;
+
+import com.sun.identity.common.configuration.ConfigurationListener;
 
 /**
  * Wrapper which defines a simple dependency injectable dependency for code wishing to access
@@ -29,5 +31,16 @@ public class SystemPropertiesWrapper {
      */
     public int getAsInt(String key, int def) {
         return SystemProperties.getAsInt(key, def);
+    }
+
+    /**
+     * Wraps the call to {@link com.iplanet.am.util.SystemProperties#observe(ConfigurationListener, String...)}
+     *
+     * @param listener The listener to call when one of the provided properties has changed.
+     * @param properties The list of properties that should be observed. A change in any one of these properties
+     *                   will cause the listener to be notified.
+     */
+    public void observe(ConfigurationListener listener, String... properties) {
+        SystemProperties.observe(listener, properties);
     }
 }

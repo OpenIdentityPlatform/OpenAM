@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
-import org.forgerock.json.JsonValue;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,8 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
+import org.forgerock.json.JsonValue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Unit tests for {@link JsonValueBuilder}.
@@ -146,6 +147,15 @@ public class JsonValueBuilderTest {
 
         // Then...
         assertThat(actualJsonValue.toString()).isEqualTo(jsonString);
+    }
+
+    @Test
+    public void shouldLoadJsonFromResource() {
+        // When
+        JsonValue result = JsonValueBuilder.fromResource(this.getClass(), "JsonValueBuilderTest.json");
+
+        // Then
+        assertThat(result).isObject().hasBoolean("test");
     }
 
 }

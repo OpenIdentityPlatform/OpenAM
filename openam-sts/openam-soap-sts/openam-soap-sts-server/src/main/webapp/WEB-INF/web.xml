@@ -13,6 +13,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2016 Agile Digital Engineering
 -->
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
@@ -28,7 +29,7 @@
     </filter>
     <filter-mapping>
         <filter-name>audit_context_filter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/sts/*</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -37,7 +38,7 @@
     </filter>
     <filter-mapping>
         <filter-name>audit_access_filter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/sts/*</url-pattern>
     </filter-mapping>
 
     <!--

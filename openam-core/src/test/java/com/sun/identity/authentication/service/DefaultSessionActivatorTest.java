@@ -11,34 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.authentication.util.ISAuthConstants;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.security.auth.Subject;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
-import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
 
 public class DefaultSessionActivatorTest {
+
     private static final String ORGDN = "testdn";
     private static final SessionID SID = new SessionID("test");
 
@@ -59,7 +60,7 @@ public class DefaultSessionActivatorTest {
         MockitoAnnotations.initMocks(this);
 
         given(mockState.getOrgDN()).willReturn(ORGDN);
-        given(mockSessionService.newInternalSession(eq(ORGDN), any(HttpSession.class), eq(false)))
+        given(mockSessionService.newInternalSession(eq(ORGDN), eq(false)))
                 .willReturn(mockNewSession);
         given(mockNewSession.getID()).willReturn(SID);
     }
@@ -70,10 +71,10 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
-        verify(mockSessionService).newInternalSession(eq(ORGDN), any(HttpSession.class), anyBoolean());
+        verify(mockSessionService).newInternalSession(eq(ORGDN), anyBoolean());
     }
 
     @Test
@@ -82,10 +83,10 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
-        verify(mockNewSession).removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+        verify(mockNewSession).clearAuthContext();
     }
 
     @Test
@@ -98,7 +99,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getProperty("three")).willReturn("c");
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockState).setSessionProperties(mockNewSession);
@@ -115,10 +116,10 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
-        verify(mockSessionService).destroyInternalSession(authSessionID);
+        verify(mockSessionService).destroyAuthenticationSession(authSessionID);
     }
 
     @Test
@@ -127,7 +128,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         verify(mockState).setSession(mockNewSession);
@@ -139,7 +140,7 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null);
 
         // Then
         ArgumentCaptor<Subject> subjectArgumentCaptor = ArgumentCaptor.forClass(Subject.class);
@@ -154,39 +155,10 @@ public class DefaultSessionActivatorTest {
         given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
 
         // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, subject, null);
+        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, subject);
 
         // Then
         verify(mockState).setSubject(subject);
         assertThat(subject.getPrincipals()).contains(new SSOTokenPrincipal(SID.toString()));
-    }
-
-    @Test
-    public void shouldStoreLoginContextInSessionIfEnabled() throws Exception {
-        // Given
-        Object loginContext = "some login context";
-        given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
-        given(mockState.isModulesInSessionEnabled()).willReturn(true);
-
-        // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
-
-        // Then
-        verify(mockNewSession).setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
-    }
-
-    @Test
-    public void shouldNotStoreLoginContextInSessionIfDisabled() throws Exception {
-        // Given
-        Object loginContext = "some login context";
-        given(mockAuthSession.getPropertyNames()).willReturn(Collections.enumeration(Collections.emptyList()));
-        given(mockState.isModulesInSessionEnabled()).willReturn(false);
-
-        // When
-        DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, loginContext);
-
-        // Then
-        verify(mockNewSession, never()).setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
-
     }
 }

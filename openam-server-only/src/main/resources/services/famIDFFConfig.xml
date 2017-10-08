@@ -48,6 +48,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a100"
+                    order="100"
                     resourceName="cookieName">
                     <DefaultValues>
                         <Value>fedCookie</Value>
@@ -57,6 +58,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a101"
+                    order="200"
                     resourceName="idpProxyFinderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.federation.services.FSRealmIDPProxyImpl</Value>
@@ -66,6 +68,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a102"
+                    order="300"
                     resourceName="requestCacheCleanupInterval">
                     <DefaultValues>
                         <Value>300</Value>
@@ -75,6 +78,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a103"
+                    order="400"
                     resourceName="requestCacheTimeout">
                     <DefaultValues>
                         <Value>300</Value>
@@ -84,12 +88,14 @@
                     type="single"
                     syntax="string"
                     i18nKey="a104"
+                    order="500"
                     resourceName="idpLoginUrl">
                 </AttributeSchema>
                 <AttributeSchema name="XMLSigningOn"
                     type="single_choice"
                     syntax="string"
                     i18nKey="a105"
+                    order="600"
                     resourceName="xmlSigningOn">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="true">true</ChoiceValue>

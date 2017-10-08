@@ -21,6 +21,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -28,16 +36,6 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.IdRepoException;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
@@ -54,9 +52,7 @@ public class LoginAuthenticatorTest {
 
     @BeforeMethod
     public void setUp() {
-
         coreServicesWrapper = mock(CoreServicesWrapper.class);
-
         loginAuthenticator = new LoginAuthenticator(coreServicesWrapper);
     }
 
@@ -159,8 +155,7 @@ public class LoginAuthenticatorTest {
     }
 
     @Test
-    public void shouldGetLoginProcessForSubsequentRequest() throws AuthException, AuthLoginException, SSOException,
-            IdRepoException, RestAuthException {
+    public void shouldGetLoginProcessForSubsequentRequest() throws Exception {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -175,7 +170,7 @@ public class LoginAuthenticatorTest {
                 .indexType(authIndexType)
                 .indexValue(authIndexValue);
 
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
+        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("/ORG_DN");
         given(coreServicesWrapper.getAuthContext(eq(request), eq((HttpServletResponse) null), (SessionID) anyObject(),
                 eq(false), eq(false))).willReturn(authContextLocalWrapper);
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(false);
@@ -190,7 +185,7 @@ public class LoginAuthenticatorTest {
                 eq(false), eq(false));
         verify(coreServicesWrapper).isNewRequest(authContextLocalWrapper);
         verify(coreServicesWrapper).getDomainNameByRequest(request);
-        verify(coreServicesWrapper).isOrganizationActive("ORG_DN");
+        verify(coreServicesWrapper).isOrganizationActive("/ORG_DN");
         verify(coreServicesWrapper).getExistingValidSSOToken(Matchers.<SessionID>anyObject());
         verifyNoMoreInteractions(coreServicesWrapper);
     }

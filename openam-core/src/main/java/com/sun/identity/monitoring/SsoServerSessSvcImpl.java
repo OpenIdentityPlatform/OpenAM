@@ -24,17 +24,19 @@
  *
  * $Id: SsoServerSessSvcImpl.java,v 1.3 2009/11/02 20:10:45 hvijay Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.monitoring;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.management.snmp.SnmpStatusException;
+
 import org.forgerock.guice.core.InjectorHolder;
+
+import com.iplanet.dpro.session.service.SessionNotificationSender;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.management.snmp.SnmpStatusException;
+import com.sun.management.snmp.agent.SnmpMib;
 
 /**
  * This class extends the "SsoServerSessSvc" class.
@@ -62,36 +64,6 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
     }
 
     /*
-     * increment the active session counter
-     */
-    public void incSessionActiveCount() {
-        if (debug.messageEnabled()) {
-            debug.message("SsoServerSessSvcImpl.incSessionActiveCount");
-        }
-
-        long li = SessionActiveCount.longValue();
-        li++;
-        SessionActiveCount = Long.valueOf(li);
-    }
-
-    /*
-     * decrement the active session counter
-     */
-    public void decSessionActiveCount() {
-        if (debug.messageEnabled()) {
-            debug.message("SsoServerSessSvcImpl.decSessionActiveCount");
-        }
-
-        long li = SessionActiveCount.longValue();
-        li--;
-        if (li < 0) {
-            SessionActiveCount = 0L;
-        } else {
-            SessionActiveCount = Long.valueOf(li);
-        }
-    }
-
-    /*
      *  increment the created sessions counter
      *  does there need to be a destroyed sessions counter
      *  method to decrement the created sessions count?
@@ -107,7 +79,7 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      * Getter for the "SessionNotifCount" variable.
      */
     public Long getSessionNotifCount() throws SnmpStatusException {
-        return Long.valueOf(InjectorHolder.getInstance(SessionService.class).getNotificationQueueSize());
+        return Long.valueOf(InjectorHolder.getInstance(SessionNotificationSender.class).getNotificationQueueSize());
     }
 
 }

@@ -24,10 +24,12 @@
  *
  * $Id: ResourceResultCache.java,v 1.21 2010/01/21 22:18:01 dillidorai Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy.client;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
@@ -46,6 +48,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.idm.AMIdentity;
@@ -252,7 +255,7 @@ class ResourceResultCache implements SSOTokenListener {
         PolicyDecision pd = getPolicyDecision(appToken, serviceName, 
                 token, resourceName, actionNames, 
                 env, true); //use cache
-        if (pd.getTimeToLive() > System.currentTimeMillis()) {
+        if (pd.getTimeToLive() > currentTimeMillis()) {
             validTtl = true;
         }
         while (!validTtl && (count < retryCount)) {
@@ -266,7 +269,7 @@ class ResourceResultCache implements SSOTokenListener {
             pd = getPolicyDecision(appToken, serviceName, 
                     token, resourceName, actionNames, 
                     env, false);  //do not use cache
-            if (pd.getTimeToLive() > System.currentTimeMillis()) {
+            if (pd.getTimeToLive() > currentTimeMillis()) {
                 validTtl = true;
                 break;
             }
@@ -470,8 +473,14 @@ class ResourceResultCache implements SSOTokenListener {
                 scopeResultsMap = new HashMap();
                 tokenIDScopesMap.put(tokenID, scopeResultsMap);
                 if (!tokenRegistry.contains(tokenID)) {
-                    token.addSSOTokenListener(this);
-                    tokenRegistry.add(tokenID);
+                    try {
+                        token.addSSOTokenListener(this);
+                        tokenRegistry.add(tokenID);
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to tokenRegistry
+                        // scopeResultsMap will be populated and returned to the caller but not cached
+                        debug.message("ResourceResultCache.getResourceResults(): could not add sso listener: {}", ex.getMessage());
+                    }
                 }
             }
         }
@@ -513,8 +522,8 @@ class ResourceResultCache implements SSOTokenListener {
                             + "would contact server since env does not Match");
                 }
                 fetchResultsFromServer = true;
-            } else if (((Long)results[2]).longValue() 
-                    < System.currentTimeMillis()) {
+            } else if (((Long) results[2]).longValue()
+                    < currentTimeMillis()) {
                 if (debug.messageEnabled()) {
                     debug.message("ResourceResultCache.getResourceResults():"
                             + "would contact server since results ttl has "
@@ -574,7 +583,7 @@ class ResourceResultCache implements SSOTokenListener {
             results[1] = env;
 
             results[2] 
-                    = new Long(System.currentTimeMillis() + cacheTtl);
+                    = new Long(currentTimeMillis() + cacheTtl);
 
             if (actionNames != null) {
                 Set actionNames1 = actionNames;
@@ -841,7 +850,7 @@ class ResourceResultCache implements SSOTokenListener {
         } else if (result.equals(ResourceMatch.WILDCARD_MATCH)) {
             mergePolicyDecisions(resourceResult.getPolicyDecision(), pd,
                     serviceName);
-            if (pd.getTimeToLive() < System.currentTimeMillis()) {
+            if (pd.getTimeToLive() < currentTimeMillis()) {
                 processed = true;
             }
             if (!processed) {

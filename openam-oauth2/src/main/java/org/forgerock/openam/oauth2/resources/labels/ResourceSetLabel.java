@@ -17,18 +17,32 @@
 package org.forgerock.openam.oauth2.resources.labels;
 
 import java.util.Set;
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
 /**
  * A bean representing a resource set label.
  */
+@Title(UMA_LABEL_RESOURCE + "resourceSetLabel." + TITLE)
+@Description(UMA_LABEL_RESOURCE + "resourceSetLabel." + DESCRIPTION)
 public class ResourceSetLabel {
 
+    @Title(UMA_LABEL_RESOURCE + "resourceSetLabel.id." + TITLE)
+    @Description(UMA_LABEL_RESOURCE + "resourceSetLabel.id." + DESCRIPTION)
     private final String id;
+
+    @Title(UMA_LABEL_RESOURCE + "resourceSetLabel.name." + TITLE)
+    @Description(UMA_LABEL_RESOURCE + "resourceSetLabel.name." + DESCRIPTION)
     private String name;
+
+    @Title(UMA_LABEL_RESOURCE + "resourceSetLabel.type." + TITLE)
+    @Description(UMA_LABEL_RESOURCE + "resourceSetLabel.type." + DESCRIPTION)
     private final LabelType type;
+
     private final Set<String> resourceSetIds;
 
     public ResourceSetLabel(String id, String name, LabelType type, Set<String> resourceSetIds) {

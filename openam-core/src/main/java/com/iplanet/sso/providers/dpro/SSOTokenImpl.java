@@ -24,14 +24,25 @@
  *
  * $Id: SSOTokenImpl.java,v 1.6 2009/04/10 17:57:07 manish_rustagi Exp $
  *
- * Portions Copyright 2011-2015 ForgeRock AS.
+ * Portions Copyright 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.sso.providers.dpro;
 
+import java.net.InetAddress;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.util.HashMap;
+
+import javax.security.auth.login.LoginException;
+
+import org.forgerock.openam.session.SessionURL;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionListener;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
@@ -39,16 +50,6 @@ import com.iplanet.sso.SSOTokenListener;
 import com.sun.identity.authentication.internal.AuthContext;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.session.SessionURL;
-
-import javax.security.auth.login.LoginException;
-import java.net.InetAddress;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.util.HashMap;
-
-import static org.forgerock.openam.session.SessionConstants.INACTIVE;
-import static org.forgerock.openam.session.SessionConstants.VALID;
 
 /**
  * This class <code>SSOTokenImpl</code> implements the interface
@@ -121,7 +122,7 @@ class SSOTokenImpl implements SSOToken {
             SecureRandom secureRandom;
             try {
                 secureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            } catch (NoSuchProviderException e) {
+            } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
                 secureRandom = SecureRandom.getInstance("SHA1PRNG");
             }
             String amCtxId = Long.toHexString(secureRandom.nextLong());
@@ -486,8 +487,8 @@ class SSOTokenImpl implements SSOToken {
             if (ldapConnect) {
                 return true;
             }
-            int state = session.getState(possiblyResetIdleTime);
-            return (state == VALID) || (state == INACTIVE);
+            SessionState state = session.getState(possiblyResetIdleTime);
+            return state == SessionState.VALID;
         } catch (Exception e) {
             return false;
         }
@@ -505,8 +506,8 @@ class SSOTokenImpl implements SSOToken {
             if (ldapConnect) {
                 return;
             }
-            int state = session.getState(true);
-            if (state != VALID && state != INACTIVE) {
+            SessionState state = session.getState(true);
+            if (state != SessionState.VALID) {
                 throw new SSOException(SSOProviderBundle.rbName, "invalidstate", null);
             }
         } catch (Exception e) {

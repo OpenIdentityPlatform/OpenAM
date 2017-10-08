@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.config.user;
@@ -341,7 +341,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
 
         //cannot just add the issueTokenTypes set directly to the baseValue because the enclosing enums will not be quoted
         if (issueTokenTypes != null) {
-            JsonValue issueTokens = new JsonValue(new HashSet<String>());
+            JsonValue issueTokens = new JsonValue(new ArrayList<String>());
             Collection<String> issueCollection = issueTokens.asCollection(String.class);
             for (TokenType tokenType :issueTokenTypes) {
                 issueCollection.add(tokenType.name());
@@ -559,7 +559,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         Ultimately, the ISSUE_TOKEN_TYPES is a set, but it's set type gets stripped by the MapMarshalUtils.toJsonValueMap
         method. Thus it is a 'complex' object, which must be reconstituted in this method.
          */
-        Set<String> jsonIssueSet = new HashSet<>();
+        List<String> jsonIssueSet = new ArrayList<>();
         JsonValue jsonIssueTypes = new JsonValue(jsonIssueSet);
         jsonAttributes.remove(ISSUE_TOKEN_TYPES);
         jsonAttributes.put(ISSUE_TOKEN_TYPES, jsonIssueTypes);

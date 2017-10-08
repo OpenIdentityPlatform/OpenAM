@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -44,12 +44,13 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.oauth2.rest.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -104,62 +105,7 @@ public class ResourceSetResourceTest {
         //Then
         assertThat(readPromise).succeeded().withObject().isNotNull();
     }
-
-    @Test
-    public void createShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        CreateRequest request = mock(CreateRequest.class);
-        //When
-        Promise<ResourceResponse, ResourceException> instancePromise = resource.createInstance(context, request);
-
-        //Then
-        assertThat(instancePromise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void deleteShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        DeleteRequest request = mock(DeleteRequest.class);
-
-        //When
-        Promise<ResourceResponse, ResourceException> promise = resource.deleteInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void patchShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        PatchRequest request = mock(PatchRequest.class);
-
-        //When
-        Promise<ResourceResponse, ResourceException> promise = resource.patchInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
-    @Test
-    public void actionInstanceShouldNotBeSupported() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = mock(ActionRequest.class);
-
-        //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionInstance(context, "RESOURCE_SET_UID", request);
-
-        //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
-    }
-
+    
     @Test
     public void actionCollectionShouldNotBeSupported() {
 
@@ -288,5 +234,10 @@ public class ResourceSetResourceTest {
 
         //Then
         assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ResourceSetResource.class).hasValidAnnotations();
     }
 }

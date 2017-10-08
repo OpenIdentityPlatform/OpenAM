@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageRulesView",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function ($, _, ManageRulesView, Constants) {
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
 
             this.idPrefix = "Sub_";
             this.property = "subject";

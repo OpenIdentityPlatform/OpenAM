@@ -48,6 +48,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a500"
+                    order="100"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -57,6 +58,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a501"
+                    order="200"
                     resourceName="smsGatewayClass">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl</Value>
@@ -66,6 +68,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a502"
+                    order="300"
                     resourceName="smtpHostname">
                     <DefaultValues>
                         <Value>smtp.gmail.com</Value>
@@ -75,6 +78,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="65535"
                     i18nKey="a503"
+                    order="400"
                     resourceName="smtpHostPort">
                     <DefaultValues>
                         <Value>465</Value>
@@ -84,6 +88,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a504"
+                    order="500"
                     resourceName="smtpUsername">
                     <DefaultValues>
                         <Value>opensso.sun</Value>
@@ -93,6 +98,7 @@
                     type="single"
                     syntax="password"
                     i18nKey="a505"
+                    order="600"
                     resourceName="smtpUserPassword">
                     <DefaultValues>
                         <Value>sunopensso</Value>
@@ -102,6 +108,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a506"
+                    order="700"
                     resourceName="smtpSslEnabled">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
@@ -115,6 +122,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a5061"
+                    order="800"
                     resourceName="smtpFromAddress">
                     <DefaultValues>
                         <Value>no-reply@openam.org</Value>
@@ -125,6 +133,7 @@
                     type="single"
                     syntax="number_range" rangeStart="1" rangeEnd="30"
                     i18nKey="a507"
+                    order="900"
                     resourceName="otpValidityDuration">
                     <DefaultValues>
                         <Value>5</Value>
@@ -134,6 +143,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a508"
+                    order="1000"
                     resourceName="otpLength">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="6digits">6</ChoiceValue>
@@ -147,6 +157,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a509"
+                    order="1100"
                     resourceName="otpDeliveryMethod">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="sms">SMS</ChoiceValue>
@@ -160,7 +171,7 @@
                 <AttributeSchema
                    name="sunAMAuthHOTPAutoClicking"
                    cosQualifier="default" type="single"
-                   syntax="boolean" i18nKey="a520" resourceName="autoSendOTP">
+                   syntax="boolean" i18nKey="a520" order="1500" resourceName="autoSendOTP">
                   <BooleanValues>
                     <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                     <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -173,6 +184,7 @@
                          type="single"
                          syntax="string"
                          i18nKey="a510"
+                         order="1200"
                          resourceName="userProfileTelephoneAttribute">
                   <DefaultValues>
                     <Value>telephoneNumber</Value>
@@ -182,6 +194,7 @@
                          type="single"
                          syntax="string"
                          i18nKey="a511"
+                         order="1300"
                          resourceName="mobileCarrierAttribute">
                   <DefaultValues>
                     <Value></Value>
@@ -191,6 +204,7 @@
                          type="single"
                          syntax="string"
                          i18nKey="a512"
+                         order="1400"
                          resourceName="userProfileEmailAttribute">
                   <DefaultValues>
                     <Value>mail</Value>
@@ -201,6 +215,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a500"
+                        order="100"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -210,6 +225,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a501"
+                        order="200"
                         resourceName="smsGatewayClass">
                         <DefaultValues>
                             <Value>com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl</Value>
@@ -219,6 +235,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a502"
+                        order="300"
                         resourceName="smtpHostname">
                         <DefaultValues>
                             <Value>smtp.gmail.com</Value>
@@ -228,6 +245,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="65535"
                         i18nKey="a503"
+                        order="400"
                         resourceName="smtpHostPort">
                         <DefaultValues>
                             <Value>465</Value>
@@ -237,6 +255,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a504"
+                        order="500"
                         resourceName="smtpUsername">
                         <DefaultValues>
                             <Value>opensso.sun</Value>
@@ -246,6 +265,7 @@
                         type="single"
                         syntax="password"
                         i18nKey="a505"
+                        order="600"
                         resourceName="smtpUserPassword">
                         <DefaultValues>
                             <Value>sunopensso</Value>
@@ -255,6 +275,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a506"
+                        order="700"
                         resourceName="smtpSslEnabled">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
@@ -268,6 +289,7 @@
                         type="single"
                         syntax="string"
                         i18nKey="a5061"
+                        order="800"
                         resourceName="smtpFromAddress">
                         <DefaultValues>
                             <Value>no-reply@openam.org</Value>
@@ -277,6 +299,7 @@
                         type="single"
                         syntax="number_range" rangeStart="1" rangeEnd="30"
                         i18nKey="a507"
+                        order="900"
                         resourceName="otpValidityDuration">
                         <DefaultValues>
                             <Value>5</Value>
@@ -286,6 +309,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a508"
+                        order="1000"
                         resourceName="otpLength">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="6digits">6</ChoiceValue>
@@ -299,6 +323,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a509"
+                        order="1100"
                         resourceName="otpDeliveryMethod">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="sms">SMS</ChoiceValue>
@@ -312,7 +337,7 @@
 		            <AttributeSchema
                       name="sunAMAuthHOTPAutoClicking"
                       cosQualifier="default" type="single"
-                      syntax="boolean" i18nKey="a520" resourceName="autoSendOTP">
+                      syntax="boolean" i18nKey="a520" order="1500" resourceName="autoSendOTP">
                       <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -325,6 +350,7 @@
                                                  type="single"
                                                  syntax="string"
                                                  i18nKey="a510"
+                                                 order="1200"
                                                  resourceName="userProfileTelephoneAttribute">
                                   <DefaultValues>
                         <Value>telephoneNumber</Value>
@@ -334,6 +360,7 @@
                                                  type="single"
                                                  syntax="string"
                                                  i18nKey="a511"
+                                                 order="1300"
                                                  resourceName="mobileCarrierAttribute">
                                   <DefaultValues>
                         <Value></Value>
@@ -343,6 +370,7 @@
                                                  type="single"
                                                  syntax="string"
                                                  i18nKey="a512"
+                                                 order="1400"
                                                  resourceName="userProfileEmailAttribute">
                                   <DefaultValues>
                         <Value>mail</Value>

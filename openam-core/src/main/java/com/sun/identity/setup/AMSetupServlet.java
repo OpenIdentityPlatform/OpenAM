@@ -29,21 +29,13 @@
 
 package com.sun.identity.setup;
 
-import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.forgerock.openam.utils.IOUtils.writeToFile;
+import static com.sun.identity.setup.AMSetupUtils.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.IOUtils.*;
+import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -56,13 +48,16 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AccessController;
-import java.text.SimpleDateFormat;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,8 +73,33 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseLocator;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.license.ServletContextLicenseLocator;
+import org.forgerock.openam.setup.EmbeddedOpenDJManager;
+import org.forgerock.openam.setup.ZipUtils;
+import org.forgerock.openam.upgrade.EmbeddedOpenDJBackupManager;
+import org.forgerock.openam.upgrade.OpenDJUpgrader;
+import org.forgerock.openam.upgrade.VersionUtils;
+import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.config.ConfigurationFramework;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -95,9 +115,10 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.UI.LoginLogoutMapping;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.internal.server.SMSAuthModule;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.ConfigMonitoring;
 import com.sun.identity.common.DebugPropertiesObserver;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.common.configuration.ServerConfigXML;
 import com.sun.identity.common.configuration.ServerConfigXML.DirUserObject;
@@ -133,19 +154,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.license.License;
-import org.forgerock.openam.license.LicenseLocator;
-import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.license.ServletContextLicenseLocator;
-import org.forgerock.openam.upgrade.UpgradeDirectoryUtils;
-import org.forgerock.openam.upgrade.OpenDJUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.VersionUtils;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.config.ConfigurationFramework;
 
 /**
  * This class is the first class to get loaded by the Servlet container.
@@ -275,114 +283,20 @@ public class AMSetupServlet extends HttpServlet {
      * Checks if the embedded directory (if present) needs to be upgraded
      */
     private static void checkOpenDJUpgrade() throws ServletException {
-        // check for embedded directory
         if (!isEmbeddedDS()) {
             return;
         }
-        
-        // check if upgrade is required
-        OpenDJUpgrader upgrader = new OpenDJUpgrader(getBaseDir() + OPENDS_DIR, servletCtx);
-        if (!upgrader.isUpgradeRequired()) {
-            return;
-        }
-        
-        // backup embedded directory
-        createOpenDJBackup();
-                
-        // initiate upgrade
-        try {
-            upgrader.upgrade();
-        } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("OpenDJ upgrade exception: ", ex);
-            throw new ServletException("An error occurred while upgrading embedded OpenDJ", ex);
-        }
-        isOpenDJUpgraded = true;
-    }
-    
-    private static void createOpenDJBackup() {
-        try {
-            UpgradeDirectoryUtils.createUpgradeDirectories(getBaseDir());
-        } catch (UpgradeException ue) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot create backup directory", ue);
-            return;
-        }
-        
-        ZipOutputStream zOut = null;
-        String baseDir = getBaseDir();
-        String backupDir = baseDir + "/backups/";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String dateStamp = dateFormat.format(new Date());
-        File backupFile = new File(backupDir + "opendj.backup." + dateStamp + ".zip");
-  
-        if (backupFile.exists()) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot continue as backup file exists! "
-                    + backupFile.getName());
-            return;
-        }
-       
-        File opendjDirectory = new File(baseDir + OPENDS_DIR);
-        if (opendjDirectory.exists() && opendjDirectory.isDirectory()) {
-            final String[] filenames = opendjDirectory.list();
-            
-            try {
-                zOut = new ZipOutputStream(new FileOutputStream(backupFile));
-                
-                // Compress the files
-                for (String filename : filenames) {
-                    zipDir(new File(baseDir + OPENDS_DIR + File.separator + filename),
-                                    baseDir + OPENDS_DIR + File.separator, zOut, (baseDir + File.separator).length());
-                }
-
-                zOut.close();
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error("IOException", ioe);
-            } finally {
-                if (zOut != null) {
-                    try {
-                        zOut.close();
-                    } catch (IOException ioe) {
-                        // do nothing
-                    }
-                }
-            }
+        String baseDirectory = getBaseDir();
+        Debug logger = Debug.getInstance(SetupConstants.DEBUG_NAME);
+        ZipUtils zipUtils = new ZipUtils(logger);
+        OpenDJUpgrader upgrader = new OpenDJUpgrader(new EmbeddedOpenDJBackupManager(logger, zipUtils, baseDirectory),
+                baseDirectory + OPENDS_DIR, servletCtx);
+        EmbeddedOpenDJManager embeddedOpenDJManager = new EmbeddedOpenDJManager(logger, baseDirectory, upgrader);
+        if (embeddedOpenDJManager.getState() == EmbeddedOpenDJManager.State.UPGRADE_REQUIRED) {
+            isOpenDJUpgraded = embeddedOpenDJManager.upgrade() == EmbeddedOpenDJManager.State.UPGRADED;
         }
     }
     
-    private static void zipDir(File filename, String dirName, ZipOutputStream zOut, int stripLen) {
-        try {
-            if (!filename.exists()) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error("file not found");
-            }
-            
-            if (!filename.isDirectory()) {
-                zOut.putNextEntry(new ZipEntry((dirName + filename.getName()).replace('\\','/').substring(stripLen)));
-                FileInputStream fileIn = new FileInputStream(filename);
-                byte[] buffer =new byte[(int)filename.length()];
-                int inLen = fileIn.read(buffer);
- 
-                if (inLen != filename.length()) {
-                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("Short read: " + (filename.length() - inLen));
-                }
-            
-                zOut.write(buffer, 0, buffer.length);
-                zOut.closeEntry();
-                fileIn.close();
-            } else {
-                String subdirname = dirName + filename.getName() + File.separator;
-                zOut.putNextEntry(new ZipEntry(subdirname.replace('\\','/').substring(stripLen)));
-                zOut.closeEntry();
-                
-                String[] dirlist = new File(subdirname).list();
-
-                for (String dir : dirlist) {
-                    zipDir(new File(subdirname + dir), subdirname, zOut, stripLen);
-                }
-            }
-        } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to create zip file", ex);
-        }        
-    }
-
     /**
      * Checks if the product is already configured. This is required 
      * when the container on which WAR is deployed is restarted. If  
@@ -394,15 +308,13 @@ public class AMSetupServlet extends HttpServlet {
         isConfiguredFlag = overrideAMC == null || overrideAMC.equalsIgnoreCase("false");
         
         if (!isConfiguredFlag && servletCtx != null) {
+            // This call has side effect that sets the System base dir property
             String baseDir = getBaseDir();
             try {
-                String bootstrapFile = getBootStrapFile();
-                if (bootstrapFile != null) {
+                if (canBootstrap()) {
                     isConfiguredFlag = Bootstrap.load(new BootstrapData(baseDir), false);
-                } else {                    
-                    if (baseDir != null) {
+                } else if (baseDir != null) {
                         isConfiguredFlag = loadAMConfigProperties(baseDir + "/" + SetupConstants.AMCONFIG_PROPERTIES);
-                    }
                 }
             } catch (ConfiguratorException e) {
                 //ignore, WAR may not be configured yet.
@@ -463,15 +375,13 @@ public class AMSetupServlet extends HttpServlet {
            
         String loadBalancerHost = request.getParameter("LB_SITE_NAME");
         String primaryURL = request.getParameter("LB_PRIMARY_URL");
-        String sfoEnabled = request.getParameter("LB_SESSION_HA_SFO");
-        
+
         if (loadBalancerHost != null) {     
             // site configuration is passed as a map of the site 
             // information 
             Map<String, String> siteConfig = new HashMap<String, String>(5);
             siteConfig.put(SetupConstants.LB_SITE_NAME, loadBalancerHost);
             siteConfig.put(SetupConstants.LB_PRIMARY_URL, primaryURL);
-            siteConfig.put(SetupConstants.LB_SESSION_HA_SFO, sfoEnabled);
             req.addParameter(SetupConstants.CONFIG_VAR_SITE_CONFIGURATION, siteConfig);
         }
                 
@@ -571,7 +481,6 @@ public class AMSetupServlet extends HttpServlet {
         Map<String, Object> userRepo = (Map<String, Object>) map.remove(SetupConstants.USER_STORE);
 
         try {
-
             // Check for click-through license acceptance before processing the request.
             SetupProgress.reportStart("configurator.progress.license.check", new Object[0]);
             if (!isLicenseAccepted(request)) {
@@ -593,7 +502,7 @@ public class AMSetupServlet extends HttpServlet {
 
             isConfiguredFlag = configure(request, map, userRepo);
             if (isConfiguredFlag) {
-                FQDNUtils.getInstance().init();
+                FqdnValidator.getInstance().initialize();
                 //postInitialize was called at the end of configure????
                 postInitialize(getAdminSSOToken());
             }
@@ -644,8 +553,6 @@ public class AMSetupServlet extends HttpServlet {
                 if (siteMap != null && !siteMap.isEmpty()) {
                     String site = (String) siteMap.get( SetupConstants.LB_SITE_NAME);
                     String primaryURL = (String) siteMap.get(SetupConstants.LB_PRIMARY_URL);
-                    Boolean isSessionHASFOEnabled = Boolean.valueOf(
-                            (String) siteMap.get(SetupConstants.LB_SESSION_HA_SFO));
 
                     /*
                      * If primary url is null that means we are adding
@@ -663,17 +570,12 @@ public class AMSetupServlet extends HttpServlet {
                         ServerConfiguration.addToSite(adminToken, serverInstanceName, site);
                     }
 
-                    //configure SFO (enabled/disabled) by creating a subconfiguration for the site
-                    Map<String, Set<String>> values = new HashMap<String, Set<String>>(1);
-                    values.put(CoreTokenConstants.IS_SFO_ENABLED, asSet(isSessionHASFOEnabled.toString()));
-                    createSFOSubConfig(adminToken, site, values);
                 }
                 if (EmbeddedOpenDS.isMultiServer(map)) {
                     // Setup Replication port in SMS for each server
                     updateReplPortInfo(map);
                 }
-                EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                        SubjectUtils.createSuperAdminSubject(), "/");
+                EntitlementConfiguration ec = getEntitlementConfiguration(SubjectUtils.createSuperAdminSubject(), "/");
                 ec.reindexApplications();
             }
         } catch (Exception e) {
@@ -900,6 +802,12 @@ public class AMSetupServlet extends HttpServlet {
         try {
             if (!isDITLoaded) {
                 ServerConfiguration.createDefaults(adminSSOToken);
+                final String cookieDomain = (String) map.get(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN);
+                if (isNotEmpty(cookieDomain)) {
+                    ServiceSchemaManager scm = new ServiceSchemaManager(Constants.SVC_NAME_PLATFORM, adminSSOToken);
+                    ServiceSchema globalSchema = scm.getGlobalSchema();
+                    globalSchema.setAttributeDefaults(Constants.ATTR_COOKIE_DOMAINS, asSet(cookieDomain));
+                }
             }
             if (!isDITLoaded || !ServerConfiguration.isServerInstanceExist(adminSSOToken, serverInstanceName)) {
                 ServerConfiguration.createServerInstance(adminSSOToken, serverInstanceName,
@@ -1004,12 +912,10 @@ public class AMSetupServlet extends HttpServlet {
             // postInitialize requires the user repo to be configured
             postInitialize(adminSSOToken);
 
-            /*
-             * Requiring the keystore.jks file in OpenAM workspace.
-             * The createIdentitiesForWSSecurity is for the 
-             * JavaEE/NetBeans integration that we had done.
-             */
-            createPasswordFiles(basedir, deployuri);
+            // create .storepass and .keypass files to unlock the keystore
+            // The template keystore file stores the password protected with "changeit"
+            String storePass = AMSetupUtils.getRandomString();
+            createPasswordFiles(basedir + deployuri, storePass, "changeit");
             if (!isDITLoaded) {
                 if ((userRepo == null) || userRepo.isEmpty()) {
                     createDemoUser();
@@ -1030,29 +936,6 @@ public class AMSetupServlet extends HttpServlet {
             throw e;
         }
         return configured;
-    }
-
-    /**
-     * Creates a SubConfiguration in the Session service that should enable/disable SFO based on the provided values.
-     *
-     * @param adminToken The admin token to use when adding the SubConfiguration.
-     * @param siteName The name of the site that has been provided for the configurator.
-     * @param values Valid values for the session subconfiguration containing the SFO settings.
-     * @throws SMSException If there was an error while creating the new SubConfiguration.
-     * @throws SSOException If the provided admin token wasn't valid.
-     */
-    private static void createSFOSubConfig(SSOToken adminToken, String siteName, Map<String, Set<String>> values)
-            throws SMSException, SSOException {
-        ServiceConfigManager scm = new ServiceConfigManager("iPlanetAMSessionService", adminToken);
-        ServiceConfig sc = scm.getGlobalConfig(null);
-        if (sc == null) {
-            throw new SMSException("Global config does not exist for iPlanetAMSessionService");
-        }
-        ServiceConfig existingSubConfig = sc.getSubConfig(siteName);
-        //if the subconfig already exists, then we shouldn't try to create it for the second time
-        if (existingSubConfig == null) {
-            sc.addSubConfig(siteName, "Site", 0, values);
-        }
     }
 
     public static String getErrorMessage() {
@@ -1166,17 +1049,21 @@ public class AMSetupServlet extends HttpServlet {
     /**
      * Returns location of the bootstrap file.
      *
-     * @return Location of the bootstrap file. Returns null if the file
+     *  return the legacy bootstrap file OR boot.properties. If both files exist, the legacy bootstrap is returned
+     *
+     * @return Location of the bootstrap file. Returns null if a bootstrap file
      *         cannot be located 
      * @throws ConfiguratorException if servlet context is null or deployment
      *         application real path cannot be determined.
      */
     static String getBootStrapFile() throws ConfiguratorException {
         String bootstrap = null;
-        
+        String bootJson = null;
+
         String configDir = getPresetConfigDir();
         if (configDir != null && configDir.length() > 0) {
             bootstrap = configDir + "/bootstrap";
+            bootJson = configDir + "/boot.json";
         } else {
             String locator = getBootstrapLocator();
             FileReader frdr = null;
@@ -1184,7 +1071,9 @@ public class AMSetupServlet extends HttpServlet {
             try {
                 frdr = new FileReader(locator);
                 BufferedReader brdr = new BufferedReader(frdr);
-                bootstrap = brdr.readLine() + "/bootstrap";
+                String basePath = brdr.readLine();
+                bootstrap = basePath + "/bootstrap";
+                bootJson = basePath + "/boot.json";
             } catch (IOException e) {
                 //ignore
             } finally {
@@ -1197,14 +1086,37 @@ public class AMSetupServlet extends HttpServlet {
                 }
             }
         }
-        
+
         if (bootstrap != null) {
             File test = new File(bootstrap);
-            if (!test.exists()) {
+            if (!test.canRead()) {
                 bootstrap = null;
             }
         }
-        return bootstrap;
+        if (bootJson != null) {
+            File test = new File(bootJson);
+            if (!test.exists()) {
+                bootJson = null;
+            }
+        }
+
+        return bootstrap != null ? bootstrap : bootJson;
+    }
+
+    /**
+     * Determine if we can boot from one of
+     * <ul>
+     *     <li>legacy bootstrap file</li>
+     *     <li>boot.json</li>
+     * </ul>
+     *
+     * @return true if the system can boot from files or environment variables
+     * @throws ConfiguratorException if we encounter an I/O error or security exception while checking for boot properties
+     */
+    static boolean canBootstrap() throws ConfiguratorException {
+        String bsFile = getBootStrapFile();
+        // We may do more checks here in the future.
+        return bsFile != null;
     }
 
     // this is the file which contains the base dir.
@@ -1583,31 +1495,51 @@ public class AMSetupServlet extends HttpServlet {
      * Create the storepass and keypass files
      *
      * @param basedir the configuration base directory.
-     * @param deployuri the deployment URI. 
+     * @param keystorePwd password for .storepass
+     * @param keyPassword password for the .keypass - usually the same as above
      * @throws IOException if password files cannot be written.
      */
-    private static void createPasswordFiles(String basedir, String deployuri) throws IOException {
-        String pwd = Crypt.encrypt("changeit");
-        String location = basedir + deployuri;
-        writeContent(location + "/.keypass", pwd);
-        writeContent(location + "/.storepass", pwd);
-        copyCtxFile("/WEB-INF/template/keystore", "keystore.jks", location);
+    static void createPasswordFiles(String basedir, String keystorePwd, String keyPassword) throws IOException {
+        // We no longer encrypt the password in the keypass /storepass, because
+        // the boot passwords are stored in the keystore, and we need
+        // to be able to open the keystore to boot.
+        // The keystore now moves to the basedir
+        writeContent(basedir + "/.keypass", keyPassword);
+        writeContent(basedir + "/.storepass", keystorePwd);
+        copyCtxFile("/WEB-INF/template/keystore", "keystore.jks", basedir);
+        copyCtxFile("/WEB-INF/template/keystore", "keystore.jceks", basedir);
+        // the sample keystore files are encrypted with the default "changeit". We need to open and then save them
+        // the new password
+        AMKeyProvider jceks = new AMKeyProvider(true, basedir + "/keystore.jceks", "changeit", "JCEKS", "changeit");
+        AMKeyProvider jks = new AMKeyProvider(true, basedir + "/keystore.jks", "changeit", "JKS", "changeit");
+
+        jceks.setKey(keystorePwd, keyPassword);
+        jks.setKey(keystorePwd, keyPassword);
+
+        try {
+            jceks.store();
+            jks.store();
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new IOException("Can't update keystore password", e);
+        }
     }
 
     /**
      * Helper method to create the storepass and keypass files
      *
-     * @param fName is the name of the file to create.
+     * @param fName   is the name of the file to create.
      * @param content is the password to write in the file.
+     * @throws IOException
      */
     private static void writeContent(String fName, String content) throws IOException {
         FileWriter fout = null;
         try {
-            fout = new FileWriter(new File(fName));
-            fout.write(content);
+            Files.write(Paths.get(fName), content.getBytes(UTF_8));
+            chmodFileReadOnly(new File(fName));
+
         } catch (IOException ioex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME)
-                    .error("AMSetupServlet.writeContent: Exception in creating password files:" , ioex);
+                    .error("AMSetupServlet.writeContent: Exception in creating password files:", ioex);
             throw ioex;
         } finally {
             if (fout != null) {
@@ -1617,6 +1549,22 @@ public class AMSetupServlet extends HttpServlet {
                     //No handling requried
                 }
             }
+        }
+    }
+
+    /**
+     * Change a file to be read only for owner (eg password file on disk that we want to protect)
+     *
+     * @param f - the File handle to the file
+     * @throws IOException if the file does not exist or permissions can not be changed
+     */
+    public static void chmodFileReadOnly(File f) throws IOException {
+        // Tyy to chmod the file to be owner readable only
+        if ( !(f.setReadOnly() && f.setReadable(false, false) && f.setReadable(true, true))) {
+            // Unable to set permissions...
+            // Debug log may not be established right now so we cant really log a message...
+            // So we have to ignore this
+            // Debug.WARNING("Could not chmod file to to be readonly. Will also try POSIX");
         }
     }
 
@@ -1631,8 +1579,8 @@ public class AMSetupServlet extends HttpServlet {
         if (sc != null) {
             ServiceConfig subConfig = sc.getSubConfig(configName);
             if (subConfig != null) {
-                Map<String, Object> configMap = subConfig.getAttributes();
-                Set<String> vals = (Set<String>) configMap.get("sun-idrepo-ldapv3-config-ldap-server");
+                Map<String, Set<String>> configMap = subConfig.getAttributes();
+                Set<String> vals = configMap.get("sun-idrepo-ldapv3-config-ldap-server");
                 vals.add(entry);
                 HashMap<String, Set<String>> mp = new HashMap<String, Set<String>>(2);
                 mp.put("sun-idrepo-ldapv3-config-ldap-server", vals);
@@ -1849,7 +1797,7 @@ public class AMSetupServlet extends HttpServlet {
         ByteArrayInputStream bis = null;
         try {
             bis = new ByteArrayInputStream(str.getBytes());
-            DSConfigMgr.initInstance(bis);
+            DSConfigMgr.initInstance(bis, true);
         } finally {
             if (bis != null) {
                 try {
@@ -1949,9 +1897,9 @@ public class AMSetupServlet extends HttpServlet {
 
             String dsAdminPort = props.getProperty(Constants.DS_ADMIN_PORT);
 
-            Set<String> currServerSet = new HashSet<String>();
-            Set<String> currServerDSSet = new HashSet<String>();
-            Set<String> currServerDSAdminPortsSet = new HashSet<String>();
+            Set<String> currServerSet = new CaseInsensitiveHashSet<String>();
+            Set<String> currServerDSSet = new CaseInsensitiveHashSet<String>();
+            Set<String> currServerDSAdminPortsSet = new CaseInsensitiveHashSet<String>();
 
             for (String sname : serverSet) {
                 Properties p = ServerConfiguration.getServerInstance(adminToken, sname);

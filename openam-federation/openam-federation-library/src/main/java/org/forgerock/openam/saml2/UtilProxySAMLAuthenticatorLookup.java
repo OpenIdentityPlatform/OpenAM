@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.saml2;
 
@@ -239,8 +239,9 @@ public class UtilProxySAMLAuthenticatorLookup extends SAMLBase implements SAMLAu
                 // Send an appropriate response to the passive request
                 data.setSpEntityID(data.getAuthnRequest().getIssuer().getValue());
                 try {
-                    IDPSSOUtil.sendNoPassiveResponse(request, response, out, data.getIdpMetaAlias(), data.getIdpEntityID(),
-                            data.getRealm(), data.getAuthnRequest(), data.getRelayState(), data.getSpEntityID());
+                    IDPSSOUtil.sendResponseWithStatus(request, response, out, data.getIdpMetaAlias(),
+                            data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(), data.getRelayState(),
+                            data.getSpEntityID(), SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE);
                     return false;
                 } catch (SAML2Exception sme) {
                     SAML2Utils.debug.error(classMethod, sme);

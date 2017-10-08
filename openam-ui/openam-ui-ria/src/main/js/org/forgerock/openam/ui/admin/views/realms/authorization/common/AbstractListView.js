@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -28,19 +28,19 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
 ], function ($, _, Messages, AbstractView, EventManager, Router, Constants, UIUtils, FormHelper, BackgridUtils) {
 
     return AbstractView.extend({
-        toolbarTemplateID: "#gridToolbar",
+        toolbarTemplateID: "[data-grid-toolbar]",
 
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
         },
 
-        onDeleteClick: function (e, msg, id, callback) {
+        onDeleteClick (e, msg, id, callback) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecord, this, id, callback));
         },
 
-        deleteRecord: function (id, callback) {
+        deleteRecord (id, callback) {
             var self = this,
                 item = self.data.items.get(id),
                 onSuccess = function () {
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             });
         },
 
-        editRecord: function (e, id, route) {
+        editRecord (e, id, route) {
             var self = this;
 
             Router.routeTo(route, {
@@ -68,11 +68,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/Abstract
             });
         },
 
-        bindDefaultHandlers: function () {
+        bindDefaultHandlers () {
             this.data.items.on("backgrid:sort", BackgridUtils.doubleSortFix);
         },
 
-        renderToolbar: function () {
+        renderToolbar () {
             var self = this;
 
             UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {

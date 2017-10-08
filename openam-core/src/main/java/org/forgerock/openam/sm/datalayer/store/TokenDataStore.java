@@ -11,36 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.store;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
+import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * A generic token store that can read an write a java bean, {@code T}, that has annotations to support conversion
@@ -85,7 +82,7 @@ public class TokenDataStore<T> {
         Token token = adapter.toToken(obj);
         SyncResultHandler<Token> handler = new SyncResultHandler<Token>();
         try {
-            taskExecutor.execute(token.getTokenId(), taskFactory.create(token, handler));
+            taskExecutor.execute(token.getTokenId(), taskFactory.create(token, Options.defaultOptions(), handler));
             handler.getResults();
         } catch (ServerException e) {
             throw e;
@@ -111,7 +108,7 @@ public class TokenDataStore<T> {
                 throw new NotFoundException("Object not found");
             }
             SyncResultHandler<Token> handler = new SyncResultHandler<Token>();
-            taskExecutor.execute(id, taskFactory.read(id, handler));
+            taskExecutor.execute(id, taskFactory.read(id, Options.defaultOptions(), handler));
             Token token = handler.getResults();
             if (token == null) {
                 throw new NotFoundException("Object not found with id: " + id);
@@ -142,11 +139,9 @@ public class TokenDataStore<T> {
             // Check it exists
             read(token.getTokenId());
             // Update it
-            taskExecutor.execute(token.getTokenId(), taskFactory.update(token, handler));
+            taskExecutor.execute(token.getTokenId(), taskFactory.update(token, Options.defaultOptions(), handler));
             handler.getResults();
-        } catch (ServerException e) {
-            throw e;
-        } catch (NotFoundException e) {
+        } catch (ServerException | NotFoundException e) {
             throw e;
         } catch (DataLayerException e) {
             if (debug.warningEnabled()) {
@@ -163,9 +158,9 @@ public class TokenDataStore<T> {
      * @throws ServerException When an error occurs during removal.
      */
     public void delete(String id) throws NotFoundException, ServerException {
-        SyncResultHandler<String> handler = new SyncResultHandler<String>();
+        SyncResultHandler<PartialToken> handler = new SyncResultHandler<>();
         try {
-            taskExecutor.execute(id, taskFactory.delete(id, handler));
+            taskExecutor.execute(id, taskFactory.delete(id, Options.defaultOptions(), handler));
             handler.getResults();
         } catch (ServerException e) {
             throw e;

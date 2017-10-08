@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
 
+import javax.security.auth.Subject;
+
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-
-import javax.security.auth.Subject;
 
 /**
  * Session activator that just destroys the old session and does not create any new session. Used for cases where
@@ -38,9 +38,8 @@ enum NoSessionActivator implements SessionActivator {
      */
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject,
-                                   final Object loginContext) {
-        sessionService.destroyInternalSession(authSession.getID());
+                                   final InternalSession authSession, final Subject subject) {
+        sessionService.destroyAuthenticationSession(authSession.getID());
         return true;
     }
 }

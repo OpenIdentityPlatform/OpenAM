@@ -101,7 +101,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
         // Given
 
         // When
-        configListener.realmConfigurationChanged("anyRealm");
+        configListener.realmConfigurationChanged("anyrealm");
 
         // Then
         assertThat(provider.getAuditService("anyRealm")).isNotNull();
@@ -113,8 +113,8 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
         // Given
 
         // When
-        configListener.realmConfigurationChanged("anyRealm");
-        configListener.realmConfigurationRemoved("anyRealm");
+        configListener.realmConfigurationChanged("anyrealm");
+        configListener.realmConfigurationRemoved("anyrealm");
 
         // Then
         assertThat(provider.getAuditService("anyRealm")).isNotNull();
@@ -161,7 +161,7 @@ public class AuditServiceProviderImplTest extends GuiceTestCase {
         auditServiceConfig = new AMAuditServiceConfiguration(false);
 
         // When
-        configListener.realmConfigurationChanged("anyRealm");
+        configListener.realmConfigurationChanged("anyrealm");
 
         // Then
         assertThat(provider.getAuditService("anyRealm").getRegisteredHandler("Mock Handler")).isNull();

@@ -17,23 +17,30 @@ package org.forgerock.openam.core.rest.server;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.core.rest.server.SelfServiceInfo.SelfServiceInfoBuilder;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.common.FQDNUtils;
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.common.configuration.MapValueParser;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -50,9 +57,10 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.core.rest.server.models.ServerInfo;
 import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.rest.ServiceConfigUtils;
+import org.forgerock.openam.utils.ServiceConfigUtils;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
@@ -60,24 +68,34 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.URI;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
  * <p>
  * This resources acts as a read only resource for the moment.
  */
+@CollectionProvider(details = @Handler(mvccSupported = false,
+        title = SERVER_INFO_RESOURCE + TITLE,
+        description = SERVER_INFO_RESOURCE + DESCRIPTION,
+        resourceSchema = @Schema(fromType = ServerInfo.class)),
+        pathParam = @Parameter(
+                name = "resourceId", type = "string",
+                enumTitles = {"All data", "Cookie Domains"}, enumValues = {"*", "cookieDomains"},
+                description = SERVER_INFO_RESOURCE + PATH_PARAM + DESCRIPTION))
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
@@ -102,11 +120,11 @@ public class ServerInfoResource extends RealmAwareResource {
      */
     private Promise<ResourceResponse, ResourceException> getCookieDomains() {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        Set<String> cookieDomains;
+        List<String> cookieDomains;
         ResourceResponse resource;
         int rev;
         try {
-            cookieDomains = AuthClientUtils.getCookieDomains();
+            cookieDomains = getCookieDomainsList();
             rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
             resource = newResourceResponse(COOKIE_DOMAINS, Integer.toString(rev), result);
@@ -121,6 +139,10 @@ public class ServerInfoResource extends RealmAwareResource {
         }
     }
 
+    private List<String> getCookieDomainsList() {
+        return newList(AuthClientUtils.getCookieDomains());
+    }
+
     /**
      * Retrieves all server info set on the server.
      *
@@ -131,7 +153,6 @@ public class ServerInfoResource extends RealmAwareResource {
      */
     private Promise<ResourceResponse, ResourceException> getAllServerInfo(Context context, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        Set<String> cookieDomains;
         ResourceResponse resource;
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
@@ -146,9 +167,8 @@ public class ServerInfoResource extends RealmAwareResource {
         protectedUserAttributes.addAll(restSecurity.getProtectedUserAttributes());
 
         try {
-            cookieDomains = AuthClientUtils.getCookieDomains();
-            result.put("domains", cookieDomains);
-            result.put("protectedUserAttributes", protectedUserAttributes);
+            result.put("domains", getCookieDomainsList());
+            result.put("protectedUserAttributes", new ArrayList<>(protectedUserAttributes));
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(selfServiceInfo.isForgottenPasswordEnabled()));
@@ -156,7 +176,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("kbaEnabled", String.valueOf(selfServiceInfo.isKbaEnabled()));
             result.put("selfRegistration", String.valueOf(selfServiceInfo.isUserRegistrationEnabled()));
             result.put("lang", getJsLocale(localeContext.getLocale()));
-            result.put("successfulUserRegistrationDestination", "default");
+            result.put("successfulUserRegistrationDestination", selfServiceInfo.getUserRegistrationDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
             result.put("referralsEnabled", Boolean.FALSE.toString());
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
@@ -320,6 +340,14 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Read(operationDescription = @Operation(
+            description = SERVER_INFO_RESOURCE + READ_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = 403,
+                            description = SERVER_INFO_RESOURCE + ERROR_400_DESCRIPTION)
+            }
+    ))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 

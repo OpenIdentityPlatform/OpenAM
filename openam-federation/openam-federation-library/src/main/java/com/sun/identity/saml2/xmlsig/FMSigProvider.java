@@ -24,7 +24,7 @@
  *
  * $Id: FMSigProvider.java,v 1.5 2009/05/09 15:43:59 mallas Exp $
  *
- *  Portions Copyrighted 2011-2015 ForgeRock AS.
+ *  Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.xmlsig;
@@ -33,8 +33,10 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Set;
-import javax.xml.transform.TransformerException;
 
+import javax.xml.xpath.XPathException;
+
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -49,10 +51,10 @@ import org.apache.xml.security.keys.keyresolver.KeyResolverException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.ElementProxy;
-import org.apache.xpath.XPathAPI;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.shared.xml.XPathAPI;
 
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
@@ -70,6 +72,7 @@ public final class FMSigProvider implements SigProvider {
     private static String c14nMethod = null;
     private static String transformAlg = null;
     private static String sigAlg = null;
+    private static String digestAlg = null;
     // flag to check if the partner's signing cert included in
     // the XML doc is the same as the one in its meta data
     private static boolean checkCert = true;
@@ -85,6 +88,9 @@ public final class FMSigProvider implements SigProvider {
 	    Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS); 
 	sigAlg = SystemPropertiesManager.get(
 	    SAML2Constants.XMLSIG_ALGORITHM); 
+	digestAlg = SystemPropertiesManager.get(
+	    SAML2Constants.DIGEST_ALGORITHM,
+            Constants.ALGO_ID_DIGEST_SHA1);
 	
 	String valCert = 
 	    SystemPropertiesManager.get(
@@ -118,34 +124,25 @@ public final class FMSigProvider implements SigProvider {
      * @return Element representing the signature element
      * @throws SAML2Exception if the document could not be signed
      */
-    public Element sign(
-	String xmlString,
-	String idValue,
-	PrivateKey privateKey,
-	X509Certificate cert
-    ) throws SAML2Exception {
+    public Element sign(String xmlString, String idValue, PrivateKey privateKey, X509Certificate cert)
+            throws SAML2Exception {
 	
-	String classMethod = "FMSigProvider.sign: ";
-        if (xmlString == null ||
-	    xmlString.length() == 0 ||
-	    idValue == null ||
-	    idValue.length() == 0 ||
-	    privateKey == null) {
-	    
-            SAML2SDKUtils.debug.error(
-		classMethod +
-		"Either input xml string or id value or "+
-		"private key is null.");  
-            throw new SAML2Exception( 
-		SAML2SDKUtils.bundle.getString("nullInput"));  
+	    String classMethod = "FMSigProvider.sign: ";
+        if (StringUtils.isEmpty(xmlString)) {
+            SAML2SDKUtils.debug.error(classMethod + "The xml to sign was empty.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage", new String[]{"xml"});
+        }
+        if (StringUtils.isEmpty(idValue)) {
+            SAML2SDKUtils.debug.error(classMethod + "The idValue was empty.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "emptyInputMessage", new String[]{"idValue"});
+        }
+	    if (privateKey == null) {
+            SAML2SDKUtils.debug.error(classMethod + "The private key was null.");
+            throw new SAML2Exception(SAML2SDKUtils.BUNDLE_NAME, "nullInputMessage", new String[]{"private key"});
         }                                                 
-	Document doc =
-	    XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
+	    Document doc = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
         if (doc == null) {
-            throw new SAML2Exception(
-                SAML2SDKUtils.bundle.getString(
-		    "errorObtainingElement")
-	    );
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("errorObtainingElement"));
         }
 	Element root = doc.getDocumentElement();
 	XMLSignature sig = null;
@@ -208,7 +205,7 @@ public final class FMSigProvider implements SigProvider {
 	    sig.addDocument(
 		ref,
 		transforms,
-		Constants.ALGO_ID_DIGEST_SHA1);
+		digestAlg);
 	} catch (XMLSignatureException sige1) {
 	    throw new SAML2Exception(sige1);
 	}	    
@@ -263,10 +260,10 @@ public final class FMSigProvider implements SigProvider {
                         createDSctx(doc, "ds", Constants.SignatureSpecNS);
         Element sigElement = null;
         try {
-            sigElement = (Element) org.apache.xpath.XPathAPI.selectSingleNode(
+            sigElement = (Element) XPathAPI.selectSingleNode(
                     doc,
                     "//ds:Signature[1]", nscontext);
-        } catch (TransformerException te) {
+        } catch (XPathException te) {
             throw new SAML2Exception(te);
         }
         Element refElement;
@@ -274,7 +271,7 @@ public final class FMSigProvider implements SigProvider {
             refElement = (Element) XPathAPI.selectSingleNode(
                     doc,
                     "//ds:Reference[1]", nscontext);
-        } catch (TransformerException te) {
+        } catch (XPathException te) {
             throw new SAML2Exception(te);
         }
         String refUri = refElement.getAttribute("URI");

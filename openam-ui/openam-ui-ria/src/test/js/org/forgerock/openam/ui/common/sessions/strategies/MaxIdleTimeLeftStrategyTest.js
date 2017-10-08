@@ -11,82 +11,51 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
     "jquery",
     "squire",
     "sinon"
-], function ($, Squire, sinon) {
-    var getMaxIdlePromise, getTimeLeftPromise, MaxIdleTimeLeftStrategy, SessionDelegate;
-    describe("org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy", function () {
-        beforeEach(function (done) {
-            var injector = new Squire();
+], ($, Squire, sinon) => {
+    let getTimeLeftPromise;
+    let MaxIdleTimeLeftStrategy;
+    let SessionService;
+    describe("org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy", () => {
+        beforeEach((done) => {
+            const injector = new Squire();
 
-            getMaxIdlePromise = $.Deferred();
             getTimeLeftPromise = $.Deferred();
 
-            SessionDelegate = {
-                getMaxIdle: sinon.stub().returns(getMaxIdlePromise),
+            SessionService = {
                 getTimeLeft: sinon.stub().returns(getTimeLeftPromise)
             };
 
             injector
-                .mock("org/forgerock/openam/ui/user/delegates/SessionDelegate", SessionDelegate)
+                .mock("org/forgerock/openam/ui/user/services/SessionService", SessionService)
                 .require(
                     ["org/forgerock/openam/ui/common/sessions/strategies/MaxIdleTimeLeftStrategy"]
-                , function (subject) {
+                , (subject) => {
                     MaxIdleTimeLeftStrategy = subject;
                     done();
                 });
         });
 
-        var getMaxIdlePromisePayload = { maxidletime: 10 };
-
-        it("returns a promise", function () {
-            getMaxIdlePromise.resolve(getMaxIdlePromisePayload);
-            var func = MaxIdleTimeLeftStrategy();
+        it("returns a promise", () => {
+            getTimeLeftPromise.resolve();
+            const func = MaxIdleTimeLeftStrategy();
 
             expect(func.then).to.not.be.undefined;
 
             return func;
         });
 
-        context("on first invocation", function () {
-            it("resolves with the maximum idle time in seconds", function () {
-                getMaxIdlePromise.resolve(getMaxIdlePromisePayload);
-
-                return MaxIdleTimeLeftStrategy().then(function (seconds) {
-                    expect(seconds).to.be.eq(600);
-                });
-            });
-        });
-
-        context("on second invocation", function () {
-            beforeEach(function () {
-                getMaxIdlePromise.resolve(getMaxIdlePromisePayload);
-
-                MaxIdleTimeLeftStrategy();
-            });
-
-            context("when session time left is greater than maximum idle time", function () {
-                it("resolves with the maximum idle time in seconds", function () {
-                    getTimeLeftPromise.resolve({ maxtime: 900 });
-
-                    return MaxIdleTimeLeftStrategy().then(function (seconds) {
-                        expect(seconds).to.be.eq(600);
-                    });
-                });
-            });
-
-            context("when session time left is less than maximum idle time", function () {
-                it("resolves with the session time left in seconds", function () {
-                    getTimeLeftPromise.resolve({ maxtime: 300 });
-
-                    return MaxIdleTimeLeftStrategy().then(function (seconds) {
-                        expect(seconds).to.be.eq(300);
-                    });
+        context("when invoked", () => {
+            it("returns the idle expiration time from session service", () => {
+                getTimeLeftPromise.resolve(300);
+                return MaxIdleTimeLeftStrategy().then((seconds) => {
+                    expect(seconds).to.be.eq(300);
                 });
             });
         });

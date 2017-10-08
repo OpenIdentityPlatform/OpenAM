@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationCreatorNDateTest.java,v 1.1 2010/01/11 20:19:06 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -47,8 +47,7 @@ public class ApplicationCreatorNDateTest {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup()
@@ -67,7 +66,7 @@ public class ApplicationCreatorNDateTest {
         // appResources.add("http://www.ApplicationCreatorNDateTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -76,14 +75,14 @@ public class ApplicationCreatorNDateTest {
             return;
         }
 
-        ApplicationManager.deleteApplication(adminSubject, "/",
-            APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                adminSubject, "/", APPL_NAME);
     }
 
     @Test
     public void test() throws Exception {
-        Application appl = ApplicationManager.getApplication(
-            adminSubject, "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
 
         long creationDate = appl.getCreationDate();
         String createdBy = appl.getCreatedBy();
@@ -91,10 +90,10 @@ public class ApplicationCreatorNDateTest {
         //reset createdBy and creationDate
         appl.setCreatedBy(null);
         appl.setCreationDate(-1);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
-        appl = ApplicationManager.getApplication(
-            adminSubject, "/", APPL_NAME);
+        appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
 
         if (!appl.getCreatedBy().equals(createdBy)) {
             throw new Exception(

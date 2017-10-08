@@ -64,7 +64,16 @@ public class WSFederationActionFactory {
     {
         String classMethod = "WSFederationActionFactory.createAction: ";
         WSFederationAction action = null;
-        
+
+        // If this is an Active Requestor Profile request, then we must not parse the request parameters, only the
+        // request InputStream should be processed.
+        if (request.getRequestURI().startsWith(request.getContextPath() + WSFederationConstants.MEX_ENDPOINT_PREFIX)) {
+            return new MexRequest(request, response);
+        } else if ("POST".equals(request.getMethod()) && request.getRequestURI().startsWith(request.getContextPath()
+                + WSFederationConstants.STS_ENDPOINT_PREFIX)) {
+            return new ActiveRequest(request, response);
+        }
+
         String wa = request.getParameter(WSFederationConstants.WA);
         if (wa!=null && debug.messageEnabled()) {
             debug.message(classMethod + WSFederationConstants.WA + "="+wa);
@@ -123,9 +132,8 @@ public class WSFederationActionFactory {
                 startsWith(request.getContextPath() + WSFederationConstants.METADATA_URL_PREFIX)) {
                 // Metadata request
                 action = new MetadataRequest(request, response);
-            } else  if (wa == null || 
-                wa.equals(WSFederationConstants.WSIGNIN10)) {
-                // We allow missing wa for RP signin request to accomodate 
+            } else if (wa == null || wa.equals(WSFederationConstants.WSIGNIN10)) {
+                // We allow missing wa for RP signin request to accomodate
                 // agents etc
                 if ( wtrealm != null && (wtrealm.length()>0)) {
                     // GET with wa == wsignin1.0 and wtrealm 

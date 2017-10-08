@@ -44,7 +44,7 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
@@ -136,7 +136,7 @@ public class ResourceSetService {
                             final Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         final Set<ResourceSetDescription> sharedResourceSets = new HashSet<>();
 
-                        String realm = RealmContext.getRealm(context);
+                        String realm = RealmContext.getRealm(context).asPath();
                         try {
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
                                 if (!sharedResourceSets.contains(sharedPolicy.getResourceSet())) {
@@ -393,7 +393,7 @@ public class ResourceSetService {
                     resourceSet = resourceSetsById.get(entry.getKey());
                 } else {
                     RealmContext realmContext = context.asContext(RealmContext.class);
-                    resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
+                    resourceSet = resourceSetStoreFactory.create(realmContext.getRealm().asPath())
                             .read(entry.getKey(), resourceOwnerId);
                 }
                 if (augmentWithPolicies) {

@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function ($, _, AbstractView) {
     return AbstractView.extend({
@@ -30,15 +29,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             "dp.change input": "changeInput"
         },
 
-        initBasic: function (data, el, cssClasses) {
-            var elWrapper = $('<div class="condition-attr form-inline ' + cssClasses + '"></div>');
+        initBasic (data, el, cssClasses) {
+            var elWrapper = $(`<div class="condition-attr form-inline ${cssClasses}"></div>`);
             el.append(elWrapper);
 
             this.data = data;
             this.element = el.find(elWrapper);
         },
 
-        changeInput: function (e) {
+        changeInput (e) {
             e.stopPropagation();
 
             var target = $(e.currentTarget),
@@ -60,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        populateInputGroup: function (target) {
+        populateInputGroup (target) {
             var group = target.closest(".attr-group"),
                 inputs = group.find(":input"),
                 populated = _.find(inputs, function (el) {
@@ -72,7 +71,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        populateAutoFillGroup: function (target) {
+        populateAutoFillGroup (target) {
             var group = target.closest("li").find("div.auto-fill-group"),
                 first = group.eq(0),
                 second = group.eq(1),

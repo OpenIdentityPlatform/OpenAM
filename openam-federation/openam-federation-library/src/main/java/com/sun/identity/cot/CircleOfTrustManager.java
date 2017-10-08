@@ -24,6 +24,7 @@
  *
  * $Id: CircleOfTrustManager.java,v 1.13 2009/10/28 23:58:56 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package com.sun.identity.cot;
 
@@ -646,21 +647,13 @@ public class CircleOfTrustManager {
             throw new COTException("invalidEntityID", null);
         }
         try {
-            Map attrs = configInst.getConfiguration(realm, cotName);
-            //validate protocol type
-            isValidProtocolType(protocolType);
+
+            CircleOfTrustDescriptor cotDesc = getCircleOfTrust(realm, cotName);
+
             // add the cot to the entity config descriptor
             if (addToEntityConfig) {
                 updateEntityConfig(realm, cotName, protocolType, entityId);
-            } 
-            // add the entityid to the cot
-            CircleOfTrustDescriptor cotDesc;
-            if (attrs == null) {
-                cotDesc = new CircleOfTrustDescriptor(cotName, realm, "active");
-            } else {
-                cotDesc = new CircleOfTrustDescriptor(cotName, realm, attrs);
             }
-            
             if (!cotDesc.add(entityId, protocolType)) {
                 debug.error(classMethod +
                         "fail to add entityid to the circle of trust."
@@ -670,12 +663,6 @@ public class CircleOfTrustManager {
             } else {
                 modifyCircleOfTrust(realm, cotDesc);
             }
-        } catch (ConfigurationException e) {
-            debug.error(classMethod, e);
-            String[] data = { e.getMessage(), cotName, entityId, realm };
-            LogUtil.error(Level.INFO,
-                    LogUtil.CONFIG_ERROR_ADD_COT_MEMBER,data);
-            throw new COTException(e);
         } catch (JAXBException jbe) {
             debug.error(classMethod, jbe);
             String[] data = { jbe.getMessage(),cotName,entityId,

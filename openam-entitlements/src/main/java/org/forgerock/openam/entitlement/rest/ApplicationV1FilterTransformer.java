@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.entitlement.rest;
 
@@ -77,10 +77,10 @@ public class ApplicationV1FilterTransformer {
         final Map<String, Boolean> actions = new HashMap<>();
         final Set<String> resources = new HashSet<>();
 
-        final Set<String> resourceTypeUuids = jsonValue
+        final Collection<String> resourceTypeUuids = jsonValue
                 .get(RESOURCE_TYPE_UUIDS)
                 .required()
-                .asSet(String.class);
+                .asCollection(String.class);
 
         for (String resourceTypeUuid : resourceTypeUuids) {
             final ResourceType resourceType = resourceTypeService
@@ -95,6 +95,7 @@ public class ApplicationV1FilterTransformer {
         }
 
         jsonValue.remove(RESOURCE_TYPE_UUIDS);
+        jsonValue.remove(APPLICATION_DISPLAY_NAME);
         jsonValue.add(ACTIONS, actions);
         jsonValue.add(RESOURCES, resources);
         jsonValue.add(REALM, realm);

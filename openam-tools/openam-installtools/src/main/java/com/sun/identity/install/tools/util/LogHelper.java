@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: LogHelper.java,v 1.2 2008/06/25 05:51:29 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.install.tools.util;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -126,7 +129,7 @@ public class LogHelper {
     }
 
     public static String getDateStamp() {
-        return getDateFormat().format(new Date());
+        return getDateFormat().format(newDate());
     }
 
     private static SimpleDateFormat getDateFormat() {

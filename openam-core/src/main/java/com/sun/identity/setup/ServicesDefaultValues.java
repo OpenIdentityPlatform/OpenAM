@@ -41,6 +41,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.opendj.ldap.DN;
 
@@ -58,6 +59,7 @@ import com.sun.identity.sm.SMSSchema;
  */
 public class ServicesDefaultValues {
     public static final String RANDOM_SECURE = "@128_BIT_RANDOM_SECURE@";
+    public static final String RANDOM_SECURE_256 = "@256_BIT_RANDOM_SECURE@";
 
     private static ServicesDefaultValues instance = new ServicesDefaultValues();
     private static Set preappendSlash = new HashSet();
@@ -101,13 +103,14 @@ public class ServicesDefaultValues {
         IHttpServletRequest request
     ) {
         Locale locale = (Locale)request.getLocale();
-        Map map = instance.defValues;
+        Map<String, Object> map = instance.defValues;
         map.putAll(request.getParameterMap());
 
         String base = (String)map.get(
             SetupConstants.CONFIG_VAR_BASE_DIR);
         base = base.replace('\\', '/');
         map.put(SetupConstants.CONFIG_VAR_BASE_DIR, base);
+        map.put(SetupConstants.USER_HOME, System.getProperty("user.home", ""));
 
         if (!isEncryptionKeyValid()){
             throw new ConfiguratorException("configurator.encryptkey",
@@ -122,23 +125,19 @@ public class ServicesDefaultValues {
 
         validatePassword(locale);
         if (!isServiceURLValid()) {
-            throw new ConfiguratorException("configurator.invalidhostname",
-                null, locale);
+            throw new ConfiguratorException("configurator.invalidhostname", null, locale);
         }
 
-        String cookieDomain = (String)map.get(
-            SetupConstants.CONFIG_VAR_COOKIE_DOMAIN);
+        String cookieDomain = (String) map.get(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN);
         if (!isCookieDomainValid(cookieDomain)) {
-            throw new ConfiguratorException("configurator.invalidcookiedomain",
-                null, locale);
+            throw new ConfiguratorException("configurator.invalidcookiedomain", null, locale);
         }
 
         setDeployURI(request.getContextPath(), map);
 
         String hostname = (String)map.get(
             SetupConstants.CONFIG_VAR_SERVER_HOST);
-        map.put(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN,
-            getCookieDomain(cookieDomain, hostname));
+        map.put(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, getCookieDomain(cookieDomain, hostname));
         setPlatformLocale();
 
         String dbOption = (String)map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
@@ -267,7 +266,7 @@ public class ServicesDefaultValues {
                     }
                     hostName = serverURL.getHost();
                 }
-                if (isHostnameValid(hostName)) {
+                if (StringUtils.isNotEmpty(hostName)) {
                     map.put(SetupConstants.CONFIG_VAR_SERVER_HOST, hostName);
                     map.put(SetupConstants.CONFIG_VAR_SERVER_PROTO, protocol);
                     map.put(SetupConstants.CONFIG_VAR_SERVER_PORT, port);
@@ -283,78 +282,30 @@ public class ServicesDefaultValues {
         return valid;
     }
 
-    /*
-     * valid: localhost (no period)
-     * valid: abc.sun.com (two periods)
-     *
-     * @param hostname is the user specified host name.
-     * @return <code>true</code> if syntax for host is correct.
-     */
-    private static boolean isHostnameValid(String hostname) {
-        boolean valid = (hostname != null) && (hostname.length() > 0);
-        if (valid) {
-            int idx = hostname.lastIndexOf(".");
-            if ((idx != -1) && (idx != (hostname.length() -1))) {
-                int idx1 = hostname.lastIndexOf(".", idx-1);
-                valid = (idx1 != -1) && (idx1 < (idx -1));
-            }
-        }
-        return valid;
-    }
-
     /**
      * Validates if cookie Domain is syntactically correct.
      *
      * @param cookieDomain is the user specified cookie domain.
      * @return <code>true</code> if syntax for cookie domain is correct.
      */
-    private static boolean isCookieDomainValid(String cookieDomain) {
-        boolean valid = (cookieDomain == null) || (cookieDomain.length() == 0);
-
-        if (!valid) {
-            int idx1 = cookieDomain.lastIndexOf(".");
-
-            // need to have a period and cannot be the last char.
-            valid = (idx1 == -1) || (idx1 != (cookieDomain.length() -1));
-
-            if (valid) {
-                int idx2 = cookieDomain.lastIndexOf(".", idx1-1);
-                /*
-                 * need to be have a period before the last one e.g.
-                 * .sun.com and cannot be ..com
-                 */
-                valid = (idx2 != -1) && (idx2 < (idx1 -1));
-            }
-        }
-        return valid;
+    public static boolean isCookieDomainValid(String cookieDomain) {
+        return StringUtils.isEmpty(cookieDomain) || !cookieDomain.contains(":");
     }
 
     /**
-     * Returns the cookie Domain based on the hostname.
+     * Returns the cookie Domain based on the hostname. In case the hostname has only one component, or if the hostname
+     * ends with a '.', or if the hostname is a valid IP address, host only cookies shall be used.
      *
-     * @param cookieDomain is the user specified cookie domain.
-     * @param hostname is the host for which the cookie domain is set.
-     * @return cookieDomain containing the valid cookie domain for
-     *         the specified hostname.
+     * @param cookieDomain Is the user specified cookie domain.
+     * @param hostname Is the host for which the cookie domain is set.
+     * @return CookieDomain containing the valid cookie domain for the specified hostname.
      */
-    private static String getCookieDomain(
-        String cookieDomain,
-        String hostname
-    ) {
+    private static String getCookieDomain(String cookieDomain, String hostname) {
         int idx = hostname.lastIndexOf(".");
-        if ((idx == -1) || (idx == (hostname.length() -1)) ||
-                ValidateIPaddress.isValidIP(hostname)
-                ) {
+        if (idx == -1 || idx == hostname.length() - 1 || ValidateIPaddress.isValidIP(hostname)) {
             cookieDomain = "";
-        } else if ((cookieDomain == null) || (cookieDomain.length() == 0)) {
-            // try to determine the cookie domain if it is not set
-            String topLevelDomain = hostname.substring(idx+1);
-            int idx2 = hostname.lastIndexOf(".", idx-1);
-
-            if ((idx2 != -1) && (idx2 < (idx -1))) {
-                cookieDomain = hostname.substring(idx2);
-            }
         }
+
         return cookieDomain;
     }
 
@@ -589,13 +540,18 @@ public class ServicesDefaultValues {
                     orig = orig.replaceAll("@" + key + "@", value);
                 }
             }
+        }
+        orig = replaceRandomSecureTags(orig, RANDOM_SECURE, 128);
+        orig = replaceRandomSecureTags(orig, RANDOM_SECURE_256, 256);
+        return orig;
+    }
 
-            // Each Secure Random tag should be a newly generated random.
-            while (orig.contains(RANDOM_SECURE)) {
-                byte[] bytes = new byte[16]; // 16 * 8 = 128 bits
-                secureRandom.nextBytes(bytes);
-                orig = orig.replace(RANDOM_SECURE, Base64.encode(bytes));
-            }
+    private static String replaceRandomSecureTags(String orig, String tag, int size) {
+        // Each Secure Random tag should be a newly generated random.
+        while (orig.contains(tag)) {
+            byte[] bytes = new byte[size / 8];
+            secureRandom.nextBytes(bytes);
+            orig = orig.replace(tag, Base64.encode(bytes));
         }
         return orig;
     }

@@ -11,10 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
+
+import java.security.AccessController;
+import java.security.KeyPair;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.util.SystemProperties;
@@ -22,27 +33,10 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jose.utils.KeystoreManager;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.openam.utils.OpenAMSettings;
-
-import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.AccessController;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides access to any OpenAM settings.
@@ -50,17 +44,12 @@ import java.util.Set;
  * @since 12.0.0
  */
 public class OpenAMSettingsImpl implements OpenAMSettings {
-
-    private final static String DEFAULT_KEYSTORE_FILE_PROP = "com.sun.identity.saml.xmlsig.keystore";
-    private final static String DEFAULT_KEYSTORE_PASS_FILE_PROP = "com.sun.identity.saml.xmlsig.storepass";
-    private final static String DEFAULT_KEYSTORE_TYPE_PROP = "com.sun.identity.saml.xmlsig.storetype";
-    private final static String DEFAULT_PRIVATE_KEY_PASS_FILE_PROP  = "com.sun.identity.saml.xmlsig.keypass";
-
     private static final MapValueParser MAP_VALUE_PARSER = new MapValueParser();
 
     private final Debug logger = Debug.getInstance("amSMS");
     private final String serviceName;
     private final String serviceVersion;
+    private  AMKeyProvider amKeyProvider;
 
     /**
      * Constructs a new OpenAMSettingsImpl.
@@ -130,62 +119,36 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
     /**
      * {@inheritDoc}
      */
-    public KeyPair getServerKeyPair(String realm) throws SMSException, SSOException {
-        final String alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
-
-        //get keystore password from file
-        final String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
-        String keystorePass = null;
-        if (kspfile != null) {
-            try {
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(kspfile)));
-                    keystorePass = decodePassword(br.readLine());
-                } finally {
-                    if (br != null) {
-                        br.close();
-                    }
+    public KeyPair getSigningKeyPair(String realm, JwsAlgorithm algorithm) throws SMSException, SSOException {
+        if (JwsAlgorithmType.RSA.equals(algorithm.getAlgorithmType())) {
+            String alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
+            return getServerKeyPair(realm, alias);
+        } else if (JwsAlgorithmType.ECDSA.equals(algorithm.getAlgorithmType())) {
+            Set<String> algorithmAliases = getSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
+            for (String algorithmAlias : algorithmAliases) {
+                if (StringUtils.isEmpty(algorithmAlias)) {
+                    logger.warning("Empty signing key alias");
+                    continue;
                 }
-            } catch (IOException e) {
-                logger.error("Unable to read keystore password file " + kspfile, e);
-            }
-        } else {
-            logger.error("keystore password is null");
-        }
-
-        final String keypassfile = SystemPropertiesManager.get(DEFAULT_PRIVATE_KEY_PASS_FILE_PROP);
-        String keypass = null;
-        if (keypassfile != null) {
-            try {
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(keypassfile)));
-                    keypass = decodePassword(br.readLine());
-                } finally {
-                    if (br != null) {
-                        br.close();
-                    }
+                String[] aliasSplit = algorithmAlias.split("\\|");
+                if (aliasSplit.length != 2) {
+                    logger.warning("Invalid signing key alias mapping: " + algorithmAlias);
+                    continue;
                 }
-            } catch (IOException e) {
-                logger.error("Unable to read key password file " + keypassfile, e);
+                return getServerKeyPair(realm, aliasSplit[1]);
             }
-        } else {
-            logger.error("key password is null");
         }
-
-        final KeystoreManager keystoreManager = new KeystoreManager(
-                SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS"),
-                SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP), keystorePass);
-
-        final PrivateKey privateKey = keystoreManager.getPrivateKey(alias, keypass);
-        final PublicKey publicKey = keystoreManager.getPublicKey(alias);
-        return new KeyPair(publicKey, privateKey);
+        return new KeyPair(null, null);
     }
 
-    private String decodePassword(String password)  {
-        final String decodedPassword = AccessController.doPrivileged(new DecodeAction(password));
-        return decodedPassword == null ? password : decodedPassword;
+    @Override
+    public KeyPair getServerKeyPair(String realm, String alias) throws SMSException, SSOException {
+        // we late initialize AMKeyProvider as it needs access to the config store to read the
+        // system props for storepass, etc.  If we init too early it may not be available
+        if (amKeyProvider == null) {
+            amKeyProvider = new AMKeyProvider();
+        }
+        return amKeyProvider.getKeyPair(alias);
     }
 
     /**

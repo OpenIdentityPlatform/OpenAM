@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement;
@@ -211,8 +211,17 @@ public final class EntitlementRegistry {
      * @throws NameAlreadyRegisteredException if the short name is already registered.
      */
     public void registerSubjectType(Class<? extends EntitlementSubject> type) {
-        String name = type.getSimpleName().replace("Subject", "");
+        String name = getSubjectTypeName(type);
         registerSubjectType(name, type);
+    }
+
+    /**
+     * Gets the name of the subject type.
+     * @param type The type.
+     * @return The name.
+     */
+    public static String getSubjectTypeName(Class<? extends EntitlementSubject> type) {
+        return type.getSimpleName().replace("Subject", "");
     }
 
     /**

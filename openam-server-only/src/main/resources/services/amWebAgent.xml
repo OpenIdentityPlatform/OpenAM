@@ -54,7 +54,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="GET">
+                    i18nKey="GET"
+                    order="200">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -65,7 +66,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="POST">
+                    i18nKey="POST"
+                    order="600">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -76,7 +78,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="PUT">
+                    i18nKey="PUT"
+                    order="700">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -87,7 +90,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="DELETE">
+                    i18nKey="DELETE"
+                    order="100">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -98,7 +102,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="HEAD">
+                    i18nKey="HEAD"
+                    order="300">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -109,7 +114,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="OPTIONS">
+                    i18nKey="OPTIONS"
+                    order="400">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -120,7 +126,8 @@
                     type="single"
 		    syntax="boolean"
                     uitype="radio"
-                    i18nKey="PATCH">
+                    i18nKey="PATCH"
+                    order="500">
 		    <IsResourceNameAllowed/>
 		    <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>

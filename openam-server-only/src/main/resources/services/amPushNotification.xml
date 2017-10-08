@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2016 ForgeRock AS.
+  -->
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="PushNotificationService" version="1.0">
+
+        <Schema
+                serviceHierarchy="/DSAMEConfig/PushNotificationService"
+                i18nFileName="amPushNotification"
+                revisionNumber="1"
+                resourceName="pushNotification"
+                i18nKey="push-notification-description">
+            <Organization>
+
+                <!-- validators -->
+
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- configuration settings -->
+
+                <!-- https://aws.amazon.com/developers/access-keys/ source of example key values -->
+
+                <AttributeSchema name="accessKey" type="single" i18nKey="a010" order="100" validator="RequiredValueValidator">
+                    <ExampleValue>
+                        <Value>AKIAIOSFODNN7EXAMPLE</Value>
+                    </ExampleValue>
+                </AttributeSchema>
+
+                <AttributeSchema name="secret" type="single" i18nKey="a020" order="200" validator="RequiredValueValidator">
+                    <ExampleValue>
+                        <Value>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</Value>
+                    </ExampleValue>
+                </AttributeSchema>
+
+                <AttributeSchema name="appleEndpoint" type="single" i18nKey="a030" order="300" validator="RequiredValueValidator">
+                    <ExampleValue>
+                        <Value>arn:aws:sns:us-east-1:1234567890:app/APNS/production</Value>
+                    </ExampleValue>
+                </AttributeSchema>
+
+                <AttributeSchema name="googleEndpoint" type="single" i18nKey="a040" order="400" validator="RequiredValueValidator">
+                    <ExampleValue>
+                        <Value>arn:aws:sns:us-east-1:1234567890:app/GCM/production</Value>
+                    </ExampleValue>
+                </AttributeSchema>
+
+                <!-- http://docs.aws.amazon.com/general/latest/gr/rande.html for region list
+                     (or google 'amazon aws regions') -->
+
+                <AttributeSchema name="region" type="single_choice" syntax="string" i18nKey="a045" order="500"
+                                 validator="RequiredValueValidator">
+                    <ChoiceValues>
+                        <ChoiceValue>us-gov-west-1</ChoiceValue>
+                        <ChoiceValue>us-east-1</ChoiceValue>
+                        <ChoiceValue>us-west-1</ChoiceValue>
+                        <ChoiceValue>us-west-2</ChoiceValue>
+                        <ChoiceValue>eu-west-1</ChoiceValue>
+                        <ChoiceValue>eu-central-1</ChoiceValue>
+                        <ChoiceValue>ap-southeast-1</ChoiceValue>
+                        <ChoiceValue>ap-southeast-2</ChoiceValue>
+                        <ChoiceValue>ap-northeast-1</ChoiceValue>
+                        <ChoiceValue>ap-northeast-2</ChoiceValue>
+                        <ChoiceValue>sa-east-1</ChoiceValue>
+                        <ChoiceValue>cn-north-1</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>us-east-1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="delegateFactory" type="single" syntax="string" i18nKey="a050" order="600"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.services.push.sns.SnsHttpDelegateFactory</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdDuration" type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a060" order="700" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdConcurrency" type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="16" i18nKey="a070" order="800" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>16</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="mdCacheSize" type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a080" order="900" validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>10000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

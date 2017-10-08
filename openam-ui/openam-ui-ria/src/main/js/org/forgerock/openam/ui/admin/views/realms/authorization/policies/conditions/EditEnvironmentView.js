@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditEnvironmentView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBooleanView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrStringView",
@@ -29,12 +29,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDateView",
     "handlebars"
-], function ($, _, AbstractView, UIUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
+], function ($, _, AbstractView, UIUtils, PoliciesService, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
              TimeAttr, DayAttr, DateAttr, Handlebars) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditEnvironmentTemplate.html",
         events: {
-            "change select.type-selection": "changeType"
+            "change [data-type-selection]": "changeType"
         },
         data: {},
         i18n: {
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
         SCRIPT_RESOURCE: "Script",
 
-        render: function (schema, element, itemID, itemData, callback) {
+        render (schema, element, itemID, itemData, callback) {
             var self = this,
                 hiddenData = {};
 
@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
-                self.setElement("#environment_" + itemID);
+                self.setElement(`#environment_${itemID}`);
 
                 if (itemData) {
                     // Temporary fix, the name attribute is being added by the server after the policy is created.
@@ -90,7 +90,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        createListItem: function (allEnvironments, item) {
+        createListItem (allEnvironments, item) {
             var self = this,
                 itemToDisplay = null,
                 itemData = item.data().itemData,
@@ -107,8 +107,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 if (type === self.SCRIPT_RESOURCE) {
                     itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
                         self.i18n.condition.title);
-                    PoliciesDelegate.getScriptById(mergedData.scriptId).done(function (script) {
-                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + "scriptId"] =
+                    PoliciesService.getScriptById(mergedData.scriptId).done(function (script) {
+                        itemToDisplay[`${self.i18n.condition.key}${type}${self.i18n.condition.props}scriptId`] =
                             script.name;
                         self.setListItemHtml(item, itemToDisplay);
                     });
@@ -128,7 +128,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        setListItemHtml: function (item, itemToDisplay) {
+        setListItemHtml (item, itemToDisplay) {
             var self = this;
 
             UIUtils.fillTemplateWithData(
@@ -137,11 +137,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 },
                 function (tpl) {
                     item.find(".item-data").html(tpl);
-                    self.setElement("#" + item.attr("id"));
+                    self.setElement(`#${item.attr("id")}`);
                 });
         },
 
-        changeType: function (e) {
+        changeType (e) {
             e.stopPropagation();
             var self = this,
                 itemData = {},
@@ -189,7 +189,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        getHelperText: function (schema) {
+        getHelperText (schema) {
             var helperText = {};
             switch (schema.title) {
                 case "IPv4": // fall through
@@ -213,7 +213,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return helperText;
         },
 
-        buildHTML: function (itemData, hiddenData, schema) {
+        buildHTML (itemData, hiddenData, schema) {
             var self = this,
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
@@ -223,26 +223,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             function buildScriptAttr () {
                 new ArrayAttr().render({
-                    itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]],
+                    itemData, hiddenData, data: [hiddenData[itemData.type]],
                     title: "scriptId", dataSource: "scripts", multiple: false,
-                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId"
+                    i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}scriptId`
                 }, itemDataEl, htmlBuiltPromise.resolve);
             }
 
             if (itemData.type === "SimpleTime") {
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
-                new TimeAttr().render({ itemData: itemData }, itemDataEl);
-                new DayAttr().render({ itemData: itemData }, itemDataEl);
-                new DateAttr().render({ itemData: itemData }, itemDataEl);
+                new TimeAttr().render({ itemData }, itemDataEl);
+                new DayAttr().render({ itemData }, itemDataEl);
+                new DateAttr().render({ itemData }, itemDataEl);
 
                 if (!itemData.enforcementTimeZone) {
                     itemData.enforcementTimeZone = "GMT";
                 }
                 new ArrayAttr().render({
-                    itemData: itemData,
+                    itemData,
                     data: [itemData.enforcementTimeZone],
                     title: "enforcementTimeZone",
-                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "enforcementTimeZone",
+                    i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}enforcementTimeZone`,
                     dataSource: "enforcementTimeZone",
                     multiple: false
                 }, itemDataEl);
@@ -250,7 +250,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
                 if (itemData && itemData.scriptId) {
-                    PoliciesDelegate.getScriptById(itemData.scriptId).done(function (script) {
+                    PoliciesService.getScriptById(itemData.scriptId).done(function (script) {
                         hiddenData[itemData.type] = script.name;
                         buildScriptAttr();
                     });
@@ -268,37 +268,37 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         case "number": // fall through
                         case "integer":
                             new StringAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey,
-                                schema: schema,
-                                value: value
+                                i18nKey,
+                                schema,
+                                value
                             }, itemDataEl);
                             break;
                         case "boolean":
                             new BooleanAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: value,
                                 title: key,
-                                i18nKey: i18nKey,
+                                i18nKey,
                                 selected: itemData[key]
                             }, itemDataEl);
                             break;
                         case "array":
                             new ArrayAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         case "object":
                             new ObjectAttr().render({
-                                itemData: itemData,
+                                itemData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         default:
@@ -315,7 +315,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return htmlBuiltPromise;
         },
 
-        setDefaultJsonValues: function (schema) {
+        setDefaultJsonValues (schema) {
             var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
                 switch (value.type) {
@@ -349,7 +349,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return itemData;
         },
 
-        animateOut: function () {
+        animateOut () {
             // hide all items except the title selector
             this.$el.find(".no-float").fadeOut(500);
             this.$el.find(".clear-left").fadeOut(500);
@@ -363,7 +363,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.$el.removeClass("invalid-rule");
         },
 
-        animateIn: function () {
+        animateIn () {
             var self = this;
             setTimeout(function () {
                 self.$el.find(".field-float-pattern, .field-float-selectize, .timezone-field")

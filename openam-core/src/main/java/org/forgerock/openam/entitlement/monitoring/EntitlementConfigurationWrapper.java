@@ -11,12 +11,15 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package org.forgerock.openam.entitlement.monitoring;
 
-import com.sun.identity.entitlement.EntitlementConfiguration;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
 import org.forgerock.openam.entitlement.PolicyConstants;
+
+import com.sun.identity.entitlement.EntitlementConfiguration;
 
 /**
  * Non-static wrapper for the {@link EntitlementConfiguration}.
@@ -28,7 +31,7 @@ public class EntitlementConfigurationWrapper {
     private final EntitlementConfiguration entitlementConfiguration;
 
     public EntitlementConfigurationWrapper() {
-        entitlementConfiguration = EntitlementConfiguration.getInstance(PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
+        entitlementConfiguration = getEntitlementConfiguration(PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
     }
 
     /**

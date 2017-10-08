@@ -1,0 +1,22 @@
+<div class="btn-toolbar page-toolbar" role="toolbar" aria-label="toolbar">
+    {{#if href}}
+        {{> util/_ButtonLink href=href icon=icon title=title }}
+    {{/if}}
+    <ul class="btn-group pull-right" role="group">
+        <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#toggleAView"><i class="fa fa-th"></i></a></li>
+        <li class="btn-group tab-toggles"><a class="btn fr-btn-secondary" data-toggle="tab" href="#toggleBView"><i class="fa fa-list"></i></a></li>
+    </ul>
+</div>
+
+<div class="tab-content clearfix">
+    <div role="tabpanel" class="tab-pane" id="toggleAView">
+        <div class="row" id="viewAContainer"></div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="toggleBView">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="viewBContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>

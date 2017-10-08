@@ -29,10 +29,13 @@
 
 package com.sun.identity.policy.plugins;
 
+import static com.sun.identity.policy.PolicyConfig.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyConfig;
@@ -288,7 +291,6 @@ public class LDAPFilterCondition implements Condition {
         throws SSOException, PolicyException {
 
         boolean member = false;
-        boolean listenerAdded = false;
         String userLocalDN = token.getPrincipal().getName();
 
         String tokenID = token.getTokenID().toString();
@@ -379,20 +381,17 @@ public class LDAPFilterCondition implements Condition {
                     + ", member:" + member);
         }
 
-        SubjectEvaluationCache.addEntry(tokenID, ldapServer, 
-            ldapConditionFilter, member);
-        if (!listenerAdded) {
-            if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                tokenID)) 
-            {
+        if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+            try {
                 token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                PolicyEvaluator.ssoListenerRegistry.put(
-                    tokenID, PolicyEvaluator.ssoListener);
+                SubjectEvaluationCache.addEntry(tokenID, ldapServer, ldapConditionFilter, member);
+                PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                 if (debug.messageEnabled()) {
-                    debug.message("LDAPFilterCondition.isMember():"
-                            + " sso listener added .\n");
+                    debug.message("LDAPFilterCondition.isMember(): sso listener added .\n");
                 }
-                listenerAdded = true;
+            } catch (SSOTokenListenersUnsupportedException ex) {
+                // Catching exception to avoid adding tokenID to SubjectEvaluationCache and ssoListenerRegistry
+                debug.message("LDAPFilterCondition.isMember(): could not add sso listener: {}", ex.getMessage());
             }
         }
         if (debug.messageEnabled()) {
@@ -476,7 +475,7 @@ public class LDAPFilterCondition implements Condition {
      */
     private void resetPolicyConfig(Map env) throws PolicyException, SSOException {
 
-        if (System.currentTimeMillis() > policyConfigExpiresAt) {
+        if (currentTimeMillis() > policyConfigExpiresAt) {
 
             String realmDn = CollectionHelper.getMapAttr(env, PolicyEvaluator.REALM_DN);
             if (realmDn == null) {
@@ -495,7 +494,7 @@ public class LDAPFilterCondition implements Condition {
      * Sets the policy configuration parameters used by this condition.
      */
     private synchronized void setPolicyConfig(Map configParams, String realmDn) throws PolicyException {
-        if (System.currentTimeMillis() < policyConfigExpiresAt) {
+        if (currentTimeMillis() < policyConfigExpiresAt) {
             return;
         }
         if (debug.messageEnabled()) {
@@ -571,7 +570,7 @@ public class LDAPFilterCondition implements Condition {
 
         // initialize the connection pool for the ldap server
         Options options = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.MILLISECONDS));
+                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.SECONDS));
 
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
@@ -586,7 +585,7 @@ public class LDAPFilterCondition implements Condition {
                     }
                 });
 
-        policyConfigExpiresAt = System.currentTimeMillis() + PolicyConfig.getSubjectsResultTtl(configParams);
+        policyConfigExpiresAt = currentTimeMillis() + getSubjectsResultTtl(configParams);
     }
 
     /**

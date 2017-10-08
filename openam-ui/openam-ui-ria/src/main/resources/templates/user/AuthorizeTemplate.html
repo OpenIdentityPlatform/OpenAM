@@ -133,16 +133,18 @@
             <!-- Required parameters -->
             <input type="hidden" name="response_type" aria-hidden="true" value="{{oauth2Data.responseType}}"/>
             <input type="hidden" name="client_id" aria-hidden="true" value="{{oauth2Data.clientId}}"/>
+            <input type="hidden" name="csrf" aria-hidden="true" value="{{oauth2Data.csrf}}"/>
 
             <div class="form-group clearfix">
                 <div class="pull-right">
                     <button type="submit" name="decision" class="btn btn-default" value="deny">{{t 'form.deny'}}</button>
                     <button type="submit" name="decision" class="btn btn-primary" value="allow">{{t 'form.allow'}}</button>
                 </div>
-
+                {{#if oauth2Data.isSaveConsentEnabled}}
                 <div class="pull-left checkbox">
                     <label for="saveConsent"><input type="checkbox" name="save_consent" id="saveConsent"/>{{t 'form.save'}}</label>
                 </div>
+                {{/if}}
             </div>
 
         </fieldset>

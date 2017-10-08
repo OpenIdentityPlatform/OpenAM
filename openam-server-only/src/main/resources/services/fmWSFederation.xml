@@ -47,12 +47,14 @@
                         type="single"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="metadata">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-wsfederation-entityconfig"
                         type="single"
                         syntax="string"
                         i18nKey="a102"
+                        order="200"
                         resourceName="entityConfig">
                     </AttributeSchema>
                 </SubSchema>

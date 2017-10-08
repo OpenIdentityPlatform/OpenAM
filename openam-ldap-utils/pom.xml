@@ -12,8 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
- *
+ * Copyright 2013-2016 ForgeRock AS.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -22,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>13.0.0</version>
+        <version>14.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ldap-utils</artifactId>
@@ -33,40 +32,6 @@
     <properties>
         <checkstyleFailOnError>true</checkstyleFailOnError>
     </properties>
-
-    <!-- Build -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM LDAP Utilities</Specification-Title>
-                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM LDAP Utilities</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Version>${project.version}</Version>
-                            <Create-On>${maven.build.timestamp}</Create-On>
-                            <Revision>${git.short.sha1}</Revision>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>

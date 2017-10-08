@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts;
@@ -21,7 +21,15 @@ package org.forgerock.openam.sts;
  * implement this interface, and this interface will be used to identify tokens specified in token transformations.
  * An extensible means of identifying tokens types is necessary to support end-user-provided JsonTokenValidators and
  * JsonTokenProviders.
+ *
+ * @supported.all.api
  */
 public interface TokenTypeId {
+
+    /**
+     * Gets the token type id.
+     *
+     * @return the token type id.
+     */
     String getId();
 }

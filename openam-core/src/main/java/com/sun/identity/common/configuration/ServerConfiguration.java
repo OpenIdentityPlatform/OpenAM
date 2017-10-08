@@ -24,21 +24,10 @@
  *
  * $Id: ServerConfiguration.java,v 1.16 2010/01/15 18:10:55 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.RemoteServiceAttributeValidator;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,12 +44,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.RemoteServiceAttributeValidator;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
 
 /**
  * This manages server configuration information.
@@ -98,7 +100,7 @@ public class ServerConfiguration extends ConfigurationBase {
     public static Set getServerInfo(SSOToken ssoToken) 
         throws SMSException, SSOException {
         Set serverInfo = new HashSet();
-        ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
 
         if (sc != null) {
             Set names = sc.getSubConfigNames();
@@ -145,7 +147,7 @@ public class ServerConfiguration extends ConfigurationBase {
         throws SMSException, SSOException, IOException {
         Map results = new HashMap();
 
-        ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
 
         if (sc != null) {
             Set names = sc.getSubConfigNames("*");
@@ -183,7 +185,7 @@ public class ServerConfiguration extends ConfigurationBase {
     public static Set<String> getServers(SSOToken ssoToken)
         throws SMSException, SSOException {
         Set<String> servers = new HashSet<>();
-        ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
         if (sc != null) {
             servers.addAll(sc.getSubConfigNames("*"));
             servers.remove(DEFAULT_SERVER_CONFIG);
@@ -242,7 +244,7 @@ public class ServerConfiguration extends ConfigurationBase {
         String serverConfigXML
     ) throws SMSException, SSOException, ConfigurationException,
         UnknownPropertyNameException {
-        ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
         if (sc != null) {
             String serverId = getNextId(ssoToken);
             createServerInstance(ssoToken, instanceName, serverId, values,
@@ -254,11 +256,13 @@ public class ServerConfiguration extends ConfigurationBase {
         SSOToken ssoToken
     ) throws SSOException, SMSException, UnknownPropertyNameException {
         boolean bCreated = false;
-        ServiceConfig sc = getRootServerConfig(ssoToken);
-        try {
-            bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
-        } catch (SMSException e) {
-            // ignore, default is not created.
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
+        if (sc != null) {
+            try {
+                bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
+            } catch (SMSException e) {
+                // ignore, default is not created.
+            }
         }
         if (!bCreated) {
             ResourceBundle res = ResourceBundle.getBundle(SERVER_DEFAULTS);
@@ -298,11 +302,13 @@ public class ServerConfiguration extends ConfigurationBase {
     
     public static Map<String, String> getNewServerDefaults(SSOToken ssoToken) throws SMSException, SSOException {
         boolean bCreated = false;
-        ServiceConfig sc = getRootServerConfig(ssoToken);
-        try {
-            bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
-        } catch (SMSException smse) {
-            // ignore, default is not created.
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
+        if (sc != null) {
+            try {
+                bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
+            } catch (SMSException smse) {
+                // ignore, default is not created.
+            }
         }
 
         if (bCreated) {
@@ -451,6 +457,22 @@ public class ServerConfiguration extends ConfigurationBase {
         Set servers =  getServers(ssoToken);
         return servers.contains(instanceName);
     }
+
+    /**
+     * Returns <code>true</code> if server or site id exists.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the service management datastore.
+     * @param serverId Id of the server instance.
+     *
+     * @return <code>true</code> if server id exists.
+     *
+     * @throws SMSException if errors access in the service management datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     */
+    public static boolean hasServerOrSiteId(SSOToken ssoToken, String serverId) throws SMSException, SSOException {
+        return getServerConfigurationId(getRootServerConfigWithRetry(ssoToken)).contains(serverId) ||
+            getSiteConfigurationId(getRootSiteConfig(ssoToken)).contains(serverId);
+    }
     
     /**
      * Sets configuration to a server instance.
@@ -564,9 +586,11 @@ public class ServerConfiguration extends ConfigurationBase {
         
         ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
         if (cfg != null) {
-            ServiceConfig sc = getRootServerConfig(ssoToken);
-            sc.removeSubConfig(instanceName);
-            deleted = true;
+            ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
+            if (sc != null) {
+                sc.removeSubConfig(instanceName);
+                deleted = true;
+            }
         }
 
         return deleted;
@@ -600,7 +624,7 @@ public class ServerConfiguration extends ConfigurationBase {
         if (!instanceName.equals(DEFAULT_SERVER_CONFIG)) {
             validateProperty(ssoToken, values);
         }
-        ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
         
         if (sc != null) {
             if (!instanceName.equals(DEFAULT_SERVER_CONFIG)) {
@@ -942,11 +966,13 @@ public class ServerConfiguration extends ConfigurationBase {
      *
      * @param serverName Server name to clone.
      * @param cloneName server name.
+     * @param cloneId new server id
      */
     public static void cloneServerInstance(
         SSOToken ssoToken,
         String serverName,
-        String cloneName
+        String cloneName,
+        String cloneId
     ) throws SMSException, SSOException, ConfigurationException {
         URL url = null;
         try {
@@ -960,17 +986,40 @@ public class ServerConfiguration extends ConfigurationBase {
         if (cfg != null) {
             Map map = cfg.getAttributes();
 
-            ServiceConfig sc = getRootServerConfig(ssoToken);
-            String serverId = getNextId(ssoToken);
-            Set setID = new HashSet(2);
-            setID.add(serverId);
-            map.put(ATTR_SERVER_ID, setID);
-            setProtocolHostPortURI(map, cloneName);
+            ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
 
+            if (sc != null) {
+                Set setID = new HashSet(2);
+                setID.add(cloneId);
+                map.put(ATTR_SERVER_ID, setID);
+                setProtocolHostPortURI(map, cloneName);
 
-            sc.addSubConfig(cloneName, SUBSCHEMA_SERVER, 0, map);
-            updateOrganizationAlias(ssoToken, cloneName, true);
+                sc.addSubConfig(cloneName, SUBSCHEMA_SERVER, 0, map);
+                updateOrganizationAlias(ssoToken, cloneName, true);
+            }
         }
+    }
+
+    /**
+     * Clones an existing server using the new cloned server name.
+     *
+     * @param token
+     *         SSO token
+     * @param serverName
+     *         name of existing server
+     * @param cloneName
+     *         name of new cloned server
+     *
+     * @throws SSOException
+     *         should there be some issue with the passed token
+     * @throws SMSException
+     *         should some SMS error occur
+     * @throws ConfigurationException
+     *         should some issue occur within configuration handling
+     */
+    public static void cloneServerInstance(SSOToken token, String serverName, String cloneName)
+            throws SSOException, SMSException, ConfigurationException {
+        cloneServerInstance(token, serverName, cloneName, getNextId(token));
     }
 
     private static void setProtocolHostPortURI(Map map, String serverName)
@@ -1068,14 +1117,16 @@ public class ServerConfiguration extends ConfigurationBase {
             Map map = XMLUtils.parseAttributeValuePairTags(
                 (Node)topElement);
 
-            ServiceConfig sc = getRootServerConfig(ssoToken);
-            String serverId = getNextId(ssoToken);
-            Set setID = new HashSet(2);
-            setID.add(serverId);
-            map.put(ATTR_SERVER_ID, setID);
+            ServiceConfig sc = getRootServerConfigWithRetry(ssoToken);
+            if (sc != null) {
+                String serverId = getNextId(ssoToken);
+                Set setID = new HashSet(2);
+                setID.add(serverId);
+                map.put(ATTR_SERVER_ID, setID);
 
-            sc.addSubConfig(serverName, SUBSCHEMA_SERVER, 0, map);
-            updateOrganizationAlias(ssoToken, serverName, true);
+                sc.addSubConfig(serverName, SUBSCHEMA_SERVER, 0, map);
+                updateOrganizationAlias(ssoToken, serverName, true);
+            }
         }
     }
 }

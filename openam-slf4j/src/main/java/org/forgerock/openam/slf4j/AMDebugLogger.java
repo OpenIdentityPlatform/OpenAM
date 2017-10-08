@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.slf4j;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.slf4j.helpers.MarkerIgnoringBase;
 
@@ -30,7 +32,7 @@ public class AMDebugLogger extends MarkerIgnoringBase {
     }
 
     public boolean isTraceEnabled() {
-        return debug.messageEnabled();
+        return debug.messageEnabled() && SystemPropertiesManager.getAsBoolean(Constants.ENABLE_TRACE_IN_MESSAGE_MODE);
     }
 
     public void trace(String s) {

@@ -11,13 +11,54 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_404_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SUBJECT_TYPES_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.rest.model.json.JsonEntitlementConditionModule;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.rest.query.QueryResponsePresentation;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,36 +68,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.LogicalSubject;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.rest.model.json.JsonEntitlementConditionModule;
-import org.forgerock.openam.rest.RestUtils;
-import org.forgerock.openam.rest.query.QueryResponsePresentation;
-import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
-import org.forgerock.util.Reject;
-import org.forgerock.util.promise.Promise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementSubject}s.
@@ -66,7 +77,17 @@ import java.util.TreeSet;
  *
  * @see ConditionTypesResource
  */
-public class SubjectTypesResource implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = SUBJECT_TYPES_RESOURCE + TITLE,
+                description = SUBJECT_TYPES_RESOURCE + DESCRIPTION,
+                mvccSupported = false,
+                resourceSchema = @Schema(schemaResource = "SubjectTypesResource.schema.json")),
+        pathParam = @Parameter(
+                name = "resourceId",
+                type = "string",
+                description = SUBJECT_TYPES_RESOURCE + PATH_PARAM + DESCRIPTION))
+public class SubjectTypesResource {
 
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_LOGICAL = "logical";
@@ -91,58 +112,6 @@ public class SubjectTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
-            DeleteRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Unsupported by this endpoint.
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
-            UpdateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
      * {@inheritDoc}
      *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject}s to return.
@@ -150,7 +119,11 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Looks up all the names of subjects registered in the system, and then returns each one to the
      * result handler having determined its schema and jsonified it.
      */
-    @Override
+    @Query(operationDescription = @Operation(
+            description = SUBJECT_TYPES_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*"
+    )
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
@@ -191,7 +164,12 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject} to return.
      */
-    @Override
+    @Read(operationDescription = @Operation(
+            errors = {
+                    @ApiError(
+                            code = 404,
+                            description = SUBJECT_TYPES_RESOURCE + ERROR_404_DESCRIPTION)},
+            description = SUBJECT_TYPES_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
@@ -211,7 +189,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                 LogicalSubject.class.isAssignableFrom(subjectClass));
 
         final ResourceResponse resource = newResourceResponse(resourceId,
-                String.valueOf(System.currentTimeMillis()), json);
+                String.valueOf(currentTimeMillis()), json);
 
         return newResultPromise(resource);
     }

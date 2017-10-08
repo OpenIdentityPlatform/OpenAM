@@ -24,11 +24,14 @@
  *
  * $Id: WSFederationAction.java,v 1.3 2008/06/25 05:48:09 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.servlet;
 
 import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,5 +59,5 @@ public abstract class WSFederationAction {
      * Processes the sign-out request, returning a response via the 
      * HttpServletResponse passed to the constructor.
      */
-    abstract public void process() throws IOException, WSFederationException;
+    abstract public void process() throws ServletException, IOException, WSFederationException;
 }

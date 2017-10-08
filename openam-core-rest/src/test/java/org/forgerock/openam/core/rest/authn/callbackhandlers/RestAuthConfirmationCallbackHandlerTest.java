@@ -11,27 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class RestAuthConfirmationCallbackHandlerTest {
 
@@ -100,8 +99,7 @@ public class RestAuthConfirmationCallbackHandlerTest {
 
         //Then
         assertEquals("ConfirmationCallback", jsonObject.get("type").asString());
-        assertNotNull(jsonObject.get("output"));
-        assertEquals(5, jsonObject.get("output").size());
+        assertThat(jsonObject).hasArray("output").hasSize(5);
         assertEquals("Select confirmation:", jsonObject.get("output").get(0).get("value").asString());
         assertEquals(ConfirmationCallback.INFORMATION, (int)jsonObject.get("output").get(1).get("value").asInteger());
         assertEquals("OK", jsonObject.get("output").get(2).get("value").get(0).asString());
@@ -109,8 +107,7 @@ public class RestAuthConfirmationCallbackHandlerTest {
         assertEquals("CANCEL", jsonObject.get("output").get(2).get("value").get(2).asString());
         assertEquals(-1, (int) jsonObject.get("output").get(3).get("value").asInteger());
         assertEquals(0, (int) jsonObject.get("output").get(4).get("value").asInteger());
-        assertNotNull(jsonObject.get("input"));
-        assertEquals(1, jsonObject.get("input").size());
+        assertThat(jsonObject).hasArray("input").hasSize(1);
         assertEquals(0, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
@@ -202,9 +199,6 @@ public class RestAuthConfirmationCallbackHandlerTest {
 
         //When
         restAuthConfirmationCallbackHandler.convertFromJson(confirmationCallback, jsonConfirmationCallback);
-
-        //Then
-        fail();
     }
 
     @Test

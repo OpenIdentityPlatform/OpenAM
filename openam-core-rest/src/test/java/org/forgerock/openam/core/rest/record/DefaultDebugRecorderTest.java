@@ -11,25 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.record;
 
-
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.debug.DebugConstants;
-import com.sun.identity.shared.debug.DebugLevel;
-import com.sun.identity.shared.debug.file.impl.InvalidDebugConfigurationException;
-
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.util.thread.ExecutorServiceFactory;
-import org.mockito.Mockito;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,6 +22,23 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
+import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.thread.listener.ShutdownManager;
+import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.debug.DebugConstants;
+import com.sun.identity.shared.debug.DebugLevel;
+import com.sun.identity.shared.debug.file.impl.InvalidDebugConfigurationException;
 
 public class DefaultDebugRecorderTest extends DebugTestTemplate {
     protected static final String DEBUG_CONFIG_FOR_TEST = "/record/debugconfig.properties";
@@ -48,8 +50,8 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
         super.setUp();
         initializeProvider(DEBUG_CONFIG_FOR_TEST);
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
-        recordDebugController = new DefaultDebugRecorderForTest(new ExecutorServiceFactory(Mockito.mock
-                (org.forgerock.util.thread.listener.ShutdownManager.class)));
+        recordDebugController = new DefaultDebugRecorderForTest(
+                new AuditRequestContextPropagatingExecutorServiceFactory(Mockito.mock(ShutdownManager.class)));
     }
 
     @Test
@@ -343,7 +345,7 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
          *
          * @param executorServiceFactory
          */
-        public DefaultDebugRecorderForTest(ExecutorServiceFactory executorServiceFactory) {
+        public DefaultDebugRecorderForTest(AMExecutorServiceFactory executorServiceFactory) {
             super(executorServiceFactory);
         }
 

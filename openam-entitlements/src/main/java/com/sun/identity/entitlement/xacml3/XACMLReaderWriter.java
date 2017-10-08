@@ -11,24 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
+import static com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils.*;
+import static org.forgerock.openam.xacml.v3.XACMLApplicationUtils.getApplicationNameFromPolicy;
+import static org.forgerock.openam.xacml.v3.XACMLApplicationUtils.policyToApplication;
+import static org.forgerock.openam.xacml.v3.XACMLResourceTypeUtils.createResourceType;
+import static org.forgerock.openam.xacml.v3.XACMLResourceTypeUtils.generateResourceTypeDummyUuid;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.JAXBException;
+
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.xacml.v3.XACMLApplicationUtils;
+import org.forgerock.openam.xacml.v3.XACMLResourceTypeUtils;
+import org.json.JSONException;
+
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import org.json.JSONException;
-
-import javax.xml.bind.JAXBException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Facade for reading and writing XACML and translating between XACML PolicySets and AM Privilege types.
@@ -58,27 +68,60 @@ public class XACMLReaderWriter {
     }
 
     /**
-     * Translate provided XACML PolicySet into OpenAM Privilege and ReferralPrivilege objects.
+     * Translate provided XACML PolicySet into OpenAM Privileges, ReferralPrivileges, Applications and ResourceTypes.
+     * XACML export file doesn't map Application and Resource Type completely and hence dummy ResourceType Ids
+     * are assigned to ResourceTypes created and same is used for linking Application, Privilege to the ResourceType.
+     * <p />
+     *
+     * From a policySet instance: <br />
+     * <li> An application is created for every unique application name found in the Policy instances.</li>
+     * <li> One ResourceType instance (with dummy uuid) per Policy is created.</li>
+     * <li> One instance of Privilege per Policy instance is created. </li>
      *
      * @param policySet The set of policies to translate
-     * @return OpenAM Privileges and ReferralPrivileges
+     * @return OpenAM Privileges, ReferralPrivileges, Applications and ResourceTypes.
      * @throws EntitlementException If there was any unexpected error.
      */
     public PrivilegeSet fromXACML(PolicySet policySet) throws EntitlementException {
         PrivilegeSet privilegeSet = new PrivilegeSet();
-
         try {
 
             if (policySet == null) {
                 return privilegeSet;
             }
 
-            for (Policy policy : XACMLPrivilegeUtils.getPoliciesFromPolicySet(policySet)) {
-                if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
-                    privilegeSet.addReferralPrivilege(XACMLPrivilegeUtils.policyToReferral(policy));
-                } else {
-                    privilegeSet.addPrivilege(XACMLPrivilegeUtils.policyToPrivilege(policy));
+            Map<String, Application> applicationMap = new HashMap<>();
+
+            for (Policy policy : getPoliciesFromPolicySet(policySet)) {
+
+                if (isReferralPolicy(policy)) {
+                    privilegeSet.addReferralPrivilege(policyToReferral(policy));
+                    continue;
                 }
+
+                String applicationName = getApplicationNameFromPolicy(policy);
+
+                Application application = applicationMap.get(applicationName);
+                if (application == null) {
+                    application = policyToApplication(policy);
+                    applicationMap.put(applicationName, application);
+                    privilegeSet.addApplication(application);
+                }
+
+                // Create one resourceType instance (with a dummy uuid) per policy read from the XACML file.
+                // Later these instances with dummy ids will be replaced by either an existing instance
+                //  in the data store or by a new instance created during Resource Type Import Step generation.
+                ResourceType resourceType = createResourceType(applicationName, null,
+                        getResourceNamesFromPolicy(policy),
+                        getActionValuesFromPolicy(policy),
+                        generateResourceTypeDummyUuid());
+                privilegeSet.addResourceType(resourceType);
+
+                Privilege privilege = policyToPrivilege(policy);
+                privilegeSet.addPrivilege(privilege);
+
+                application.addResourceTypeUuid(resourceType.getUUID());
+                privilege.setResourceTypeUuid(resourceType.getUUID());
             }
 
             return privilegeSet;
@@ -111,6 +154,5 @@ public class XACMLReaderWriter {
         }
         return policySet;
     }
-
 
 }

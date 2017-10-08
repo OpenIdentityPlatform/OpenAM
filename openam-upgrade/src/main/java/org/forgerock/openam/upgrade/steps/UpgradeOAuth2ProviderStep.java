@@ -11,29 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
+import javax.inject.Inject;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayer;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSUtils;
@@ -42,6 +35,15 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.utils.MappingUtils;
 
 /**
  * This upgrade step will find all the OAuth2 Providers that was created with a subset of the available attributes.
@@ -56,6 +58,9 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
 
     public static final Map<String, String> ALGORITHM_NAMES = new HashMap<String, String>();
     public static final Set<String> DEFAULT_CLAIMS = new HashSet<String>();
+    private static final Map<String, String> RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS = new HashMap<>();
+    private static final String OLD_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.provider.impl.ScopeImpl";
+    private static final String NEW_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.OpenAMScopeValidator";
 
     static {
         ALGORITHM_NAMES.put(JwsAlgorithm.HS256.getAlgorithm(), JwsAlgorithm.HS256.name());
@@ -70,6 +75,16 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
         DEFAULT_CLAIMS.add("family_name");
         DEFAULT_CLAIMS.add("locale");
         DEFAULT_CLAIMS.add("name");
+
+        RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.put(
+                "org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType",
+                "org.forgerock.oauth2.core.TokenResponseTypeHandler");
+        RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.put(
+                "org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType",
+                "org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler");
+        RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.put(
+                "org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType",
+                "org.forgerock.openidconnect.IdTokenResponseTypeHandler");
     }
 
     private static final String REPORT_DATA = "%REPORT_DATA%";
@@ -112,6 +127,9 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             final ServiceSchema serviceSchema = ssm.getOrganizationSchema();
             for (String realm : getRealmNames()) {
                 final ServiceConfig serviceConfig = scm.getOrganizationConfig(realm, null);
+                if (!serviceConfig.exists()) {
+                    continue;
+                }
                 final Map<String, Set<String>> withDefaults = serviceConfig.getAttributesForRead();
                 final Map<String, Set<String>> withoutDefaults = serviceConfig.getAttributesWithoutDefaultsForRead();
                 final Map<String, Set<String>> withoutValidators = SMSUtils.removeValidators(withDefaults,
@@ -122,6 +140,10 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 } else if (shouldUpgradeClaims(withDefaults)) {
                     attributesToUpdate.put(realm, withoutValidators);
                 } else if (shouldUpgradeAlgorithmName(withoutDefaults)) {
+                    attributesToUpdate.put(realm, null);
+                } else if (shouldUpgradeResponseTypePlugins(withoutDefaults)) {
+                    attributesToUpdate.put(realm, null);
+                } else if (shouldUpgradeScopePlugin(withoutDefaults)) {
                     attributesToUpdate.put(realm, null);
                 }
             }
@@ -154,6 +176,23 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
         return false;
     }
 
+    private boolean shouldUpgradeResponseTypePlugins(Map<String, Set<String>> attributes) {
+        final Set<String> responseTypePlugins = attributes.get(RESPONSE_TYPE_LIST);
+        if (responseTypePlugins != null) {
+            for (String responseTypePlugin : responseTypePlugins) {
+                String pluginClass = responseTypePlugin.split("\\|")[1];
+                if (RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.containsKey(pluginClass)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean shouldUpgradeScopePlugin(Map<String, Set<String>> attributes) {
+        return attributes.get(SCOPE_PLUGIN_CLASS).contains(OLD_SCOPE_PLUGIN);
+    }
+
     @Override
     public void perform() throws UpgradeException {
         persistDefaultsForProviders();
@@ -169,8 +208,10 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 if (attributes == null) {
                     attributes = serviceConfig.getAttributesWithoutDefaults();
                 }
+                migrateResponseTypePlugins(attributes);
                 renameAlgorithms(attributes);
                 sortScopes(attributes);
+                migrateScopeValidatorPlugin(attributes);
                 serviceConfig.setAttributes(attributes);
                 UpgradeProgress.reportEnd("upgrade.success");
             }
@@ -206,6 +247,29 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 }
             }
             attributes.put(ID_TOKEN_SIGNING_ALGORITHMS, newAlgorithms);
+        }
+    }
+
+    private void migrateScopeValidatorPlugin(Map<String, Set<String>> attributes) {
+        if (attributes.get(SCOPE_PLUGIN_CLASS).contains(OLD_SCOPE_PLUGIN)) {
+            attributes.put(SCOPE_PLUGIN_CLASS, asSet(NEW_SCOPE_PLUGIN));
+        }
+    }
+
+    private void migrateResponseTypePlugins(Map<String, Set<String>> attributes) {
+        final Set<String> responseTypePlugins = attributes.get(RESPONSE_TYPE_LIST);
+        if (responseTypePlugins != null) {
+            final Set<String> newResponseTypePlugins = new HashSet<>();
+            for (String responseTypePlugin : responseTypePlugins) {
+                String pluginClass = responseTypePlugin.split("\\|")[1];
+                if (RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.containsKey(pluginClass)) {
+                    newResponseTypePlugins.add(responseTypePlugin.replace(pluginClass,
+                            RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS.get(pluginClass)));
+                } else {
+                    newResponseTypePlugins.add(responseTypePlugin);
+                }
+            }
+            attributes.put(RESPONSE_TYPE_LIST, newResponseTypePlugins);
         }
     }
 

@@ -28,13 +28,15 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * A wrapper around core utility class like, {@link AMAuthUtils} and {@link IdUtils} to facilitate testing.
@@ -164,7 +166,7 @@ public class CoreWrapper {
      * @return {@code true} if the FQDN is valid.
      */
     public boolean isValidFQDN(String hostname) {
-        return FQDNUtils.getInstance().isHostnameValid(hostname);
+        return FqdnValidator.getInstance().isHostnameValid(hostname);
     }
 
     /**
@@ -265,5 +267,16 @@ public class CoreWrapper {
      */
     public AMIdentity getIdentity(String username, String realm) {
         return IdUtils.getIdentity(username, realm);
+    }
+
+    /**
+     * Gets a {@link com.sun.identity.sm.ServiceConfigManager} for the given service.
+     * @param serviceName The name of the service.
+     * @param token The token to use.
+     * @return The service config manager.
+     */
+    public ServiceConfigManager getServiceConfigManager(String serviceName, SSOToken token)
+            throws SSOException, SMSException {
+        return new ServiceConfigManager(serviceName, token);
     }
 }

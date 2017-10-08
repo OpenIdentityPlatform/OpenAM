@@ -78,7 +78,7 @@ public final class MailService extends AbstractRequestHandler {
         switch (request.getAction()) {
         case "send":
             try {
-                JsonValue response = sendEmail(RealmContext.getRealm(context), request.getContent());
+                JsonValue response = sendEmail(RealmContext.getRealm(context).asPath(), request.getContent());
                 return newResultPromise(newActionResponse(response));
             } catch (ResourceException rE) {
                 return rE.asPromise();

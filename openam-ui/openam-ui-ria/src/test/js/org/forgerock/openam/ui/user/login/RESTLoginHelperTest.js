@@ -16,30 +16,30 @@
 
 define([
     "squire"
-], function (Squire) {
-    describe("org/forgerock/openam/ui/user/login/RESTLoginHelper", function () {
-        var RESTLoginHelper;
+], (Squire) => {
+    describe("org/forgerock/openam/ui/user/login/RESTLoginHelper", () => {
+        let RESTLoginHelper;
 
-        before(function (done) {
-            var injector = new Squire();
+        before((done) => {
+            const injector = new Squire();
 
             injector
-                .mock("org/forgerock/openam/ui/user/delegates/AuthNDelegate", {})
+                .mock("org/forgerock/openam/ui/user/services/AuthNService", {})
                 .mock("org/forgerock/openam/ui/user/UserModel", {})
                 .mock("org/forgerock/commons/ui/common/main/ViewManager", {})
-                .require(["org/forgerock/openam/ui/user/login/RESTLoginHelper"], function (subject) {
+                .require(["org/forgerock/openam/ui/user/login/RESTLoginHelper"], (subject) => {
                     RESTLoginHelper = subject;
                     done();
                 });
         });
 
-        describe("#filterUrlParams", function () {
-            it("returns a string", function () {
+        describe("#filterUrlParams", () => {
+            it("returns a string", () => {
                 expect(RESTLoginHelper.filterUrlParams()).to.be.a("string");
             });
 
-            it("coverts an object to parameter string", function () {
-                var params = {
+            it("coverts an object to parameter string", () => {
+                const params = {
                     arg: "argValue",
                     locale: "localeValue"
                 };
@@ -47,26 +47,26 @@ define([
                 expect(RESTLoginHelper.filterUrlParams(params)).to.eq("&arg=argValue&locale=localeValue");
             });
 
-            it("filters out non-allowed parameters", function () {
-                var params = {
-                        arg: "argValue",
-                        authIndexType: "authIndexTypeValue",
-                        authIndexValue: "authIndexValueValue",
-                        "goto": "gotoValue",
-                        gotoOnFail: "gotoOnFailValue",
-                        ForceAuth: "ForceAuthValue",
-                        locale: "localeValue",
-                        unknown: "unknown"
-                    },
-                    expected = "&arg=argValue&authIndexType=authIndexTypeValue&authIndexValue=authIndexValueValue" +
+            it("filters out non-allowed parameters", () => {
+                const params = {
+                    arg: "argValue",
+                    authIndexType: "authIndexTypeValue",
+                    authIndexValue: "authIndexValueValue",
+                    "goto": "gotoValue",
+                    gotoOnFail: "gotoOnFailValue",
+                    ForceAuth: "ForceAuthValue",
+                    locale: "localeValue",
+                    unknown: "unknown"
+                };
+                const expected = "&arg=argValue&authIndexType=authIndexTypeValue&authIndexValue=authIndexValueValue" +
                                "&goto=gotoValue&gotoOnFail=gotoOnFailValue&ForceAuth=ForceAuthValue&locale=localeValue";
 
                 expect(RESTLoginHelper.filterUrlParams(params)).to.eq(expected);
             });
 
-            context("when all parameters are filtered out", function () {
-                it("returns an empty string", function () {
-                    var params = {
+            context("when all parameters are filtered out", () => {
+                it("returns an empty string", () => {
+                    const params = {
                         unknown: "unknown"
                     };
 
@@ -74,8 +74,8 @@ define([
                 });
             });
 
-            context("when params is \"undefined\"", function () {
-                it("returns an empty string", function () {
+            context("when params is \"undefined\"", () => {
+                it("returns an empty string", () => {
                     expect(RESTLoginHelper.filterUrlParams(undefined)).to.eq("");
                 });
             });

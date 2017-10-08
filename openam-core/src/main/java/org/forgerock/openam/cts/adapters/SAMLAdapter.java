@@ -11,23 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
+import java.text.MessageFormat;
+import java.util.Calendar;
+
+import javax.inject.Inject;
+
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
-
-import javax.inject.Inject;
-import java.text.MessageFormat;
-import java.util.Calendar;
 
 /**
  * TokenAdapter for SAML tokens. SAML tokens in particular have no specific hierarchy so the SAMLToken
@@ -97,7 +98,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
      */
     public SAMLToken fromToken(Token token) {
         // Use the persisted field to work out the type of class that was persisted.
-        String className = token.getValue(SAMLTokenField.OBJECT_CLASS.getField());
+        String className = token.getAttribute(SAMLTokenField.OBJECT_CLASS.getField());
 
         Class<?> c;
         try {
@@ -121,7 +122,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         long expiryTime = TimeUtils.toUnixTime(token.getExpiryTimestamp());
 
         // Secondary Key
-        String secondaryKey = token.getValue(SAMLTokenField.SECONDARY_KEY.getField());
+        String secondaryKey = token.getAttribute(SAMLTokenField.SECONDARY_KEY.getField());
 
         String primaryKey = tokenIdFactory.fromSAMLPrimaryTokenId(token.getTokenId());
         if (secondaryKey != null && !secondaryKey.isEmpty()) {

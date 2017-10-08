@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.scripting.rest.batch;
 
@@ -120,7 +120,7 @@ public class BatchResource extends RealmAwareResource {
 
             final String realm = getRealm(serverContext);
             final ScriptConfiguration scriptConfig =
-                    scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), realm).get(scriptId);
+                    scriptingServiceFactory.create(realm).get(scriptId);
             final ScriptObject script = new ScriptObject(scriptConfig.getName(), scriptConfig.getScript(),
                     scriptConfig.getLanguage());
             final ScriptResponse response = new ScriptResponse();

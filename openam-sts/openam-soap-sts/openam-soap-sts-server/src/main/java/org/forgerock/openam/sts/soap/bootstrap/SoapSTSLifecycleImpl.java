@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Copyright 2016 Agile Digital Engineering
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -45,6 +46,10 @@ public class SoapSTSLifecycleImpl implements SoapSTSLifecycle {
     private static final int POLL_INTERVAL_DEFAULT = 300;
     private static final int AGENT_CONFIG_POLL_INITIAL_WAIT = 10;
     private static final int AGENT_CONFIG_POLL_INTERVAL = 600;
+    /**
+     * Publish the STS instances straight away in the first instance to speed up the time when the STS is ready for use.
+     */
+    private static final long PUBLISH_POLL_INITIAL_WAIT = 0;
     private final ScheduledExecutorService scheduledExecutorService;
     private final SoapSTSAgentConfigAccess soapSTSAgentConfigAccess;
     private final SoapSTSInstancePublisher soapSTSInstancePublisher;
@@ -112,8 +117,9 @@ public class SoapSTSLifecycleImpl implements SoapSTSLifecycle {
     private void agentConfigObtained(JsonValue agentConfig) {
         if (!configObtained) {
             final int pollInterval = getPublishPollInterval(agentConfig);
-            logger.debug("Scheduling the publish service poller at an interval of " + pollInterval + " seconds.");
-            scheduledExecutorService.scheduleAtFixedRate(soapSTSInstancePublisher, pollInterval, pollInterval,
+            logger.debug("Scheduling the publish service with an intitial wait of " + PUBLISH_POLL_INITIAL_WAIT
+                    + " seconds with subsequent iterations at an interval of " + pollInterval + " seconds.");
+            scheduledExecutorService.scheduleAtFixedRate(soapSTSInstancePublisher, PUBLISH_POLL_INITIAL_WAIT, pollInterval,
                     TimeUnit.SECONDS);
             if (!agentConfigAccessFuture.cancel(true)) {
                 logger.error("Could not cancel the AgentConfigAccessRunnable!");

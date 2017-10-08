@@ -24,11 +24,12 @@
  *
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
 import static java.util.Collections.emptySet;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -52,6 +53,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -358,6 +360,10 @@ public class DataStore {
         try {
             createDefaultSubConfig(adminToken, realm, null);
             dn = getPrivilegeDistinguishedName(p.getName(), realm, null);
+
+            if (SMSEntry.checkIfEntryExists(dn, adminToken)) {
+                throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS);
+            }
 
             SMSEntry s = new SMSEntry(adminToken, dn);
             Map<String, Set<String>> map = new HashMap<String, Set<String>>();
@@ -846,16 +852,14 @@ public class DataStore {
         final long start = DB_MONITOR_PRIVILEGE.start();
 
         final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        final Privilege privilege;
+        Privilege privilege = null;
 
         try {
             final Iterator i = SMSEntry.search(token, privilegeDN, NO_FILTER, NO_LIMIT, NO_LIMIT,
                     NOT_SORTED, NOT_SORTED, NO_EXCLUSIONS);
-            if (i.hasNext()) {
+            while (i.hasNext()) {
                 SMSDataEntry e = (SMSDataEntry) i.next();
                 privilege = Privilege.getInstance(new JSONObject(e.getAttributeValue(SERIALIZABLE_INDEX_KEY)));
-            } else {
-                privilege = null;
             }
         } catch (SMSException e) {
             Object[] arg = {privilegeDN};
@@ -871,12 +875,12 @@ public class DataStore {
     }
 
     private Set<IPrivilege> searchPrivileges(
-        String realm,
-        BufferedIterator iterator,
-        ResourceSearchIndexes indexes,
-        Set<String> subjectIndexes,
-        boolean bSubTree,
-        Set<String> excludeDNs
+            String realm,
+            BufferedIterator iterator,
+            ResourceSearchIndexes indexes,
+            Set<String> subjectIndexes,
+            boolean bSubTree,
+            Set<String> excludeDNs
     ) throws EntitlementException {
         Set<IPrivilege> results = new HashSet<IPrivilege>();
         String filter = getFilter(indexes, subjectIndexes, bSubTree);
@@ -884,28 +888,28 @@ public class DataStore {
 
         if (PolicyConstants.DEBUG.messageEnabled()) {
             PolicyConstants.DEBUG.message(
-                "[PolicyEval] DataStore.searchPrivileges");
+                    "[PolicyEval] DataStore.searchPrivileges");
             PolicyConstants.DEBUG.message(
-                "[PolicyEval] search filter: " + filter);
+                    "[PolicyEval] search filter: " + filter);
             PolicyConstants.DEBUG.message(
-                "[PolicyEval] search DN: " + baseDN);
+                    "[PolicyEval] search DN: " + baseDN);
         }
 
         if (filter != null) {
             SSOToken token = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
+                    AdminTokenAction.getInstance());
 
             long start = DB_MONITOR_PRIVILEGE.start();
-            
+
             if (SMSEntry.checkIfEntryExists(baseDN, token)) {
                 try {
                     Iterator i = SMSEntry.search(
-                        token, baseDN, filter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, excludeDNs);
+                            token, baseDN, filter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, excludeDNs);
                     while (i.hasNext()) {
                         SMSDataEntry e = (SMSDataEntry) i.next();
                         Privilege privilege = Privilege.getInstance(
-                            new JSONObject(e.getAttributeValue(
-                            SERIALIZABLE_INDEX_KEY)));
+                                new JSONObject(e.getAttributeValue(
+                                        SERIALIZABLE_INDEX_KEY)));
                         iterator.add(privilege);
                         results.add(privilege);
                     }
@@ -929,6 +933,22 @@ public class DataStore {
 
     List<Privilege> findPoliciesByRealmAndApplication(String realm, String application) throws EntitlementException {
         return findPolicies(realm, String.format("(&(sunserviceID=indexes)(ou=application=%s))", application));
+    }
+
+    List<Privilege> findAllPoliciesByRealmAndSubjectIndex(String realm, Set<String> subjectIndexes) throws EntitlementException {
+        StringBuilder filter = new StringBuilder("(|");
+        for (String index : subjectIndexes) {
+            filter.append('(')
+                    .append(SMSEntry.ATTR_XML_KEYVAL)
+                    .append('=')
+                    .append(SUBJECT_INDEX_KEY)
+                    .append('=')
+                    .append(escapeCharactersInFilter(index))
+                    .append(')');
+        }
+        filter.append(')');
+
+        return findPolicies(realm, filter.toString());
     }
 
     private List<Privilege> findPolicies(String realm, String ldapFilter) throws EntitlementException {
@@ -1023,22 +1043,30 @@ public class DataStore {
         return results;
     }
 
+    private static String getFilter(Set<String> subjectIndexes) {
+        StringBuilder subjectFilter = new StringBuilder();
+
+        if (isNotEmpty(subjectIndexes)) {
+            subjectFilter.append("(|");
+
+            for (String subjectIndex : subjectIndexes) {
+                subjectFilter.append(MessageFormat
+                        .format(SUBJECT_FILTER_TEMPLATE, escapeCharactersInFilter(subjectIndex)));
+            }
+
+            subjectFilter.append(')');
+        }
+
+        return subjectFilter.toString();
+    }
+
     static String getFilter(
         ResourceSearchIndexes indexes,
         Set<String> subjectIndexes,
         boolean bSubTree
     ) {
         StringBuilder filter = new StringBuilder();
-
-        StringBuilder subjectBuffer = new StringBuilder();
-        if ((subjectIndexes != null) && !subjectIndexes.isEmpty()) {
-            for (String i : subjectIndexes) {
-                subjectBuffer.append(MessageFormat.format(SUBJECT_FILTER_TEMPLATE, escapeCharactersInFilter(i)));
-            }
-        }
-        if (subjectBuffer.length() > 0) {
-            filter.append("(|").append(subjectBuffer.toString()).append(")");
-        }
+        filter.append(getFilter(subjectIndexes));
 
         Set<String> hostIndexes = indexes.getHostIndexes();
         StringBuilder hostBuffer = new StringBuilder();
@@ -1108,7 +1136,7 @@ public class DataStore {
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
             return adminToken;
         }
         return SubjectUtils.getSSOToken(subject);

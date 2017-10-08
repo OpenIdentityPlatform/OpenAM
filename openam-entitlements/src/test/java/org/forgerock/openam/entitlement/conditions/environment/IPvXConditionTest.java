@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -197,18 +197,18 @@ public abstract class IPvXConditionTest<T extends Comparable<T>> {
     public abstract Object[][] validIpAddresses();
 
     @Test(dataProvider = "validIpAddresses")
-    public void testValidIpAddressesAreAccepted(String validIpAddress) throws EntitlementException {
+    public void testValidIpAddressesAreAccepted(String validStartIpAddress, String validEndIpAddress) throws EntitlementException {
         // Given
         // an valid IP address
 
         // When
-        condition.setStartIpAndEndIp(validIpAddress, validIpAddress);
-        condition.setIpRange(asList(validIpAddress + "-" + validIpAddress));
+        condition.setStartIpAndEndIp(validStartIpAddress, validEndIpAddress);
+        condition.setIpRange(asList(validStartIpAddress + "-" + validEndIpAddress));
 
         // Then
-        assertThat(condition.getStartIp()).isEqualTo(validIpAddress);
-        assertThat(condition.getEndIp()).isEqualTo(validIpAddress);
-        assertThat(condition.getIpRange()).isEqualTo(asList(validIpAddress, validIpAddress));
+        assertThat(condition.getStartIp()).isEqualTo(validStartIpAddress);
+        assertThat(condition.getEndIp()).isEqualTo(validEndIpAddress);
+        assertThat(condition.getIpRange()).isEqualTo(asList(validStartIpAddress, validEndIpAddress));
     }
 
     @DataProvider(name = "invalidIpAddresses")

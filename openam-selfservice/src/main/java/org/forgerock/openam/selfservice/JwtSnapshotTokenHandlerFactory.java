@@ -11,22 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.selfservice;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
-import org.forgerock.openam.shared.security.crypto.KeyPairProvider;
+import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.selfservice.core.config.StageConfigException;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenConfig;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandler;
 import org.forgerock.selfservice.core.snapshot.SnapshotTokenHandlerFactory;
 import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandler;
-import org.forgerock.selfservice.stages.tokenhandlers.JwtTokenHandlerConfig;
 
+import javax.crypto.SecretKey;
+import javax.inject.Inject;
 import java.security.KeyPair;
 
 /**
@@ -36,32 +38,49 @@ import java.security.KeyPair;
  */
 final class JwtSnapshotTokenHandlerFactory implements SnapshotTokenHandlerFactory {
 
-    private final KeyPairProvider provider;
+    private static final JweAlgorithm DEFAULT_ENCRYPTION_ALGORITHM = JweAlgorithm.RSAES_PKCS1_V1_5;
+    private static final EncryptionMethod DEFAULT_ENCRYPTION_METHOD = EncryptionMethod.A128CBC_HS256;
+    private static final JwsAlgorithm DEFAULT_SIGNING_ALGORITHM = JwsAlgorithm.HS256;
 
-    @AssistedInject
-    JwtSnapshotTokenHandlerFactory(@Assisted KeyPairProvider provider) {
-        this.provider = provider;
+    private final AMKeyProvider keyProvider;
+
+    @Inject
+    JwtSnapshotTokenHandlerFactory(AMKeyProvider keyProvider) {
+        this.keyProvider = keyProvider;
     }
 
     @Override
     public SnapshotTokenHandler get(SnapshotTokenConfig config) {
-        if (config.getType().equals(JwtTokenHandlerConfig.TYPE)) {
-            return configureJwtTokenHandler((JwtTokenHandlerConfig) config);
+        if (config.getType().equals(KeyStoreJwtTokenConfig.TYPE)) {
+            return configureJwtTokenHandler((KeyStoreJwtTokenConfig) config);
         }
 
         throw new StageConfigException("Unknown token type " + config.getType());
     }
 
-    private SnapshotTokenHandler configureJwtTokenHandler(JwtTokenHandlerConfig config) {
+    private SnapshotTokenHandler configureJwtTokenHandler(KeyStoreJwtTokenConfig config) {
+        KeyPair encryptionKeyPair = keyProvider.getKeyPair(config.getEncryptionKeyPairAlias());
+
+        if (encryptionKeyPair == null) {
+            throw new StageConfigException("Unable to retrieve key pair for encryption key pair alias "
+                    + config.getEncryptionKeyPairAlias());
+        }
+
+        SecretKey secretKey = keyProvider.getSecretKey(config.getSigningSecretKeyAlias());
+
+        if (secretKey == null) {
+            throw new StageConfigException("Unable to retrieve key for certificate alias "
+                    + config.getSigningSecretKeyAlias());
+        }
+
         SigningManager signingManager = new SigningManager();
-        SigningHandler signingHandler = signingManager.newHmacSigningHandler(config.getSharedKey());
-        KeyPair keyPair = provider.getKeyPair(config.getKeyPairAlgorithm(), config.getKeyPairSize());
+        SigningHandler signingHandler = signingManager.newHmacSigningHandler(secretKey.getEncoded());
 
         return new JwtTokenHandler(
-                config.getJweAlgorithm(),
-                config.getEncryptionMethod(),
-                keyPair,
-                config.getJwsAlgorithm(),
+                DEFAULT_ENCRYPTION_ALGORITHM,
+                DEFAULT_ENCRYPTION_METHOD,
+                encryptionKeyPair,
+                DEFAULT_SIGNING_ALGORITHM,
                 signingHandler,
                 config.getTokenLifeTimeInSeconds());
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -26,10 +26,14 @@ import java.util.List;
  * Defines the concern of providing the AuthnStatement list to be included in the generated SAML2 assertion. If no
  * custom interface implementation is specified in the SAML2Config, then the DefaultAuthenticationStatementsProvider will
  * be used.
+ *
+ * @supported.all.api
  */
 public interface AuthenticationStatementsProvider {
+
     /**
      * Invoked to obtain the List of AuthnStatement instances to be included in the generated SAML2 assertion.
+     *
      * @param saml2Config The STS-instance-specific SAML2 configurations
      * @param authnContextClassRef The AuthNContext class ref pulled out of the TokenGenerationServiceInvocationState.
      * @return The list of AuthnStatements

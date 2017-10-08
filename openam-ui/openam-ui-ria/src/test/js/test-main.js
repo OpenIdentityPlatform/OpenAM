@@ -11,40 +11,47 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-var TEST_REGEXP = /(spec|test)\.js$/i,
-    allTestFiles = Object.keys(window.__karma__.files).filter(function (file) {
-        return TEST_REGEXP.test(file);
+(function () {
+    var TEST_REGEXP = /(spec|test)\.js$/i,
+        allTestFiles = Object.keys(window.__karma__.files).filter(function (file) {
+            return TEST_REGEXP.test(file);
+        });
+
+    require.config({
+        baseUrl: "/base/target/compiled",
+
+        map: {
+            "*": {
+                // TODO: Remove this when there are no longer any references to the "underscore" dependency
+                "underscore": "lodash"
+            }
+        },
+        paths: {
+            "backbone": "/base/target/dependencies/libs/backbone-1.1.2-min",
+            "chai": "/base/node_modules/chai/chai",
+            "handlebars": "/base/target/dependencies/libs/handlebars-4.0.5",
+            "jquery": "/base/target/dependencies/libs/jquery-2.1.1-min",
+            "lodash": "/base/target/dependencies/libs/lodash-3.10.1-min",
+            "moment": "/base/target/dependencies/libs/moment-2.8.1-min",
+            "redux": "/base/target/dependencies/libs/redux-3.5.2-min",
+            "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
+            "sinon": "/base/target/test-classes/libs/sinon-1.15.4",
+            "squire": "/base/target/test-classes/libs/squire-0.2.0"
+        },
+        shim: {
+            "lodash": {
+                exports: "_"
+            }
+        }
     });
 
-require.config({
-    baseUrl: "/base/target/compiled",
+    require(["chai", "sinon-chai"].concat(allTestFiles), function (chai, chaiSinon) {
+        chai.use(chaiSinon);
 
-    map: {
-        "*": {
-            // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore": "lodash"
-        }
-    },
-    paths: {
-        jquery: "/base/target/dependencies/libs/jquery-2.1.1-min",
-        lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
-        sinon: "/base/target/test-classes/libs/sinon-1.15.4",
-        squire: "/base/target/test-classes/libs/squire-0.2.0",
-        chai: "/base/node_modules/chai/chai",
-        "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai"
-    },
-    shim: {
-        "lodash": {
-            exports: "_"
-        }
-    }
-});
-
-require(["chai", "sinon-chai"].concat(allTestFiles), function (chai, chaiSinon) {
-    chai.use(chaiSinon);
-    window.expect = chai.expect;
-    window.__karma__.start();
-});
+        window.expect = chai.expect;
+        window.__karma__.start();
+    });
+}());

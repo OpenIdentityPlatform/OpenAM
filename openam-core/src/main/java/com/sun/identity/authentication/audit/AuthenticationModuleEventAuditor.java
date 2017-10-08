@@ -89,14 +89,8 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
         String realm = getRealmFromState(loginState);
 
         if (eventPublisher.isAuditing(realm, AUTHENTICATION_TOPIC, AM_LOGIN_MODULE_COMPLETED)) {
-            String principalName = principal == null ? null : principal.getName();
-            Map sharedState = loginState == null ? emptyMap() : loginState.getSharedState();
+            String principalName = principal == null ? getFailedPrincipal(loginState) : principal.getName();
             String authId = getUserId(principalName, realm);
-
-            if ((isEmpty(principalName) || isEmpty(authId)) && sharedState.containsKey(SHARED_STATE_USERNAME)) {
-                principalName = (String) sharedState.get(SHARED_STATE_USERNAME);
-                authId = getUserId(principalName, realm);
-            }
 
             auditModuleEvent(loginState, realm, principalName, authId, FAILED, auditEntryDetail);
         }

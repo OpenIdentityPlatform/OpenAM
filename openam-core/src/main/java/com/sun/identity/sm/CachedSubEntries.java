@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,12 @@
  *
  * $Id: CachedSubEntries.java,v 1.10 2008/07/11 01:46:21 arviranga Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.am.util.Cache;
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.openam.utils.Time.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +37,17 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class CachedSubEntries {
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.schema.CoreSchema;
+
+import com.iplanet.am.util.Cache;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.shared.debug.Debug;
+
+public class CachedSubEntries implements SMSEventListener{
     // Cache of CachedSubEntries based on lowercased DN to obtain sub entries
     protected static Map smsEntries = Collections.synchronizedMap(
         new HashMap(100));
@@ -53,7 +60,7 @@ public class CachedSubEntries {
 
     protected CachedSMSEntry cachedEntry;
 
-    protected String notificationID;
+    private final SMSEventListenerManager.Subscription subscription;
 
     // Debug & I18n variables
     private static Debug debug = SMSEntry.debug;
@@ -63,8 +70,7 @@ public class CachedSubEntries {
         try {
             cachedEntry = CachedSMSEntry.getInstance(t, dn);
             // Register for notifications to clear instance cache
-            notificationID = SMSEventListenerManager
-                .notifyChangesToSubNodes(t, dn, this);
+            subscription = SMSEventListenerManager.registerForNotifyChangesToSubNodes(dn, this);
         } catch (SSOException ssoe) {
             // invalid ssoToken
             debug.warning("CachedSubEntries::init Invalid SSOToken", ssoe);
@@ -95,8 +101,8 @@ public class CachedSubEntries {
                     "cache: " + subEntries);
             }
             // Check if cached entries can be used
-            if (CachedSMSEntry.ttlEnabled && ((System.currentTimeMillis() -
-                lastUpdated) > CachedSMSEntry.ttl)) {
+            if (CachedSMSEntry.ttlEnabled && ((currentTimeMillis() -
+                    lastUpdated) > CachedSMSEntry.ttl)) {
                 // Clear the cache
                 ssoTokenToSubEntries.clear();
             } else {
@@ -110,7 +116,7 @@ public class CachedSubEntries {
             Set answer = new LinkedHashSet(subEntries);
             ssoTokenToSubEntries.put(tokenID, answer);
             subEntries = new LinkedHashSet(answer);
-            lastUpdated = System.currentTimeMillis();
+            lastUpdated = currentTimeMillis();
         }
         if (debug.messageEnabled()) {
             debug.message("CachedSubEntries:getSubEntries Entries from " +
@@ -188,15 +194,17 @@ public class CachedSubEntries {
 
     protected void update() {
         if (debug.messageEnabled()) {
-            debug.message("CachedSubEntries::update called for dn: " 
+            debug.message("CachedSubEntries::update called for dn: "
                 + cachedEntry.getDN());
         }
         // Clear the cache, will be updated in the next lookup
         ssoTokenToSubEntries.clear();
     }
 
+    @Override
     protected void finalize() throws Throwable {
-        SMSEventListenerManager.removeNotification(notificationID);
+        super.finalize();
+        subscription.cancel();
     }
 
     /**
@@ -282,6 +290,22 @@ public class CachedSubEntries {
                 items.hasNext();) {
                 CachedSubEntries entry = (CachedSubEntries) items.next();
                 entry.update();
+            }
+        }
+    }
+
+    @Override
+    public void notifySMSEvent(DN dn, int event) {
+        if (dn != null) {
+            // We do not cache Realm names.
+            // We cache only service names and policy names.
+
+            if (!dn.rdn().getFirstAVA().getAttributeType().matches(CoreSchema.getOAttributeType())) {
+                if (event == SMSObjectListener.ADD) {
+                    add(LDAPUtils.rdnValueFromDn(dn));
+                } else {
+                    remove(LDAPUtils.rdnValueFromDn(dn));
+                }
             }
         }
     }

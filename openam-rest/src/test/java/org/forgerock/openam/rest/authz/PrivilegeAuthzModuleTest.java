@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -25,7 +25,6 @@ import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAs
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 
@@ -34,13 +33,19 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
+
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.openam.authz.PrivilegeDefinition;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTest;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 import org.forgerock.http.routing.RoutingMode;
@@ -72,6 +77,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -83,7 +89,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Unit test for {@link org.forgerock.openam.rest.authz.PrivilegeAuthzModule}.
+ * Unit test for {@link CrestPrivilegeAuthzModule}.
  *
  * @since 12.0.0
  */
@@ -120,6 +126,10 @@ public class PrivilegeAuthzModuleTest {
     private Session session;
     @Mock
     private SessionCache sessionCache;
+    @Mock
+    private SSOTokenManager ssoTokenManager;
+    private RealmTestHelper realmTestHelper;
+    private Realm subrealm;
 
     private CrestAuthorizationModule module;
 
@@ -135,11 +145,21 @@ public class PrivilegeAuthzModuleTest {
         given(coreWrapper.convertOrgNameToRealmName("realmdn")).willReturn("/abc");
         given(sessionCache.getSession(any(SessionID.class))).willReturn(session);
 
-        module = new PrivilegeAuthzModule(evaluator, definitions, factory, sessionCache, coreWrapper);
+        module = new CrestPrivilegeAuthzModule(evaluator, definitions, factory, coreWrapper, ssoTokenManager);
 
         Session session = mock(Session.class);
         given(subjectContext.getCallerSession()).willReturn(session);
         given(session.getClientDomain()).willReturn("realmdn");
+
+        given(subjectContext.getCallerSSOToken()).willReturn(token);
+        realmTestHelper = new RealmTestHelper(coreWrapper);
+        realmTestHelper.setupRealmClass();
+        subrealm = realmTestHelper.mockRealm("abc");
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -153,6 +173,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(token, permission, ENVIRONMENT)).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -163,9 +184,8 @@ public class PrivilegeAuthzModuleTest {
         final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
-        final RealmContext context = new RealmContext(subjectContext);
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final ReadRequest request = Requests.newReadRequest("/policies/123");
-        context.setSubRealm("abc", "abc");
         Promise<ResourceResponse, ResourceException> result = router.handleRead(context, request);
 
         // Then...
@@ -183,6 +203,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
         Promise<QueryResponse, ResourceException> promise = Promises.newResultPromise(Responses.newQueryResponse("abc-def"));
@@ -194,8 +215,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final QueryRequest request = Requests.newQueryRequest("/policies");
         Promise<QueryResponse, ResourceException> result = router.handleQuery(context, request, handler);
 
@@ -215,6 +235,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -226,8 +247,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> result = router.handleCreate(context, request);
 
@@ -246,6 +266,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -257,8 +278,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final UpdateRequest request = Requests.newUpdateRequest("/policies/123", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> result = router.handleUpdate(context, request);
 
@@ -277,6 +297,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -288,8 +309,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final DeleteRequest request = Requests.newDeleteRequest("/policies/123");
         Promise<ResourceResponse, ResourceException> result = router.handleDelete(context, request);
 
@@ -308,6 +328,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
@@ -319,8 +340,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final PatchRequest request = Requests.newPatchRequest("/policies/123", PatchOperation.add("abc", "123"));
         Promise<ResourceResponse, ResourceException> result = router.handlePatch(context, request);
 
@@ -339,6 +359,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
@@ -350,13 +371,43 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final ActionRequest request = Requests.newActionRequest("/policies", "evaluate");
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
         // Then...
         assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
+    }
+
+    @Test
+    public void crestActionEvaluateWithInvalidSession() throws SSOException, DelegationException {
+        // Given...
+        final Set<String> actions = new HashSet<>(Arrays.asList("READ"));
+        final DelegationPermission permission = new DelegationPermission(
+                "/abc", "rest", "1.0", "policies", "evaluate", actions, EXTENSIONS, DUMB_FUNC);
+        given(factory.newInstance("/abc", "rest", "1.0", "policies", "evaluate", actions, EXTENSIONS))
+                .willReturn(permission);
+
+        given(subjectContext.getCallerSSOToken()).willReturn(token);
+        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+
+        Session session = mock(Session.class);
+        given(subjectContext.getCallerSession()).willReturn(session);
+
+        given(ssoTokenManager.isValidToken(token)).willReturn(false);
+        given(session.getClientDomain()).willReturn("realmdn");
+
+        // When...
+        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
+        final Router router = new Router();
+        router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
+
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
+        final ActionRequest request = Requests.newActionRequest("/policies", "evaluate");
+        Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
+
+        // Then...
+        assertThat(result).failedWithException().isInstanceOf(ForbiddenException.class);
     }
 
     @Test
@@ -370,6 +421,7 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
@@ -381,8 +433,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final ActionRequest request = Requests.newActionRequest("/policies", "blowup");
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
@@ -397,7 +448,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final Context context = new RealmContext(subjectContext);
+        final Context context = new RealmContext(subjectContext, Realm.root());
         final ActionRequest request = Requests.newActionRequest("/policies", "unknownAction");
         Promise<ActionResponse, ResourceException> promise = router.handleAction(context, request);
 
@@ -416,19 +467,18 @@ public class PrivilegeAuthzModuleTest {
 
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(false);
+        given(ssoTokenManager.isValidToken(token)).willReturn(true);
 
         // When...
         final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, Router.uriTemplate("/policies"), chain);
 
-        final RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm("abc", "abc");
+        final RealmContext context = new RealmContext(subjectContext, subrealm);
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         Promise<ResourceResponse, ResourceException> promise = router.handleCreate(context, request);
 
         // Then...
         assertThat(promise).failedWithException().isInstanceOf(ForbiddenException.class);
     }
-
 }

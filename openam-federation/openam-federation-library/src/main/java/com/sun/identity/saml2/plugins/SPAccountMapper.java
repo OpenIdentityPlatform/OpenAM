@@ -24,7 +24,7 @@
  *
  * $Id: SPAccountMapper.java,v 1.5 2008/08/19 19:11:15 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.plugins;
 
@@ -80,7 +80,7 @@ public interface SPAccountMapper {
      * @param realm The hosted SP's realm.
      * @param hostEntityID The hosted SP's entityID.
      * @param remoteEntityID The remote IdP's entityID.
-     * @param nameIDFormat The non-transient, non-persistent NameID-Format in question.
+     * @param nameIDFormat The non-transient NameID-Format in question.
      * @return <code>true</code> if the provided NameID-Format should be persisted in the user data store,
      * <code>false</code> otherwise.
      */

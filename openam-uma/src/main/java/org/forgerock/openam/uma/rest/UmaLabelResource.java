@@ -11,62 +11,81 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
+import static org.forgerock.json.JsonValueFunctions.enumConstant;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+import static org.forgerock.openam.rest.RestUtils.isContractConformantUserProvidedIdCreate;
 import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Set;
 
 import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import java.util.Collections;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Create;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
  * A collection provider for UMA Labels.
  * @Since 13.0.0
  */
-public class UmaLabelResource implements CollectionResourceProvider {
-
+@CollectionProvider(
+        details = @Handler(
+                mvccSupported = true,
+                title = UMA_LABEL_RESOURCE + TITLE,
+                description =  UMA_LABEL_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(fromType = ResourceSetLabel.class),
+                parameters = {
+                        @Parameter(
+                                name = "user",
+                                type = "string",
+                                description = UMA_LABEL_RESOURCE + "pathparams.user")}),
+        pathParam = @Parameter(
+                name = "umaLabelId",
+                type = "string",
+                description = UMA_LABEL_RESOURCE + PATH_PARAM + DESCRIPTION))
+public class UmaLabelResource {
     private static final Debug debug = Debug.getInstance("umaLabel");
     private static final String TYPE_LABEL = "type";
     private static final String NAME_LABEL = "name";
@@ -84,19 +103,16 @@ public class UmaLabelResource implements CollectionResourceProvider {
         this.localeContextProvider = localeContextProvider;
     }
 
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
-            ActionRequest actionRequest) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
-            ActionRequest actionRequest) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    @Override
+    @Create(operationDescription =
+    @Operation(
+            description = UMA_LABEL_RESOURCE + CREATE_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = INTERNAL_ERROR,
+                            description = UMA_LABEL_RESOURCE + CREATE + ERROR_500_DESCRIPTION),
+                    @ApiError(
+                            code = CONFLICT,
+                            description = UMA_LABEL_RESOURCE + CREATE + ERROR_409_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
         final JsonValue umaLabel = createRequest.getContent();
@@ -116,6 +132,11 @@ public class UmaLabelResource implements CollectionResourceProvider {
         try {
             label = labelStore.create(realm, userName, new ResourceSetLabel(null, labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
             return newResultPromise(newResourceResponse(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
+        } catch (ConflictException e) {
+            if (isContractConformantUserProvidedIdCreate(serverContext, createRequest)) {
+                return new PreconditionFailedException(e.getMessage()).asPromise();
+            }
+            return e.asPromise();
         } catch (ResourceException e) {
             return e.asPromise();
         }
@@ -124,7 +145,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
     private void validate(JsonValue umaLabel) throws BadRequestException {
         try {
             umaLabel.get(TYPE_LABEL).required();
-            umaLabel.get(TYPE_LABEL).asEnum(LabelType.class);
+            umaLabel.get(TYPE_LABEL).as(enumConstant(LabelType.class));
             umaLabel.get(NAME_LABEL).required();
         } catch (JsonValueException e) {
             debug.error("Invalid Json - " + e.getMessage());
@@ -132,7 +153,11 @@ public class UmaLabelResource implements CollectionResourceProvider {
         }
     }
 
-    @Override
+    @Delete(operationDescription = @Operation(
+            description = UMA_LABEL_RESOURCE + DELETE_DESCRIPTION,
+            errors = {@ApiError(
+                    code = BAD_REQUEST,
+                    description = UMA_LABEL_RESOURCE + DELETE + ERROR_400_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String labelId,
             DeleteRequest deleteRequest) {
         try {
@@ -159,13 +184,10 @@ public class UmaLabelResource implements CollectionResourceProvider {
         return revision.equals(String.valueOf(resourceSetLabel.hashCode()));
     }
 
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
-            PatchRequest patchRequest) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    @Override
+    @Query(operationDescription = @Operation(
+            description = UMA_LABEL_RESOURCE + QUERY_DESCRIPTION),
+            type = QueryType.FILTER,
+            queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
             QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         if (!queryRequest.getQueryFilter().toString().equals("true")) {
@@ -210,26 +232,13 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     private String resolveResourceServerName(String resourceServerId, final String realm, LocaleContext
-            localeContext, Context serverContext)
-            throws InternalServerErrorException {
+            localeContext, Context serverContext) throws InternalServerErrorException {
         try {
             ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, realm, serverContext);
             return clientRegistration.getDisplayName(localeContext.getLocale());
         } catch (InvalidClientException | NotFoundException e) {
             throw new InternalServerErrorException("Could not resolve Resource Server label name", e);
         }
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
-            ReadRequest readRequest) {
-        return new NotSupportedException("Not supported.").asPromise();
-    }
-
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
-            UpdateRequest updateRequest) {
-        return new NotSupportedException("Not supported.").asPromise();
     }
 
     private String getRealm(Context context) {

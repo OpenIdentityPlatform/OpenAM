@@ -28,19 +28,20 @@
  */
 package com.sun.identity.sm.ldap;
 
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.sm.SMSDataEntry;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.ByteString;
-import org.opends.server.types.Attribute;
-import org.opends.server.types.SearchResultEntry;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.ByteString;
+import org.opends.server.types.Attribute;
+import org.opends.server.types.SearchResultEntry;
+
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.sm.SMSDataEntry;
 
 
 /**
@@ -113,7 +114,7 @@ public class EmbeddedSearchResultIterator implements Iterator<SMSDataEntry> {
                     if (answer == null) {
                         answer = new CaseInsensitiveHashMap<>(10);
                     }
-                    answer.put(attr.getName(), strValues);
+                    answer.put(attr.getAttributeDescription().toString(), strValues);
                 }
             }
         }

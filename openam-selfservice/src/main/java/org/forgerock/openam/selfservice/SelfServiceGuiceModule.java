@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.selfservice;
 
@@ -23,24 +23,24 @@ import static org.forgerock.openam.selfservice.config.beans.UserRegistrationCons
 import com.google.inject.Injector;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.ElevatedConnectionFactoryWrapper;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactory;
 import org.forgerock.openam.selfservice.config.ServiceConfigProviderFactoryImpl;
 import org.forgerock.openam.selfservice.config.beans.ForgottenPasswordConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.ForgottenUsernameConsoleConfig;
 import org.forgerock.openam.selfservice.config.beans.UserRegistrationConsoleConfig;
+import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.selfservice.core.ProcessStore;
 import org.forgerock.selfservice.core.ProgressStage;
@@ -63,22 +63,15 @@ public final class SelfServiceGuiceModule extends PrivateModule {
 
     @Override
     protected void configure() {
-        install(new FactoryModuleBuilder()
-                .implement(SnapshotTokenHandlerFactory.class, JwtSnapshotTokenHandlerFactory.class)
-                .build(new TypeLiteral<KeyPairInjector<SnapshotTokenHandlerFactory>>() { }));
-
         bind(ProcessStore.class).to(ProcessStoreImpl.class);
         bind(ServiceConfigProviderFactory.class).to(ServiceConfigProviderFactoryImpl.class);
+        bind(SnapshotTokenHandlerFactory.class).to(JwtSnapshotTokenHandlerFactory.class);
         bind(SelfServiceFactory.class).to(SelfServiceFactoryImpl.class);
         bind(KbaResource.class);
 
-        try {
-            bind(Client.class)
-                    .annotatedWith(SelfService.class)
-                    .toInstance(new Client(new HttpClientHandler()));
-        } catch (HttpApplicationException haE) {
-            throw new HttpClientCreationException("Unable to create http client", haE);
-        }
+        bind(Client.class)
+                .annotatedWith(SelfService.class)
+                .toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
 
         // Registration CREST services
         expose(new TypeLiteral<SelfServiceRequestHandler<UserRegistrationConsoleConfig>>() { });
@@ -132,9 +125,10 @@ public final class SelfServiceGuiceModule extends PrivateModule {
     @Singleton
     @SelfService
     ConnectionFactory getConnectionFactory(@Named("InternalCrestRouter") Router router,
-            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
+            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction, SSOTokenContext.Factory contextFactory) {
         ConnectionFactory internalConnectionFactory = newInternalConnectionFactory(router);
-        return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction);
+        return new ElevatedConnectionFactoryWrapper(internalConnectionFactory, ssoTokenPrivilegedAction,
+                contextFactory);
     }
 
     @Provides

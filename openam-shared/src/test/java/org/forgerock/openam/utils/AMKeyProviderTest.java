@@ -11,35 +11,44 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
-import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.security.EncodeAction;
-import com.sun.identity.shared.encode.URLEncDec;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.AccessController;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import javax.crypto.SecretKey;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.iplanet.services.util.Crypt;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.encode.URLEncDec;
+
 public class AMKeyProviderTest {
 
-    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks")
+    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jceks")
             .getFile());
-    private static final String KEY_STORE_TYPE = "JKS";
+    private static final String KEY_STORE_TYPE = "JCEKS";
     private static final String KEY_STORE_PASS = "testcase";
     private static final String DEFAULT_PRIVATE_KEY_PASS = "testcase";
     private static final String PRIVATE_KEY_PASS = "keypass";
     private static final String DEFAULT_PRIVATE_KEY_ALIAS = "defaultkey";
     private static final String PRIVATE_KEY_ALIAS = "privatekey";
+    private static final String SECRET_KEY_ALIAS = "secretkey";
 
-    KeyProvider amKeyProvider;
+    //KeyProvider amKeyProvider;
+    AMKeyProvider amKeyProvider; // need more specific type for the additional password store methods
 
     @BeforeClass
     public void setUp() {
@@ -107,4 +116,43 @@ public class AMKeyProviderTest {
         PrivateKey key = amKeyProvider.getPrivateKey(PRIVATE_KEY_ALIAS);
         Assert.assertNull(key);
     }
+
+    @Test
+    public void getSecretKeyUsingDefaultPassword() {
+        SecretKey key = amKeyProvider.getSecretKey(SECRET_KEY_ALIAS);
+        Assert.assertNotNull(key);
+    }
+
+    @Test
+    public void storeAndRetrievePassword() throws KeyStoreException {
+        String password = "the rain in spain!!";
+        amKeyProvider.setSecretKeyEntry("admin", password);
+        String p = amKeyProvider.getSecret("admin");
+        Assert.assertEquals(password, p);
+    }
+
+    @Test
+    public void readPasswordFileDecryptsThePassword() throws IOException {
+        Path tempFile = Files.createTempFile("keyprovidertest", ".tmp");
+        String plainText = "MySuperSecret Password!";
+        String pw = Crypt.encode(plainText); // encode using Crypt util
+
+        // ensure that an encrypted password gets decoded
+        Assert.assertTrue(AMKeyProvider.decodePassword(pw).equals(plainText));
+        // ensure that a plain text password gets "decoded" - even if it is not encrypted
+        Assert.assertTrue(AMKeyProvider.decodePassword(plainText).equals(plainText));
+
+
+        // Write an encrypted password to a file
+        Files.write(tempFile, pw.getBytes());
+        // read it back
+        String result = amKeyProvider.readPasswordFile(tempFile.toString());
+        Assert.assertEquals(result, plainText);  // we should get the plain text back
+        // now write a plain vanilla password to the file
+        Files.write(tempFile, plainText.getBytes());
+        result = amKeyProvider.readPasswordFile(tempFile.toString());
+        Assert.assertEquals(result, plainText);
+        Files.delete(tempFile); // clean up after test
+    }
+
 }

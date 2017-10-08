@@ -26,10 +26,19 @@
  */
 
 /**
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2016 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.session;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -37,6 +46,7 @@ import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMConsoleConfig;
 import com.sun.identity.console.base.AMViewConfig;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -47,10 +57,7 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import com.sun.web.ui.model.CCActionTableModel;
-import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
@@ -62,13 +69,9 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 public class SMProfileViewBean
     extends SMViewBeanBase
@@ -188,54 +191,52 @@ public class SMProfileViewBean
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException
     {
-        if (validSession) {
-            super.beginDisplay(event);
-            SMProfileModel model = (SMProfileModel)getModel();
-            Map map = model.getServerNames();
-            OptionList optList = new OptionList();
-            CCDropDownMenu child = 
-                (CCDropDownMenu)getChild(CHILD_SERVER_NAME_MENU);
-            String value = (String)child.getValue();
-            if (map != null &&  !map.isEmpty()) {
-                for (Iterator iter=map.keySet().iterator(); iter.hasNext(); ) {
-                    String str = (String)iter.next();
-                    String val = (String)map.get(str);
-                    optList.add(str, val);
-                    if (value == null) {
-                        child.setValue(val);
+        if (isXuiAdminConsoleEnabled()) {
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.TOP_LEVEL_REALM_SESSIONS, authenticationRealm);
+        } else {
+            if (validSession) {
+                super.beginDisplay(event);
+                SMProfileModel model = (SMProfileModel) getModel();
+                Map map = model.getServerNames();
+                OptionList optList = new OptionList();
+                CCDropDownMenu child =
+                        (CCDropDownMenu) getChild(CHILD_SERVER_NAME_MENU);
+                String value = (String) child.getValue();
+                if (map != null && !map.isEmpty()) {
+                    for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
+                        String str = (String) iter.next();
+                        String val = (String) map.get(str);
+                        optList.add(str, val);
+                        if (value == null) {
+                            child.setValue(val);
+                        }
                     }
                 }
-            }
-            child.setOptions(optList);
-            value = (String)child.getValue();
-            model.setProfileServerName(value);
-            SMSessionCache cache = null;
-            try {
-                cache = model.getSessionCache(getFilterString());
-                if (cache != null) {
-                    populateTableModel(cache.getSessions());
-                    String errorMessage = cache.getErrorMessage();
-                    if (errorMessage != null && errorMessage.length() > 0) {
-                        setInlineAlertMessage(CCAlert.TYPE_WARNING, 
-                            "message.warning", errorMessage);
+                child.setOptions(optList);
+                value = (String) child.getValue();
+                model.setProfileServerName(value);
+                SMSessionCache cache = null;
+                try {
+                    cache = model.getSessionCache(getFilterString());
+                    if (cache != null) {
+                        populateTableModel(cache.getSessions());
+                        String errorMessage = cache.getErrorMessage();
+                        if (errorMessage != null && errorMessage.length() > 0) {
+                            setInlineAlertMessage(CCAlert.TYPE_WARNING,
+                                    "message.warning", errorMessage);
+                        }
                     }
+                } catch (AMConsoleException ae) {
+                    setInlineAlertMessage(CCAlert.TYPE_ERROR,
+                            "message.error", ae.getMessage());
                 }
-            } catch (AMConsoleException ae) {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, 
-                    "message.error", ae.getMessage());
-            }
-            if (cache == null) {           
-                populateTableModel(Collections.EMPTY_LIST);
-            }
-            setPageSessionAttribute(SERVER_NAME, value);
-            // Set our Sub-Tabs
-            addSessionsTab(model,1);
-            // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
-            // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
-            if ( (!SystemPropertiesManager.get(CoreTokenConstants.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
-                 (SystemPropertiesManager.get(CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
-            {
-                removeSessionsTab();
+                if (cache == null) {
+                    populateTableModel(Collections.EMPTY_LIST);
+                }
+                setPageSessionAttribute(SERVER_NAME, value);
+                // Set our Sub-Tabs
+                addSessionsTab(model, 1);
             }
         }
     }
@@ -246,25 +247,6 @@ public class SMProfileViewBean
         config.addSessionTabs(tabModel, model);
         registerChild(TAB_COMMON, CCTabs.class);
         tabModel.setSelectedNode(selectedNode);
-    }
-
-    // Remove all Session Tabs, since HA not available, disable associated Tabs.
-    protected void removeSessionsTab() {
-        if (tabModel != null) {
-            tabModel.clear();
-            // removeSessionsTab(551); Current Sessions, Leave!
-            removeSessionsTab(552);
-        }
-    }
-
-    private void removeSessionsTab(int tabNodeId) {
-            CCNavNodeInterface tabNode = tabModel.getNodeById(tabNodeId);
-            if (tabNode != null)
-            {
-                tabNode.setVisible(false);
-                tabNode.setAcceptsChildren(false);
-                tabNode.getParent().removeChild(tabNode);
-            }
     }
 
     /**

@@ -16,13 +16,14 @@
 
 package org.forgerock.openam.core.rest.session;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
@@ -33,6 +34,7 @@ import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -62,23 +64,23 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
 
     private final SSOTokenManager ssoTokenManager;
     private final Set<String> allowedActions;
-    private final String tokenId;
+    private final String tokenIdParameter;
 
     /**
      * Creates an authz module that will verify that a tokenId provided by the user (via query params)
      * is the same user (via universal identifier) as the user requesting the action.
      *
-     * @param tokenId The tokenId query parameter. May not be null.
+     * @param tokenIdParameter The tokenId query parameter. May not be null.
      * @param ssoTokenManager An instance of the SSOTokenManager.
      * @param allowedActions A list of allowed actions. Will be matched ignoring case.
      */
-    public TokenOwnerAuthzModule(String tokenId, SSOTokenManager ssoTokenManager, String... allowedActions) {
+    public TokenOwnerAuthzModule(String tokenIdParameter, SSOTokenManager ssoTokenManager, String... allowedActions) {
         Reject.ifNull(allowedActions);
-        Reject.ifTrue(StringUtils.isEmpty(tokenId));
+        Reject.ifTrue(StringUtils.isEmpty(tokenIdParameter));
 
         this.ssoTokenManager = ssoTokenManager;
         this.allowedActions = new HashSet<>(Arrays.asList(allowedActions));
-        this.tokenId = tokenId;
+        this.tokenIdParameter = tokenIdParameter;
     }
 
     @Override
@@ -132,16 +134,16 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
         return new ForbiddenException().asPromise();
     }
 
-    private boolean isTokenOwner(Context context, ActionRequest request)
-            throws ResourceException, SSOException {
+    boolean isTokenOwner(Context context, Request request) throws ResourceException, SSOException {
         String loggedInUserId = getUserId(context);
 
-        final String queryTemp = request.getAdditionalParameter(tokenId);
-        if (StringUtils.isEmpty(queryTemp)) { //if there's no tokenId then we're talking about ourselves
-            return true;
+        String tokenId =  request.getResourcePath(); // infer from the token from resource path
+        if (StringUtils.isEmpty(tokenId)) {
+            //if there's no tokenId then is it supplied as additional parameter
+            tokenId = request.getAdditionalParameter(tokenIdParameter);
         }
 
-        final String queryUsername = ssoTokenManager.createSSOToken(queryTemp).getProperty(Constants.UNIVERSAL_IDENTIFIER);
+        final String queryUsername = ssoTokenManager.createSSOToken(tokenId).getProperty(Constants.UNIVERSAL_IDENTIFIER);
         return queryUsername.equalsIgnoreCase(loggedInUserId);
     }
 
@@ -155,7 +157,7 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
         return false;
     }
 
-    private String getUserId(Context context) throws ResourceException {
+    String getUserId(Context context) throws ResourceException {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
 
         try {

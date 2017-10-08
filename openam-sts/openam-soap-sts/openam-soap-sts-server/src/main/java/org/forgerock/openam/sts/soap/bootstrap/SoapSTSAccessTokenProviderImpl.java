@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -26,16 +26,19 @@ import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.soap.config.SoapSTSModule;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @see SoapSTSAccessTokenProvider
@@ -57,6 +60,8 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
     private final String sessionServiceVersion;
     private final SoapSTSAgentCredentialsAccess credentialsAccess;
     private final Logger logger;
+
+    private static AtomicReference<String> accessTokenRef = new AtomicReference<String>();
 
     @Inject
     SoapSTSAccessTokenProviderImpl(HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
@@ -103,6 +108,9 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
 
     @Override
     public String getAccessToken() throws ResourceException {
+        if (StringUtils.isNotEmpty(accessTokenRef.get())) {
+            return accessTokenRef.get();
+        }
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, authNServiceVersion);
@@ -121,7 +129,10 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
                     + " : " + connectionResult.getResult());
             } else {
                 try {
-                    return amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult());
+                    if (StringUtils.isEmpty(accessTokenRef.get())) {
+                        accessTokenRef.set(amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult()));
+                    }
+                    return accessTokenRef.get();
                 } catch (TokenValidationException e) {
                     throw new InternalServerErrorException("Exception caught obtaining the soap-sts-agent token " + e,
                             e);
@@ -135,6 +146,9 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
 
     @Override
     public void invalidateAccessToken(String sessionId){
+        if (StringUtils.isEmpty(accessTokenRef.get())) {
+            return;
+        }
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, sessionServiceVersion);
@@ -153,6 +167,8 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
             }
         } catch (IOException ioe) {
             logger.error("IOException caught invalidating the soap-sts-agent token: " + ioe, ioe);
+        } finally {
+            accessTokenRef.set(null);
         }
     }
 }

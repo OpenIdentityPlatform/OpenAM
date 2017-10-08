@@ -14,21 +14,27 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/Form", [
+ /**
+ * @deprecated
+ */
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "jsonEditor",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
     "popoverclickaway", // depends on jquery and bootstrap
     "selectize" // jquery dependencies
 ], function ($, _, JSONEditor, JSONEditorTheme) {
     var obj = function Form (element, schema, values) {
+        console.warn("[Form] \"Form\" is deprecated. Use a FlatJSONSchemaView or GroupedJSONSchemaView instead.");
+
         this.element = element;
         this.schema = schema;
         this.values = values;
 
         // Attributes that are identifiable as passwords
-        this.passwordAttributes = _.pluck(_.where(schema.properties, { format: "password" }), "_id");
+        const passwordProperties = _.where(schema.properties, { format: "password" });
+        this.passwordAttributes = _.map(passwordProperties, (property) => _.findKey(schema.properties, property));
 
         JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(6, 4);
@@ -36,9 +42,8 @@ define("org/forgerock/openam/ui/admin/models/Form", [
         this.editor = new JSONEditor(element, {
             "disable_collapse": true,
             "disable_edit_json": true,
-            "disable_properties": true,
             "iconlib": "fontawesome4",
-            "schema": schema,
+            schema,
             "theme": "openam"
         });
 
@@ -92,6 +97,10 @@ define("org/forgerock/openam/ui/admin/models/Form", [
 
     obj.prototype.reset = function () {
         this.editor.setValue(_.pick(this.values, _.keys(this.schema.properties)));
+    };
+
+    obj.prototype.destroy = function () {
+        this.editor.destroy();
     };
 
     return obj;

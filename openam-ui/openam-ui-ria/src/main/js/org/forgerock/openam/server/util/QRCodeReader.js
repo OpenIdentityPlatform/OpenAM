@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/server/util/QRCodeReader", [
+define([
     "jquery",
     "qrcode"
 ], function ($, QRCodeReader) {
@@ -25,7 +25,8 @@ define("org/forgerock/openam/server/util/QRCodeReader", [
             qr.addData(options.text);
             qr.make();
 
-            return qr.createImgTag();
+            //3 is the size of the painted squares, 8 is the white border around the edge
+            return qr.createImgTag(3, 8);
         };
 
     /**
@@ -41,12 +42,16 @@ define("org/forgerock/openam/server/util/QRCodeReader", [
      * @param  {String} id - used to select target.
      */
     obj.createCode = function (options) {
-        var code = getCode(options),
-            element = $("<div class='text-center'/>");
+        const code = getCode(options);
+        const element = $("<div class='text-center'/>");
         element.append(code);
-
-        $("#" + options.id).append(element);
-
+        const container = $(`#${options.id}`);
+        container.append(element);
+        container.append(
+            `<div class="form-group">
+                <a href="${options.text}" class="btn btn-lg btn-block btn-uppercase btn-default"
+                >${$.t("templates.user.LoginTemplate.onMobileDevice")}</a>
+            </div>`);
     };
 
     return obj;

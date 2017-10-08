@@ -96,12 +96,12 @@ public class Saml2BearerServerResource extends ServerResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final AccessTokenService accessTokenService;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     @Inject
-    public Saml2BearerServerResource(final OAuth2RequestFactory<?, Request> requestFactory,
+    public Saml2BearerServerResource(final OAuth2RequestFactory requestFactory,
             final AccessTokenService accessTokenService, JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;

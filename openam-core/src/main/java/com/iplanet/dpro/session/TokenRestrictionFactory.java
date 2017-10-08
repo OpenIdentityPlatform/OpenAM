@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,34 +24,45 @@
  *
  * $Id: TokenRestrictionFactory.java,v 1.3 2008/06/25 05:41:29 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
 
-import com.sun.identity.shared.encode.Base64;
-import org.forgerock.openam.utils.IOUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.net.UnknownHostException;
+import java.security.AccessController;
+import java.util.Set;
+
+import org.forgerock.openam.dpro.session.NoOpTokenRestriction;
+import org.forgerock.openam.utils.IOUtils;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
- * Helper class to marshal/unmarshal a Token Restriction object.
+ * Factory for creating {@link TokenRestriction} instances.
  */
 
 public class TokenRestrictionFactory {
+
+    private static final String AM_SESSION_SERVICE = "iPlanetAMSessionService";
+
     /**
      * Serializes the restriction object.
      * 
-     * @param tr Token Restriction object to be serialized.
-     * @return a serialized form of the restriction object
+     * @param tokenRestriction Token Restriction object to be serialized.
+     * @return a serialized form of the restriction object.
      * @throws Exception if the there was an error.
      */
-    public static String marshal(TokenRestriction tr) throws Exception {
-        // perform general Java serialization
+    public static String marshal(TokenRestriction tokenRestriction) throws Exception {
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(bs);
-        os.writeObject(tr);
+        os.writeObject(tokenRestriction);
         os.flush();
         os.close();
         return Base64.encode(bs.toByteArray());
@@ -60,12 +71,42 @@ public class TokenRestrictionFactory {
     /**
      * Deserialize the string into Token Restriction object.
      * 
-     * @param data Token Restriction object in the string format
+     * @param data Token Restriction object in the string format.
      * @return a Token Restriction object.
      * @throws Exception if the there was an error.
      */
     public static TokenRestriction unmarshal(String data) throws Exception {
-        // perform general Java deserialization
         return IOUtils.deserialise(Base64.decode(data), false);
+    }
+
+    /**
+     * Create a new instance of {@link NoOpTokenRestriction},
+     * which always satisfies the restriction.
+     *
+     * @return a new instance of {@link NoOpTokenRestriction}.
+     */
+    public NoOpTokenRestriction createNoOpTokenRestriction() {
+        return new NoOpTokenRestriction();
+    }
+
+    /**
+     * Create a new instance of {@link DNOrIPAddressListTokenRestriction},
+     * which handles the restriction of the {@code DN} or {@code IPAddress}.
+     *
+     * @return a new instance of {@link DNOrIPAddressListTokenRestriction}.
+     * @param dn the {@code DN} of the user.
+     * @param hostNames the list of host names.
+     * @throws UnknownHostException if the host cannot be resolved.
+     * @throws SSOException if the single sign on token is invalid or expired.
+     * @throws SMSException if an error occurred while trying to perform the operation.
+     */
+    public DNOrIPAddressListTokenRestriction createDNOrIPAddressListTokenRestriction(
+            String dn,
+            Set<String> hostNames) throws UnknownHostException, SSOException, SMSException {
+
+        ServiceSchemaManager serviceSchemaManager = new ServiceSchemaManager(
+                AM_SESSION_SERVICE,
+                AccessController.doPrivileged(AdminTokenAction.getInstance()));
+        return new DNOrIPAddressListTokenRestriction(dn, hostNames, serviceSchemaManager);
     }
 }

@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.saml2;
@@ -311,11 +311,13 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
             }
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Unexpected SAML2SubjectConfirmation in AMSAMLTokenProvider: " + subjectConfirmation);
-        } finally {
+        } catch (TokenCreationException e) {
             if (consumptionToken != null) {
                 invalidateTokenGenerationServiceConsumptionToken(consumptionToken);
             }
+            throw e;
         }
+
     }
 
 }

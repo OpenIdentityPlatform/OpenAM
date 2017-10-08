@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2011-2016 ForgeRock AS.
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at legal/CDDLv1.0.txt.
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file at legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+ <Service name="iPlanetAMAuthSampleAuthService" version="1.0">
+  <Schema
+   serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthSampleAuthService"
+   i18nFileName="amAuthSampleAuth" revisionNumber="10"
+   i18nKey="sampleauth-service-description" resourceName="sample">
+   <Organization>
+    <!-- Specify resourceName for a JSON-friendly property in the REST SMS -->
+    <AttributeSchema name="iplanet-am-auth-sampleauth-auth-level" resourceName="authLevel"
+     type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+     i18nKey="a500">
+     <DefaultValues>
+      <Value>1</Value>
+     </DefaultValues>
+    </AttributeSchema>
+
+    <!-- No need for resourceName when the name is JSON-compatible -->
+    <AttributeSchema name="specificAttribute"
+     type="single" syntax="string" validator="no" i18nKey="a501" />
+
+    <!--
+     For Auth Modules, the parent Schema element specifies the REST SMS resourceName,
+     and the nested SubSchema must have resourceName="USE-PARENT"
+    -->
+    <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+     <AttributeSchema name="iplanet-am-auth-sampleauth-auth-level" resourceName="authLevel"
+      type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+      i18nKey="a500">
+      <DefaultValues>
+       <Value>1</Value>
+      </DefaultValues>
+     </AttributeSchema>
+
+     <!-- No need for a DefaultValues element when the default is blank -->
+     <AttributeSchema name="specificAttribute"
+      type="single" syntax="string" validator="no" i18nKey="a501" />
+
+    </SubSchema>
+   </Organization>
+  </Schema>
+ </Service>
+</ServicesConfiguration>

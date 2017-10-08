@@ -14,47 +14,45 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
-    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/ServiceInvoker",
+    "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
+    "org/forgerock/openam/ui/user/services/AuthNService",
+    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, SessionDelegate,
-             URIUtils, UserModel, ViewManager) {
+    "org/forgerock/openam/ui/user/login/logout",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/gotoUrl"
+], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
-        AuthNDelegate.getRequirements().then(function (requirements) {
+        AuthNService.getRequirements(params).then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
+            _.each(requirements.callbacks, function (obj, i) {
+                if (params.hasOwnProperty(`callback_${i}`)) {
+                    populatedRequirements.callbacks[i].input[0].value = params[`callback_${i}`];
+                }
+            });
 
-            // used in auto login from self registration
-            if (params.userName && params.password && requirements.stage === "DataStore1") {
-                populatedRequirements.callbacks[0].input[0].value = params.userName;
-                populatedRequirements.callbacks[1].input[0].value = params.password;
-            } else {
-                _.each(requirements.callbacks, function (obj, i) {
-                    if (params.hasOwnProperty("callback_" + i)) {
-                        populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
-                    }
-                });
-            }
-
-            AuthNDelegate.submitRequirements(populatedRequirements).then(function (result) {
+            AuthNService.submitRequirements(populatedRequirements, params).then(function (result) {
                 if (result.hasOwnProperty("tokenId")) {
                     obj.getLoggedUser(function (user) {
                         Configuration.setProperty("loggedUser", user);
-                        self.setSuccessURL(result.tokenId).then(function () {
+                        self.setSuccessURL(result.tokenId, result.successUrl).then(function () {
                             successCallback(user);
-                            AuthNDelegate.resetProcess();
+                            AuthNService.resetProcess();
                         });
                     }, errorCallback);
                 } else if (result.hasOwnProperty("authId")) {
@@ -67,7 +65,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         var href = "#login",
                             realm = Configuration.globalData.auth.subRealm;
                         if (realm) {
-                            href += "/" + realm;
+                            href += `/${realm}`;
                         }
                         location.href = href;
                     }
@@ -83,51 +81,76 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        return UserModel.getProfile().then(successCallback, function (xhr) {
+        const sessionToken = SessionToken.get();
+        const noSessionHandler = (xhr) => {
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
-            obj.removeSessionCookie();
+            SessionToken.remove();
 
-            if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
+            if (_.get(xhr, "responseJSON.code") === 404) {
                 errorCallback("loggedIn");
             } else {
                 errorCallback();
             }
+        };
+        // TODO AME-11593 Call to idFromSession is required to populate the fullLoginURL, which we use later to
+        // determine the parameters you logged in with. We should remove the support of fragment parameters and use
+        // persistent url query parameters instead.
+        ServiceInvoker.restCall({
+            url: `${Constants.host}/${Constants.context}/json${
+                fetchUrl.default("/users?_action=idFromSession")}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            type: "POST",
+            errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
+        }).then((data) => {
+            Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
+
+        // We do not want to trigger an unauthorized error when we are getting the logged user.
+        const suppressError = { errorsHandlers : { "Unauthorized": { status: 401 } } };
+
+        if (sessionToken) {
+            return SessionService.updateSessionInfo(sessionToken, suppressError).then((data) => {
+                return UserModel.fetchById(data.username).then(successCallback);
+            }, noSessionHandler);
+        } else {
+            noSessionHandler();
+        }
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
-        // The successfulLoginURL is populated by the server (not from window.location of the browser), upon successful
-        // authentication.
-        var successfulLoginURL = Configuration.globalData.auth.fullLoginURL,
-            successfulLoginURLParams = successfulLoginURL
-                ? successfulLoginURL.substring(successfulLoginURL.indexOf("?") + 1) : "";
-
-        return URIUtils.parseQueryString(successfulLoginURLParams);
+        // The successfulLoginURL is populated by the server upon successful authentication,
+        // not from window.location of the browser.
+        const fullLoginURL = Configuration.globalData.auth.fullLoginURL;
+        const paramString = fullLoginURL ? fullLoginURL.substring(fullLoginURL.indexOf("?") + 1) : "";
+        return query.parseParameters(paramString);
     };
 
-    obj.setSuccessURL = function (tokenId) {
-        var promise = $.Deferred(),
-            urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
-            url = Configuration.globalData.auth.successURL,
-            context = "";
-        if (urlParams && urlParams.goto) {
-            AuthNDelegate.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+
+    obj.setSuccessURL = function (tokenId, successUrl) {
+        const promise = $.Deferred();
+        let context = "";
+
+        const goto = query.parseParameters().goto;
+
+        if (goto) {
+            AuthNService.validateGotoUrl(goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
-                    data.successURL.indexOf("/" + Constants.context) !== 0) {
-                    context = "/" + Constants.context;
+                    data.successURL.indexOf(`/${Constants.context}`) !== 0) {
+                    context = `/${Constants.context}`;
                 }
-                Configuration.globalData.auth.urlParams.goto = context + data.successURL;
+                gotoUrl.set(encodeURIComponent(context + data.successURL));
                 promise.resolve();
-            }, function () {
+            }, () => {
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH) {
+            if (successUrl !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
-                if (!Configuration.globalData.auth.urlParams.goto) {
-                    Configuration.globalData.auth.urlParams.goto = url;
+
+                if (!gotoUrl.exists()) {
+                    gotoUrl.set(successUrl);
                 }
             }
             promise.resolve();
@@ -136,59 +159,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.filterUrlParams = function (params) {
-        var paramsToSave = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"],
-            filteredParams = _.pick(params, paramsToSave);
-
-        return _.isEmpty(filteredParams) ? "" : "&" + $.param(filteredParams);
+        const filtered = ["arg", "authIndexType", "authIndexValue", "goto", "gotoOnFail", "ForceAuth", "locale"];
+        return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
+    // called by commons
     obj.logout = function (successCallback, errorCallback) {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
-            if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function (response) {
-                    obj.removeSessionCookie();
-
-                    successCallback(response);
-                    return true;
-
-                }, obj.removeSessionCookie);
-            } else {
-                obj.removeSessionCookie();
-                successCallback();
-            }
-        }, function () {
-            if (errorCallback) {
-                errorCallback();
-            }
-        });
-    };
-
-    obj.removeSession = function () {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
-            if (result.valid) {
-                SessionDelegate.logout(tokenCookie).then(function () {
-                    obj.removeSessionCookie();
-                });
-            }
-        });
-    };
-
-    obj.removeSessionCookie = function () {
-        var auth = Configuration.globalData.auth;
-        if (auth.cookieDomains && auth.cookieDomains.length !== 0) {
-            _.each(auth.cookieDomains, function (cookieDomain) {
-                CookieHelper.deleteCookie(auth.cookieName, "/", cookieDomain);
-            });
-        } else {
-            CookieHelper.deleteCookie(auth.cookieName, "/", location.hostname);
-        }
-    };
-
-    obj.removeAuthCookie = function () {
-        var auth = Configuration.globalData.auth;
-        CookieHelper.deleteCookie("authId", "/", auth.cookieDomains ? auth.cookieDomains : location.hostname);
+        logout.default().then(successCallback, errorCallback);
     };
 
     return obj;

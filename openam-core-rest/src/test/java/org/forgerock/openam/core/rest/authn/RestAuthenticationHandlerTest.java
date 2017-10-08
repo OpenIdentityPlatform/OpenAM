@@ -11,26 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
+
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import java.io.IOException;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.assertj.core.api.Assertions;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.rest.authn.core.AuthIndexType;
 import org.forgerock.openam.core.rest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
@@ -43,14 +52,7 @@ import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.BDDMockito.given;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -62,6 +64,7 @@ public class RestAuthenticationHandlerTest {
     private RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private AuthIdHelper authIdHelper;
+    private CoreWrapper coreWrapper;
 
     @BeforeMethod
     public void setUp() {
@@ -70,9 +73,10 @@ public class RestAuthenticationHandlerTest {
         restAuthCallbackHandlerManager = mock(RestAuthCallbackHandlerManager.class);
         amAuthErrorCodeResponseStatusMapping = mock(AMAuthErrorCodeResponseStatusMapping.class);
         authIdHelper = mock(AuthIdHelper.class);
+        coreWrapper = mock(CoreWrapper.class);
 
         restAuthenticationHandler = new RestAuthenticationHandler(loginAuthenticator, restAuthCallbackHandlerManager,
-                amAuthErrorCodeResponseStatusMapping, authIdHelper);
+                amAuthErrorCodeResponseStatusMapping, authIdHelper, coreWrapper);
     }
 
     @Test
@@ -107,7 +111,6 @@ public class RestAuthenticationHandlerTest {
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.size(), 2);
         assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
         assertTrue(response.isDefined("successUrl"));
 
@@ -263,7 +266,6 @@ public class RestAuthenticationHandlerTest {
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.size(), 2);
         assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
         assertTrue(response.isDefined("successUrl"));
         verify(loginProcess).next(callbacks);
@@ -397,7 +399,6 @@ public class RestAuthenticationHandlerTest {
                 postBody, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.size(), 2);
         assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
         assertTrue(response.isDefined("successUrl"));
 
@@ -420,7 +421,7 @@ public class RestAuthenticationHandlerTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         String module = "LDAP";
-        String existingSesssionId = "session1";
+        String existingSessionId = "session1";
 
         AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
 
@@ -432,9 +433,40 @@ public class RestAuthenticationHandlerTest {
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         // When
-        restAuthenticationHandler.initiateAuthentication(request, response, "module", module, existingSesssionId);
+        restAuthenticationHandler.initiateAuthentication(request, response, "module", module, existingSessionId);
 
         // Then
         verify(loginProcess).cleanup();
+    }
+
+    @Test
+    public void shouldReturnAbsoluteRealmInSuccessfulAuthenticationResponse() throws Exception {
+        JsonValue response = performSuccessfulAuthentication();
+        assertThat(response).stringAt("realm").isEqualTo("REALM");
+    }
+
+    private JsonValue performSuccessfulAuthentication() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
+        given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
+
+        SSOToken ssoToken = mock(SSOToken.class);
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+
+        AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
+
+        LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(true);
+        given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
+
+        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+
+        given(coreWrapper.convertOrgNameToRealmName(anyString())).willReturn("REALM");
+
+        return restAuthenticationHandler.initiateAuthentication(request, httpResponse, null, null, null);
     }
 }

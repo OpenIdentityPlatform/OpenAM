@@ -24,7 +24,7 @@
  *
  * $Id: StringAttributeConditionEvaluation.java,v 1.2 2009/08/31 19:48:45 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -54,8 +54,7 @@ public class StringAttributeConditionEvaluation {
     private static final String ATTR_VALUE = "hello";
 
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup() throws Exception {

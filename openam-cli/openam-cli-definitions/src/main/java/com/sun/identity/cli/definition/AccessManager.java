@@ -490,70 +490,6 @@ public class AccessManager {
   private String set_realm_attrs;
 
   @SubCommandInfo(
-          implClassName="com.sun.identity.cli.realm.RealmCreatePolicy",
-          description="Create policies in a realm.",
-          webSupport="true",
-          mandatoryOptions={
-                  "realm|e|s|Name of realm.",
-                  "xmlfile|X|s|Name of file that contains policy XML definition."},
-          optionAliases={},
-          macro="authentication",
-          optionalOptions={},
-          resourceStrings={
-                  "subcmd-create-policies-__web__-xmlfile=Policy XML",
-                  "create-policy-in-realm-succeed=Policies were created under realm, {0}."})
-  private String create_policies;
-
-  @SubCommandInfo(
-          implClassName="com.sun.identity.cli.realm.RealmDeletePolicy",
-          description="Delete policies from a realm.",
-          webSupport="true",
-          mandatoryOptions={"realm|e|s|Name of realm."},
-          optionAliases={},
-          macro="authentication",
-          optionalOptions={
-                  "policynames|p|m|Names of policy to be deleted.",
-                  "file|D|s|Name of file that contains the policy names to be deleted."},
-          resourceStrings={
-                  "missing-policy-names=Policy names need to be provided either with --policynames or --file option",
-                  "delete-policy-in-realm-succeed=Policies were deleted under realm, {0}."})
-  private String delete_policies;
-
-  @SubCommandInfo(
-          implClassName="com.sun.identity.cli.realm.RealmUpdatePolicy",
-          description="Update policies in a realm.",
-          webSupport="true",
-          mandatoryOptions={
-                  "realm|e|s|Name of realm.",
-                  "xmlfile|X|s|Name of file that contains policy XML definition."},
-          optionAliases={},
-          macro="authentication",
-          optionalOptions={},
-          resourceStrings={
-                  "update-policy-in-realm-name-not-found=The policy provided did not exist in the policy store with the same name. If this is a new policy then run create-policies.",
-                  "update-policy-in-realm-succeed=Policies were updated under realm, {0}."})
-  private String update_policies;
-
-  @SubCommandInfo(
-          implClassName="com.sun.identity.cli.realm.RealmGetPolicy",
-          description="List policy definitions in a realm.",
-          webSupport="true",
-          mandatoryOptions={
-                  "realm|e|s|Name of realm."},
-          optionAliases={},
-          macro="authentication",
-          optionalOptions={
-                  "policynames|p|m|Names of policy. This can be an wildcard. All policy definition in the realm will be returned if this option is not provided.",
-                  "outfile|o|s|Filename where policy definition will be printed to. Definition will be printed in standard output if this option is not provided.",
-                  "namesonly|n|u|Returns only names of matching policies. Policies are not returned." },
-          resourceStrings={
-                  "get-policy-names-in-realm-succeed=Policy names were returned under realm, {0}.",
-                  "get-policy-names-in-realm-no-policies=There were not matching policy names under realm, {0}.",
-                  "get-policy-in-realm-succeed=Policy definitions were returned under realm, {0}.",
-                  "get-policy-in-realm-no-policies=There were not matching policies under realm, {0}."})
-  private String list_policies;
-
-  @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.RemoveAttributeDefaults",
           description="Remove default attribute values in schema.",
           webSupport="true",
@@ -943,14 +879,14 @@ public class AccessManager {
           webSupport="true",
           mandatoryOptions={
                   "servicename|s|s|Name of service.",
-                  "subconfigname|g|s|Name of (or path to) sub configuration."},
+                  "subconfigname|g|s|Sub-schema name of (or path to) the type of sub-configuration being added."},
           optionAliases={},
           macro="authentication",
           optionalOptions={
                   "attributevalues|a|m|Attribute values e.g. homeaddress=here.",
                   "datafile|D|s|Name of file that contains attribute values data.",
                   "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided).",
-                  "subconfigid|b|s|ID of parent configuration(Sub Configuration shall be added to root configuration if this option is not provided).",
+                  "subconfigid|b|s|User-specfieid ID of (or path to) the sub-configuration.",
                   "priority|p|s|Priority of the sub configuration."},
           resourceStrings={
                   "add-sub-configuration-succeed=Sub Configuration {1} was added.",
@@ -998,7 +934,7 @@ public class AccessManager {
           mandatoryOptions={
                   "servicename|s|s|Name of service.",
                   "subconfigname|g|s|Name of sub configuration.",
-                  "operation|o|s|Operation (either add/set/modify) to be performed on the sub configuration."},
+                  "operation|o|s|Operation (either add/set/delete) to be performed on the sub configuration."},
           optionAliases={},
           macro="authentication",
           optionalOptions={
@@ -1834,7 +1770,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.ExportServiceConfiguration",
-          description="Export service configuration. In production environments, you should back up the service configuration using file system utilities or the export-ldif command.",
+          description="Export service configuration. In production environments, you should back up the service configuration using file system utilities or the export-ldif command. Note that export-ldif/import-ldif commands must be on the same deployment where the encryption keys are located.",
           webSupport="false",
           mandatoryOptions={
                   "encryptsecret|e|s|Secret key for encrypting password. Any arbitrary value can be specified."},
@@ -1849,7 +1785,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.schema.ImportServiceConfiguration",
-          description="Import service configuration. In production environments, you should restore the service configuration using file system utilities or the import-ldif command.",
+          description="Import service configuration. In production environments, you should restore the service configuration using file system utilities or the import-ldif command. Note that import-ldif/export-ldif commands must be on the same deployment where the encryption keys are located.",
           webSupport="false",
           mandatoryOptions={
                   "encryptsecret|e|s|Secret key for decrypting password.",
@@ -2653,6 +2589,34 @@ public class AccessManager {
           }
   )
   private String unregister_auth_module;
+
+  @SubCommandInfo(
+          implClassName="org.forgerock.openam.cli.entitlement.PolicyImport",
+          description="Import policy model into a given realm",
+          webSupport="true",
+          mandatoryOptions={
+                  "realm|e|s|Realm name",
+                  "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                  "jsonfile|J|s|JSON file containing the policy model to be imported."},
+          optionAliases={},
+          macro="authentication",
+          optionalOptions={},
+          resourceStrings={})
+  private String policy_import;
+
+  @SubCommandInfo(
+          implClassName="org.forgerock.openam.cli.entitlement.PolicyExport",
+          description="Export policy configuration for a given realm",
+          webSupport="true",
+          mandatoryOptions={
+                  "realm|e|s|Realm name",
+                  "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                  "jsonfile|J|s|JSON file for which to write the policy model to."},
+          optionAliases={},
+          macro="authentication",
+          optionalOptions={},
+          resourceStrings={})
+  private String policy_export;
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.entitlement.CreateApplication",

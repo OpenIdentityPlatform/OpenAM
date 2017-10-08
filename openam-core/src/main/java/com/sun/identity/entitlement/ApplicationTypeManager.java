@@ -24,19 +24,23 @@
  *
  * $Id: ApplicationTypeManager.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.interfaces.ISaveIndex;
-import com.sun.identity.entitlement.interfaces.ISearchIndex;
-import com.sun.identity.entitlement.interfaces.ResourceName;
-import org.forgerock.openam.entitlement.PolicyConstants;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import com.sun.identity.entitlement.interfaces.ISaveIndex;
+import com.sun.identity.entitlement.interfaces.ISearchIndex;
+import com.sun.identity.entitlement.interfaces.ResourceName;
 
 /**
  * Application Type manager.
@@ -58,8 +62,7 @@ public final class ApplicationTypeManager {
      */
     public static Set<String> getApplicationTypeNames(Subject adminSubject) {
         Set<String> names = new HashSet<String>();
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         Set<ApplicationType> applications = ec.getApplicationTypes();
         for (ApplicationType a : applications) {
             names.add(a.getName());
@@ -79,8 +82,7 @@ public final class ApplicationTypeManager {
         Subject adminSubject,
         String name
     ) {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         Set<ApplicationType> applications = ec.getApplicationTypes();
 
         for (ApplicationType a : applications) {
@@ -103,8 +105,7 @@ public final class ApplicationTypeManager {
         Subject adminSubject,
         String name
     ) throws EntitlementException {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         ec.removeApplicationType(name);
     }
 
@@ -119,8 +120,7 @@ public final class ApplicationTypeManager {
         Subject adminSubject,
         ApplicationType appType
     ) throws EntitlementException {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
         ec.storeApplicationType(appType);
     }
 

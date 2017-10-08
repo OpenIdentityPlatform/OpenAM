@@ -29,6 +29,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -50,6 +53,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.Mock;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,26 +65,19 @@ public class PendingRequestResourceTest {
     private PendingRequestsService service;
     @Mock
     private ContextHelper contextHelper;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws Exception {
         initMocks(this);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         resource = new PendingRequestResource(service, contextHelper);
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("", "other");
-
-        //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
-
-        //Then
-        assertThat(promise).failedWithResourceException().isInstanceOf(NotSupportedException.class);
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @SuppressWarnings("unchecked")
@@ -91,11 +88,11 @@ public class PendingRequestResourceTest {
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
 
-        mockPendingRequestsForUser("alice", "REALM", 2);
+        mockPendingRequestsForUser("alice", "/REALM", 2);
         mockPendingRequestApprovalService();
 
         //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
+        Promise<ActionResponse, ResourceException> promise = resource.approveAll(context, request);
 
         //Then
         verify(service, times(2)).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
@@ -110,29 +107,14 @@ public class PendingRequestResourceTest {
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
 
-        mockPendingRequestsForUser("alice", "REALM", 2);
+        mockPendingRequestsForUser("alice", "/REALM", 2);
 
         //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
+        Promise<ActionResponse, ResourceException> promise = resource.denyAll(context, request);
 
         //Then
         verify(service, times(2)).denyPendingRequest(anyString(), anyString());
         assertThat(promise).succeeded();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
-
-        //Given
-        Context context = mock(Context.class);
-        ActionRequest request = Requests.newActionRequest("", "other");
-
-        //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
-
-        //Then
-        assertThat(promise).failedWithResourceException().isInstanceOf(NotSupportedException.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -143,11 +125,11 @@ public class PendingRequestResourceTest {
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
 
-        mockPendingRequestsForUser("alice", "REALM", 1);
+        mockPendingRequestsForUser("alice", "/REALM", 1);
         mockPendingRequestApprovalService();
 
         //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
+        Promise<ActionResponse, ResourceException> promise = resource.approveAll(context, request);
 
         //Then
         verify(service).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
@@ -162,10 +144,10 @@ public class PendingRequestResourceTest {
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
 
-        mockPendingRequestsForUser("alice", "REALM", 1);
+        mockPendingRequestsForUser("alice", "/REALM", 1);
 
         //When
-        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
+        Promise<ActionResponse, ResourceException> promise = resource.denyAll(context, request);
 
         //Then
         verify(service).denyPendingRequest(anyString(), anyString());
@@ -181,7 +163,7 @@ public class PendingRequestResourceTest {
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
         given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
 
-        mockPendingRequestsForUser("alice", "REALM", 2);
+        mockPendingRequestsForUser("alice", "/REALM", 2);
 
         //When
         Promise<QueryResponse, ResourceException> promise = resource.queryCollection(context, request, handler);
@@ -208,9 +190,10 @@ public class PendingRequestResourceTest {
         assertThat(promise).succeeded();
     }
 
-    private Context mockContext(String realm) {
+    private Context mockContext(String realmName) {
+        Realm realm = realmTestHelper.mockRealm(realmName);
         RealmContext realmContext = mock(RealmContext.class);
-        given(realmContext.getResolvedRealm()).willReturn(realm);
+        given(realmContext.getRealm()).willReturn(realm);
         return realmContext;
     }
 
@@ -238,5 +221,10 @@ public class PendingRequestResourceTest {
         Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
         given(service.approvePendingRequest(any(Context.class), anyString(), any(JsonValue.class), anyString()))
                 .willReturn(promise);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(PendingRequestResource.class).hasValidAnnotations();
     }
 }

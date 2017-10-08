@@ -40,6 +40,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a500"
+                order="100"
                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -50,6 +51,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a502"
+                order="200"
                 resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
@@ -60,6 +62,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a503"
+                order="300"
                 resourceName="failedAuthenticationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -74,6 +77,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a505"
+                order="400"
                 resourceName="failureScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -84,6 +88,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a506"
+                order="500"
                 resourceName="invertFailureScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -98,6 +103,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a507"
+                order="600"
                 resourceName="ipRangeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -112,6 +118,7 @@
                 type="list"
                 syntax="string"
                 i18nKey="a508"
+                order="700"
                 resourceName="ipRange">
                     <DefaultValues>
                         <Value>10.0.0.0/24</Value>
@@ -122,6 +129,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a509"
+                order="800"
                 resourceName="ipRangeScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -132,6 +140,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a510"
+                order="900"
                 resourceName="invertIPRangeScoreEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -146,6 +155,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a511"
+                order="1000"
                 resourceName="ipHistoryCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -160,6 +170,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a512"
+                order="1100"
                 resourceName="ipHistoryCount">
                     <DefaultValues>
                         <Value>5</Value>
@@ -170,6 +181,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a513"
+                order="1200"
                 resourceName="ipHistoryProfileAttribute">
                     <DefaultValues>
                         <Value>iphistory</Value>
@@ -180,6 +192,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a514"
+                order="1300"
                 resourceName="saveSuccessfulIP">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -194,6 +207,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a515"
+                order="1400"
                 resourceName="ipHistoryScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -204,6 +218,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a516"
+                order="1500"
                 resourceName="invertIPHistoryScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -218,6 +233,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a517"
+                order="1600"
                 resourceName="knownCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -232,6 +248,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a518"
+                order="1700"
                 resourceName="knownCookieName">
                     <DefaultValues>
                         <Value></Value>
@@ -242,6 +259,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a519"
+                order="1800"
                 resourceName="knownCookieValue">
                     <DefaultValues>
                         <Value></Value>
@@ -252,6 +270,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a520"
+                order="1900"
                 resourceName="createKnownCookieOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -266,6 +285,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a521"
+                order="2000"
                 resourceName="knownCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -276,6 +296,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a522"
+                order="2100"
                 resourceName="invertKnownCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -290,6 +311,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a534"
+                order="3300"
                 resourceName="deviceCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -304,6 +326,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a535"
+                order="3400"
                 resourceName="deviceCookieName">
                     <DefaultValues>
                         <Value>Device</Value>
@@ -314,6 +337,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a536"
+                order="3500"
                 resourceName="saveDeviceCookieValueOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -328,6 +352,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a537"
+                order="3600"
                 resourceName="deviceCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -338,6 +363,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a538"
+                order="3700"
                 resourceName="invertDeviceCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -352,6 +378,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a523"
+                order="2200"
                 resourceName="timeSinceLastLoginCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -366,6 +393,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a524"
+                order="2300"
                 resourceName="timeSinceLastLoginCookieName">
                     <DefaultValues>
                         <Value></Value>
@@ -376,6 +404,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a525"
+                order="2400"
                 resourceName="maxTimeSinceLastLogin">
                     <DefaultValues>
                         <Value></Value>
@@ -386,6 +415,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a526"
+                order="2500"
                 resourceName="saveLastLoginTimeOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -400,6 +430,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a527"
+                order="2600"
                 resourceName="timeSinceLastLoginScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -410,6 +441,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a528"
+                order="2700"
                 resourceName="invertTimeSinceLastLoginScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -424,6 +456,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a529"
+                order="2800"
                 resourceName="profileRiskAttributeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -438,6 +471,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a530"
+                order="2900"
                 resourceName="profileRiskAttributeName">
                     <DefaultValues>
                         <Value></Value>
@@ -448,6 +482,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a531"
+                order="3000"
                 resourceName="profileRiskAttributeValue">
                     <DefaultValues>
                         <Value></Value>
@@ -458,6 +493,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a532"
+                order="3100"
                 resourceName="profileRiskAttributeScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -468,6 +504,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a533"
+                order="3200"
                 resourceName="invertProfileRiskAttributeScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -482,6 +519,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a539"
+                order="3800"
                 resourceName="geolocationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -496,6 +534,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a540"
+                order="3900"
                 resourceName="geolocationDatabaseLocation">
                     <DefaultValues>
                         <Value></Value>
@@ -506,6 +545,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a541"
+                order="4000"
                 resourceName="geolocationValidCountryCodes">
                     <DefaultValues>
                         <Value></Value>
@@ -516,6 +556,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a542"
+                order="4100"
                 resourceName="geolocationScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -526,6 +567,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a543"
+                order="4200"
                 resourceName="invertGeolocationScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -540,6 +582,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a544"
+                order="4300"
                 resourceName="requestHeaderCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -554,6 +597,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a545"
+                order="4400"
                 resourceName="requestHeaderName">
                     <DefaultValues>
                         <Value></Value>
@@ -564,6 +608,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a546"
+                order="4500"
                 resourceName="requestHeaderValue">
                     <DefaultValues>
                         <Value></Value>
@@ -574,6 +619,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a547"
+                order="4600"
                 resourceName="requestHeaderScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -584,6 +630,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a548"
+                order="4700"
                 resourceName="invertRequestHeaderScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -600,6 +647,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a500"
+                order="100"
                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -610,6 +658,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a502"
+                order="200"
                 resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
@@ -620,6 +669,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a503"
+                order="300"
                 resourceName="failedAuthenticationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -634,6 +684,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a505"
+                order="400"
                 resourceName="failureScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -644,6 +695,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a506"
+                order="500"
                 resourceName="invertFailureScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -658,6 +710,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a507"
+                order="600"
                 resourceName="ipRangeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -672,6 +725,7 @@
                 type="list"
                 syntax="string"
                 i18nKey="a508"
+                order="700"
                 resourceName="ipRange">
                     <DefaultValues>
                         <Value>10.0.0.0/24</Value>
@@ -682,6 +736,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a509"
+                order="800"
                 resourceName="ipRangeScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -692,6 +747,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a510"
+                order="900"
                 resourceName="invertIPRangeScoreEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -706,6 +762,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a511"
+                order="1000"
                 resourceName="ipHistoryCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -720,6 +777,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a512"
+                order="1100"
                 resourceName="ipHistoryCount">
                     <DefaultValues>
                         <Value>5</Value>
@@ -730,6 +788,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a513"
+                order="1200"
                 resourceName="ipHistoryProfileAttribute">
                     <DefaultValues>
                         <Value>iphistory</Value>
@@ -740,6 +799,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a514"
+                order="1300"
                 resourceName="saveSuccessfulIP">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -754,6 +814,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a515"
+                order="1400"
                 resourceName="ipHistoryScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -764,6 +825,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a516"
+                order="1500"
                 resourceName="invertIPHistoryScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -778,6 +840,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a517"
+                order="1600"
                 resourceName="knownCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -792,6 +855,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a518"
+                order="1700"
                 resourceName="knownCookieName">
                     <DefaultValues>
                         <Value></Value>
@@ -802,6 +866,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a519"
+                order="1800"
                 resourceName="knownCookieValue">
                     <DefaultValues>
                         <Value></Value>
@@ -812,6 +877,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a520"
+                order="1900"
                 resourceName="createKnownCookieOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -826,6 +892,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a521"
+                order="2000"
                 resourceName="knownCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -836,6 +903,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a522"
+                order="2100"
                 resourceName="invertKnownCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -850,6 +918,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a534"
+                order="3300"
                 resourceName="deviceCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -864,6 +933,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a535"
+                order="3400"
                 resourceName="deviceCookieName">
                     <DefaultValues>
                         <Value>Device</Value>
@@ -874,6 +944,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a536"
+                order="3500"
                 resourceName="saveDeviceCookieValueOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -888,6 +959,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a537"
+                order="3600"
                 resourceName="deviceCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -898,6 +970,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a538"
+                order="3700"
                 resourceName="invertDeviceCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -912,6 +985,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a523"
+                order="2200"
                 resourceName="timeSinceLastLoginCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -926,6 +1000,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a524"
+                order="2300"
                 resourceName="timeSinceLastLoginCookieName">
                     <DefaultValues>
                         <Value></Value>
@@ -936,6 +1011,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a525"
+                order="2400"
                 resourceName="maxTimeSinceLastLogin">
                     <DefaultValues>
                         <Value></Value>
@@ -946,6 +1022,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a526"
+                order="2500"
                 resourceName="saveLastLoginTimeOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -960,6 +1037,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a527"
+                order="2600"
                 resourceName="timeSinceLastLoginScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -970,6 +1048,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a528"
+                order="2700"
                 resourceName="invertTimeSinceLastLoginScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -984,6 +1063,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a529"
+                order="2800"
                 resourceName="profileRiskAttributeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -998,6 +1078,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a530"
+                order="2900"
                 resourceName="profileRiskAttributeName">
                     <DefaultValues>
                         <Value></Value>
@@ -1008,6 +1089,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a531"
+                order="3000"
                 resourceName="profileRiskAttributeValue">
                     <DefaultValues>
                         <Value></Value>
@@ -1018,6 +1100,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a532"
+                order="3100"
                 resourceName="profileRiskAttributeScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -1028,6 +1111,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a533"
+                order="3200"
                 resourceName="invertProfileRiskAttributeScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -1042,6 +1126,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a539"
+                order="3800"
                 resourceName="geolocationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -1056,6 +1141,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a540"
+                order="3900"
                 resourceName="geolocationDatabaseLocation">
                     <DefaultValues>
                         <Value></Value>
@@ -1066,6 +1152,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a541"
+                order="4000"
                 resourceName="geolocationValidCountryCodes">
                     <DefaultValues>
                         <Value></Value>
@@ -1076,6 +1163,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a542"
+                order="4100"
                 resourceName="geolocationScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -1086,6 +1174,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a543"
+                order="4200"
                 resourceName="invertGeolocationScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -1100,6 +1189,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a544"
+                order="4300"
                 resourceName="requestHeaderCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -1114,6 +1204,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a545"
+                order="4400"
                 resourceName="requestHeaderName">
                     <DefaultValues>
                         <Value></Value>
@@ -1124,6 +1215,7 @@
                 type="single"
                 syntax="string"
                 i18nKey="a546"
+                order="4500"
                 resourceName="requestHeaderValue">
                     <DefaultValues>
                         <Value></Value>
@@ -1134,6 +1226,7 @@
                 type="single"
                 syntax="number"
                 i18nKey="a547"
+                order="4600"
                 resourceName="requestHeaderScore">
                     <DefaultValues>
                         <Value>1</Value>
@@ -1144,6 +1237,7 @@
                 type="single"
                 syntax="boolean"
                 i18nKey="a548"
+                order="4700"
                 resourceName="invertRequestHeaderScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>

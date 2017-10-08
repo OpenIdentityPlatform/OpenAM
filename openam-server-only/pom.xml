@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-*
-* Copyright (c) 2011-2016 ForgeRock AS.
-*
-* The contents of this file are subject to the terms
-* of the Common Development and Distribution License
-* (the License). You may not use this file except in
-* compliance with the License.
-*
-* You can obtain a copy of the License at
-* http://forgerock.org/license/CDDLv1.0.html
-* See the License for the specific language governing
-* permission and limitations under the License.
-*
-* When distributing Covered Code, include this CDDL
-* Header Notice in each file and include the License file
-* at http://forgerock.org/license/CDDLv1.0.html
-* If applicable, add the following below the CDDL Header,
-* with the fields enclosed by brackets [] replaced by
-* your own identifying information:
-* "Portions Copyrighted [year] [name of copyright owner]"
-*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2011-2016 ForgeRock AS.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -30,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>13.0.0</version>
+        <version>14.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -38,6 +29,21 @@
     <description>OpenAM Server Only Component</description>
     <artifactId>openam-server-only</artifactId>
     <packaging>war</packaging>
+
+    <properties>
+        <!-- Default settings for standard embedded dj. -->
+        <dj.backend.type>je</dj.backend.type>
+        <!-- By default this property is empty so as not to include the SecurID auth module. -->
+        <auth.securID.xml />
+        <!-- Default settings for the exclusion list to use for creating the opendj zip file. -->
+        <exclusion.list.filename>opendj_exclusion_list</exclusion.list.filename>
+        <!-- Default folder to use for pulling in third party distribution legal notices. -->
+        <third.party.legal.directory>legal</third.party.legal.directory>
+        <!-- Default value for whether the build is running in oem mode -->
+        <is.oem.build>false</is.oem.build>
+
+        <full.version.information>@VERSION@ Build @REVISION@ (@DATESTAMP@)</full.version.information>
+    </properties>
 
     <!-- Build -->
     <build>
@@ -97,12 +103,10 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-auth-deviceprint-scripts</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
+                                    <artifactId>openam-ui-api</artifactId>
+                                    <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/openam_TEMP</outputDirectory>
-                                    <includes>**/*.js</includes>
+                                    <outputDirectory>${project.build.directory}/api</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -156,6 +160,10 @@
                                 <property name="core.xml.dir" value="${project.basedir}/../openam-core/src/main/resources/xml" />
 
                                 <property name="federation.xml.dir" value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
+
+                                <property name="exclusion.list" value="${exclusion.list.filename}" />
+
+                                <property name="is.oem" value="${is.oem.build}" />
 
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
                                     <target name="openam-server-prepare-war" />
@@ -222,6 +230,7 @@
                         <nonFilteredFileExtension>ico</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jar</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jceks</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
                         <nonFilteredFileExtension>lz</nonFilteredFileExtension>
@@ -246,6 +255,14 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>XUI</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/api/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>api</targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -287,7 +304,7 @@
                         </webResource>
                         <webResource>
                             <!-- Copy all third-party licences too. -->
-                            <directory>${project.parent.basedir}/legal</directory>
+                            <directory>${project.parent.basedir}/${third.party.legal.directory}</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -429,10 +446,25 @@
                 </includes>
                 <targetPath>${project.build.directory}/classes</targetPath>
             </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>AMConfig.properties</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 
     <profiles>
+        <profile>
+            <id>with-oem</id>
+            <properties>
+                <exclusion.list.filename>opendj_oem_exclusion_list</exclusion.list.filename>
+                <third.party.legal.directory>legal-oem</third.party.legal.directory>
+                <is.oem.build>true</is.oem.build>
+            </properties>
+        </profile>
         <profile>
             <id>release</id>
             <dependencies>
@@ -521,60 +553,47 @@
             </build>
         </profile>
         <profile>
-            <id>precommit</id>
+            <id>precompile-jsps</id>
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-jspc-maven-plugin</artifactId>
+                        <version>${jetty.jspc.version}</version>
                         <executions>
                             <execution>
-                                <phase>process-resources</phase>
+                                <id>jspc</id>
                                 <goals>
-                                    <goal>run</goal>
+                                    <goal>jspc</goal>
                                 </goals>
                                 <configuration>
-                                    <target>
-                                        <script language="groovy"><![CDATA[
-                                            File libs = new File(project.getProperty("project.build.directory") +
-                                                    "/generated-sources/license/THIRD-PARTY.txt")
-                                            File thirdParty = new File(project.getProperty("basedir") +
-                                                    "/../legal/THIRDPARTYREADME.txt")
-                                            List published = thirdParty.readLines().findAll { s -> s.startsWith("Version:") }
-                                            List missing = [];
-                                            libs.eachLine { line ->
-                                                (line =~ /\(([^:\(]+):([^:]+):([^ ]+)/).each { match, groupId, artifactId, version ->
-                                                    if (!groupId.startsWith("org.forgerock") &&
-                                                            !published.any { s -> s.contains(artifactId) && s.contains(version) }) {
-                                                        missing.add("$groupId:$artifactId:$version")
-                                                    }
-                                                }
-                                            }
-                                            if (!missing.isEmpty()) {
-                                                throw new Exception("Missing libraries from THIRDPARTYREADME.txt:\n" +
-                                                        missing.join("\n"))
-                                            }
-                                        ]]></script>
-                                    </target>
+                                    <!-- Exclude JSPs with known compilation issues: -->
+                                    <excludes>**/ButtonFrame.jsp,**/Masthead.jsp,**/Version.jsp,
+                                        **/userconsole.jsp</excludes>
                                 </configuration>
                             </execution>
                         </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.codehaus.groovy</groupId>
-                                <artifactId>groovy-jsr223</artifactId>
-                                <version>2.3.3</version>
-                            </dependency>
-                        </dependencies>
                     </plugin>
+
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>forgerock-dev</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.forgerock.openam</groupId>
+                    <artifactId>openam-time-travel</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>suppress-upgrade</id>
+            <properties>
+                <full.version.information />
+            </properties>
+        </profile>
     </profiles>
-
-    <properties>
-        <!-- By default this property is empty so as not to include the SecurID auth module -->
-        <auth.securID.xml />
-    </properties>
 
     <dependencies>
         <!-- Embedded OpenDJ Dependencies -->
@@ -609,6 +628,12 @@
             <artifactId>openam-ui-ria</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ui-api</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -662,11 +687,6 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-uma</artifactId>
         </dependency>
 
@@ -712,6 +732,11 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-push-notification</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-configuration</artifactId>
         </dependency>
 
@@ -723,6 +748,21 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-selfservice</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-notifications-integration</artifactId>
         </dependency>
 
         <!-- Include all Authentication Modules -->
@@ -759,11 +799,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-persistentcookie</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-auth-deviceprint-module</artifactId>
         </dependency>
 
         <dependency>
@@ -828,12 +863,22 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-push</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-oauth2</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-radius</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-amster</artifactId>
         </dependency>
 
         <dependency>
@@ -859,22 +904,11 @@
         <!-- Oauth2 dependencies -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>oauth2-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>oauth2-restlet</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openid-connect-restlet</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-saml2</artifactId>
         </dependency>
 
         <dependency>
@@ -926,24 +960,6 @@
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
-        </dependency>
-        <!-- XML -->
-        <!-- Xerces-J Required for fedlet -->
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-resolver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces-J</groupId>
-            <artifactId>xml-serializer</artifactId>
         </dependency>
     </dependencies>
 </project>

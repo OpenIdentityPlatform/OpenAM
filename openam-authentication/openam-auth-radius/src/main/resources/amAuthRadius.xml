@@ -48,6 +48,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="primaryRadiusServers">
 		    <DefaultValues>
                         <Value>127.0.0.1</Value>
@@ -58,6 +59,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a102"
+                    order="200"
                     resourceName="secondaryRadiusServers">
 		    <DefaultValues>
                         <Value>127.0.0.1</Value>
@@ -68,12 +70,14 @@
                     type="single"
                     syntax="password"
                     i18nKey="a103"
+                    order="300"
                     resourceName="sharedSecret">
 		</AttributeSchema>
 	        <AttributeSchema name="iplanet-am-auth-radius-server-port"
                     type="single"
                     syntax="number"
                     i18nKey="a104"
+                    order="400"
                     resourceName="serverPortNumber">
 		    <DefaultValues>
                         <Value>1645</Value>
@@ -83,6 +87,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a500"
+                    order="700"
                     resourceName="authenticationLevel">
 		    <DefaultValues>
                         <Value>0</Value>
@@ -92,6 +97,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a105"
+                    order="500"
                     resourceName="serverTimeout">
 		    <DefaultValues>
                         <Value>3</Value>
@@ -101,6 +107,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a106"
+                    order="600"
                     resourceName="healthCheckInterval">
 		    <DefaultValues>
                         <Value>5</Value>
@@ -111,6 +118,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="primaryRadiusServers">
     		    <DefaultValues>
                             <Value>127.0.0.1</Value>
@@ -121,6 +129,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a102"
+                        order="200"
                         resourceName="secondaryRadiusServers">
     		    <DefaultValues>
                             <Value>127.0.0.1</Value>
@@ -131,12 +140,14 @@
                         type="single"
                         syntax="password"
                         i18nKey="a103"
+                        order="300"
                         resourceName="sharedSecret">
     		    </AttributeSchema>
     	            <AttributeSchema name="iplanet-am-auth-radius-server-port"
                         type="single"
                         syntax="number"
                         i18nKey="a104"
+                        order="400"
                         resourceName="serverPortNumber">
     		    <DefaultValues>
                             <Value>1645</Value>
@@ -146,6 +157,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a500"
+                        order="700"
                         resourceName="authenticationLevel">
     		    <DefaultValues>
                             <Value>0</Value>
@@ -155,6 +167,7 @@
                         type="single"
                         syntax="number"
                         i18nKey="a105"
+                        order="500"
                         resourceName="serverTimeout">
     		    <DefaultValues>
                             <Value>3</Value>
@@ -164,6 +177,7 @@
                         type="single"
                         syntax="number"
                         i18nKey="a106"
+                        order="600"
                         resourceName="healthCheckInterval">
 	            <DefaultValues>
                         <Value>5</Value>

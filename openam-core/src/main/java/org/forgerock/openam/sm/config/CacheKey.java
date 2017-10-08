@@ -60,7 +60,7 @@ final class CacheKey {
     }
 
     static CacheKey newInstance(String source, String realm) {
-        return new CacheKey(source, realm);
+        return new CacheKey(source, realm.toLowerCase());
     }
 
 }

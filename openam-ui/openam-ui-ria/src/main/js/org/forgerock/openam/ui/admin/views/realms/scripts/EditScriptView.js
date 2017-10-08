@@ -14,9 +14,9 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "libs/codemirror/lib/codemirror",
     "org/forgerock/commons/ui/common/components/ChangesPending",
@@ -28,46 +28,47 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/delegates/ScriptsDelegate",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/ScriptsService",
+    "org/forgerock/openam/ui/admin/services/global/ScriptsService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/common/util/Promise",
     "libs/codemirror/mode/groovy/groovy",
     "libs/codemirror/mode/javascript/javascript",
-    "libs/codemirror/addon/display/fullscreen"
+    "libs/codemirror/addon/display/fullscreen",
+    // jquery dependencies
+    "selectize"
 ], function ($, _, BootstrapDialog, CodeMirror, ChangesPending, Messages, AbstractView, EventManager, Router, Base64,
-             Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate, FormHelper) {
+             Constants, UIUtils, Script, RealmScriptsService, GlobalScriptsService, FormHelper, Promise) {
 
     return AbstractView.extend({
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
-
-        template: "templates/admin/views/realms/scripts/EditScriptTemplate.html",
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "partials/alerts/_Alert.html"
         ],
         events: {
-            "click #upload": "uploadScript",
+            "click [data-upload-script]": "uploadScript",
             "change [name=upload]": "readUploadedFile",
-            "click #validateScript": "validateScript",
-            "click #changeContext": "openDialog",
+            "click [data-validation-script]": "validateScript",
+            "click [data-change-context]": "openDialog",
             "change input[name=language]": "onChangeLanguage",
-            "click #saveChanges": "submitForm",
-            "click #delete": "onDeleteClick",
-            "click #editFullScreen": "editFullScreen",
-            "click .full-screen-bar button": "exitFullScreen",
-            "change [data-field]": "checkChanges"
+            "click [data-save]": "submitForm",
+            "click [data-delete]": "onDeleteClick",
+            "click [data-show-fullscreen]": "editFullScreen",
+            "click [data-exit-fullscreen]": "exitFullScreen",
+            "change [data-field]": "checkChanges",
+            "keyup [data-field]": "checkChanges"
         },
 
-        onModelSync: function () {
-            this.renderAfterSyncModel();
-        },
-
-        render: function (args, callback) {
+        render (args, callback) {
             var uuid = null;
 
-            this.realmPath = args[0];
+            this.data.realmPath = args[0];
+            this.data.headerActions = [
+                { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" }
+            ];
 
             // As we interrupt render to update the model, we need to remember the callback
             if (callback) {
@@ -79,24 +80,22 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 uuid = args[1];
             }
 
-            this.contextsPromise = SMSGlobalDelegate.scripts.getAllContexts();
-            this.defaultContextPromise = SMSGlobalDelegate.scripts.getDefaultGlobalContext();
-            this.contextSchemaPromise = SMSGlobalDelegate.scripts.getSchema();
-            this.languageSchemaPromise = SMSGlobalDelegate.scripts.getContextSchema();
+            this.contextsPromise = GlobalScriptsService.scripts.getAllContexts();
+            this.defaultContextPromise = GlobalScriptsService.scripts.getDefaultGlobalContext();
+            this.contextSchemaPromise = GlobalScriptsService.scripts.getSchema();
+            this.languageSchemaPromise = GlobalScriptsService.scripts.getContextSchema();
 
-            /**
-             * Guard clause to check if model requires sync'ing/updating
-             * Reason: We do not know the id of the data we need until the render function is called with args,
-             * thus we can only check at this point if we have the correct model to render this view (the model
-             * might already contain the correct data).
-             * Behaviour: If the model does require sync'ing then we abort this render via the return and render
-             * will it invoked again when the model is updated
-             */
-            if (this.syncModel(uuid)) {
-                return;
+            if (uuid) {
+                this.template = "templates/admin/views/realms/scripts/EditScriptTemplate.html";
+                this.model = new Script({ _id: uuid });
+                this.listenTo(this.model, "sync", this.renderAfterSyncModel);
+                this.model.fetch();
+            } else {
+                this.template = "templates/admin/views/realms/scripts/NewScriptTemplate.html";
+                this.newEntity = true;
+                this.model = new Script();
+                this.renderAfterSyncModel();
             }
-
-            this.renderAfterSyncModel();
         },
 
         /**
@@ -107,19 +106,20 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
          * In the first case we should to create a new model, in second case is not create.
          * So the render function is divided into two parts, so as not to cause a re-check and avoid the second case.
          */
-        renderAfterSyncModel: function () {
+        renderAfterSyncModel () {
             var self = this;
 
             this.data.entity = _.pick(this.model.attributes,
                 "uuid", "name", "description", "language", "context", "script");
-            this.data.deleteBtnDisabled = !this.data.entity.name;
 
             if (!this.data.contexts) {
-                $.when(self.contextsPromise, self.contextSchemaPromise, self.languageSchemaPromise).done(
-                    function (contexts, contextSchema, langSchema) {
-                        self.data.contexts = contexts[0].result;
-                        self.addContextNames(self.data.contexts, contextSchema[0]);
-                        self.langSchema = langSchema[0];
+                Promise.all([self.contextsPromise, self.defaultContextPromise, self.contextSchemaPromise,
+                        self.languageSchemaPromise]).done(
+                    function (results) {
+                        self.data.contexts = results[0][0].result;
+                        self.data.defaultContext = results[1][0].defaultContext;
+                        self.addContextNames(self.data.contexts, results[2][0]);
+                        self.langSchema = results[3][0];
                         self.renderScript();
                     });
             } else {
@@ -130,7 +130,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             }
         },
 
-        renderScript: function () {
+        renderScript () {
             var self = this,
                 context;
 
@@ -138,35 +138,33 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 context = _.find(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
                 });
-                self.data.contextName = context.name;
+                this.data.contextName = context.name;
                 this.data.languages = this.addLanguageNames(context.languages);
             } else {
                 this.data.languages = [];
-                this.data.newScript = true;
             }
 
             this.parentRender(function () {
-                this.changesPendingWidget = ChangesPending.watchChanges({
-                    element: this.$el.find(".script-changes-pending"),
-                    watchedObj: this.data.entity,
-                    undo: !this.newEntity,
-                    undoCallback: function (changes) {
-                        _.extend(self.data.entity, changes);
-                        var context = _.find(self.data.contexts, {
-                            "_id": self.data.entity.context
-                        });
-                        self.data.contextName = context.name;
-                        self.data.languages = self.addLanguageNames(context.languages);
-                        self.reRenderView();
-                    },
-                    alertClass: "alert-warning alert-sm"
-                });
-
-                this.showUploadButton();
-
-                if (this.data.newScript) {
-                    this.openDialog();
+                if (this.newEntity) {
+                    this.$el.find("#context").selectize();
                 } else {
+                    this.changesPendingWidget = ChangesPending.watchChanges({
+                        element: this.$el.find(".script-changes-pending"),
+                        watchedObj: this.data.entity,
+                        undo: !this.newEntity,
+                        undoCallback (changes) {
+                            _.extend(self.data.entity, changes);
+                            var context = _.find(self.data.contexts, {
+                                "_id": self.data.entity.context
+                            });
+                            self.data.contextName = context.name;
+                            self.data.languages = self.addLanguageNames(context.languages);
+                            self.reRenderView();
+                        },
+                        alertClass: "alert-warning alert-sm"
+                    });
+
+                    this.showUploadButton();
                     this.initScriptEditor();
                 }
 
@@ -176,7 +174,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             });
         },
 
-        reRenderView: function () {
+        reRenderView () {
             this.parentRender(function () {
                 this.showUploadButton();
                 this.initScriptEditor();
@@ -186,13 +184,19 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             });
         },
 
-        checkChanges: function () {
+        checkChanges () {
             this.updateFields();
-            this.changesPendingWidget.makeChanges(this.data.entity);
+            if (this.newEntity) {
+                this.toggleSaveButton(this.checkRequiredFields());
+            } else {
+                this.changesPendingWidget.makeChanges(this.data.entity);
+            }
         },
 
-        updateFields: function () {
-            var app = this.data.entity,
+        updateFields () {
+            var self = this,
+                app = this.data.entity,
+                previousContext = app.context,
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
@@ -208,10 +212,23 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 }
             });
 
-            app.script = this.scriptEditor.getValue();
+            if (this.newEntity) {
+                if (previousContext !== app.context) {
+                    self.toggleSaveButton(false);
+                    this.changeContext().then(function () {
+                        self.toggleSaveButton(self.checkRequiredFields());
+                    });
+                }
+            } else {
+                app.script = this.scriptEditor.getValue();
+            }
         },
 
-        submitForm: function (e) {
+        checkRequiredFields () {
+            return this.data.entity.name && this.data.entity.context && this.data.entity.language;
+        },
+
+        submitForm (e) {
             e.preventDefault();
 
             var self = this,
@@ -220,18 +237,19 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             this.updateFields();
 
-            _.extend(this.model.attributes, this.data.entity);
+            _.extend(this.model.attributes, { description: "" }, this.data.entity);
             savePromise = this.model.save();
 
             if (savePromise) {
                 savePromise.done(function () {
                     if (self.newEntity) {
-                        Router.routeTo(Router.currentRoute, {
-                            args: [encodeURIComponent(self.realmPath), self.model.id],
+                        Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
+                            args: [encodeURIComponent(self.data.realmPath), self.model.id],
                             trigger: true
                         });
+                    } else {
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     }
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
@@ -239,27 +257,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             }
         },
 
-        syncModel: function (uuid) {
-            var syncRequired = !this.model || (uuid && this.model.id !== uuid);
-
-            if (syncRequired && uuid) {
-                // edit existing script
-                this.stopListening(this.model);
-                this.model = new Script({ _id: uuid });
-                this.listenTo(this.model, "sync", this.onModelSync);
-                this.model.fetch();
-            } else if (!uuid) {
-                // create new script, sync is not needed
-                this.newEntity = true;
-                syncRequired = false;
-                this.stopListening(this.model);
-                this.model = new Script();
-            }
-
-            return syncRequired;
-        },
-
-        validateScript: function () {
+        validateScript () {
             var scriptText = this.scriptEditor.getValue(),
                 language = this.data.entity.language,
                 script,
@@ -267,10 +265,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             script = {
                 script: Base64.encodeUTF8(scriptText),
-                language: language
+                language
             };
 
-            ScriptsDelegate.validateScript(script).done(function (result) {
+            RealmScriptsService.validateScript(script).done(function (result) {
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
                     result,
                     function (tpl) {
@@ -279,16 +277,16 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             }).fail(function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        uploadScript: function () {
+        uploadScript () {
             this.$el.find("[name=upload]").trigger("click");
         },
 
-        readUploadedFile: function (e) {
+        readUploadedFile (e) {
             var self = this,
                 file = e.target.files[0],
                 reader = new FileReader();
@@ -302,7 +300,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             reader.readAsText(file);
         },
 
-        openDialog: function () {
+        openDialog () {
             var self = this;
 
             if (!this.data.defaultContext) {
@@ -315,46 +313,38 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             }
         },
 
-        renderDialog: function () {
+        renderDialog () {
             BootstrapDialog.show(this.constructDialogOptions());
         },
 
-        constructDialogOptions: function () {
+        constructDialogOptions () {
             var self = this,
                 footerButtons = [],
                 options = {
-                    type: self.data.newScript ? BootstrapDialog.TYPE_PRIMARY : BootstrapDialog.TYPE_DANGER,
-                    title: self.data.newScript
-                        ? $.t("console.scripts.edit.dialog.title.select")
-                        : $.t("console.scripts.edit.dialog.title.change"),
+                    type: BootstrapDialog.TYPE_DANGER,
+                    title: $.t("console.scripts.edit.dialog.title"),
                     cssClass: "script-change-context",
-                    closable: !self.data.newScript,
                     message: $("<div></div>"),
-                    onshow: function () {
+                    onshow () {
                         var dialog = this;
                         UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ChangeContextTemplate.html",
                             self.data,
                             function (tpl) {
                                 dialog.message.append(tpl);
-                                self.data.newScript = false;
                             });
                     }
                 };
 
-            if (!self.data.newScript) {
-                footerButtons.push({
-                    label: $.t("common.form.cancel"),
-                    cssClass: "btn-default",
-                    action: function (dialog) {
-                        dialog.close();
-                    }
-                });
-            }
-
             footerButtons.push({
-                label: self.data.newScript ? $.t("common.form.save") : $.t("common.form.change"),
-                cssClass: self.data.newScript ? "btn-primary" : "btn-danger",
-                action: function (dialog) {
+                label: $.t("common.form.cancel"),
+                cssClass: "btn-default",
+                action (dialog) {
+                    dialog.close();
+                }
+            }, {
+                label: $.t("common.form.change"),
+                cssClass: "btn-danger",
+                action (dialog) {
                     var checkedItem = dialog.$modalContent.find("[name=changeContext]:checked"),
                         newContext = checkedItem.val(),
                         newContextName = checkedItem.parent().text().trim();
@@ -372,7 +362,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             return options;
         },
 
-        changeContext: function () {
+        changeContext () {
             var self = this,
                 selectedContext = _.find(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
@@ -407,7 +397,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             return promise;
         },
 
-        initScriptEditor: function () {
+        initScriptEditor () {
             this.scriptEditor = CodeMirror.fromTextArea(this.$el.find("#script")[0], {
                 lineNumbers: true,
                 autofocus: true,
@@ -419,22 +409,22 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             this.scriptEditor.on("update", _.bind(this.checkChanges, this));
         },
 
-        onChangeLanguage: function (e) {
+        onChangeLanguage (e) {
             this.changeLanguage(e.target.value);
         },
 
-        changeLanguage: function (lang) {
+        changeLanguage (lang) {
             this.data.entity.language = lang;
             this.scriptEditor.setOption("mode", lang.toLowerCase());
         },
 
-        showUploadButton: function () {
+        showUploadButton () {
             // Show the Upload button for modern browsers only. Documented feature.
             // File: Chrome 13; Firefox (Gecko) 3.0 (1.9) (non standard), 7 (7) (standard); Internet Explorer 10.0;
             //       Opera 11.5; Safari (WebKit) 6.0
             // FileReader: Firefox (Gecko) 3.6 (1.9.2);	Chrome 7; Internet Explorer 10; Opera 12.02; Safari 6.0.2
             if (window.File && window.FileReader && window.FileList) {
-                this.$el.find("#upload").show();
+                this.$el.find("[data-upload-scripts]").show();
             }
         },
 
@@ -443,7 +433,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
          * @param  {Array} contexts Array with script contexts
          * @param  {Object} schema Script schema with translations
          */
-        addContextNames: function (contexts, schema) {
+        addContextNames (contexts, schema) {
             var i,
                 index,
                 length = contexts.length;
@@ -460,7 +450,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
          * @param  {Array} languages Language IDs from Context
          * @returns {Array} result combined array
          */
-        addLanguageNames: function (languages) {
+        addLanguageNames (languages) {
             var result,
                 i,
                 length = languages.length,
@@ -479,18 +469,18 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             return result;
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.scripts.edit.script") },
                 _.bind(this.deleteScript, this));
         },
 
-        deleteScript: function () {
+        deleteScript () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsScripts, {
-                        args: [encodeURIComponent(self.realmPath)],
+                        args: [encodeURIComponent(self.data.realmPath)],
                         trigger: true
                     });
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
@@ -502,17 +492,21 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             });
         },
 
-        editFullScreen: function () {
+        editFullScreen () {
             this.toggleFullScreen(true);
         },
 
-        exitFullScreen: function () {
+        exitFullScreen () {
             this.toggleFullScreen(false);
         },
 
-        toggleFullScreen: function (fullScreen) {
+        toggleFullScreen (fullScreen) {
             this.scriptEditor.setOption("fullScreen", fullScreen);
             this.$el.find(".full-screen-bar").toggle(fullScreen);
+        },
+
+        toggleSaveButton (flag) {
+            this.$el.find("[data-save]").prop("disabled", !flag);
         }
     });
 });

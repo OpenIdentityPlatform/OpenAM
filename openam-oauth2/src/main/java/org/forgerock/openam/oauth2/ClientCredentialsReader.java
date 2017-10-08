@@ -11,19 +11,19 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 */
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.JwtProfile.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.JwtProfile.*;
 import static org.forgerock.openidconnect.Client.TokenEndpointAuthMethod.*;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Set;
 import javax.inject.Inject;
 import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;

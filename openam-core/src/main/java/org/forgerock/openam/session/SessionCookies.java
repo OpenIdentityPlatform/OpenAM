@@ -1,36 +1,50 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright 2015-2016 ForgeRock AS.
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.dpro.session.InvalidSessionIdException;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+import org.forgerock.openam.utils.StringUtils;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.share.SessionBundle;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Responsible for providing functionality around Session cookie management.
@@ -123,12 +137,12 @@ public class SessionCookies {
         }
 
         if (sid == null || StringUtils.isBlank(sid.toString())) {
-            throw new SessionException(SessionBundle.rbName, "invalidSessionID", null);
+            throw new InvalidSessionIdException();
         }
 
         if (SystemProperties.isServerMode()) {
-            SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-            if (!sessionService.isSiteEnabled()) {
+            SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+            if (!sessionServerConfig.isSiteEnabled()) {
                 cookieValue = WebtopNaming.getLBCookieValue(sid.getSessionServerID());
                 return lbCookieName + "=" + cookieValue;
             }
@@ -136,9 +150,10 @@ public class SessionCookies {
 
         if (RESET_LB_COOKIE_NAME) {
             if (SystemProperties.isServerMode()) {
-                SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
-                if (sessionService.isSessionFailoverEnabled() && sessionService.isLocalSite(sid)) {
-                    cookieValue = WebtopNaming.getLBCookieValue(sessionService.getCurrentHostServer(sid));
+                SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+                ServicesClusterMonitorHandler servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
+                if (sessionServerConfig.isLocalSite(sid)) {
+                    cookieValue = WebtopNaming.getLBCookieValue(servicesClusterMonitorHandler.getCurrentHostServer(sid));
                 }
             } else {
                 Session sess = sessionCache.readSession(sid);

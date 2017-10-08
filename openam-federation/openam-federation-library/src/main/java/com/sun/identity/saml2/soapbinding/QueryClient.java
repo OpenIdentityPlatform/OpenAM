@@ -24,9 +24,12 @@
  *
  * $Id: QueryClient.java,v 1.9 2009/10/29 00:19:21 madan_ranganath Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.saml2.soapbinding;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -151,7 +154,7 @@ public class QueryClient {
                 String requestID = SAML2SDKUtils.generateID();
                 xacmlQuery.setID(requestID);
                 xacmlQuery.setVersion(SAML2Constants.VERSION_2_0);
-                xacmlQuery.setIssueInstant(new Date());
+                xacmlQuery.setIssueInstant(newDate());
 
                 XACMLPDPConfigElement pdpConfig = getPDPConfig(realm,
                                                                pdpEntityID);
@@ -546,15 +549,15 @@ public class QueryClient {
             if (!isTrusted) {
                 if (debug.messageEnabled()) {
                     debug.message(classMethod +
-                            "Issuer in Request is not valid.");
+                            "Issuer in Response is not valid.");
                 }
                 String[] args = {realm, pepEntityID, issuerID};
                 
                 LogUtil.error(Level.INFO,
-                        LogUtil.INVALID_ISSUER_IN_PEP_REQUEST,
+                        LogUtil.INVALID_ISSUER_RESPONSE,
                         args);
                 throw new SAML2Exception(
-                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuer",args);
+                        SAML2SDKUtils.BUNDLE_NAME,"invalidIssuerInResponse", args);
             }
             // verify signed response
             verifySignedResponse(pepEntityID,pdpEntityID, samlResponse);

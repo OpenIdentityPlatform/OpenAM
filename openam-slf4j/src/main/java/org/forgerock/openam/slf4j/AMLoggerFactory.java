@@ -26,15 +26,42 @@ import org.slf4j.Logger;
 
 public class AMLoggerFactory implements ILoggerFactory {
 
-    private static final LoadingCache<String, Debug> cache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<String, Debug>() {
+    private static final LoadingCache<String, AMDebugLogger> amLoggerCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<String, AMDebugLogger>() {
                 @Override
-                public Debug load(String s) {
-                    return Debug.getInstance(s);
+                public AMDebugLogger load(String s) {
+                    return new AMDebugLogger(Debug.getInstance(s));
+                }
+            });
+
+    private static final LoadingCache<String, OpenDJLoggerAdapter> djLoggerCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<String, OpenDJLoggerAdapter>() {
+                @Override
+                public OpenDJLoggerAdapter load(String s) {
+                    return new OpenDJLoggerAdapter(s);
                 }
             });
 
     public Logger getLogger(String s) {
-        return new AMDebugLogger(cache.getUnchecked(s));
+        // For the case when OpenAM is running with OpenDJ embedded
+        if (isEmbeddedDJLogger(s)) {
+            return djLoggerCache.getUnchecked(s);
+        } else {
+            return amLoggerCache.getUnchecked(s);
+        }
+    }
+
+    private boolean isEmbeddedDJLogger(String s) {
+        boolean isOpenDJSDK =
+                (s.startsWith("com.forgerock.opendj.ldap.") && !s.startsWith("com.forgerock.opendj.ldap.config")) ||
+                s.startsWith("com.forgerock.opendj.util.") ||
+                s.startsWith("org.forgerock.opendj.asn1.") ||
+                s.startsWith("org.forgerock.opendj.ldap.") ||
+                s.startsWith("org.forgerock.opendj.ldif.") ||
+                s.startsWith("org.forgerock.opendj.util.");
+
+        boolean isOpenDJ = s.contains(".opendj") || s.contains(".opends");
+
+        return isOpenDJ && !isOpenDJSDK;
     }
 }

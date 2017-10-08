@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -41,7 +41,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
@@ -50,6 +51,7 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.util.promise.Promise;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -62,6 +64,7 @@ public class UmaEnabledFilterTest {
     private static UmaProviderSettingsFactory enabledFactory;
     private Context context;
     private RequestHandler requestHandler;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeClass
     public static void setupFactories() throws Exception {
@@ -81,7 +84,9 @@ public class UmaEnabledFilterTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        context = ClientContext.newInternalClientContext(new RealmContext(new RootContext()));
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+        context = ClientContext.newInternalClientContext(new RealmContext(new RootContext(), Realm.root()));
         requestHandler = mock(RequestHandler.class);
         when(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
                 .thenReturn(promise(newActionResponse(null)));
@@ -97,6 +102,11 @@ public class UmaEnabledFilterTest {
                 .thenReturn(promise(newResourceResponse(null, null, null)));
         when(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class)))
                 .thenReturn(promise(newResourceResponse(null, null, null)));
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     private <V> Promise<V, ResourceException> promise(V response) {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
+
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -35,12 +38,15 @@ import java.util.logging.Level;
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.protocol.RequesterID;
+import com.sun.identity.saml2.protocol.impl.RequesterIDImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
+import com.sun.identity.saml2.assertion.EncryptedAssertion;
 import com.sun.identity.saml2.assertion.NameID; 
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -52,6 +58,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -65,12 +72,14 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map; 
 import java.util.HashMap;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPMessage;
@@ -82,6 +91,8 @@ import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.audit.SAML2EventLogger;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Element;
 
@@ -279,7 +290,7 @@ public class IDPProxyUtil {
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             try {
                 // sessionExpireTime is counted in seconds
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
+                long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval;
                 SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(requestID, new AuthnRequestInfoCopy(reqInfo),
                         sessionExpireTime);
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -368,7 +379,7 @@ public class IDPProxyUtil {
             newRequest.setRequestedAuthnContext(origRequest.
                 getRequestedAuthnContext());
             newRequest.setExtensions(origRequest.getExtensions()); 
-            newRequest.setIssueInstant(new Date());
+            newRequest.setIssueInstant(newDate());
             newRequest.setVersion(SAML2Constants.VERSION_2_0);
             Scoping scoping = origRequest.getScoping(); 
             if (scoping != null) {
@@ -381,6 +392,11 @@ public class IDPProxyUtil {
                     newScoping.setProxyCount(new Integer(proxyCount-1));
                 }
                 newScoping.setIDPList(scoping.getIDPList());
+
+                //Set the requesterIDs
+                newScoping.setRequesterIDs(scoping.getRequesterIDs());
+                addRequesterIDToScope(newScoping, origRequest.getIssuer().getValue());
+
                 newRequest.setScoping(newScoping);
             } else {
                 //handling the alwaysIdpProxy case -> the incoming request
@@ -400,6 +416,10 @@ public class IDPProxyUtil {
                         scoping.setProxyCount(proxyCount - 1);
                     }
                 }
+
+                //Set the requesterIDs
+                addRequesterIDToScope(scoping, origRequest.getIssuer().getValue());
+
                 List<String> proxyIdPs = spConfigAttrMap.get(
                         SAML2Constants.IDP_PROXY_LIST);
                 if (proxyIdPs != null && !proxyIdPs.isEmpty()) {
@@ -423,6 +443,19 @@ public class IDPProxyUtil {
                 "Error in creating new authn request.", ex);
             throw new SAML2Exception(ex);
         }
+    }
+
+    public static void addRequesterIDToScope(Scoping scoping, String requesterId) throws SAML2Exception {
+        List<RequesterID> requesterIDs = new ArrayList<>();
+        if (scoping.getRequesterIDs() != null) {
+            requesterIDs.addAll(scoping.getRequesterIDs());
+        }
+
+        RequesterID requesterID = new RequesterIDImpl();
+        requesterID.setValue(requesterId);
+        requesterIDs.add(requesterID);
+
+        scoping.setRequesterIDs(requesterIDs);
     }
     
     /**
@@ -505,6 +538,9 @@ public class IDPProxyUtil {
      * @param requestID request ID 
      * @param idpMetaAlias meta Alias 
      * @param newSession Session object
+     * @param nameIDFormat name identifier format
+     * @param saml2Auditor a <code>SAML2EventLogger</code> auditor object to hook into
+     *                tracking information for the saml request
      * @throws SAML2Exception for any SAML2 failure.
      */
     private static void sendProxyResponse(
@@ -514,7 +550,8 @@ public class IDPProxyUtil {
         String requestID,
         String idpMetaAlias,
         Object newSession,
-        String nameIDFormat)
+        String nameIDFormat,
+        SAML2EventLogger saml2Auditor)
         throws SAML2Exception 
     { 
         String classMethod = "IDPProxyUtil.sendProxyResponse: "; 
@@ -558,11 +595,11 @@ public class IDPProxyUtil {
                                   nameIDFormat, 
                                   relayState,
                                   newSession,
-                                  null);
+                                  saml2Auditor);
     }
 
-    /**
-     * Sends back a NoPassive response for the original AuthnRequest.
+     /**
+     * Sends back response with firstlevel and secondlevel status code if available for the original AuthnRequest.
      *
      * @param request The request.
      * @param response The response.
@@ -571,17 +608,22 @@ public class IDPProxyUtil {
      * @param idpMetaAlias The IdP's metaAlias.
      * @param hostEntityID The IdP's entity ID.
      * @param realm The realm where the IdP belongs to.
-     * @throws SAML2Exception If there was an error while sending the NoPassive response.
+     * @param firstlevelStatusCodeValue First-level status code value passed.
+     * @param secondlevelStatusCodeValue Second-level status code value passed.
+     * @throws SAML2Exception If there was an error while sending the response with second-level status-code.
      */
-    public static void sendNoPassiveProxyResponse(HttpServletRequest request, HttpServletResponse response,
-            PrintWriter out, String requestID, String idpMetaAlias, String hostEntityID, String realm)
+    public static void sendResponseWithStatus(HttpServletRequest request, HttpServletResponse response,
+                                                          PrintWriter out, String requestID, String idpMetaAlias,
+                                                          String hostEntityID, String realm,
+                                                          String firstlevelStatusCodeValue,
+                                                          String secondlevelStatusCodeValue)
             throws SAML2Exception {
 
         AuthnRequest origRequest = (AuthnRequest) IDPCache.proxySPAuthnReqCache.remove(requestID);
         String relayState = (String) IDPCache.relayStateCache.remove(origRequest.getID());
 
-        IDPSSOUtil.sendNoPassiveResponse(request, response, out, idpMetaAlias, hostEntityID, realm,
-                origRequest, relayState, origRequest.getIssuer().getValue());
+        IDPSSOUtil.sendResponseWithStatus(request, response, out, idpMetaAlias, hostEntityID, realm, origRequest,
+                relayState, origRequest.getIssuer().getValue(), firstlevelStatusCodeValue, secondlevelStatusCodeValue);
     }
 
     /**
@@ -593,13 +635,14 @@ public class IDPProxyUtil {
      * @param metaAlias The meta alias.
      * @param respInfo ResponseInfo object.
      * @param newSession Session object.
+     * @param auditor a <code>SAML2EventLogger</code> auditor
      * @throws SAML2Exception for any SAML2 failure.
      */
     public static void generateProxyResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-            String metaAlias, ResponseInfo respInfo, Object newSession) throws SAML2Exception {
+            String metaAlias, ResponseInfo respInfo, Object newSession, SAML2EventLogger auditor) throws SAML2Exception {
         Response saml2Resp = respInfo.getResponse();
         String requestID = saml2Resp.getInResponseTo();
-        String nameidFormat = getNameIDFormat(saml2Resp);
+        String nameidFormat = getNameIDFormat(saml2Resp, metaAlias);
         if (nameidFormat != null && SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("NAME ID Format= " + nameidFormat);
         }
@@ -607,21 +650,38 @@ public class IDPProxyUtil {
         // Save the SAML response received from the IdP in the request object, so that we can access the original
         // assertion when generating the new one.
         request.setAttribute(SAML2Constants.SAML_PROXY_IDP_RESPONSE_KEY, saml2Resp);
-        sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat);
+        sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat, auditor);
     }
     
-    private static String getNameIDFormat(Response res)  
-    {
+    private static String getNameIDFormat(Response res, String metaAlias) {
+
         if (res == null) {
             return null;
         }
 
-        List assertions = res.getAssertion();
-        if ((assertions == null) || (assertions.size() == 0)) {
-            return null;
+        Assertion assertion = null;
+        List<Assertion> assertions = res.getAssertion();
+
+        if(CollectionUtils.isEmpty(assertions)){
+            // Check for Encrypted Assertions
+            List<EncryptedAssertion> encryptedAssertions = res.getEncryptedAssertion();
+            if(CollectionUtils.isEmpty(encryptedAssertions)){
+                return null;
+            } else {
+                String realm = SAML2Utils.getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
+                try {
+                    String hostEntityId = sm.getEntityByMetaAlias(metaAlias);
+                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(sm.getSPSSOConfig(realm, hostEntityId));
+                    assertion = encryptedAssertions.get(0).decrypt(decryptionKeys);
+                } catch (SAML2Exception ex) {
+                    SAML2Utils.debug.error("getNameIDFormat failed decrypting EncryptedAssertion", ex);
+                    return null;
+                }
+            }
+        } else {
+            assertion = assertions.get(0);
         }
 
-        Assertion assertion = (Assertion)assertions.get(0);
         Subject subject = assertion.getSubject();
         if (subject == null) {
             return null;

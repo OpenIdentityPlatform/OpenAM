@@ -17,6 +17,7 @@ package org.forgerock.openam.scripting.service;
 
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
+import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptContext;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
@@ -35,6 +36,7 @@ public class ScriptConfiguration {
     private final String id;
     private final String name;
     private final String script;
+    private final boolean isDefault;
     private final SupportedScriptingLanguage language;
     private final ScriptContext context;
     private final String description;
@@ -208,6 +210,7 @@ public class ScriptConfiguration {
         this.id = builder.id;
         this.name = builder.name;
         this.script = builder.script;
+        this.isDefault = ScriptConstants.GlobalScript.isGlobalScript(id);
         this.language = builder.language;
         this.context = builder.context;
         this.description = builder.description;
@@ -247,6 +250,14 @@ public class ScriptConfiguration {
      */
     public String getScript() {
         return script;
+    }
+
+    /**
+     * Returns {@code true} if this is a default script.
+     * @return {@code true} if a default script.
+     */
+    public boolean isDefault() {
+        return isDefault;
     }
 
     /**

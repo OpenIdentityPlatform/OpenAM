@@ -24,16 +24,15 @@
  *
  * $Id: WSFedIDPViewBean.java,v 1.8 2008/10/16 20:43:00 babysunil Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.model.ModelControlException;
+import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
@@ -70,7 +69,22 @@ public class WSFedIDPViewBean extends WSFedGeneralBase {
         setDisplayFieldValue(WSFedPropertiesModel.TFCLAIM_TYPES, 
                 getStandardValues());       
     }
-    
+
+    @Override
+    protected View createChild(String name) {
+        if (WSFedPropertiesModel.IS_HOSTED.equals(name)) {
+            return new StaticTextField(this, name, isHosted());
+        } else {
+            return super.createChild(name);
+        }
+    }
+
+    @Override
+    protected void registerChildren() {
+        super.registerChildren();
+        registerChild(WSFedPropertiesModel.IS_HOSTED, StaticTextField.class);
+    }
+
     protected void createPropertyModel() {
         retrieveCommonProperties();
         if (isHosted()) {

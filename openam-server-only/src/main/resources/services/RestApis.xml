@@ -38,7 +38,8 @@
                                  syntax="string"
                                  any="display"
                                  resourceName="defaultVersion"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 order="100">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a101a">Latest</ChoiceValue>
                         <ChoiceValue i18nKey="a101b">Oldest</ChoiceValue>
@@ -53,7 +54,8 @@
                                  syntax="boolean"
                                  any="display"
                                  resourceName="warningHeader"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="200">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="a102a">Enabled</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="a102b">Disabled</BooleanFalseValue>
@@ -62,8 +64,23 @@
                         <Value>Enabled</Value>
                     </DefaultValues>
                 </AttributeSchema>
-            </Global>
+                <AttributeSchema name="openam-rest-apis-descriptions-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 any="display"
+                                 resourceName="descriptionsEnabled"
+                                 i18nKey="a103"
+                                 order="300">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="a103a">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="a103b">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
+            </Global>
         </Schema>
     </Service>
 </ServicesConfiguration>

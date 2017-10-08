@@ -47,6 +47,7 @@
                    type="list"
                    syntax="string"
                    i18nKey="a101"
+                   order="100"
                    resourceName="singleLogoutHandlerList">
                    <DefaultValues>
                        <Value>key=SAML2|class=com.sun.identity.multiprotocol.SAML2SingleLogoutHandler</Value>

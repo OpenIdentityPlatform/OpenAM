@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,11 @@
  *
  * $Id: QueryHandlerServlet.java,v 1.9 2009/09/22 22:49:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.soapbinding;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.key.KeyUtil;
@@ -384,7 +386,7 @@ public class QueryHandlerServlet extends HttpServlet {
             // set response attributes
             samlResponse.setID(SAML2Utils.generateID());
             samlResponse.setVersion(SAML2Constants.VERSION_2_0);
-            samlResponse.setIssueInstant(new Date());
+            samlResponse.setIssueInstant(newDate());
             Issuer issuer = AssertionFactory.getInstance().createIssuer();
             issuer.setValue(pdpEntityID);
             samlResponse.setIssuer(issuer);
@@ -396,7 +398,7 @@ public class QueryHandlerServlet extends HttpServlet {
             
             assertion.setID(SAML2Utils.generateID());
             assertion.setVersion(SAML2Constants.VERSION_2_0);
-            assertion.setIssueInstant(new Date());
+            assertion.setIssueInstant(newDate());
             assertion.setIssuer(issuer);
             // end assertion set attributes
             

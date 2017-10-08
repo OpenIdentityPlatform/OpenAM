@@ -1,13 +1,4 @@
-{{#if newScript}}
-    <p>{{t "console.scripts.edit.dialog.helper"}}</p>
-{{else}}
-    <div class="alert" role="alert">
-        <div class="media">
-            <div class="media-left" href="#"><i class="fa fa-exclamation-circle"></i></div>
-            <div class="media-body">{{t "console.scripts.edit.dialog.warning"}}</div>
-        </div>
-    </div>
-{{/if}}
+{{> alerts/_Alert text="console.scripts.edit.dialog.warning"}}
 
 {{#each contexts}}
 <div class="radio">

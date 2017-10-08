@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SetApplication.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -34,16 +36,30 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+
 public class SetApplication extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public SetApplication(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -74,8 +90,7 @@ public class SetApplication extends ApplicationImpl {
 
         Subject adminSubject = getAdminSubject();
         try {
-            Application appl = ApplicationManager.getApplication(adminSubject,
-                realm, appName);
+            Application appl = applicationServiceFactory.create(adminSubject, realm).getApplication(appName);
             Object[] param = {appName};
 
             if (appl == null) {
@@ -85,7 +100,7 @@ public class SetApplication extends ApplicationImpl {
             }
 
             setApplicationAttributes(appl, attributeValues, false);
-            ApplicationManager.saveApplication(getAdminSubject(), realm, appl);
+            applicationServiceFactory.create(getAdminSubject(), realm).saveApplication(appl);
             getOutputWriter().printlnMessage(
                 MessageFormat.format(getResourceString(
                 "set-application-modified"), param));

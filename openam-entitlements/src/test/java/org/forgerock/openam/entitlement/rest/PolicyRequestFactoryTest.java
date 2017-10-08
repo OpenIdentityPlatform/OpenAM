@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -25,8 +25,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
@@ -38,6 +41,7 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,25 +60,35 @@ public class PolicyRequestFactoryTest {
     private Subject restSubject;
 
     private PolicyRequestFactory factory;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         restSubject = new Subject();
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         factory = new PolicyRequestFactory(mock(SSOTokenManager.class));
+    }
+
+    @AfterMethod
+    public void testDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
     public void shouldRetrieveBatchRequest() throws EntitlementException {
         // When...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resources", Arrays.asList("/resource/a", "/resource/b"));
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // Given...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = factory.buildRequest(PolicyAction.EVALUATE, context, actionRequest);
 
         // Then...
@@ -85,6 +99,7 @@ public class PolicyRequestFactoryTest {
         assertThat(batchRequest.getResources()).containsOnly("/resource/a", "/resource/b");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest, times(2)).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -93,13 +108,15 @@ public class PolicyRequestFactoryTest {
     public void shouldRetrieveTreeRequest() throws EntitlementException {
         // When...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        given(subjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("resource", "/resource/a");
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        Realm realm = realmTestHelper.mockRealm("abc");
 
         // Given...
-        Context context = buildContextStructure("/abc");
+        Context context = buildContextStructure(realm);
         PolicyRequest request = factory.buildRequest(PolicyAction.TREE_EVALUATE, context, actionRequest);
 
         // Then...
@@ -110,6 +127,7 @@ public class PolicyRequestFactoryTest {
         assertThat(treeRequest.getResource()).isEqualTo("/resource/a");
 
         verify(subjectContext).getCallerSubject();
+        verify(subjectContext).getCallerSSOToken();
         verify(actionRequest, times(2)).getContent();
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
@@ -117,20 +135,21 @@ public class PolicyRequestFactoryTest {
     @Test(expectedExceptions = EntitlementException.class)
     public void shouldRejectUnsupportedAction() throws EntitlementException {
         // Given...
-        Context context = buildContextStructure("/abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        Context context = buildContextStructure(realm);
         factory.buildRequest(PolicyAction.UNKNOWN, context, actionRequest);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullAction() throws EntitlementException {
         // Given...
-        Context context = buildContextStructure("/abc");
+        Realm realm = realmTestHelper.mockRealm("abc");
+        Context context = buildContextStructure(realm);
         factory.buildRequest(null, context, actionRequest);
     }
 
-    private Context buildContextStructure(final String realm) {
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.setSubRealm(realm, realm);
+    private Context buildContextStructure(final Realm realm) {
+        RealmContext realmContext = new RealmContext(subjectContext, realm);
         return ClientContext.newInternalClientContext(realmContext);
     }
 }

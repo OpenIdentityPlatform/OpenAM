@@ -24,7 +24,7 @@
  *
  * $Id: Bootstrap.java,v 1.18 2009/05/13 21:26:36 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.setup;
 
@@ -176,7 +176,8 @@ public class Bootstrap {
         boolean bStartDS
     ) throws Exception {
         Properties properties = null;
-        bootstrapData.initSMS(bStartDS);       
+        bootstrapData.initSMS(bStartDS);
+
         if (reinit) {
             AdminUtils.initialize();
             SMSAuthModule.initialize();
@@ -205,6 +206,7 @@ public class Bootstrap {
         try {
             properties = ServerConfiguration.getServerInstance(
                 ssoToken, instanceName);
+
             if (properties != null) {
                 // set debug level to error because debug.message in
                 // SMSEntry.initializedClass won't work and will print out
@@ -229,7 +231,7 @@ public class Bootstrap {
                     ServerConfiguration.getServerConfigXML(
                     ssoToken, instanceName);
                 Crypt.reinitialize();
-                BootstrapData.loadServerConfigXML(serverConfigXML);
+                BootstrapData.loadServerConfigXML(serverConfigXML, true);
                 SMSEntry.initializeClass();
 
                 if (debugSetAtDefault) {
@@ -270,7 +272,6 @@ public class Bootstrap {
             }
         } catch (SMSException e) {
             //ignore. product is not configured yet.
-        	System.out.println("Bootstrap.getConfiguration :" + e);
             properties = null;
         }
         return properties;

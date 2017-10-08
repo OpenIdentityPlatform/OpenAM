@@ -15,34 +15,31 @@
  */
 package org.forgerock.openam.entitlement.configuration;
 
-import static com.sun.identity.entitlement.EntitlementException.MODIFY_RESOURCE_TYPE_FAIL;
-import static com.sun.identity.entitlement.EntitlementException.REMOVE_RESOURCE_TYPE_FAIL;
-import static com.sun.identity.entitlement.EntitlementException.RESOURCE_TYPE_RETRIEVAL_ERROR;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.ERROR;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.MESSAGE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.ATTEMPT_REMOVE_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.ATTEMPT_SAVE_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.FAILED_REMOVE_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.FAILED_SAVE_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.SUCCEEDED_REMOVE_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.SUCCEEDED_SAVE_RESOURCE_TYPE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATED_BY;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATION_DATE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_DESCRIPTION;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_LAST_MODIFIED_BY;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_LAST_MODIFIED_DATE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_NAME;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_PATTERNS;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCE_TYPES;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.REALM_DN_TEMPLATE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.RESOURCE_TYPE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.SCHEMA_RESOURCE_TYPES;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionSet;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAttribute;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resourceTypeFromMap;
-import static org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+import static com.sun.identity.entitlement.EntitlementException.*;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.*;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.*;
+
+import org.forgerock.openam.core.DNWrapper;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.util.query.QueryFilter;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -55,23 +52,6 @@ import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.util.query.QueryFilter;
-
-import javax.inject.Inject;
-import javax.security.auth.Subject;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 
 
 /**
@@ -256,7 +236,9 @@ public class ResourceTypeConfigurationImpl implements ResourceTypeConfiguration 
 
         final SSOToken token = SubjectUtils.getSSOToken(subject);
         final String dn = getResourceTypeBaseDN(realm);
-        final Filter filter = queryFilter.accept(new SmsQueryFilterVisitor(), null);
+        final Filter filter = Filter.and(
+                Filter.equality(SMSEntry.ATTR_SERVICE_ID, "resourceType"),
+                queryFilter.accept(new SmsQueryFilterVisitor(), null));
         final Set<ResourceType> resourceTypes = new HashSet<ResourceType>();
 
         try {

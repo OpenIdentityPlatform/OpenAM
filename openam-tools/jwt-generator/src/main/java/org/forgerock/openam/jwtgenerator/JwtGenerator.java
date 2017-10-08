@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.jwtgenerator;
@@ -69,11 +69,11 @@ public class JwtGenerator {
                 .build();
         System.out.println("JWT: " + jwt);
 
-        Calendar expiry = Calendar.getInstance();
+        Calendar expiry = org.forgerock.openam.utils.Time.getCalendarInstance();
         expiry.add(Calendar.DAY_OF_YEAR, 7);
 
         X509CertInfo info = new X509CertInfo();
-        CertificateValidity interval = new CertificateValidity(new Date(), new Date(validTime));
+        CertificateValidity interval = new CertificateValidity(org.forgerock.openam.utils.Time.newDate(), new Date(validTime));
         BigInteger sn = new BigInteger(64, new SecureRandom());
         X500Name owner = new X500Name("CN=ForgeRock,L=Bristol,C=GB");
 

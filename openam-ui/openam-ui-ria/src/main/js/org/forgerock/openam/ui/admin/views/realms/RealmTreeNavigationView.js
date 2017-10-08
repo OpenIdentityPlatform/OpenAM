@@ -11,40 +11,142 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
-    "org/forgerock/openam/ui/common/components/TreeNavigation"
-], function ($, _, Constants, EventManager, Router, SMSGlobalDelegate, TreeNavigation) {
-    var RealmTreeNavigationView = TreeNavigation.extend({
+    "org/forgerock/openam/ui/admin/services/global/RealmsService",
+    "org/forgerock/openam/ui/common/components/TreeNavigation",
+    "org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs",
+    "org/forgerock/openam/ui/admin/views/common/navigation/createTreeNavigation"
+], ($, _, Constants, EventManager, Router, RealmsService, TreeNavigation, createBreadcrumbs,
+    createTreeNavigation) => {
+
+    const navData = [{
+        title: "console.common.navigation.dashboard",
+        icon: "fa-dashboard",
+        route: "realmsDashboard"
+    }, {
+        title: "console.common.navigation.applications",
+        icon: "fa-list-alt",
+        children: [{
+            title: "console.common.navigation.saml20",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_FEDERATION"
+        }, {
+            title: "console.common.navigation.wsfed",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_FEDERATION"
+        }, {
+            title: "console.common.navigation.oauth20",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_OAUTH20"
+        }, {
+            title: "console.common.navigation.javaAgents",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_JAVA"
+        }, {
+            title: "console.common.navigation.webAgents",
+            icon: "fa-angle-right",
+            event: "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_WEB"
+        }]
+    }, {
+        title: "console.common.navigation.authentication",
+        icon: "fa-user",
+        children: [{
+            title: "console.common.navigation.settings",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationSettings"
+        }, {
+            title: "console.common.navigation.chains",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationChains"
+        }, {
+            title: "console.common.navigation.modules",
+            icon: "fa-angle-right",
+            route: "realmsAuthenticationModules"
+        }]
+    }, {
+        title: "console.common.navigation.services",
+        icon: "fa-plug",
+        route: "realmsServices"
+    }, {
+        title: "console.common.navigation.sessions",
+        icon: "fa-ticket",
+        route: "realmsSessions"
+    }, {
+        title: "console.common.navigation.dataStores",
+        icon: "fa-database",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_DATASTORES"
+    }, {
+        title: "console.common.navigation.privileges",
+        icon: "fa-check-square-o",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_PRIVILEGES"
+    }, {
+        title: "console.common.navigation.authorization",
+        icon: "fa-key",
+        children: [{
+            title: "console.common.navigation.policySets",
+            icon: "fa-angle-right",
+            route: "realmsPolicySets"
+        }, {
+            title: "console.common.navigation.resourceTypes",
+            icon: "fa-angle-right",
+            route: "realmsResourceTypes"
+        }]
+    }, {
+        title: "console.common.navigation.subjects",
+        icon: "fa-users",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_SUBJECTS"
+    }, {
+        title: "console.common.navigation.sts",
+        icon: "fa-tty",
+        event: "main.navigation.EVENT_REDIRECT_TO_JATO_STS"
+    }, {
+        title: "console.common.navigation.scripts",
+        icon: "fa-code",
+        route: "realmsScripts"
+    }];
+
+    function shortenRealmName (realmPath) {
+        let realmName;
+        if (realmPath === "/") {
+            realmName = $.t("console.common.topLevelRealm");
+        } else {
+            realmName = _.last(realmPath.split("/"));
+        }
+        return realmName;
+    }
+
+    const RealmTreeNavigationView = TreeNavigation.extend({
         events: {
             "click [data-event]": "sendEvent"
         },
-        sendEvent: function (e) {
+        sendEvent (e) {
             e.preventDefault();
             EventManager.sendEvent($(e.currentTarget).data().event, this.data.realmPath);
         },
-        template: "templates/admin/views/realms/RealmTreeNavigationTemplate.html",
-        realmExists: function (path) {
-            return SMSGlobalDelegate.realms.get(path);
+
+        realmExists (path) {
+            return RealmsService.realms.get(path);
         },
-        render: function (args, callback) {
-            var self = this;
-
+        render (args, callback) {
             this.data.realmPath = args[0];
-            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm")
-                : this.data.realmPath;
-
-            this.realmExists(this.data.realmPath).done(function () {
-                TreeNavigation.prototype.render.call(self, args, callback);
-            }).fail(function (xhr) {
+            this.data.realmName = shortenRealmName(this.data.realmPath);
+            this.data.crumbs = createBreadcrumbs(this.route.pattern);
+            this.data.treeNavigation = createTreeNavigation(navData, [encodeURIComponent(this.data.realmPath)]);
+            this.data.title = this.data.realmName;
+            this.data.home = `#${Router.getLink(
+                Router.configuration.routes.realmDefault, [encodeURIComponent(this.data.realmPath)])}`;
+            this.data.icon = "fa-cloud";
+            this.realmExists(this.data.realmPath).then(() => {
+                TreeNavigation.prototype.render.call(this, args, callback);
+            }, (xhr) => {
                 /**
                  * If a non-existant realm was specified, return to realms list
                  */

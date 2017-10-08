@@ -24,7 +24,7 @@
  *
  * $Id: IdUtils.java,v 1.34 2009/11/20 23:52:54 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -42,7 +42,6 @@ import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMDirectoryAccessFactory;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
-import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.SystemProperties;
@@ -56,12 +55,15 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrgConfigViaAMSDK;
-import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
+import org.forgerock.openam.core.realms.RealmLookup;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 
@@ -85,12 +87,6 @@ public final class IdUtils {
     protected static Map typesCanHaveMembers = new CaseInsensitiveHashMap();
 
     protected static Map typesCanAddMembers = new CaseInsensitiveHashMap();
-
-    // Static map to cache "orgIdentifier" and organization DN
-    private static Map orgIdentifierToOrgName = Collections.synchronizedMap(
-        new CaseInsensitiveHashMap());
-    private static Map orgStatusCache = Collections.synchronizedMap(
-        new CaseInsensitiveHashMap());
 
     // ServiceConfigManager for sunidentityrepository service
     private static String notificationId;
@@ -436,10 +432,12 @@ public final class IdUtils {
     /**
      * Returns the matching DN from the AM SDK for this entry. This utility is
      * required by auth.
-     * 
+     *
      * @param id  <code>AMIdentity</code> object.
      * @return <code>DN</code> of the object, as represented in the datastore.
+     * @deprecated use {@link org.forgerock.openam.identity.idm.IdentityUtils#getDN(AMIdentity)} instead.
      */
+    @Deprecated
     public static String getDN(AMIdentity id) {
         if (id.getDN() != null) {
             return id.getDN();
@@ -453,174 +451,15 @@ public final class IdUtils {
      * 
      * @param orgIdentifier  Organization identifier
      * @return Organization mapping to that identifier.
+     * @deprecated Use {@link RealmLookup#lookup(String)} instead.
      */
+    @Deprecated
     public static String getOrganization(SSOToken token, String orgIdentifier)
             throws IdRepoException, SSOException {
-        // Check in cache first
-        String id = null;
-        if ((id = (String) orgIdentifierToOrgName.get(orgIdentifier)) != null) {
-            return (id);
-        }
-
-        // Compute the organization name
-        if (debug.messageEnabled()) {
-            debug.message("IdUtils:getOrganization Input orgname: "
-                    + orgIdentifier);
-        }
-        if (orgIdentifier == null || orgIdentifier.length() == 0
-                || orgIdentifier.equals("/")) {
-            // Return base DN
-            id = DNMapper.orgNameToDN("/");
-        } else if (orgIdentifier.startsWith("/")) {
-            // If orgIdentifier is in "/" format covert to DN and return
-            id = DNMapper.orgNameToDN(orgIdentifier);
-            try {
-                new OrganizationConfigManager(token, orgIdentifier);
-            } catch (SMSException e) {
-                debug.message("IdUtils.getOrganization Exception in getting org name from SMS", e);
-                Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
-            }
-        } else if (LDAPUtils.isDN(orgIdentifier)) {
-            id = orgIdentifier;
-            try {
-                // Search for realms with orgIdentifier name
-                OrganizationConfigManager ocm = 
-                    new OrganizationConfigManager(token, orgIdentifier);
-            } catch (SMSException smse) {
-                // debug message here.
-                if (debug.messageEnabled()) {
-                    debug.message("IdUtils.getOrganization Exception in "
-                            + "getting org name from SMS", smse);
-                }
-                Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
-            }
-        } else if (ServiceManager.isCoexistenceMode()) {
-            // Return the org DN as determined by AMStoreConnection
-            if (debug.messageEnabled()) {
-                debug.message("IdUtils.getOrganization: getting from AMSDK");
-            }
-            try {
-                AMStoreConnection amsc = new AMStoreConnection(token);
-                id = amsc.getOrganizationDN(orgIdentifier, null);
-            } catch (AMException ame) {
-                if (debug.messageEnabled()) {
-                    debug.message("IdUtils.getOrganization Exception in "
-                            + "getting org name from AMSDK", ame);
-                }
-                throw convertAMException(ame);
-            }
-        } else {
-            // Get the realm name from SMS
-            if (debug.messageEnabled()) {
-                debug.message("IdUtils.getOrganization: getting from " +
-                    "SMS realms");
-            }
-            try {
-                boolean foundOrg = false;
-                ServiceManager sm = new ServiceManager(token);
-                // First search for realms with orgIdentifier name
-                OrganizationConfigManager ocm = sm
-                        .getOrganizationConfigManager("/");
-                Set subOrgNames = ocm.getSubOrganizationNames(orgIdentifier,
-                        true);
-                if (subOrgNames != null && !subOrgNames.isEmpty()) {
-                    if (subOrgNames.size() == 1) {
-                        id = DNMapper.orgNameToDN((String) subOrgNames
-                                .iterator().next());
-                        foundOrg = true;
-                    } else {
-                        for (Iterator items = subOrgNames.iterator();
-                            items.hasNext();) {
-                            // check for orgIdentifier
-                            String subRealmName = (String) items.next();
-                            StringTokenizer st = new StringTokenizer(
-                                    subRealmName, "/");
-                            // Need to handle the scenario where multiple
-                            // sub-realm with the same name should not be
-                            // allowed
-                            while (st.hasMoreTokens()) {
-                                if (st.nextToken().equalsIgnoreCase(
-                                        orgIdentifier)) {
-                                    if (!foundOrg) {
-                                        id = DNMapper.orgNameToDN(subRealmName);
-                                        foundOrg = true;
-                                    } else {
-                                        Object[] args = {orgIdentifier};
-                                        throw new IdRepoException(IdRepoBundle
-                                            .BUNDLE_NAME, IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Check if organization name has been determined
-                if (debug.messageEnabled()) {
-                    debug.message("IdUtils.getOrganization: getting from " +
-                        "SMS realms aliases");
-                }
-                // perform organization alias search
-                Set vals = new HashSet();
-                vals.add(orgIdentifier);
-                Set orgAliases = sm.searchOrganizationNames(
-                    IdConstants.REPO_SERVICE,
-                    IdConstants.ORGANIZATION_ALIAS_ATTR, vals);
-                if (!foundOrg &&
-                    ((orgAliases == null) || orgAliases.isEmpty())) {
-                    if (debug.warningEnabled()) {
-                        debug.warning("IdUtils.getOrganization Unable" +
-                            " to find Org name for: " + orgIdentifier);
-                    }
-                    Object[] args = {orgIdentifier};
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            IdRepoErrorCode.NO_MAPPING_FOUND, args);
-                } else if ((orgAliases != null)  && (orgAliases.size() > 0) &&
-                    (foundOrg || orgAliases.size() > 1)) {
-                    // Multiple realms should not have the same alias
-                    if (debug.warningEnabled()) {
-                        debug.warning("IdUtils.getOrganization Multiple " +
-                            " matching Orgs found for: " + orgIdentifier);
-                    }
-                    Object[] args = {orgIdentifier};
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            IdRepoErrorCode.MULTIPLE_MAPPINGS_FOUND, args);
-                }
-                if (!foundOrg) {
-                    String tmpS = (String) orgAliases.iterator().next();
-                    id = DNMapper.orgNameToDN(tmpS);
-                }
-            } catch (SMSException smse) {
-                // debug message here.
-                if (debug.messageEnabled()) {
-                    debug.message("IdUtils.getOrganization Exception in "
-                            + "getting org name from SMS", smse);
-                }
-                Object[] args = { orgIdentifier };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
-            }
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("IdUtils:getOrganization Search for OrgIdentifier:" +
-                orgIdentifier + " returning realm DN: " + id);
-        }
-
-        // Add to cache and return id
-        orgIdentifierToOrgName.put(orgIdentifier, id);
-        return id;
-    }
-
-    /**
-     * Clears the cache containing orgIdentifiers to organization names
-     */
-    protected static void clearOrganizationNamesCache() {
-        orgIdentifierToOrgName.clear();
-        orgStatusCache.clear();
-        if (debug.messageEnabled()) {
-            debug.message("IdUtils.clearOrganizationNamesCache called");
+        try {
+            return InjectorHolder.getInstance(RealmLookup.class).lookup(orgIdentifier).asDN();
+        } catch (RealmLookupException e) {
+            throw new IdRepoException(e.getResourceBundleName(), e.getErrorCode(), e.getMessageArgs());
         }
     }
 
@@ -634,55 +473,22 @@ public final class IdUtils {
      * for organization status from the realms tree.
      * 
      * @param token token SSOToken a valid SSOToken.
-     * @param org name of the organization of interest.
+     * @param realm name of the organization of interest.
      * @return <code>true</code> if org is active; 
      *    otherwise <code>false</code>
      * @throws IdRepoException if there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
+     * @deprecated Use {@link RealmLookup#isActive(Realm)} instead.
      */
-    public static boolean isOrganizationActive(SSOToken token, String org)
+    @Deprecated
+    public static boolean isOrganizationActive(SSOToken token, String realm)
             throws IdRepoException, SSOException {
-        // Check the cache
-        if (orgStatusCache.containsKey(org)) {
-            return (((Boolean) orgStatusCache.get(org)).booleanValue());
+        try {
+            RealmLookup realmLookup = InjectorHolder.getInstance(RealmLookup.class);
+            return realmLookup.isActive(realmLookup.lookup(realm));
+        } catch (RealmLookupException e) {
+            throw new IdRepoException(e.getResourceBundleName(), e.getErrorCode(), e.getMessageArgs());
         }
-        boolean isActive = true;
-        // Need to initialize ServiceManager by creating the constructor
-        if (!ServiceManager.isCoexistenceMode()) {
-            // Pick it up from the realms tree.
-            try {
-                OrganizationConfigManager ocm = new OrganizationConfigManager(
-                        token, org);
-                if (ocm == null) {
-                    Object[] args = { org };
-                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
-                }
-                Map attributes = ocm.getAttributes(IdConstants.REPO_SERVICE);
-                Set vals = (Set) attributes
-                        .get(IdConstants.ORGANIZATION_STATUS_ATTR);
-                if (vals == null || vals.isEmpty()) {
-                    isActive = true;
-                } else {
-                    String stringActive = (String) vals.iterator().next();
-                    isActive = stringActive.equalsIgnoreCase("Active");
-                }
-            } catch (SMSException smse) {
-                Object args[] = { org };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.NO_MAPPING_FOUND, args);
-            }
-        } else if (ServiceManager.isAMSDKEnabled()) {
-            // Return the org DN as determined by AMStoreConnection.
-            try {
-                AMStoreConnection amsc = new AMStoreConnection(token);
-                AMOrganization orgObj = amsc.getOrganization(org);
-                isActive = orgObj.isActivated();
-            } catch (AMException ame) {
-                throw convertAMException(ame);
-            }
-        }
-        // Add to cache
-        orgStatusCache.put(org, isActive);
-        return isActive;
     }
 
     private static void initializeForGetIdentity() {
@@ -873,13 +679,11 @@ public final class IdUtils {
         public void globalConfigChanged(String serviceName, String version,
             String groupName, String serviceComponent, int type) {
             initialize();
-            clearOrganizationNamesCache();
         }
 
         public void organizationConfigChanged(String serviceName,
             String version, String orgName, String groupName,
             String serviceComponent, int type) {
-            clearOrganizationNamesCache();
         }
     }
 

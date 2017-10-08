@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 
 import java.security.KeyPair;
 import java.util.Map;
@@ -93,11 +94,23 @@ public interface OpenAMSettings {
      * Gets the key pair that OpenAM is configured to use for the specified realm.
      *
      * @param realm The realm.
+     * @param algorithm The signing algorithm.
      * @return The key pair.
      * @throws SSOException If there is a problem getting the setting value.
      * @throws SMSException If there is a problem getting the setting value.
      */
-    KeyPair getServerKeyPair(String realm) throws SMSException, SSOException;
+    KeyPair getSigningKeyPair(String realm, JwsAlgorithm algorithm) throws SMSException, SSOException;
+
+    /**
+     * Gets the key pair that OpenAM is configured to use for the specified realm.
+     *
+     * @param realm The realm.
+     * @param attributeName The attribute name the alias for the key pair is stored.
+     * @return The key pair.
+     * @throws SSOException If there is a problem getting the setting value.
+     * @throws SMSException If there is a problem getting the setting value.
+     */
+    KeyPair getServerKeyPair(String realm, String attributeName) throws SMSException, SSOException;
 
     /**
      * Gets the name of the SSO Cookie.

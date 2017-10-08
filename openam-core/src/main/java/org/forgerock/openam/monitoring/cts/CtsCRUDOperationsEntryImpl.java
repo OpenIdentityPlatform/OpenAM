@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.monitoring.cts;
@@ -119,21 +119,23 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
     /**
      * Gets the average rate that the specified CTS operation has been made on the CTS.
      *
-     * @return The average rate.
+     * @return The average rate. The monitored value is multiplied by 100 to allow SNMP clients to display it as
+     * floating point value with 2 decimal places.
      */
     @Override
-    public Long getSAverage() throws SnmpStatusException {
-        return (long) monitoringStore.getAverageOperationsPerPeriod(null, getCTSOperation());
+    public Integer getSAverage() throws SnmpStatusException {
+        return (int) (monitoringStore.getAverageOperationsPerPeriod(null, getCTSOperation()) * 100);
     }
 
     /**
      * Gets the average failure rate of the given CTS operation in the current period.
      *
-     * @return the average failure rate.
+     * @return the average failure rate. The monitored value is multiplied by 100 to allow SNMP clients to display it as
+     * floating point value with 2 decimal places.
      */
     @Override
-    public Long getSFailureAverage() {
-        return (long) monitoringStore.getAverageOperationFailuresPerPeriod(getCTSOperation());
+    public Integer getSFailureAverage() {
+        return (int) (monitoringStore.getAverageOperationFailuresPerPeriod(getCTSOperation()) * 100);
     }
 
     /**

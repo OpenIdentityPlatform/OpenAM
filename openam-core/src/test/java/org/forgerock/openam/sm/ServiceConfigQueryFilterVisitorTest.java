@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
@@ -42,6 +42,8 @@ public class ServiceConfigQueryFilterVisitorTest {
         for (int i = 1; i < 5; i++) {
             attributeMap.put("param" + i, Collections.singleton("value" + i));
         }
+        attributeMap.put("long1", Collections.singleton("1"));
+        attributeMap.put("double1", Collections.singleton("2.1"));
         when(serviceConfig.getAttributesForRead()).thenReturn(attributeMap);
 
         filterVisitor = new ServiceConfigQueryFilterVisitor();
@@ -105,6 +107,58 @@ public class ServiceConfigQueryFilterVisitorTest {
                 equalTo("param1", "value2"),
                 contains("param2", "3"),
                 startsWith("param3", "val"));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void shouldMatchGreaterThanSearch() {
+        // given
+        QueryFilter<String> queryFilter = and(greaterThan("long1", 0l), greaterThan("double1", 1.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void shouldMatchGreaterThanOrEqualSearch() {
+        // given
+        QueryFilter<String> queryFilter = and(
+                and(greaterThanOrEqualTo("long1", 0l), greaterThanOrEqualTo("double1", 1.1)),
+                and(greaterThanOrEqualTo("long1", 1l), greaterThanOrEqualTo("double1", 2.1)));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void shouldMatchLessThanSearch() {
+        // given
+        QueryFilter<String> queryFilter = and(lessThan("long1", 2l), lessThan("double1", 3.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void shouldMatchLessThanOrEqualSearch() {
+        // given
+        QueryFilter<String> queryFilter = and(
+                and(lessThanOrEqualTo("long1", 2l), lessThanOrEqualTo("double1", 3.1)),
+                and(lessThanOrEqualTo("long1", 1l), lessThanOrEqualTo("double1", 2.1)));
 
         // when
         boolean result = queryFilter.accept(filterVisitor, serviceConfig);
@@ -205,5 +259,74 @@ public class ServiceConfigQueryFilterVisitorTest {
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void shouldNotMatchGreaterThanSearch() {
+        // given
+        QueryFilter<String> queryFilter = or(greaterThan("long1", 2l), greaterThan("double1", 3.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void shouldNotMatchGreaterThanOrEqualSearch() {
+        // given
+        QueryFilter<String> queryFilter = or(greaterThanOrEqualTo("long1", 2l), greaterThanOrEqualTo("double1", 3.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void shouldNotMatchLessThanSearch() {
+        // given
+        QueryFilter<String> queryFilter = or(lessThan("long1", 0l), lessThan("double1", 1.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void shouldNotMatchLessThanOrEqualSearch() {
+        // given
+        QueryFilter<String> queryFilter = or(lessThanOrEqualTo("long1", 0l), lessThanOrEqualTo("double1", 1.1));
+
+        // when
+        boolean result = queryFilter.accept(filterVisitor, serviceConfig);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class,
+            expectedExceptionsMessageRegExp = "Value of field \"param1\" is not a Long")
+    public void shouldThrowUnsupportedOperationExceptionWhenNotALong() {
+        // given
+        QueryFilter<String> queryFilter = greaterThan("param1", 0l);
+
+        // when
+        queryFilter.accept(filterVisitor, serviceConfig);
+
+    }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class,
+            expectedExceptionsMessageRegExp = "Value of field \"param1\" is not a Double")
+    public void shouldThrowUnsupportedOperationExceptionWhenNotADouble() {
+        // given
+        QueryFilter<String> queryFilter = lessThan("param1", 1.1);
+
+        // when
+        queryFilter.accept(filterVisitor, serviceConfig);
     }
 }

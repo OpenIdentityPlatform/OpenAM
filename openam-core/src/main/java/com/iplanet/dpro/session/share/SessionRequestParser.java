@@ -24,17 +24,19 @@
  *
  * $Id: SessionRequestParser.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.share;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.xml.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * <code>SessionRequestParser</code> parses the <code>SessionRequest</code>
@@ -138,13 +140,6 @@ class SessionRequestParser {
         nodelist = elem.getElementsByTagName("AddSessionListener");
         if (nodelist != null && nodelist.getLength() != 0) {
             sessionRequest.setMethodID(SessionRequest.AddSessionListener);
-        }
-
-        // check AddSessionListenerOnAllSessions
-        nodelist = elem.getElementsByTagName("AddSessionListenerOnAllSessions");
-        if (nodelist != null && nodelist.getLength() != 0) {
-            sessionRequest.setMethodID(
-                    SessionRequest.AddSessionListenerOnAllSessions);
         }
 
         // check SetProperty

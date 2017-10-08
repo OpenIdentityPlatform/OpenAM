@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 
-import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.coretoken.CoreTokenConstants;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.idm.IdConstants;
@@ -46,7 +46,6 @@ public class ExcludedServicesFactory {
             }
         }
         excludedServices.addAll(Arrays.asList(
-                IdConstants.AGENT_SERVICE,
                 EntitlementService.SERVICE_NAME,
                 EntitlementUtils.INDEXES_NAME,
                 CoreTokenConstants.CORE_TOKEN_STORE_SERVICE_NAME,
@@ -54,17 +53,17 @@ public class ExcludedServicesFactory {
                 "openProvisioning"
         ));
 
-        excludedServices.remove(SmsRequestHandler.IDFF_METADATA_SERVICE);
+        excludedServices.remove(SmsServiceHandlerFunction.IDFF_METADATA_SERVICE);
         excludedServices.remove(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
         excludedServices.remove("iPlanetAMAuthScriptedService");
         excludedServices.remove("iPlanetAMAuthDeviceIdMatchService");
 
         if (type == SchemaType.GLOBAL) {
             excludedServices.addAll(Arrays.asList(
-                    SmsRequestHandler.IDFF_METADATA_SERVICE,
-                    SmsRequestHandler.COT_CONFIG_SERVICE,
-                    SmsRequestHandler.SAML2_METADATA_SERVICE,
-                    SmsRequestHandler.WS_METADATA_SERVICE
+                    SmsServiceHandlerFunction.IDFF_METADATA_SERVICE,
+                    SmsServiceHandlerFunction.COT_CONFIG_SERVICE,
+                    SmsServiceHandlerFunction.SAML2_METADATA_SERVICE,
+                    SmsServiceHandlerFunction.WS_METADATA_SERVICE
             ));
         }
 

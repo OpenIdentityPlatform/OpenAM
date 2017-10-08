@@ -24,24 +24,17 @@
  *
  * $Id: Cert.java,v 1.14 2009/03/13 20:54:42 beomsuk Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.cert;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.x500.X500Principal;
-import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -49,8 +42,16 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import com.iplanet.am.util.JSSInit;
-import com.iplanet.am.util.SystemProperties;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.x500.X500Principal;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.LDAPUrl;
+
 import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -60,13 +61,9 @@ import com.sun.identity.security.cert.AMCRLStore;
 import com.sun.identity.security.cert.AMCertPath;
 import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.LDAPUrl;
-import org.mozilla.jss.CryptoManager;
+
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.CertificateExtensions;
@@ -129,6 +126,7 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_emailAddrTag; 
     private int amAuthCert_serverPort =389;
     private boolean portal_gw_cert_auth_enabled = false;
+    private boolean portal_gw_cert_preferred = false;
     private Set portalGateways = null;
     // HTTP Header name to have clien certificate in servlet request.
     private String certParamName = null;
@@ -147,8 +145,7 @@ public class Cert extends AMLoginModule {
     private static com.sun.identity.shared.debug.Debug debug = null;
 
     static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
-    static boolean usingJSSHandler = false;
-    
+
     private String amAuthCert_cacheCRL;
     private boolean doCRLCaching = true;
     
@@ -156,15 +153,6 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_updateCRL;
     private boolean doCRLUpdate = true;
     
-    
-    static {
-        String handler = SystemProperties.get(Constants.PROTOCOL_HANDLER,
-            Constants.JSSE_HANDLER);
-        usingJSSHandler = handler.equals(Constants.JSS_HANDLER);
-        if (usingJSSHandler) {
-            JSSInit.initialize();
-        }
-    }
 
     /**
      * Default module constructor does nothing
@@ -308,6 +296,11 @@ public class Cert extends AMLoginModule {
                  }
             }
 
+            // Switch to decide if provided certs in portal gateway (header)
+            // is preferred over certs provided from servlet request
+            portal_gw_cert_preferred = Boolean.valueOf(CollectionHelper.getMapAttr(
+                options, "iplanet-am-auth-cert-gw-cert-preferred"));
+
             amAuthCert_emailAddrTag = bundle.getString("emailAddrTag");
 
             amAuthCert_serverHost = CollectionHelper.getServerMapAttr(
@@ -349,29 +342,33 @@ public class Cert extends AMLoginModule {
             }
 
             if (debug.messageEnabled()) {
-                debug.message("\nldapProviderUrl="+ amAuthCert_serverHost +
-                    "\n\tamAuthCert_serverPort = " + amAuthCert_serverPort +
-                    "\n\tstartSearchLoc=" + amAuthCert_startSearchLoc +
-                    "\n\tsecurityType=" + amAuthCert_securityType +
-                    "\n\tprincipleUser=" + amAuthCert_principleUser +
-                    "\n\tauthLevel="+authLevel+
-                    "\n\tuseSSL=" + amAuthCert_useSSL +
-                    "\n\tocspEnable=" + ocspEnabled +
-                    "\n\tuserProfileMapper=" + amAuthCert_userProfileMapper +
-                    "\n\tsubjectAltExtMapper=" + 
-                        amAuthCert_subjectAltExtMapper +
-                    "\n\taltUserProfileMapper=" + 
-                        amAuthCert_altUserProfileMapper +
-                    "\n\tchkCRL=" + amAuthCert_chkCRL +
-                    "\n\tchkAttrCRL=" + amAuthCert_chkAttrCRL +
-                    "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL) +
-                    "\n\tcacheCRL=" + doCRLCaching +
-                    "\n\tupdateCRLs=" + doCRLUpdate +
-                    "\n\tchkCertInLDAP=" + amAuthCert_chkCertInLDAP +
-                    "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP +
-                    "\n\temailAddr=" + amAuthCert_emailAddrTag +
-                    "\n\tgw-cert-auth-enabled="+portal_gw_cert_auth_enabled +
-                    "\n\tclient=" + client);
+                StringBuilder sb = new StringBuilder();
+                sb.append("\nldapProviderUrl=").append(amAuthCert_serverHost)
+                    .append("\n\tamAuthCert_serverPort=").append(amAuthCert_serverPort)
+                    .append("\n\tstartSearchLoc=").append(amAuthCert_startSearchLoc)
+                    .append("\n\tsecurityType=").append(amAuthCert_securityType)
+                    .append("\n\tprincipleUser=").append(amAuthCert_principleUser)
+                    .append("\n\tauthLevel=").append(authLevel)
+                    .append("\n\tuseSSL=").append(amAuthCert_useSSL)
+                    .append("\n\tocspEnable=").append(ocspEnabled)
+                    .append("\n\tuserProfileMapper=").append(amAuthCert_userProfileMapper)
+                    .append("\n\tsubjectAltExtMapper=")
+                        .append(amAuthCert_subjectAltExtMapper)
+                    .append("\n\taltUserProfileMapper=")
+                        .append(amAuthCert_altUserProfileMapper)
+                    .append("\n\tchkCRL=").append(amAuthCert_chkCRL)
+                    .append("\n\tchkAttrCRL=").append(amAuthCert_chkAttrCRL)
+                    .append("\n\tchkAttributesCRL=").append(Arrays.toString(amAuthCert_chkAttributesCRL))
+                    .append("\n\tcacheCRL=").append(doCRLCaching)
+                    .append("\n\tupdateCRLs=").append(doCRLUpdate)
+                    .append("\n\tchkCertInLDAP=").append(amAuthCert_chkCertInLDAP)
+                    .append("\n\tchkAttrCertInLDAP=").append(amAuthCert_chkAttrCertInLDAP)
+                    .append("\n\temailAddr=").append(amAuthCert_emailAddrTag)
+                    .append("\n\tgw-cert-auth-enabled=").append(portal_gw_cert_auth_enabled)
+                    .append("\n\tgw-cert-ParamName=").append(certParamName)
+                    .append("\n\tgw_cert_preferred=").append(portal_gw_cert_preferred)
+                    .append("\n\tclient=").append(client);
+                debug.message(sb.toString());
             }
         } else {
             debug.error("options is null");
@@ -404,15 +401,19 @@ public class Cert extends AMLoginModule {
                         throw new AuthLoginException(amAuthCert, 
                             "noURLCertAuth", null);
                     }
-
                     thecert = getPortalStyleCert(servletRequest);
                     allCerts = new X509Certificate[] { thecert };
                 } else {
-                    if (debug.messageEnabled()) {
-                        debug.message("Certificate: got all certs from " + 
-                            "HttpServletRequest =" + allCerts.length);
+                    if (portal_gw_cert_auth_enabled && portal_gw_cert_preferred) {
+                        thecert = getPortalStyleCert(servletRequest);
+                        allCerts = new X509Certificate[] { thecert };
+                    } else {
+                       if (debug.messageEnabled()) {
+                           debug.message("Certificate: got all certs from " +
+                               "HttpServletRequest = {}", allCerts.length);
+                       }
+                       thecert = allCerts[0];
                     }
-                    thecert = allCerts[0];
                 }
             } else {
                 thecert = sendCallback();
@@ -469,12 +470,7 @@ public class Cert extends AMLoginModule {
             }
         }
 
-        int ret;
-        if (usingJSSHandler) {
-            ret = doJSSRevocationValidation(thecert);
-        } else {
-            ret = doJCERevocationValidation(allCerts);
-        }
+        int ret = doJCERevocationValidation(allCerts);
 
         if (ret != ISAuthConstants.LOGIN_SUCCEED) {
             debug.error("X509Certificate:CRL / OCSP verify failed.");
@@ -483,62 +479,6 @@ public class Cert extends AMLoginModule {
         }
         
         return ISAuthConstants.LOGIN_SUCCEED;
-    }
-
-    private int doJSSRevocationValidation(X509Certificate cert) {
-        int ret = ISAuthConstants.LOGIN_IGNORE;
-        boolean validateCA = amAuthCert_validateCA.equalsIgnoreCase("true");
-
-        X509CRL crl = null;
-        
-        if (crlEnabled) {
-            crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
-        
-            if ((crl != null) && (!crl.isRevoked(cert))) {
-                ret = ISAuthConstants.LOGIN_SUCCEED;
-            }
-        }
-
-        /**
-         * OCSP validation, this will use the CryptoManager.isCertvalid()
-         * method to validate certificate, OCSP is one of the steps in
-         * this process. Here is the algorith to find OCSP responder:
-         * 1. use global OCSP responder if set
-         * 2. use the OCSP responder in user's certificate if presents
-         * 3. no OCSP responder
-         * The isCertValid() WON'T perform OCSP validation if no OCSP responder
-         * found in above process.
-         */
-        if (ocspEnabled) {
-            try {
-                CryptoManager cm = CryptoManager.getInstance();
-                if (cm.isCertValid(cert.getEncoded(), true,
-                    CryptoManager.CertUsage.SSLClient) == true) {
-                    debug.message("cert is valid");
-                    ret = ISAuthConstants.LOGIN_SUCCEED;
-                } else {
-                    ret = ISAuthConstants.LOGIN_IGNORE;
-                }
-            } catch (Exception e) {
-                debug.message("certValidation failed with exception",e);
-            }
-        }
-        if ((ret == ISAuthConstants.LOGIN_SUCCEED)
-                && (crlEnabled || ocspEnabled)
-                && validateCA
-                && !AMCertStore.isRootCA(cert)) {
-            /*
-            The trust anchor is not necessarily a certificate, but a public key (trusted) entry in the trust-store. Don't
-            march up the chain unless the AMCertStore can actually return a non-null issuer certificate. If the issuer
-            certificate is null, then the result of the previous doRevocationValidation invocation is the final answer.
-             */
-            X509Certificate issuerCertificate = AMCertStore.getIssuerCertificate(
-                    ldapParam, cert, amAuthCert_chkAttrCertInLDAP);
-            if (issuerCertificate != null) {
-                ret = doJSSRevocationValidation(issuerCertificate);
-            }
-        }
-        return ret;
     }
 
     private int doJCERevocationValidation(X509Certificate[] allCerts)
@@ -707,7 +647,7 @@ public class Cert extends AMLoginModule {
             }
 
             if (debug.messageEnabled()) {
-                debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + userTokenId);
+                debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + " " + userTokenId);
             }
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -832,8 +772,7 @@ public class Cert extends AMLoginModule {
            }
        } else {
            debug.message("getPortalStyleCert: checking cert in userCert param");
-           Hashtable requestHash = 
-               getLoginState("getPortalStyleCert()").getRequestParamHash(); 
+           Map<String, String> requestHash = getLoginState("getPortalStyleCert()").getRequestParamHash();
            if (requestHash != null) {
                certParam = (String) requestHash.get("IDToken0"); 
                if (certParam == null) {
@@ -846,7 +785,7 @@ public class Cert extends AMLoginModule {
            debug.message ("in Certificate. validate certParam: " + certParam);
        }
        if (certParam == null || certParam.equals("")) {
-           debug.message("Certificate: no cert from HttpServletRequest");
+           debug.message("Certificate: no cert from HttpServletRequest header");
            throw new AuthLoginException(amAuthCert, "noCert", null);
        }
 

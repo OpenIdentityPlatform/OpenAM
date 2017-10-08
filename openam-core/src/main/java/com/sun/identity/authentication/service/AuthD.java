@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,23 +24,46 @@
  *
  * $Id: AuthD.java,v 1.23 2009/11/25 12:02:02 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.ldap.LDAPUtils.*;
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.authentication.service.AuthSessionFactory;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.AuthenticationSessionStore;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
@@ -68,27 +91,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.opendj.ldap.DN;
 
 
 /**
@@ -123,9 +125,7 @@ public class AuthD implements ConfigurationListener {
                 ConfigurationObserver.getInstance().addListener(INSTANCE);
 
             }
-
             return INSTANCE;
-
         }
     }
 
@@ -169,22 +169,8 @@ public class AuthD implements ConfigurationListener {
      */  
     static final int LOG_ERROR  = 1;
 
-    private static final boolean enforceJAASThread = SystemProperties.getAsBoolean(Constants.ENFORCE_JAAS_THREAD);
-    /**
-     * Configured directory server host name for auth
-     */
-    public static final String directoryHostName = SystemProperties.get(Constants.AM_DIRECTORY_HOST);
-    /**
-     * Configured directory server port number for auth
-     */
-    public static final int directoryPort = SystemProperties.getAsInt(Constants.AM_DIRECTORY_PORT, 0);
-
     private static final boolean logStatus = "ACTIVE".equalsIgnoreCase(SystemProperties.get(Constants.AM_LOGSTATUS,
             "INACTIVE"));
-    /**
-     * Configured revisionNumber for auth service
-     */
-    public static int revisionNumber;
 
     private final ConcurrentMap<String, AMIdentityRepository> idRepoMap =
             new ConcurrentHashMap<String, AMIdentityRepository>();
@@ -227,20 +213,18 @@ public class AuthD implements ConfigurationListener {
 
     private final String rootSuffix;
 
-    static {
-        if (debug.messageEnabled()) {
-            debug.message("Directory Host: "+ directoryHostName +
-            "\nDirectory PORT : "+ directoryPort);
-        }
-    }
+    private static AuthSessionFactory authSessionFactory = InjectorHolder.getInstance(AuthSessionFactory.class);
     
 
     private AuthD() {
         debug.message("AuthD initializing");
         try {
             rootSuffix = defaultOrg = ServiceManager.getBaseDN();
-            final Session authSession = initAuthSession();
-            ssoAuthSession = initSsoAuthSession(authSession);
+            ssoAuthSession = authSessionFactory.getAuthenticationSession(defaultOrg);
+            if (ssoAuthSession == null) {
+                debug.error("AuthD failed to get auth session");
+                throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
+            }
             initAuthServiceGlobalSettings();
             initPlatformServiceGlobalSettings();
             initSessionServiceDynamicSettings();
@@ -270,10 +254,6 @@ public class AuthD implements ConfigurationListener {
      */
     private void initAuthServiceGlobalSettings() throws Exception {
         ServiceSchemaManager scm = new ServiceSchemaManager(ISAuthConstants.AUTH_SERVICE_NAME, ssoAuthSession);
-        revisionNumber = scm.getRevisionNumber();
-        if (debug.messageEnabled()) {
-            debug.message("revision number = " + revisionNumber);
-        }
         updateAuthServiceGlobals(scm);
         new AuthConfigMonitor(scm);
     }
@@ -447,27 +427,27 @@ public class AuthD implements ConfigurationListener {
      * Return max session time
      * @return max session time
      */
-    String getDefaultMaxSessionTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.MAX_SESSION_TIME, "120");
+    int getDefaultMaxSessionTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.MAX_SESSION_TIME, 120, debug);
     }
     
     /**
      * Return max session idle time
      * @return max session idle time
      */
-    String getDefaultMaxIdleTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.SESS_MAX_IDLE_TIME, "30");
+    int getDefaultMaxIdleTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.SESS_MAX_IDLE_TIME, 30, debug);
     }
     
     /**
      * Return  max session caching time
      * @return  max session caching time
      */
-    String getDefaultMaxCachingTime() {
-        return CollectionHelper.getMapAttr(sessionSchema.getAttributeDefaults(),
-        ISAuthConstants.SESS_MAX_CACHING_TIME, "3");
+    int getDefaultMaxCachingTime() {
+        return CollectionHelper.getIntMapAttr(sessionSchema.getAttributeDefaults(),
+        ISAuthConstants.SESS_MAX_CACHING_TIME, 3, debug);
     }
 
     /**
@@ -506,7 +486,7 @@ public class AuthD implements ConfigurationListener {
         if (realmIdentity.getAssignedServices().contains(serviceName)) {
             realmIdentity.modifyService(serviceName, attributes);
         } else {
-            //TODO add it somehow?
+            realmIdentity.assignService(serviceName, attributes);
         }
     }
 
@@ -536,28 +516,17 @@ public class AuthD implements ConfigurationListener {
      * @param sid <code>SessionID</code> to be destroyed
      */
     public void destroySession(SessionID sid) {
-        getSessionService().destroyInternalSession(sid);
+        getSessionService().destroyAuthenticationSession(sid);
     }
     
     /**
      * Creates a new session.
      *
      * @param domain Domain Name.
-     * @param httpSession HTTP Session.
      * @return new <code>InternalSession</code>
      */
-    public static InternalSession newSession(
-        String domain, 
-        HttpSession httpSession,
-        boolean stateless) {
-        InternalSession is = null;
-        try {
-            is = getSessionService().newInternalSession(domain, httpSession, stateless);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            debug.error("Error creating session: ", ex);
-        }
-        return is;
+    public static InternalSession newSession(final String domain, final boolean stateless) {
+        return getSessionService().newInternalSession(domain, stateless);
     }
     
     /**
@@ -567,16 +536,16 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(String sessId) {
-        if (debug.messageEnabled()) {
-            debug.message("getSession for " + sessId);
-        }
-        InternalSession is = null;
-        if (sessId != null) {
-            SessionID sid = new SessionID(sessId);
-            is = getSession(sid);
-        }
-        if (is == null) {
+        debug.message("getSession for %s", sessId);
+
+        if (null == sessId) {
             debug.message("getSession returned null");
+            return null;
+        }
+        InternalSession is = getSession(new SessionID(sessId));
+        if (null == is) {
+            debug.message("getSession returned null");
+            return null;
         }
         return is;
     }
@@ -584,15 +553,19 @@ public class AuthD implements ConfigurationListener {
     /**
      * Returns the session associated with a session ID.
      *
-     * @param sid Session ID.
+     * @param sessionId Session ID.
      * @return the <code>InternalSession</code> associated with a session ID.
      */
-    public static InternalSession getSession(SessionID sid) {
-        InternalSession is = null;
-        if (sid != null) {
-            is = getSessionService().getInternalSession(sid);
-        } 
-        return is;
+    public static InternalSession getSession(SessionID sessionId) {
+        if (null == sessionId) {
+            return null;
+        }
+        InternalSession internalSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).getSession(sessionId);
+        if (internalSession != null) {
+            return internalSession;
+        }
+
+        return InjectorHolder.getInstance(SessionAccessManager.class).getInternalSession(sessionId);
     }
         
         
@@ -600,7 +573,7 @@ public class AuthD implements ConfigurationListener {
      * Returns the session associated with an HTTP Servlet Request.
      *
      * @param req HTTP Servlet Request.
-     * @return the <code>InternalSession</code> associated with 
+     * @return the <code>InternalSession</code> associated with
      *   anHTTP Servlet Request.
      */
     public InternalSession getSession(HttpServletRequest req) {
@@ -816,32 +789,6 @@ public class AuthD implements ConfigurationListener {
     public SSOToken getSSOAuthSession()  {
         return ssoAuthSession;
     }
-
-    private Session initAuthSession() throws SSOException, SessionException {
-        final Session authSession = getSessionService().getAuthenticationSession(defaultOrg, null);
-        if (authSession == null) {
-            debug.error("AuthD failed to get auth session");
-            throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
-        }
-
-        String clientID = authSession.getClientID();
-        authSession.setProperty("Principal", clientID);
-        authSession.setProperty("Organization", defaultOrg);
-        authSession.setProperty("Host",
-                authSession.getID().getSessionServer());
-
-        if (LDAPUtils.isDN(clientID)) {
-            String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
-            authSession.setProperty(Constants.UNIVERSAL_IDENTIFIER, id);
-        }
-
-        return authSession;
-    }
-    
-    private SSOToken initSsoAuthSession(Session authSession) throws SSOException, SessionException {
-        SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-        return ssoManager.createSSOToken(authSession.getID().toString());
-    }
     
     @Override
     public synchronized void notifyChanges() {
@@ -855,14 +802,14 @@ public class AuthD implements ConfigurationListener {
 
     /**
      * get inetDomainStatus attribute for the org
-     * @param orgName org name to check inetDomainStatus
+     * @param realm org name to check inetDomainStatus
      * @return true if org is active
      * @throws IdRepoException if can not can any information for org
      * @throws SSOException if can not use <code>SSOToken</code> for admin
      */
-    boolean getInetDomainStatus(String orgName)
+    boolean getInetDomainStatus(String realm)
         throws IdRepoException, SSOException {
-        return IdUtils.isOrganizationActive(ssoAuthSession,orgName);
+        return IdUtils.isOrganizationActive(ssoAuthSession, realm);
     }
     
     /**
@@ -874,19 +821,21 @@ public class AuthD implements ConfigurationListener {
      */
     public boolean isSuperAdmin(String dn) {
         boolean isAdmin = false;
-        String nDN = DNUtils.normalizeDN(dn);
-        if ((nDN != null) && (superAdmin != null || specialUser != null)) {
-            if (debug.messageEnabled()) {
-                debug.message("passed dn is :" + dn);
-            }
-            if (superAdmin != null) {
+        if (LDAPUtils.isDN(dn)) {
+            String nDN = DNUtils.normalizeDN(dn);
+            if ((nDN != null) && (superAdmin != null || specialUser != null)) {
                 if (debug.messageEnabled()) {
-                    debug.message("normalized super dn is :" + superAdmin);
+                    debug.message("passed dn is :" + dn);
                 }
-                isAdmin = nDN.equals(superAdmin);
-            }
-            if (!isAdmin) {
-                isAdmin = isSpecialUser(nDN);
+                if (superAdmin != null) {
+                    if (debug.messageEnabled()) {
+                        debug.message("normalized super dn is :" + superAdmin);
+                    }
+                    isAdmin = nDN.equals(superAdmin);
+                }
+                if (!isAdmin) {
+                    isAdmin = isSpecialUser(nDN);
+                }
             }
         }
         if (debug.messageEnabled()) {
@@ -1356,14 +1305,5 @@ public class AuthD implements ConfigurationListener {
      */
     Set getDefaultServiceFailureURLSet() {
         return defaultServiceFailureURLSet;
-    }
-
-
-    /**
-     * Flag to force to use JAAS thread.
-     * Default is false.
-     */
-    static boolean isEnforceJAASThread() {
-        return enforceJAASThread;
     }
 }

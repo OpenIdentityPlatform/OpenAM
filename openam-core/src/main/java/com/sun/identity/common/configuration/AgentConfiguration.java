@@ -24,12 +24,13 @@
  *
  * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.common.configuration;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
@@ -48,6 +49,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
@@ -93,16 +95,19 @@ public class AgentConfiguration {
   
     static {
         localAgentProperties = new HashMap();
-        ResourceBundle rb = ResourceBundle.getBundle(AGENT_LOCAL_PROPERTIES);
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String key = (String)e.nextElement();
-            Set set = new HashSet();
-            String value = rb.getString(key);
-            StringTokenizer st = new StringTokenizer(value, ",");
-            while (st.hasMoreTokens()) {
-                set.add(st.nextToken());
+        String agentLocalPropertiesFilePath = String.format("%s.properties", AGENT_LOCAL_PROPERTIES);
+        if (AgentConfiguration.class.getClassLoader().getResource(agentLocalPropertiesFilePath) != null) {
+            ResourceBundle rb = ResourceBundle.getBundle(AGENT_LOCAL_PROPERTIES);
+            for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
+                String key = (String) e.nextElement();
+                Set set = new HashSet();
+                String value = rb.getString(key);
+                StringTokenizer st = new StringTokenizer(value, ",");
+                while (st.hasMoreTokens()) {
+                    set.add(st.nextToken());
+                }
+                localAgentProperties.put(key, set);
             }
-            localAgentProperties.put(key, set);
         }
     }
     
@@ -442,10 +447,14 @@ public class AgentConfiguration {
         if (serverURL == null) {
             // need to set an arbitrary number to com.iplanet.am.server.port
             // so that number validator will pass
-            Map map = new HashMap(2);
-            map.put("SERVER_PORT", "80");
-            tagswapAttributeValues(attributeValues, map);
-       }
+            Map map = new HashMap(5);
+            map.put("SERVER_PROTO", SystemProperties.get("com.iplanet.am.server.protocol"));
+            map.put("SERVER_HOST", SystemProperties.get("com.iplanet.am.server.host"));
+            map.put("SERVER_PORT", SystemProperties.get("com.iplanet.am.server.port"));
+            map.put("AM_SERVICES_DEPLOY_URI", SystemProperties.get("com.iplanet.am.services.deploymentDescriptor"));
+            map.put("REALM", realm.equals("/") ? "" : realm);
+            tagswapAttributeValues(inheritedValues, map);
+        }
 
         if (agentURL == null) {
             // need to set an arbitrary number to com.iplanet.am.server.port
@@ -655,7 +664,7 @@ public class AgentConfiguration {
         for (Iterator i = attributeValues.keySet().iterator(); i.hasNext(); ) {
             String attrName = (String)i.next();
             Set values = (Set)attributeValues.get(attrName);
-            Set newValues = new HashSet(values.size() *2);
+            Set newValues = new HashSet(values.size() * 2);
 
             for (Iterator j = values.iterator(); j.hasNext(); ) {
                 String value = (String)j.next();
@@ -883,7 +892,7 @@ public class AgentConfiguration {
     private static Set getAgentAttributeSchemaNames(String agentTypeName)
         throws SMSException, SSOException {
         Set attrSchemas = getAgentAttributeSchemas(agentTypeName);
-        Set names = new HashSet(attrSchemas.size() *2);
+        Set names = new HashSet(attrSchemas.size() * 2);
         
         for (Iterator i = attrSchemas.iterator(); i.hasNext(); ) {
             AttributeSchema as = (AttributeSchema)i.next();
@@ -987,12 +996,16 @@ public class AgentConfiguration {
             isPropertiesLocallyStored(amid)
         ) {
             Set localProp = getLocalPropertyNames(agentType);
-            Map temp = new HashMap(localProp.size()*2);
+            Map temp = new HashMap(localProp.size() * 2);
             for (Iterator i = localProp.iterator(); i.hasNext(); ) {
                 String key = (String)i.next();
                 temp.put(key, values.get(key));
             }
             values = temp;
+        }
+
+        if (reformat && AGENT_TYPE_OAUTH2.equalsIgnoreCase(agentType)) {
+            values.remove(ATTR_NAME_PWD);
         }
         
         return (reformat) ? unparseAttributeMap(agentType, values) :
@@ -1021,7 +1034,7 @@ public class AgentConfiguration {
         }
         return isLocal;
     }
-    
+
     private static Map parseAttributeMap(String agentType, Map attrValues)
         throws SMSException, SSOException {
         Map dummy = new HashMap();
@@ -1470,7 +1483,7 @@ public class AgentConfiguration {
         
         String agentType = getAgentType(amid);
         Map attrSchemas = getAttributeSchemas(agentType, notToInherit);
-        Map resetValues = new HashMap(notToInherit.size() *2);
+        Map resetValues = new HashMap(notToInherit.size() * 2);
         
         for (Iterator i = notToInherit.iterator(); i.hasNext(); ) {
             String attrName = (String)i.next();

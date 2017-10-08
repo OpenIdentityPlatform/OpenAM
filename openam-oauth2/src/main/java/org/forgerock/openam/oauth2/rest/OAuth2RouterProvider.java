@@ -16,25 +16,23 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ResourceSets.NAME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ResourceSets.SCOPES;
+import static org.forgerock.openam.oauth2.OAuth2Constants.ShortClientAttributeNames.*;
 import static org.forgerock.openam.rest.audit.RestletBodyAuditor.*;
-import static org.forgerock.openam.rest.service.RestletUtils.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.TOKEN_TYPE_HINT;
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.ACTIVE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.APPLICATION_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ResourceSets.*;
-
-import java.util.Set;
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
@@ -45,24 +43,21 @@ import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.rest.RealmRoutingFactory;
 import org.forgerock.openam.rest.audit.OAuth2AccessAuditFilter;
-import org.forgerock.openam.rest.audit.OAuth2AuditContextProvider;
 import org.forgerock.openam.rest.audit.RestletBodyAuditor;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
+import org.forgerock.openidconnect.restlet.IdTokenInfo;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
 import org.restlet.Restlet;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * Guice Provider from getting the OAuth2 HTTP router.
@@ -71,38 +66,32 @@ import com.google.inject.name.Names;
  */
 public class OAuth2RouterProvider implements Provider<Router> {
 
-    private final RestRealmValidator realmValidator;
-    private final CoreWrapper coreWrapper;
     private final AuditEventPublisher eventPublisher;
     private final AuditEventFactory eventFactory;
-    private final Set<OAuth2AuditContextProvider> contextProviders;
+    private final OAuth2RequestFactory requestFactory;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
-     *  @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
      * @param eventPublisher The publisher responsible for logging the events.
      * @param eventFactory The factory that can be used to create the events.
-     * @param contextProviders The OAuth2 audit context providers, responsible for finding details which can
+     * @param requestFactory The factory that provides access to OAuth2Request.
      * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
      */
     @Inject
-    public OAuth2RouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
-            @Named(OAUTH2_AUDIT_CONTEXT_PROVIDERS) Set<OAuth2AuditContextProvider> contextProviders,
+    public OAuth2RouterProvider(AuditEventPublisher eventPublisher, AuditEventFactory eventFactory,
+            OAuth2RequestFactory requestFactory,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
-        this.realmValidator = realmValidator;
-        this.coreWrapper = coreWrapper;
         this.eventPublisher = eventPublisher;
         this.eventFactory = eventFactory;
-        this.contextProviders = contextProviders;
+        this.requestFactory = requestFactory;
         this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     @Override
     public Router get() {
-        final Router router = new RestletRealmRouter(realmValidator, coreWrapper);
+        final Router router = new RestletRealmRouter();
+        router.attach("/" + RealmRoutingFactory.REALM_ROUTE, new RealmRoutingFactory().createRouter(router));
 
         // Standard OAuth2 endpoints
 
@@ -127,6 +116,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
                 jsonAuditor(CLIENT_NAME.getType(), APPLICATION_TYPE.getType(), REDIRECT_URIS.getType()),
                 jacksonAuditor(CLIENT_ID, CLIENT_NAME.getType(), APPLICATION_TYPE.getType(), REDIRECT_URIS.getType())));
         router.attach("/userinfo", auditWithOAuthFilter(wrap(UserInfo.class)));
+        router.attach("/idtokeninfo", auditWithOAuthFilter(wrap(IdTokenInfo.class)));
         router.attach("/connect/endSession", auditWithOAuthFilter(wrap(EndSession.class)));
         router.attach("/connect/jwk_uri", auditWithOAuthFilter(wrap(OpenIDConnectJWKEndpoint.class)));
 
@@ -149,6 +139,9 @@ public class OAuth2RouterProvider implements Provider<Router> {
         router.attach("/device/code", auditWithOAuthFilter(wrap(DeviceCodeResource.class),
                 formAuditor(RESPONSE_TYPE, GRANT_TYPE, CLIENT_ID, SCOPE), noBodyAuditor()));
 
+        // OAuth2 Token Revocation
+        router.attach("/token/revoke", auditWithOAuthFilter(wrap(TokenRevocationResource.class)));
+
         return router;
     }
 
@@ -157,13 +150,13 @@ public class OAuth2RouterProvider implements Provider<Router> {
     }
 
     private Filter auditWithOAuthFilter(Restlet restlet) {
-        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders,
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, requestFactory,
                 noBodyAuditor(), noBodyAuditor());
     }
 
     private Filter auditWithOAuthFilter(Restlet restlet, RestletBodyAuditor<?> requestDetailCreator,
             RestletBodyAuditor<?> responseDetailCreator) {
-        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, contextProviders,
+        return new OAuth2AccessAuditFilter(restlet, eventPublisher, eventFactory, requestFactory,
                 requestDetailCreator, responseDetailCreator);
     }
 }

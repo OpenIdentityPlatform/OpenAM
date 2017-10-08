@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,13 +15,13 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.tokens.CoreTokenField;
-
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Map;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
  * Provides the mapping between CoreTokenFields and the type of the value that is associated to
@@ -32,8 +32,6 @@ import java.util.Map;
  * - Persisting a Token to LDAP
  *
  * Both of these cases need to know the type of the value stored in the Tokens map.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenFieldTypes {
     /**
@@ -145,6 +143,7 @@ public class CoreTokenFieldTypes {
         switch (field) {
             case TOKEN_ID:
             case USER_ID:
+            case ETAG:
             case STRING_ONE:
             case STRING_TWO:
             case STRING_THREE:
@@ -160,6 +159,24 @@ public class CoreTokenFieldTypes {
             case STRING_THIRTEEN:
             case STRING_FOURTEEN:
             case STRING_FIFTEEN:
+            case MULTI_STRING_ONE:
+            case MULTI_STRING_TWO:
+            case MULTI_STRING_THREE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @param field Non null field to check.
+     * @return True if the field is a multi-value field.
+     */
+    public static boolean isMulti(CoreTokenField field) {
+        switch (field) {
+            case MULTI_STRING_ONE:
+            case MULTI_STRING_TWO:
+            case MULTI_STRING_THREE:
                 return true;
             default:
                 return false;

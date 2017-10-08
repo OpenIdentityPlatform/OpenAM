@@ -24,7 +24,7 @@
   
    $Id: sms.dtd,v 1.8 2008/09/04 23:59:39 veiming Exp $
   
-   Portions Copyrighted 2014-2015 ForgeRock AS.
+   Portions Copyrighted 2014-2016 ForgeRock AS.
 -->
 
 <!-- This DTD defines the data structure that will be used by services to define their configuration information and their management tasks.
@@ -112,6 +112,8 @@ Unique Declaration name for DOCTYPE tag:
         maintainPriority ( yes | no ) "no"
         validate ( yes | no ) "yes"
         supportsApplicableOrganization ( yes | no ) "no"
+        hideConfigUI ( yes | no ) "no"
+        realmCloneable ( yes | no ) "yes"
         i18nFileName CDATA #IMPLIED
         resourceName CDATA #IMPLIED
         %i18nIndex;
@@ -141,14 +143,14 @@ Unique Declaration name for DOCTYPE tag:
 
 <!-- AttributeSchema defines a single configuration parameter for a service. The attribute name gives the name for the configurable parameter, The type specifies the kind of value the attribute will take.  Possible values are: single, list, single_choice, multi_choice, signature, or validator type.  For single_choice, a default value must be defined from the list of choice values. The default value for type is list; The uitype specifies the display type as radio, link, button, or name_value_list; The syntax defines whether the parameter is boolean, string, paragraph, password, encrypted_password, dn, email, url, numeric, percent, number, decimal_number, number_range, decimal_range, xml, or date.  The cosQualifier defines how the OpenSSO will resolve conflicting cosQulaifier attributes assigned to the same user object.  The default value for syntax is string; The rangeStart and rangeEnd provide the starting and ending values for attribute syntax decimal_range and number range, respectively; The minValue and maxValue provide the minimun and maximun acceptable values respectively.  The validator specifies the name of the class that would validate this attribute.  The any provides means for service developers to add service-specific information.  The propertiesViewBeanURL specifies the name of the Admin Console viewbean associated with this attribute. The i18nIndex attribute provides the I18N key used to get the localized display name.  The elements IsOptional, IsServiceIdentifier, IsResourceNameAllowed, IsStatusAttribute represent whether the attribute is optional, a service identifier (CoS specifier), resource name allowed or status attribute, respectievely. The element BooleanValues provide the boolean true and false values. The element DefaultValues provides the default values for the parameter. The element ChoiceValues provides the possible values for the parameter if it is of choice type. The element Condition, if present specifies boolean operations which determine if the attribute is valid based on the current configuration data. If multiple Condition elements are present it is sufficient if at least one of them statisfy the requirement (this provides "OR" implementation). -->
 <!ELEMENT AttributeSchema (IsOptional?, IsServiceIdentifier?, IsResourceNameAllowed?,
-        IsStatusAttribute?, ChoiceValues?, BooleanValues?, DefaultValues?,
+        IsStatusAttribute?, ChoiceValues?, BooleanValues?, DefaultValues?, ExampleValue?,
         Condition* ) >
 <!ATTLIST AttributeSchema
         name NMTOKEN #REQUIRED
         type ( single | list | single_choice | multiple_choice |
                 signature | validator ) "list"
         uitype ( radio | link | button | name_value_list | unorderedlist |
-                orderedlist | maplist | globalmaplist | addremovelist ) #IMPLIED
+                orderedlist | maplist | globalmaplist | addremovelist | scriptSelect | globalScriptSelect) #IMPLIED
         syntax ( boolean | string | paragraph | password | encrypted_password | 
                 dn | email | url | numeric | percent | number |
                 decimal_number | number_range | decimal_range | xml | date | script ) "string"
@@ -164,6 +166,7 @@ Unique Declaration name for DOCTYPE tag:
         propertiesViewBeanURL CDATA #IMPLIED
         isSearchable ( yes | no ) "no"
         resourceName CDATA #IMPLIED
+        order CDATA #IMPLIED
         %i18nIndex;
 >
 
@@ -175,6 +178,10 @@ Unique Declaration name for DOCTYPE tag:
 <!ATTLIST DefaultValuesClassName
         className        NMTOKEN                #REQUIRED
 >
+
+<!-- ExampleValue provide example value for an attribute. The values are statically defined via the sub-element
+Value. -->
+<!ELEMENT ExampleValue ( Value ) >
 
 <!-- ChoiceValues provide the only possible values for the attribute. The values are statically defined via the sub-element Value or can be dynamically computed by calling the class defined by the sub-element ChoiceValuesClassName. -->
 <!ELEMENT ChoiceValues ( ChoiceValue* | ChoiceValuesClassName ) >

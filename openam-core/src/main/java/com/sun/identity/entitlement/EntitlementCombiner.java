@@ -24,12 +24,14 @@
  *
  * $Id: EntitlementCombiner.java,v 1.4 2009/12/07 19:46:45 veiming Exp $
  *
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+
 import com.sun.identity.entitlement.interfaces.ResourceName;
-import org.forgerock.openam.entitlement.PolicyConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,8 +77,7 @@ public abstract class EntitlementCombiner {
      */
     public void init(String realm, String applicationName, String normalisedResourceName, String requestedResourceName,
                      Set<String> actions, boolean isRecursive) throws EntitlementException {
-        Application application = ApplicationManager.getApplication(
-                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
+        Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realm).getApplication(applicationName);
         init(normalisedResourceName, requestedResourceName, actions, isRecursive, application);
     }
 

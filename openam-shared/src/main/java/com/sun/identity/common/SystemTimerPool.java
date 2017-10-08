@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SystemTimerPool.java,v 1.5 2008/09/05 00:51:02 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.common;
 
@@ -39,9 +36,12 @@ import org.forgerock.util.thread.listener.ShutdownListener;
 /**
  * SystemTimerPool is a TimerPool which shared in the system.
  */
-
 public class SystemTimerPool {
-    
+
+    /** The name of the {@link TimerPool} instance. */
+    public static final String TIMER_NAME = "SystemTimerPool";
+    /** The name of the {@link TimerPool} scheduler. */
+    public static final String SCHEDULER_NAME = TIMER_NAME + TimerPool.SCHEDULER_SUFFIX;
     protected static TimerPool instance;
     public static final int DEFAULT_POOL_SIZE = 3;
     private static int poolSize;
@@ -56,7 +56,7 @@ public class SystemTimerPool {
             } catch (NumberFormatException ex) {
                 // Don't load the Debug object in static block as it can
                 // cause issues when doing a container restart.
-                Debug debug = Debug.getInstance("SystemTimerPool");
+                Debug debug = Debug.getInstance(TIMER_NAME);
                 debug.error("SystemTimerPool.<init>: incorrect pool size "
                     + size + " defaulting to " + DEFAULT_POOL_SIZE);
             }
@@ -73,8 +73,7 @@ public class SystemTimerPool {
 
             // Don't load the Debug object in static block as it can
             // cause issues when doing a container restart.
-            instance = new TimerPool("SystemTimerPool",
-                poolSize, false, Debug.getInstance("SystemTimerPool"));
+            instance = new TimerPool(TIMER_NAME, poolSize, false, Debug.getInstance(TIMER_NAME));
 
             try {
                 shutdownMan.addShutdownListener(new ShutdownListener() {

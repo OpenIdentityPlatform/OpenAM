@@ -24,7 +24,7 @@
  *
  * $Id: BootstrapData.java,v 1.16 2009/05/05 21:24:47 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -39,6 +39,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,19 +51,30 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.forgerock.openam.setup.BootstrapConfig;
+import org.forgerock.openam.setup.ConfigStoreProperties;
+import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.opendj.ldap.DN;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.opendj.ldap.DN;
 
 public class BootstrapData {
+
     private List data = new ArrayList();
-    
+
+    // The key alias for the dsame user password in the keystore
+    public static final String DSAME_PWD_KEY = "dsameUserPwd";
+    // the key alias for the config store password
+    public static final String CONFIG_PWD_KEY = "configStorePwd";
+
+
     final static String BOOTSTRAP = "bootstrap";
     
     static final String PROTOCOL = "protocol";
@@ -101,21 +115,97 @@ public class BootstrapData {
     private String dsameUserPwd;
     private String instanceName;
 
+
     /**
      * Creates an instance of this class
      *
      * @param basedir Base Directory of the installation.
      * @throws IOException if cannot read the file.
      */
-    public BootstrapData(String basedir) 
-        throws IOException {
+    public BootstrapData(String basedir) throws IOException {
         this.basedir = basedir;
-        readFile(basedir + "/" + BOOTSTRAP);
+
+        // if there is a bootstrap file, go ahead and boot from it -
+        // trigger the migration of everything AFTER the system is booted
+        String bootstrapFile = basedir + "/" + BOOTSTRAP;
+        if (new File(bootstrapFile).exists()) {
+            readFile(bootstrapFile);
+        }
+        else {
+            readBootJson(basedir);
+        }
     }
-    
-    public BootstrapData(Map mapConfig)
-        throws UnsupportedEncodingException {
+
+    public BootstrapData(Map mapConfig) throws UnsupportedEncodingException {
         data.add(createBootstrapResource(mapConfig, false));
+    }
+
+    /**
+     * Read bootstrap data from boot.json
+     *
+     * The boot passwords are stored in keystore.jceks.
+     *
+     * This mimics the readFile() call - and as a side effect leaves this.data List populated with
+     * the bootstrap url in the same form as the bootstrap file.
+     *
+     * @throws IOException if the boot.json can not be read or is corrupt, or if the boot keys can not be read from the
+     *  keystore
+     */
+
+    private void readBootJson(String basedir) throws IOException {
+        // open props file in base dir
+
+        BootstrapConfig boot = BootstrapConfig.fromJsonFile(basedir + "/boot.json");
+
+        String dsamePassword;
+        String configStorePassword;
+
+        try {
+            AMKeyProvider amKeyProvider = new AMKeyProvider(boot.getKeyStoreConfig("default"));
+            dsamePassword = amKeyProvider.getSecret(DSAME_PWD_KEY);
+            configStorePassword = amKeyProvider.getSecret(CONFIG_PWD_KEY);
+        } catch (KeyStoreException e) {
+            throw new IOException("Can't open boot keystore", e);
+        }
+
+        String server_instance = boot.getInstance();
+
+        if (server_instance == null) {
+            throw new IOException("Can't bootstrap - missing server instance");
+        }
+
+        String dsame_user = boot.getDsameUser();
+
+
+        // The existing bootstrap supports multiple config stores ldap servers
+        // so the bootstrap process can fail over to another config server
+        // We should encourage customers to use environment load balancing or LDAP proxies in
+        // preference to this.
+        for(ConfigStoreProperties cfp: boot.getConfigStoreList()) {
+            // build the config map that createBootstrapResource() wants to see
+            Map m = new HashMap();
+
+            // createBootstrapResource() expects proto to have :// appended.
+            String proto = cfp.getLdapProtocol() + "://";
+            m.put( PROTOCOL, proto);
+            m.put(DS_HOST, cfp.getLdapHost());
+            String port = "" + cfp.getLdapPort(); // convert port to string
+            m.put(DS_PORT, port);
+            m.put(SERVER_INSTANCE, server_instance);
+            m.put(PWD, dsamePassword);
+            m.put(DS_BASE_DN, cfp.getBaseDN());
+            m.put(USER, dsame_user);
+            m.put(DS_MGR, cfp.getDirManagerDN());
+            m.put(DS_PWD, configStorePassword);
+
+            String bootstrap = createBootstrapResource(m, false);
+
+            // just for added pleasure, createBootstrapResource() does not process the dsame user name
+            bootstrap = StringUtils.strReplaceAll(bootstrap, "@DSAMEUSER_NAME@",
+                    URLEncoder.encode(dsame_user, "UTF-8"));
+
+            data.add(bootstrap);
+        }
     }
 
     /**
@@ -179,7 +269,7 @@ public class BootstrapData {
         Properties prop = getBootstrapProperties();
         SystemProperties.initializeProperties(prop, true);
         Crypt.reinitialize();
-        loadServerConfigXML(serverConfigXML);
+        loadServerConfigXML(serverConfigXML, false);
         
         if (startDS) {
             startEmbeddedDS(basedir + AMSetupServlet.OPENDS_DIR);
@@ -235,12 +325,12 @@ public class BootstrapData {
         }
     }
     
-    static void loadServerConfigXML(String xml)
+    static void loadServerConfigXML(String xml, boolean isBootstrapComplete)
         throws LDAPServiceException {
         ByteArrayInputStream bis = null;
         try {
             bis = new ByteArrayInputStream(xml.getBytes());
-            DSConfigMgr.initInstance(bis);
+            DSConfigMgr.initInstance(bis, isBootstrapComplete);
         } finally {
             if (bis != null) {
                 try {

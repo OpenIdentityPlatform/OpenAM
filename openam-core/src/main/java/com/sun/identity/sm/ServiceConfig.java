@@ -256,17 +256,17 @@ public class ServiceConfig {
      * @throws SMSException
      *             if an error occurred while performing the operation.
      */
-    public Set getSubConfigNames(String pattern, String schemaName)
+    public Set<String> getSubConfigNames(String pattern, String schemaName)
             throws SMSException {
         validateServiceConfigImpl();
         try {
-            return (sc.getSubConfigNames(token, pattern, schemaName));
+            return sc.getSubConfigNames(token, pattern, schemaName);
         } catch (SSOException s) {
             SMSEntry.debug.error("ServiceConfigManager: Unable to "
                     + "get subConfig Names for filters: " + pattern + "AND"
                     + schemaName, s);
         }
-        return (Collections.EMPTY_SET);
+        return Collections.emptySet();
 
     }
 
@@ -447,7 +447,7 @@ public class ServiceConfig {
      * @return the <code>Map</code> where key is the attribute name and value
      *         is the <code>Set</code> of attribute values
      */
-    public Map getAttributes() {
+    public Map<String, Set<String>> getAttributes() {
         validate();
         return (sc.getAttributes());
     }
@@ -492,7 +492,7 @@ public class ServiceConfig {
      * @return the <code>Map</code> where key is the attribute name
      *	 and value is the <code>Set</code> of attribute values
      */
-    public Map getAttributesForRead() {
+    public Map<String, Set<String>> getAttributesForRead() {
         validate();
 	return (sc.getAttributesForRead());
     }
@@ -504,7 +504,7 @@ public class ServiceConfig {
      * corresponding values in the <code>Map</code> is a
      * <code>Set</code> that contains the values for the attribute.
      */
-    public Map getAttributesWithoutDefaultsForRead() {
+    public Map<String, Set<String>> getAttributesWithoutDefaultsForRead() {
         validate();
         return (sc.getAttributesWithoutDefaultsForRead());
     }

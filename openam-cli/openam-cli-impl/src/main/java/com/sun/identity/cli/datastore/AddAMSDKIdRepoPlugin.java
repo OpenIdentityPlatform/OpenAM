@@ -395,7 +395,7 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
     private ConnectionFactory getLDAPConnection(DSEntry ds) throws Exception {
         BindRequest bindRequest = LDAPRequests.newSimpleBindRequest(bindDN, bindPwd.toCharArray());
         Options options = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.MILLISECONDS))
+                .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.SECONDS))
                 .set(AUTHN_BIND_REQUEST, bindRequest);
 
         if (ds.ssl) {

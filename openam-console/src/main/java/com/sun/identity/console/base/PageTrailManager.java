@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,13 @@
  *
  * $Id: PageTrailManager.java,v 1.3 2008/07/10 23:27:22 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.base;
 
+import static org.forgerock.openam.utils.Time.*;
+
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.iplanet.sso.SSOException;
@@ -80,19 +80,24 @@ public class PageTrailManager
         String randomStr = "";
         try {
             String key = token.getTokenID().toString();
-                                                                                
-            synchronized(mapTokenIDs) {
+
+            synchronized (mapTokenIDs) {
                 Map map = (Map) mapTokenIDs.get(key);
-                                                                                
+
                 if (map == null) {
                     map = new HashMap(10);
                     token.addSSOTokenListener(this);
                 }
-                                                                                
+
                 randomStr = getRandomString();
                 map.put(randomStr, pageTrail);
                 mapTokenIDs.put(key, map);
             }
+        } catch (SSOTokenListenersUnsupportedException ex) {
+            // NB. If SSOTokenListenersUnsupportedException is thrown, mapTokenIDs must not
+            // store reference to token ID as this will cause a memory leak.
+            debug.message("PageTrailManager.registerTrail(): could not add sso listener: {}", ex.getMessage());
+            randomStr = "";
         } catch (SSOException ssoe) {
             debug.warning("PageTrailManager.registerTrail()", ssoe);
             randomStr = "";
@@ -156,7 +161,7 @@ public class PageTrailManager
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(System.currentTimeMillis());
+        sb.append(currentTimeMillis());
         sb.append(Base64.encode(keyRandom));
         return (sb.toString());
     }

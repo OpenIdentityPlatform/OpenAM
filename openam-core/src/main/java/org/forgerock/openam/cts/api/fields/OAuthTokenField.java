@@ -1,5 +1,5 @@
-/**
- * Copyright 2013-2015 ForgeRock AS.
+/*
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.tokens.CoreTokenField;
 
 /**
@@ -47,7 +47,9 @@ public enum OAuthTokenField {
     NONCE(OAuth2Constants.Custom.NONCE, CoreTokenField.STRING_ELEVEN),
     GRANT_TYPE(OAuth2Constants.Params.GRANT_TYPE, CoreTokenField.STRING_TWELVE),
     SESSION_ID(OAuth2Constants.Custom.SSO_TOKEN_ID, CoreTokenField.STRING_THIRTEEN),
-    DEVICE_USER_CODE(OAuth2Constants.DeviceCode.USER_CODE, CoreTokenField.STRING_FOURTEEN);
+    DEVICE_USER_CODE(OAuth2Constants.DeviceCode.USER_CODE, CoreTokenField.STRING_FOURTEEN),
+    AUTH_GRANT_ID(OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID, CoreTokenField.STRING_FIFTEEN),
+    AUTH_TIME(OAuth2Constants.CoreTokenParams.AUTH_TIME, CoreTokenField.DATE_TWO);
 
     private final String oAuthField;
     private final CoreTokenField coreTokenField;

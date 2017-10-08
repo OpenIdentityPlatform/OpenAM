@@ -24,7 +24,7 @@
  *
  * $Id: EventService.java,v 1.19 2009/09/28 21:47:33 ww203982 Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap.event;
@@ -39,6 +39,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.iplanet.am.sdk.ldap.ACIEventListener;
 import com.iplanet.am.sdk.ldap.EntryEventListener;
@@ -57,30 +69,24 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ldap.LDAPEventManager;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
-import org.forgerock.opendj.ldap.responses.SearchResultEntry;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
- *
+ * The EventService is responsible for listening to and dispatching to listening objects
+ * messages returning from persistent searches running in an underlying LDAP implementation.
  *
  * @supported.api
  */
 public class EventService {
 
+    private static final String EVENT_CONNECTION_RETRY_INTERVAL =
+            "com.iplanet.am.event.connection.delay.between.retries";
+
+    /** Retry interval for reconnecting to persistent searches. **/
+    public static final int RETRY_INTERVAL = SystemProperties.getAsInt(EVENT_CONNECTION_RETRY_INTERVAL, 3000);
+
     private static Debug logger = Debug.getInstance("amEventService");
     private static I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
     private static DSConfigMgr cm = null;
-    private static final String EVENT_CONNECTION_RETRY_INTERVAL =
-            "com.iplanet.am.event.connection.delay.between.retries";
-    private static final int RETRY_INTERVAL = SystemProperties.getAsInt(EVENT_CONNECTION_RETRY_INTERVAL, 3000);
     private static final String EVENT_LISTENER_DISABLE_LIST = "com.sun.am.event.connection.disable.list";
     private static final Class<? extends IDSEventListener> ACI_EVENT_LISTENER_CLASS_NAME = ACIEventListener.class;
     private static final Class<? extends IDSEventListener> ENTRY_EVENT_LISTENER_CLASS_NAME = EntryEventListener.class;
@@ -143,9 +149,10 @@ public class EventService {
     }
 
     /**
-     *
+     * Returns the event service (presuming we are not in the process of shutting down).
      *
      * @supported.api
+     * @return The singleton instance of the EventService.
      */
     public synchronized static EventService getEventService() throws EventException, LdapException {
         if (isShutdownCalled) {
@@ -154,14 +161,20 @@ public class EventService {
         return Singleton.INSTANCE.getEventService();
     }
 
-    //Question: is ok to not actually restart running psearches if the listener is still enabled?
+    /**
+     * Restarts all currently registered persistent searches.
+     *
+     * Persistent searches that do not have enabled listeners are removed.
+     *
+     * Legacy Comment:
+     *      Question: is ok to not actually restart running psearches if the listener is still enabled?
+     */
     public synchronized void restartPSearches() {
         List<Class<? extends IDSEventListener>> listenersClasses = getEnabledListenersClasses();
 
         for (Iterator<Class<? extends IDSEventListener>> iterator = persistentSearches.keySet().iterator();
              iterator.hasNext();) {
             Class<? extends IDSEventListener> pSearchListenerClass = iterator.next();
-            //remove any running psearches that do not have enabled listeners
             if (!listenersClasses.contains(pSearchListenerClass)) {
                 persistentSearches.get(pSearchListenerClass).search.stopSearch();
                 iterator.remove();
@@ -183,7 +196,7 @@ public class EventService {
 
                 pSearch.addListener(listener, new BigInteger(130, new Random()).toString());
 
-                pSearch.startSearch();
+                pSearch.startQuery();
                 persistentSearches.put(listenerClass, new ListenerSearch(listener, pSearch));
                 logger.message("EventService.restartPSearches() - successfully initialized: {}", listenerClass);
                 iterator.remove();
@@ -200,6 +213,9 @@ public class EventService {
         isRunning = true;
     }
 
+    /**
+     * Removes listeners from running persistent searches and then stops their execution on the datastore.
+     */
     public synchronized void stopPSearches() {
         isShutdownCalled = true;
         for (ListenerSearch pSearch : persistentSearches.values()) {
@@ -208,10 +224,21 @@ public class EventService {
         }
     }
 
+    /**
+     * Informs the callers as to the state of the EventService.
+     *
+     * @return {@code true} if the EventService is started and the system is not shutting down.
+     */
     public static boolean isStarted() {
         return isRunning && !isShutdownCalled;
     }
 
+    /**
+     * Retrieve the listener of a specific listening class derivative type.
+     *
+     * @param listenerClass The {@link IDSEventListener} implementation class to retrieve.
+     * @return a listener of the class type provided.
+     */
     public IDSEventListener getListener(Class<? extends IDSEventListener> listenerClass) {
         return persistentSearches.get(listenerClass).listener;
     }
@@ -281,8 +308,8 @@ public class EventService {
 
     private ConnectionFactory getSmsConnectionFactory() throws LDAPServiceException {
         if (smsConnectionFactory == null) {
-            smsConnectionFactory = DSConfigMgr.getDSConfigMgr()
-                    .getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
+            smsConnectionFactory =
+                    DSConfigMgr.getDSConfigMgr().getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
         }
         return smsConnectionFactory;
     }
@@ -365,8 +392,9 @@ public class EventService {
         private final SearchResultEntryHandler resultEntryHandler = new PSearchResultEntryHandler();
 
         public EventServicePersistentSearch(int retryInterval, DN pSearchBaseDN, Filter pSearchFilter,
-                SearchScope pSearchScope, ConnectionFactory factory, String... attributeNames) {
-            super(retryInterval, pSearchBaseDN, pSearchFilter, pSearchScope, factory, attributeNames);
+                                        SearchScope pSearchScope, ConnectionFactory factory, String... attributeNames) {
+            super(retryInterval, pSearchBaseDN, pSearchFilter, pSearchScope,
+                    LdapConnectionFactoryProvider.wrapExistingConnectionFactory(factory), attributeNames);
         }
 
         @Override

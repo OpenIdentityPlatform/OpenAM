@@ -16,25 +16,33 @@
 package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.getUserId;
-import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.CREATE;
+import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.DELETE;
+import static org.forgerock.openam.audit.AuditConstants.ConfigOperation.UPDATE;
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.*;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.core.DNWrapper;
+import org.forgerock.openam.session.SessionEventType;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.DNMapper;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants.EventName;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.audit.context.AuditRequestContext;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 /**
  * Responsible for publishing audit activity for changes to {@link SessionInfo} objects.
@@ -42,50 +50,80 @@ import java.security.PrivilegedAction;
  * @since 13.0.0
  */
 @Singleton
-public final class SessionAuditor {
+public class SessionAuditor implements InternalSessionListener {
 
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
     private final PrivilegedAction<SSOToken> adminTokenAction;
+    private final DNWrapper dnWrapper;
 
     /**
      * Create a new Auditor.
      *
      * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
-     * @param auditEventFactory   AuditEventFactory for audit event builders.
+     * @param auditEventFactory AuditEventFactory for audit event builders.
+     * @param adminTokenAction PrivilegedAction for populating the audit event runas field with the admin user ID.
      */
     @Inject
     public SessionAuditor(
             AuditEventPublisher auditEventPublisher,
             AuditEventFactory auditEventFactory,
-            PrivilegedAction<SSOToken> adminTokenAction) {
+            PrivilegedAction<SSOToken> adminTokenAction,
+            DNWrapper dnWrapper) {
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.adminTokenAction = adminTokenAction;
+        this.dnWrapper = dnWrapper;
     }
 
-    public void auditActivity(SessionInfo sessionInfo, EventName eventName) {
+    @Override
+    public void onEvent(final InternalSessionEvent event) {
+        auditActivity(event.getInternalSession().toSessionInfo(), event.getType(), event.getTime());
+    }
+
+    public void auditActivity(SessionInfo sessionInfo, SessionEventType eventType, long timestamp) {
+        switch (eventType) {
+            case SESSION_CREATION:
+                auditActivity(sessionInfo, AM_SESSION_CREATED, CREATE, timestamp);
+                break;
+            case IDLE_TIMEOUT:
+                auditActivity(sessionInfo, AM_SESSION_IDLE_TIMED_OUT, DELETE, timestamp);
+                break;
+            case MAX_TIMEOUT:
+                auditActivity(sessionInfo, AM_SESSION_MAX_TIMED_OUT, DELETE, timestamp);
+                break;
+            case LOGOUT:
+                auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT, DELETE, timestamp);
+                break;
+            case DESTROY:
+                auditActivity(sessionInfo, AM_SESSION_DESTROYED, DELETE, timestamp);
+                break;
+            case PROPERTY_CHANGED:
+                auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED, UPDATE, timestamp);
+                break;
+            default:
+                // ignore other session events
+        }
+    }
+
+    private void auditActivity(SessionInfo sessionInfo, EventName eventName, ConfigOperation operation, long timestamp) {
         String realm = sessionInfo.getClientDomain();
-        String contextId = sessionInfo.getProperties().get(Constants.AM_CTX_ID);
-        String uid = sessionInfo.getProperties().get(Constants.UNIVERSAL_IDENTIFIER);
-
-        auditActivity(realm, contextId, uid, eventName);
-    }
-
-    private void auditActivity(String realm, String contextId, String uid, EventName eventName) {
-
-        realm = isEmpty(realm) ? NO_REALM : DNMapper.orgNameToRealmName(realm);
+        realm = isEmpty(realm) ? NO_REALM : dnWrapper.orgNameToRealmName(realm);
 
         if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
 
+            String contextId = sessionInfo.getProperties().get(Constants.AM_CTX_ID);
+            String uid = sessionInfo.getProperties().get(Constants.UNIVERSAL_IDENTIFIER);
+
             AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent(realm)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
+                    .timestamp(timestamp)
                     .eventName(eventName)
                     .component(Component.SESSION)
                     .trackingId(contextId)
                     .runAs(getUserId(getAdminToken()))
                     .objectId(contextId)
-                    .operation(getCrudType(eventName));
+                    .operation(String.valueOf(operation));
 
             if (StringUtils.isNotEmpty(uid)) {
                 builder.userId(uid);
@@ -93,23 +131,6 @@ public final class SessionAuditor {
 
             auditEventPublisher.tryPublish(ACTIVITY_TOPIC, builder.toEvent());
 
-        }
-    }
-
-    private String getCrudType(EventName eventName) {
-        switch (eventName) {
-            case AM_SESSION_CREATED:
-                return "CREATE";
-            case AM_SESSION_IDLE_TIMED_OUT:
-            case AM_SESSION_MAX_TIMED_OUT:
-            case AM_SESSION_LOGGED_OUT:
-            case AM_SESSION_DESTROYED:
-                return "DELETE";
-            case AM_SESSION_REACTIVATED:
-            case AM_SESSION_PROPERTY_CHANGED:
-                return "UPDATE";
-            default:
-                return "";
         }
     }
 

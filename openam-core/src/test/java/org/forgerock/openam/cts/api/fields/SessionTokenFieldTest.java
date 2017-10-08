@@ -15,13 +15,24 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import com.iplanet.dpro.session.service.InternalSession;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.annotation.Annotation;
+
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iplanet.dpro.session.service.InternalSession;
+
 public class SessionTokenFieldTest {
+    /**
+     * Ensures that the latestAccessTime field is not renamed in the JSON, as the SessionTokenField class is used to
+     * optimise cases where only that field is changed.
+     */
     @Test
     public void shouldFailIfLastAccessTimeFieldIsRemoved() throws NoSuchFieldException {
         String fieldName = SessionTokenField.LATEST_ACCESS_TIME.getInternalSessionFieldName();
-        InternalSession.class.getDeclaredField(fieldName);
+        Annotation annotation = InternalSession.class.getDeclaredField("latestAccessTimeInSeconds").getAnnotations()[0];
+        assertThat(((JsonProperty) annotation).value()).isEqualTo(fieldName);
     }
 }

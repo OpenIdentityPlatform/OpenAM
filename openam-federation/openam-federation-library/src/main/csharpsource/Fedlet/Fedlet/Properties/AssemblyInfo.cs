@@ -24,6 +24,9 @@
  *
  * $Id: AssemblyInfo.cs,v 1.12 2010/01/26 01:20:15 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2016 ForgeRock AS.
+ */
 
 using System;
 using System.Reflection;
@@ -36,9 +39,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OpenAM Fedlet")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ForgeRock Inc")]
+[assembly: AssemblyCompany("ForgeRock AS.")]
 [assembly: AssemblyProduct("OpenAM Fedlet for ASP.NET")]
-[assembly: AssemblyCopyright("Copyright © 2011-2013")]
+[assembly: AssemblyCopyright("Copyright © 2011-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -61,6 +64,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.*")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.*")]
+[assembly: AssemblyFileVersion("1.4.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("")]

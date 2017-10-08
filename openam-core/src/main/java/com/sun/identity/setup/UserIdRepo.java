@@ -31,11 +31,14 @@ package com.sun.identity.setup;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.StringUtils;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -74,6 +77,7 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -388,7 +392,9 @@ class UserIdRepo {
                 .set(AUTHN_BIND_REQUEST, request);
 
         if (userSSLStore != null && userSSLStore.equals("SSL")) {
-            options = options.set(SSL_CONTEXT, SSLContext.getDefault());
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            options = options.set(SSL_CONTEXT,
+                    new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
         }
 
         return getConnectionFactory(getHost(userRepo), Integer.parseInt(getPort(userRepo)), options).getConnection();

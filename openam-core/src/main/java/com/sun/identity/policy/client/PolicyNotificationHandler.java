@@ -74,10 +74,9 @@ public class PolicyNotificationHandler implements NotificationHandler {
      * Processes PLL notifications
      * @param notifications PLL notification to be processed
      */
-    void processPLLNotifications(Vector notifications) {
+    void processPLLNotifications(Vector<Notification> notifications) {
 	for (int i = 0; i < notifications.size(); i++) {
-	    Notification  notification 
-                    = (Notification) notifications.elementAt(i);
+	    Notification notification = notifications.elementAt(i);
             if (debug.messageEnabled()) {
                 debug.message("PolicyNotificationHandler."
                         + "processPLLNotifications():"

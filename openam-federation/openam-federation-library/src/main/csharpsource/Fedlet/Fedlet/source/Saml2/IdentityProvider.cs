@@ -25,9 +25,10 @@
  * $Id: IdentityProvider.cs,v 1.6 2010/01/19 18:23:09 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
+using System;
 using System.Collections;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -252,6 +253,68 @@ namespace Sun.Identity.Saml2
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the requested digest method for use with the specific IDP
+        /// </summary>
+        public string RequestedDigestMethod
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:IDPSSOConfig/mdx:Attribute[@name='requestedDigestMethod']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath.ToString(), this.extendedMetadataNsMgr);
+                return (node == null ? null : node.InnerText.Trim());
+            }
+        }
+
+        /// <summary>
+        /// Gets the requested signature and signing method for use with the specific IDP
+        /// </summary>
+        public string RequestedSignatureSigningAlgorithm
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:IDPSSOConfig/mdx:Attribute[@name='requestedSignatureSigningAlgorithm']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath.ToString(), this.extendedMetadataNsMgr);
+                if (node == null)
+                {
+                    // Default to SHA1 method for none specified
+                    return Saml2Constants.SignatureAlgorithmRsa;
+                }
+
+                string method = node.InnerText.Trim().ToLowerInvariant();
+                if (String.IsNullOrEmpty(method))
+                {
+                    return Saml2Constants.SignatureAlgorithmRsa;
+                }
+
+                // Ensure the method is a supported type.
+                switch (method)
+                {
+                    case Saml2Constants.SignatureAlgorithmRsa256:
+                        {
+                            return Saml2Constants.SignatureAlgorithmRsa256;
+                        }
+                    case Saml2Constants.SignatureAlgorithmRsa384:
+                        {
+                            return Saml2Constants.SignatureAlgorithmRsa384;
+                        }
+                    case Saml2Constants.SignatureAlgorithmRsa512:
+                        {
+                            return Saml2Constants.SignatureAlgorithmRsa512;
+                        }
+                    case Saml2Constants.SignatureAlgorithmRsa:
+                        {
+                            return Saml2Constants.SignatureAlgorithmRsa;
+                        }
+                    default:
+                        // Unrecognised method
+                        throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
+                }                
+            }
         }
 
         /// <summary>

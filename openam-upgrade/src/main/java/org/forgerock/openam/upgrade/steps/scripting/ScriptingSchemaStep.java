@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps.scripting;
 
@@ -22,6 +22,7 @@ import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHE
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.google.inject.Inject;
 import com.iplanet.sso.SSOException;
@@ -260,7 +261,7 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
     }
 
     private void updateMetaData(Map<String, Set<String>> attributes) {
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         String principalName = SubjectUtils.getPrincipalId(getAdminSubject());
 
         if (!attributes.containsKey(SCRIPT_CREATED_BY)) {

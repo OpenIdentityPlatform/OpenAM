@@ -11,19 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.api.query;
+
+import static org.forgerock.util.time.Duration.*;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQuery;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
+import org.forgerock.util.time.Duration;
 
 import com.sun.identity.shared.debug.Debug;
 
@@ -35,6 +42,7 @@ import com.sun.identity.shared.debug.Debug;
  *
  * Uses Token as its main means of expressing the data returned from the data store and so is
  * intended for use with the Core Token Service.
+ *
  * @param <C> The type of connection that will be used.
  * @param <F> The type of filter (if any) that will be supported.
  */
@@ -44,6 +52,7 @@ public abstract class QueryBuilder<C, F> {
 
     protected String[] requestedAttributes = new String[]{};
     protected int sizeLimit;
+    protected Duration timeLimit;
     protected F filter;
     protected int pageSize;
 
@@ -54,6 +63,7 @@ public abstract class QueryBuilder<C, F> {
         this.debug = debug;
 
         sizeLimit = 0;
+        timeLimit = duration(0, TimeUnit.SECONDS);
         pageSize = 0;
     }
 
@@ -65,6 +75,18 @@ public abstract class QueryBuilder<C, F> {
      */
     public QueryBuilder<C, F> limitResultsTo(int maxSize) {
         sizeLimit = maxSize;
+        return this;
+    }
+
+    /**
+     * Limit the amount of time within this query should finish. The default behavior is to have no time limit
+     * associated with the query.
+     *
+     * @param timeLimit The time limit associated with this query.
+     * @return The QueryBuilder instance.
+     */
+    public QueryBuilder<C, F> within(Duration timeLimit) {
+        this.timeLimit = timeLimit;
         return this;
     }
 
@@ -133,8 +155,6 @@ public abstract class QueryBuilder<C, F> {
      * Assign a filter to the query. This can be a complex filter and is handled
      * by the QueryFilter class.
      *
-     * @see QueryFilter For more details on generating a filter.
-     *
      * @param filter An OpenDJ SDK Filter to assign to the query.
      * @return The QueryBuilder instance.
      */
@@ -185,4 +205,14 @@ public abstract class QueryBuilder<C, F> {
         }
         return executeRawResults(connection, Token.class);
     }
+
+    /**
+     * Attaches a listener to a connection which will continually return its results. The listener will perform
+     * appropriate actions in response to the data returned from the connection.
+     *
+     * @param listener The listening class used to process the returned data.
+     * @throws DataLayerException An error forming the continuous query connection.
+     */
+    public abstract ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) throws DataLayerException;
+
 }

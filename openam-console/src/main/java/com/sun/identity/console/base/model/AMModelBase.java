@@ -24,10 +24,12 @@
  *
  * $Id: AMModelBase.java,v 1.18 2009/12/11 23:25:19 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -77,6 +79,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -298,7 +302,7 @@ public class AMModelBase
         StringBuilder sb = new StringBuilder(30);
         byte[] keyRandom = new byte[5];
         random.nextBytes(keyRandom);
-        sb.append(System.currentTimeMillis());
+        sb.append(currentTimeMillis());
         sb.append(Base64.encode(keyRandom));
         return(sb.toString().replace('/', '.'));
     }
@@ -356,7 +360,7 @@ public class AMModelBase
         String dn = "";
         if (userDN != null) {
             try {
-                dn = IdUtils.getDN(IdUtils.getIdentity(ssoToken));
+                dn = IdentityUtils.getDN(IdUtils.getIdentity(ssoToken));
             } catch (SSOException e) {
                 debug.error("AMModelBase.getUserDN", e);
             } catch (IdRepoException e) {

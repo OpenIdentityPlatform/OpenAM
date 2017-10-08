@@ -11,32 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service.cluster;
 
 import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.SessionIDExtensions;
-import com.iplanet.dpro.session.service.SessionServerConfig;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.service.SessionServiceConfig;
-import com.iplanet.dpro.session.service.cluster.MultiServerClusterMonitor.ClusterStateServiceFactory;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 
 import java.net.URL;
 import java.util.Map;
 
+import org.forgerock.openam.utils.CollectionUtils;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionIDExtensions;
+import com.iplanet.dpro.session.service.SessionServerConfig;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.cluster.MultiServerClusterMonitor.ClusterStateServiceFactory;
+import com.sun.identity.shared.debug.Debug;
+
 public class MultiServerClusterMonitorTest {
 
-    private SessionService mockSessionService;
     private Debug mockDebug;
     private SessionServerConfig mockServerConfig;
     private SessionServiceConfig mockServiceConfig;
@@ -44,31 +45,15 @@ public class MultiServerClusterMonitorTest {
 
     @BeforeTest
     public void setUp() {
-        mockSessionService = mock(SessionService.class);
         mockDebug = mock(Debug.class);
         mockServerConfig = mock(SessionServerConfig.class);
         mockServiceConfig = mock(SessionServiceConfig.class);
         mockFactory = mock(ClusterStateServiceFactory.class);
     }
 
-    @Test(expectedExceptions = IllegalStateException.class)
-    public void requiresSessionFailover() throws Exception {
-        // Given
-        given(mockServiceConfig.isSessionFailoverEnabled()).willReturn(false);
-
-        // When
-        new MultiServerClusterMonitor(mockSessionService, mockDebug, mockServiceConfig, mockServerConfig);
-
-        // Then
-        // Expect IllegalStateException
-    }
-
     @Test
     public void canEstablishHostServerIdForSession() throws Exception {
         // Given
-
-        given(mockServiceConfig.isSessionFailoverEnabled()).willReturn(true);
-        given(mockServiceConfig.isUseInternalRequestRoutingEnabled()).willReturn(true);
 
         given(mockServerConfig.getServerIDsInLocalSite()).willReturn(CollectionUtils.asSet("01", "02"));
         given(mockServerConfig.getServerFromID("01")).willReturn("http://openam1.example.com:18080/openam");
@@ -84,7 +69,7 @@ public class MultiServerClusterMonitorTest {
 
         ClusterStateService mockClusterService = mock(ClusterStateService.class);
         given(mockFactory.createClusterStateService(
-                eq(mockSessionService), eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
+                eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
                 .willReturn(mockClusterService);
         given(mockClusterService.isUp("01")).willReturn(true);
 
@@ -96,7 +81,7 @@ public class MultiServerClusterMonitorTest {
 
         // When
         MultiServerClusterMonitor clusterMonitor = new MultiServerClusterMonitor(
-                mockSessionService, mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
+                mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
         String currentHostServer = clusterMonitor.getCurrentHostServer(mockSessionID);
 
         // Then
@@ -113,9 +98,6 @@ public class MultiServerClusterMonitorTest {
         // to. The first of these alternate servers that is found to be up will become the
         // new home server for that session.
 
-        given(mockServiceConfig.isSessionFailoverEnabled()).willReturn(true);
-        given(mockServiceConfig.isUseInternalRequestRoutingEnabled()).willReturn(true);
-
         given(mockServerConfig.getServerIDsInLocalSite()).willReturn(CollectionUtils.asSet("01", "02"));
         given(mockServerConfig.getServerFromID("01")).willReturn("http://openam1.example.com:18080/openam");
         given(mockServerConfig.getServerFromID("02")).willReturn("http://openam2.example.com:28080/openam");
@@ -130,7 +112,7 @@ public class MultiServerClusterMonitorTest {
 
         ClusterStateService mockClusterService = mock(ClusterStateService.class);
         given(mockFactory.createClusterStateService(
-                eq(mockSessionService), eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
+                eq(mockServerConfig), eq(mockServiceConfig), any(Map.class), any(Map.class)))
                 .willReturn(mockClusterService);
         given(mockClusterService.isUp("01")).willReturn(true);
         given(mockClusterService.isUp("02")).willReturn(false);
@@ -147,7 +129,7 @@ public class MultiServerClusterMonitorTest {
 
         // When
         MultiServerClusterMonitor clusterMonitor = new MultiServerClusterMonitor(
-                mockSessionService, mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
+                mockDebug, mockServiceConfig, mockServerConfig, mockFactory);
         String currentHostServer = clusterMonitor.getCurrentHostServer(mockSessionID);
 
         // Then

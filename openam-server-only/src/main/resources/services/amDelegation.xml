@@ -85,7 +85,8 @@
                     type="single"
                     syntax="boolean"
                     uitype="radio"
-                    i18nKey="READ">
+                    i18nKey="READ"
+                    order="300">
                     <IsResourceNameAllowed/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -96,7 +97,8 @@
                     type="single"
                     syntax="boolean"
                     uitype="radio"
-                    i18nKey="MODIFY">
+                    i18nKey="MODIFY"
+                    order="200">
                     <IsResourceNameAllowed/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
@@ -107,7 +109,8 @@
                     type="single"
                     syntax="boolean"
                     uitype="radio"
-                    i18nKey="DELEGATE">
+                    i18nKey="DELEGATE"
+                    order="100">
                     <IsResourceNameAllowed/>
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>

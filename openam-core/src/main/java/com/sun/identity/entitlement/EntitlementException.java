@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
- * Portions copyright 2010-2015 ForgeRock AS.
+ * Portions copyright 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -61,6 +61,11 @@ public class EntitlementException extends Exception {
     public static final int RESOURCE_LIST_EMPTY = 14;
     public static final int RESOURCE_TYPE_ID_MISMATCH = 15;
 
+    public static final int UNSUPPORTED_SUBJECT_INDEX = 57;
+    public static final int UNABLE_TO_CREATE_SUBJECT_INDEX = 58;
+    public static final int UNKNOWN_IDENTITY = 59;
+    public static final int UNABLE_TO_QUERY_POLICY_INVALID_UID = 60;
+
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;
     public static final int UNABLE_SEARCH_PRIVILEGES = 215;
@@ -81,9 +86,11 @@ public class EntitlementException extends Exception {
     public static final int MISSING_RESOURCE_TYPE = 236;
     public static final int INVALID_RESOURCE_TYPE = 237;
     public static final int NO_RESOURCE_TYPE_EXPECTED = 238;
+    public static final int MISSING_APPLICATION_NAME = 239;
     public static final int APP_RETRIEVAL_ERROR = 248;
     public static final int MISSING_RESOURCE_TYPE_NAME = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
+    public static final int NO_RESOURCE_TYPE_MATCH_FOUND = 242;
 
     public static final int INCONSISTENT_WILDCARDS = 300;
     public static final int INVALID_PORT = 301;
@@ -94,6 +101,7 @@ public class EntitlementException extends Exception {
 
     public static final int INVALID_APP_TYPE = 317;
     public static final int INVALID_APP_REALM = 318;
+    public static final int APPLICATION_TYPE_NOT_FOUND = 319;
 
     public static final int NO_SUCH_APPLICATION = 321;
     public static final int NOT_FOUND = 325;
@@ -119,8 +127,14 @@ public class EntitlementException extends Exception {
     public static final int AUTHENTICATION_ERROR = 434;
     public static final int CLIENT_IP_EMPTY = 437;
     public static final int RESOURCE_ENV_NOT_KNOWN = 438;
+    public static final int APPLICATION_SEARCH_FAILED = 450;
+    public static final int INVALID_QUERY_FILTER = 452;
+    public static final int INVALID_QUERY_ID = 454;
+    public static final int QUERY_ID_MISSING_UID = 456;
 
     public static final int CONDITION_EVALUATION_FAILED = 510;
+
+    public static final int UNABLE_TO_RETRIEVE_SUBJECT_ATTRIBUTE = 600;
 
     public static final int INVALID_OAUTH2_SCOPE = 700;
     public static final int AUTH_LEVEL_NOT_INTEGER = 710;

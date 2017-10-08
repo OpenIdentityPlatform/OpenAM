@@ -23,6 +23,7 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthChoiceCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthConfirmationCallbackHandler;
@@ -31,6 +32,7 @@ import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthHttpCallbac
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthLanguageCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthNameCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
+import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthPollingWaitCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthRedirectCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthTextInputCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthTextOutputCallbackHandler;
@@ -110,6 +112,8 @@ public class RestAuthCallbackHandlerFactory {
             return new RestAuthTextOutputCallbackHandler();
         } else if (X509CertificateCallback.class.isAssignableFrom(callbackClass)) {
             return new RestAuthX509CallbackHandler();
+        } else if (PollingWaitCallback.class.isAssignableFrom(callbackClass)) {
+            return new RestAuthPollingWaitCallbackHandler();
         }
 
         DEBUG.error(MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));

@@ -24,26 +24,12 @@
  *
  * $Id: DeleteXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
 
-import com.iplanet.sso.SSOToken;
-
-import com.sun.identity.cli.AttributeValues;
-import com.sun.identity.cli.AuthenticatedCommand;
-import com.sun.identity.cli.CLIException;
-import com.sun.identity.cli.ExitCodes;
-import com.sun.identity.cli.IArgument;
-import com.sun.identity.cli.IOutput;
-import com.sun.identity.cli.LogWriter;
-import com.sun.identity.cli.RequestContext;
-
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,6 +38,20 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.security.auth.Subject;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.cli.AttributeValues;
+import com.sun.identity.cli.AuthenticatedCommand;
+import com.sun.identity.cli.CLIException;
+import com.sun.identity.cli.ExitCodes;
+import com.sun.identity.cli.IArgument;
+import com.sun.identity.cli.IOutput;
+import com.sun.identity.cli.LogWriter;
+import com.sun.identity.cli.RequestContext;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 
 /**
  * Deletes policies in a realm.
@@ -72,24 +72,6 @@ public class DeleteXACML extends AuthenticatedCommand {
         SSOToken adminSSOToken = getAdminSSOToken();
         Subject adminSubject = SubjectUtils.createSubject(adminSSOToken);
         String realm = getStringOptionValue(IArgument.REALM_NAME);
-
-        // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
-        if(!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY", 
-                    "list-xacml not supported in  legacy policy mode"};
-            debugError("DeleteXACML.handleRequest(): "
-                    + "delete-xacml not supported in  legacy policy mode");
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_DELETE_POLICY_IN_REALM", 
-                args);
-            throw new CLIException(
-                getResourceString( 
-                    "delete-xacml-not-supported-in-legacy-policy-mode"), 
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                "delete-xacml");
-        }
 
         List policyNames = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
         String file = getStringOptionValue(IArgument.FILE);

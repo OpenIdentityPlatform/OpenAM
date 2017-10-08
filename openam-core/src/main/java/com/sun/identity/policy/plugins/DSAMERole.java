@@ -24,7 +24,7 @@
  *
  * $Id: DSAMERole.java,v 1.4 2009/01/28 05:35:01 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy.plugins;
@@ -37,6 +37,7 @@ import com.iplanet.am.sdk.AMSearchResults;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
@@ -331,7 +332,6 @@ public class DSAMERole implements Subject {
         throws SSOException, PolicyException {
         String tokenID = token.getTokenID().toString();
         String userDN = token.getPrincipal().getName();
-        boolean listenerAdded = false;
         boolean roleMatch = false;
         Set roleSet = null;
         if (subjectRoles.size() > 0) {
@@ -355,18 +355,18 @@ public class DSAMERole implements Subject {
                     }
                 }
                 // got here so entry not in subject evalauation cache
-                if (!listenerAdded) {
-                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                            tokenID)) 
-                    {
+                boolean listeningToSsoToken = true;
+                if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                    try {
                         token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                        PolicyEvaluator.ssoListenerRegistry.put(
-                            tokenID, PolicyEvaluator.ssoListener);
+                        PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                         if (debug.messageEnabled()) {
-                            debug.message("DSAMERole.isMember():"
-                                + " sso listener added .\n");
+                            debug.message("DSAMERole.isMember(): sso listener added .\n");
                         }
-                        listenerAdded = true;
+                    } catch (SSOTokenListenersUnsupportedException ex) {
+                        // Catching exception to avoid adding tokenID to ssoListenerRegistry
+                        debug.message("DSAMERole.isMember(): could not add sso listener: {}", ex.getMessage());
+                        listeningToSsoToken = false;
                     }
                 }
                 if (debug.messageEnabled()) {
@@ -392,8 +392,9 @@ public class DSAMERole implements Subject {
                           +tokenID+" "+ldapServer+" "+valueDN+" "+roleMatch
                         +" in subject evaluation cache.");
                 }
-                SubjectEvaluationCache.addEntry(tokenID, ldapServer, 
-                      valueDN, roleMatch);
+                if (listeningToSsoToken) {
+                    SubjectEvaluationCache.addEntry(tokenID, ldapServer, valueDN, roleMatch);
+                }
                 if (roleMatch) {
                     break;
                 }

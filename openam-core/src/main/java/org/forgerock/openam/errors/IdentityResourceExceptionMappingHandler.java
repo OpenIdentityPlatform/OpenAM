@@ -82,6 +82,14 @@ public class IdentityResourceExceptionMappingHandler implements ExceptionMapping
                 idRepoException = new PasswordPolicyException(idRepoException.getConstraintViolationDetails());
             }
 
+            if (ldapResultCode == ResultCode.ATTRIBUTE_OR_VALUE_EXISTS ||
+                    ldapResultCode == ResultCode.UNWILLING_TO_PERFORM ) {
+                idRepoException = new PasswordPolicyException(
+                        ldapResultCode,
+                        IdRepoErrorCode.PASSWORD_POLICY_FAILED,
+                        idRepoException.getMessageArgs());
+            }
+
             return new BadRequestException(idRepoException.getMessage());
         }
 

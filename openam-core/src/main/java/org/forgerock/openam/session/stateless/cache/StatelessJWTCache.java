@@ -98,6 +98,15 @@ public class StatelessJWTCache {
     }
 
     /**
+     * Removes the given JWT from the cache.
+     *
+     * @param jwt the JWT to remove from the cache.
+     */
+    public void remove(String jwt) {
+        sessionInfoCache.remove(jwt);
+    }
+
+    /**
      * Clearing the cache will remove all cached mappings between JWT and SessionID.
      *
      * This may be required in the event of configuration changes which should

@@ -24,7 +24,7 @@
  *
  * $Id: AuthSSOProvider.java,v 1.2 2008/06/25 05:41:53 qcheng Exp $
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.internal;
@@ -141,7 +141,7 @@ public class AuthSSOProvider implements SSOProvider {
     }
 
     @Override
-    public Set getValidSessions(SSOToken requester, String server)
+    public Set<SSOToken> getValidSessions(SSOToken requester, String server)
             throws SSOException {
         throw new UnsupportedOperationException("Not implemented");
     }

@@ -29,7 +29,18 @@
 
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.dpro.session.SessionEvent;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Date;
+import java.util.StringTokenizer;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.utils.StringUtils;
+
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogConstants;
@@ -39,29 +50,14 @@ import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 /**
  * Responsible for logging Session events to the audit logs amSSO.access and amSSO.error.
  *
- * amSSO access and error logging logic extracted from SessionService class
- * as part of first-pass refactoring to improve SessionService adherence to SRP.
- *
  * @since 13.0.0
  */
-/*
- * Further refactoring is warranted.
- */
 @Singleton
-public class SessionLogging {
+public class SessionLogging implements InternalSessionListener {
 
     private static final String LOG_PROVIDER = "Session";
     private static final String AM_SSO_ACCESS_LOG_FILE = "amSSO.access";
@@ -87,17 +83,50 @@ public class SessionLogging {
         this.adminTokenAction = adminTokenAction;
     }
 
+    @Override
+    public void onEvent(final InternalSessionEvent event) {
+        logEvent(event.getInternalSession().toSessionInfo(), event.getType(), event.getTime());
+    }
+
     /**
      * Log the event based on the values contained in the SessionInfo
      *
      * @param sessionInfo SessionInfo
      * @param eventType event type.
      */
-    public void logEvent(SessionInfo sessionInfo, int eventType) {
-        logIt(sessionInfo, getEventId(eventType));
+    public void logEvent(SessionInfo sessionInfo, SessionEventType eventType, long timestamp) {
+        switch (eventType) {
+            case SESSION_CREATION:
+                logEvent(sessionInfo, "SESSION_CREATED", timestamp);
+                break;
+            case IDLE_TIMEOUT:
+                logEvent(sessionInfo, "SESSION_IDLE_TIMED_OUT", timestamp);
+                break;
+            case MAX_TIMEOUT:
+                logEvent(sessionInfo, "SESSION_MAX_TIMEOUT", timestamp);
+                break;
+            case LOGOUT:
+                logEvent(sessionInfo, "SESSION_LOGOUT", timestamp);
+                break;
+            case DESTROY:
+                logEvent(sessionInfo, "SESSION_DESTROYED", timestamp);
+                break;
+            case PROPERTY_CHANGED:
+                logEvent(sessionInfo, "SESSION_PROPERTY_CHANGED", timestamp);
+                break;
+            case QUOTA_EXHAUSTED:
+                logEvent(sessionInfo, "SESSION_QUOTA_EXHAUSTED", timestamp);
+                break;
+            case PROTECTED_PROPERTY:
+                logEvent(sessionInfo, "SESSION_PROTECTED_PROPERTY_ERROR", timestamp);
+                break;
+            default:
+                logEvent(sessionInfo, "SESSION_UNKNOWN_EVENT", timestamp);
+        }
+
     }
 
-    private void logIt(SessionInfo sessionInfo, String eventId) {
+    private void logEvent(SessionInfo sessionInfo, String logMessageId, long timestamp) {
         try {
             String clientID = sessionInfo.getClientID();
             String uidData;
@@ -108,7 +137,8 @@ public class SessionLogging {
                 uidData = (st.hasMoreTokens()) ? st.nextToken() : clientID;
             }
             String[] data = {uidData};
-            LogRecord lr = getLogMessageProvider().createLogRecord(eventId, data, null);
+            LogRecord lr = getLogMessageProvider().createLogRecord(logMessageId, data, null);
+            lr.addTimeLogInfo(new Date(timestamp));
             lr.addLogInfo(LogConstants.LOGIN_ID_SID, sessionInfo.getSessionID());
             lr.addLogInfo(LogConstants.CONTEXT_ID, sessionInfo.getProperties().get(Constants.AM_CTX_ID));
             lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
@@ -119,48 +149,6 @@ public class SessionLogging {
             getLogger().log(lr, AccessController.doPrivileged(adminTokenAction));
         } catch (Exception ex) {
             sessionDebug.error("SessionService.logIt(): Cannot write to the session log file: ", ex);
-        }
-    }
-
-    public void logSystemMessage(String msgID, Level level) {
-        if (!serviceConfig.isLoggingEnabled()) {
-            return;
-        }
-        try {
-            String[] data = {msgID};
-            LogRecord lr = getLogMessageProvider().createLogRecord(msgID, data, null);
-            SSOToken serviceToken = AccessController.doPrivileged(adminTokenAction);
-            lr.addLogInfo(LogConstants.LOGIN_ID_SID, serviceToken.getTokenID().toString());
-            lr.addLogInfo(LogConstants.LOGIN_ID, serviceToken.getPrincipal().getName());
-            getErrorLogger().log(lr, serviceToken);
-        } catch (Exception ex) {
-            sessionDebug.error("SessionService.logSystemMessage(): Cannot write to the session error log file: ", ex);
-        }
-    }
-
-    private String getEventId(int eventType) {
-
-        switch (eventType) {
-            case SessionEvent.SESSION_CREATION:
-                return "SESSION_CREATED";
-            case SessionEvent.IDLE_TIMEOUT:
-                return "SESSION_IDLE_TIMED_OUT";
-            case SessionEvent.MAX_TIMEOUT:
-                return "SESSION_MAX_TIMEOUT";
-            case SessionEvent.LOGOUT:
-                return "SESSION_LOGOUT";
-            case SessionEvent.REACTIVATION:
-                return "SESSION_REACTIVATION";
-            case SessionEvent.DESTROY:
-                return "SESSION_DESTROYED";
-            case SessionEvent.PROPERTY_CHANGED:
-                return "SESSION_PROPERTY_CHANGED";
-            case SessionEvent.QUOTA_EXHAUSTED:
-                return "SESSION_QUOTA_EXHAUSTED";
-            case SessionEvent.PROTECTED_PROPERTY:
-                return "SESSION_PROTECTED_PROPERTY_ERROR";
-            default:
-                return "SESSION_UNKNOWN_EVENT";
         }
     }
 

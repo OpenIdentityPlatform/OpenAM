@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -21,7 +21,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.PoliciesAuditFilter;
 
@@ -37,52 +37,52 @@ public class EntitlementsRestRouteProvider extends AbstractRestRouteProvider {
     public void addResourceRoutes(ResourceRouter rootRouter, ResourceRouter realmRouter) {
         realmRouter.route("policies")
                 .auditAs(POLICY, PoliciesAuditFilter.class)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(PolicyV1Filter.class)
-                .toCollection(PolicyResource.class)
+                .toAnnotatedCollection(PolicyResource.class)
                 .forVersion(2)
-                .toCollection(PolicyResource.class)
+                .toAnnotatedCollection(PolicyResource.class)
                 .forVersion(2, 1)
-                .toCollection(PolicyResourceWithCopyMoveSupport.class);
+                .toAnnotatedCollection(PolicyResourceWithCopyMoveSupport.class);
 
         realmRouter.route("applications")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
                 .forVersion(1)
                 .through(ApplicationV1Filter.class)
-                .toCollection(ApplicationsResource.class)
-                .forVersion(2)
-                .toCollection(ApplicationsResource.class);
+                .toAnnotatedCollection(ApplicationsResource.class)
+                .forVersion(2, 1)
+                .toAnnotatedCollection(ApplicationsResource.class);
 
         realmRouter.route("subjectattributes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toCollection(SubjectAttributesResourceV1.class);
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
+                .toAnnotatedCollection(SubjectAttributesResourceV1.class);
 
         realmRouter.route("resourcetypes")
                 .auditAs(POLICY)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toCollection(ResourceTypesResource.class);
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
+                .toAnnotatedCollection(ResourceTypesResource.class);
 
         rootRouter.route("applicationtypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(ApplicationTypesResource.class);
+                .toAnnotatedCollection(ApplicationTypesResource.class);
 
         rootRouter.route("decisioncombiners")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(DecisionCombinersResource.class);
+                .toAnnotatedCollection(DecisionCombinersResource.class);
 
         rootRouter.route("conditiontypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(ConditionTypesResource.class);
+                .toAnnotatedCollection(ConditionTypesResource.class);
 
         rootRouter.route("subjecttypes")
                 .auditAs(POLICY)
                 .authorizeWith(PrivilegeWriteAndAnyPrivilegeReadOnlyAuthzModule.class)
-                .toCollection(SubjectTypesResource.class);
+                .toAnnotatedCollection(SubjectTypesResource.class);
     }
 }

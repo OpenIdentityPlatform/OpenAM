@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -33,21 +33,21 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
+    "org/forgerock/openam/ui/admin/services/global/ScriptsService",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, ThemeableSelectAllCell,
              Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script,
-             SMSGlobalDelegate, FormHelper) {
+             ScriptsService, FormHelper) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
         events: {
-            "click #addNewScript": "addNewScript",
-            "click #deleteRecords": "onDeleteClick"
+            "click [data-add-entity]": "addNewScript",
+            "click [data-delete-scripts]": "onDeleteClick"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 columns,
                 grid,
@@ -58,8 +58,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
 
             this.realmPath = args[0];
             this.data.selectedUUIDs = [];
-            this.contextSchemaPromise = SMSGlobalDelegate.scripts.getSchema();
-            this.languageSchemaPromise = SMSGlobalDelegate.scripts.getContextSchema();
+            this.contextSchemaPromise = ScriptsService.scripts.getSchema();
+            this.languageSchemaPromise = ScriptsService.scripts.getContextSchema();
 
             Scripts = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/scripts"),
@@ -119,7 +119,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             }];
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+                attributes: () => ({ tabindex: 0 }),
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.is("input") || $target.is(".select-row-cell")) {
@@ -142,7 +143,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             this.data.scripts.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 row: ClickableRow,
                 collection: self.data.scripts,
                 className: "backgrid table table-hover",
@@ -175,13 +176,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             });
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             var msg = { message: $.t("console.scripts.list.confirmDeleteText") };
             e.preventDefault();
             FormHelper.showConfirmationBeforeDeleting(msg, _.bind(this.deleteRecords, this));
         },
 
-        deleteRecords: function () {
+        deleteRecords () {
             var self = this,
                 i = 0,
                 item,
@@ -205,7 +206,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             }
         },
 
-        onRowSelect: function (model, selected) {
+        onRowSelect (model, selected) {
             if (selected) {
                 if (!_.contains(this.data.selectedUUIDs, model.id)) {
                     this.data.selectedUUIDs.push(model.id);
@@ -217,23 +218,23 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             this.renderToolbar();
         },
 
-        renderToolbar: function () {
+        renderToolbar () {
             var self = this;
 
             UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
-                self.$el.find("#gridToolbar").html(tpl);
+                self.$el.find("[data-grid-toolbar]").html(tpl);
             });
         },
 
-        addNewScript: function () {
-            Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
+        addNewScript () {
+            Router.routeTo(Router.configuration.routes.realmsScriptNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
         },
 
         // TODO: server side fix is needed instead of this function
-        createMapBySchema: function (schema) {
+        createMapBySchema (schema) {
             var map, i, length;
 
             if (schema && schema["enum"]) {

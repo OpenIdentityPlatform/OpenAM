@@ -4,6 +4,21 @@ DO NOT TRANSLATE OR LOCALIZE
 Apache Software License, Version 2.0
 ***************************************************************************
 
+Version: asciidoctorj-1.5.4.jar
+Copyright: Copyright 2012-2016 Dan Allen, Ryan Waldron and the Asciidoctor Project
+
+Version: aws-java-sdk-core-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: aws-java-sdk-sns-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: aws-java-sdk-sqs-1.10.72.jar
+Copyright: Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+
+Version: jackson-dataformat-cbor-2.5.3.jar
+Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
 Version: bootstrap-tabdrop-1.0.js
 Copyright: Copyright 2012 Stefan Petre
 
@@ -47,11 +62,11 @@ Version: commons-codec-1.6.jar
 Copyright: Copyright 2002-2013 The Apache Software Foundation,
            Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org)
 
-Version: commons-collections-3.2.1.jar
-Copyright: Copyright 2001-2008 The Apache Software Foundation
+Version: commons-collections-3.2.2.jar
+Copyright: Copyright 2001-2015 The Apache Software Foundation
 
-Version: commons-fileupload-1.2.2.jar
-Copyright: Copyright 2002-2013 The Apache Software Foundation
+Version: commons-fileupload-1.3.1.jar
+Copyright: Copyright 2002-2014 The Apache Software Foundation
 
 Version: commons-io-2.3.jar
 Copyright: Copyright 2002-2012 The Apache Software Foundation
@@ -68,43 +83,43 @@ Copyright: Copyright 2001-2007 The Apache Software Foundation
 Version: commons-logging-api-1.1.jar
 Copyright: Copyright 2001-2007 The Apache Software Foundation
 
-Version: cxf-api-2.7.17.jar
+Version: cxf-api-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-soap-2.7.17.jar
+Version: cxf-rt-bindings-soap-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-bindings-xml-2.7.17.jar
+Version: cxf-rt-bindings-xml-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-core-2.7.17.jar
+Version: cxf-rt-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-databinding-jaxb-2.7.17.jar
+Version: cxf-rt-databinding-jaxb-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-jaxws-2.7.17.jar
+Version: cxf-rt-frontend-jaxws-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-frontend-simple-2.7.17.jar
+Version: cxf-rt-frontend-simple-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-2.7.17.jar
+Version: cxf-rt-transports-http-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-transports-http-jetty-2.7.17.jar
+Version: cxf-rt-transports-http-jetty-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-addr-2.7.17.jar
+Version: cxf-rt-ws-addr-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-policy-2.7.17.jar
+Version: cxf-rt-ws-policy-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-rt-ws-security-2.7.17.jar
+Version: cxf-rt-ws-security-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
-Version: cxf-services-sts-core-2.7.17.jar
+Version: cxf-services-sts-core-2.7.18.jar
 Copyright: Copyright 2006-2015 The Apache Software Foundation
 
 Version: ehcache-core-2.5.1.jar
@@ -174,14 +189,14 @@ Copyright: Copyright 2003-2010 The Apache Software Foundation
 Version: google-http-client-1.19.0.jar
 Copyright: Copyright (c) 2011 Google Inc.
 
-Version: groovy-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-json-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-json-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
-Version: groovy-jsr223-2.3.3.jar
-Copyright: Copyright 2001-2009 The Apache Software Foundation
+Version: groovy-jsr223-2.4.6.jar
+Copyright: Copyright 2001-2016 The Apache Software Foundation
 
 Version: guice-3.0-no_aop.jar
 Copyright: Copyright 2009 Google Inc
@@ -195,19 +210,30 @@ Copyright: Copyright 2009 Google Inc
 Version: HikariCP-2.4.1.jar
 Copyright: Copyright (C) 2013-2015 Brett Wooldridge
 
-Version: httpasyncclient-4.1.jar
+Version: httpasyncclient-osgi-4.1.2.jar
+Copyright: Copyright 2010-2015 The Apache Software Foundation
+
+Version: httpasyncclient-osgi-4.5.2.jar
 Copyright: Copyright 2010-2015 The Apache Software Foundation
 
 Version: httpclient-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
-Version: httpclient-4.4.1.jar
+Version: httpclient-4.3.6.jar
+Copyright: Copyright 1999-2015 The Apache Software Foundation
+
+Version: httpclient-osgi-4.5.2.jar
 Copyright: Copyright 1999-2015 The Apache Software Foundation
 
 Version: httpcore-4.0.1.jar
 Copyright: Copyright 1999-2014 The Apache Software Foundation
 
-Version: httpcore-4.4.1.jar
+Version: httpcore-4.3.3.jar
+Copyright: Copyright 2005-2015 The Apache Software Foundation
+           This project contains annotations derived from JCIP-ANNOTATIONS
+           Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
+
+Version: httpcore-osgi-4.4.5.jar
 Copyright: Copyright 2005-2015 The Apache Software Foundation
            This project contains annotations derived from JCIP-ANNOTATIONS
            Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
@@ -215,34 +241,34 @@ Copyright: Copyright 2005-2015 The Apache Software Foundation
 Version: httpcore-nio-4.4.1.jar
 Copyright: 2005-2015 The Apache Software Foundation
 
-Version: jackson-annotations-2.4.2.jar
+Version: jackson-annotations-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-core-2.4.2.jar
+Version: jackson-core-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-core-asl-1.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-databind-2.4.2.jar
+Version: jackson-databind-2.8.1.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-dataformat-csv-2.6.3.jar
+Version: jackson-dataformat-csv-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-dataformat-smile-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-xml-2.4.2.jar
+Version: jackson-dataformat-xml-2.8.1.jar
+Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-dataformat-yaml-2.8.1.jar
+Copyright: Copyright ©2009-2015 FasterXML, LLC. All rights reserved unless otherwise indicated.
+
+Version: jackson-module-jaxb-annotations-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-yaml-2.4.4.jar
-Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
-
-Version: jackson-module-jaxb-annotations-2.6.3.jar
-Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
-
-Version: jackson-module-jsonSchema-2.6.3.jar
+Version: jackson-module-jsonSchema-2.8.1.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: java-ipv6-0.14.jar
@@ -278,9 +304,6 @@ Copyright: Copyright (C) 2005, University of Maryland
 
 Version: jstl-1.1.2.jar
 Copyright: Copyright 1999-2004 The Apache Software Foundation.
-
-Version: log4j-1.2.16.jar
-Copyright: Copyright 2007 The Apache Software Foundation
 
 Version: maxmind-db-1.0.0.jar
 Copyright: Copyright (c) 2014 by MaxMind, Inc.
@@ -328,6 +351,9 @@ Copyright: Copyright (c) 2008-2010 Andrey Somov
 Version: super-csv-2.4.0.jar
 Copyright: Copyright 2007 Kasper B. Graversen
 
+Version: swagger-models-1.5.9.jar
+Copyright: Copyright 2016 SmartBear Software
+
 Version: velocity-1.7.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
@@ -344,7 +370,7 @@ Version: xml-resolver-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
 
 Version: xml-resolver-1.2.jar
-Copyright:
+Copyright: Copyright 2006 The Apache Software Foundation.
 
 Version: xml-serializer-2.11.0.jar
 Copyright: Copyright 1999-2006- Apache 1999-2002 - Lotus 2001-2002 - Sun, 2003 - IBM
@@ -371,8 +397,14 @@ Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 Version: woodstox-core-asl-4.4.1.jar
 Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: wss4j-1.6.18.jar
+Version: woodstox-core-5.0.2.jar
+Copyright (c) 2004 Tatu Saloranta, tatu.saloranta@iki.fi
+
+Version: wss4j-1.6.19.jar
 Copyright: Copyright 2004-2015 The Apache Software Foundation
+
+Version: joda-time-2.7.jar
+Copyright 2001-2016 Stephen Colebourne
 
 ==================
 Full license text:
@@ -790,7 +822,7 @@ Version: bootstrap-datetimepicker-4.14.30-min.js
 Copyright: Copyright (c) 2015 Jonathan Peterson
 
 Version: bootstrap-dialog-1.34.4-min.js
-Copyright:
+Copyright: Copyright 2015 Twitter.
 
 Version: codemirror/addon/display/fullscreen.js
 Copyright: Copyright (C) 2014 by Marijn Haverbeke
@@ -863,7 +895,7 @@ Version: requirejs-2.1.14-min.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
 Version: spin-2.0.1-min.js
-Copyright:
+Copyright: Copyright (c) 2011-2014 Felix Gnass
 
 Version: squire-0.2.0.js
 Copyright: Copyright (c) 2013 Merrick Christensen
@@ -896,7 +928,7 @@ Version: sha256.js
 Copyright: Copyright (c) 2009-2013 by Jeff Mott. All rights reserved.
 
 Version: swfobject-2.2-min.js
-Copyright:
+Copyright: Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 
 Version: calendar_date_select.js (1.16.1)
 Copyright: Copyright 2009 Tim Harper
@@ -928,8 +960,8 @@ Copyright: Copyright 2004-2013 QOS.ch
 Version: slf4j-jdk14-1.7.5.jar
 Copyright: Copyright 2004-2007 QOS.ch
 
-Version: log4j-over-slf4j-1.7.5.jar
-Copyright: Copyright 2004-2013 QOS.ch
+Version: jcl-over-slf4j-1.7.21.jar
+Copyright:  Copyright 2001-2004 The Apache Software Foundation.
 
 Version: text.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
@@ -967,9 +999,6 @@ Mozilla Public License 2.0 (MPL-2.0)
 
 Version: jss4-2007-08-11.jar
 Copyright: Copyright Mozilla Foundation
-
-Version: publicsuffix-1.0.1.jar
-Copyright: Copyright 2004 Sam Hocevar
 
 Version: rhino-1.7R4.jar
 Copyright: Copyright Mozilla Foundation
@@ -1189,40 +1218,40 @@ Version: jato-2005-05-04.jar
 Copyright: Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved
 
 Version: cc-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_de-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_es-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_fr-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_it-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_ja-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_ko-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_sv-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_CN-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_HK-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: cc_zh_TW-2008-08-08.jar
-Copyright:
+Copyright: Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
 
 Version: grizzly-framework-2.3.23.jar
 Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
@@ -1236,11 +1265,14 @@ Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights rese
 Version: grizzly-http-servlet-2.3.23.jar
 Copyright: Copyright (c) 2007-2015 Oracle and/or its affiliates. All rights reserved.
 
+Version: javax.jms:javax.jms-api:2.0.1.jar
+Copyright: Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights reserved.
+
 Version: jaxb-impl-1.0.6.jar
-Copyright:
+Copyright: Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
 
 Version: jaxb-xjc-1.0.6.jar
-Copyright:
+Copyright: Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
 
 Version: jsp-api-2.1.jar
 Copyright: Copyright 2005 Sun Microsystems, Inc. All rights reserved.
@@ -1365,12 +1397,6 @@ Copyright: Copyright (c) 2005-2009 Sun Microsystems Inc. All Rights Reserved,
 Version: openam-auth-datastore-12.0.0.jar
 Copyright: Copyright (c) 2005-2009 Sun Microsystems Inc. All Rights Reserved,
            Portions Copyrighted 2011-2014 ForgeRock AS
-
-Version: openam-auth-deviceprint-module-12.0.0.jar
-Copyright: Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved,
-           Portions Copyrighted 2013 Syntegrity.
-           Portions Copyrighted 2013 ForgeRock Inc.,
-           Portions Copyrighted 2014 Nomura Research Institute, Ltd
 
 Version: openam-auth-hotp-12.0.0.jar
 Copyright: Copyright (c) 2005-2009 Sun Microsystems Inc. All Rights Reserved,
@@ -1767,6 +1793,9 @@ Eclipse Public License (EPL) Version 1.0
 
 Version: jgrapht-core-0.9.1.jar
 Copyright: Copyright 2003-2015, by Barak Naveh and Contributors. All rights reserved.
+
+Version: jruby-complete-1.7.21.jar
+Copyright: Copyright (c) 2007-2016 The JRuby project
 
 ==================
 Full license text:

@@ -126,19 +126,21 @@ public class DebugFileImpl implements DebugFile {
             throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : " +
                     this);
         }
-        return !newDebugDir.equals(debugDirectory.getAndSet(newDebugDir));
+
+        fileLock.readLock().lock();
+        try {
+            return !newDebugDir.equals(debugDirectory.getAndSet(newDebugDir));
+        } finally {
+            fileLock.readLock().unlock();
+        }
+    }
+
+    private boolean isConfigFileInitialized() {
+        return currentFile != null && currentFile.exists();
     }
 
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
-
-        if (isConfigChanged()) {
-            initialize();
-        }
-
-        if (needsTimeRotation() || needsSizeRotation()) {
-            rotate();
-        }
 
         StringBuilder buf = new StringBuilder();
         buf.append(prefix);
@@ -153,9 +155,21 @@ public class DebugFileImpl implements DebugFile {
             buf.append(stBuf.toString());
         }
 
+        if (isConfigChanged() || !isConfigFileInitialized()) {
+            initialize();
+        }
+
+        if (needsTimeRotation() || needsSizeRotation()) {
+            rotate();
+        }
+
         fileLock.readLock().lock();
         try {
-            debugWriter.println(buf.toString());
+            if (debugWriter != null) {
+                debugWriter.println(buf.toString());
+            } else {
+                StdDebugFile.printError(prefix, msg, th);
+            } 
         } finally {
             fileLock.readLock().unlock();
         }
@@ -265,12 +279,16 @@ public class DebugFileImpl implements DebugFile {
      * @return true if the log file need to be rotated
      */
     private boolean needsSizeRotation() {
-        if (currentFile == null) {
-            return false;
+        fileLock.readLock().lock();
+        try {
+            if (currentFile != null) {
+                return configuration.getRotationFileSizeInByte() != -1
+                    && currentFile.length() >= configuration.getRotationFileSizeInByte();
+            }
+        } finally {
+            fileLock.readLock().unlock();
         }
-
-        return configuration.getRotationFileSizeInByte() != -1
-                && currentFile.length() >= configuration.getRotationFileSizeInByte();
+        return false;
     }
 
     /*
@@ -279,7 +297,15 @@ public class DebugFileImpl implements DebugFile {
      * @return true if the log file need to be rotated
      */
     private boolean needsTimeRotation() {
-        return configuration.getRotationInterval() > 0 && nextRotation <= clock.now();
+        fileLock.readLock().lock();
+        try {
+            if (configuration != null) {
+                return configuration.getRotationInterval() > 0 && nextRotation <= clock.now();
+            }
+        } finally {
+            fileLock.readLock().unlock();
+        }
+        return false;
     }
 
     private synchronized void rotate() throws IOException {

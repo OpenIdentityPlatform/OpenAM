@@ -11,29 +11,41 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sso.providers.stateless;
 
-import com.sun.identity.shared.datastruct.CollectionHelper;
+import java.security.Key;
+import java.security.KeyPair;
+import java.util.Map;
+
+import javax.crypto.spec.SecretKeySpec;
+
 import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.json.jose.jwe.CompressionAlgorithm;
 import org.forgerock.json.jose.jwe.JweAlgorithmType;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openam.utils.StringUtils;
 
-import java.security.KeyPair;
-import java.util.Map;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.encode.Base64;
 
 /**
  * Responsible for loading SMS configuration options relating to JwtSessionMapper.
  */
 public class JwtSessionMapperConfig {
 
-    public static final String SIGNING_ALGORITHM = "openam-session-stateless-signing-type";
-    public static final String SIGNING_HMAC_SHARED_SECRET = "openam-session-stateless-signing-hmac-shared-secret";
-    public static final String SIGNING_RSA_KEY_ALIAS = "openam-session-stateless-signing-rsa-certificate-alias";
-    public static final String ENCRYPTION_ALGORITHM = "openam-session-stateless-encryption-type";
-    public static final String ENCRYPTION_RSA_KEY_ALIAS = "openam-session-stateless-encryption-rsa-certificate-alias";
+    static final String SIGNING_ALGORITHM = "openam-session-stateless-signing-type";
+    static final String SIGNING_HMAC_SHARED_SECRET = "openam-session-stateless-signing-hmac-shared-secret";
+    static final String ENCRYPTION_ALGORITHM = "openam-session-stateless-encryption-type";
+    static final String COMPRESSION_TYPE = "openam-session-stateless-compression-type";
+
+    private static final String ASYMMETRIC_SIGNING_KEY_ALIAS = "openam-session-stateless-signing-rsa-certificate-alias";
+    private static final String ENCRYPTION_RSA_KEY_ALIAS = "openam-session-stateless-encryption-rsa-certificate-alias";
+    private static final String ENCRYPTION_AES_KEY = "openam-session-stateless-encryption-aes-key";
+
+    private static final String NONE = "NONE";
 
     private final JwtSessionMapper jwtSessionMapper;
 
@@ -51,11 +63,28 @@ public class JwtSessionMapperConfig {
 
         // Configure encryption algorithm and parameters
 
-        String encryptionAlgorithm = CollectionHelper.getMapAttr(attrs, ENCRYPTION_ALGORITHM);
-        final boolean encryptionEnabled = JweAlgorithmType.RSA.toString().equalsIgnoreCase(encryptionAlgorithm);
+        String encryptionAlgorithm = CollectionHelper.getMapAttr(attrs, ENCRYPTION_ALGORITHM, NONE);
+        final boolean encryptionEnabled = !StringUtils.isEqualTo(NONE, encryptionAlgorithm);
+
         if (encryptionEnabled) {
-            builder.encryptedUsingKeyPair(getKeyPair(attrs, ENCRYPTION_RSA_KEY_ALIAS));
+            JweAlgorithmType jweAlgorithmType = JweAlgorithmType.valueOf(encryptionAlgorithm);
+            switch (jweAlgorithmType) {
+                case RSA:
+                    builder.encryptedUsingKeyPair(getKeyPair(attrs, ENCRYPTION_RSA_KEY_ALIAS));
+                    break;
+                case AES_KEYWRAP:
+                    builder.encryptedUsingKeyWrap(getSecretKey(attrs, ENCRYPTION_AES_KEY));
+                    break;
+                case DIRECT:
+                    builder.encryptedUsingDirectKey(getSecretKey(attrs, ENCRYPTION_AES_KEY));
+                    break;
+            }
         }
+
+        // Configure compression
+        CompressionAlgorithm compressionAlgorithm = CompressionAlgorithm.parseAlgorithm(
+                CollectionHelper.getMapAttr(attrs, COMPRESSION_TYPE, NONE));
+        builder.compressedUsing(compressionAlgorithm);
 
         // Configure signing algorithm and parameters
 
@@ -65,7 +94,7 @@ public class JwtSessionMapperConfig {
         switch (signingAlgorithm) {
 
             case RS256:
-                builder.signedUsingRS256(getKeyPair(attrs, SIGNING_RSA_KEY_ALIAS));
+                builder.signedUsingRS256(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
                 break;
 
             case HS256:
@@ -78,6 +107,18 @@ public class JwtSessionMapperConfig {
 
             case HS512:
                 builder.signedUsingHS512(CollectionHelper.getMapAttr(attrs, SIGNING_HMAC_SHARED_SECRET));
+                break;
+
+            case ES256:
+                builder.signedUsingES256(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
+                break;
+
+            case ES384:
+                builder.signedUsingES384(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
+                break;
+
+            case ES512:
+                builder.signedUsingES512(getKeyPair(attrs, ASYMMETRIC_SIGNING_KEY_ALIAS));
                 break;
 
             case NONE:
@@ -95,6 +136,12 @@ public class JwtSessionMapperConfig {
     KeyPair getKeyPair(Map attrs, String key) {
         String keyAlias = CollectionHelper.getMapAttr(attrs, key);
         return AMKeyProviderHolder.INSTANCE.getKeyPair(keyAlias);
+    }
+
+    @VisibleForTesting
+    Key getSecretKey(Map attrs, String key) {
+        byte[] keyData = Base64.decode(CollectionHelper.getMapAttr(attrs, key));
+        return new SecretKeySpec(keyData, "AES");
     }
 
     private static final class AMKeyProviderHolder {

@@ -23,12 +23,11 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.util.Reject;
 
 /**
- * Responsible for querying the persistence store for matching Tokens.
+ * Responsible for querying the persistence layer for matching Tokens.
  *
  * @see PartialQueryTask
  */
@@ -45,7 +44,7 @@ public class QueryTask extends AbstractTask {
     }
 
     /**
-     * Perform the query using the provided LDAPAdapter.
+     * Perform the query using the provided TokenStorageAdapter.
      *
      * The ResultHandler is able to receive a return type of either Tokens
      * or PartialTokens and so the value passed to the ResultHandler will
@@ -53,15 +52,14 @@ public class QueryTask extends AbstractTask {
      *
      * @see org.forgerock.openam.cts.api.filter.TokenFilter#getReturnFields()
      *
-     * @param connection Connection to use.
      * @param adapter Utility functions to perform the task with.
      * @throws DataLayerException If there was any error during the query.
      * @throws IllegalArgumentException If the TokenFilter provided defined any return fields.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
         Reject.ifFalse(tokenFilter.getReturnFields().isEmpty());
-        handler.processResults(adapter.query(connection, tokenFilter));
+        handler.processResults(adapter.query(tokenFilter));
     }
 
     @Override

@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2015 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -13,6 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.monitoring.cts;
@@ -141,10 +140,11 @@ public class CtsCRUDOperationsPerTokenTypeEntryImpl extends CtsCRUDOperationsPer
     /**
      * Gets the average rate that the specified CTS operation, on the specified Token type has been made on the CTS.
      *
-     * @return The average rate.
+     * @return The average rate. The monitored value is multiplied by 100 to allow SNMP clients to display it as
+     * floating point value with 2 decimal places.
      */
     @Override
-    public Long getDAverage() throws SnmpStatusException {
+    public Integer getDAverage() throws SnmpStatusException {
         final TokenType tokenType = getTokenType();
         final CTSOperation operation = getCTSOperation();
 
@@ -152,7 +152,7 @@ public class CtsCRUDOperationsPerTokenTypeEntryImpl extends CtsCRUDOperationsPer
             throw new InvalidSNMPQueryException();
         }
 
-        return (long) monitoringStore.getAverageOperationsPerPeriod(getTokenType(), getCTSOperation());
+        return (int) (monitoringStore.getAverageOperationsPerPeriod(getTokenType(), getCTSOperation()) * 100);
     }
 
     /**

@@ -11,11 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -24,17 +23,17 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
     var DashboardTasksView = AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTasksTemplate.html",
         data: {},
-        element: "#commonTasks",
-        events:{
-            "click .am-panel-card a" : "cardClick",
-            "click span#commonTasksBtn" : "commonTasksBtnClick"
+        element: "[data-common-tasks-container]",
+        events: {
+            "click [data-panel-card] a" : "cardClick",
+            "click [data-common-tasks]" : "commonTasksBtnClick"
         },
-        render: function (args, callback) {
+        render (args, callback) {
             this.realmPath = args[0];
             this.parentRender(callback);
         },
 
-        cardClick: function (e) {
+        cardClick (e) {
             var dataset = $(e.currentTarget).data();
             if (!dataset.taskLink || dataset.taskLink.indexOf("http") !== 0) {
                 e.preventDefault();
@@ -47,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
             }
         },
 
-        commonTasksBtnClick: function (e) {
+        commonTasksBtnClick (e) {
             e.preventDefault();
             this.data.taskGroup = {};
             this.data.taskGroup.tasks = this.data.allTasks;

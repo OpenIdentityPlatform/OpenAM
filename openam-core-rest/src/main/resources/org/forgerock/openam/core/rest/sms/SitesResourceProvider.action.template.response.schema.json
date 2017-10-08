@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SitesResourceProvider#action.template.response.schema.title",
+  "description": "i18n:api-descriptor/SitesResourceProvider#action.template.response.schema.description",
+  "properties": {
+    "url": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SitesResourceProvider#action.template.response.url.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#action.template.response.url.description"
+    },
+    "servers": {
+      "type": "array",
+      "title": "i18n:api-descriptor/SitesResourceProvider#action.template.response.servers.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#action.template.response.servers.description",
+      "items": {
+        "type": "string"
+      }
+    },
+    "secondaryURLs": {
+      "type": "array",
+      "title": "i18n:api-descriptor/SitesResourceProvider#action.template.response.secondaryurls.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#action.template.response.secondaryurls.description",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

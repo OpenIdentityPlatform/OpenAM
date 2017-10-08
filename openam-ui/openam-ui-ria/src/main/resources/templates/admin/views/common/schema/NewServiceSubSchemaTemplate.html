@@ -1,0 +1,26 @@
+{{> headers/_Title title=title }}
+
+<div class="panel multiple-panels panel-content">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <label class="control-label" for="instanceId">{{t "common.form.name"}}</label>
+                <input data-instance-id type="text" id="instanceId" class="form-control" required name="instanceId"
+                    placeholder="{{t 'common.form.validation.required'}}">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body form-group">
+            <form data-json-form></form>
+        </div>
+    </div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button data-cancel class="btn btn-default" type="button">{{t "common.form.cancel"}}</button>
+            <button data-save class="btn btn-primary" type="button" disabled>{{t "common.form.create"}}</button>
+        </div>
+    </div>
+</div>

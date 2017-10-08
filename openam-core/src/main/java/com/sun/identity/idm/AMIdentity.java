@@ -24,7 +24,7 @@
  *
  * $Id: AMIdentity.java,v 1.37 2009/11/20 23:52:54 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -34,6 +34,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMCrypt;
@@ -52,10 +57,6 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.i18n.LocalizedIllegalArgumentException;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.RDN;
 
 /**
  * This class represents an Identity which needs to be managed by Access
@@ -178,7 +179,7 @@ public class AMIdentity {
             univIdWithoutDN = univIdWithoutDN.substring(0, index);
             universalId = DN.valueOf(univIdWithoutDN);
         }
-        name = LDAPUtils.rdnValue(universalId.rdn());
+        name = LDAPUtils.unescapeValue(LDAPUtils.rdnValue(universalId.rdn()));
         type = new IdType(LDAPUtils.rdnValue(universalId.parent().rdn()));
         orgName = universalId.parent().parent().toString();
     }
@@ -204,6 +205,14 @@ public class AMIdentity {
     }
 
     public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type, String orgName) {
+        // check if name is DN with more than one RDN
+        if (LDAPUtils.isDN(name, 1)) {
+            // escaped name will come in from xxx, but escaped name fails if used in search.
+            name = LDAPUtils.rdnValueFromDn(name);
+        }
+
+        name = LDAPUtils.unescapeValue(name);
+
         this.name = name;
         this.type = type;
         this.orgName = DNMapper.orgNameToDN(orgName);
@@ -212,14 +221,10 @@ public class AMIdentity {
             this.univDN = amsdkdn.toString();
         }
 
-        if (LDAPUtils.isDN(name)) {
-            name = LDAPUtils.rdnValueFromDn(name);
-        }
-
         try {
             univIdWithoutDN = LDAPUtils.newDN(this.orgName)
                     .child(new RDN("ou", type.getName()))
-                    .child(new RDN("id", name))
+                    .child(new RDN("id", LDAPUtils.escapeValue(name)))
                     .toString();
         } catch (LocalizedIllegalArgumentException e) {
             throw new IllegalArgumentException("Cannot parse orgName: " + orgName, e);
@@ -316,8 +321,7 @@ public class AMIdentity {
     public Map getAttributes() throws IdRepoException, SSOException {
 
         IdServices idServices = IdServicesFactory.getDataStoreServices();
-        Map attrs = idServices
-                .getAttributes(token, type, name, orgName, univDN);
+        Map attrs = idServices.getAttributes(token, type, name, orgName, univDN);
         if (debug.messageEnabled()) {
             debug.message("AMIdentity.getAttributes all: attrs=" +
                 IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrs, null));
@@ -552,7 +556,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Set getAssignedServices() throws IdRepoException, SSOException {
+    public Set<String> getAssignedServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
         ServiceManager sm;
         try {
@@ -591,7 +595,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Set getAssignableServices() throws IdRepoException, SSOException {
+    public Set<String> getAssignableServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
         ServiceManager sm;
         try {
@@ -796,7 +800,7 @@ public class AMIdentity {
      *             If user's single sign on token is invalid.
      * @supported.api
      */
-    public Map getServiceAttributes(String serviceName)
+    public Map<String, Set<String>> getServiceAttributes(String serviceName)
         throws IdRepoException, SSOException {
         Set attrNames = getServiceAttributesName(serviceName);
 
@@ -806,8 +810,7 @@ public class AMIdentity {
             debug.message("AMIdentity.getServiceAttributes: attrNames="
                 + attrNames + ";  orgName=" + orgName + ";  univDN=" + univDN);
        }
-        return idServices.getServiceAttributes(token, type, name, serviceName,
-            attrNames, orgName, univDN);
+        return idServices.getServiceAttributes(token, type, name, serviceName, attrNames, orgName, univDN);
     }
 
 

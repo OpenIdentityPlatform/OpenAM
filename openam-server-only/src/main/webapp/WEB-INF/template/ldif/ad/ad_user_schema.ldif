@@ -142,23 +142,6 @@ schemaIDGUID:: DBESFSKYTEyK80Ejrt4l4Q==
 oMSyntax: 22
 systemOnly: FALSE
 
-dn: CN=iplanet-am-session-add-session-listener-on-all-sessions,CN=Schema,CN=Configuration,@userStoreRootSuffix@
-changetype: add
-adminDisplayName: iplanet-am-session-add-session-listener-on-all-sessions
-adminDescription: Add Session Listener on All Sessions
-attributeID: 2.16.840.1.113730.3.1.1070
-attributeSyntax: 2.5.5.5
-cn: iplanet-am-session-add-session-listener-on-all-sessions
-instanceType: 4
-isSingleValued: FALSE
-lDAPDisplayName: iplanet-am-session-add-session-listener-on-all-sessions
-objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
-objectClass: attributeSchema
-schemaIDGUID:: XnmfWnNuLEKTblYG/3P9KQ==
-oMSyntax: 22
-systemOnly: FALSE
-
-
 dn:
 changetype: modify
 add: schemaUpdateNow
@@ -217,7 +200,6 @@ mayContain: iplanet-am-session-max-caching-time
 mayContain: iplanet-am-session-quota-limit
 mayContain: iplanet-am-session-get-valid-sessions
 mayContain: iplanet-am-session-destroy-sessions
-mayContain: iplanet-am-session-add-session-listener-on-all-sessions
 mayContain: iplanet-am-session-service-status
 objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: classSchema
@@ -356,15 +338,15 @@ changetype: add
 adminDisplayName: oath2faEnabled
 adminDescription: Indicator for enabling of OATH 2FA
 attributeID: 1.3.6.1.4.1.36733.2.2.1.131
-attributeSyntax: 1.3.6.1.4.1.1466.115.121.1.27
+attributeSyntax: 2.5.5.9
 cn: oath2faEnabled
 instanceType: 4
 isSingleValued: FALSE
 lDAPDisplayName: oath2faEnabled
 objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
 objectClass: attributeSchema
-schemaIDGUID:: SUEqj1qJF0yIXSuk4gPGSw==
-oMSyntax: 22
+schemaIDGUID:: nbMoMMtlAEy+64sW1Tg94Q==
+oMSyntax: 2
 systemOnly: FALSE
 
 

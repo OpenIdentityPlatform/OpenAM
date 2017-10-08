@@ -32,12 +32,6 @@ package com.sun.identity.setup;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.AUTHN_BIND_REQUEST;
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -67,6 +61,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletContext;
@@ -91,8 +86,8 @@ import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownPriority;
 import org.forgerock.util.time.Duration;
+import org.opends.quicksetup.TempLogFile;
 import org.opends.server.core.DirectoryServer;
-import org.opends.server.extensions.ConfigFileHandler;
 import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
 import org.opends.server.tools.InstallDS;
 import org.opends.server.tools.RebuildIndex;
@@ -101,6 +96,12 @@ import org.opends.server.types.DirectoryEnvironmentConfig;
 import org.opends.server.util.EmbeddedUtils;
 import org.opends.server.util.ServerConstants;
 import org.opends.server.util.TimeThread;
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -410,7 +411,9 @@ public class EmbeddedOpenDS {
                 "--doNotStart",                 // 15
                 "--hostname",                   // 16
                 "hostname",                     // 17
-                "--noPropertiesFile"            // 18
+                "--noPropertiesFile",           // 18
+                "--backendType",                // 19
+                "je"                            // 20
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -419,6 +422,8 @@ public class EmbeddedOpenDS {
         setupCmd[8] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT);
         setupCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT);
         setupCmd[17] = getOpenDJHostName(map);
+        setupCmd[20] = SystemProperties.get(SetupConstants.DJ_BACKEND_TYPE_CONFIG_NAME,
+                SetupConstants.DJ_BACKEND_TYPE_DEFAULT);
 
         Object[] params = {concat(setupCmd)};
         SetupProgress.reportStart("emb.setupcommand", params);
@@ -429,7 +434,7 @@ public class EmbeddedOpenDS {
                 setupCmd,
                 SetupProgress.getOutputStream(),
                 SetupProgress.getOutputStream(),
-                null);
+                TempLogFile.newTempLogFile("opendj-setup-"));
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -457,7 +462,6 @@ public class EmbeddedOpenDS {
         DirectoryEnvironmentConfig config = new DirectoryEnvironmentConfig();
         config.setServerRoot(new File(odsRoot));
         config.setForceDaemonThreads(true);
-        config.setConfigClass(ConfigFileHandler.class);
         config.setConfigFile(new File(odsRoot + "/config", "config.ldif"));
         debug.message("EmbeddedOpenDS.startServer:starting DS Server...");
         EmbeddedUtils.startServer(config);
@@ -764,25 +768,20 @@ public class EmbeddedOpenDS {
                 debug.message("EmbeddedOpenDS:loadLDIF(" + ldif + ")");
             }
 
-            String[] args1 =
-                    {
-                            "-C",                                               // 0
-                            "org.opends.server.extensions.ConfigFileHandler",   // 1
-                            "-f",                                               // 2
-                            odsRoot + "/config/config.ldif",                    // 3
-                            "-n",                                               // 4
-                            "userRoot",                                         // 5
-                            "-l",                                               // 6
-                            ldif,                                               // 7
-                            "--trustAll",                                       // 8
-                            "-D",                                               // 9
-                            "cn=Directory Manager",                             // 10
-                            "-w",                                               // 11
-                            "password",                                         // 12
-                            "--noPropertiesFile"                                // 13
-                    };
-            args1[10] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
-            args1[12] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
+            String[] args1 = new String[]{
+                    "-f",
+                    odsRoot + "/config/config.ldif",
+                    "-n",
+                    "userRoot",
+                    "-l",
+                    ldif,
+                    "--trustAll",
+                    "-D",
+                    (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN),
+                    "-w",
+                    (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD),
+                    "--noPropertiesFile"
+            };
             ret = org.opends.server.tools.ImportLDIF.mainImportLDIF(args1, false,
                     SetupProgress.getOutputStream(), SetupProgress.getOutputStream());
 
@@ -1325,8 +1324,6 @@ public class EmbeddedOpenDS {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
 
         String[] args = {
-                "--configClass",
-                "org.opends.server.extensions.ConfigFileHandler",
                 "--configFile",
                 getOpenDJConfigFile(map),
                 "--baseDN",

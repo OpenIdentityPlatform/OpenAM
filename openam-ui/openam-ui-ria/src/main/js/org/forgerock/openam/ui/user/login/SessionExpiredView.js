@@ -14,20 +14,24 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/login/SessionExpiredView", [
-    "jquery",
+define([
+    "i18next",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/user/login/navigateThenRefresh"
+], (i18next, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper, navigateThenRefresh) => {
 
-    var SessionExpiredView = AbstractView.extend({
+    const SessionExpiredView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
-        render: function () {
+        events: {
+            "click [data-return-to-login-page]" : navigateThenRefresh
+        },
+        render () {
             /*
             The RESTLoginHelper.filterUrlParams returns a filtered list of the parameters from the value set within
             the Configuration.globalData.auth.fullLoginURL which is populated by the server upon successful login.
@@ -38,12 +42,10 @@ define("org/forgerock/openam/ui/user/login/SessionExpiredView", [
             this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
             delete Configuration.globalData.auth.fullLoginURL;
 
-            RESTLoginHelper.removeSessionCookie();
-            Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
 
-            this.data.title = $.t("templates.user.SessionExpiredTemplate.sessionExpired");
+            this.data.title = i18next.t("templates.user.SessionExpiredTemplate.sessionExpired");
             this.parentRender();
         }
     });

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl;
@@ -64,7 +64,8 @@ public class ResourceSetDataLayerConfiguration extends LdapDataLayerConfiguratio
     @Override
     public void updateExternalLdapConfiguration(ModifiedProperty<String> hosts, ModifiedProperty<String> username,
             ModifiedProperty<String> password, ModifiedProperty<String> maxConnections,
-            ModifiedProperty<Boolean> sslMode, ModifiedProperty<Integer> heartbeat) {
+            ModifiedProperty<Boolean> sslMode, ModifiedProperty<Integer> heartbeat,
+            ModifiedProperty<Boolean> affinityEnabled) {
         hosts.set(SystemProperties.get(STORE_HOSTNAME));
         username.set(SystemProperties.get(STORE_USERNAME));
         password.set(AMPasswordUtil.decrypt(SystemProperties.get(STORE_PASSWORD)));

@@ -11,24 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.http.annotations;
 
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import java.util.HashMap;
-import java.util.Map;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.google.inject.Key;
+import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
+import java.util.Map;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.services.context.Context;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
@@ -39,6 +40,7 @@ import org.forgerock.util.promise.Promise;
  */
 public final class Endpoints {
 
+    private static final Debug DEBUG = Debug.getInstance("frRest");
     private static final String HEADER_X_HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
 
     /**
@@ -65,7 +67,15 @@ public final class Endpoints {
                     response.setEntity(new NotSupportedException().toJsonValue().getObject());
                     return newResultPromise(response);
                 }
-                return method.invoke(context, request);
+
+                try {
+                    return method.invoke(context, request);
+                } catch (Throwable t) {
+                    DEBUG.error("Endpoints :: Caught exception during execution of handle() : ", t);
+                    Response response = new Response(Status.INTERNAL_SERVER_ERROR);
+                    response.setEntity(new InternalServerErrorException(t).toJsonValue().getObject());
+                    return newResultPromise(response);
+                }
             }
         };
     }

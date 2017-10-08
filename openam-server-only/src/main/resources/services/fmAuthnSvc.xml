@@ -44,7 +44,8 @@
                     type="list" 
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    order="100">
                     <DefaultValues> 
                         <Value>key=PLAIN|class=@AUTHNSVC_PLAIN_MECHANISM_HANDLER@</Value> 
                         <Value>key=CRAM-MD5|class=@AUTHNSVC_CRAMMD5_MECHANISM_HANDLER@</Value>
@@ -54,7 +55,8 @@
                 <AttributeSchema name="ChallengeCleanupInterval"
                     type="single"
                     syntax="number"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    order="200">
                     <DefaultValues>
                         <Value>60000</Value>
                     </DefaultValues>
@@ -62,12 +64,14 @@
                 <AttributeSchema name="TransformClasses"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    order="300">
                 </AttributeSchema>
                 <AttributeSchema name="PlainMechanismAuthModule"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    order="400">
                     <DefaultValues>
                         <Value>DataStore</Value>
                     </DefaultValues>
@@ -75,7 +79,8 @@
                 <AttributeSchema name="CramMD5MechanismAuthModule"
                     type="single"
                     syntax="string"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    order="500">
                     <DefaultValues>
                         <Value>DataStore</Value>
                     </DefaultValues>

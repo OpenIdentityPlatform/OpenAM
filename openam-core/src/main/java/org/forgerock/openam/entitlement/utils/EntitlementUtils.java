@@ -15,40 +15,45 @@
  */
 package org.forgerock.openam.entitlement.utils;
 
-import static com.sun.identity.entitlement.opensso.EntitlementService.APPLICATION_CLASSNAME;
-import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_META;
-import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_SUBJECT_ATTR_NAMES;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_CONDITIONS;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ENTITLEMENT_COMBINER;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_COMP_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
-import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_APPLICATION_CLASS;
+import static com.sun.identity.entitlement.opensso.EntitlementService.*;
+import static org.forgerock.openam.utils.Time.*;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
-import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.ApplicationTypeManager;
-import com.sun.identity.entitlement.DenyOverride;
-import com.sun.identity.entitlement.EntitlementCombiner;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.PolicyConstants;
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.util.Reject;
-
-import javax.security.auth.Subject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
+import org.forgerock.util.Reject;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.ApplicationTypeManager;
+import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.EntitlementCondition;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.EntitlementSubject;
+import com.sun.identity.entitlement.opensso.EntitlementService;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * Utility methods for managing entitlements.
@@ -68,6 +73,7 @@ public final class EntitlementUtils {
     public static final String CONFIG_LAST_MODIFIED_BY = "lastModifiedBy";
     public static final String CONFIG_LAST_MODIFIED_DATE = "lastModifiedDate";
     public static final String CONFIG_NAME = "name";
+    public static final String CONFIG_DISPLAY_NAME = "displayName";
     public static final String CONFIG_APPLICATION_TYPE = "applicationType";
     public static final String EMPTY = "";
     public static final String SCHEMA_RESOURCE_TYPES = "resourceTypes";
@@ -123,11 +129,16 @@ public final class EntitlementUtils {
      */
     public static Application createApplication(ApplicationType applicationType, String name,
             Map<String, Set<String>> data) throws InstantiationException, IllegalAccessException, EntitlementException {
-        Application app = ApplicationManager.newApplication(name, applicationType);
+        Application app = newApplication(name, applicationType);
 
         final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
         if (resourceTypeUuids != null) {
             app.addAllResourceTypeUuids(resourceTypeUuids);
+        }
+
+        String displayName = getAttribute(data, CONFIG_DISPLAY_NAME);
+        if (displayName != null) {
+            app.setDisplayName(displayName);
         }
 
         String description = getAttribute(data, CONFIG_DESCRIPTION);
@@ -178,6 +189,27 @@ public final class EntitlementUtils {
         }
 
         return app;
+    }
+
+    /**
+     * Creates an application.
+     *
+     * @param name Name of application.
+     * @param applicationType application type.
+     * @throws EntitlementException if application class is not found.
+     */
+    public static Application newApplication(String name, ApplicationType applicationType) throws EntitlementException {
+        Class clazz = applicationType.getApplicationClass();
+        Class[] parameterTypes = {String.class, ApplicationType.class};
+        Constructor constructor;
+        try {
+            constructor = clazz.getConstructor(parameterTypes);
+            Object[] parameters = {name, applicationType};
+            return (Application) constructor.newInstance(parameters);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | InstantiationException |
+                IllegalArgumentException | InvocationTargetException ex) {
+            throw new EntitlementException(INVALID_APPLICATION_CLASS, ex);
+        }
     }
 
     /**
@@ -356,8 +388,8 @@ public final class EntitlementUtils {
         try {
             return Long.parseLong(getAttribute(data, attributeName));
         } catch (NumberFormatException e) {
-            PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong", e);
-            return new Date().getTime();
+            PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong attributeName={}", attributeName, e);
+            return newDate().getTime();
         }
     }
 
@@ -376,7 +408,7 @@ public final class EntitlementUtils {
      * @return An SSO token.
      */
     public static SSOToken getSSOToken(Subject subject) {
-        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+        if (PolicyConstants.SUPER_ADMIN_SUBJECT.equals(subject)) {
             return getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
@@ -413,6 +445,26 @@ public final class EntitlementUtils {
     }
 
     /**
+     * Returns all the short names of {@link EntitlementSubject}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unique EntitlementSubject registered at point of query.
+     */
+    public static Set<String> getSubjectsShortNames() {
+        return registry.getSubjectsShortNames();
+    }
+
+    /**
+     * Returns all the short names of {@link EntitlementCondition}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unique EntitlementConditions registered at point of query.
+     */
+    public static Set<String> getConditionsShortNames() {
+        return registry.getConditionsShortNames();
+    }
+
+    /**
      * Create a ResourceType object from a map, mapping strings to sets.
      * @param uuid The uuid of the created resource type object.
      * @param data The data map for the object.
@@ -430,5 +482,59 @@ public final class EntitlementUtils {
                 .setLastModifiedBy(getAttribute(data, CONFIG_LAST_MODIFIED_BY, EMPTY))
                 .setLastModifiedDate(getDateAttributeAsLong(data, CONFIG_LAST_MODIFIED_DATE))
                 .build();
+    }
+
+    /**
+     * Get a new instance of the {@link EntitlementConfiguration}.
+     *
+     * @param subject The requesting Subject.
+     * @param realm The realm for which the configuration is required.
+     * @return The {@link EntitlementConfiguration} for the given realm.
+     */
+    public static EntitlementConfiguration getEntitlementConfiguration(Subject subject, String realm) {
+        if (SystemProperties.isServerMode()) {
+            return InjectorHolder.getInstance(EntitlementConfigurationFactory.class).create(subject, realm);
+        }
+
+        return new EntitlementService(subject, realm);
+    }
+
+    /**
+     * Get a new instance of the {@link ApplicationService}.
+     *
+     * @param subject The requesting Subject.
+     * @param realm The realm for which the configuration is required.
+     * @return The {@link ApplicationService} for the given realm.
+     */
+    public static ApplicationService getApplicationService(Subject subject, String realm) {
+        if (SystemProperties.isServerMode()) {
+            return InjectorHolder.getInstance(ApplicationServiceFactory.class).create(subject, realm);
+        }
+
+        try {
+            Class<? extends ApplicationServiceFactory> factoryClass = Class
+                    .forName("org.forgerock.openam.entitlement.service.ApplicationServiceFactoryImpl")
+                    .asSubclass(ApplicationServiceFactory.class);
+            return factoryClass.newInstance().create(subject, realm);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            PolicyConstants.DEBUG.error("EntitlementUtils.getApplicationService", e);
+        }
+
+        throw new UnsupportedOperationException("Requested operation is not supported in Client Mode.");
+    }
+
+    /**
+     * Gets the realm to obtain entitlements configuration ({@code Application} and {@code ResourceType} instances)
+     * from. For all realms except {@code /sunamhiddenrealmdelegationservicepermissions}, this will be the realm as
+     * passed in. For that realm, however, the root realm is returned.
+     * @param realm The realm being queried.
+     * @return The realm to use for entitlements configuration objects.
+     */
+    public static String getEntitlementConfigurationRealm(String realm) {
+        if (realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX) ||
+                realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX2)) {
+            return "/";
+        }
+        return realm;
     }
 }

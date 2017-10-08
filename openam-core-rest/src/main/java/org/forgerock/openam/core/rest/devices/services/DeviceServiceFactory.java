@@ -17,19 +17,21 @@ package org.forgerock.openam.core.rest.devices.services;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
 
 /**
  * Defines the interface for providing {@link AuthenticatorOathServiceFactory}s.
  */
-public interface DeviceServiceFactory {
+public interface DeviceServiceFactory<T extends DeviceService> {
 
     /**
-     * Creates a new OathService for the current realm.
+     * Creates a new DeviceService for the current realm.
      * @param realm The realm for which to grab the OathService.
      *
      * @throws SMSException If we cannot connect to/read from SMS.
      * @throws SSOException If we cannot utilise the Admin token for access to the service.
      */
-    DeviceService create(String realm) throws SMSException, SSOException;
+    T create(ServiceConfigManager serviceConfigManager, String realm) throws SMSException, SSOException;
 
 }

@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  *
  * $Id: AuthPropertiesViewBean.java,v 1.5 2008/07/07 20:39:19 veiming Exp $
  *
@@ -30,14 +30,10 @@
 
 package com.sun.identity.console.authentication;
 
-
-import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
-import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -196,9 +192,10 @@ public  class AuthPropertiesViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
-            String redirectRealm = getRedirectRealm(this);
-            redirectToXui(getRequestContext().getRequest(), redirectRealm,
-                MessageFormat.format("realms/{0}/authentication/settings", Uris.urlEncodePathElement(redirectRealm)));
+            String redirectRealm = getAdministeredRealm(this);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm,
+                MessageFormat.format("realms/{0}/authentication-settings", Uris.urlEncodePathElement(redirectRealm)));
         }
     }
 

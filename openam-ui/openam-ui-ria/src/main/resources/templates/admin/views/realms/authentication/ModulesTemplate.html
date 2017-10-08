@@ -2,8 +2,10 @@
 
 <p class="page-description">{{t "console.authentication.modules.description"}}</p>
 <div class="btn-toolbar page-toolbar">
-    <a class="btn btn-primary" id="addModule" href="#"><i class="fa fa-plus"></i> {{t 'console.authentication.modules.addModule'}}</a>
-    <button id="deleteModules" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i> {{t 'common.form.delete'}}</button>
+    <a class="btn btn-primary" href="{{routeTo 'realmsAuthenticationModuleNew' realmPath}}">
+        <i class="fa fa-plus"></i> {{t 'console.authentication.modules.addModule'}}
+    </a>
+    <button disabled class="btn btn-default" data-delete-modules type="button"><i class="fa fa-times"></i> {{t 'common.form.delete'}}</button>
 </div>
 
 <div class="panel panel-default">
@@ -21,8 +23,8 @@
                 </thead>
                 <tbody>
                     {{#each this.formData}}
-                    <tr data-module-name="{{_id}}" data-module-type="{{type}}" data-module-chains={{chains}}>
-                        <td class="select-row-cell"><input class="select-module" type="checkbox" {{#if chains}}disabled{{/if}}/></td>
+                    <tr data-module-name="{{_id}}" data-module-type="{{type}}" data-module-chains="{{chains}}">
+                        <td class="select-row-cell"><input data-select-module type="checkbox" {{#if chains}}disabled{{/if}}/></td>
                         <td class="wordwrap">
                             <a href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath type _id}}" title="{{t 'common.form.edit'}}" {{#if chains}}class="check-before-edit"{{/if}}>{{_id}}</a>
                         </td>
@@ -35,8 +37,10 @@
                         </td>
                         <td class="fr-col-btn-2">
                             <div class="btn-group">
-                                <a class="btn btn-link{{#if chains}} check-before-edit{{/if}}" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath type _id}}"  title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
-                                <button type="button" class="btn btn-link delete-module-button" {{#if chains}}disabled{{/if}}><i class="fa fa-close" {{#unless chains}}title="{{t 'common.form.delete'}}"{{/unless}} ></i></button>
+                                <a class="btn btn-link" {{#if chains}}data-check-before-edit{{/if}} href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath type _id}}"  title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
+                                <button type="button" class="btn btn-link" data-delete-module {{#if chains}}disabled{{/if}}>
+                                    <i class="fa fa-close" {{#unless chains}}title="{{t 'common.form.delete'}}"{{/unless}}></i>
+                                </button>
                             </div>
                         </td>
                     </tr>

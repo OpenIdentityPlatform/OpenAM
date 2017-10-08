@@ -314,7 +314,7 @@ public final class IdRepoListener {
         for (int i = 0; i < types.length; i++) {
             IdType itype = types[i];
             String n = LDAPUtils.isDN(name) ? LDAPUtils.rdnValueFromDn(name) : name;
-            String id = "id=" + n + ",ou=" + itype.getName() + "," + realm;
+            String id = "id=" + LDAPUtils.escapeValue(n) + ",ou=" + itype.getName() + "," + realm;
             if (isAmsdk) {
                 id = id + ",amsdkdn=" + name;
             }

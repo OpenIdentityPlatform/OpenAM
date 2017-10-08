@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ServerConfigXML.java,v 1.3 2009/08/24 21:04:20 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.common.configuration;
 
@@ -110,8 +107,8 @@ public class ServerConfigXML implements Serializable {
     public class ServerGroup implements Serializable {
         public int minPool;
         public int maxPool;
-        public List hosts = new ArrayList();
-        public List dsUsers = new ArrayList();
+        public List<ServerObject> hosts = new ArrayList<>();
+        public List<DirUserObject> dsUsers = new ArrayList<>();
         public String dsBaseDN;
 
         /**
@@ -215,7 +212,7 @@ public class ServerConfigXML implements Serializable {
     /**
      * Server object.
      */
-    public class ServerObject implements Serializable {
+    public static class ServerObject implements Serializable {
         public String name;
         public String host;
         public String port;

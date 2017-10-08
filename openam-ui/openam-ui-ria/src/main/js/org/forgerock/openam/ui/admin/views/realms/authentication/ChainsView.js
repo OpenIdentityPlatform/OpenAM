@@ -14,23 +14,22 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/views/realms/authentication/AddChainDialog",
     "org/forgerock/openam/ui/common/util/array/arrayify",
     "org/forgerock/openam/ui/common/util/Promise"
-], function ($, _, Messages, AbstractView, SMSRealmDelegate, FormHelper, AddChainDialog, arrayify, Promise) {
+], function ($, _, Messages, AbstractView, AuthenticationService, FormHelper, arrayify, Promise) {
     function getChainNameFromElement (element) {
         return $(element).data().chainName;
     }
     function performDeleteChains (realmPath, names) {
         return Promise.all(arrayify(names).map(function (name) {
-            return SMSRealmDelegate.authentication.chains.remove(realmPath, name);
+            return AuthenticationService.authentication.chains.remove(realmPath, name);
         }));
     }
 
@@ -38,34 +37,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
             "change input[data-chain-name]" : "chainSelected",
-            "click  button.delete-chain-btn": "onDeleteSingle",
-            "click  #deleteChains"          : "onDeleteMultiple",
-            "click  #selectAll"             : "selectAll",
-            "click  #addChain"              : "addChain"
+            "click  [data-delete-chain]"    : "onDeleteSingle",
+            "click  [data-delete-chains]"   : "onDeleteMultiple",
+            "click  [data-select-all]"      : "selectAll"
         },
-        partials: [
-            "partials/alerts/_Alert.html" // AddChainDialog
-        ],
-        addChain: function (event) {
-            event.preventDefault();
-
-            AddChainDialog(this.data.realmPath, this.data.sortedChains);
-        },
-        chainSelected: function (event) {
+        chainSelected (event) {
             var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
 
-            this.$el.find("#deleteChains").prop("disabled", !hasChainsSelected);
+            this.$el.find("[data-delete-chains]").prop("disabled", !hasChainsSelected);
 
             if (checked) {
                 row.addClass("selected");
             } else {
                 row.removeClass("selected");
-                this.$el.find("#selectAll").prop("checked", false);
+                this.$el.find("[data-select-all]").prop("checked", false);
             }
         },
-        selectAll: function (event) {
+        selectAll (event) {
             var checked = $(event.currentTarget).is(":checked");
             this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:not(:disabled)")
                 .prop("checked", checked);
@@ -74,25 +64,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             } else {
                 this.$el.find(".sorted-chains").removeClass("selected");
             }
-            this.$el.find("#deleteChains").prop("disabled", !checked);
+            this.$el.find("[data-delete-chains]").prop("disabled", !checked);
         },
-        onDeleteSingle: function (e) {
-            e.preventDefault();
+        onDeleteSingle (event) {
+            event.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({
                 type: $.t("console.authentication.common.chain")
-            }, _.bind(this.deleteChain, this, e));
+            }, _.bind(this.deleteChain, this, event));
         },
-        onDeleteMultiple: function (e) {
-            e.preventDefault();
+        onDeleteMultiple (event) {
+            event.preventDefault();
 
             var selectedChains = this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked");
 
             FormHelper.showConfirmationBeforeDeleting({
                 message: $.t("console.authentication.chains.confirmDeleteSelected", { count: selectedChains.length })
-            }, _.bind(this.deleteChains, this, e, selectedChains));
+            }, _.bind(this.deleteChains, this, event, selectedChains));
         },
-        deleteChain: function (event) {
+        deleteChain (event) {
             var self = this,
                 element = event.currentTarget,
                 name = getChainNameFromElement(event.currentTarget);
@@ -104,12 +94,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        deleteChains: function (event, selectedChains) {
+        deleteChains (event, selectedChains) {
             var self = this,
                 element = event.currentTarget,
                 names = _(selectedChains).toArray().map(getChainNameFromElement).value();
@@ -121,18 +111,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
                 $(element).prop("disabled", false);
             });
         },
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this,
                 sortedChains = [];
 
             this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.chains.all(this.data.realmPath).then(function (data) {
+            AuthenticationService.authentication.chains.all(this.data.realmPath).then(function (data) {
                 _.each(data.values.result, function (obj) {
                     // Add default chains to top of list.
                     if (obj.active) {
@@ -150,7 +140,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }, function (response) {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         }

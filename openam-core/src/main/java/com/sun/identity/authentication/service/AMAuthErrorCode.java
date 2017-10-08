@@ -165,5 +165,10 @@ public class AMAuthErrorCode {
      *  Stateless ForceAuth failed
      */
     public static final String STATELESS_FORCE_FAILED = "125";
+
+    /**
+     *  Module not found
+     */
+    public static final String AUTH_MODULE_NOT_FOUND = "126";
     
 }

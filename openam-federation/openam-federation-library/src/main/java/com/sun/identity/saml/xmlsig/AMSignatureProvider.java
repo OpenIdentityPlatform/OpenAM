@@ -24,24 +24,33 @@
  *
  * $Id: AMSignatureProvider.java,v 1.11 2009/08/29 03:06:47 mallas Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
-import java.util.*;
-import java.security.*;
-import java.security.cert.*;
-import org.w3c.dom.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Iterator;
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.PrivateKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
+import javax.xml.xpath.XPathException;
+
+import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
+import com.sun.identity.liberty.ws.soapbinding.SOAPBindingConstants;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.shared.xml.XPathAPI;
 import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.saml.common.*;
+import com.sun.identity.saml.common.SAMLConstants;
+import com.sun.identity.saml.common.SAMLUtilsCommon;
 
-import org.apache.xpath.XPathAPI;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.keys.KeyInfo;
@@ -56,9 +65,12 @@ import org.apache.xml.security.keys.keyresolver.implementations.X509SKIResolver;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.ElementProxy;
 import org.apache.xml.security.transforms.Transforms;
-import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
-import com.sun.identity.liberty.ws.soapbinding.SOAPBindingConstants;
-import javax.xml.transform.TransformerException;
+
+import org.forgerock.openam.utils.StringUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * <code>SignatureProvider</code> is an interface
@@ -77,6 +89,7 @@ public class AMSignatureProvider implements SignatureProvider {
     private boolean isJKSKeyStore= false;
     private String wsfVersion = null;
     private String defaultSigAlg = null;
+    private String digestAlg = null;
 
     /**
      * Default Constructor
@@ -106,6 +119,10 @@ public class AMSignatureProvider implements SignatureProvider {
         
         defaultSigAlg = SystemConfigurationUtil.getProperty(
             SAMLConstants.XMLSIG_ALGORITHM);
+
+        digestAlg = SystemConfigurationUtil.getProperty(
+            SAMLConstants.DIGEST_ALGORITHM,
+            Constants.ALGO_ID_DIGEST_SHA1);
 
         try {
             String valCert = SystemConfigurationUtil.getProperty(
@@ -235,7 +252,7 @@ public class AMSignatureProvider implements SignatureProvider {
             	transforms.addTransform(transformAlg);
             }
             
-            sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+            sig.addDocument("", transforms, digestAlg);
         
             // add certificate 
             X509Certificate cert =
@@ -525,7 +542,7 @@ public class AMSignatureProvider implements SignatureProvider {
             transforms.addTransform(
 				Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
             String ref = "#" + id;  
-            sig.addDocument(ref, transforms, Constants.ALGO_ID_DIGEST_SHA1);
+            sig.addDocument(ref, transforms, digestAlg);
             if (includeCert) {
                 X509Certificate cert =
                     (X509Certificate) keystore.getX509Certificate(certAlias);
@@ -664,8 +681,7 @@ public class AMSignatureProvider implements SignatureProvider {
 		if (SAMLUtilsCommon.debug.messageEnabled()) {
 		    SAMLUtilsCommon.debug.message("id = " +id);
 		}
-		signature.addDocument("#"+id, transforms,
-			Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("#"+id, transforms, digestAlg);
 	    }
 
 	    X509Certificate cert =
@@ -832,8 +848,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 if (SAMLUtilsCommon.debug.messageEnabled()) {
                     SAMLUtilsCommon.debug.message("id = " +id);
                 }
-                signature.addDocument("#"+id, transforms,
-                        Constants.ALGO_ID_DIGEST_SHA1);
+                signature.addDocument("#"+id, transforms, digestAlg);
             }
             KeyInfo keyInfo = signature.getKeyInfo();
             Element securityTokenRef = doc.createElementNS(wsseNS,
@@ -976,8 +991,7 @@ public class AMSignatureProvider implements SignatureProvider {
 		if (SAMLUtilsCommon.debug.messageEnabled()) {
 		    SAMLUtilsCommon.debug.message("id = " +id);
 		}
-		signature.addDocument("#"+id, transforms,
-			Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("#"+id, transforms, digestAlg);
 	    }
 
 	    KeyInfo keyInfo = signature.getKeyInfo();
@@ -1094,7 +1108,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 Element refElement;
                 try {
                     refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
-                } catch (TransformerException te) {
+                } catch (XPathException te) {
                     throw new XMLSignatureException(te);
                 }
                 String refUri = refElement.getAttribute("URI");
@@ -1381,7 +1395,7 @@ public class AMSignatureProvider implements SignatureProvider {
             Element refElement;
             try {
                 refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
-            } catch (TransformerException te) {
+            } catch (XPathException te) {
                 throw new XMLSignatureException(te);
             }
             String refUri = refElement.getAttribute("URI");
@@ -1406,7 +1420,10 @@ public class AMSignatureProvider implements SignatureProvider {
                     return false;
                 }
             } else {
-                if (certAlias == null || certAlias.length() == 0) {
+                if (StringUtils.isEmpty(certAlias)) {
+                    if (SAMLUtilsCommon.debug.warningEnabled()) {
+                        SAMLUtilsCommon.debug.warning("Could not find a KeyInfo and certAlias was not defined");
+                    }
                     return false; 
                 }
                 if (SAMLUtilsCommon.debug.messageEnabled()) {

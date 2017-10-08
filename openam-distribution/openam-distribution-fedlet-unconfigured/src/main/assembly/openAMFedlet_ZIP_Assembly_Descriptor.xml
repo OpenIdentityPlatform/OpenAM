@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright 2016 ForgeRock AS.
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
@@ -8,43 +32,32 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <!-- Single Files -->
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-fedlet-unconfigured-war:war</include>
+            </includes>
+            <outputFileNameMapping>fedlet.war</outputFileNameMapping>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+    </fileSets>
     <files>
         <file>
-            <source>${project.build.directory}/${project.build.finalName}.war</source>
-            <outputDirectory></outputDirectory>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/README.unconfigured</source>
+            <source>${project.basedir}/src/main/resources/README.unconfigured</source>
             <outputDirectory></outputDirectory>
             <destName>README</destName>
         </file>
         <file>
             <source>${project.basedir}/../../openam-server-only/src/main/resources/FederationConfig.properties</source>
             <outputDirectory>conf</outputDirectory>
-            <destName>FederationConfig.properties</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/fedlet.cot-template</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>fedlet.cot-template</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/idp-extended.xml-template</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>idp-extended.xml-template</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/sp-extended.xml-template</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>sp-extended.xml-template</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/sp.xml-template</source>
-            <outputDirectory>conf</outputDirectory>
-            <destName>sp.xml-template</destName>
         </file>
     </files>
-
 </assembly>
 

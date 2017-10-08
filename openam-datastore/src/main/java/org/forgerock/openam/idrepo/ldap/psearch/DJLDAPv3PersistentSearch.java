@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.idrepo.ldap.psearch;
@@ -22,25 +22,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.idrepo.ldap.IdentityMovedOrRenamedListener;
 import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
+import com.iplanet.services.ldap.event.LDAPv3PersistentSearch;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * This class will execute persistent search request against the configured datastore. When a result is received, the
  * internal caches will be notified about the changes, so the caches can be dirtied.
- *
- * @author Peter Major
  */
 public class DJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<IdRepoListener, Set<IdType>> {
 
@@ -49,6 +48,14 @@ public class DJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<IdRepoListe
     private final Set<IdentityMovedOrRenamedListener> movedOrRenamedListenerSet = new HashSet<>(1);
     private final String usersSearchAttributeName;
 
+    /**
+     * Creates a new DJLDAPv3PersistentSearch using the provided configuration data and connection factory.
+     *
+     * @param configMap Non null. Map containing the configuration data necessary to perform a persistent search,
+     *                  including the retry interval, search DN, the filter to apply and scope of the query and
+     *                  any user attributes that will be returned through the connection.
+     * @param factory Used to produce connections down to the LDAP datastore.
+     */
     public DJLDAPv3PersistentSearch(Map<String, Set<String>> configMap, ConnectionFactory factory) {
         super(CollectionHelper.getIntMapAttr(configMap, LDAP_RETRY_INTERVAL, 3000, DEBUG),
                 DN.valueOf(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN)), LDAPUtils
@@ -58,7 +65,6 @@ public class DJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<IdRepoListe
                                 SearchScope.WHOLE_SUBTREE), factory,
                 CollectionHelper.getMapAttr(configMap, LDAP_USER_SEARCH_ATTR));
         usersSearchAttributeName = CollectionHelper.getMapAttr(configMap, LDAP_USER_SEARCH_ATTR);
-
     }
 
     /**

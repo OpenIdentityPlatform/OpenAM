@@ -24,7 +24,7 @@
 
    $Id: spAssertionConsumer.jsp,v 1.17 2010/01/23 00:07:06 exu Exp $
 
-   Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2012-2016 ForgeRock AS.
 --%>
 
 <%@page
@@ -33,6 +33,7 @@ com.sun.identity.federation.common.FSUtils,
 com.sun.identity.saml.common.SAMLUtils,
 com.sun.identity.saml2.common.SAML2Constants,
 com.sun.identity.saml2.common.SAML2Exception,
+com.sun.identity.saml2.common.InvalidStatusCodeSaml2Exception,
 com.sun.identity.saml2.common.SAML2Utils,
 com.sun.identity.saml2.logging.LogUtil,
 com.sun.identity.saml2.meta.SAML2MetaException,
@@ -96,7 +97,6 @@ java.io.PrintWriter
     AuditEventFactory aef = InjectorHolder.getInstance(AuditEventFactory.class);
     SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
     saml2Auditor.setMethod("spAssertionConsumer");
-    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
     saml2Auditor.setSessionTrackingId(session.getId());
     saml2Auditor.auditAccessAttempt();
 
@@ -126,8 +126,14 @@ java.io.PrintWriter
     }
 
     String requestURL = request.getRequestURL().toString();
-    // get entity id and orgName
+    // get entity id and realm
     String metaAlias = SAML2MetaUtils.getMetaAliasByUri(requestURL);
+    String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
+    if (realm == null || realm.length() == 0) {
+        realm = "/";
+    }
+    saml2Auditor.setRealm(realm);
+
     SAML2MetaManager metaManager = SAML2Utils.getSAML2MetaManager();
     if (metaManager == null) {
         // logging?
@@ -159,10 +165,6 @@ java.io.PrintWriter
                 SAML2Utils.bundle.getString("metaDataError"));
         return;
     }
-    String orgName = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
-    if (orgName == null || orgName.length() == 0) {
-        orgName = "/";
-    }
     String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
 
     // federate flag
@@ -180,7 +182,7 @@ java.io.PrintWriter
     }
     try {
         respInfo = SPACSUtils.getResponse(
-            request, response, orgName, hostEntityId, metaManager);
+            request, response, realm, hostEntityId, metaManager);
         saml2Auditor.setRequestId(respInfo.getResponse().getInResponseTo());
     } catch (SAML2Exception se) {
         // Only do a sendError if one hasn't already been called.
@@ -218,7 +220,7 @@ java.io.PrintWriter
                 + "is true, and token is null. do local login first.");
         }
         FSUtils.forwardRequest(request, response,
-                getLocalLoginUrl(orgName, hostEntityId, metaManager, respInfo, requestURL, relayState));
+                getLocalLoginUrl(realm, hostEntityId, metaManager, respInfo, requestURL, relayState));
         saml2Auditor.auditForwardToLocalUserLogin();
         return;
     }
@@ -229,45 +231,49 @@ java.io.PrintWriter
     boolean isProxyOn = IDPProxyUtil.isIDPProxyEnabled(requestID);
     try {
         newSession = SPACSUtils.processResponse( request, response, new PrintWriter(out, true), metaAlias, token,
-                respInfo, orgName, hostEntityId, metaManager, saml2Auditor);
+                respInfo, realm, hostEntityId, metaManager, saml2Auditor);
         saml2Auditor.setUserId(sessionProvider.getPrincipalName(newSession));
         saml2Auditor.setSSOTokenId(newSession);
+
     } catch (SAML2Exception se) {
-        SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
         String[] data = {hostEntityId, se.getMessage(), ""};
         if (LogUtil.isErrorLoggable(Level.FINE)) {
             data[2] = saml2Resp.toXMLString(true, true);
         }
         LogUtil.error(Level.INFO, LogUtil.SP_SSO_FAILED, data, null);
+        SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
         if (se.isRedirectionDone()) {
+            //The redirection has already happened successfully and logging auditsuccess.
             saml2Auditor.auditAccessSuccess();
             return;
-        }
-        if (isProxyOn) {
-            if ("noPassiveResponse".equals(se.getErrorCode())) {
-                try {
-                    IDPProxyUtil.sendNoPassiveProxyResponse(request, response, new PrintWriter(out, true),
-                            requestID, metaAlias, hostEntityId, orgName);
-                } catch (SAML2Exception samle) {
-                    SAML2Utils.debug.error("Failed to send nopassive proxy response", samle);
+        } else if (se instanceof InvalidStatusCodeSaml2Exception && isProxyOn) {
+            SAML2Utils.debug.error("spAssertionConsumer.jsp: Non-Success status code in response");
+            String firstlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getFirstlevelStatuscode();
+            String secondlevelStatusCodeValue = ((InvalidStatusCodeSaml2Exception) se).getSecondlevelStatuscode();
+            try {
+                IDPProxyUtil.sendResponseWithStatus(request, response, new PrintWriter(out, true),
+                        requestID, metaAlias, hostEntityId, realm, firstlevelStatusCodeValue,
+                        secondlevelStatusCodeValue);
+            } catch (SAML2Exception samle) {
+                SAML2Utils.debug.error("Failed to send response with status ", samle);
+            }
+            return;
+        } else {
+            if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
                 }
+                FSUtils.forwardRequest(request, response,
+                        getLocalLoginUrl(realm, hostEntityId, metaManager, respInfo, requestURL, relayState));
+                saml2Auditor.auditForwardToLocalUserLogin();
                 return;
             }
-        }
-        if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
-            }
-            FSUtils.forwardRequest(request, response,
-                    getLocalLoginUrl(orgName, hostEntityId, metaManager, respInfo, requestURL, relayState));
-            saml2Auditor.auditForwardToLocalUserLogin();
+            saml2Auditor.auditAccessFailure(String.valueOf(response.SC_INTERNAL_SERVER_ERROR),
+                    SAML2Utils.bundle.getString("SSOFailed"));
+            SAMLUtils.sendError(request, response, response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
+                    SAML2Utils.bundle.getString("SSOFailed"));
             return;
         }
-        SAMLUtils.sendError(request, response, response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
-                SAML2Utils.bundle.getString("SSOFailed"));
-        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_INTERNAL_SERVER_ERROR),
-                SAML2Utils.bundle.getString("SSOFailed"));
-        return;
     }
 
     if (newSession == null) {
@@ -295,7 +301,7 @@ java.io.PrintWriter
     if (isProxyOn) { 
         try {
             IDPProxyUtil.generateProxyResponse(request, response, new PrintWriter(out, true), metaAlias, respInfo,
-                    newSession);
+                    newSession, saml2Auditor);
             saml2Auditor.auditForwardToProxy();
         } catch (SAML2Exception se) {
             SAML2Utils.debug.error("Failed sending proxy response", se);
@@ -304,7 +310,7 @@ java.io.PrintWriter
         return;  
     } 
     // redirect to relay state
-    String finalUrl = SPACSUtils.getRelayState(relayState, orgName, hostEntityId, metaManager);
+    String finalUrl = SPACSUtils.getRelayState(relayState, realm, hostEntityId, metaManager);
 
     String realFinalUrl = finalUrl;
     if (finalUrl != null && finalUrl.length() != 0) {
@@ -316,7 +322,7 @@ java.io.PrintWriter
                  realFinalUrl = finalUrl;
         }
     }
-    String redirectUrl = SPACSUtils.getIntermediateURL(orgName, hostEntityId, metaManager);
+    String redirectUrl = SPACSUtils.getIntermediateURL(realm, hostEntityId, metaManager);
     String realRedirectUrl = null;
     if (redirectUrl != null && redirectUrl.length() != 0) {
         if (realFinalUrl != null && realFinalUrl.length() != 0) {
@@ -351,7 +357,7 @@ java.io.PrintWriter
     } else {
         // log it
 	    try {
-	        SAML2Utils.validateRelayStateURL(orgName, hostEntityId, realRedirectUrl, SAML2Constants.SP_ROLE);
+	        SAML2Utils.validateRelayStateURL(realm, hostEntityId, realRedirectUrl, SAML2Constants.SP_ROLE);
         } catch (SAML2Exception se) {
 	        SAMLUtils.sendError(request, response,
                 response.SC_BAD_REQUEST, "requestProcessingError",

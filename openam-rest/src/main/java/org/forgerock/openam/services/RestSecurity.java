@@ -31,7 +31,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
-import org.forgerock.openam.rest.ServiceConfigUtils;
+import org.forgerock.openam.utils.ServiceConfigUtils;
 
 import java.security.AccessController;
 import java.util.Set;

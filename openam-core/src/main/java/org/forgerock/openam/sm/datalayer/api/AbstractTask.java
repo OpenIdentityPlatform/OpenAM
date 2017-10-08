@@ -25,12 +25,13 @@ public abstract class AbstractTask<T> implements Task {
     private boolean isError = false;
 
     /**
+     * A new abstract task constructor - requires at least a ResultHandler to be configured.
+     *
      * @param handler Non null handler to notify.
      */
     public AbstractTask(ResultHandler<T, ?> handler) {
         this.handler = handler;
     }
-
 
     @Override
     public void processError(DataLayerException error) {
@@ -39,13 +40,13 @@ public abstract class AbstractTask<T> implements Task {
     }
 
     @Override
-    public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
+    public void execute(TokenStorageAdapter adapter) throws DataLayerException {
         if (isError) {
             return;
         }
 
         try {
-            performTask(connection, adapter);
+            performTask(adapter);
         } catch (DataLayerException e) {
             processError(e);
             throw e;
@@ -53,12 +54,11 @@ public abstract class AbstractTask<T> implements Task {
     }
 
     /**
-     * Performs a task
+     * Performs a task.
      *
-     * @param connection Non null connection to use.
      * @param adapter Required for LDAP operations.
      * @throws DataLayerException If there was any problem creating the Token.
      */
-    public abstract <T> void performTask(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException;
+    public abstract void performTask(TokenStorageAdapter adapter) throws DataLayerException;
 
 }

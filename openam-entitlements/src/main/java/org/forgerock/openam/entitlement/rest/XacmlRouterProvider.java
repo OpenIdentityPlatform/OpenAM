@@ -25,8 +25,6 @@ import javax.inject.Provider;
 import java.util.Set;
 
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.ResourceApiVersionRestlet;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.xacml.v3.rest.XacmlService;
@@ -39,31 +37,24 @@ import org.restlet.routing.Router;
  */
 public class XacmlRouterProvider implements Provider<Router> {
 
-    private final RestRealmValidator realmValidator;
     private final ResourceApiVersionBehaviourManager versionBehaviourManager;
-    private final CoreWrapper coreWrapper;
     private final Set<String> invalidRealmNames;
 
     /**
      * Constructs a new RestEndpoints instance.
      *
-     * @param realmValidator An instance of the RestRealmValidator.
-     * @param coreWrapper An instance of the CoreWrapper.
      * @param versionBehaviourManager The ResourceApiVersionBehaviourManager.
      */
     @Inject
-    public XacmlRouterProvider(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            ResourceApiVersionBehaviourManager versionBehaviourManager,
+    public XacmlRouterProvider(ResourceApiVersionBehaviourManager versionBehaviourManager,
             @Named("InvalidRealmNames") Set<String> invalidRealms) {
-        this.realmValidator = realmValidator;
         this.versionBehaviourManager = versionBehaviourManager;
-        this.coreWrapper = coreWrapper;
         this.invalidRealmNames = invalidRealms;
     }
 
     @Override
     public Router get() {
-        RestletRealmRouter router = new RestletRealmRouter(realmValidator, coreWrapper);
+        RestletRealmRouter router = new RestletRealmRouter();
 
         ResourceApiVersionRestlet policiesVersionRouter = new ResourceApiVersionRestlet(versionBehaviourManager);
         policiesVersionRouter.attach(version(1), wrap(XacmlService.class));

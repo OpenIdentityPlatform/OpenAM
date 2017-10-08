@@ -16,29 +16,32 @@
 
 package org.forgerock.openam.entitlement.rest;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertTrue;
+
+import javax.security.auth.Subject;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import javax.security.auth.Subject;
-import org.forgerock.services.context.Context;
-import org.forgerock.json.JsonValue;
-import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.entitlement.rest.ApplicationTypesResource;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
+import org.forgerock.services.context.ClientContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -49,13 +52,16 @@ public class ApplicationTypesResourceTest {
     private ApplicationTypeManagerWrapper typeManager;
     private ApplicationTypeManagerWrapper mockApplicationTypeManager;
     private Debug mockDebug;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         typeManager = mock(ApplicationTypeManagerWrapper.class);
         testResource = new ApplicationTypesResource(typeManager, mock(Debug.class));
         mockApplicationTypeManager = mock(ApplicationTypeManagerWrapper.class);
         mockDebug = mock(Debug.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         testResource = new ApplicationTypesResource(mockApplicationTypeManager, mockDebug) {
             @Override
@@ -65,11 +71,16 @@ public class ApplicationTypesResourceTest {
         };
     }
 
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
+    }
+
     @Test (expectedExceptions = InternalServerErrorException.class)
     public void undefinedSubjectShouldFail() throws ResourceException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = null;
@@ -88,7 +99,7 @@ public class ApplicationTypesResourceTest {
     public void readShouldFailOnInvalidApplicationType() throws ResourceException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
@@ -109,7 +120,7 @@ public class ApplicationTypesResourceTest {
             ExecutionException, InterruptedException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject subject = new Subject();
@@ -129,6 +140,10 @@ public class ApplicationTypesResourceTest {
         assertTrue(result.get().getId().equals("test"));
     }
 
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ApplicationTypesResource.class).hasValidAnnotations();
+    }
 
 
 }

@@ -24,6 +24,8 @@
  *
  * $Id: LogUtil.java,v 1.12 2010/01/23 00:07:41 exu Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
+ *
  */
 
 
@@ -132,6 +134,7 @@ public class LogUtil {
     public static final String MISSING_AUDIENCE_RESTRICTION =
                                 "MISSING_AUDIENCE_RESTRICTION";
     public static final String WRONG_AUDIENCE = "WRONG_AUDIENCE";
+    public static final String DATE_CONDITION_NOT_MET = "DATE_CONDITION_NOT_MET";
     public static final String FOUND_AUTHN_ASSERTION =
                                 "FOUND_AUTHN_ASSERTION";
 

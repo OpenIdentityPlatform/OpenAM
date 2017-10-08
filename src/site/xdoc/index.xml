@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2016 ForgeRock AS.
   !    
 -->
 <document
@@ -53,13 +53,13 @@
    <p>You are welcome to join us. Here are some ways to get started.</p>
    <ul>
     <li>Download and install a build from the <a
-    href="http://forgerock.org/openam.html">download page</a>.</li>
+    href="https://forgerock.org/downloads/">downloads page</a>.</li>
     <li>Join the <a
     href="https://lists.forgerock.org/mailman/listinfo/openam">OpenAM
     mailing list</a> to ask questions, make suggestions, and tell us what
     you think of OpenAM.</li>
     <li><a
-    href="https://sso.forgerock.com/openam/UI/Login">Register
+    href="https://forgerock.org/registration/">Register
     to join the community</a>.</li>
     <li>Read and edit <a
     href="https://wikis.forgerock.org/confluence/display/OPENAM/Home"
@@ -76,7 +76,7 @@
     href="https://wikis.forgerock.org/confluence/display/openam/Guide+to+OpenAM+Subversion"
     >Guide to OpenAM Subversion</a>.</li>   
     <li>Make sure you <a
-    href="https://sso.forgerock.com/openam/UI/Login">register
+    href="https://forgerock.org/registration/">register
     to join the community</a>, thus also registering to <a
     href="https://bugster.forgerock.org/jira/browse/OPENAM">report issues, and
     describe requests for enhancements</a>, as well as to edit <a

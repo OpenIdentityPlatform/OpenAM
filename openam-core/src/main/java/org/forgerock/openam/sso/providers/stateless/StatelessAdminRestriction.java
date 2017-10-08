@@ -33,10 +33,10 @@ import com.sun.identity.authentication.service.AuthD;
  */
 public class StatelessAdminRestriction {
     private final SuperUserDelegate delegate;
-    private final StatelessSessionFactory factory;
+    private final StatelessSessionManager factory;
 
     @Inject
-    public StatelessAdminRestriction(SuperUserDelegate delegate, StatelessSessionFactory factory) {
+    public StatelessAdminRestriction(SuperUserDelegate delegate, StatelessSessionManager factory) {
         this.delegate = delegate;
         this.factory = factory;
     }

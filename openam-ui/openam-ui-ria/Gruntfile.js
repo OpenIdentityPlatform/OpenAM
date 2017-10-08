@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 /* global module, require, process */
@@ -35,8 +35,9 @@ function mavenProjectTestSource (projectDir) {
 }
 
 module.exports = function (grunt) {
-    var compositionDirectory = "target/composed",
+    var compositionDirectory = "target/XUI",
         compiledDirectory = "target/compiled",
+        transpiledDirectory = "target/transpiled",
         testClassesDirectory = "target/test-classes",
         forgeRockCommonsDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-commons",
         forgeRockUiDirectory = process.env.FORGEROCK_UI_SRC + "/forgerock-ui-user",
@@ -66,7 +67,6 @@ module.exports = function (grunt) {
             "**/*.ico",
             "**/*.json",
             "**/*.png",
-            "**/*.js",
             "**/*.eot",
             "**/*.svg",
             "**/*.woff",
@@ -78,6 +78,43 @@ module.exports = function (grunt) {
         serverDeployDirectory = process.env.OPENAM_HOME + "/XUI";
 
     grunt.initConfig({
+        babel: {
+            options: {
+                env: {
+                    development: {
+                        sourceMaps: true
+                    }
+                },
+                ignore: ["libs/"],
+                presets: ["es2015", "react"],
+                plugins: [
+                    ["transform-es2015-classes", { "loose": true }],
+                    "transform-object-rest-spread"
+                ]
+            },
+            transpileJS: {
+                files: [{
+                    expand: true,
+                    cwd: compositionDirectory,
+                    src: ["**/*.js"],
+                    dest: transpiledDirectory
+                }]
+            },
+            transpileJSM: {
+                files: [{
+                    expand: true,
+                    cwd: compositionDirectory,
+                    src: ["**/*.jsm", "**/*.jsx"],
+                    dest: transpiledDirectory,
+                    rename: function (dest, src) {
+                        return dest + "/" + src.replace(".jsm", ".js").replace(".jsx", ".js");
+                    }
+                }],
+                options: {
+                    plugins: ["transform-es2015-modules-amd"]
+                }
+            }
+        },
         copy: {
             /**
              * Copy all the sources and resources from this project and all dependencies into the composition directory.
@@ -108,6 +145,20 @@ module.exports = function (grunt) {
                     ]),
                     dest: compiledDirectory
                 }]
+            },
+            /**
+             * Copy files that have been transpiled into the compiled directory.
+             */
+            transpiled: {
+                files: [{
+                    expand: true,
+                    cwd: transpiledDirectory,
+                    src: [
+                        "**/*.js",
+                        "!main.js" // Output by r.js
+                    ],
+                    dest: compiledDirectory
+                }]
             }
         },
         eslint: {
@@ -117,6 +168,8 @@ module.exports = function (grunt) {
             lint: {
                 src: [
                     "." + mavenSrcPath + "/**/*.js",
+                    "." + mavenSrcPath + "/**/*.jsm",
+                    "." + mavenSrcPath + "/**/*.jsx",
                     "!." + mavenSrcPath + "/libs/**/*.js",
                     "." + mavenTestPath + "/**/*.js"
                 ],
@@ -181,8 +234,8 @@ module.exports = function (grunt) {
              */
             compile: {
                 options: {
-                    baseUrl: compositionDirectory,
-                    mainConfigFile: compositionDirectory + "/main.js",
+                    baseUrl: transpiledDirectory,
+                    mainConfigFile: transpiledDirectory + "/main.js",
                     out: compiledDirectory + "/main.js",
                     include: ["main"],
                     preserveLicenseComments: false,
@@ -231,6 +284,20 @@ module.exports = function (grunt) {
                 compareUsing: "md5"
             },
             /**
+             * Copy files that have been transpiled (with their source maps) into the compiled directory.
+             */
+            transpiled: {
+                files: [{
+                    cwd: transpiledDirectory,
+                    src: [
+                        "**/*.js",
+                        "**/*.js.map"
+                    ],
+                    dest: compiledDirectory
+                }],
+                compareUsing: "md5"
+            },
+            /**
              * Copy the test source files into the test-classes target directory.
              */
             test: {
@@ -270,12 +337,14 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks("grunt-babel");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-less");
     grunt.loadNpmTasks("grunt-contrib-requirejs");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-eslint");
     grunt.loadNpmTasks("grunt-karma");
+    grunt.loadNpmTasks("grunt-newer");
     grunt.loadNpmTasks("grunt-sync");
     grunt.loadNpmTasks("grunt-text-replace");
 
@@ -284,9 +353,11 @@ module.exports = function (grunt) {
      */
     grunt.registerTask("deploy", [
         "sync:compose",
+        "newer:babel",
         "less",
         "replace",
         "sync:compiled",
+        "sync:transpiled",
         "sync:test",
         "sync:server"
     ]);
@@ -297,14 +368,16 @@ module.exports = function (grunt) {
     grunt.registerTask("build", [
         "copy:compose",
         "eslint",
+        "babel",
         "requirejs",
         "less",
         "replace",
         "copy:compiled",
+        "copy:transpiled",
         "karma:build"
     ]);
 
-    grunt.registerTask("dev", ["copy:compose", "deploy", "watch"]);
+    grunt.registerTask("dev", ["copy:compose", "babel", "deploy", "watch"]);
     grunt.registerTask("prod", ["build"]);
 
     grunt.registerTask("default", ["dev"]);

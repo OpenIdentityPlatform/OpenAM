@@ -24,15 +24,13 @@
  *
  * $Id: DebugImpl.java,v 1.4 2009/03/07 08:01:53 veiming Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.impl;
 
-import static java.util.Collections.newSetFromMap;
+import static com.sun.identity.shared.debug.DebugConstants.DEBUG_DATE_FORMAT;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -49,11 +47,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -62,10 +57,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class DebugImpl implements IDebug {
 
     static final Map<String, String> INSTANCE_NAMES = new ConcurrentSkipListMap<>(new WildcardComparator());
-    static final Set<String> SINGLE_INSTANCE_CATEGORY = newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     static {
-        SINGLE_INSTANCE_CATEGORY.add("EmbeddedDJ");
         initProperties();
     }
 
@@ -77,8 +70,6 @@ public class DebugImpl implements IDebug {
     private boolean mergeAllMode = false;
 
     private DebugLevel debugLevel = DebugLevel.ON;
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
 
     private DebugFileProvider debugFileProvider;
     private DebugFile debugFile = null;
@@ -248,8 +239,8 @@ public class DebugImpl implements IDebug {
 
         StringBuilder prefix = new StringBuilder();
         String dateFormatted;
-        synchronized (dateFormat) {
-            dateFormatted = this.dateFormat.format(new Date());
+        synchronized (DEBUG_DATE_FORMAT) {
+            dateFormatted = DEBUG_DATE_FORMAT.format(newDate());
         }
         prefix.append(debugName)
                 .append(":").append(dateFormatted)
@@ -301,8 +292,8 @@ public class DebugImpl implements IDebug {
                      * In order to have less logs for this kind of issue. It's waiting an interval of time before
                      * printing this error again.
                      */
-                    if (lastDirectoryIssue + DIR_ISSUE_ERROR_INTERVAL_IN_MS < System.currentTimeMillis()) {
-                        lastDirectoryIssue = System.currentTimeMillis();
+                    if (lastDirectoryIssue + DIR_ISSUE_ERROR_INTERVAL_IN_MS < currentTimeMillis()) {
+                        lastDirectoryIssue = currentTimeMillis();
                         stdoutDebugFile.writeIt(prefix, "Debug file can't be written : " + e.getMessage(), null);
                     }
                     stdoutDebugFile.writeIt(prefix, msg, th);

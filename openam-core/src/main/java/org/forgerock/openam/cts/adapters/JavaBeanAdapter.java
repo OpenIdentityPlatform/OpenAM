@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.adapters;
@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -210,9 +209,9 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
             }
 
             for (FieldDetails details : fields) {
-                details.write(token.getValue(details.tokenField), bean);
+                details.write(token.getAttribute(details.tokenField), bean);
             }
-            idField.write(token.getValue(idField.tokenField), bean);
+            idField.write(token.getAttribute(idField.tokenField), bean);
 
             return bean;
         } catch (Exception e) {

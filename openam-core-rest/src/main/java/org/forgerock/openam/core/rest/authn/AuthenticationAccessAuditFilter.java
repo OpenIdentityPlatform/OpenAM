@@ -126,7 +126,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
     @Override
     protected String getRealm(Context context) {
         if (context.containsContext(RealmContext.class)) {
-            return context.asContext(RealmContext.class).getResolvedRealm();
+            return context.asContext(RealmContext.class).getRealm().asPath();
         }
         return null;
     }

@@ -1,0 +1,8 @@
+<!-- Copyright 2016 ForgeRock AS.
+	License terms: https://forgerock.org/cddlv1-0/ -->
+{{!-- There is a bug in Firefox where it assumes an input above a password field is the username field. It then goes on
+    to pre-populate these assumed fields if you have previously set the browser to remember them.
+    The markup below fools firefox into pre-populating hidden inputs instead, without effecting any other browsers
+    or their autocomplete functionality which is often required --}}
+<input type="text" class="hidden" aria-hidden="true" id="badFireFoxBad" name="badFireFoxBad" value="" />
+<input type="password" class="hidden" aria-hidden="true" id="fakePassword" name="fakePassword" value="" />

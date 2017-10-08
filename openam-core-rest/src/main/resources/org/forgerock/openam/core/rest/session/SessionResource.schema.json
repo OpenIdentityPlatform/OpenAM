@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SessionResource#schema.title",
+  "description": "i18n:api-descriptor/SessionResource#schema.description",
+  "properties": {
+    "timeleft": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/SessionResource#schema.timeleft.title",
+      "description": "i18n:api-descriptor/SessionResource#schema.timeleft.description"
+    },
+    "userid": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SessionResource#schema.userid.title",
+      "description": "i18n:api-descriptor/SessionResource#schema.userid.description"
+    }
+  },
+  "required": ["timeleft", "userid"]
+}

@@ -24,7 +24,7 @@
  *
  * $Id: AMViewBeanBase.java,v 1.15 2009/10/19 18:17:33 asyhuang Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.base;
 
@@ -47,6 +47,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListener;
 import com.iplanet.sso.SSOTokenEvent;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMFormatUtils;
 import com.sun.identity.console.base.model.AMI18NUtils;
@@ -905,9 +906,11 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
             Map store =  getSessionStore(storeKey);
             if (store == null) {
                 store = new HashMap();
-                stores.put(storeKey, store);
                 try {
                     ssoToken.addSSOTokenListener(listener);
+                    stores.put(storeKey, store);
+                } catch (SSOTokenListenersUnsupportedException ex) {
+                    debug.message("SessionStore.getSessionStore: {}", ex.getMessage());
                 } catch(SSOException ssoe) {
                     debug.warning("SessionStore.getSessionStore", ssoe);
                 }

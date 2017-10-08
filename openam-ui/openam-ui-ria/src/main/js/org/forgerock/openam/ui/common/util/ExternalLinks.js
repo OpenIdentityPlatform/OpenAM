@@ -14,13 +14,10 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-/*global define*/
-
-define("org/forgerock/openam/ui/common/util/ExternalLinks", [
+define([
     "lodash"
-], function (_) {
-
-    var backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13/admin-guide";
+], (_) => {
+    const backstageDocsUrl = "https://backstage.forgerock.com/#!/docs/openam/13.5/";
 
     return {
         backstage: {
@@ -28,9 +25,10 @@ define("org/forgerock/openam/ui/common/util/ExternalLinks", [
                 policySets: "#configure-apps-with-console",
                 policies: "#configure-policies-with-console",
                 resourceTypes: "#configure-resource-types-with-console"
-            }, function (hash) {
-                return backstageDocsUrl + hash;
-            })
+            }, (hash) => `${backstageDocsUrl}admin-guide${hash}`),
+            config: {
+                services : `${backstageDocsUrl}reference#chap-config-ref`
+            }
         }
     };
 });

@@ -11,29 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
-import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
-import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
+import org.forgerock.openam.cts.worker.CTSWorkerManager;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.util.Options;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -45,15 +47,17 @@ public class CoreTokenAdapterTest {
     private TaskDispatcher mockTaskDispatcher;
     private ResultHandlerFactory mockResultHandlerFactory;
     private Debug mockDebug;
-    private CTSReaperInit mockReaperInit;
+    private CTSWorkerManager mockReaperInit;
+    private Options options;
 
     @BeforeMethod
     public void setup() {
         mockStrategy = mock(TokenBlobStrategy.class);
         mockTaskDispatcher = mock(TaskDispatcher.class);
         mockResultHandlerFactory = mock(ResultHandlerFactory.class);
-        mockReaperInit = mock(CTSReaperInit.class);
+        mockReaperInit = mock(CTSWorkerManager.class);
         mockDebug = mock(Debug.class);
+        options = Options.defaultOptions();
 
         adapter = new CoreTokenAdapter(mockStrategy, mockTaskDispatcher, mockResultHandlerFactory, mockReaperInit,
                 mockDebug);
@@ -65,10 +69,10 @@ public class CoreTokenAdapterTest {
         Token token = new Token("badger", TokenType.SESSION);
 
         // When
-        adapter.create(token);
+        adapter.create(token, options);
 
         // Then
-        verify(mockTaskDispatcher).create(eq(token), any(ResultHandler.class));
+        verify(mockTaskDispatcher).create(eq(token), any(Options.class), any(ResultHandler.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -77,13 +81,14 @@ public class CoreTokenAdapterTest {
         // Given
         String tokenId = "badger";
         Token token = new Token(tokenId, TokenType.SESSION);
+        Options options = Options.defaultOptions();
 
         ResultHandler<Token, CoreTokenException> mockResultHandler = mock(ResultHandler.class);
         given(mockResultHandler.getResults()).willReturn(token);
         given(mockResultHandlerFactory.getReadHandler()).willReturn(mockResultHandler);
 
         // When
-        Token result = adapter.read(tokenId);
+        Token result = adapter.read(tokenId, options);
 
         // Then
         assertThat(result.getTokenId()).isEqualTo(tokenId);
@@ -136,10 +141,10 @@ public class CoreTokenAdapterTest {
         Token token = new Token("badger", TokenType.SESSION);
 
         // When
-        adapter.updateOrCreate(token);
+        adapter.updateOrCreate(token, options);
 
         // Then
-        verify(mockTaskDispatcher).update(eq(token), any(ResultHandler.class));
+        verify(mockTaskDispatcher).update(eq(token), any(Options.class), any(ResultHandler.class));
     }
 
     @Test
@@ -148,10 +153,10 @@ public class CoreTokenAdapterTest {
         String tokenId = "badger";
 
         // When
-        adapter.delete(tokenId);
+        adapter.delete(tokenId, options);
 
         // Then
-        verify(mockTaskDispatcher).delete(eq(tokenId), any(ResultHandler.class));
+        verify(mockTaskDispatcher).delete(eq(tokenId), any(Options.class), any(ResultHandler.class));
     }
 
     @Test

@@ -17,6 +17,39 @@
 
 package org.forgerock.openam.authentication.modules.fr.oath;
 
+import static org.forgerock.openam.utils.Time.*;
+
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.codec.DecoderException;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathService;
+import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
+import org.forgerock.openam.utils.Alphabet;
+import org.forgerock.openam.utils.CodeException;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.qr.GenerationUtils;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -28,37 +61,12 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.codec.DecoderException;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.devices.OathDeviceSettings;
-import org.forgerock.openam.core.rest.devices.OathDevicesDao;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorOathService;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.qr.GenerationUtils;
 
 /**
  * Implements the OATH specification. OATH uses a OTP to authenticate
@@ -119,6 +127,8 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final int ERROR = 2;
     private int algorithm = 0;
 
+    private boolean outOfSync = false;
+
     protected String amAuthOATH = null;
 
     private static final int LOGIN_START = ISAuthConstants.LOGIN_START;
@@ -138,12 +148,17 @@ public class AuthenticatorOATH extends AMLoginModule {
     private AuthenticatorOathService realmOathService;
     private AMIdentity id;
 
-    private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
-    private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
+    private final OathMaker oathDevices = InjectorHolder.getInstance(OathMaker.class);
+
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorOathService> oathServiceFactory =
+            InjectorHolder.getInstance(Key.get(
+                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorOathService>>(){},
+                    Names.named(AuthenticatorOathServiceFactory.FACTORY_NAME)));
+
+    private final RecoveryCodeGenerator recoveryCodeGenerator = InjectorHolder.getInstance(RecoveryCodeGenerator.class);
 
     private OathDeviceSettings newDevice = null;
-
-
+    
     /**
      * Standard constructor sets-up the debug logging module.
      */
@@ -185,13 +200,22 @@ public class AuthenticatorOATH extends AMLoginModule {
             debug.message("OATH::init");
         }
 
+        userName = (String) sharedState.get(getUserKey());
+        try {
+            checkForSessionAndGetUsernameAndUUID();
+        } catch (AuthLoginException | SSOException e) {
+            if (debug.messageEnabled()) {
+                debug.message("AuthenticatorOATH :: init() : Unable to get userName ", e);
+            }
+            return;
+        }
+
         //get username from previous authentication
         try {
-            userName = (String) sharedState.get(getUserKey());
 
-            //gets skippable name from the realm's service and stores it
-            id = getIdentity();
-            realmOathService = new AuthenticatorOathService(id.getRealm());
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            id = IdUtils.getIdentity(userName, realm);
+            realmOathService = oathServiceFactory.create(id.getRealm());
 
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
 
@@ -204,7 +228,7 @@ public class AuthenticatorOATH extends AMLoginModule {
             try {
                 this.minSecretKeyLength = CollectionHelper.getIntMapAttr(options, MIN_SECRET_KEY_LENGTH, 0, debug);
             } catch (NumberFormatException e) {
-                minSecretKeyLength = 0; //Default value has been deleted, set to 0
+                minSecretKeyLength = 0;
             }
 
             this.windowSize = CollectionHelper.getIntMapAttr(options, WINDOW_SIZE, 0, debug);
@@ -217,15 +241,14 @@ public class AuthenticatorOATH extends AMLoginModule {
             this.issuerName = CollectionHelper.getMapAttr(options, ISSUER_NAME);
 
             final String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
-            if (algorithm.equalsIgnoreCase("HOTP")) {
+            if ("HOTP".equalsIgnoreCase(algorithm)) {
                 this.algorithm = HOTP;
-            } else if (algorithm.equalsIgnoreCase("TOTP")) {
+            } else if ("TOTP".equalsIgnoreCase(algorithm)) {
                 this.algorithm = TOTP;
             } else {
                 this.algorithm = ERROR;
             }
 
-            //set authentication level
             if (authLevel != null) {
                 try {
                     setAuthLevel(Integer.parseInt(authLevel));
@@ -255,8 +278,9 @@ public class AuthenticatorOATH extends AMLoginModule {
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         try {
-            checkForSessionAndGetUsernameAndUUID();
-
+            if (StringUtils.isEmpty(userName)) {
+                throw new AuthLoginException("amAuth", "noUserName", null);
+            }
             final OathDeviceSettings settings = getOathDeviceSettings(id.getName(), id.getRealm());
 
             try {
@@ -349,7 +373,6 @@ public class AuthenticatorOATH extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("OATH.process() : Username from SSOToken : " + userName);
             }
-
             if (StringUtils.isEmpty(userName)) {
                 throw new AuthLoginException("amAuth", "noUserName", null);
             }
@@ -402,7 +425,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         }
 
         //get Arrival time of the OTP
-        time = System.currentTimeMillis() / 1000L;
+        time = currentTimeMillis() / 1000L;
 
         if (isRecoveryCode(OTP, deviceToAuthAgainst, id)) {
             return RECOVERY_USED;
@@ -412,26 +435,35 @@ public class AuthenticatorOATH extends AMLoginModule {
             }
             if (null == settings) {
                 // this is the first time we have authorised against this device - we can now save it.
-                deviceFactory.saveDeviceProfile(id.getName(), id.getRealm(), deviceToAuthAgainst);
+                oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), deviceToAuthAgainst);
             }
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
             //the OTP is out of the window or incorrect
             if (++attempt >= TOTAL_ATTEMPTS) {
                 setFailureID(userName);
-                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                if (outOfSync) {
+                    throw new InvalidPasswordException(amAuthOATH, "outOfSync", null);
+                } else {
+                    throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                }
             }
 
-            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            replaceHeader(state, MODULE_NAME + " Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
             return state;
         }
     }
 
     private OathDeviceSettings createBasicDevice() throws AuthLoginException {
 
-        OathDeviceSettings settings = deviceFactory.createDeviceProfile(minSecretKeyLength);
+        OathDeviceSettings settings = oathDevices.createDeviceProfile(minSecretKeyLength);
         settings.setChecksumDigit(checksum);
-        settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
+
+        try {
+            settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.ALPHANUMERIC, false));
+        } catch (CodeException e) {
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
 
         return settings;
     }
@@ -448,8 +480,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         if (recoveryCodes.contains(otp)) {
             recoveryCodes.remove(otp);
             settings.setRecoveryCodes(recoveryCodes.toArray(new String[recoveryCodes.size()]));
-            devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                    Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+            oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
             return true;
         }
 
@@ -669,7 +700,7 @@ public class AuthenticatorOATH extends AMLoginModule {
 
                 if (lastLoginTimeStep == localTime) {
                     debug.error("OATH.checkOTP(): Login failed attempting to use the same OTP in same Time Step: " + localTime);
-                    throw new InvalidPasswordException(amAuthOATH, "authFailed", null, userName, null);
+                    return false;
                 }
 
                 boolean sameWindow = false;
@@ -688,8 +719,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                 otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(localTime), passLenStr);
 
                 if (isEqual(otpGen, otp)) {
-                    setLoginTime(id, localTime, settings);
-                    return true;
+                    return setLoginTime(id, localTime, settings);
                 }
 
                 for (int i = 1; i <= totpStepsInWindow; i++) {
@@ -700,8 +730,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                     otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(time1), passLenStr);
 
                     if (isEqual(otpGen, otp)) {
-                        setLoginTime(id, time1, settings);
-                        return true;
+                        return setLoginTime(id, time1, settings);
                     }
 
                     //check time step before current time
@@ -712,8 +741,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                                 "than the current times OTP");
                         return false;
                     } else if (isEqual(otpGen, otp) && !sameWindow) {
-                        setLoginTime(id, time2, settings);
-                        return true;
+                        return setLoginTime(id, time2, settings);
                     }
                 }
 
@@ -737,11 +765,7 @@ public class AuthenticatorOATH extends AMLoginModule {
      */
     private OathDeviceSettings getOathDeviceSettings(String username, String realm)
             throws IOException, AuthLoginException {
-
-        //get data from the DAO
-        List<JsonValue> profiles = devicesDao.getDeviceProfiles(username, realm);
-        List<OathDeviceSettings> allSettings = JsonConversionUtils.toOathDeviceSettingValues(profiles);
-
+        List<OathDeviceSettings> allSettings = oathDevices.getDeviceProfiles(username, realm);
         return CollectionUtils.getFirstItem(allSettings, null);
     }
 
@@ -759,41 +783,6 @@ public class AuthenticatorOATH extends AMLoginModule {
     }
 
     /**
-     * Gets the AMIdentity of a user with username equal to userName.
-     *
-     * @return The AMIdentity of user with username equal to userName.
-     */
-    private AMIdentity getIdentity() {
-        AMIdentity theID = null;
-        AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
-
-        IdSearchControl idsc = new IdSearchControl();
-        idsc.setRecursive(true);
-        idsc.setAllReturnAttributes(true);
-        // search for the identity
-        Set<AMIdentity> results = Collections.emptySet();
-        try {
-            idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
-            if (searchResults != null) {
-                results = searchResults.getSearchResults();
-            }
-            if (results.isEmpty()) {
-                debug.error("OATH.getIdentity : User " + userName + " is not found");
-            } else if (results.size() > 1) {
-                debug.error("OATH.getIdentity : More than one user found for the userName " + userName);
-            } else {
-                theID = results.iterator().next();
-            }
-        } catch (IdRepoException e) {
-            debug.error("OATH.getIdentity : Error searching Identities with username : " + userName, e);
-        } catch (SSOException e) {
-            debug.error("OATH.getIdentity : Module exception : ", e);
-        }
-        return theID;
-    }
-
-    /**
      * Sets the HOTP counter for a user.
      *
      * @param id      The user id to set the counter for.
@@ -803,31 +792,32 @@ public class AuthenticatorOATH extends AMLoginModule {
     private void setCounterAttr(AMIdentity id, int counter, OathDeviceSettings settings)
             throws AuthLoginException, IOException {
         settings.setCounter(counter);
-        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+        oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
     }
 
     /**
-     * Sets the last login time of a user.
+     * Sets the last login time of a user after checking that the clock drift hasn't spread too far from the config's
+     * allowed settings.
      *
      * @param id   The id of the user to set the attribute of.
      * @param time The time <strong>step</strong> to set the attribute to.
      * @param settings The settings to store the value in.
+     * @return {@code false} if the device is out of drift range, {@code true} if device profile has been saved.
      */
-    private void setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
+    private boolean setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
             throws AuthLoginException, IOException {
-        settings.setLastLogin(time * totpTimeStep, TimeUnit.SECONDS);
 
         // Update the observed time-step drift for resynchronisation
         long drift = time - (this.time / totpTimeStep);
         if (Math.abs(drift) > totpMaxClockDrift) {
-            setFailureID(userName);
-            throw new AuthLoginException(amAuthOATH, "outOfSync", null);
+            outOfSync = true;
+            return false;
         }
 
+        settings.setLastLogin(time * totpTimeStep, TimeUnit.SECONDS);
         settings.setClockDriftSeconds((int) drift * totpTimeStep);
-        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
-                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+        oathDevices.saveDeviceProfile(id.getName(), id.getRealm(), settings);
+        return true;
     }
 
     /**

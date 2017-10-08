@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+ * Copyright (c) 2012-2016 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,6 +28,10 @@
  */
 package org.forgerock.openam.cli.schema;
 
+import java.text.MessageFormat;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.CLIException;
@@ -42,16 +46,11 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.text.MessageFormat;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 /**
  * This ssoadm command is able to retrieve the values of the subconfiguration
- * elements within SMS. One possibility is to use this command to retrieve
- * the SFO configuration.
+ * elements within SMS.
  *
- * @author Peter Major
  */
 public class GetSubConfiguration extends SchemaCommand {
 

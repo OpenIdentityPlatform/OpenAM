@@ -11,16 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.server;
 
+import org.forgerock.api.annotations.Title;
 import org.forgerock.openam.utils.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A class to encapsulate a social authentication implementation.
  */
+@Title("Social authentication Implementation")
 public final class SocialAuthenticationImplementation {
 
     public static final String SERVICE_NAME = "socialAuthNService";
@@ -29,8 +33,13 @@ public final class SocialAuthenticationImplementation {
     public static final String CHAINS_ATTRIBUTE = "socialAuthNAuthChain";
     public static final String ICONS_ATTRIBUTE = "socialAuthNIcon";
 
+    @Title("Icon path")
     private String iconPath;
+
+    @Title("Authentication chain")
     private String authnChain;
+
+    @Title("Display name")
     private String displayName;
 
     public String getIconPath() {
@@ -63,6 +72,7 @@ public final class SocialAuthenticationImplementation {
      *
      * @return true if the implementation has all its required values
      */
+    @JsonIgnore
     public boolean isValid() {
         return StringUtils.isNotEmpty(getAuthnChain()) &&
                StringUtils.isNotEmpty(getDisplayName()) &&

@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/CreatedResourcesView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -24,22 +24,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
     "org/forgerock/commons/ui/common/util/UIUtils",
     "autosizeInput",
     "doTimeout"
-], function ($, _, AbstractView, EventManager, Constants, UIUtils) {
-    var CreatedResourcesView = AbstractView.extend({
+], ($, _, AbstractView, EventManager, Constants, UIUtils) => {
+    const CreatedResourcesView = AbstractView.extend({
         element: "#editResources",
         template: "templates/admin/views/realms/authorization/policies/CreatedResourcesTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click #addResource": "addResource",
-            "keyup #addResource": "addResource",
+            "click [data-add-resource]": "addResource",
+            "keyup [data-add-resource]": "addResource",
             "keyup #resourceBuilder input": "addResource",
             "click span[data-delete]": "deleteResource",
             "keyup span[data-delete]": "deleteResource",
-            "click #removePendingResource": "removePendingResource",
-            "click #addResourceEditBtn" : "showEditingResources"
+            "click [data-remove-pending]": "removePendingResource",
+            "click [data-show-editing]" : "showEditingResources"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             _.extend(this.data, args);
 
             if (this.data.entity.resources) {
@@ -50,13 +50,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
 
             var self = this;
 
-            this.parentRender(function () {
+            this.parentRender(() => {
                 this.$el.find(".selectize").selectize({
                     sortField: {
                         field: "text",
                         direction: "asc"
                     },
-                    onChange: function (value) {
+                    onChange (value) {
                         self.data.options.newPattern = value;
 
                         UIUtils.fillTemplateWithData(
@@ -75,30 +75,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
                 delete self.data.options.justAdded;
                 self.flashDomItem(self.$el.find(".text-success"), "text-success");
 
-                if (callback) {
-                    callback();
-                }
+                if (callback) { callback(); }
             });
         },
 
-        validate: function (inputs) {
+        validate (inputs) {
             // This is very simple native validation for supporting browsers for now.
             // More complexity to come later.
-            var self = this;
-            self.valid = true;
+            let allInputsValid = true;
 
-            _.find(inputs, function (input) {
-                // unsupporting browsers will return undefined not false
-                if (input.checkValidity() === false) {
-                    self.valid = false;
+            _.find(inputs, (input) => {
+                if (_.isFunction(input.checkValidity) && !input.checkValidity()) {
+                    allInputsValid = false;
                     return;
                 }
             });
 
-            return self.valid;
+            return allInputsValid;
         },
 
-        addResource: function (e) {
+        addResource (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -134,7 +130,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
 
             if (duplicateIndex >= 0) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
-                this.flashDomItem(this.$el.find("#createdResources ul li:eq(" + duplicateIndex + ")"), "text-danger");
+                this.flashDomItem(this.$el.find(`#createdResources ul li:eq(${duplicateIndex})`), "text-danger");
             } else {
                 this.data.entity.resources.push(resource);
                 this.data.options.justAdded = resource;
@@ -142,7 +138,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             }
         },
 
-        removePendingResource: function (e) {
+        removePendingResource (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -151,7 +147,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             this.render(this.data);
         },
 
-        deleteResource: function (e) {
+        deleteResource (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -160,11 +156,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Create
             this.render(this.data);
         },
 
-        showEditingResources: function () {
+        showEditingResources () {
+            this.$el.find("[data-show-editing]").prop("disabled", true);
             this.$el.find("li.editing").removeClass("hidden");
         },
 
-        flashDomItem: function (item, className) {
+        flashDomItem (item, className) {
             item.addClass(className);
             $.doTimeout(_.uniqueId(className), 2000, function () {
                 item.removeClass(className);

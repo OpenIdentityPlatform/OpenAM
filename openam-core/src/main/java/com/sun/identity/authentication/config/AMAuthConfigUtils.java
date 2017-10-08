@@ -24,26 +24,12 @@
  *
  * $Id: AMAuthConfigUtils.java,v 1.5 2008/06/25 05:41:51 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.config;
 
 import static javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag.*;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.am.sdk.AMOrganization;
-import com.iplanet.am.sdk.AMTemplate;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.SMSException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 
@@ -60,6 +47,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.iplanet.am.sdk.AMOrganization;
+import com.iplanet.am.sdk.AMStoreConnection;
+import com.iplanet.am.sdk.AMTemplate;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * Authentication Configuration Utility.
@@ -539,7 +541,7 @@ public class AMAuthConfigUtils {
      * @throws AMConfigurationException if <code>configName</code> is null or
      *         not defined.
      */
-    public static Map getNamedConfig(
+    public static Map<String, Set<String>> getNamedConfig(
         String configName,
         String orgName,
         SSOToken token
@@ -577,14 +579,7 @@ public class AMAuthConfigUtils {
         }
 
         // retrieve attribute
-        Map attributeDataMap = conf.getAttributes();
-        /*Set value = (Set) map.get(ATTR_NAME);
-        if (value == null || value.isEmpty()) {
-            return null;
-        } else {
-            return (String) value.iterator().next();
-        }*/
-        return attributeDataMap;
+        return conf.getAttributes();
     }
 
     /**

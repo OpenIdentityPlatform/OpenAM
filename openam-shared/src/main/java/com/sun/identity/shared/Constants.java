@@ -314,19 +314,6 @@ public interface Constants {
             "com.iplanet.am.session.failover.httpSessionTrackingCookieName";
 
     /**
-     * property string to choose whether local or remote saving method is used
-     */
-    static final String AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD =
-            "com.iplanet.am.session.failover.useRemoteSaveMethod";
-
-    /**
-     * property string to choose whether we rely on app server load balancer to
-     * do the request routing or use our own
-     */
-    static final String AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING =
-            "com.iplanet.am.session.failover.useInternalRequestRouting";
-
-    /**
      * Property string for failover cluster state check timeout
      */
     static final String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT =
@@ -357,9 +344,9 @@ public interface Constants {
             "iplanet-am-session-constraint-max-wait-time";
 
     /**
-     * Property string for max number of sessions
+     * Property name for maximum size of the internal session cache.
      */
-    static final String AM_SESSION_MAX_SESSIONS = "com.iplanet.am.session.maxSessions";
+    String AM_SESSION_MAX_CACHE_SIZE = "org.forgerock.openam.session.service.access.persistence.caching.maxsize";
 
     /**
      * Property string for security provider package.
@@ -496,13 +483,6 @@ public interface Constants {
      */
     static final String AUTH_UNIQUE_COOKIE_DOMAIN =
             "com.sun.identity.authentication.uniqueCookieDomain";
-
-    /**
-     * Property string for checking if remote method
-     * <code>AddListenerOnAllSessions</code> is enabled.
-     */
-    static final String ENABLE_ADD_LISTENER_ON_ALL_SESSIONS =
-            "com.sun.am.session.enableAddListenerOnAllSessions";
 
     /**
      * Property string for list of IP address of remote clients which are
@@ -1009,13 +989,6 @@ public interface Constants {
             "com.sun.am.event.notification.expire.time";
 
     /**
-     * Global schema property name in Session Service.
-     * constant used for session trimming when purge delay > 0
-     */
-    static final String ENABLE_TRIM_SESSION =
-            "iplanet-am-session-enable-session-trimming";
-
-    /**
      * property string to the size of SystemTimerPool
      */
     static final String SYSTEM_TIMERPOOL_SIZE =
@@ -1222,13 +1195,6 @@ public interface Constants {
             "openam.auth.soap.rest.generic.authentication.exception";
 
     /**
-     * Switch to allow using local sessions to track session counts when running
-     * in SessionCount.MULTI_SERVER_MODE.
-     */
-    static final String USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE =
-            "openam.session.useLocalSessionsInMultiServerMode";
-
-    /**
      * Default Domain Attribute
      */
     static final String DEFAULT_ROOT_NAMING_ATTRIBUTE = "dc";
@@ -1341,6 +1307,11 @@ public interface Constants {
             "org.forgerock.openam.utils.xml.transformerfactory.cache.size";
 
     /**
+     * Size of XML shared XPathFactory cache.
+     */
+    final String XPATHFACTORY_CACHE_SIZE = "org.forgerock.openam.utils.xml.xpathfactory.cache.size";
+
+    /**
      * Property to enable/disable resource lookup caching.
      */
     public static final String RESOURCE_LOOKUP_CACHE_ENABLED =
@@ -1387,4 +1358,30 @@ public interface Constants {
      * Property that allows the AM_ACCESS_ATTEMPT event name to be audited.
      */
     public static final String AUDIT_AM_ACCESS_ATTEMPT_ENABLED = "org.forgerock.openam.audit.access.attempt.enabled";
+
+    /**
+     * Property to specify the TLS version to connect to the secure ldap server.
+     */
+    public static final String LDAP_SERVER_TLS_VERSION = "org.forgerock.openam.ldap.secure.protocol.version";
+
+    /**
+     * Property to enable capturing trace-level messages from Log4J world when in message-level debug mode.
+     */
+    public static final String ENABLE_TRACE_IN_MESSAGE_MODE = "org.forgerock.openam.slf4j.enableTraceInMessage";
+
+    /**
+     * Property to determine whether notifications should be published for agent consumption.
+     */
+    String NOTIFICATIONS_AGENTS_ENABLED = "org.forgerock.openam.notifications.agents.enabled";
+
+    /** Service name for the REST APIs service. */
+    String REST_APIS_SERVICE_NAME = "RestApisService";
+    
+    /** Service version for the REST APIs service. */
+    String REST_APIS_SERVICE_VERSION = "1.0";
+
+    /**
+     * The name of the request attribute that tells whether this authentication happened via WS-Fed AR profile.
+     */
+    String WSFED_ACTIVE_LOGIN = "org.forgerock.openam.federation.wsfed.active.login";
 }

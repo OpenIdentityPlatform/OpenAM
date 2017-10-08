@@ -16,7 +16,18 @@
 
 package org.forgerock.openam.shared.concurrency;
 
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Fail.fail;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyLong;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.doAnswer;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
+import static org.testng.Assert.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +35,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.util.thread.listener.ShutdownListener;
@@ -53,7 +65,8 @@ public class ThreadMonitorTest {
         monitor = new ThreadMonitor(
                 mockWorkPool,
                 mockShutdownWrapper,
-                mockDebug);
+                mockDebug,
+                0, 0);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -163,6 +176,47 @@ public class ThreadMonitorTest {
         verify(mockFuture).get();
     }
 
+    @Test
+    public void shouldIncrementRecoveryDelay() throws ExecutionException, InterruptedException {
+        final Semaphore semaphore = new Semaphore(1);
+        ExecutorService executorService = null;
+        try {
+            executorService = Executors.newCachedThreadPool();
+            final ThreadMonitor monitor = new ThreadMonitor(
+                    executorService,
+                    mock(ShutdownManager.class),
+                    mockDebug, 0, 0);
+
+            // Given
+            final int[] errorsCount = {0};
+            semaphore.acquire();
+            Runnable mockRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    errorsCount[0]++;
+                    if (errorsCount[0] >= 4) {
+                        semaphore.release();
+                    }
+                    throw new IllegalStateException();
+
+                }
+            };
+
+            // When
+            monitor.watchThread(executorService, mockRunnable);
+
+            // Then
+            if (!semaphore.tryAcquire(1, TimeUnit.SECONDS)) {
+                fail("ThreadMonitor did not reschedule the Runnable successfully.");
+            }
+            assertTrue(monitor.getSuccessiveFailingCounter() >= 3,
+                    "Expected successiveFailingCounter to be at least 3.");
+        } finally {
+            if (executorService != null) {
+                executorService.shutdown();
+            }
+        }
+    }
 
     private ExecutorService immediateExecutor() {
         return immediateExecutor(mock(Future.class));

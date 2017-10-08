@@ -34,13 +34,13 @@ import com.iplanet.sso.SSOToken;
 public class StatelessAdminRestrictionTest {
 
     private SuperUserDelegate mockDelegate;
-    private StatelessSessionFactory mockFactory;
+    private StatelessSessionManager mockFactory;
     private StatelessAdminRestriction restriction;
 
     @BeforeMethod
     public void setup() {
         mockDelegate = mock(SuperUserDelegate.class);
-        mockFactory = mock(StatelessSessionFactory.class);
+        mockFactory = mock(StatelessSessionManager.class);
         restriction = new StatelessAdminRestriction(mockDelegate, mockFactory);
     }
 

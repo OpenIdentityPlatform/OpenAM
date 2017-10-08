@@ -17,12 +17,7 @@
 package com.iplanet.services.ldap.event;
 
 import static org.forgerock.openam.ldap.LDAPConstants.*;
-
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,10 +30,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
@@ -57,7 +53,20 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
+import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimerPool;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.debug.Debug;
+
+/**
+ * An abstract implementation of LDAPv3 persistent searches.
+ *
+ * @param <T> Type of listener.
+ * @param <H> Supported token types.
+ */
 public abstract class LDAPv3PersistentSearch<T, H> {
 
     private static final Debug DEBUG = Debug.getInstance("PersistentSearch");
@@ -67,8 +76,8 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private static final List<String> AD_DEFAULT_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(
             AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR));
 
-    private final ConnectionFactory factory;
-    private final Map<T, H> listeners = new ConcurrentHashMap<>(1);
+    private final ConnectionFactory<Connection> factory;
+    private final ConcurrentHashMap<T, H> listeners = new ConcurrentHashMap<>(1);
     private final int retryInterval;
     private final DN searchBaseDN;
     private final Filter searchFilter;
@@ -84,6 +93,16 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         STANDARD, AD, NONE
     }
 
+    /**
+     * Generate a new LDAPv3PersistentSearch.
+     *
+     * @param retryInterval How frequently to reconnect (in milliseconds).
+     * @param searchBaseDN The base DN from which to perform the query.
+     * @param searchFilter The filter which forms the query's parameters.
+     * @param searchScope The scope of the search, from the searchBaseDN.
+     * @param factory A connection factory used to produce connections down to LDAP.
+     * @param attributeNames Attribute names which will be returned alongside the DN of the query-resulted objects.
+     */
     public LDAPv3PersistentSearch(int retryInterval, DN searchBaseDN, Filter searchFilter,
             SearchScope searchScope, ConnectionFactory factory, String... attributeNames) {
         this.retryInterval = retryInterval;
@@ -144,16 +163,25 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     /**
      * Starts the persistent search connection against the directory. The caller must ensure that calls made to
      * startPSearch and stopPsearch are properly synchronized.
+     *
+     * @throws DataLayerException if the initial connection could not be created.
      */
-    public void startSearch() {
+    public void startQuery() throws DataLayerException {
         try {
-            conn = factory.getConnection();
+            conn = factory.create();
             startSearch(conn);
-        } catch (LdapException ere) {
-            DEBUG.error("An error occurred while trying to initiate persistent search connection", ere);
+        } catch (LdapException e) { //if we cannot start the search
+            logError(e);
             DEBUG.message("Restarting persistent search");
             restartSearch();
+        } catch (DataLayerException e) { //if we cannot get a connection
+            logError(e);
+            throw e;
         }
+    }
+
+    private void logError(Throwable t) {
+        DEBUG.error("An error occurred while trying to initiate persistent search connection", t);
     }
 
     private void startSearch(Connection conn) throws LdapException {
@@ -230,7 +258,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             try {
                // Schedules the task for the exact second without any non-zero milliseconds
                SystemTimerPool.getTimerPool().schedule(retryTask,
-                    new Date(System.currentTimeMillis() + retryInterval / 1000 * 1000));
+                    new Date(currentTimeMillis() + retryInterval / 1000 * 1000));
             } catch (IllegalMonitorStateException e) {
                 DEBUG.warning("PSearch was not restarted, application may be shutting down:", e);
             }
@@ -243,14 +271,23 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         return Collections.unmodifiableMap(listeners);
     }
 
+    /**
+     * This interface represents the ability of a listener to return result entries.
+     */
     protected interface SearchResultEntryHandler {
         boolean handle(SearchResultEntry entry, String dn, DN previousDn, PersistentSearchChangeType type);
     }
 
+    /**
+     * Returns the {@code SearchResultEntryHandler} for the concrete implementation.
+     *
+     * @return The {@code SearchResultEntryHandler} for this implementation.
+     */
     protected abstract SearchResultEntryHandler getSearchResultEntryHandler();
 
     private class PersistentSearchResultHandler implements SearchResultHandler {
 
+        @Override
         public boolean handleEntry(SearchResultEntry entry) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Processing persistent search response: " + entry.toString());
@@ -315,24 +352,12 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             return getSearchResultEntryHandler().handle(entry, dn, previousDn, type);
         }
 
+        @Override
         public boolean handleReference(SearchResultReference reference) {
             //ignoring references
             return true;
         }
 
-        public void handleErrorResult(LdapException error) {
-            if (!shutdown) {
-                DEBUG.error("An error occurred while executing persistent search", error);
-                DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");
-                clearCaches();
-                restartSearch();
-            } else {
-                DEBUG.message("Persistence search has been cancelled",error);
-            }
-        }
-
-        public void handleResult(Result result) {
-        }
     }
 
     private class RetryTask extends GeneralTaskRunnable {
@@ -362,13 +387,13 @@ public abstract class LDAPv3PersistentSearch<T, H> {
 
         public void run() {
             try {
-                conn = factory.getConnection();
+                conn = factory.create();
                 startSearch(conn);
                 //everything seems to work, let's disable retryTask and reset the debug limit
                 runPeriod = -1;
                 lastLogged = 0;
-            } catch (Exception ex) {
-                long now = System.currentTimeMillis();
+            } catch (DataLayerException | LdapException ex) {
+                long now = currentTimeMillis();
                 if (now - lastLogged > 60000) {
                     DEBUG.error("Unable to start persistent search: " + ex.getMessage());
                     lastLogged = now;
@@ -376,5 +401,10 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 IOUtils.closeIfNotNull(conn);
             }
         }
+    }
+
+    @VisibleForTesting
+    protected boolean isShutdown() {
+        return shutdown;
     }
 }

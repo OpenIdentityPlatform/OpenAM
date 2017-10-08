@@ -56,7 +56,7 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
     @Override
     public PolicyStore getPolicyStore(Context context) {
         Subject adminSubject = context.asContext(SubjectContext.class).getCallerSubject();
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        String realm = context.asContext(RealmContext.class).getRealm().asPath();
 
         return getPolicyStore(adminSubject, realm);
     }

@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/DashboardResource#schema.title",
+  "description": "i18n:api-descriptor/DashboardResource#schema.description",
+  "properties": {
+    "*": {
+      "type": "object",
+      "title": "i18n:api-descriptor/DashboardResource#schema.properties.title",
+      "description": "i18n:api-descriptor/DashboardResource#schema.properties.description",
+      "properties": {
+        "dashboardIcon": {
+          "title": "i18n:api-descriptor/DashboardResource#schema.dashboardicon.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.dashboardicon.description",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dashboardName": {
+          "type": "array",
+          "title": "i18n:api-descriptor/DashboardResource#schema.dashboardname.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.dashboardname.description",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dashboardLogin": {
+          "type": "array",
+          "title": "i18n:api-descriptor/DashboardResource#schema.dashboardlogin.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.dashboardlogin.description",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ICFIdentifier": {
+          "type": "array",
+          "title": "i18n:api-descriptor/DashboardResource#schema.icfidentifier.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.icfidentifier.description",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dashboardDisplayName": {
+          "type": "array",
+          "title": "i18n:api-descriptor/DashboardResource#schema.dashboarddisplayname.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.dashboarddisplayname.description",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dashboardClassName": {
+          "type": "array",
+          "title": "i18n:api-descriptor/DashboardResource#schema.dashboardclassname.title",
+          "description": "i18n:api-descriptor/DashboardResource#schema.dashboardclassname.description",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

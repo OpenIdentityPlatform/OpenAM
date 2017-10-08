@@ -24,10 +24,12 @@
  *
  * $Id: Logger.java,v 1.15 2009/12/09 00:34:21 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.log;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -621,7 +623,7 @@ public class Logger extends java.util.logging.Logger {
         rec.addLogInfo(LogConstants.LOGIN_ID,
             ssoToken.getPrincipal().getName());
 
-        Date date = new Date();
+        Date date = newDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         /*

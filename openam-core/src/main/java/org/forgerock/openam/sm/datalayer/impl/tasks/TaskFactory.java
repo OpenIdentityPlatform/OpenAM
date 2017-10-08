@@ -11,17 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import java.util.Collection;
-
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.util.Options;
 
 /**
  * Generates instances of specific Task implementations.
@@ -35,45 +36,54 @@ public class TaskFactory {
 
     /**
      * Used to signal the creation of the given Token.
-     * @param token Non null.
-     * @return Non null Token creation Task.
+     *
+     * @param token Non null. The token to create.
+     * @param options Non null. The Options for the operation.
+     * @return Non null. Token creation Task.
      */
-    public Task create(Token token, ResultHandler<Token, ?> handler) {
-        return new CreateTask(token, handler);
+    public Task create(Token token, Options options, ResultHandler<Token, ?> handler) {
+        return new CreateTask(token, options, handler);
     }
 
     /**
      * Used to signal a read operation for the Token ID.
-     * @param tokenId Non null.
+     *
+     * @param tokenId Non null. The token ID to read.
+     * @param options Non null. The Options for the operation.
      * @param handler Required handler to notify when operation is complete.
-     * @return Non null Token read Task.
+     * @return Non null. Token read Task.
      */
-    public Task read(String tokenId, ResultHandler<Token, ?> handler) {
-        return new ReadTask(tokenId, handler);
+    public Task read(String tokenId, Options options, ResultHandler<Token, ?> handler) {
+        return new ReadTask(tokenId, options, handler);
     }
 
     /**
      * Used to signal an update operation for the given Token.
-     * @param token Non null.
-     * @return Non null Token update Task.
+     *
+     * @param token Non null. The token ID to update.
+     * @param options Non null. The Options for the operation.
+     * @return Non null. Token update Task.
      */
-    public Task update(Token token, ResultHandler<Token, ?> handler) {
-        return new UpdateTask(token, handler);
+    public Task update(Token token, Options options, ResultHandler<Token, ?> handler) {
+        return new UpdateTask(token, options, handler);
     }
 
     /**
      * Used to signal a delete operation for the given Token ID.
-     * @param tokenId Non null.
-     * @return Non null Token delete Task.
+     *
+     * @param tokenId Non null. The token ID to delete.
+     * @param options Non null. The Options for the operation.
+     * @return Non null. Token delete Task.
      */
-    public Task delete(String tokenId, ResultHandler<String, ?> handler) {
-        return new DeleteTask(tokenId, handler);
+    public Task delete(String tokenId, Options options, ResultHandler<PartialToken, ?> handler) {
+        return new DeleteTask(tokenId, options, handler);
     }
 
     /**
      * Used to signal a query against the persistence store.
-     * @param filter Non null TokenFilter to use.
-     * @param handler Non null ResultHandler to be notified of the results.
+     *
+     * @param filter Non null. TokenFilter to use.
+     * @param handler Non null. ResultHandler to be notified of the results.
      * @return Non null Token query Task.
      */
     public Task query(TokenFilter filter, ResultHandler<Collection<Token>, ?> handler) {
@@ -82,11 +92,23 @@ public class TaskFactory {
 
     /**
      * Used to signal an attribute based query against the persistence store.
-     * @param filter Non null TokenFilter to use.
-     * @param handler Non null ResultHandler to be notified of the results.
+     *
+     * @param filter Non null. TokenFilter to use.
+     * @param handler Non null. ResultHandler to be notified of the results.
      * @return Non null Token query Task.
      */
     public Task partialQuery(TokenFilter filter, ResultHandler<Collection<PartialToken>, ?> handler) {
         return new PartialQueryTask(filter, handler);
+    }
+
+    /**
+     * Used to signal an attribute based continuous query against the persistence store.
+     *
+     * @param filter Non null. TokenFilter to use.
+     * @param listener Non null. ContinuousQueryListener to be updated by the resulting stream.
+     * @return Non null. Token query Task.
+     */
+    public ContinuousQueryTask continuousQuery(TokenFilter filter, ContinuousQueryListener listener) {
+        return new ContinuousQueryTask(filter, listener);
     }
 }

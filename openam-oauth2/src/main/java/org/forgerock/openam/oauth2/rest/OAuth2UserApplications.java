@@ -11,27 +11,56 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
-import static org.forgerock.openam.cts.api.fields.OAuthTokenField.*;
-import static org.forgerock.util.query.QueryFilter.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValueFunctions.setOf;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.CLIENT_ID;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.EXPIRY_TIME;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.ID;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.REALM;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.SCOPE;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.TOKEN_NAME;
+import static org.forgerock.openam.cts.api.fields.OAuthTokenField.USER_NAME;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DELETE_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.OAUTH2_USER_APPLICATIONS;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.QUERY_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Token.OAUTH_REFRESH_TOKEN;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
+import static org.forgerock.util.query.QueryFilter.or;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Delete;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Query;
+import org.forgerock.api.annotations.RequestHandler;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.enums.QueryType;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
@@ -40,19 +69,15 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Responses;
-import org.forgerock.json.resource.annotations.Delete;
-import org.forgerock.json.resource.annotations.Query;
-import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -62,23 +87,36 @@ import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * A request handler for inspecting and revoking OAuth2 applications. It requires a user and a realm to be available
  * in the request context.
  *
  * @since 13.0.0
  */
-@RequestHandler
+@CollectionProvider(details = @Handler(
+                mvccSupported = false,
+                title = OAUTH2_USER_APPLICATIONS + TITLE,
+                description = OAUTH2_USER_APPLICATIONS + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "OAuth2UserApplications.resource.schema.json"),
+                parameters = @Parameter(name = "user", type = "string", description = OAUTH2_USER_APPLICATIONS
+                        + PATH_PARAM + "user")),
+        pathParam = @Parameter(
+                name = "clientId",
+                type = "string",
+                description = OAUTH2_USER_APPLICATIONS + PATH_PARAM + "clientid"))
 public class OAuth2UserApplications {
 
-    private final OAuthTokenStore tokenStore;
+    private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
-    public OAuth2UserApplications(OAuthTokenStore tokenStore,
+    public OAuth2UserApplications(TokenStore tokenStore,
             OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
             ClientRegistrationStore clientRegistrationStore, ContextHelper contextHelper,
             @Named("frRest") Debug debug) {
@@ -103,27 +141,35 @@ public class OAuth2UserApplications {
      * @param request Unused but necessary for used of the {@link @Query} annotation.
      * @return A promise of a query response.
      */
-    @Query
+    @Query(operationDescription = @Operation(description = OAUTH2_USER_APPLICATIONS + QUERY_DESCRIPTION,
+                    errors = @ApiError(
+                            code = 500,
+                            description = OAUTH2_USER_APPLICATIONS + QUERY + ERROR_500_DESCRIPTION)),
+            type = QueryType.FILTER, queryableFields = {})
     public Promise<QueryResponse, ResourceException> query(Context context, QueryResourceHandler queryHandler,
             QueryRequest request) {
+
         String userId = contextHelper.getUserId(context);
         String realm = contextHelper.getRealm(context);
 
         try {
             QueryFilter<CoreTokenField> queryFilter = getQueryFilter(userId, realm);
 
-            JsonValue tokens = tokenStore.query(queryFilter);
+            JsonValue tokens = tokenStore.queryForToken(realm, queryFilter);
 
             Map<String, Set<JsonValue>> applicationTokensMap = new HashMap<>();
 
             for (JsonValue token : tokens) {
                 String clientId = getAttributeValue(token, CLIENT_ID.getOAuthField());
-                Set<JsonValue> applicationTokens = applicationTokensMap.get(clientId);
-                if (applicationTokens == null) {
-                    applicationTokens = new HashSet<>();
-                    applicationTokensMap.put(clientId, applicationTokens);
+                realm = getAttributeValue(token, REALM.getOAuthField());
+                if(tokenClientExists(clientId, realm, context)) {
+                    Set<JsonValue> applicationTokens = applicationTokensMap.get(clientId);
+                    if (applicationTokens == null) {
+                        applicationTokens = new HashSet<>();
+                        applicationTokensMap.put(clientId, applicationTokens);
+                    }
+                    applicationTokens.add(token);
                 }
-                applicationTokens.add(token);
             }
 
             for (Map.Entry<String, Set<JsonValue>> applicationTokens : applicationTokensMap.entrySet()) {
@@ -133,14 +179,23 @@ public class OAuth2UserApplications {
             }
 
             return Promises.newResultPromise(Responses.newQueryResponse());
-        } catch (CoreTokenException | ServerException | InvalidClientException |
+        } catch (ServerException | InvalidClientException |
                 NotFoundException e) {
             debug.message("Failed to query OAuth2 clients for user {}", userId, e);
             return new InternalServerErrorException(e).asPromise();
-        } catch (InternalServerErrorException e) {
-            debug.message("Failed to query OAuth2 clients for user {}", userId, e);
-            return e.asPromise();
         }
+    }
+
+    /**
+     * Checks if the client to which the access token is issued exists
+     */
+    private boolean tokenClientExists(String clientId, String relam, Context context) {
+        try {
+            clientRegistrationStore.get(clientId, relam, context);
+        } catch (InvalidClientException | NotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -150,7 +205,9 @@ public class OAuth2UserApplications {
      * @param resourceId The id of the OAuth2 client.
      * @return A promise of the removed application.
      */
-    @Delete
+    @Delete(operationDescription = @Operation(
+            description = OAUTH2_USER_APPLICATIONS + DELETE_DESCRIPTION,
+            errors = @ApiError(code = 500, description = OAUTH2_USER_APPLICATIONS + DELETE + ERROR_500_DESCRIPTION)))
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId) {
         String userId = contextHelper.getUserId(context);
         String realm = contextHelper.getRealm(context);
@@ -165,7 +222,7 @@ public class OAuth2UserApplications {
                     equalTo(CLIENT_ID.getField(), resourceId)
             );
 
-            JsonValue tokens = tokenStore.query(queryFilter);
+            JsonValue tokens = tokenStore.queryForToken(realm, queryFilter);
 
             if (tokens.asCollection().isEmpty()) {
                 return new org.forgerock.json.resource.NotFoundException().asPromise();
@@ -174,21 +231,18 @@ public class OAuth2UserApplications {
             for (JsonValue token : tokens) {
                 String tokenId = getAttributeValue(token, ID.getOAuthField());
                 debug.message("Removing OAuth2 token {} with client {} for user {}", tokenId, resourceId, userId);
-                tokenStore.delete(tokenId);
+                tokenStore.delete(realm, tokenId);
             }
 
             return getResourceResponse(context, resourceId, tokens).asPromise();
-        } catch (CoreTokenException | InvalidClientException | NotFoundException | ServerException e) {
+        } catch (InvalidClientException | NotFoundException | ServerException e) {
             debug.message("Failed to revoke access to OAuth2 client {} for user {}", resourceId, userId, e);
             return new InternalServerErrorException(e).asPromise();
-        } catch (InternalServerErrorException e) {
-            debug.message("Failed to revoke access to OAuth2 client {} for user {}", resourceId, userId, e);
-            return e.asPromise();
         }
     }
 
     private ResourceResponse getResourceResponse(Context context, String clientId, Iterable<JsonValue> tokens)
-            throws NotFoundException, InvalidClientException, ServerException, InternalServerErrorException {
+            throws NotFoundException, InvalidClientException, ServerException {
         String realm = getAttributeValue(tokens.iterator().next(), REALM.getOAuthField());
         OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(context);
 
@@ -196,7 +250,7 @@ public class OAuth2UserApplications {
         Map<String, String> scopeDescriptions = clientRegistration.getScopeDescriptions(getLocale(context));
         Map<String, String> scopes = new HashMap<>();
         for (JsonValue token : tokens) {
-            for (String scope : token.get(SCOPE.getOAuthField()).asSet(String.class)) {
+            for (String scope : getAttributeValueSet(token, SCOPE.getOAuthField())) {
                 if (scopeDescriptions.containsKey(scope)) {
                     scopes.put(scope, scopeDescriptions.get(scope));
                 } else {
@@ -245,11 +299,27 @@ public class OAuth2UserApplications {
     }
 
     private String getAttributeValue(JsonValue token, String attributeName) {
-        Set<String> value = token.get(attributeName).asSet(String.class);
-        if (CollectionUtils.isNotEmpty(value)) {
-            return value.iterator().next();
+        String value;
+        JsonValue jsonValue = token.get(attributeName);
+        if (jsonValue.isString()) {
+            value = jsonValue.asString();
+        } else if (jsonValue.isCollection()) {
+            value = CollectionUtils.getFirstItem(jsonValue.asCollection(String.class));
+        } else {
+            value = jsonValue.toString();
         }
-        return null;
+        return value;
+    }
+
+    private Set<String> getAttributeValueSet(JsonValue token, String attributeName) {
+        Set<String> value = new HashSet<>();
+        JsonValue jsonValue = token.get(attributeName);
+        if (jsonValue.isString()) {
+            value.add(jsonValue.asString());
+        } else if (jsonValue.isCollection()) {
+            value = jsonValue.as(setOf(String.class));
+        }
+        return value;
     }
 
     private Locale getLocale(Context context) {

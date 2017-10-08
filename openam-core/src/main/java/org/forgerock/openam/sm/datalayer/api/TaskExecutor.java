@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.api;
@@ -20,6 +20,7 @@ package org.forgerock.openam.sm.datalayer.api;
  * An interface for executing token tasks against a data layer.
  */
 public interface TaskExecutor {
+
     /**
      * Executes the task for the given tokenId.
      * @param tokenId The token the task is in reference to. May be null in the case of query.

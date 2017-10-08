@@ -24,7 +24,7 @@
  *
  * $Id: AuthnStatement.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.assertion;
@@ -72,7 +72,7 @@ public interface AuthnStatement extends Statement {
      * @return <code>AuthnContext</code> of the statement.
      * @see #setAuthnContext(AuthnContext)
      */
-    public AuthnContext getAuthnContext();
+    AuthnContext getAuthnContext();
 
     /**
      * Sets the value of the <code>AuthnContext</code> property.
@@ -81,7 +81,7 @@ public interface AuthnStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAuthnContext()
      */
-    public void setAuthnContext(AuthnContext value)
+    void setAuthnContext(AuthnContext value)
         throws SAML2Exception;
 
     /**
@@ -90,7 +90,7 @@ public interface AuthnStatement extends Statement {
      * @return the value of the <code>AuthnInstant</code> attribute.
      * @see #setAuthnInstant(Date)
      */
-    public Date getAuthnInstant();
+    Date getAuthnInstant();
 
     /**
      * Sets the value of the <code>AuthnInstant</code> attribute.
@@ -99,7 +99,7 @@ public interface AuthnStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAuthnInstant()
      */
-    public void setAuthnInstant(Date value)
+    void setAuthnInstant(Date value)
         throws SAML2Exception;
 
     /**
@@ -108,7 +108,7 @@ public interface AuthnStatement extends Statement {
      * @return <code>SubjectLocality</code> of the statement.
      * @see #setSubjectLocality(SubjectLocality)
      */
-    public SubjectLocality getSubjectLocality();
+    SubjectLocality getSubjectLocality();
 
     /**
      * Sets the value of the <code>SubjectLocality</code> property.
@@ -117,7 +117,7 @@ public interface AuthnStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getSubjectLocality()
      */
-    public void setSubjectLocality(SubjectLocality value)
+    void setSubjectLocality(SubjectLocality value)
         throws SAML2Exception;
 
     /**
@@ -126,7 +126,7 @@ public interface AuthnStatement extends Statement {
      * @return the value of the <code>SessionIndex</code> attribute.
      * @see #setSessionIndex(String)
      */
-    public String getSessionIndex();
+    String getSessionIndex();
 
     /**
      * Sets the value of the <code>SessionIndex</code> attribute.
@@ -135,7 +135,7 @@ public interface AuthnStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getSessionIndex()
      */
-    public void setSessionIndex(String value)
+    void setSessionIndex(String value)
         throws SAML2Exception;
 
     /**
@@ -144,7 +144,7 @@ public interface AuthnStatement extends Statement {
      * @return the value of <code>SessionNotOnOrAfter</code> attribute.
      * @see #setSessionNotOnOrAfter(Date)
      */
-    public Date getSessionNotOnOrAfter();
+    Date getSessionNotOnOrAfter();
 
     /**
      * Sets the value of the <code>SessionNotOnOrAfter</code> attribute.
@@ -153,6 +153,6 @@ public interface AuthnStatement extends Statement {
      * @throws SAML2Exception if the object is immutable.
      * @see #getSessionNotOnOrAfter()
      */
-    public void setSessionNotOnOrAfter(Date value)
+    void setSessionNotOnOrAfter(Date value)
         throws SAML2Exception;
 }

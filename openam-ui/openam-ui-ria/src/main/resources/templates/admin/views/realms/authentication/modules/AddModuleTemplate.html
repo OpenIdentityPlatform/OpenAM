@@ -1,14 +1,29 @@
-<div class="form-group">
-    <label for="newModuleName">{{t "console.authentication.modules.moduleName"}}</label>
-    <input autofocus type="text" id="newModuleName" class="form-control" placeholder=""  value="">
-</div>
-<div class="form-group">
-    <label for="newModuleType">{{t "console.authentication.modules.moduleType"}}</label>
-    <select class="form-control" id="newModuleType">
-        <option disabled selected value="">{{t "console.authentication.modules.selectModuleType"}}</option>
-        {{#each types}}
-        <option value="{{ _id }}">{{ name }}</option>
-        {{/each}}
-    </select>
-</div>
-<div id="alertContainer"></div>
+{{> headers/_Title title="console.authentication.modules.addModuleTitle"}}
+<div class="panel panel-default fr-panel-with-border">
+    <div class="panel-body tab-content">
+        <div class="block clearfix form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="newModuleName">{{t "common.form.name"}}</label>
+                <div class="col-sm-9">
+                    <input autofocus type="text" id="newModuleName" data-module-name class="form-control" placeholder="{{t 'common.form.validation.required'}}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="newModuleType">{{t "common.form.type"}}</label>
+                <div class="col-sm-9">
+                    <div data-module-type></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <a class="btn btn-default" href="{{routeTo 'realmsAuthenticationModules' realmPath}}">
+                {{t "common.form.cancel"}}
+            </a>
+            <button type="button" data-save disabled class="btn btn-primary">
+                <span>{{t 'common.form.create'}}</span>
+            </button>
+        </div>
+    </div>
+  </div>

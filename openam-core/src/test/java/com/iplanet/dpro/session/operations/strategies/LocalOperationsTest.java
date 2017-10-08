@@ -11,95 +11,201 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
+
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
+import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
+import org.forgerock.openam.utils.TimeTravelUtil;
+import org.forgerock.util.time.TimeService;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.InternalSessionEvent;
+import com.iplanet.dpro.session.service.InternalSessionEventBroker;
+import com.iplanet.dpro.session.service.SessionServerConfig;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 public class LocalOperationsTest {
 
     private LocalOperations local;
-    private SessionService mockService;
-    private Session mockRequester;
-    private Session mockSession;
-    private SessionID mockSessionID;
-    private InternalSession mockInternalSession;
+    @Mock private Session mockRequester;
+    @Mock private Session mockSession;
+    @Mock private SessionID mockSessionID;
+    @Mock private InternalSession mockInternalSession;
+    @Mock private SessionAccessManager sessionAccessManager;
+    @Mock private SessionInfoFactory sessionInfoFactory;
+    @Mock private SessionServerConfig serverConfig;
+    @Mock private SessionServiceConfig serviceConfig;
+    @Mock private SessionCookies sessionCookies;
+    @Mock private SessionChangeAuthorizer sessionChangeAuthorizer;
+    @Mock private InternalSessionEventBroker internalSessionEventBroker;
 
     @BeforeMethod
     public void setup() {
-        mockSessionID = mock(SessionID.class);
-        mockRequester = mock(Session.class);
-        mockSession = mock(Session.class);
+        MockitoAnnotations.initMocks(this);
+        TimeTravelUtil.setBackingTimeService(TimeTravelUtil.FrozenTimeService.INSTANCE);
         given(mockSession.getID()).willReturn(mockSessionID);
-        mockInternalSession = mock(InternalSession.class);
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
         given(mockInternalSession.getID()).willReturn(mockSessionID);
+        given(mockInternalSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
 
-        mockService = mock(SessionService.class);
+        local = new LocalOperations(mock(Debug.class), sessionAccessManager, mock(SessionQueryManager.class),
+                sessionInfoFactory, serverConfig, internalSessionEventBroker, sessionChangeAuthorizer);
+    }
 
-        local = new LocalOperations(mock(Debug.class), mockService);
+    @AfterMethod
+    public void tearDown() {
+        TimeTravelUtil.setBackingTimeService(TimeService.SYSTEM);
     }
 
     @Test
-    public void shouldUseSessionServiceForRefresh() throws SessionException {
+    public void shouldNotSetLastAccessTimeWhenResetFlagIsFalse() throws SessionException {
         // Given
-        boolean flag = true;
+        boolean reset = false;
         // When
-        local.refresh(mockSession, flag);
+        local.refresh(mockSession, reset);
         // Then
-        verify(mockService).getSessionInfo(eq(mockSessionID), eq(flag));
+        verify(mockInternalSession, times(0)).setLatestAccessTime();
+    }
+
+    @Test
+    public void shouldSetLastAccessTimeWhenResetFlagIsTrue() throws SessionException {
+        // Given
+        boolean reset = true;
+        // When
+        local.refresh(mockSession, reset);
+        // Then
+        verify(mockInternalSession).setLatestAccessTime();
     }
 
     @Test
     public void shouldReturnSessionInfoOnRefresh() throws SessionException {
         // Given
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
-        given(mockService.getSessionInfo(any(SessionID.class), anyBoolean())).willReturn(mockSessionInfo);
+        given(sessionInfoFactory.getSessionInfo(mockInternalSession, mockSessionID)).willReturn(mockSessionInfo);
         // When
-        SessionInfo result = local.refresh(mock(Session.class), true);
+        SessionInfo result = local.refresh(mockSession, true);
         // Then
         assertThat(result).isEqualTo(mockSessionInfo);
     }
 
     @Test
-    public void shouldUseSessionServiceForLogout() throws SessionException {
+    public void shouldRemoveSessionFromSessionAccessManagerOnLogout() throws Exception {
         // Given
         // When
         local.logout(mockSession);
         // Then
-        verify(mockService).logout(eq(mockSessionID));
+        verify(sessionAccessManager).removeInternalSession(mockInternalSession);
     }
 
     @Test
-    public void shouldUseSessionServiceForDestroy() throws SessionException {
+    public void firesInternalSessionEventWhenLoggingOutSession() throws Exception {
         // Given
-        given(mockService.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
+        // When
+        local.logout(mockSession);
+        // Then
+        verifyEvent(SessionEventType.LOGOUT);
+    }
+
+    @Test
+    public void shouldRemoveSessionFromSessionAccessManagerOnDestroy() throws SessionException {
+        // Given
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
         // When
         local.destroy(mockRequester, mockSession);
         // Then
-        verify(mockService).destroySession(eq(mockRequester), eq(mockSessionID));
+        verify(sessionAccessManager).removeSessionId(eq(mockSessionID));
     }
 
     @Test
-    public void shouldUseSessionServiceForSetProperty() throws SessionException {
+    public void firesInternalSessionEventWhenDestroyingSession() throws Exception {
         // Given
-        String name = "name";
-        String value = "value";
+        given(mockSession.getSessionID()).willReturn(mockSessionID);
+        given(sessionAccessManager.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
         // When
-        local.setProperty(mockSession, name, value);
+        local.destroy(mockRequester, mockSession);
         // Then
-        verify(mockService).setProperty(eq(mockSessionID), eq(name), eq(value));
+        verifyEvent(SessionEventType.DESTROY);
     }
+
+    @Test
+    public void shouldSetTimeoutStateOfInternalSessionOnSessionTimeout() throws Exception {
+        // Given
+        TimeTravelUtil.FrozenTimeService.INSTANCE.fastForward(10, MINUTES);
+        // When
+        local.timeout(mockInternalSession, SessionEventType.MAX_TIMEOUT);
+        // Then
+        verify(mockInternalSession).setTimedOutTime(TimeUnit.MINUTES.toMillis(10));
+    }
+
+    @DataProvider(name = "timeoutTypes")
+    public Object[][] getTimeoutTypes() {
+        return new Object[][] {
+                { SessionEventType.MAX_TIMEOUT },
+                { SessionEventType.IDLE_TIMEOUT }
+        };
+    }
+
+    @Test(dataProvider = "timeoutTypes")
+    public void firesInternalSessionEventsOnSessionTimeout(SessionEventType eventType) throws Exception {
+        // Given
+        // When
+        local.timeout(mockInternalSession, eventType);
+        // Then
+        verify(mockInternalSession).setState(eq(SessionState.DESTROYED));
+        verifyEvents(eventType, SessionEventType.DESTROY);
+    }
+
+    @Test(dataProvider = "timeoutTypes", expectedExceptions = IllegalStateException.class)
+    public void willNotTimeoutSessionWhichIsStored(SessionEventType eventType) throws Exception {
+        // Given
+        given(mockInternalSession.isStored()).willReturn(true);
+        // When
+        local.timeout(mockInternalSession, eventType);
+        // Then
+        // expect exception
+    }
+
+    private void verifyEvent(SessionEventType eventType) {
+        verifyEvents(eventType);
+    }
+
+    private void verifyEvents(SessionEventType... eventTypes) {
+        ArgumentCaptor<InternalSessionEvent> eventCaptor = ArgumentCaptor.forClass(InternalSessionEvent.class);
+        verify(internalSessionEventBroker, times(eventTypes.length)).onEvent(eventCaptor.capture());
+        for (int i = 0; i < eventTypes.length; i++) {
+            SessionEventType expectedEventType = eventTypes[i];
+            InternalSessionEvent actualEvent = eventCaptor.getAllValues().get(i);
+            assertThat(actualEvent.getType()).isEqualTo(expectedEventType);
+            assertThat(actualEvent.getInternalSession()).isEqualTo(mockInternalSession);
+            assertThat(actualEvent.getTime()).isEqualTo(TimeTravelUtil.FrozenTimeService.INSTANCE.now());
+        }
+    }
+
 }

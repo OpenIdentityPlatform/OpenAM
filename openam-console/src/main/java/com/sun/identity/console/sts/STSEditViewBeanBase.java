@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 /*
- * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2015-2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.console.sts;
 
@@ -203,6 +203,7 @@ class STSEditViewBeanBase extends AMPrimaryMastHeadViewBean {
                             STSInstanceModelResponse creationResponse = model.updateInstance(stsType, configurationState, currentRealm, instanceName);
                             if (creationResponse.isSuccessful()) {
                                 forwardToSTSHomeViewBean();
+                                return;
                             } else {
                                 setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
                             }

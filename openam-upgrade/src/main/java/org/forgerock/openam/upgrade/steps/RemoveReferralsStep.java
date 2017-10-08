@@ -42,7 +42,8 @@ import javax.inject.Named;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.ldap.LDAPRequests;
@@ -91,7 +92,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final ApplicationManagerWrapper applicationService;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final ResourceTypeService resourceTypeService;
     private final PrivilegeManagerFactory policyServiceFactory;
 
@@ -102,14 +103,14 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
     private final Set<DN> referralsToBeRemoved;
 
     @Inject
-    public RemoveReferralsStep(ApplicationManagerWrapper applicationService,
+    public RemoveReferralsStep(ApplicationServiceFactory applicationServiceFactory,
             ResourceTypeService resourceTypeService, PrivilegeManagerFactory policyServiceFactory,
             @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory factory,
             PrivilegedAction<SSOToken> adminTokenAction, @Named(DataLayerConstants.ROOT_DN_SUFFIX) String rootDN) {
 
         super(adminTokenAction, factory);
 
-        this.applicationService = applicationService;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.resourceTypeService = resourceTypeService;
         this.policyServiceFactory = policyServiceFactory;
 
@@ -118,6 +119,10 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         applicationsToClone = new HashMap<>();
         clonedResourceTypes = new HashMap<>();
         referralsToBeRemoved = new HashSet<>();
+    }
+
+    private ApplicationService appService(String realm) {
+        return applicationServiceFactory.create(getAdminSubject(), realm);
     }
 
     @Override
@@ -171,7 +176,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         }
 
         Set<String> listedApplications = referralJson.get("mapApplNameToResources").required().keys();
-        Set<String> listedRealms = referralJson.get("realms").required().asSet(String.class);
+        List<String> listedRealms = referralJson.get("realms").required().asList(String.class);
 
         for (String application : listedApplications) {
             Set<String> destinationRealms = applicationsToClone.get(application);
@@ -211,7 +216,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
         String shallowestRealm = findShallowestRealm(destinationRealms);
         String sourceRealm = shallowestRealm.substring(0, shallowestRealm.lastIndexOf('/') + 1);
 
-        Application application = applicationService.getApplication(getAdminSubject(), sourceRealm, applicationName);
+        Application application = appService(sourceRealm).getApplication(applicationName);
 
         if (application == null) {
             throw new UpgradeException(format("Expected application %s in realm %s", applicationName, sourceRealm));
@@ -247,7 +252,7 @@ public final class RemoveReferralsStep extends AbstractUpgradeStep {
             String clonedResourceTypeId = instateAssociatedResourceType(resourceTypeId, sourceRealm, destinationRealm);
             Application clonedApplication = cloneApplication(application, clonedResourceTypeId);
 
-            applicationService.saveApplication(getAdminSubject(), destinationRealm, clonedApplication);
+            appService(destinationRealm).saveApplication(clonedApplication);
 
             for (Privilege policy : policies) {
                 policy.setResourceTypeUuid(clonedResourceTypeId);

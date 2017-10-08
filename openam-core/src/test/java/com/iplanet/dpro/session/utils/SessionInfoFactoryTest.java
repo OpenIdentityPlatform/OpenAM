@@ -11,26 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.utils;
 
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.mockito.BDDMockito.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+
+import java.util.Hashtable;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.util.Hashtable;
 
 public class SessionInfoFactoryTest {
 
@@ -51,7 +53,7 @@ public class SessionInfoFactoryTest {
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
 
-        given(mockSession.getState()).willReturn(INVALID);
+        given(mockSession.getState()).willReturn(SessionState.INVALID);
         // When / Then
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
@@ -61,14 +63,13 @@ public class SessionInfoFactoryTest {
     }
 
     @Test
-    public void shouldFailForTimeoutSessions() {
+    public void shouldFailForTimedOutSessions() {
         // Given
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
-        given(mockSession.getState()).willReturn(VALID);
+        given(mockSession.getState()).willReturn(SessionState.INVALID);
+        given(mockSession.isTimedOut()).willReturn(true);
 
-        given(mockSession.getState()).willReturn(INVALID);
-        given(mockSession.getTimeLeftBeforePurge()).willReturn(1l);
         // When / Then
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
@@ -82,8 +83,7 @@ public class SessionInfoFactoryTest {
         // Given
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
-        given(mockSession.getState()).willReturn(VALID);
-        given(mockSession.getTimeLeftBeforePurge()).willReturn(0l);
+        given(mockSession.getState()).willReturn(SessionState.VALID);
 
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
         given(mockSession.toSessionInfo()).willReturn(mockSessionInfo);

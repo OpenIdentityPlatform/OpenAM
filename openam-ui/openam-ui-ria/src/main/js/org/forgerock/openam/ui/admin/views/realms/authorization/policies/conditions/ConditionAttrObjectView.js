@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrObjectView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
 
     // jquery dependencies
@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrObject.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "field-float-selectize data-obj");
 
             this.parentRender(function () {
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        initSelectize: function () {
+        initSelectize () {
             var view = this,
                 title = "",
                 itemData,
@@ -53,13 +53,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 options = {
                     persist: false,
                     delimiter: ";",
-                    onItemRemove: function (value) {
+                    onItemRemove (value) {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(":");
                         delete itemData[title][keyValPair[0]];
                     },
-                    onItemAdd: function (value) {
+                    onItemAdd (value) {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(":");
@@ -72,17 +72,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
                         itemData[title][propName] = _.union(_.compact(propVal.split(",")), itemData[title][propName]);
                     },
-                    create: function (input) {
+                    create (input) {
                         return {
                             value: input,
                             text: input
                         };
                     },
-                    onChange: function () {
+                    onChange () {
                         title = this.$input.parent().find("label").data().title;
                         itemData = view.data.itemData;
                     },
-                    createFilter: function (text) {
+                    createFilter (text) {
                         return (/^\w+:(?:\w+,?)+$/).test(text);
                     }
                 };

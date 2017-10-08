@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.service;
 
@@ -174,7 +174,7 @@ public class SiteAddViewBean
             }
         } else {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                "serverconfig.create.site.missing.atributes");
+                model.getLocalizedString("serverconfig.create.site.missing.attributes"));
             forwardTo();
         }
     }

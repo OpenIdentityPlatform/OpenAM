@@ -24,7 +24,7 @@
  *
  * $Id: DeleteApplicationPrivilege.java,v 1.1 2009/11/10 19:01:03 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -37,6 +37,8 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.util.List;
@@ -53,8 +55,9 @@ public class DeleteApplicationPrivilege extends ApplicationPrivilegeBase {
 
 
     @Inject
-    public DeleteApplicationPrivilege(ResourceTypeService resourceTypeService) {
-        super(resourceTypeService);
+    public DeleteApplicationPrivilege(ResourceTypeService resourceTypeService,
+            ApplicationServiceFactory applicationServiceFactory) {
+        super(resourceTypeService, applicationServiceFactory);
     }
 
     /**

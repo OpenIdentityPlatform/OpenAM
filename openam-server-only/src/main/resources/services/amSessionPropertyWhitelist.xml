@@ -34,6 +34,7 @@
                              type="list"
                              syntax="string"
                              i18nKey="a100"
+                             order="100"
                              resourceName="sessionPropertyWhitelist">
             </AttributeSchema>
 

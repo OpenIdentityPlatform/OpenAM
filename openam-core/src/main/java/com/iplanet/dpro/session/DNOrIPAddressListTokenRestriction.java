@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,24 +24,13 @@
  *
  * $Id: DNOrIPAddressListTokenRestriction.java,v 1.7 2009/10/29 17:33:29 ericow Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS
  */
 package com.iplanet.dpro.session;
 
-import com.iplanet.am.util.Misc;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,6 +38,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iplanet.am.util.Misc;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * <code>DNOrIPAddressListTokenRestriction</code> implements
@@ -80,7 +78,8 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     private static final String SESSION_DNRESTRICTIONONLY_ATTR_NAME =
         "iplanet-am-session-dnrestrictiononly";
 
-    private static final String AM_SESSION_SERVICE = "iPlanetAMSessionService";
+    @JsonIgnore
+    private transient ServiceSchemaManager serviceSchemaManager;
 
     /**
      * Default constructor for InternalSession deserialization.
@@ -88,15 +87,19 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     public DNOrIPAddressListTokenRestriction() {
     }
 
-   /**
+    /**
     * Constructs <code>DNOrIPAddressListTokenRestriction</code> object based on
     * the <code>DN</code> and list of host names to be restricted.
     * @param dn the <code>DN</code> of the user
     * @param hostNames list of host names.
-    * @exception Exception if finding IP Address of host to be restricted or
-    *            if something goes wrong.
+    * @param serviceSchemaManager the service's schema manager.
+    * @exception UnknownHostException if the host cannot be resolved.
     */
-    public DNOrIPAddressListTokenRestriction(String dn, List<String> hostNames) throws Exception {
+    public DNOrIPAddressListTokenRestriction(
+            String dn,
+            Set<String> hostNames,
+            ServiceSchemaManager serviceSchemaManager) throws UnknownHostException {
+        this.serviceSchemaManager = serviceSchemaManager;
         StringBuilder buf = null;
         if (dn.indexOf('|') > 0) {
             StringTokenizer st = new StringTokenizer(dn, "|");
@@ -131,8 +134,9 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
             }
         }
         buf.append('\n');
-        Collections.sort(hostNames);
-        for (String hostName : hostNames) {
+        List<String> hostNamesList = new ArrayList<>(hostNames);
+        Collections.sort(hostNamesList);
+        for (String hostName : hostNamesList) {
             buf.append(hostName).append('\n');
         }
         asString = buf.toString();
@@ -246,19 +250,6 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
                 && other.toString().equals(this.toString());
     }
 
-   /**
-    * Gets the admin token for checking the dn restriciton property
-    * @return admin the admin {@link SSOToken}
-    */
-    private static SSOToken getAdminToken() {
-        try {
-            return AccessController.doPrivileged(AdminTokenAction.getInstance());
-        } catch (Exception e) {
-            DEBUG.error("Failed to get the admin token for dnRestrictionOnly property checking.", e);
-        }
-        return null;
-    }
-
     /**
      * Gets the  value of the "iplanet-am-session-dnrestrictiononly" session global attribute.
      * NOTE: It may be possible that this setting gets initialized more than once, but that should be fine as it
@@ -266,11 +257,10 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
      *
      * @return Whether the DN restriction only is enabled.
      */
-    private static boolean isDNRestrictionOnly() {
+    private boolean isDNRestrictionOnly() {
         if (!isInitialized) {
             try {
-                ServiceSchemaManager ssm = new ServiceSchemaManager(AM_SESSION_SERVICE, getAdminToken());
-                ServiceSchema schema = ssm.getGlobalSchema();
+                ServiceSchema schema = serviceSchemaManager.getGlobalSchema();
                 Map attrs = schema.getAttributeDefaults();
                 dnRestrictionOnly = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs,
                         SESSION_DNRESTRICTIONONLY_ATTR_NAME, "false"));

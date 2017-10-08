@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api;
 
 /**
  * Responsible for collecting together all constants used in the Core Token Service.
  */
-public class CoreTokenConstants {
+public final class CoreTokenConstants {
 
     /**
      * Debugging header, for all debug messages.
@@ -58,28 +58,13 @@ public class CoreTokenConstants {
     /**
      * Globals public Constants, so not to pollute entire product.
      */
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX =
-            "iplanet-am-session-sfo-store-root-suffix";
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
-            "iplanet-am-session-sfo-store-type";
     public static final String SYS_PROPERTY_EXPIRED_SEARCH_LIMIT =
             "forgerock-openam-session-expired-search-limit";
     public static final String DEBUG_NAME = "amSessionRepository";
 
-    public static final String IS_SFO_ENABLED =
-            "iplanet-am-session-sfo-enabled";
-    /**
-     * System property for checking whether session crosstalk is reduced. See
-     * {@link com.iplanet.dpro.session.service.SessionService#isReducedCrossTalkEnabled()}.
-     */
-    public static final String IS_REDUCED_CROSSTALK_ENABLED = "iplanet-am-session-reduced-crosstalk-enabled";
     public static final String OBJECT_CLASS = "objectClass";
 
     public static final String FR_CORE_TOKEN = "frCoreToken";
-    /**
-     * The name of the Scheduled Service used by the CTS Reaper.
-     */
-    public static final String CTS_SCHEDULED_SERVICE = "CTSScheduledService";
     /**
      * The name of the general purpose worker pool for the CTS.
      */
@@ -127,6 +112,11 @@ public class CoreTokenConstants {
     public static final String CTS_STORE_MAX_CONNECTIONS_DEFAULT = "10";
 
     /**
+     * Enable/disable the OpenDJ SDK's affinity based load balancing feature.
+     */
+    public static final String CTS_STORE_AFFINITY_ENABLED = "org.forgerock.services.cts.store.affinity.enabled";
+
+    /**
      * The maximum duration in seconds to wait whilst placing tasks on the asynchronous work queue.
      */
     public static final String CTS_ASYNC_QUEUE_TIMEOUT = "org.forgerock.services.cts.async.queue.timeout";
@@ -137,17 +127,11 @@ public class CoreTokenConstants {
     public static final String CTS_ASYNC_QUEUE_SIZE = "org.forgerock.services.cts.async.queue.size";
 
     /**
-     * Where to broadcast session logout/destroy to.
-     */
-    public static final String LOGOUT_DESTROY_BROADCAST = "iplanet-am-session-logout-destroy-broadcast";
-
-    /**
-     * The number of minutes to retain Sessions in DESTROYED state while waiting for delete replication to occur.
-     */
-    public static final String REDUCED_CROSSTALK_PURGE_DELAY = "iplanet-am-session-reduced-crosstalk-purge-delay";
-
-    /**
      * Binding constant for the CTS Jackson Object Mapper.
      */
     public static final String OBJECT_MAPPER = "cts-json-object-mapper";
+
+    private CoreTokenConstants() {
+        // intentionally non-instantiable
+    }
 }

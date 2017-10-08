@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ListApplications.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -33,12 +35,26 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+
 public class ListApplications extends ApplicationImpl {
+
+    /**
+     * Create a new instance.
+     *
+     * @param applicationServiceFactory The {@link ApplicationServiceFactory}.
+     */
+    @Inject
+    public ListApplications(ApplicationServiceFactory applicationServiceFactory) {
+        super(applicationServiceFactory);
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -55,8 +71,7 @@ public class ListApplications extends ApplicationImpl {
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_LIST_APPLICATIONS", params);
         try {
-            Set<String> names = ApplicationManager.getApplicationNames(
-                getAdminSubject(), realm);
+            Set<String> names = applicationServiceFactory.create(getAdminSubject(), realm).getApplicationNames();
             IOutput writer = getOutputWriter();
 
             if ((names == null) || names.isEmpty()) {

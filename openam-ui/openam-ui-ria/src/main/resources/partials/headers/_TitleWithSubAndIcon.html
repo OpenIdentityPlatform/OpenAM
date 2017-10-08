@@ -1,23 +1,23 @@
 <header class="page-header page-header-no-border clearfix">
+
     {{#if icon}}
-        <span class="header-icon pull-left bg-primary"><i class="fa fa-{{icon}}"></i></span>
+    <span class="header-icon pull-left bg-primary"><i class="fa fa-{{icon}}"></i></span>
     {{/if}}
+
+
+    <div class="deep-page-header-button-group button-group pull-right">
+        <div data-tab-search />
+        {{#each headerActions}}
+            {{partial actionPartial this}}
+        {{/each}}
+    </div>
 
     <div class="pull-left">
         <h4 class="page-type">{{t type}}</h4>
         {{#if detail}}
-            <span class="page-header-detail {{detail.class}}">{{#if detail.icon}}<i class="fa {{detail.icon}}"></i> {{/if}} {{t detail.text}}</span>
+            <span class="page-header-detail {{detail.class}}">{{#if detail.icon}}<i class="fa {{detail.icon}}"></i> {{/if}} {{t detail.text safeString=false}}</span>
         {{/if}}
-        <h1>{{t title}}</h1>
+        <h1 class="wordwrap">{{t title safeString=false}}</h1>
     </div>
 
-    {{#if helpLink}}
-        {{> util/_HelpLink className="deep-page-header-button-group"}}
-    {{/if}}
-
-    {{#if buttons}}
-        <div class="deep-page-header-button-group button-group pull-right">
-            {{partial this.buttons this}}
-        </div>
-    {{/if}}
 </header>

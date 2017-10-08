@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -40,17 +44,24 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.entitlement.rest.wrappers.ApplicationTypeManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.AdminSubjectContext;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.uma.UmaUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.services.context.Context;
@@ -67,6 +78,7 @@ import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtClaimSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdEventListener;
@@ -90,16 +102,21 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final Debug logger = Debug.getInstance("UmaProvider");
 
     private final AMIdentityRepositoryFactory idRepoFactory;
-    private final ApplicationManagerWrapper applicationManager;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final RequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
     private final SessionCache sessionCache;
 
+
+    private static final int NO_ACTION =  1;
+    private static final int CREATE_UMA_APPLICATION = 2;
+    private static final int REMOVE_UMA_APPLICATION = 3;
+
     /**
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
      * @param idRepoFactory An instance of the {@code AMIdentityRepositoryFactory}.
-     * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
+     * @param applicationServiceFactory An instance of the {@code ApplicationServiceFactory}.
      * @param applicationTypeManagerWrapper An instance of the {@code ApplicationTypeManagerWrapper}.
      * @param policyResource An instance of the policy backend {@code PromisedRequestHandler}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
@@ -107,12 +124,12 @@ public class UmaPolicyApplicationListener implements IdEventListener {
      */
     @Inject
     public UmaPolicyApplicationListener(final AMIdentityRepositoryFactory idRepoFactory,
-            ApplicationManagerWrapper applicationManager,
+            ApplicationServiceFactory applicationServiceFactory,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) RequestHandler policyResource,
             ResourceSetStoreFactory resourceSetStoreFactory, SessionCache sessionCache) {
         this.idRepoFactory = idRepoFactory;
-        this.applicationManager = applicationManager;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
@@ -134,12 +151,21 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                 return;
             }
 
-            if (isResourceServer(identity)) {
-                createApplication(identity.getRealm(), identity.getName());
-            } else {
-                removeApplication(identity.getRealm(), identity.getName());
-            }
+            switch (getIdentityAction(identity)) {
 
+            case NO_ACTION:
+                logger.message("Identity is not an OAuth agent no action needed");
+                break;
+            case CREATE_UMA_APPLICATION:
+                createApplication(identity.getRealm(), identity.getName());
+                break;
+            case REMOVE_UMA_APPLICATION:
+                removeApplication(identity.getRealm(), identity.getName());
+                break;
+
+            default:
+                logger.error("Failed to handle identity action");
+            }
         } catch (IdRepoException e) {
             logger.error("Failed to get identity", e);
         } catch (SSOException e) {
@@ -203,7 +229,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     @SuppressWarnings("unchecked")
     private Map<String, Set<String>> getIdentityAttributes(AMIdentity identity) throws IdRepoException, SSOException {
         IdSearchControl searchControl = new IdSearchControl();
-        searchControl.setAllReturnAttributes(true);
+        searchControl.setReturnAttributes(CollectionUtils.asSet(IdConstants.AGENT_TYPE, OAuth2Constants.OAuth2Client.SCOPES));
         searchControl.setMaxResults(0);
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         IdSearchResults searchResults = idRepoFactory.create(identity.getRealm(), adminToken)
@@ -214,34 +240,18 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         return new HashMap<String, Set<String>>((Map) searchResults.getResultAttributes().values().iterator().next());
     }
 
-    private Set<String> getScopes(Map<String, Set<String>> identity) {
-        return identity.get("com.forgerock.openam.oauth2provider.scopes");
-    }
-
-    private boolean isResourceServer(AMIdentity identity) throws IdRepoException, SSOException {
-
-        Set<String> scopes = getScopes(getIdentityAttributes(identity));
-        if (scopes != null) {
-            for (String scope : scopes) {
-                String[] scopeParts = scope.split("\\|");
-                if (scopeParts[0].contains("uma_protection")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private void createApplication(String realm, String resourceServerId) {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm, resourceServerId);
+            ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+            Application application = appService.getApplication(resourceServerId);
             if (application == null) {
                 ApplicationType applicationType = applicationTypeManagerWrapper.getApplicationType(adminSubject,
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
-                applicationManager.saveApplication(adminSubject, realm, application);
+                application.setSubjects(asSet(EntitlementRegistry.getSubjectTypeName(JwtClaimSubject.class)));
+                appService.saveApplication(application);
             }
         } catch (EntitlementException e) {
             logger.error("Failed to create policy application", e);
@@ -251,13 +261,17 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void removeApplication(String realm, String resourceServerId) throws NotFoundException, ServerException {
         OpenAMSettingsImpl umaSettings = new OpenAMSettingsImpl(UmaConstants.SERVICE_NAME, UmaConstants.SERVICE_VERSION);
         if (onDeleteResourceServerDeletePolicies(umaSettings, realm)) {
-            deletePolicies(realm, resourceServerId);
             try {
+                deletePolicies(realm, resourceServerId);
                 Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-                if (applicationManager.getApplication(adminSubject, realm, resourceServerId) != null) {
-                    applicationManager.deleteApplication(adminSubject, realm, resourceServerId);
+                ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+                if (appService.getApplication(resourceServerId) != null) {
+                    appService.deleteApplication(resourceServerId);
                 }
             } catch (EntitlementException e) {
+                logger.error("Failed to remove policy application", e);
+            } catch (RealmLookupException e) {
+                //Should never happen as realm would have already been validated
                 logger.error("Failed to remove policy application", e);
             }
         }
@@ -290,9 +304,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         }
     }
 
-    private void deletePolicies(String realm, String resourceServerId) {
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.setDnsAlias("/", realm);
+    private void deletePolicies(String realm, String resourceServerId) throws RealmLookupException {
+        RealmContext realmContext = new RealmContext(new RootContext(), Realm.of(realm));
         final Context context = new AdminSubjectContext(logger, sessionCache, realmContext);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));
@@ -333,4 +346,17 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             resourceSetStore.delete(resourceSet.getId(), resourceSet.getResourceOwnerId());
         }
     }
+
+    private int getIdentityAction(AMIdentity identity) throws IdRepoException, SSOException {
+        Map<String, Set<String>> attrValues = getIdentityAttributes(identity);
+        String agentType =  CollectionHelper.getMapAttr(attrValues, IdConstants.AGENT_TYPE, "NO_TYPE");
+        if (!AgentConfiguration.AGENT_TYPE_OAUTH2.equalsIgnoreCase(agentType)) {
+            return NO_ACTION;
+        } else if (UmaUtils.isUmaResourceServerAgent(attrValues)) {
+            return CREATE_UMA_APPLICATION;
+        } else {
+            return REMOVE_UMA_APPLICATION;
+        }
+    }
+
 }

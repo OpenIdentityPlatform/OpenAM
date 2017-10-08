@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,28 +24,10 @@
  *
  * $Id: AMAuthenticationManager.java,v 1.9 2009/08/05 19:57:27 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.config;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SMSException;
 
 import java.security.AccessController;
 import java.util.Collections;
@@ -58,6 +40,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 
 /**
  * This class provides interfaces to manage authentication module instances. 
@@ -567,20 +567,7 @@ public class AMAuthenticationManager {
      * @return a Set of String values for module instance names.
      */
     public Set<String> getAllowedModuleNames() {
-        Set<String> retVal;
-        if (AuthUtils.getAuthRevisionNumber() >= ISAuthConstants.AUTHSERVICE_REVISION7_0) {
-            retVal = getRegisteredModuleNames();
-        } else {
-            Map<String, Set<String>> attrMap = orgServiceConfig.getAttributes();
-            Set<String> defaultModuleNames = attrMap.get(ISAuthConstants.AUTH_ALLOWED_MODULES);
-            Set<String> returnSet = Collections.EMPTY_SET;
-            if (defaultModuleNames != null && !GLOBAL_MODULE_NAMES.isEmpty()) {
-                   returnSet = new HashSet<String>();
-                returnSet.addAll(GLOBAL_MODULE_NAMES);
-                returnSet.addAll(defaultModuleNames);
-            }
-            retVal = returnSet;
-        }
+        Set<String> retVal = getRegisteredModuleNames();
         if (retVal != null) {
             retVal.remove(ISAuthConstants.APPLICATION_MODULE);
         }

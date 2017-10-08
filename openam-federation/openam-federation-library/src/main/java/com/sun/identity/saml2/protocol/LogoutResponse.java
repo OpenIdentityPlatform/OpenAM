@@ -24,10 +24,14 @@
  *
  * $Id: LogoutResponse.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.sun.identity.saml2.protocol.impl.LogoutResponseImpl;
 
 /**
  * This class represents the <code>LogoutResponse</code> element in
@@ -43,6 +47,9 @@ package com.sun.identity.saml2.protocol;
  *
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = LogoutResponseImpl.class)
 public interface LogoutResponse
 extends com.sun.identity.saml2.protocol.StatusResponse {   
                                                                           

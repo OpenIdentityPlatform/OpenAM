@@ -28,6 +28,8 @@
  */
 package com.sun.identity.sm;
 
+import static java.util.Arrays.asList;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.Constants;
@@ -269,8 +271,12 @@ public class ServiceSchema {
      * Returns the name for the service schema when used in a CREST representation.
      */
     public String getResourceName() {
-        String resourceName = ss.getResourceName();
-        return resourceName == null ? getName() : resourceName;
+        for (String name : asList(ss.getResourceName(), getName())) {
+            if (name != null) {
+                return name;
+            }
+        }
+        return getServiceName();
     }
 
     /**
@@ -354,7 +360,7 @@ public class ServiceSchema {
      * 
      * @return attribute schemas defined for the service
      */
-    public Set getAttributeSchemas() {
+    public Set<AttributeSchema> getAttributeSchemas() {
         Set answer = new HashSet();
         for (Iterator items = getAttributeSchemaNames().iterator(); items
                 .hasNext();) {
@@ -534,8 +540,19 @@ public class ServiceSchema {
      * @return Map of Attribute Names and Sets of their default values as
      *         defined in the Schema
      */
-    public Map getAttributeDefaults() {
+    public Map<String, Set<String>> getAttributeDefaults() {
         return (ss.getAttributeDefaults());
+    }
+
+    /**
+     * Returns a map of all the attribute and their example values in this
+     * schema.
+     *
+     * @return Map of Attribute Names and Sets of their example values as
+     *         defined in the Schema
+     */
+    public Map<String, Set<String>> getAttributeExamples() {
+        return (ss.getAttributeExamples());
     }
 
     /**
@@ -640,8 +657,8 @@ public class ServiceSchema {
      * 
      * @return the names of service's sub-schemas
      */
-    public Set getSubSchemaNames() {
-        return (ss.getSubSchemaNames());
+    public Set<String> getSubSchemaNames() {
+        return ss.getSubSchemaNames();
     }
 
     /**

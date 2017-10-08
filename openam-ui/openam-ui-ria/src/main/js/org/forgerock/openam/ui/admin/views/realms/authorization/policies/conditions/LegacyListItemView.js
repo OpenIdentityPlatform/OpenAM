@@ -11,20 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/LegacyListItemView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {
     return AbstractView.extend({
         data: {},
         mode: "append",
-        render: function (itemData, callback, element, itemID) {
+        render (itemData, callback, element, itemID) {
             this.setElement(element);
             this.data.itemID = itemID;
             this.data.itemData = itemData;
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 "templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
                 this.data,
                 function () {
-                    self.setElement("#legacy_" + itemID);
+                    self.setElement(`#legacy_${itemID}`);
                     self.delegateEvents();
 
                     self.$el.data("itemData", itemData);

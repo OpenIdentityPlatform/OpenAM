@@ -24,7 +24,7 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -63,10 +63,7 @@ public class SessionServerConfig {
     /*
      * Local server details are those of the server on which the code is executing.
      */
-    private final String localServerID;
-    private final String localServerProtocol;
-    private final String localServerHost;
-    private final int localServerPort;
+    private String localServerID;
     private final String localServerDeploymentPath;
     private final URL localServerURL;
     private final URL localServerSessionServiceURL;
@@ -84,20 +81,11 @@ public class SessionServerConfig {
         this.sessionDebug = sessionDebug;
         try {
 
-            localServerProtocol = requiredSystemProperty(AM_SERVER_PROTOCOL);
-            localServerHost = requiredSystemProperty(AM_SERVER_HOST);
-            final String localServerPortAsString = requiredSystemProperty(AM_SERVER_PORT);
-            localServerPort = Integer.parseInt(localServerPortAsString);
             localServerDeploymentPath = requiredSystemProperty(AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-            // TODO: Establish whether or not the previous fields can be dropped in favour of WebtopNaming.getLocalServer()
+            localServerID = refreshLocalServerID();
+            localServerURL = new URL(WebtopNaming.getLocalServer());
+            localServerSessionServiceURL = sessionServiceURLService.getSessionServiceURL(localServerID);
 
-            localServerURL = new URL(localServerProtocol, localServerHost, localServerPort, localServerDeploymentPath);
-
-            localServerSessionServiceURL = sessionServiceURLService.getSessionServiceURL(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
-
-            localServerID = WebtopNaming.getServerID(
-                    localServerProtocol, localServerHost, localServerPortAsString, localServerDeploymentPath);
 
         } catch (Exception ex) {
             sessionDebug.error("Failed to load Session Server configuration", ex);
@@ -131,11 +119,21 @@ public class SessionServerConfig {
     }
 
     /**
-     * Gets ID for this OpenAM server.
+     * Gets ID for this OpenAM server from cache.
      */
     public String getLocalServerID() {
-        return localServerID;
+        return getLocalServerID(false);
     }
+
+    /**
+     * Gets ID for this OpenAM server from cache or refreshed depends on the parameter
+     * @param forceReload - if true reloads the localServerID and does not use the cashed value.
+     */
+    public String getLocalServerID(boolean forceReload) {
+        return (forceReload)? refreshLocalServerID() : localServerID ;
+    }
+
+    
 
     /**
      * Gets the full URL for this OpenAM server.
@@ -160,7 +158,7 @@ public class SessionServerConfig {
      */
     public boolean isSiteEnabled() {
         try {
-            return WebtopNaming.isSiteEnabled(getLocalServerID());
+            return WebtopNaming.isSiteEnabled(getLocalServerID(true));
         } catch (Exception e) {
             sessionDebug.error("Failed to check if local server {0} is part of site", getLocalServerID(), e);
             throw new IllegalStateException(e);
@@ -235,13 +233,19 @@ public class SessionServerConfig {
      * AM-instance host of the session). WebtopNaming will then be called to turn this serverId (01,02, etc) into a
      * URL which will point a PLL client GetSession request. Calling this method is part of insuring that the PLL GetSession
      * request does not get routed to a site (load-balancer).
+     *
+     * This method checks whether the provided ID (let it be server or site ID)
+     * belongs to a local site. If the current server is not member of a site,
+     * then the ID will be compared to the current server's ID.
      * @param siteID the server id (PRIMARY_ID) pulled from a presented cookie.
-     * @return true if the specified serverId is actually a site identifier for the current deployment
+     * @return <code>true</code> if the provided ID corresponds to a local server or site.
      */
     public boolean isLocalSite(String siteID) {
-        // TODO: Investigate this method further and rename / better document its behaviour
-        // How does this method compare to WebtopNaming.isSite? Is this method redundant?
-        return getSiteID().equals(siteID) || getSecondarySiteIDs().contains(siteID);
+        String localID = getSiteID();
+        if (localID == null) {
+           localID = getLocalServerID();
+        }
+        return localID.equals(siteID) || getSecondarySiteIDs().contains(siteID);
     }
 
     /**
@@ -273,7 +277,7 @@ public class SessionServerConfig {
      * https://openam.example.com:8080/openam/GetHttpSession?op=create
      */
     public URL createLocalServerURL(String path) throws MalformedURLException {
-        return new URL(localServerProtocol, localServerHost, localServerPort, localServerDeploymentPath + "/" + path);
+        return new URL(WebtopNaming.getLocalServer() + "/" + path);
     }
 
     /**
@@ -295,7 +299,11 @@ public class SessionServerConfig {
      * of one or more sites, the returned set will only include this server's ID.
      */
     public Set<String> getServerIDsInLocalSite() throws Exception {
-        Set<String> serverIDs = WebtopNaming.getSiteNodes(getSiteID());
+        String siteid = getSiteID();
+        if (siteid == null) {
+           return Collections.singleton(localServerID);
+        }
+        Set<String> serverIDs = WebtopNaming.getSiteNodes(siteid);
         if ((serverIDs == null) || (serverIDs.isEmpty())) {
             serverIDs = new HashSet<String>();
             serverIDs.add(localServerID);
@@ -392,6 +400,15 @@ public class SessionServerConfig {
         }
 
         return Collections.unmodifiableSet(results);
+    }
+
+    private String refreshLocalServerID() {
+        try {
+            localServerID = WebtopNaming.getAMServerID();
+        } catch (ServerEntryNotFoundException e) {
+            throw new IllegalStateException("Failed to load Session Server configuration", e);
+        }
+        return localServerID;
     }
 
 }

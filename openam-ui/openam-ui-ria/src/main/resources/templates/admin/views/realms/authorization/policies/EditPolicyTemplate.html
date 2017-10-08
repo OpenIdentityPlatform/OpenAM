@@ -1,7 +1,4 @@
-{{> breadcrumb/_Breadcrumb backLink=backLink}}
-{{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.policy" icon="gavel"
-    detail=status buttons="templates/admin/views/realms/partials/_HeaderDeleteButton"
-    helpLink="backstage.authz.policies" }}
+{{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.policy" icon="gavel" detail=status }}
 
 <p class="panel-description">{{entity.description}}</p>
 
@@ -84,10 +81,14 @@
         </div>
 
         <div role="tabpanel" class="tab-pane" id="responseAttributesTab">
-            <div class="row clearfix">
-                <div class="col-sm-6" id="userAttrs"></div>
-                <div class="col-sm-6" id="staticAttrs"></div>
+            <div id="userAttrs" class="block"></div>
+
+            <div class="block">
+                <h3 class="block-header">{{t "console.authorization.common.staticAttributes"}}</h3>
+                <div data-static-attributes></div>
             </div>
+
+            <div id="customAttrs" class="block"></div>
         </div>
 
         <div role="tabpanel" class="tab-pane" id="settingsTab">
@@ -125,7 +126,7 @@
     </div>
 
     <div class="panel-footer clearfix">
-        <input type="button" name="submitForm" value="{{t 'common.form.saveChanges'}}" class="btn btn-primary pull-right">
+        <input data-save type="button" name="submitForm" value="{{t 'common.form.saveChanges'}}" class="btn btn-primary pull-right">
     </div>
 
 </div>

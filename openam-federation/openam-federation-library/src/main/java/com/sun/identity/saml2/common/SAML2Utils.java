@@ -22,10 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.saml2.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.SystemConfigurationException;
@@ -393,26 +395,16 @@ public class SAML2Utils extends SAML2SDKUtils {
                     LogUtil.WRONG_STATUS_CODE,
                     data,
                     null);
-            if (SAML2Constants.RESPONDER.equals(statusCode)) {
-                //In case of passive authentication the NoPassive response will be sent using two StatusCode nodes:
-                //the outer StatusCode will be Responder and the inner StatusCode will contain the NoPassive URN
-                StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
-                if (secondLevelStatusCode != null
-                        && SAML2Constants.NOPASSIVE.equals(secondLevelStatusCode.getValue())) {
-                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "noPassiveResponse", null);
-                }
-            } else if (SAML2Constants.REQUESTER.equals(statusCode)) {
-                // when is AllowCreate=false mode the auth module gets here with a
-                // statusCode of urn:oasis:names:tc:SAML:2.0:status:Requester
-
-                StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
-                if (secondLevelStatusCode != null
-                        && SAML2Constants.INVALID_NAME_ID_POLICY.equals(secondLevelStatusCode.getValue())) {
-                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "nameIDMReqInvalidNameIDPolicy", null);
+            StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
+            String secondLevelStatusCodeValue = (secondLevelStatusCode != null) ? secondLevelStatusCode.getValue() :
+                    null;
+            if (debug.messageEnabled()) {
+                debug.message(method + "First level status code : " + statusCode);
+                if (secondLevelStatusCodeValue != null) {
+                    debug.message(method + "Second level status code : " + secondLevelStatusCodeValue);
                 }
             }
-
-            throw new SAML2Exception(bundle.getString("invalidStatusCodeInResponse"));
+            throw new InvalidStatusCodeSaml2Exception(statusCode, secondLevelStatusCodeValue);
         }
 
         if (saml2MetaManager == null) {
@@ -605,6 +597,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 checkAudience(assertion.getConditions(),
                         hostEntityId,
                         assertionID);
+                checkConditions(assertion.getConditions(), hostEntityId, assertionID);
                 if (smap == null) {
                     smap = fillMap(authnStmts,
                             subject,
@@ -695,40 +688,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                         "missingSubjectConfirmationData"));
             }
 
-            String recipient = subjectConfData.getRecipient();
-            if (recipient == null || recipient.length() == 0) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "missing Recipient in Assertion.");
-                }
-                String[] data = {assertionID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.MISSING_RECIPIENT,
-                        data,
-                        null);
-                throw new SAML2Exception(bundle.getString("missingRecipient"));
-            }
-            boolean foundMatch = false;
-            Iterator acsIter = spDesc.getAssertionConsumerService().iterator();
-            while (acsIter.hasNext()) {
-                AssertionConsumerServiceElement acs =
-                        (AssertionConsumerServiceElement) acsIter.next();
-                if (recipient.equals(acs.getLocation())) {
-                    foundMatch = true;
-                    break;
-                }
-            }
-            if (!foundMatch) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "this sp is not the intended "
-                            + "recipient.");
-                }
-                String[] data = {assertionID, recipient};
-                LogUtil.error(Level.INFO,
-                        LogUtil.WRONG_RECIPIENT,
-                        data,
-                        null);
-                throw new SAML2Exception(bundle.getString("wrongRecipient"));
-            }
+            validateRecipient(spDesc, assertionID, subjectConfData);
 
             // in seconds
             int timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
@@ -748,7 +708,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             Date notOnOrAfter = subjectConfData.getNotOnOrAfter();
             if (notOnOrAfter == null ||
                     ((notOnOrAfter.getTime() + timeskew * 1000) <
-                            System.currentTimeMillis())) {
+                            currentTimeMillis())) {
                 if (debug.messageEnabled()) {
                     debug.message(method + "Time in SubjectConfirmationData of "
                             + "Assertion:" + assertionID + " is invalid.");
@@ -766,7 +726,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             Date notBefore = subjectConfData.getNotBefore();
             if (notBefore != null) {
                 if ((notBefore.getTime() + timeskew * 1000) >
-                        System.currentTimeMillis()) {
+                        currentTimeMillis()) {
                     if (debug.messageEnabled()) {
                         debug.message(method + "SubjectConfirmationData included "
                                 + "NotBefore.");
@@ -815,6 +775,47 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
         retMap.put(SAML2Constants.IS_BEARER, Boolean.valueOf(hasBearer));
         return retMap;
+    }
+
+    /**
+     * Validates the Recipient value stored within the SubjectConfirmationData element based on the following rules:
+     * <ul>
+     *  <li>The value MUST not be null.</li>
+     *  <li>The value must correspond to one of the hosted SP's ACS endpoints.</li>
+     * </ul>
+     *
+     * @param spDesc The standard SAML metadata of the hosted SP.
+     * @param assertionID The ID of the assertion to be used when creating audit log entries.
+     * @param subjectConfData The {@link SubjectConfirmationData} element to validate.
+     * @throws SAML2Exception If there was a validation error.
+     */
+    public static void validateRecipient(SPSSODescriptorElement spDesc, String assertionID,
+            SubjectConfirmationData subjectConfData) throws SAML2Exception {
+        String recipient = subjectConfData.getRecipient();
+        if (StringUtils.isEmpty(recipient)) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.validateRecipient(): missing Recipient in Assertion.");
+            }
+            String[] data = {assertionID};
+            LogUtil.error(Level.INFO, LogUtil.MISSING_RECIPIENT, data, null);
+            throw new SAML2Exception(bundle.getString("missingRecipient"));
+        }
+        boolean foundMatch = false;
+        for (Object o : spDesc.getAssertionConsumerService()) {
+            AssertionConsumerServiceElement acs = (AssertionConsumerServiceElement) o;
+            if (recipient.equals(acs.getLocation())) {
+                foundMatch = true;
+                break;
+            }
+        }
+        if (!foundMatch) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.validateRecipient(): this sp is not the intended recipient.");
+            }
+            String[] data = {assertionID, recipient};
+            LogUtil.error(Level.INFO, LogUtil.WRONG_RECIPIENT, data, null);
+            throw new SAML2Exception(bundle.getString("wrongRecipient"));
+        }
     }
 
     private static void checkAudience(final Conditions conds,
@@ -867,6 +868,41 @@ public class SAML2Utils extends SAML2SDKUtils {
                     null);
 
             throw new SAML2Exception(bundle.getString("audienceNotMatch"));
+        }
+    }
+
+    private static void checkConditions(Conditions conditions, String hostEntityId, String assertionID) throws SAML2Exception {
+        String method = "SAML2Utils.checkConditions: ";
+        if (conditions == null) {
+            debug.message("{}Conditions is missing from Assertion", method);
+            String[] data = {assertionID};
+            LogUtil.error(Level.INFO, LogUtil.MISSING_CONDITIONS, data, null);
+            throw new SAML2Exception(bundle.getString("missingConditions"));
+        }
+
+        Date notOnOrAfter = conditions.getNotOnOrAfter();
+        if (debug.messageEnabled()) {
+            if (notOnOrAfter == null) {
+                debug.message("{}No NotOnOrAfter Condition.", method);
+            } else {
+                debug.message("{}NotOnOrAfter Condition = {}", method, notOnOrAfter);
+            }
+        }
+
+        Date notBefore = conditions.getNotBefore();
+        if (debug.messageEnabled()) {
+            if (notBefore == null) {
+                debug.message("{}No NotBefore Condition.", method);
+            } else {
+                debug.message("{}NotBefore Condition = {}", method, notBefore);
+            }
+        }
+        
+        if (!conditions.checkDateValidity(currentTimeMillis())) {
+            debug.message("{}The assertion does not meet NotOnOrAfter or NotBefore condition.", method);
+            String[] data = {assertionID};
+            LogUtil.error(Level.INFO, LogUtil.DATE_CONDITION_NOT_MET, data, null);
+            throw new SAML2Exception(bundle.getString("checkDateValidityNotMatch"));
         }
     }
 
@@ -927,7 +963,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         // SessionNotOnOrAfter
         if (sessionNotOnOrAfter != null) {
             long maxSessionTime = (sessionNotOnOrAfter.getTime() -
-                    System.currentTimeMillis()) / 60000;
+                    currentTimeMillis()) / 60000;
             if (maxSessionTime > 0) {
                 smap.put(SAML2Constants.MAX_SESSION_TIME,
                         new Long(maxSessionTime));
@@ -1346,28 +1382,17 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Returns the realm.
-     *
-     * @param paramsMap a map of parameters
-     * @return realm if the input map contains the realm, otherwise
-     * return the default realm from AMConfig.properties
-     */
-    public static String getRealm(final Map paramsMap) {
-        return getRealm(getParameter(paramsMap, SAML2Constants.REALM));
-    }
-
-    /**
      * Returns the query parameter value for the param specified from the given Map.
      *
      * @param paramsMap     a map of parameters
      * @param attributeName name of the parameter
      * @return the value of this parameter or null if the parameter was not found in the params map
      */
-    public static String getParameter(final Map paramsMap, final String attributeName) {
+    public static String getParameter(final Map<String, String> paramsMap, final String attributeName) {
         if (null == paramsMap || paramsMap.isEmpty()) {
             return null;
         }
-        return (String) paramsMap.get(attributeName);
+        return paramsMap.get(attributeName);
     }
 
     /**
@@ -1776,7 +1801,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             errResp.setInResponseTo(request.getID());
         }
         errResp.setVersion(SAML2Constants.VERSION_2_0);
-        errResp.setIssueInstant(new Date());
+        errResp.setIssueInstant(newDate());
 
         // set the idp entity id as the response issuer
         if (issuerEntityID != null) {

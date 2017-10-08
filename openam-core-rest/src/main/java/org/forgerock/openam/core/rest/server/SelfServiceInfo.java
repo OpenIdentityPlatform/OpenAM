@@ -16,14 +16,14 @@
 
 package org.forgerock.openam.core.rest.server;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.forgerock.openam.sm.config.ConfigAttribute;
 import org.forgerock.openam.sm.config.ConfigSource;
 import org.forgerock.openam.sm.config.ConsoleConfigBuilder;
 import org.forgerock.util.Reject;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Self service information.
@@ -37,6 +37,7 @@ final class SelfServiceInfo {
     private final boolean forgottenPasswordEnabled;
     private final boolean kbaEnabled;
     private final Set<String> protectedUserAttributes;
+    private final String userRegistrationDestination;
 
     private SelfServiceInfo(SelfServiceInfoBuilder builder) {
         userRegistrationEnabled = builder.userRegistrationEnabled;
@@ -46,6 +47,7 @@ final class SelfServiceInfo {
                 builder.forgottenUsernameKbaEnabled ||
                 builder.forgottenPasswordKbaEnabled;
         protectedUserAttributes = builder.protectedUserAttributes;
+        userRegistrationDestination = builder.userRegistrationDestination;
     }
 
     /**
@@ -94,6 +96,15 @@ final class SelfServiceInfo {
     }
 
     /**
+     * Gets the user registration destination.
+     *
+     * @return user registration destination
+     */
+    public String getUserRegistrationDestination() {
+        return userRegistrationDestination;
+    }
+
+    /**
      * Builder indented for the use by {@link SelfServiceInfo} to retrieve self service configuration.
      */
     @ConfigSource("selfService")
@@ -106,6 +117,7 @@ final class SelfServiceInfo {
         private boolean forgottenUsernameKbaEnabled;
         private boolean forgottenPasswordKbaEnabled;
         private final Set<String> protectedUserAttributes;
+        private String userRegistrationDestination;
 
         /**
          * Constructs a new self service info builder.
@@ -189,6 +201,17 @@ final class SelfServiceInfo {
         @ConfigAttribute(value = "selfServiceProfileProtectedUserAttributes", required = false)
         public void setProtectedUserAttributes(Set<String> protectedUserAttributes) {
             this.protectedUserAttributes.addAll(protectedUserAttributes);
+        }
+
+        /**
+         * Sets the user registration destination.
+         *
+         * @param userRegistrationDestination
+         *         user registration destination
+         */
+        @ConfigAttribute("selfServiceUserRegistrationDestination")
+        public void setUserRegistrationDestination(String userRegistrationDestination) {
+            this.userRegistrationDestination = userRegistrationDestination;
         }
 
         @Override

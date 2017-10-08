@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -65,13 +65,25 @@ public class IPv6ConditionTest extends IPvXConditionTest<IPv6Address> {
     @DataProvider(name = "validIpAddresses")
     public Object[][] validIpAddresses() {
         return new Object[][]{
-                {"0000:0000:0000:0000:0000:0000:0000:0000"},     // minimum (long form)
-                {"::"},                                          // minimum (short form)
-                {"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"},     // maximum (long form)
-                {"::1"},                                         // loop-back (short form)
-                {"::ffff:192.0.2.128"},                          // address mapped from IPv4
-                {"2001:0db8:85a3:0000:0000:8a2e:0370:7334"},     // random example (long form)
-                {"2001:0db8:85a3::8a2e:0370:7334"}               // random example (short form)
+                {"0000:0000:0000:0000:0000:0000:0000:0000",
+                 "0000:0000:0000:0000:0000:0000:0000:0000"},     // minimum (long form)
+                {"::",
+                 "::"},                                          // minimum (short form)
+                {"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                 "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"},     // maximum (long form)
+                {"::1",
+                 "::1"},                                         // loop-back (short form)
+                {"::ffff:192.0.2.128",
+                 "::ffff:192.0.2.128"},                          // address mapped from IPv4
+                {"2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+                 "2001:0db8:85a3:0000:0000:8a2e:0370:7334"},     // random example (long form)
+                {"2001:0db8:85a3::8a2e:0370:7334",
+                 "2001:0db8:85a3::8a2e:0370:7334"},              // random example (short form)
+                {"0:0:0:0:0:ffff:c0a8:63", 
+                 "::ffff:192.168.0.99"},                         // same random example
+                {"::9", "::10"},                                 // random example
+                {"::ffff:192.168.0.99", "::ffff:192.168.0.100"}, // random example
+                {"::ffff:192.168.9.1", "::ffff:192.168.10.1"}    // random example
         };
     }
 

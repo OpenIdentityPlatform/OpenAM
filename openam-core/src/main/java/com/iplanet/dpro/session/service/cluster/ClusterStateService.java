@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -27,22 +27,14 @@
  */
 
 /*
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service.cluster;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.openam.utils.Time.*;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -58,7 +50,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimer;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * The <code>ClusterStateService</code> monitors the state of Server instances
@@ -167,9 +172,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
     // server instance id 
     private static String localServerId = null;
 
-    // SessionService
-    private static volatile SessionService sessionService = null;
-
     static {
         sessionDebug = Debug.getInstance("amSession");
 
@@ -224,15 +226,14 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Constructs an instance for the cluster service
-     * @param localServerId id of the server instance in which this
-     *                      ClusterStateService instance is running
+     * @param localServerId id of the server instance in which this ClusterStateService instance is running
      * @param timeout timeout for waiting on an individual server (millisec)
      * @param period checking cycle period (millisecs)
      * @param serverMembers map of Server ID to URL for all cluster Server members.
      * @param siteMembers Mapping of Site ID to URL for all Sites.
      * @throws Exception If there was an unexpected error initialising the ClusterStateService.
      */
-    protected ClusterStateService(SessionService sessionService, String localServerId,
+    protected ClusterStateService(String localServerId,
                                   int timeout, long period, Map<String, String> serverMembers,
                                   Map<String, String> siteMembers) throws Exception {
         if ( (localServerId == null)||(localServerId.isEmpty()) )
@@ -243,7 +244,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
         // Ensure we Synchronize this Instantiation.
         synchronized (this) {
-            this.sessionService = sessionService;
             this.localServerId = localServerId;
             this.timeout = timeout;
             this.period = period;
@@ -261,7 +261,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             // to ensure that ordering in different server instances is identical
             Arrays.sort(serverSelectionList);
             SystemTimer.getTimer().schedule(this, new Date((
-                    System.currentTimeMillis() / 1000) * 1000));
+                    currentTimeMillis() / 1000) * 1000));
         } // End of Synchronized Block.
     }
 
@@ -362,17 +362,18 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     boolean checkServerUp(String serverId) {
-        if ( (serverId == null) || (serverId.isEmpty()) ) {
-            return false;
+        if (StringUtils.isNotEmpty(serverId) && CollectionUtils.isNotEmpty(servers)) {
+            if (serverId.equalsIgnoreCase(localServerId)) {
+                return true;
+            }
+            StateInfo info = servers.get(serverId);
+            if (info != null) {
+                info.isUp = checkServerUp(info);
+                return info.isUp;
+            }
+            sessionDebug.error("Failed to check server status for non-existent server: " + serverId);
         }
-        if (serverId.equalsIgnoreCase(localServerId)) {
-            return true;
-        }
-        if ( (servers == null) || servers.isEmpty() )
-            { return false; }
-        StateInfo info = servers.get(serverId);
-        info.isUp = checkServerUp(info);
-        return info.isUp;
+        return false;
     }
 
     /**
@@ -438,10 +439,9 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
     public void run() {
         try {
-            boolean cleanRemoteSessions = false;
             synchronized (this) {
 
-                Collection<StateInfo> infos = new ArrayList<StateInfo>();
+                Collection<StateInfo> infos = new ArrayList<>();
                 infos.addAll(servers.values());
                 infos.addAll(sites.values());
 
@@ -451,15 +451,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
                     if (!info.isUp) {
                         down.add(info.id);
                     } else {
-                        if (!down.isEmpty() && down.remove(info.id)) {
-                            cleanRemoteSessions = true;
-                        }
+                        down.remove(info.id);
                     }
                 }
 
-            }
-            if (cleanRemoteSessions) {
-                sessionService.cleanUpRemoteSessions();
             }
         } catch (Exception ex) {
             sessionDebug.error("cleanRemoteSessions Background thread has encountered an Exception: " + ex.getMessage(), ex);

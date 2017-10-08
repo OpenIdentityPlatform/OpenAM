@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -17,7 +17,7 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
 import static org.forgerock.openam.upgrade.steps.UpgradeOAuth2ProviderStep.*;
 
@@ -166,6 +166,9 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                     addAttributeToMap(map, type, subConfig, addedLifetimeProps, realm);
                 }
             }
+            if (!attrs.containsKey(SUBJECT_TYPE)) {
+                addAttributeToMap(map, type, subConfig, SUBJECT_TYPE, realm);
+            }
         }
     }
 
@@ -221,6 +224,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                                 }
                             } else if (ADDED_LIFETIME_PROPERTIES.contains(attrName)) {
                                 attrs.put(attrName, Collections.singleton("0"));
+                            } else if (SUBJECT_TYPE.contains(attrName)) {
+                                attrs.put(attrName, Collections.singleton("Public"));
                             }
                         }
                         oauth2Config.setAttributes(attrs);

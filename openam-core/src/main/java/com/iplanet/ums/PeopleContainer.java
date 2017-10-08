@@ -24,7 +24,7 @@
  *
  * $Id: PeopleContainer.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.ums;
@@ -175,7 +175,7 @@ public class PeopleContainer extends PersistentObject {
      */
     public long getUserCount() throws UMSException {
         /*
-         * String value = getAttribute( NUM_USER_ATTR_NAME ).getValue(); return
+         * String value = getAttribute( NUM_USER_ATTR_NAME ).getAttribute(); return
          * (new Long( value )).longValue();
          */
         SearchTemplate template = TemplateManager.getTemplateManager()
@@ -198,7 +198,7 @@ public class PeopleContainer extends PersistentObject {
     public long getChildPeopleContainerCount() throws UMSException {
         /*
          * String value = getAttribute( NUM_PEOPLECONTAINER_ATTR_NAME
-         * ).getValue(); return (new Long( value )).longValue();
+         * ).getAttribute(); return (new Long( value )).longValue();
          */
         SearchTemplate template = TemplateManager.getTemplateManager()
                 .getSearchTemplate(BASIC_PEOPLECONTAINER_SEARCH,

@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/ApplicationTypesResource#schema.title",
+  "description": "i18n:api-descriptor/ApplicationTypesResource#schema.description",
+  "properties": {
+    "name": {
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.name.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.name.description",
+      "type": "string"
+    },
+    "actions": {
+      "type": "object",
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.actions.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.actions.description",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "resourceComparator": {
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.resourceComparator.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.resourceComparator.description",
+      "type": "string"
+    },
+    "saveIndex": {
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.saveIndex.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.saveIndex.description",
+      "type": "string"
+    },
+    "searchIndex": {
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.searchIndex.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.searchIndex.description",
+      "type": "string"
+    },
+    "applicationClassName": {
+      "title": "i18n:api-descriptor/ApplicationTypesResource#schema.applicationClassName.title",
+      "description": "i18n:api-descriptor/ApplicationTypesResource#schema.applicationClassName.description",
+      "type": "string"
+    }
+  }
+}

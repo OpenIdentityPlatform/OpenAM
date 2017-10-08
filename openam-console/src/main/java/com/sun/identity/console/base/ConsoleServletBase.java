@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ConsoleServletBase.java,v 1.7 2009/03/24 23:57:32 babysunil Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.base;
 
@@ -42,7 +39,7 @@ import com.iplanet.jato.view.ViewBean;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.RequestUtils;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.shared.Constants;
@@ -361,12 +358,11 @@ public abstract class ConsoleServletBase
         }
 
         if (!hostname.equalsIgnoreCase(getConsoleHost())) {
-            hostname = FQDNUtils.getInstance().getFullyQualifiedHostName(
-                hostname);
+            hostname = FqdnValidator.getInstance().getFullyQualifiedHostName(hostname);
 
             if (hostname != null) {
                 /*
-                 * this required because FQDNUtils default hostname to
+                 * this required because FqdnValidator default hostname to
                  * server host. for the case of remote console 
                  * installation, default should be console host.
                 */

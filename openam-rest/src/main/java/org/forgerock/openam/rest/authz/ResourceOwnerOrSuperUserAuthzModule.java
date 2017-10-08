@@ -80,7 +80,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
 
     protected String getUserIdFromUri(Context context) throws InternalServerErrorException {
         String username = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        String realm = context.asContext(RealmContext.class).getRealm().asPath();
         return IdUtils.getIdentity(username, realm).getUniversalId();
     }
 }

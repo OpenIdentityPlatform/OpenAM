@@ -24,23 +24,27 @@
  *
  * $Id: NetworkMonitor.java,v 1.2 2009/12/17 18:03:51 veiming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;
 
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import org.forgerock.openam.entitlement.PolicyConstants;
+import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.sun.identity.entitlement.EntitlementConfiguration;
 
 /**
  * Utility to collect response time and throughput on a per second basis.
@@ -50,8 +54,7 @@ public class NetworkMonitor extends HttpServlet {
 
     // Static variables
     private static HashMap<String, NetworkMonitor> stats = new HashMap();
-    private static EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
+    private static EntitlementConfiguration ec = getEntitlementConfiguration(SUPER_ADMIN_SUBJECT, "/");
     private static boolean collectStats = ec.networkMonitorEnabled();
 
     // Instance variables
@@ -95,7 +98,7 @@ public class NetworkMonitor extends HttpServlet {
         if (!isCollectStats()) {
             return 0;
         }
-        return (System.currentTimeMillis());
+        return (currentTimeMillis());
     }
 
     public synchronized void end(long start) {
@@ -103,7 +106,7 @@ public class NetworkMonitor extends HttpServlet {
             long rs = 0;
             throughput++;
             if (start != 0) {
-                rs = System.currentTimeMillis() - start;
+                rs = currentTimeMillis() - start;
                 totalResponseTime += rs;
             }
             StatsData sd = getNewStats(rs);
@@ -136,7 +139,7 @@ public class NetworkMonitor extends HttpServlet {
     }
 
     private StatsData getNewStats(long responsetime) {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = currentTimeMillis();
         // nearest second
         long seconds = (long) (currentTime/1000);
         StatsData sd = new StatsData(seconds);

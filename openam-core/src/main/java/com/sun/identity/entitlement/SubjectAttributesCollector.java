@@ -24,7 +24,7 @@
  *
  * $Id: SubjectAttributesCollector.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -43,11 +43,6 @@ public interface SubjectAttributesCollector {
      * Attribute Namespace.
      */
     String NAMESPACE_ATTR = "attribute:";
-
-    /**
-     * Membership Namespace.
-     */
-    String NAMESPACE_MEMBERSHIP = "membership:";
 
     /**
      * Identity Namespace
@@ -81,23 +76,6 @@ public interface SubjectAttributesCollector {
         Subject subject,
         Set<String> attrNames
     ) throws EntitlementException;
-
-    /**
-     * Returns <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     *
-     * @param subject identity of the user
-     * @param attrName attribute name to check
-     * @param attrValue attribute value to check
-     * @return <code>true</code> if attribute value for the given user
-     * represented by <class>Subject</class> object is present.
-     * @throws com.sun.identity.entitlement.EntitlementException if this
-     * operation failed.
-     */
-    boolean hasAttribute(
-        Subject subject,
-        String attrName,
-        String attrValue) throws EntitlementException;
 
     /**
      * Returns available subject attribute names.

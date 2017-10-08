@@ -16,6 +16,7 @@
 package org.forgerock.openam.authentication.modules.saml2;
 
 import static org.forgerock.openam.authentication.modules.saml2.Constants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -212,7 +213,7 @@ public final class SAML2Proxy {
 
         if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             try {
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval; //counted in seconds
+                long sessionExpireTime = currentTimeMillis() / 1000 + SPCache.interval; //counted in seconds
                 SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(key, data, sessionExpireTime);
             } catch (SAML2TokenRepositoryException e) {
                 DEBUG.error("An error occurred while persisting the SAML token", e);

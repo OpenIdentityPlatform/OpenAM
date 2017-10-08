@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.oidc;
@@ -28,6 +28,7 @@ import org.forgerock.json.jose.exceptions.JwsSigningException;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 import java.util.List;
@@ -75,21 +76,28 @@ public class JwtHandler {
         }
         // See if a resolver is present corresponding to jwt issuer, and if not, add, then dispatch validation to
         // resolver.
-        OpenIdResolver resolver = openIdResolverCache.getResolverForIssuer(config.getCryptoContextValue());
-
+        OpenIdResolver resolver = null;
+        if (StringUtils.isNotEmpty(config.getCryptoContextValue())) {
+            resolver = openIdResolverCache.getResolverForIssuer(config.getCryptoContextValue());
+        }
         if (resolver == null) {
-            if (logger.messageEnabled()) {
-                if (CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(config.getCryptoContextType())) {
+            String cryptoContextValue;
+            if (CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(config.getCryptoContextType())) {
+                if (logger.messageEnabled()) {
                     logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using client secret");
-                } else {
+                }
+                cryptoContextValue = config.getClientSecret();
+            } else {
+                if (logger.messageEnabled()) {
                     logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using config url "
                             + config.getCryptoContextValue());
                 }
+                cryptoContextValue = config.getCryptoContextValue();
             }
+
             try {
-                resolver = openIdResolverCache.createResolver(
-                        jwtClaimSetIssuer, config.getCryptoContextType(), config.getCryptoContextValue(),
-                        config.getCryptoContextUrlValue());
+                resolver = openIdResolverCache.createResolver(jwtClaimSetIssuer, config.getCryptoContextType(),
+                        cryptoContextValue, config.getCryptoContextUrlValue());
             } catch (IllegalStateException e) {
                 logger.error("Could not create OpenIdResolver for issuer " + jwtClaimSetIssuer +
                         " using crypto context value " + config.getCryptoContextValue() + " :" + e);

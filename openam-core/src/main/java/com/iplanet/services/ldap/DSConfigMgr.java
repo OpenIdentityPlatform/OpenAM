@@ -24,15 +24,19 @@
  *
  * $Id: DSConfigMgr.java,v 1.18 2009/01/28 05:34:49 ww203982 Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.SSL_CONTEXT;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -40,17 +44,21 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CountDownLatch;
+
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.util.Options;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.I18n;
 import com.iplanet.services.util.XMLParser;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.ServerInstanceAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.util.Options;
 
 /**
  * This object is the manager of all connection information. The server
@@ -75,13 +83,18 @@ public class DSConfigMgr implements IDSConfigMgr {
     private int connNumRetry = 3;
 
     private int connRetryInterval = 1000;
-
     private HashSet retryErrorCodes = new HashSet();
+    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
 
     static Debug debugger = null;
 
+    /** Latch to indicate when the fully-initialised stable system configuration is available. */
+    private static final CountDownLatch stableConfigurationLatch = new CountDownLatch(1);
+
     static {        
         debugger = Debug.getInstance(IUMSConstants.UMS_DEBUG);
+        // this suppresses message level debug on initialization.
+        debugger.setDebug(Debug.ERROR);
     }
 
     DSConfigMgr() {
@@ -166,10 +179,39 @@ public class DSConfigMgr implements IDSConfigMgr {
         return thisInstance;
     }
 
-    public static synchronized void initInstance(InputStream is) 
+    public static synchronized void initInstance(InputStream is, boolean isBootstrapComplete)
         throws LDAPServiceException {
         thisInstance = new DSConfigMgr();
         thisInstance.loadServerConfiguration(is);
+
+        if (isBootstrapComplete) {
+            stableConfigurationLatch.countDown();
+        }
+
+    }
+
+    /**
+     * Gets the stable DSConfigMgr instance after the system has been fully initialized. If bootstrap is still in
+     * progress then this method waits until the stable configuration is available. The method will time out after 30
+     * seconds if no stable configuration is available. In this case, a warning will be logged and the current
+     * configuration returned.
+     *
+     * @return the stable configuration.
+     */
+    public static DSConfigMgr getStableDSConfigMgr() throws LDAPServiceException {
+        debugger.message("DSConfigMgr.getStableDSConfigMgr: Waiting for stable configuration");
+        try {
+            if (!stableConfigurationLatch.await(30, SECONDS)) {
+                debugger.warning("DSConfigMgr.getStableDSConfigMgr: timeout while waiting for stable configuration");
+            }
+        } catch (InterruptedException ex) {
+            // If we are interrupted then return the current configuration without waiting
+            debugger.error("DSConfigMgr.getStableDSConfigMgr: thread interrupted while waiting stable config", ex);
+            // Reset the interrupt status so that callers can determine that the thread was interrupted
+            Thread.currentThread().interrupt();
+        }
+
+        return getDSConfigMgr();
     }
 
     /**
@@ -255,9 +297,19 @@ public class DSConfigMgr implements IDSConfigMgr {
         // The 389 port number passed is overridden by the hostName:port
         // constructed by the getHostName method.  So, this is not
         // a hardcoded port number.
+        Options ldapOptions = Options.defaultOptions();
+        boolean sslEnabled = Server.Type.CONN_SSL.equals(sCfg.getConnectionType());
+        if (sslEnabled) {
+            try {
+                ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                        new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
+            } catch (GeneralSecurityException gse) {
+                debugger.error("An error occurred while setting the SSLContext", gse);
+            }
+        }
         return LDAPUtils.newFailoverConnectionFactory(
-                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
-                authID, passwd.toCharArray(), 0, null, null);
+                getLdapUrls(serverGroupID, sslEnabled),
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, ldapOptions);
     }
 
     /**
@@ -321,9 +373,19 @@ public class DSConfigMgr implements IDSConfigMgr {
             passwd = (String) AccessController
                     .doPrivileged(new ServerInstanceAction(sCfg));
         }
+        Options ldapOptions = Options.defaultOptions();
+        boolean sslEnabled = Server.Type.CONN_SSL.equals(sCfg.getConnectionType());
+        if (sslEnabled) {
+            try {
+                ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                        new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
+            } catch (GeneralSecurityException gse) {
+                debugger.error("An error occurred while setting the SSLContext", gse);
+            }
+        }
         return LDAPUtils.newFailoverConnectionFactory(
-                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
-                authID, passwd != null ? passwd.toCharArray() : null, 0, null, Options.defaultOptions());
+                getLdapUrls(serverGroupID, sslEnabled),
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, ldapOptions);
     }
 
     private Set<LDAPURL> getLdapUrls(String serverGroupID, boolean isSSL) {

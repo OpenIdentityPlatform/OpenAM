@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
- * Copyright © 2011 Cybernetica AS.
+ * Copyright 2011-2016 ForgeRock AS.
+ * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,8 +21,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
- */
+ */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -78,6 +77,7 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_SECRET = "client_secret";
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
+    public final static String PARAM_GRANT_TYPE = "grant_type";
 
     // oauthproxy parameters
     public final static String PARAM_ACTIVATION = "activation";

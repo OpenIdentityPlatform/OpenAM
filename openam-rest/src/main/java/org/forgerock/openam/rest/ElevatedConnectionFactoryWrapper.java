@@ -11,28 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.rest;
 
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.providers.dpro.SSOPrincipal;
+import java.security.Principal;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.forgerock.json.resource.AbstractConnectionWrapper;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 
-import javax.inject.Inject;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.Map;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 
 /**
  * CREST connection factory wrapper that elevates in coming contexts
@@ -44,12 +47,14 @@ public final class ElevatedConnectionFactoryWrapper implements ConnectionFactory
 
     private final ConnectionFactory connectionFactory;
     private final PrivilegedAction<SSOToken> ssoTokenPrivilegedAction;
+    private final SSOTokenContext.Factory ssoTokenContextFactory;
 
     @Inject
     public ElevatedConnectionFactoryWrapper(ConnectionFactory connectionFactory,
-            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction) {
+            PrivilegedAction<SSOToken> ssoTokenPrivilegedAction, SSOTokenContext.Factory ssoTokenContextFactory) {
         this.connectionFactory = connectionFactory;
         this.ssoTokenPrivilegedAction = ssoTokenPrivilegedAction;
+        this.ssoTokenContextFactory = ssoTokenContextFactory;
     }
 
     @Override
@@ -73,7 +78,7 @@ public final class ElevatedConnectionFactoryWrapper implements ConnectionFactory
         connectionFactory.close();
     }
 
-    private static final class ElevatedConnection extends AbstractConnectionWrapper<Connection> {
+    private final class ElevatedConnection extends AbstractConnectionWrapper<Connection> {
 
         private final String authenticationId;
         private final Map<String, Object> authorisation;
@@ -82,7 +87,7 @@ public final class ElevatedConnectionFactoryWrapper implements ConnectionFactory
             super(connection);
 
             try {
-                SSOPrincipal ssoPrincipal = (SSOPrincipal) adminToken.getPrincipal();
+                Principal ssoPrincipal = adminToken.getPrincipal();
                 authenticationId = ssoPrincipal.getName();
                 authorisation = new HashMap<>();
                 authorisation.put("authLevel", adminToken.getAuthLevel());
@@ -94,7 +99,7 @@ public final class ElevatedConnectionFactoryWrapper implements ConnectionFactory
 
         @Override
         protected Context transform(Context context) {
-            return new SecurityContext(context, authenticationId, authorisation);
+            return ssoTokenContextFactory.create(new SecurityContext(context, authenticationId, authorisation));
         }
 
     }

@@ -11,20 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
-
-import com.sun.identity.sm.ServiceConfig;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.query.BaseQueryFilterVisitor;
-import org.forgerock.util.query.QueryFilter;
+import static java.lang.Double.parseDouble;
+import static java.lang.Long.parseLong;
+import static org.forgerock.openam.utils.StringUtils.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.util.query.BaseQueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+
+import com.sun.identity.sm.ServiceConfig;
 
 /**
  * Filter visitor for {@code ServiceConfig}. It will filter against attribute data read from the Service Configuration.
@@ -34,8 +37,14 @@ import java.util.Set;
  */
 public class ServiceConfigQueryFilterVisitor extends BaseQueryFilterVisitor<Boolean, ServiceConfig, String> {
 
+    /**
+     * Get the configuration attribute data from the given {@link ServiceConfig}.
+     *
+     * @param serviceConfig The {@link ServiceConfig} instance.
+     * @return A map containing the configuration attribute data.
+     */
     @SuppressWarnings("unchecked")
-    private Map<String, Set<String>> getConfigData(ServiceConfig serviceConfig) {
+    protected Map<String, Set<String>> getConfigData(ServiceConfig serviceConfig) {
         return serviceConfig.getAttributesForRead();
     }
 
@@ -64,7 +73,7 @@ public class ServiceConfigQueryFilterVisitor extends BaseQueryFilterVisitor<Bool
         if (!(valueAssertion instanceof String)) {
             return false;
         }
-        return StringUtils.match(getMapAttr(getConfigData(serviceConfig), field), (String)valueAssertion);
+        return match(getMapAttr(getConfigData(serviceConfig), field), (String) valueAssertion);
     }
 
     @Override
@@ -72,8 +81,7 @@ public class ServiceConfigQueryFilterVisitor extends BaseQueryFilterVisitor<Bool
         if (!(valueAssertion instanceof String)) {
             return false;
         }
-        return StringUtils.containsCaseInsensitive(getMapAttr(getConfigData(serviceConfig), field),
-                (String)valueAssertion);
+        return containsCaseInsensitive(getMapAttr(getConfigData(serviceConfig), field), (String) valueAssertion);
     }
 
     @Override
@@ -81,13 +89,93 @@ public class ServiceConfigQueryFilterVisitor extends BaseQueryFilterVisitor<Bool
         if (!(valueAssertion instanceof String)) {
             return false;
         }
-        return StringUtils.startsWith(getMapAttr(getConfigData(serviceConfig), field), (String)valueAssertion);
+        return startsWith(getMapAttr(getConfigData(serviceConfig), field), (String) valueAssertion);
     }
 
     @Override
     public Boolean visitBooleanLiteralFilter(ServiceConfig serviceConfig, boolean value) {
         if (value) {
             return true;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Boolean visitGreaterThanFilter(ServiceConfig serviceConfig, String field, Object valueAssertion) {
+        String value = getMapAttr(getConfigData(serviceConfig), field);
+        if (isEmpty(value)) {
+            return false;
+        }
+        try {
+            if (valueAssertion instanceof Long) {
+                return parseLong(value) > (Long) valueAssertion;
+            }
+            if (valueAssertion instanceof Double) {
+                return parseDouble(value) > (Double) valueAssertion;
+            }
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException("Value of field \"" + field + "\" is not a "
+                    + valueAssertion.getClass().getSimpleName());
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Boolean visitGreaterThanOrEqualToFilter(ServiceConfig serviceConfig, String field, Object valueAssertion) {
+        String value = getMapAttr(getConfigData(serviceConfig), field);
+        if (isEmpty(value)) {
+            return false;
+        }
+        try {
+            if (valueAssertion instanceof Long) {
+                return parseLong(value) >= (Long) valueAssertion;
+            }
+            if (valueAssertion instanceof Double) {
+                return parseDouble(value) >= (Double) valueAssertion;
+            }
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException("Value of field \"" + field + "\" is not a "
+                    + valueAssertion.getClass().getSimpleName());
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Boolean visitLessThanFilter(ServiceConfig serviceConfig, String field, Object valueAssertion) {
+        String value = getMapAttr(getConfigData(serviceConfig), field);
+        if (isEmpty(value)) {
+            return false;
+        }
+        try {
+            if (valueAssertion instanceof Long) {
+                return parseLong(value) < (Long) valueAssertion;
+            }
+            if (valueAssertion instanceof Double) {
+                return parseDouble(value) < (Double) valueAssertion;
+            }
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException("Value of field \"" + field + "\" is not a "
+                    + valueAssertion.getClass().getSimpleName());
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Boolean visitLessThanOrEqualToFilter(ServiceConfig serviceConfig, String field, Object valueAssertion) {
+        String value = getMapAttr(getConfigData(serviceConfig), field);
+        if (isEmpty(value)) {
+            return false;
+        }
+        try {
+            if (valueAssertion instanceof Long) {
+                return parseLong(value) <= (Long) valueAssertion;
+            }
+            if (valueAssertion instanceof Double) {
+                return parseDouble(value) <= (Double) valueAssertion;
+            }
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException("Value of field \"" + field + "\" is not a "
+                    + valueAssertion.getClass().getSimpleName());
         }
         throw new UnsupportedOperationException();
     }

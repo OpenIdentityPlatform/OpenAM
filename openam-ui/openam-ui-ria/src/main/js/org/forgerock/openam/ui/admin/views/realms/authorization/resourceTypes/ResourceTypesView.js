@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -32,9 +32,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/authorization/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Messages, EventManager,
-             Router, Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
-    return AbstractListView.extend({
+], ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Messages, EventManager, Router,
+    Constants, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) =>
+    AbstractListView.extend({
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesToolbarTemplate.html",
@@ -42,30 +42,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             "partials/util/_HelpLink.html"
         ],
         events: {
-            "click #addNewRes": "addNewResourceType"
+            "click [data-add-entity]": "addNewResourceType"
         },
-        render: function (args, callback) {
-            var self = this,
-                ResourceTypes,
-                columns,
-                grid,
-                paginator,
-                ClickableRow;
-
-            this.realmPath = args[0];
-
-            ResourceTypes = Backbone.PageableCollection.extend({
+        render (args, callback) {
+            const ResourceTypes = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/resourcetypes"),
                 model: ResourceTypeModel,
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     _queryFilter: [
-                        "name+eq+" + encodeURIComponent('"^(?!Delegation Service$).*"')
+                        `name+eq+${encodeURIComponent('"^(?!Delegation Service$).*"')}`
                     ]
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
-                sync: function (method, model, options) {
+                sync (method, model, options) {
                     options.beforeSend = function (xhr) {
                         xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
                     };
@@ -73,8 +64,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 }
             });
 
-            ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+            this.realmPath = args[0];
+            this.data.items = new ResourceTypes();
+            this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }];
+            this.data.items.fetch({ reset: true }).done((response) => {
+                if (response.resultCount > 0) {
+                    this.data.hasResourceTypes = true;
+                    this.renderTable(callback);
+                } else {
+                    this.data.hasResourceTypes = false;
+                    this.parentRender(this.renderToolbar);
+                }
+            }).fail(() => {
+                Router.routeTo(Router.configuration.routes.realms, { args: [], trigger: true });
+            });
+        },
+
+        renderTable (callback) {
+            const self = this;
+            const ClickableRow = BackgridUtils.ClickableRow.extend({
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.parents().hasClass("fr-col-btn-2")) {
@@ -88,14 +97,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 }
             });
 
-            columns = [
+            const columns = [
                 {
                     name: "name",
                     label: $.t("console.authorization.resourceTypes.list.grid.0"),
                     cell: BackgridUtils.TemplateCell.extend({
                         iconClass: "fa-cube",
                         template: "templates/admin/backgrid/cell/IconAndNameCell.html",
-                        rendered: function () {
+                        rendered () {
                             this.$el.find("i.fa").addClass(this.iconClass);
                         }
                     }),
@@ -109,13 +118,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                         className: "fr-col-btn-2",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
-                            "click .edit-row-item": "editItem",
-                            "click .delete-row-item": "deleteItem"
+                            "click [data-edit-item]": "editItem",
+                            "click [data-delete-item]": "deleteItem"
                         },
-                        editItem: function (e) {
+                        editItem (e) {
                             self.editRecord(e, this.model.id, Router.configuration.routes.realmsResourceTypeEdit);
                         },
-                        deleteItem: function (e) {
+                        deleteItem (e) {
                             self.onDeleteClick(e, { type: $.t("console.authorization.common.resourceType") },
                                 this.model.id);
                         }
@@ -125,47 +134,34 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 }
             ];
 
-            this.data.items = new ResourceTypes();
-
-            grid = new Backgrid.Grid({
-                columns: columns,
+            const grid = new Backgrid.Grid({
+                columns,
                 row: ClickableRow,
-                collection: self.data.items,
+                collection: this.data.items,
                 className: "backgrid table table-hover",
                 emptyText: $.t("console.common.noResults")
             });
 
-            paginator = new Backgrid.Extension.ThemeablePaginator({
-                collection: self.data.items,
+            const paginator = new Backgrid.Extension.ThemeablePaginator({
+                collection: this.data.items,
                 windowSize: 3
             });
 
             this.bindDefaultHandlers();
-
-            this.parentRender(function () {
+            this.parentRender(() => {
                 this.renderToolbar();
-
                 this.$el.find(".table-container").append(grid.render().el);
                 this.$el.find(".panel-body").append(paginator.render().el);
 
-                this.data.items.fetch({ reset: true }).done(function () {
-                    if (callback) {
-                        callback();
-                    }
-                }).fail(function () {
-                    Router.routeTo(Router.configuration.routes.realms, {
-                        args: [],
-                        trigger: true
-                    });
-                });
+                if (callback) { callback(); }
             });
         },
 
-        addNewResourceType: function () {
+        addNewResourceType () {
             Router.routeTo(Router.configuration.routes.realmsResourceTypeNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
         }
-    });
-});
+    })
+);

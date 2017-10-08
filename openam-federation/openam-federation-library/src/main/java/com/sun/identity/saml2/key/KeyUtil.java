@@ -24,7 +24,7 @@
  *
  * $Id: KeyUtil.java,v 1.10 2009/08/28 23:42:14 exu Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.saml2.key;
 
@@ -160,13 +160,27 @@ public class KeyUtil {
     }
 
     private static Set<PrivateKey> getDecryptionKeys(List<String> aliases) {
+        final String classMethod = "KeyUtil.getDecryptionKeys: ";
         final Set<PrivateKey> decryptionKeys = new LinkedHashSet<>(3);
         if (aliases != null) {
-            for (String alias : aliases) {
-                if (StringUtils.isNotEmpty(alias) && keyProvider != null) {
-                    decryptionKeys.add(keyProvider.getPrivateKey(alias));
+            if (keyProvider != null) {
+                for (String alias : aliases) {
+                    if (StringUtils.isNotEmpty(alias)) {
+                        PrivateKey decryptionKey = keyProvider.getPrivateKey(alias);
+                        if (decryptionKey != null) {
+                            decryptionKeys.add(decryptionKey);
+                        } else {
+                            SAML2SDKUtils.debug.error(classMethod + "No decryptionKey found for alias: {}", alias);
+                        }
+                    } else {
+                        SAML2SDKUtils.debug.error(classMethod + "alias was empty.");
+                    }
                 }
+            } else {
+                SAML2SDKUtils.debug.error(classMethod + "keyProvider was null.");
             }
+        } else {
+            SAML2SDKUtils.debug.error(classMethod + "passed aliases list was null.");
         }
 
         return decryptionKeys;
@@ -178,7 +192,7 @@ public class KeyUtil {
      * by the host entity
      */    
     public static PrivateKey getDecryptionKey(BaseConfigType baseConfig) {
-        return (PrivateKey) CollectionUtils.getFirstItem(getDecryptionKeys(baseConfig), null);
+        return CollectionUtils.getFirstItem(getDecryptionKeys(baseConfig), null);
     }
 
     /**

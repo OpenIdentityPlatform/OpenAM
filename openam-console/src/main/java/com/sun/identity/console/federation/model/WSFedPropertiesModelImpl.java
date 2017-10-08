@@ -120,6 +120,10 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         IDPEX_DATA_MAP.put(TFUPN_DOMAIN, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(COT_LIST, Collections.EMPTY_SET);
         IDPEX_DATA_MAP.put(WREPLY_LIST, Collections.EMPTY_SET);
+        IDPEX_DATA_MAP.put(WSFederationConstants.ACTIVE_REQUESTOR_PROFILE_ENABLED, Collections.EMPTY_SET);
+        IDPEX_DATA_MAP.put(WSFederationConstants.AUTHENTICATOR_CLASS, Collections.EMPTY_SET);
+        IDPEX_DATA_MAP.put(WSFederationConstants.ENDPOINT_BASE_URL, Collections.EMPTY_SET);
+        IDPEX_DATA_MAP.put(WSFederationConstants.TRUSTED_ADDRESSES, Collections.EMPTY_SET);
     }
 
     static {

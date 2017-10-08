@@ -11,29 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/user/delegates/AnonymousProcessDelegate",
     "org/forgerock/commons/ui/user/anonymousProcess/AnonymousProcessView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/URIUtils"
+], ($, _, AnonymousProcessDelegate, AnonymousProcessView, Router, Constants, RealmHelper, EventManager, URIUtils) => {
+
+    function getFragmentParamString () {
+        const params = URIUtils.getCurrentFragmentQueryString();
+        return _.isEmpty(params) ? "" : `&${params}`;
+    }
 
     return AnonymousProcessView.extend({
-        render: function () {
+
+        render () {
             var params = Router.convertCurrentUrlToJSON().params,
                 overrideRealm = RealmHelper.getOverrideRealm(),
                 subRealm = RealmHelper.getSubRealm(),
                 endpoint = this.endpoint,
                 realmPath = "/",
                 continueRoute;
-
-            this.events["click #anonymousProcessReturn"] = "returnToLoginPage";
 
             if (endpoint === Constants.SELF_SERVICE_REGISTER) {
                 continueRoute = Router.configuration.routes.continueSelfRegister;
@@ -42,34 +48,45 @@ define("org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView", [
             }
 
             if (overrideRealm && overrideRealm !== "/") {
-                endpoint = (overrideRealm.substring(0, 1) === "/" ? overrideRealm.slice(1) : overrideRealm) + "/" +
-                    endpoint;
+                const slicedOverrideRealm = overrideRealm.substring(0, 1) === "/"
+                    ? overrideRealm.slice(1)
+                    : overrideRealm;
+                endpoint = `${slicedOverrideRealm}/${endpoint}`;
                 realmPath = overrideRealm;
             } else if (!overrideRealm && subRealm) {
-                endpoint = subRealm + "/" + endpoint;
+                endpoint = `${subRealm}/${endpoint}`;
                 realmPath = subRealm;
             }
 
-            realmPath = realmPath.substring(0, 1) === "/" ? realmPath : "/" + realmPath;
+            realmPath = realmPath.substring(0, 1) === "/" ? realmPath : `/${realmPath}`;
 
             if (!this.delegate || Router.currentRoute !== continueRoute) {
-                this.setDelegate("json/" + endpoint, params.token);
+                this.setDelegate(`json/${endpoint}`, params.token);
             }
 
             if (params.token) {
-                this.submitDelegate(params, function () {
+                this.submitDelegate(params, () => {
                     Router.routeTo(continueRoute, { args: [realmPath], trigger: true });
                 });
                 return;
             }
 
+            // TODO: The first undefined argument is the deprecated realm which is defined in the
+            // CommonRoutesConfig login route. This needs to be removed as part of AME-11109.
+            this.data.args = [undefined, getFragmentParamString()];
             this.setTranslationBase();
             this.parentRender();
         },
 
-        returnToLoginPage: function (e) {
+        restartProcess (e) {
             e.preventDefault();
-            location.href = e.target.href + RealmHelper.getSubRealm();
+            delete this.delegate;
+            delete this.stateData;
+
+            EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                args: this.data.args,
+                route: _.extend({}, Router.currentRoute, { forceUpdate: true })
+            });
         }
     });
 });

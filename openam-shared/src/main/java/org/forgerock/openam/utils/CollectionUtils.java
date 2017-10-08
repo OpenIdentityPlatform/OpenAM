@@ -11,13 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
-
-import com.sun.identity.common.CaseInsensitiveHashSet;
-import org.forgerock.util.Reject;
-import org.forgerock.util.Function;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +28,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.util.Function;
+import org.forgerock.util.Reject;
+
+import com.sun.identity.common.CaseInsensitiveHashSet;
 
 /**
  * A simple utility class to simplify interactions with collections.
@@ -514,6 +515,16 @@ public final class CollectionUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Returns an {@code ArrayList} of the items in the provided collection, or {@code null} if the set is null.
+     * @param collection The collection.
+     * @param <T> The type of value.
+     * @return The list, or {@code null} if the collection was {@code null}.
+     */
+    public static <T> List<T> newList(Collection<T> collection) {
+        return collection == null ? null : new ArrayList<>(collection);
     }
 
 }

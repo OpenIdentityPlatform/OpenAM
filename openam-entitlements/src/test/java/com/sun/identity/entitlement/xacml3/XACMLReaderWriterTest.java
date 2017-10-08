@@ -11,45 +11,50 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import org.testng.annotations.Test;
-
-import java.util.Calendar;
-
 import static com.sun.identity.entitlement.xacml3.Assertions.*;
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.*;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.utils.CollectionUtils.asList;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
+
+import org.testng.annotations.Test;
+
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.xacml3.core.PolicySet;
 
 public class XACMLReaderWriterTest {
 
     private static final String ROOT_REALM = "/";
-    private long now = Calendar.getInstance().getTimeInMillis();
+    private long now = getCalendarInstance().getTimeInMillis();
 
     @Test
     public void canReadAndWritePrivilegesAsXACML() throws Exception {
-
         // Given
         Privilege privilege = createArbitraryPrivilege("Privilege", now);
         ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege("ReferralPrivilege", now);
         XACMLReaderWriter xacmlReaderWriter = new XACMLReaderWriter();
 
-        PrivilegeSet inputPrivilegeSet = new PrivilegeSet(asList(referralPrivilege), asList(privilege));
+        PrivilegeSet inputPrivilegeSet = new PrivilegeSet();
+        inputPrivilegeSet.addPrivilege(privilege);
+        inputPrivilegeSet.addReferralPrivilege(referralPrivilege);
 
         // When
         PolicySet policySet = xacmlReaderWriter.toXACML(ROOT_REALM, inputPrivilegeSet);
         PrivilegeSet outputPrivilegeSet = xacmlReaderWriter.fromXACML(policySet);
 
         // Then
+        assertThat(outputPrivilegeSet.getResourceTypes()).hasSize(1);
+
+        assertThat(outputPrivilegeSet.getApplication()).hasSize(1);
+
         assertThat(outputPrivilegeSet.getPrivileges()).hasSize(1);
         assertPrivilegesEquivalent(outputPrivilegeSet.getPrivileges().get(0), privilege);
+
         assertThat(outputPrivilegeSet.getReferralPrivileges()).hasSize(1);
         assertReferralPrivilegesEquivalent(outputPrivilegeSet.getReferralPrivileges().get(0), referralPrivilege);
     }

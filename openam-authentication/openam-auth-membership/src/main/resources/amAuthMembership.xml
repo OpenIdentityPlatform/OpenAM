@@ -49,6 +49,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a101"
+                    order="100"
                     resourceName="minimumPasswordLength">
                     <DefaultValues>
                         <Value>8</Value>
@@ -58,12 +59,14 @@
                     type="list"
                     syntax="dn"
                     i18nKey="a102"
+                    order="200"
                     resourceName="defaultUserRoles">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-membership-default-user-status"
                     type="single_choice"   
                     syntax="string"    
                     i18nKey="a103"
+                    order="300"
                     resourceName="defaultUserStatus">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
@@ -77,6 +80,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a115"
+                    order="400"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -95,6 +99,7 @@
                         type="single"
                         syntax="number"
                         i18nKey="a101"
+                        order="100"
                         resourceName="minimumPasswordLength">
                         <DefaultValues>
                             <Value>8</Value>
@@ -104,12 +109,14 @@
                         type="list"
                         syntax="dn"
                         i18nKey="a102"
+                        order="200"
                         resourceName="defaultUserRoles">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-membership-default-user-status"
                         type="single_choice"   
                         syntax="string"    
                         i18nKey="a103"
+                        order="300"
                         resourceName="defaultUserStatus">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
@@ -123,6 +130,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a115"
+                        order="400"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>

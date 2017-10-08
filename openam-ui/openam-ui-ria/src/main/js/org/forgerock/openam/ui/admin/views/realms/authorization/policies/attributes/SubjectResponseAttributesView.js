@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
 
     // jquery dependencies
@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
         noBaseTemplate: true,
         attrType: "User",
 
-        render: function (args, callback) {
+        render (args, callback) {
 
             var self = this,
                 attr;
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             });
         },
 
-        getAttrs: function () {
+        getAttrs () {
             var data = [],
                 attr,
                 self = this;
@@ -71,17 +71,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attrib
             return data;
         },
 
-        initSelectize: function () {
+        initSelectize () {
             var self = this;
 
             this.$el.find(".selectize").each(function () {
                 $(this).selectize({
                     plugins: ["restore_on_backspace"],
-                    delimiter: ",",
+                    delimiter: false,
                     persist: false,
                     create: false,
                     hideSelected: true,
-                    onChange: function (value) {
+                    onChange (value) {
                         self.data.selectedUserAttributes = value;
                     }
                 });

@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.common.configuration.ServerConfiguration.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
+import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -73,14 +75,9 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
                     ServerConfiguration.DEFAULT_SERVER_CONFIG));
             Map<String, String> newDefaults = ServerConfiguration.getNewServerDefaults(getAdminToken());
 
-            Properties validProperties = new Properties();
-            validProperties.load(getClass().getResourceAsStream(VALID_SERVER_CONFIG_PROPERTIES));
-            Map<String, String> validServerProperties = new HashMap(validProperties);
-
-            Set<String> attrsToUpgrade = ServerUpgrade.getAttrsToUpgrade();
             addedAttrs = calculateAddedServerDefaults(newDefaults, existingDefaults);
-            modifiedAttrs = calculateModifiedServerDefaults(newDefaults, existingDefaults, attrsToUpgrade);
-            deletedAttrs = calculateDeletedServerDefaults(existingDefaults, validServerProperties);
+            modifiedAttrs = calculateModifiedServerDefaults(newDefaults, existingDefaults);
+            deletedAttrs = calculateDeletedServerDefaults(existingDefaults);
         } catch (Exception ex) {
             throw new UpgradeException(ex);
         }
@@ -93,6 +90,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
      * @param existingDefaults The default server properties defined in the current version.
      * @return The newly added properties.
      */
+    @VisibleForTesting
     protected Map<String, String> calculateAddedServerDefaults(Map<String, String> newDefaults,
             Map<String, String> existingDefaults) {
         Map<String, String> addedValues = new HashMap<String, String>();
@@ -106,6 +104,12 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
         return addedValues;
     }
 
+    private Map<String, String> calculateModifiedServerDefaults(Map<String, String> newDefaults,
+            Map<String, String> existingDefaults) throws UpgradeException {
+        Set<String> attrsToUpgrade = ServerUpgrade.getAttrsToUpgrade();
+        return calculateModifiedServerDefaults(newDefaults, existingDefaults, attrsToUpgrade);
+    }
+
     /**
      * Only include in the list of modified attributes those that are listed in the serverupgrade.properites file;
      * otherwise existing properties that have been locally modified would be over-written.
@@ -115,6 +119,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
      * @param attrToModify Attributes that should be checked for modification.
      * @return Modified key value pairs.
      */
+    @VisibleForTesting
     protected Map<String, String> calculateModifiedServerDefaults(Map<String, String> newDefaults,
             Map<String, String> existingDefaults, Set<String> attrToModify) {
         Map<String, String> modifiedValues = new HashMap<String, String>();
@@ -130,6 +135,13 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
         return modifiedValues;
     }
 
+    private Set<String> calculateDeletedServerDefaults(Map<String, String> existingDefaults) throws IOException {
+        Properties validProperties = new Properties();
+        validProperties.load(getClass().getResourceAsStream(VALID_SERVER_CONFIG_PROPERTIES));
+        Map<String, String> validServerProperties = new HashMap(validProperties);
+        return calculateDeletedServerDefaults(existingDefaults, validServerProperties);
+    }
+
     /**
      * Finds deleted attributes by comparing the currently defined properties against the new valid server properties.
      * By comparing against the valid server properties we can ensure that manually defined custom properties will not
@@ -139,6 +151,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
      * @param validServerProperties The valid server properties defined in validserverconfig.properties.
      * @return The attributenames that are no longer valid.
      */
+    @VisibleForTesting
     protected Set<String> calculateDeletedServerDefaults(Map<String, String> existingDefaults,
             Map<String, String> validServerProperties) {
         Set<String> deletedValues = new HashSet<String>();
@@ -163,7 +176,13 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
             UpgradeProgress.reportStart("upgrade.platformupdate");
             existingDefaults = new HashMap(ServerConfiguration.getServerInstance(getAdminToken(),
                     ServerConfiguration.DEFAULT_SERVER_CONFIG));
-            Map<String, String> upgradedValues = new HashMap<String, String>(existingDefaults);
+
+            // Refine the change sets
+            addedAttrs = calculateAddedServerDefaults(addedAttrs, existingDefaults);
+            modifiedAttrs = calculateModifiedServerDefaults(modifiedAttrs, existingDefaults);
+            deletedAttrs = calculateDeletedServerDefaults(existingDefaults);
+
+            Map<String, String> upgradedValues = new HashMap<>(existingDefaults);
             upgradedValues.putAll(addedAttrs);
             upgradedValues.putAll(modifiedAttrs);
             upgradedValues.keySet().removeAll(deletedAttrs);

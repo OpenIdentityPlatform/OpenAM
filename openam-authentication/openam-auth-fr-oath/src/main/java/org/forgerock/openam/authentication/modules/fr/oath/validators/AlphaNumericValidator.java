@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath.validators;
@@ -19,6 +19,7 @@ package org.forgerock.openam.authentication.modules.fr.oath.validators;
 import com.sun.identity.sm.ServiceAttributeValidator;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Service Manager validator for alpha numeric characters.
@@ -35,10 +36,9 @@ public class AlphaNumericValidator implements ServiceAttributeValidator {
      * @return true if everything is valid, false otherwise.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean validate(Set values) {
-        for (String toTest : (Set<String>) values) {
-            if (NOT_ALPHA_NUM.matcher(toTest).find()) {
+    public boolean validate(Set<String> values) {
+        for (String toTest : values) {
+            if (StringUtils.isEmpty(toTest) || NOT_ALPHA_NUM.matcher(toTest).find()) {
                 return false;
             }
         }

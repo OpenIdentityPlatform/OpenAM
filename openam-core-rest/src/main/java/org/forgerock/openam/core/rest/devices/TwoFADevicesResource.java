@@ -11,26 +11,39 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.core.rest.devices;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdUtils;
 import java.text.ParseException;
 
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.services.context.Context;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * Abstract sub-implementation of the UserDevicesResource.
  *
- * A TwoFADevice must have a "uuid" field in it's stored attribute profile.
+ * A TwoFADevice must have the ability to skip the module, if desired by the user and
+ * the configuration of that server allows it.
  *
  * @param <T>
  */
 public abstract class TwoFADevicesResource<T extends UserDevicesDao> extends UserDevicesResource<T> {
+
+    protected final static String SKIP = "skip";
+    protected final static String CHECK = "check";
+
+    protected final static String VALUE = "value";
+    protected final static String RESULT = "result";
+    protected final static String RESET = "reset";
 
     /**
      * Constructs a new UserDevicesResource.
@@ -46,6 +59,14 @@ public abstract class TwoFADevicesResource<T extends UserDevicesDao> extends Use
     protected ResourceResponse convertValue(JsonValue queryResult) throws ParseException {
         return newResourceResponse(queryResult.get(UUID_KEY).asString(), Integer.toString(queryResult.hashCode()),
                 queryResult);
+    }
+
+    /**
+     * Retrieving the user id in this fashion ensures that an admin can utilise these functions.
+     */
+    @VisibleForTesting
+    protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
+        return IdUtils.getIdentity(contextHelper.getUserId(context), contextHelper.getRealm(context));
     }
 
 }

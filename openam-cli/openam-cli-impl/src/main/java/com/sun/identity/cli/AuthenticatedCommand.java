@@ -165,7 +165,7 @@ public abstract class AuthenticatedCommand extends CLICommandBase {
         int type,
         Level level,
         String msgid,
-        String[] msgdata
+        String... msgdata
     ) throws CLIException {
         CommandManager mgr = getCommandManager();
         LogWriter.log(mgr, type, level, msgid, msgdata,getAdminSSOToken());

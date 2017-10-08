@@ -54,6 +54,7 @@
                     type="list" 
                     syntax="string" 
                     i18nKey="a101"
+                    order="100"
                     resourceName="requestHandlers">
                 </AttributeSchema> 
             </Global>

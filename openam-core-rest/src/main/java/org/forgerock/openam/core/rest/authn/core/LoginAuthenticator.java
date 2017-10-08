@@ -11,13 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
- */
-
-/*
+ * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package org.forgerock.openam.core.rest.authn.core;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
@@ -28,13 +31,6 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
@@ -187,7 +183,11 @@ public class LoginAuthenticator {
         HttpServletResponse response = loginConfiguration.getHttpResponse();
         SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
         boolean isSessionUpgrade = false;
-        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull() || loginConfiguration.isForceAuth()) {
+        // If the sessionID is null we don't have an authentication session yet, so we will need to use the existing
+        // session ID when creating the new AuthContext instance. For subsequent requests the sessionID won't be null,
+        // hence the AuthContext should be retrieved using that instead to ensure we only have one authentication
+        // session for this session upgrade.
+        if (sessionID.isNull() && (loginConfiguration.isSessionUpgradeRequest() || loginConfiguration.isForceAuth())) {
             sessionID = new SessionID(loginConfiguration.getSSOTokenId());
             SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(sessionID);
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),

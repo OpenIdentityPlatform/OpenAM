@@ -82,7 +82,7 @@ public class ContextHelper {
      * @return The resource realm.
      */
     public String getRealm(Context context) {
-        return context.asContext(RealmContext.class).getResolvedRealm();
+        return context.asContext(RealmContext.class).getRealm().asPath();
     }
 
     /**

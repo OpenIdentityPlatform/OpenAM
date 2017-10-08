@@ -1,8 +1,10 @@
 <div class="btn-action-group pull-right">
-    <button id="revert" class="btn btn-default" type="button">
+    {{#if revert}}
+    <button data-revert class="btn btn-default" type="button">
         <span>{{t "common.form.revert"}}</span>
     </button>
-    <button id="save" class="btn btn-primary" type="button">
+    {{/if}}
+    <button data-save {{#if saveDisabled}}disabled{{/if}} class="btn btn-primary" type="button">
         <span>{{t "common.form.saveChanges"}}</span>
     </button>
 </div>

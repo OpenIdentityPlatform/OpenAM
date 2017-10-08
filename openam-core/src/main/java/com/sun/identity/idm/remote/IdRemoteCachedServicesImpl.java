@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: IdRemoteCachedServicesImpl.java,v 1.20 2010/01/28 00:45:25 bigfatrat Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.remote;
 
@@ -59,7 +59,7 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import org.forgerock.openam.utils.CrestQuery;
 
-/*
+/**
  * Class which provides caching on top of available IdRepoLDAPServices.
  */
 public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements

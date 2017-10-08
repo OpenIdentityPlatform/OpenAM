@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "handlebars",
@@ -25,11 +27,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     // jquery dependencies
     "sortable"
-], function ($, _, AbstractView, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
-             PostProcessView, Router, SMSRealmDelegate) {
+], function ($, _, AbstractView, Constants, EventManager, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
+             PostProcessView, Router, AuthenticationService) {
 
     var createLinkView = function (index, view) {
             var linkView = new LinkView();
@@ -64,19 +66,19 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         initSortable = function (self) {
 
             self.$el.find("ol#sortableAuthChain").nestingSortable({
-                exclude:"li:not(.chain-link)",
+                exclude: "li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
                 placeholder: "<li class='placeholder'><div class='placeholder-inner'></div></i>",
 
-                onDrag: function (item, position) {
+                onDrag (item, position) {
                     item.css({
                         left: position.left - self.adjustment.left,
                         top: position.top - self.adjustment.top
                     });
                 },
 
-                onDragStart: function (item, container) {
+                onDragStart (item, container) {
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer;
 
@@ -90,7 +92,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     $("body").addClass("dragging");
                 },
 
-                onDrop: function (item, container, _super) {
+                onDrop (item, container, _super) {
                     self.sortChainData(self.originalIndex, item.index());
                     self.validateChain();
                     _super(item, container);
@@ -101,31 +103,30 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     return AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
-            "click #saveEditChain":  "saveChain",
-            "click #saveSettings":   "saveSettings",
-            "click .add-new-module": "addNewModule",
-            "click #delete":         "onDeleteClick"
+            "click [data-save-chain]"    : "saveChain",
+            "click [data-save-settings]" : "saveSettings",
+            "click [data-add-new-module]": "addNewModule",
+            "click [data-delete]"        : "onDeleteClick"
         },
         partials: [
-            "partials/alerts/_Alert.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+            "partials/alerts/_Alert.html"
         ],
 
-        addItemToList: function (element) {
+        addItemToList (element) {
             this.$el.find("ol#sortableAuthChain").append(element);
         },
 
-        addNewModule: function () {
+        addNewModule () {
             var index = this.data.form.chainData.authChainConfiguration.length,
                 linkView = createLinkView(index, this);
             this.editItem(linkView);
         },
 
-        editItem: function (linkview) {
+        editItem (linkview) {
             EditLinkView.show(linkview);
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
             if ($(e.currentTarget).hasClass("disabled")) { return false; }
 
@@ -133,13 +134,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 _.bind(this.deleteChain, this));
         },
 
-        deleteChain: function () {
+        deleteChain () {
             var self = this;
 
-            SMSRealmDelegate.authentication.chains.remove(
+            AuthenticationService.authentication.chains.remove(
                 self.data.realmPath,
                 self.data.form.chainData._id)
-            .then(function () {
+            .then(() => {
                 Messages.addMessage({
                     type: Messages.TYPE_INFO,
                     message: $.t("console.authentication.editChains.deletedChain")
@@ -148,24 +149,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     args: [encodeURIComponent(self.data.realmPath)],
                     trigger: true
                 });
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-
-        render: function (args) {
+        render (args) {
             var self = this;
 
-            SMSRealmDelegate.authentication.chains.get(args[0], args[1]).then(function (data) {
+            AuthenticationService.authentication.chains.get(args[0], args[1]).then((data) => {
 
                 self.data = {
                     realmPath : args[0],
                     allModules : data.modulesData,
-                    form : { chainData: data.chainData }
+                    form : { chainData: data.chainData },
+                    headerActions: [
+                        { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" }
+                    ]
                 };
 
                 self.parentRender(function () {
@@ -188,7 +191,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                                 $.t("console.authentication.editChains.deleteBtnTooltip.defaultOrgAuthChain");
                         }
                         // popover doesn't work in case button has disabled attribute
-                        self.$el.find("#delete").addClass("disabled").popover(popoverOpt);
+                        self.$el.find("[data-delete]").addClass("disabled").popover(popoverOpt);
                     }
 
                     if (self.data.form.chainData.authChainConfiguration.length > 0) {
@@ -207,64 +210,63 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     PostProcessView.render(self.data.form.chainData);
                 });
 
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
 
-        saveSettings: function (e) {
+        saveSettings () {
             var self = this,
                 chainData = this.data.form.chainData;
 
             chainData.loginSuccessUrl[0] = this.$el.find("#loginSuccessUrl").val();
             chainData.loginFailureUrl[0] = this.$el.find("#loginFailureUrl").val();
 
-            PostProcessView.addClassNameDialog().then(function () {
+            PostProcessView.addClassNameDialog().then(() => {
                 var savedData = {
-                        loginFailureUrl: chainData.loginFailureUrl,
-                        loginPostProcessClass: chainData.loginPostProcessClass,
-                        loginSuccessUrl: chainData.loginSuccessUrl
-                    },
-                    promise = SMSRealmDelegate.authentication.chains.update(
-                        self.data.realmPath, chainData._id, savedData);
+                    loginFailureUrl: chainData.loginFailureUrl,
+                    loginPostProcessClass: chainData.loginPostProcessClass,
+                    loginSuccessUrl: chainData.loginSuccessUrl
+                };
 
-                promise.fail(function (response) {
+                AuthenticationService.authentication.chains.update(self.data.realmPath, chainData._id, savedData)
+                .then(() => {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                }, (response) => {
                     Messages.addMessage({
                         type: Messages.TYPE_DANGER,
-                        response: response
+                        response
                     });
                 });
-
-                FormHelper.bindSavePromiseToElement(promise, e.currentTarget);
             });
         },
 
-        saveChain: function (e) {
+        saveChain () {
             var chainData = this.data.form.chainData,
                 savedData = {
                     authChainConfiguration: chainData.authChainConfiguration
-                },
-                promise = SMSRealmDelegate.authentication.chains.update(this.data.realmPath, chainData._id, savedData);
+                };
 
-            promise.fail(function (response) {
+            AuthenticationService.authentication.chains.update(this.data.realmPath, chainData._id, savedData)
+            .then(() => {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
-
-            FormHelper.bindSavePromiseToElement(promise, e.currentTarget);
         },
 
-        sortChainData: function (from, to) {
+        sortChainData (from, to) {
             var addItem = this.data.form.chainData.authChainConfiguration.splice(from, 1)[0];
             this.data.form.chainData.authChainConfiguration.splice(to, 0, addItem);
         },
 
-        validateChain: function () {
+        validateChain () {
             var invalid = false,
                 alert = "",
                 firstRequiredIndex,
@@ -276,9 +278,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 invalid = true;
                 this.$el.find("#sortableAuthChain").addClass("hidden");
                 this.$el.find("#lowerAuthChainsLegend").addClass("hidden");
+                this.$el.find(".btn-toolbar").addClass("hidden");
                 this.$el.find(".call-to-action-block").removeClass("hidden");
-
-
             } else {
                 this.$el.find(".call-to-action-block").addClass("hidden");
                 firstRequiredIndex = _.findIndex(config, { criteria: "REQUIRED" });
@@ -293,10 +294,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
                 this.$el.find("#sortableAuthChain").removeClass("hidden");
                 this.$el.find("#lowerAuthChainsLegend").removeClass("hidden");
+                this.$el.find(".btn-toolbar").removeClass("hidden");
             }
 
             this.$el.find("#alertContainer").html(alert);
-            this.$el.find("#saveEditChain").prop("disabled", invalid);
+            this.$el.find("[data-save-chain]").prop("disabled", invalid);
         }
 
     });

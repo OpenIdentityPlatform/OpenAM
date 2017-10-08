@@ -98,13 +98,13 @@ public class RealmSetServiceAttributeValues extends AuthenticatedCommand {
                     bAppend);
             }
         } catch (IdRepoException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmSetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_SET_SVC_ATTR_VALUES_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SSOException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmSetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_SET_SVC_ATTR_VALUES_REALM", args);
@@ -188,13 +188,13 @@ public class RealmSetServiceAttributeValues extends AuthenticatedCommand {
             outputWriter.printlnMessage(getResourceString(
                 "set-svc-attribute-values-realm-succeed"));
         } catch (SSOException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmSetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_SET_SVC_ATTR_VALUES_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmSetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_SET_SVC_ATTR_VALUES_REALM", args);

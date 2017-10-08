@@ -24,10 +24,12 @@
  *
  * $Id: AuthnRequestInfo.java,v 1.2 2008/06/25 05:47:53 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import java.util.Map;
@@ -77,7 +79,7 @@ public class AuthnRequestInfo extends CacheObject {
         this.response = response;
         this.spEntityID = spEntityID;
         this.idpEntityID = idpEntityID;
-        time = System.currentTimeMillis();
+        time = currentTimeMillis();
     }
 
     /**

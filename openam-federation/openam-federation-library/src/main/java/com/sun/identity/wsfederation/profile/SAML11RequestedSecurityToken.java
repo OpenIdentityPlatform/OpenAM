@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: SAML11RequestedSecurityToken.java,v 1.7 2009/12/14 23:42:48 mallas Exp $
- * 
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.assertion.AttributeStatement;
@@ -36,6 +39,7 @@ import com.sun.identity.saml.assertion.Conditions;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Statement;
 import com.sun.identity.saml.assertion.Subject;
+import com.sun.identity.saml.assertion.SubjectConfirmation;
 import com.sun.identity.saml.assertion.SubjectStatement;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLException;
@@ -149,7 +153,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
     /**
      * Creates a SAML11RequestedSecurityToken.
      * @param realm the realm of the entities.
-     * @param spEntityId service provider entity ID - consumer of the token.
+     * @param spTokenIssuerName The name of the SP Token Issuer.
      * @param idpEntityId identity provifer entity ID - issuer of the token.
      * @param notBeforeSkew number of seconds to subtract from current time
      * to form Assertion notBefore time.
@@ -167,7 +171,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
      * @throws com.sun.identity.wsfederation.common.WSFederationException in 
      * case of error.
      */
-    public SAML11RequestedSecurityToken(String realm, String spEntityId, 
+    public SAML11RequestedSecurityToken(String realm, String spTokenIssuerName,
         String idpEntityId, int notBeforeSkew, int effectiveTime,
         String certAlias, String authMethod, Date authInstant, 
         NameIdentifier ni, List attributes)
@@ -178,16 +182,15 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
         
         try {
             Subject sub = new Subject(ni);
-            Set<Statement> statements = 
-                new HashSet<Statement>();
-            statements.add(new AuthenticationStatement(authMethod, authInstant,
-                            sub, null, null));
+            sub.setSubjectConfirmation(new SubjectConfirmation(SAMLConstants.CONFIRMATION_METHOD_BEARER));
+            Set<Statement> statements = new HashSet<Statement>();
+            statements.add(new AuthenticationStatement(authMethod, authInstant, sub, null, null));
 
             if ((attributes != null) && (!attributes.isEmpty())) {
                 statements.add(new AttributeStatement(sub, attributes));
             }
 
-            Date issueInstant = new Date();
+            Date issueInstant = newDate();
 
             long skewPeriod = (long)notBeforeSkew * 1000L;
             Date notBefore = new Date(issueInstant.getTime() - skewPeriod);            
@@ -197,13 +200,11 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
                 WSFederationUtils.getMetaManager();
             FederationElement idp = 
                 metaManager.getEntityDescriptor(realm, idpEntityId);
-            FederationElement sp = 
-                metaManager.getEntityDescriptor(realm, spEntityId);
-            
+
             String issuer = metaManager.getTokenIssuerName(idp);
-        
+
             List<String> targets = new ArrayList<String>();
-            targets.add(metaManager.getTokenIssuerName(sp));
+            targets.add(spTokenIssuerName);
             
             AudienceRestrictionCondition arc = 
                 new AudienceRestrictionCondition(targets);
@@ -436,7 +437,7 @@ public class SAML11RequestedSecurityToken implements RequestedSecurityToken {
         Date sessionNotOnOrAfter = assertion.getConditions().getNotOnorAfter();
         if (sessionNotOnOrAfter != null) {
             long maxSessionTime = (sessionNotOnOrAfter.getTime() -
-                    System.currentTimeMillis()) / 60000;
+                    currentTimeMillis()) / 60000;
             if (maxSessionTime > 0) {
                 attrMap.put(SAML2Constants.MAX_SESSION_TIME,
                         new Long(maxSessionTime));

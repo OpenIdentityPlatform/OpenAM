@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.description",
+  "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.title",
+  "properties": {
+    "issueID": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.issueID.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.issueID.title",
+      "type": "integer",
+      "format": "int64"
+    },
+    "referenceID": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.referenceID.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.referenceID.title",
+      "type": "string"
+    },
+    "description": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.description.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.description.title",
+      "type": "string"
+    },
+    "threadDumpDelayInSeconds": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.threadDumpDelayInSeconds.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.threadDumpDelayInSeconds.title",
+      "type": "integer",
+      "format": "int64"
+    },
+    "configExportPassword": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportPassword.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportPassword.title",
+      "type": "string"
+    },
+    "debugLevel": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.debugLevel.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.debugLevel.title",
+      "type": "string",
+      "enum": [
+        "OFF",
+        "ERROR",
+        "WARNING",
+        "MESSAGE",
+        "ON"
+      ]
+    },
+    "autoStopTimeInMS": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopTimeInMS.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopTimeInMS.title",
+      "type": "integer",
+      "format": "int64"
+    },
+    "configExportSharePasswordEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportSharePasswordEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportSharePasswordEnabled.title",
+      "type": "boolean"
+    },
+    "autoStopFileSizeInKB": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopFileSizeInKB.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopFileSizeInKB.title",
+      "type": "integer",
+      "format": "int64"
+    },
+    "threadDumpEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.threadDumpEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.threadDumpEnabled.title",
+      "type": "boolean"
+    },
+    "configExportEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.configExportEnabled.title",
+      "type": "boolean"
+    },
+    "autoStopEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopEnabled.title",
+      "type": "boolean"
+    },
+    "autoStopTimeEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopTimeEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopTimeEnabled.title",
+      "type": "boolean"
+    },
+    "autoStopFileSizeEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopFileSizeEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.autoStopFileSizeEnabled.title",
+      "type": "boolean"
+    },
+    "zipEnabled": {
+      "description": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.zipEnabled.description",
+      "title": "i18n:api-descriptor/RecordResource#record.status.record.recordProperties.zipEnabled.title",
+      "type": "boolean"
+    }
+  }
+}

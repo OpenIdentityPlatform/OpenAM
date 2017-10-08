@@ -11,49 +11,60 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryPrivilege;
-import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryReferralPrivilege;
-import static com.sun.identity.entitlement.xacml3.XACMLExportImport.DiffStatus;
-import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import static com.sun.identity.entitlement.xacml3.XACMLExportImport.PrivilegeManagerFactory;
-import static java.util.Arrays.asList;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.testng.AssertJUnit.fail;
 
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.xacml.v3.DiffStatus;
+import org.forgerock.openam.xacml.v3.ImportStep;
+import org.forgerock.openam.xacml.v3.PersistableImportStep;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ResourceMatch;
+import com.sun.identity.entitlement.URLResourceName;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
 
 public class XACMLExportImportTest {
 
     private static final String ROOT_REALM = "/";
     private static final Subject NULL_SUBJECT = null;
     private static final InputStream NULL_INPUT = null;
-    private final long now = Calendar.getInstance().getTimeInMillis();
+    private final long now = getCalendarInstance().getTimeInMillis();
 
     private SearchFilterFactory searchFilterFactory;
     private PrivilegeValidator validator;
@@ -61,12 +72,14 @@ public class XACMLExportImportTest {
     private XACMLReaderWriter xacmlReaderWriter;
     private PrivilegeManagerFactory pmFactory;
     private Debug debug;
+    private ApplicationService applicationService;
+    private ApplicationServiceFactory applicationServiceFactory;
+    private ResourceTypeService resourceTypeService;
 
     private XACMLExportImport xacmlExportImport;
 
     @BeforeMethod
     public void setUp() throws EntitlementException {
-
         // Constructor Dependencies
 
         pmFactory = mock(PrivilegeManagerFactory.class);
@@ -76,27 +89,44 @@ public class XACMLExportImportTest {
         validator = mock(PrivilegeValidator.class);
         searchFilterFactory = new SearchFilterFactory();
         debug = mock(Debug.class);
+        applicationServiceFactory = mock(ApplicationServiceFactory.class);
+        applicationService = mock(ApplicationService.class);
+        resourceTypeService = mock(ResourceTypeService.class);
+        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+
+        Application application = mock(Application.class);
+        URLResourceName urlResourceName = mock(URLResourceName.class);
+        ResourceType resourceType = ResourceType.builder()
+                .setName("TestResourceType")
+                .setUUID("123")
+                .setPatterns(Collections.singleton("*://*:*/*")).build();
 
         // Class under test
 
-        xacmlExportImport = new XACMLExportImport(pmFactory,
-                xacmlReaderWriter, validator, searchFilterFactory, debug);
+        xacmlExportImport = new XACMLExportImport(pmFactory, xacmlReaderWriter, validator, searchFilterFactory, debug,
+                applicationServiceFactory, resourceTypeService);
 
         // Given (shared test state)
 
         given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(pm);
+        given(applicationServiceFactory.create(any(Subject.class), anyString())).willReturn(applicationService);
+        given(applicationService.getApplication(anyString())).willReturn(application);
+        given(application.getResourceComparator()).willReturn(urlResourceName);
+        given(urlResourceName.compare(anyString(), anyString(), anyBoolean())).willReturn(ResourceMatch.EXACT_MATCH);
+        given(application.getResourceTypeUuids()).willReturn(Collections.singleton("123"));
+        given(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).willReturn(resourceType);
     }
 
     @Test
     public void canImportPrivilegesIntoRealm() throws Exception {
-
         // Given
         // shared test state
         Privilege privilegeToUpdate = existing(valid(privilege("p1")));
         Privilege privilegeToAdd = notExisting(valid(privilege("p2")));
 
-        PrivilegeSet privilegeSet = new PrivilegeSet(Collections.<ReferralPrivilege>emptyList(),
-                asList(privilegeToUpdate, privilegeToAdd));
+        PrivilegeSet privilegeSet = new PrivilegeSet();
+        privilegeSet.addPrivilege(privilegeToUpdate);
+        privilegeSet.addPrivilege(privilegeToAdd);
 
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
 
@@ -117,14 +147,14 @@ public class XACMLExportImportTest {
 
     @Test
     public void canPerformAnImportDryRun() throws Exception {
-
         // Given
         // shared test state
         Privilege privilegeToUpdate = existing(valid(privilege("p1")));
         Privilege privilegeToAdd = notExisting(valid(privilege("p2")));
 
-        PrivilegeSet privilegeSet = new PrivilegeSet(Collections.<ReferralPrivilege>emptyList(),
-                asList(privilegeToUpdate, privilegeToAdd));
+        PrivilegeSet privilegeSet = new PrivilegeSet();
+        privilegeSet.addPrivilege(privilegeToUpdate);
+        privilegeSet.addPrivilege(privilegeToAdd);
 
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
 
@@ -160,24 +190,8 @@ public class XACMLExportImportTest {
         fail("Expected validation exception");
     }
 
-    @Test
-    public void testUndesirablePrivilegeNames() {
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary-name")).isFalse();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary+name")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("+")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("+name")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary-name+")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary>name")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary<name")).isTrue();
-        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary\\name")).isTrue();
-    }
-
     private Privilege privilege(String name) throws EntitlementException {
         return createArbitraryPrivilege(name, now);
-    }
-
-    private ReferralPrivilege referralPrivilege(String name) throws EntitlementException {
-        return createArbitraryReferralPrivilege(name, now);
     }
 
     private <T extends IPrivilege> T valid(T privilege) {
@@ -210,7 +224,7 @@ public class XACMLExportImportTest {
     }
 
     public static void assertImportStep(ImportStep importStep, DiffStatus diffStatus, IPrivilege privilege) {
-        assertThat(importStep.getPrivilege()).isEqualTo(privilege).as("privilege");
+        assertThat(((PersistableImportStep<Privilege>)importStep).get()).isEqualTo(privilege).as("privilege");
         assertThat(importStep.getDiffStatus()).isEqualTo(diffStatus).as("diffStatus");
     }
 

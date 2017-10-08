@@ -30,6 +30,8 @@ package com.sun.identity.setup;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSSchema;
 
@@ -290,7 +292,9 @@ public class AMSetupDSConfig {
                         .set(AUTHN_BIND_REQUEST, request);
 
                 if (ssl) {
-                    options = options.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+                    String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+                    options = options.set(SSL_CONTEXT,
+                            new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
                 }
 
                 ld = new LDAPConnectionFactory(dsHostName, getPort(), options);

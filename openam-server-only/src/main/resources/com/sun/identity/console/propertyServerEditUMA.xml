@@ -12,12 +12,14 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Copyright 2015 ForgeRock AS.
+  ~ Portions Copyright 2016 Nomura Research Institute, Ltd.
   -->
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
 <propertysheet>
     <section name="resourcesets-common-section" defaultValue="amconfig.org.forgerock.services.resourcesets.store.common.section">
         <property required="true">
+            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.store.location" labelFor="cscorg-forgerock-services-resourcesets-store-location" />
             <cc name="cscorg-forgerock-services-resourcesets-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
                 <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
                 <option label="amconfig.org.forgerock.services.store.location.external" value="external" />
@@ -58,6 +60,7 @@
     </section>
     <section name="audit-common-section" defaultValue="amconfig.org.forgerock.services.umaaudit.store.common.section">
         <property required="true">
+            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.store.location" labelFor="cscorg-forgerock-services-umaaudit-store-location" />
             <cc name="cscorg-forgerock-services-umaaudit-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
                 <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
                 <option label="amconfig.org.forgerock.services.store.location.external" value="external" />
@@ -98,6 +101,7 @@
     </section>
     <section name="pendingrequests-common-section" defaultValue="amconfig.org.forgerock.services.uma.pendingrequests.store.common.section">
         <property required="true">
+            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.store.location" labelFor="cscorg-forgerock-services-uma-pendingrequests-store-location" />
             <cc name="cscorg-forgerock-services-uma-pendingrequests-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
                 <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
                 <option label="amconfig.org.forgerock.services.store.location.external" value="external" />
@@ -138,6 +142,7 @@
     </section>
     <section name="rs-labels-common-section" defaultValue="amconfig.org.forgerock.services.uma.labels.store.common.section">
         <property required="true">
+            <label name="locationLabel" defaultValue="amconfig.org.forgerock.services.store.location" labelFor="cscorg-forgerock-services-uma-labels-store-location" />
             <cc name="cscorg-forgerock-services-uma-labels-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
                 <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
                 <option label="amconfig.org.forgerock.services.store.location.external" value="external" />

@@ -11,27 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import javax.security.auth.callback.TextInputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class RestAuthTextInputCallbackHandlerTest {
 
@@ -98,13 +97,11 @@ public class RestAuthTextInputCallbackHandlerTest {
         JsonValue jsonObject = restAuthTextInputCallbackHandler.convertToJson(textInputCallback, 1);
 
         //Then
-        assertEquals("TextInputCallback", jsonObject.get("type").asString());
-        assertNotNull(jsonObject.get("output"));
-        assertEquals(2, jsonObject.get("output").size());
+        assertThat(jsonObject).stringAt("type").isEqualTo("TextInputCallback");
+        assertThat(jsonObject).hasArray("output").hasSize(2);
         assertEquals("Enter text:", jsonObject.get("output").get(0).get("value").asString());
         assertEquals("DEFAULT_VALUE", jsonObject.get("output").get(1).get("value").asString());
-        assertNotNull(jsonObject.get("input"));
-        assertEquals(1, jsonObject.get("input").size());
+        assertThat(jsonObject).hasArray("input").hasSize(1);
         assertEquals("", jsonObject.get("input").get(0).get("value").asString());
     }
 
@@ -149,9 +146,6 @@ public class RestAuthTextInputCallbackHandlerTest {
 
         //When
         restAuthTextInputCallbackHandler.convertFromJson(textInputCallback, jsonTextInputCallback);
-
-        //Then
-        fail();
     }
 
     @Test

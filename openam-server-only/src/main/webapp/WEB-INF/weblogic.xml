@@ -17,7 +17,7 @@
 <weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
-     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
+     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
     <context-root>/openam</context-root>
     <container-descriptor>
         <container-initializer-enabled>false</container-initializer-enabled>
@@ -32,6 +32,14 @@
 
             <!-- Joda DateTime -->
             <package-name>org.joda.time.*</package-name>
+
+            <!-- SLF4J -->
+            <package-name>org.slf4j.*</package-name>
+            <package-name>org.slf4j.impl.*</package-name>
+            <package-name>org.slf4j.bridge.*</package-name>
         </prefer-application-packages>
+        <prefer-application-resources>
+            <resource-name>org/slf4j/impl/StaticLoggerBinder.class</resource-name>
+        </prefer-application-resources>
     </container-descriptor>
 </weblogic-web-app>

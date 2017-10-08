@@ -24,16 +24,10 @@
  *
  * $Id: PluginConfigImpl.java,v 1.5 2008/07/11 01:46:21 arviranga Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,11 +35,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * The class <code>PluginConfigImpl</code> provides interfaces to read the
  * plugin configuration information of a service.
  */
-class PluginConfigImpl {
+class PluginConfigImpl implements CachedSMSEntry.SMSEntryUpdateListener {
     private PluginSchemaImpl ps;
 
     private boolean newEntry;
@@ -140,7 +138,7 @@ class PluginConfigImpl {
 
     // Gets calls by local changes and also by notifications threads
     // Hence synchronized to avoid data corruption
-    synchronized void update() {
+    public synchronized void update() {
         // Get the SMSEntry
         SMSEntry entry = smsEntry.getSMSEntry();
         newEntry = entry.isNewEntry();

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest;
@@ -20,6 +20,7 @@ import static com.sun.identity.sm.SMSException.STATUS_NO_PERMISSION;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.rest.RestUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.security.AccessController;
@@ -112,7 +113,7 @@ public class RealmResource implements CollectionResourceProvider {
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         ResourceResponse resource;
         String parentRealm;
@@ -153,7 +154,7 @@ public class RealmResource implements CollectionResourceProvider {
 
             // create a resource for handler to return
             OrganizationConfigManager realmCreated = new OrganizationConfigManager(getSSOToken(), realm);
-            resource = newResourceResponse(childRealm, String.valueOf(System.currentTimeMillis()),
+            resource = newResourceResponse(childRealm, String.valueOf(currentTimeMillis()),
                     createJsonMessage("realmCreated", realmCreated.getOrganizationName()));
             return newResultPromise(resource);
 
@@ -262,7 +263,7 @@ public class RealmResource implements CollectionResourceProvider {
             DeleteRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         boolean recursive = false;
         ResourceResponse resource;
@@ -352,7 +353,7 @@ public class RealmResource implements CollectionResourceProvider {
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
         final RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realmPath = realmContext.getResolvedRealm();
+        final String realmPath = realmContext.getRealm().asPath();
 
         try {
 
@@ -402,7 +403,7 @@ public class RealmResource implements CollectionResourceProvider {
             ReadRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         ResourceResponse resource;
         JsonValue jval;
@@ -423,7 +424,7 @@ public class RealmResource implements CollectionResourceProvider {
 
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
-            resource = newResourceResponse(resourceId, String.valueOf(System.currentTimeMillis()), jval);
+            resource = newResourceResponse(resourceId, String.valueOf(currentTimeMillis()), jval);
             if(debug.messageEnabled()) {
                 debug.message("RealmResource.readInstance :: READ : Successfully read realm, " +
                         resourceId + " performed by " + principalName);
@@ -686,7 +687,7 @@ public class RealmResource implements CollectionResourceProvider {
             UpdateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getResolvedRealm();
+        String realmPath = realmContext.getRealm().asPath();
 
         final JsonValue realmDetails = request.getContent();
         ResourceResponse resource;
@@ -725,7 +726,7 @@ public class RealmResource implements CollectionResourceProvider {
                     principalName);
 
             // create a resource for handler to return
-            resource = newResourceResponse(realm, String.valueOf(System.currentTimeMillis()),
+            resource = newResourceResponse(realm, String.valueOf(currentTimeMillis()),
                     createJsonMessage("realmUpdated", realmCreatedOcm.getOrganizationName()));
             return newResultPromise(resource);
         } catch (SMSException e) {

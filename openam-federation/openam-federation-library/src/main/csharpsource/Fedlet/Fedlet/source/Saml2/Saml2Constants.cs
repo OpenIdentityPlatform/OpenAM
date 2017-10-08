@@ -25,7 +25,7 @@
  * $Id: Saml2Constants.cs,v 1.6 2010/01/12 18:04:54 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 namespace Sun.Identity.Saml2
@@ -198,9 +198,24 @@ namespace Sun.Identity.Saml2
         public const string SignatureAlgorithmDsa = "http://www.w3.org/2000/09/xmldsig#dsa-sha1";
 
         /// <summary>
-        /// Constant for the RSA type of signature algorithm. 
+        /// Constant for the RSA type of signature algorithm with SHA1. 
         /// </summary>
         public const string SignatureAlgorithmRsa = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+
+        /// <summary>
+        /// Constant for the RSA type of signature algorithm with SHA256. 
+        /// </summary>
+        public const string SignatureAlgorithmRsa256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+
+        /// <summary>
+        /// Constant for the RSA type of signature algorithm with SHA384. 
+        /// </summary>
+        public const string SignatureAlgorithmRsa384 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+
+        /// <summary>
+        /// Constant for the RSA type of signature algorithm with SHA512. 
+        /// </summary>
+        public const string SignatureAlgorithmRsa512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
 
         /// <summary>
         /// Constant for the Signature parameter.

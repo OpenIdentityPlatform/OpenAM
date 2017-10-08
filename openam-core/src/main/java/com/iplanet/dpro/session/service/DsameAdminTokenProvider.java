@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,15 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
+
+import java.security.AccessController;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -36,20 +41,10 @@ import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.security.AdminDNAction;
 import com.sun.identity.security.AdminPasswordAction;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.AccessController;
-
 /**
- * Responsible for providing a cached SSOToken for the DSAME admin user.
- *
- * Contains logic extracted from SessionService class as part of first-pass
- * refactoring to improve SessionService adherence to SRP.
+ * Responsible for providing a cached SSOToken for the DSAME (Directory Server Access Management Edition) admin user.
  *
  * @since 13.0.0
- */
-/*
- * Further refactoring is warranted.
  */
 @Singleton
 public class DsameAdminTokenProvider {
@@ -67,7 +62,11 @@ public class DsameAdminTokenProvider {
         dsameAdminPassword = (String) AccessController.doPrivileged(new AdminPasswordAction());
     }
 
-    String getDsameAdminDN() {
+    /**
+     * Returns the DSAME (Directory Server Access Management Edition) Admin Distinguished Name.
+     * @return the admin token Distinguished Name
+     */
+    public String getDsameAdminDN() {
         return dsameAdminDN;
     }
 

@@ -24,17 +24,15 @@
  *
  * $Id: AttributeSchemaImpl.java,v 1.3 2008/06/25 05:44:03 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import static com.sun.identity.sm.AttributeSchema.ListOrder.*;
+import static com.sun.identity.sm.AttributeSchema.ListOrder.INSERTION;
 import static java.util.Collections.emptySet;
 import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
 
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.xml.XMLUtils;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,8 +41,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.shared.xml.XMLUtils;
 
 
 /**
@@ -71,7 +73,9 @@ public class AttributeSchemaImpl {
 
     private AttributeSchema.Syntax syntax;
 
-    private Set defaultValues = null;
+    private Set<String> defaultValues = null;
+
+    private Set<String> exampleValues = null;
 
     private DefaultValues defaultsObject = null;
 
@@ -115,6 +119,8 @@ public class AttributeSchemaImpl {
     boolean isSearchable;
 
     private boolean hasChoiceValues;
+
+    private Integer order;
 
     /**
      * Constructor used by ServiceSchema to instantiate AttributeSchema objects.
@@ -173,6 +179,15 @@ public class AttributeSchemaImpl {
     }
 
     /**
+     * Returns the order of this attribute.
+     *
+     * @return the order of this attribute, null if not defined
+     */
+    public Integer getOrder() {
+        return order;
+    }
+
+    /**
      * Returns the value of the cosQualifier for this attribute. Either default,
      * overrid, operational or merge-cos.
      * 
@@ -185,16 +200,16 @@ public class AttributeSchemaImpl {
     /**
      * Returns the default values of the attribute.
      */
-    public Set getDefaultValues() {
+    public Set<String> getDefaultValues() {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues();
         }
-        return getDefaultValuesCopy(defaultValues);
+        return getValuesCopy(defaultValues);
     }
 
     /**
      * Returns the default values of the attribute.
-     * 
+     *
      * @param envParams
      *            Map of environment parameter to a set of values
      * @return default values for the attribute
@@ -203,10 +218,17 @@ public class AttributeSchemaImpl {
         if (defaultsObject != null) {
             defaultValues = defaultsObject.getDefaultValues(envParams);
         }
-        return getDefaultValuesCopy(defaultValues);
+        return getValuesCopy(defaultValues);
     }
 
-    private Set<?> getDefaultValuesCopy(Set<?> defaultValues) {
+    /**
+     * Returns the example values of the attribute.
+     */
+    public Set getExampleValues() {
+        return getValuesCopy(exampleValues);
+    }
+
+    private <T> Set<T> getValuesCopy(Set<T> defaultValues) {
         if (isEmpty(defaultValues)) {
             return emptySet();
         }
@@ -505,6 +527,12 @@ public class AttributeSchemaImpl {
         // Get I18N key
         key = XMLUtils.getNodeAttributeValue(n, SMSUtils.I18N_KEY);
 
+        try {
+            order = Integer.valueOf(XMLUtils.getNodeAttributeValue(n, SMSUtils.ORDER));
+        } catch (NumberFormatException e) {
+            order = null;
+        }
+
         // Get Attribute type
         String attrType = XMLUtils.getNodeAttributeValue(n,
                 SMSUtils.ATTRIBUTE_TYPE);
@@ -609,8 +637,7 @@ public class AttributeSchemaImpl {
                         choiceObject.setKeyValues(cvClassName);
                         choiceObject.setParentNode(n);
                     } catch (Exception e) {
-                        SMSEntry.debug.error("SMS AttributeSchema: "
-                                + "Unable to load class: " + className, e);
+                        SMSEntry.debug.warning("SMS AttributeSchema: Unable to load class: {}", className, e);
                         choiceObject = null;
                     }
                 }
@@ -656,6 +683,10 @@ public class AttributeSchemaImpl {
             } else {
                 defaultValues = getValues(node);
             }
+        }
+
+        if ((node = XMLUtils.getChildNode(n, SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT)) != null) {
+            exampleValues = getValues(node);
         }
 
         // If syntax is password, decrypt the attribute values

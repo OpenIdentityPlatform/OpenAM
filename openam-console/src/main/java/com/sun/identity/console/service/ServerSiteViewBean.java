@@ -31,11 +31,15 @@
  */
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.AMViewConfig;
@@ -164,7 +168,12 @@ public class ServerSiteViewBean
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException
     {
-        super.beginDisplay(event);
+        if (isXuiAdminConsoleEnabled()) {
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.DEPLOYMENT_SERVERS, authenticationRealm);
+        } else {
+            super.beginDisplay(event);
+        }
         resetButtonState(TBL_SERVER_BUTTON_DELETE);
         resetButtonState(TBL_SERVER_BUTTON_CLONE);
         resetButtonState(TBL_SITE_BUTTON_DELETE);
@@ -518,10 +527,9 @@ public class ServerSiteViewBean
     }
     
     public void handleBtnDefaultSettingsRequest(RequestInvocationEvent event) {
-        forwardToServerProfilePage(ServerConfiguration.DEFAULT_SERVER_CONFIG);
+        String authenticationRealm = getAuthenticationRealm(this);
+        redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION, authenticationRealm);
     }
-
-    
 
     protected String getBreadCrumbDisplayName() {
         return "breadcrumbs.server.config";

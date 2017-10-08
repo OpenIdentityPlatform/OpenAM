@@ -16,27 +16,31 @@
 package org.forgerock.openam.scripting.service;
 
 import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
+import static org.forgerock.openam.scripting.ScriptConstants.SERVICE_NAME;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.ChoiceValues;
-import com.sun.identity.sm.SMSEntry;
-import org.forgerock.openam.scripting.ScriptConstants;
-import org.forgerock.openam.scripting.ScriptException;
-import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
-import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
-import org.forgerock.util.query.QueryFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.scripting.ScriptConstants;
+import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.util.query.QueryFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.ChoiceValues;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * This class is used to retrieve the script names and IDs from the scripting service for display
@@ -115,13 +119,13 @@ public class ScriptChoiceValues extends ChoiceValues {
      * @return the scripting service.
      */
     private ScriptingService getScriptingService(String realm) {
-        final Subject admin = SubjectUtils.createSuperAdminSubject();
-        return new ScriptConfigurationService(LOGGER, admin, realm, new ScriptingDataStoreFactory() {
-            @Override
-            public ScriptingDataStore create(Subject subject, String realm) {
-                return new ScriptConfigurationDataStore(LOGGER, admin, realm);
-            }
-        });
+        CoreWrapper coreWrapper = new CoreWrapper();
+        try {
+            return new ScriptConfigurationService(LOGGER, realm, coreWrapper,
+                    new ServiceConfigManager(SERVICE_NAME, coreWrapper.getAdminToken()));
+        } catch (SMSException | SSOException e) {
+            throw new IllegalStateException("Unable to get service config manager for scripting service", e);
+        }
     }
 
 }

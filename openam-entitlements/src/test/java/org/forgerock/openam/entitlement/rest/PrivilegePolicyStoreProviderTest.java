@@ -17,10 +17,13 @@
 package org.forgerock.openam.entitlement.rest;
 
 import com.sun.identity.entitlement.PrivilegeManager;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -40,12 +43,19 @@ public class PrivilegePolicyStoreProviderTest {
 
     private PrivilegePolicyStoreProvider testProvider;
     private PrivilegeManagerFactory mockFactory;
-
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
-    public void setupMocks() {
+    public void setupMocks() throws Exception {
         mockFactory = mock(PrivilegeManagerFactory.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
         testProvider = new PrivilegePolicyStoreProvider(mockFactory, ATTRIBUTE_MAP);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -53,18 +63,17 @@ public class PrivilegePolicyStoreProviderTest {
         // Given
         SubjectContext subjectContext = mock(SubjectContext.class);
         Subject subject = new Subject();
-        String realm = "/test realm";
+        Realm realm = realmTestHelper.mockRealm("test realm");
         given(subjectContext.getCallerSubject()).willReturn(subject);
-        RealmContext context = new RealmContext(subjectContext);
-        context.setSubRealm(realm, realm);
+        RealmContext context = new RealmContext(subjectContext, realm);
         PrivilegeManager manager = mock(PrivilegeManager.class);
-        given(mockFactory.get(realm, subject)).willReturn(manager);
+        given(mockFactory.get(realm.asPath(), subject)).willReturn(manager);
 
         // When
         PolicyStore store = testProvider.getPolicyStore(context);
 
         // Then
-        verify(mockFactory).get(realm, subject);
+        verify(mockFactory).get(realm.asPath(), subject);
         assertThat(store).isNotNull().isInstanceOf(PrivilegePolicyStore.class);
     }
 

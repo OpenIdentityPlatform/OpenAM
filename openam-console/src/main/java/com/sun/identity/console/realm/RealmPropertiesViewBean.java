@@ -48,7 +48,6 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -116,8 +115,9 @@ public class RealmPropertiesViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            String redirectRealm = getRedirectRealm(this);
-            redirectToXui(getRequestContext().getRequest(), redirectRealm,
+            String redirectRealm = getAdministeredRealm(this);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm,
                 MessageFormat.format("realms/{0}/dashboard", Uris.urlEncodePathElement(redirectRealm)));
             return;
         }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -28,9 +28,12 @@ import java.util.Map;
  * will return a list of AttributeStatements. Only a single AttributeMapper will be provided to the AttributeStatementsProvider,
  * and the attributeMap specification will be pulled from the SAML2Config associated with the STS instance currently
  * consuming the TokenGenerationService.
+ *
+ * @supported.all.api
  */
 public interface AttributeMapper {
     /**
+     * Gets a list of populated SAML2 Attribute instances.
      *
      * @param token  The SSOToken corresponding to the subject whose attributes will be referenced.
      * @param attributeMap Contains the mapping of saml attribute names (Map keys) to local OpenAM attributes (Map values) in

@@ -24,13 +24,15 @@
  *
  * $Id: Scoping.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.ScopingImpl;
 import java.util.List;
 
 
@@ -40,6 +42,8 @@ import java.util.List;
  *
  * @supported.all.api
  */
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = ScopingImpl.class)
 public interface Scoping {
 
     /**

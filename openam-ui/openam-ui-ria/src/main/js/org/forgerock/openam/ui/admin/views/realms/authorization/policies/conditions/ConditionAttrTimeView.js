@@ -11,28 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrTimeView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
     "clockPicker"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrTime.html",
 
-        clickClockPicker: function (e) {
+        clickClockPicker (e) {
             e.stopPropagation();
             $(e.currentTarget).prev("input").clockpicker("show");
         },
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
-            this.events["click .fa-clock-o"] = _.bind(this.clickClockPicker, this);
+            this.events["click [data-clock]"] = _.bind(this.clickClockPicker, this);
 
             this.parentRender(function () {
                 this.initClockPickers();
@@ -43,14 +43,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        initClockPickers: function () {
+        initClockPickers () {
             this.$el.find(".clockpicker").each(function () {
 
                 var clock = $(this);
                 clock.clockpicker({
                     placement: "top",
                     autoclose: true,
-                    afterDone: function () {
+                    afterDone () {
                         clock.trigger("change");
                     }
                 });

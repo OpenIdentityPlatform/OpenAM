@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/SitesResourceProvider#schema.title",
+  "description": "i18n:api-descriptor/SitesResourceProvider#schema.description",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SitesResourceProvider#schema._id.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#schema._id.description"
+    },
+    "id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SitesResourceProvider#schema.id.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#schema.id.description"
+    },
+    "url": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SitesResourceProvider#schema.url.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#schema.url.description"
+    },
+    "secondaryURLs": {
+      "type": "array",
+      "title": "i18n:api-descriptor/SitesResourceProvider#schema.secondaryurls.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#schema.secondaryurls.description",
+      "items": {
+        "type": "string"
+      }
+    },
+    "servers": {
+      "type": "array",
+      "title": "i18n:api-descriptor/SitesResourceProvider#schema.servers.title",
+      "description": "i18n:api-descriptor/SitesResourceProvider#schema.servers.description",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "i18n:api-descriptor/SitesResourceProvider#schema.server.id.title",
+            "description": "i18n:api-descriptor/SitesResourceProvider#schema.server.id.description"
+          },
+          "url": {
+            "type": "string",
+            "title": "i18n:api-descriptor/SitesResourceProvider#schema.server.url.title",
+            "description": "i18n:api-descriptor/SitesResourceProvider#schema.server.url.description"
+          }
+        }
+      }
+    }
+  }
+}

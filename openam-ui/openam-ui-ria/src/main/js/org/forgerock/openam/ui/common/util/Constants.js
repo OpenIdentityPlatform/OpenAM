@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-define("org/forgerock/openam/ui/common/util/Constants", [
+define([
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (Constants) {
 
@@ -30,14 +30,11 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     path.splice(-1);
 
     Constants.context = path.join("/");
-    Constants.CONSOLE_PATH = "/" + Constants.context + "/console";
+    Constants.CONSOLE_PATH = `/${Constants.context}/console`;
     Constants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
 
     // Realm
     Constants.EVENT_INVALID_REALM = "main.EVENT_INVALID_REALM";
-
-    // Admin
-    Constants.EVENT_ADD_NEW_REALM_DIALOG = "admin.realms.EVENT_ADD_NEW_REALM_DIALOG";
 
     // Patterns
     Constants.IPV4_PATTERN =
@@ -62,14 +59,13 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     Constants.DEFAULT_STYLESHEETS = ["css/bootstrap-3.3.5-custom.css", "css/styles-admin.css"];
     Constants.EVENT_THEME_CHANGED = "main.EVENT_THEME_CHANGED";
 
-    Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION = "main.navigation.EVENT_REDIRECT_TO_JATO_CONFIGURATION";
     Constants.EVENT_REDIRECT_TO_JATO_FEDERATION = "main.navigation.EVENT_REDIRECT_TO_JATO_FEDERATION";
-    Constants.EVENT_REDIRECT_TO_JATO_SESSIONS = "main.navigation.EVENT_REDIRECT_TO_JATO_SESSIONS";
-    Constants.EVENT_REDIRECT_TO_JATO_SERVICES = "main.navigation.EVENT_REDIRECT_TO_JATO_SERVICES";
+    Constants.EVENT_REDIRECT_TO_JATO_AGENTS_OAUTH20 = "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_OAUTH20";
+    Constants.EVENT_REDIRECT_TO_JATO_AGENTS_JAVA = "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_JAVA";
+    Constants.EVENT_REDIRECT_TO_JATO_AGENTS_WEB = "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS_WEB";
     Constants.EVENT_REDIRECT_TO_JATO_DATASTORE = "main.navigation.EVENT_REDIRECT_TO_JATO_DATASTORES";
     Constants.EVENT_REDIRECT_TO_JATO_PRIVILEGES = "main.navigation.EVENT_REDIRECT_TO_JATO_PRIVILEGES";
     Constants.EVENT_REDIRECT_TO_JATO_SUBJECTS = "main.navigation.EVENT_REDIRECT_TO_JATO_SUBJECTS";
-    Constants.EVENT_REDIRECT_TO_JATO_AGENTS = "main.navigation.EVENT_REDIRECT_TO_JATO_AGENTS";
     Constants.EVENT_REDIRECT_TO_JATO_STS = "main.navigation.EVENT_REDIRECT_TO_JATO_STS";
 
     Constants.SELF_SERVICE_FORGOTTEN_USERNAME = "selfservice/forgottenUsername";

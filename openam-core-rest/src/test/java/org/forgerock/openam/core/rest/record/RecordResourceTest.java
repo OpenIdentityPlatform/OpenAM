@@ -11,32 +11,34 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.core.rest.record;
 
-import org.forgerock.services.context.Context;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
+import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.thread.ExecutorServiceFactory;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 public class RecordResourceTest extends DebugTestTemplate {
 
@@ -53,8 +55,8 @@ public class RecordResourceTest extends DebugTestTemplate {
     public void setup() throws Exception {
         super.setUp();
         MockitoAnnotations.initMocks(this);
-        debugRecorder = new DefaultDebugRecorder(new ExecutorServiceFactory(Mockito.mock
-                (org.forgerock.util.thread.listener.ShutdownManager.class)));
+        debugRecorder = new DefaultDebugRecorder(
+                new AuditRequestContextPropagatingExecutorServiceFactory(Mockito.mock(ShutdownManager.class)));
         this.recordResource = new RecordResource(debugRecorder);
     }
 
@@ -64,14 +66,10 @@ public class RecordResourceTest extends DebugTestTemplate {
         JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
                 IOUtils.getFileContentFromClassPath(RecordResourceTest.class,
                         RECORD_DIRECTORY + "startSimpleRecord.json"));
-        given(request.getAction()).willReturn("start");
         given(request.getContent()).willReturn(jsonRecordProperties);
 
         // When...
-        Promise<ActionResponse, ResourceException> promise = recordResource.actionCollection(serverContext, request);
-
-        // Then...
-        verify(request).getAction();
+        Promise<ActionResponse, ResourceException> promise = recordResource.actionStart(serverContext, request);
 
         RecordProperties recordPropertiesInput = RecordProperties.fromJson(jsonRecordProperties);
         RecordProperties recordPropertiesOutput = RecordProperties.fromJson(promise.get().getJsonContent().get("record"));
@@ -88,18 +86,17 @@ public class RecordResourceTest extends DebugTestTemplate {
                         RECORD_DIRECTORY + "startSimpleRecord.json"));
         debugRecorder.startRecording(jsonRecordProperties);
 
-        // Given...
-        given(request.getAction()).willReturn("stop");
-
         // When...
-        Promise<ActionResponse, ResourceException> promise = recordResource.actionCollection(serverContext, request);
-
-        // Then...
-        verify(request).getAction();
+        Promise<ActionResponse, ResourceException> promise = recordResource.actionStop(serverContext, request);
 
         RecordProperties recordPropertiesInput = RecordProperties.fromJson(jsonRecordProperties);
         RecordProperties recordPropertiesOutput = RecordProperties.fromJson(promise.get().getJsonContent().get("record"));
 
         assertThat(recordPropertiesInput).isEqualTo(recordPropertiesOutput);
+    }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(RecordResource.class).hasValidAnnotations();
     }
 }

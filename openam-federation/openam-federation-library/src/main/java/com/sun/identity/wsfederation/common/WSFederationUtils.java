@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -28,6 +28,8 @@
  */
 package com.sun.identity.wsfederation.common;
 
+import static org.forgerock.openam.utils.Time.*;
+
 import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
@@ -35,10 +37,17 @@ import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
+import com.sun.identity.saml.assertion.NameIdentifier;
+import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.shared.DateUtils;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import java.io.IOException;
 import java.util.Collections;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import com.sun.identity.shared.debug.Debug;
@@ -53,7 +62,10 @@ import com.sun.identity.wsfederation.key.KeyUtil;
 import com.sun.identity.wsfederation.logging.LogUtil;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
+import com.sun.identity.wsfederation.plugins.IDPAccountMapper;
+import com.sun.identity.wsfederation.plugins.IDPAttributeMapper;
 import com.sun.identity.wsfederation.plugins.whitelist.ValidWReplyExtractor;
+import com.sun.identity.wsfederation.profile.SAML11RequestedSecurityToken;
 
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -65,6 +77,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Utility methods for WS-Federation implementation.
@@ -306,8 +319,8 @@ public class WSFederationUtils {
     public static boolean isTimeValid(Assertion assertion, int timeskew)
     {
         String classMethod = "WSFederationUtils.isTimeValid: ";
-        
-        long timeNow = System.currentTimeMillis();
+
+        long timeNow = currentTimeMillis();
         Date notOnOrAfter = assertion.getConditions().getNotOnorAfter();
         String assertionID = assertion.getAssertionID();
         if (notOnOrAfter == null ) {
@@ -476,5 +489,112 @@ public class WSFederationUtils {
                 throw new WSFederationException(WSFederationUtils.bundle.getString("invalidWReplyUrl"));
             }
         }
+    }
+
+    /**
+     * Creates a SAML 1.1 token object based on the provided details.
+     *
+     * @param realm The realm of the WS-Fed entities
+     * @param idpEntityId The WS-Fed IdP (IP) entity ID.
+     * @param spEntityId The WS-Fed SP (RP) entity ID.
+     * @param session The authenticated session object.
+     * @param spTokenIssuerName The name of the token issuer corresponding to the SP (RP).
+     * @param authMethod The authentication method to specify in the AuthenticationStatement.
+     * @param wantAssertionSigned Whether the assertion should be signed.
+     * @return A SAML1.1 token.
+     * @throws WSFederationException If there was an error while creating the SAML1.1 token.
+     */
+    public static SAML11RequestedSecurityToken createSAML11Token(String realm, String idpEntityId, String spEntityId,
+            Object session, String spTokenIssuerName, String authMethod, boolean wantAssertionSigned)
+            throws WSFederationException {
+        final IDPSSOConfigElement idpConfig = metaManager.getIDPSSOConfig(realm, idpEntityId);
+        if (idpConfig == null) {
+            debug.error("Cannot find configuration for IdP " + idpEntityId);
+            throw new WSFederationException(WSFederationUtils.bundle.getString("unableToFindIDPConfiguration"));
+        }
+
+        String authSSOInstant;
+        try {
+            authSSOInstant = WSFederationUtils.sessionProvider.getProperty(session, SessionProvider.AUTH_INSTANT)[0];
+        } catch (SessionException se) {
+            throw new WSFederationException(se);
+        }
+
+        IDPAttributeMapper attrMapper = getIDPAttributeMapper(WSFederationMetaUtils.getAttributes(idpConfig));
+        IDPAccountMapper accountMapper = getIDPAccountMapper(WSFederationMetaUtils.getAttributes(idpConfig));
+
+        List attributes = attrMapper.getAttributes(session, idpEntityId, spEntityId, realm);
+
+        final Date authInstant;
+        if (StringUtils.isEmpty(authSSOInstant)) {
+            authInstant = newDate();
+        } else {
+            try {
+                authInstant = DateUtils.stringToDate(authSSOInstant);
+            } catch (ParseException pe) {
+                throw new WSFederationException(pe);
+            }
+        }
+
+        NameIdentifier nameIdentifier = accountMapper.getNameID(session, realm, idpEntityId, spEntityId);
+
+        int notBeforeSkew = WSFederationMetaUtils.getIntAttribute(idpConfig,
+                SAML2Constants.ASSERTION_NOTBEFORE_SKEW_ATTRIBUTE, SAML2Constants.NOTBEFORE_ASSERTION_SKEW_DEFAULT);
+
+        int effectiveTime = WSFederationMetaUtils.getIntAttribute(idpConfig,
+                SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE, SAML2Constants.ASSERTION_EFFECTIVE_TIME);
+
+        String certAlias = WSFederationMetaUtils.getAttribute(idpConfig, SAML2Constants.SIGNING_CERT_ALIAS);
+
+        if (wantAssertionSigned && certAlias == null) {
+            // SP wants us to sign the assertion, but we don't have a signing cert
+            debug.error("SP wants signed assertion, but no signing cert is configured");
+            throw new WSFederationException(WSFederationUtils.bundle.getString("noIdPCertAlias"));
+        }
+
+        if (!wantAssertionSigned) {
+            // SP doesn't want us to sign the assertion, so pass null certAlias to indicate no assertion signature
+            // required
+            certAlias = null;
+        }
+
+        return new SAML11RequestedSecurityToken(realm, spTokenIssuerName, idpEntityId,
+                notBeforeSkew, effectiveTime, certAlias, authMethod, authInstant,
+                nameIdentifier, attributes);
+    }
+
+    private static IDPAccountMapper getIDPAccountMapper(Map<String, List<String>> attributes)
+            throws WSFederationException {
+        IDPAccountMapper accountMapper = null;
+        List<String> accountMapperList = attributes.get( SAML2Constants.IDP_ACCOUNT_MAPPER);
+        if (accountMapperList != null) {
+            try {
+                accountMapper = Class.forName(accountMapperList.get(0)).asSubclass(IDPAccountMapper.class)
+                        .newInstance();
+            } catch (ReflectiveOperationException roe) {
+                throw new WSFederationException(roe);
+            }
+        }
+        if (accountMapper == null) {
+            throw new WSFederationException(WSFederationUtils.bundle.getString("failedAcctMapper"));
+        }
+        return accountMapper;
+    }
+
+    private static IDPAttributeMapper getIDPAttributeMapper(Map<String, List<String>> attributes)
+            throws WSFederationException {
+        IDPAttributeMapper attrMapper = null;
+        List<String> attrMapperList = attributes.get(SAML2Constants.IDP_ATTRIBUTE_MAPPER);
+        if (attrMapperList != null) {
+            try {
+                attrMapper = Class.forName(attrMapperList.get(0)).asSubclass(IDPAttributeMapper.class).newInstance();
+            } catch (ReflectiveOperationException roe) {
+                throw new WSFederationException(roe);
+            }
+        }
+        if (attrMapper == null) {
+            throw new WSFederationException(WSFederationUtils.bundle.getString("failedAttrMapper"));
+        }
+        return attrMapper;
     }
 }

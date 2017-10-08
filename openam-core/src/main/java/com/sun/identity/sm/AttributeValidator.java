@@ -24,7 +24,7 @@
  *
  * $Id: AttributeValidator.java,v 1.10 2009/11/03 00:06:31 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -429,21 +429,18 @@ class AttributeValidator {
      * @return A map which is a union of the attributes provided and default
      *         attribute values
      */
-    Map inheritDefaults(Map attrs) {
-        Set values = (Set) attrs.get(as.getName());
+    Map<String, Set<String>> inheritDefaults(Map<String, Set<String>> attrs) {
+        Set<String> values = attrs.get(as.getName());
         if (values == null) {
             // Inherit the default values
             attrs.put(as.getName(), as.getDefaultValues());
         } else if (as.getSyntax().equals(AttributeSchema.Syntax.PASSWORD)
-                || as.getSyntax().equals(
-                        AttributeSchema.Syntax.ENCRYPTED_PASSWORD)) {
+                || as.getSyntax().equals(AttributeSchema.Syntax.ENCRYPTED_PASSWORD)) {
             // Decrypt the password
-            Set vals = new HashSet();
-            for (Iterator items = values.iterator(); items.hasNext();) {
-                String tString = (String) items.next();
+            Set<String> vals = new HashSet<>();
+            for (String tString : values) {
                 try {
-                    vals.add(AccessController.doPrivileged(new DecodeAction(
-                            tString)));
+                    vals.add(AccessController.doPrivileged(new DecodeAction(tString)));
                 } catch (Throwable e) {
                     debug.error("AttributeValidator: Unable to decode", e);
                     vals.add(tString);
@@ -451,7 +448,7 @@ class AttributeValidator {
             }
             attrs.put(as.getName(), vals);
         }
-        return (attrs);
+        return attrs;
     }
 
     /**
@@ -463,21 +460,18 @@ class AttributeValidator {
      *            a Map of the attributes and their values
      * @return A map which is has replaced encrypted values with decrypted ones.
      */
-    Map decodeEncodedAttrs(Map attrs) {
-        Set values = (Set) attrs.get(as.getName());
+    Map<String, Set<String>> decodeEncodedAttrs(Map<String, Set<String>> attrs) {
+        Set<String> values = attrs.get(as.getName());
         if (values == null) {
             return attrs;
         }
         if (as.getSyntax().equals(AttributeSchema.Syntax.PASSWORD)
-                || as.getSyntax().equals(
-                        AttributeSchema.Syntax.ENCRYPTED_PASSWORD)) {
+                || as.getSyntax().equals(AttributeSchema.Syntax.ENCRYPTED_PASSWORD)) {
             // Decrypt the password
-            Set vals = new HashSet();
-            for (Iterator items = values.iterator(); items.hasNext();) {
-                String tString = (String) items.next();
+            Set<String> vals = new HashSet<>();
+            for (String tString : values) {
                 try {
-                    vals.add(AccessController.doPrivileged(new DecodeAction(
-                            tString)));
+                    vals.add(AccessController.doPrivileged(new DecodeAction(tString)));
                 } catch (Throwable e) {
                     debug.error("AttributeValidator: Unable to decode", e);
                     vals.add(tString);

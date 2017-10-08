@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2015 ForgeRock AS.
+    Portions Copyrighted 2010-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE logmessages
@@ -7581,4 +7581,76 @@
         </triggers>
         <actions />
     </logmessage>
+
+    <logmessage name="RESOURCE_READ_FAILED" id="6100" loglevel="LL_INFO"
+                description="Failed to read resource.">
+        <datainfo>
+            <item>Resource Id</item>
+            <item>Resource type</item>
+            <item>Http code</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to read resource to determine whether to create or update.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="RESOURCE_UPDATE_SUCCESS" id="6101" loglevel="LL_INFO"
+                description="Successfully updated resource.">
+        <datainfo>
+            <item>Resource Id</item>
+            <item>Resource type</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to update an existing resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="RESOURCE_UPDATE_FAILED" id="6102" loglevel="LL_INFO"
+                description="Failed to update resource.">
+        <datainfo>
+            <item>Resource Id</item>
+            <item>Resource type</item>
+            <item>Http code</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to update an existing resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="RESOURCE_CREATE_SUCCESS" id="6103" loglevel="LL_INFO"
+                description="Successfully created resource.">
+        <datainfo>
+            <item>Resource Id</item>
+            <item>Resource type</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to create a new resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="RESOURCE_CREATE_FAILED" id="6104" loglevel="LL_INFO"
+                description="Failed to create resource.">
+        <datainfo>
+            <item>Resource Id</item>
+            <item>Resource type</item>
+            <item>Http code</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to create a new resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="POLICY_EXPORT_SUCCESS" id="6105" loglevel="LL_INFO"
+                description="Successfully exported policy model resources.">
+        <datainfo>
+            <item>Realm</item>
+            <item>Exported File</item>
+        </datainfo>
+        <triggers>
+            <item>Executes export resource Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
 </logmessages>

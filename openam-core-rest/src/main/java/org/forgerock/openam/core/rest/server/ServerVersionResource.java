@@ -11,12 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.core.rest.server;
 
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.*;
+
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
+import org.forgerock.api.annotations.ApiError;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
+import org.forgerock.api.annotations.SingletonProvider;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.*;
 import org.forgerock.services.context.Context;
@@ -25,20 +37,22 @@ import org.forgerock.util.promise.Promise;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-
 /**
  * Represents server version information that can be queried via a REST interface.
  *
  * This resource is a read-only.
  * @since 13.0.0
  */
-public class ServerVersionResource implements SingletonResourceProvider {
+@SingletonProvider(
+        value = @Handler(
+                title = SERVER_VERSION_RESOURCE + TITLE,
+                description = SERVER_VERSION_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(schemaResource = "ServerVersionResource.schema.json"),
+                mvccSupported = false))
+public class ServerVersionResource {
 
     private final static String SERVER_VERSION = "version";
+
     /**
      * Used to identity the numeric version element of the AM version string.
      */
@@ -62,20 +76,12 @@ public class ServerVersionResource implements SingletonResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, ActionRequest actionRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest patchRequest) {
-        return new NotSupportedException().asPromise();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Read(operationDescription = @Operation(
+            description = SERVER_VERSION_RESOURCE + READ_DESCRIPTION,
+            errors = {
+                    @ApiError(
+                            code = 403,
+                            description = SERVER_VERSION_RESOURCE + ERROR_403_DESCRIPTION)}))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest readRequest) {
         JsonValue result = json(object(
                 field("version", getVersion()),
@@ -86,10 +92,4 @@ public class ServerVersionResource implements SingletonResourceProvider {
         return newResourceResponse(SERVER_VERSION, Integer.toString(result.asMap().hashCode()), result).asPromise();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest updateRequest) {
-        return new NotSupportedException().asPromise();
-    }
 }

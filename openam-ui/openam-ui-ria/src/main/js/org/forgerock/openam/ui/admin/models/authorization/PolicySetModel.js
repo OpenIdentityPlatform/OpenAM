@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
-    "underscore",
+define([
+    "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/utils/ModelUtils"
@@ -24,18 +24,29 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/applications"),
 
-        defaults: function () {
+        defaults () {
             return {
                 name: null,
+                displayName: null,
                 description: "",
                 resourceTypeUuids: [],
                 realm: ""
             };
         },
 
-        validate: function (attrs) {
+        parse (response) {
+            if (_.isEmpty(response.displayName)) {
+                this.displayName = response.name;
+            } else {
+                this.displayName = response.displayName;
+            }
+
+            return response;
+        },
+
+        validate (attrs) {
             if (attrs.name.trim() === "") {
-                return "errorNoName";
+                return "errorNoId";
             }
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
@@ -48,7 +59,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
             }
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
@@ -57,7 +68,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicySetModel", [
 
             if (model.id === null) {
                 method = "create";
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

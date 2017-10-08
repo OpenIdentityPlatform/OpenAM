@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.devices;
@@ -25,11 +25,6 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.openam.core.rest.devices.services.DeviceService;
-import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
+import org.forgerock.openam.core.rest.devices.services.DeviceService;
 
 /**
  * DAO for handling the retrieval and saving of a user's devices.
@@ -47,9 +47,14 @@ public class UserDevicesDao {
 
     private static final int NO_LIMIT = 0;
 
-    private final DeviceServiceFactory serviceFactory;
+    private final AuthenticatorDeviceServiceFactory serviceFactory;
 
-    public UserDevicesDao(DeviceServiceFactory serviceFactory) {
+    /**
+     * Construct a new UserDevicesDao with the provided serviceFactory.
+     *
+     * @param serviceFactory The DeviceServiceFactory used to generate specific services for realms.
+     */
+    public UserDevicesDao(AuthenticatorDeviceServiceFactory serviceFactory) {
         this.serviceFactory = serviceFactory;
     }
 
@@ -75,7 +80,11 @@ public class UserDevicesDao {
             Set<String> set = (Set<String>) identity.getAttribute(attrName);
 
             for (String profile : set) {
-                devices.add(deviceSerialisation.stringToDeviceProfile(profile));
+                try {
+                    devices.add(deviceSerialisation.stringToDeviceProfile(profile));
+                } catch (JsonException jve) {
+                    //RTE, generally indicative that the profile attribute name has changed (still return devices set)
+                }
             }
 
             return devices;

@@ -68,6 +68,11 @@ public class SMSUtils {
 
     public static final String I18N_KEY = "i18nKey";
 
+    /**
+     * Key used to reference the order of an SMS attribute.
+     */
+    public static final String ORDER = "order";
+
     public static final String ORG_CONFIG = "OrganizationConfiguration";
 
     public static final String DYNAMIC_SCHEMA = "Dynamic";
@@ -104,8 +109,7 @@ public class SMSUtils {
 
     protected static final String SERVICE_HIERARCHY = "serviceHierarchy";
 
-    protected static final String PROPERTIES_VIEW_BEAN_URL =
-        "propertiesViewBeanURL";
+    protected static final String PROPERTIES_VIEW_BEAN_URL = "propertiesViewBeanURL";
 
     protected static final String REVISION_NUMBER = "revisionNumber";
 
@@ -133,8 +137,7 @@ public class SMSUtils {
 
     protected static final String PLUGIN_CONFIG = "PluginConfiguration";
 
-    protected static final String PLUGIN_CONFIG_SCHEMA_NAME =
-        "pluginSchemaName";
+    protected static final String PLUGIN_CONFIG_SCHEMA_NAME = "pluginSchemaName";
 
     protected static final String PLUGIN_CONFIG_INT_NAME = "interfaceName";
 
@@ -166,50 +169,93 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_VALIDATOR = "validator";
 
-    protected static final String ATTRIBUTE_OPTIONAL = "IsOptional";
-
-    protected static final String ATTRIBUTE_SERVICE_ID = "IsServiceIdentifier";
-
-    protected static final String ATTRIBUTE_RESOURCE_NAME =
-        "IsResourceNameAllowed";
-
-    protected static final String ATTRIBUTE_STATUS_ATTR = "IsStatusAttribute";
-
     protected static final String HAS_SERVICE_URLS = "HasServiceURLs";
 
     protected static final String ATTRIBUTE_ANY = "any";
 
-    protected static final String ATTRIBUTE_VIEW_BEAN_URL =
-        "propertiesViewBeanURL";
+    protected static final String ATTRIBUTE_VIEW_BEAN_URL = "propertiesViewBeanURL";
 
     protected static final String ATTRIBUTE_VALUE = "Value";
 
-    protected static final String ATTRIBUTE_DEFAULT_ELEMENT = "DefaultValues";
-
-    protected static final String ATTRIBUTE_DEFAULT_CLASS =
-        "DefaultValuesClassName";
+    protected static final String ATTRIBUTE_DEFAULT_CLASS = "DefaultValuesClassName";
 
     protected static final String CLASS_NAME = "className";
 
-    protected static final String ATTRIBUTE_CHOICE_CLASS =
-        "ChoiceValuesClassName";
+    protected static final String ATTRIBUTE_CHOICE_CLASS = "ChoiceValuesClassName";
 
-    protected static final String ATTRIBUTE_CHOICE_VALUES_ELEMENT =
-        "ChoiceValues";
-
-    protected static final String ATTRIBUTE_CHOICE_VALUE_ELEMENT =
-        "ChoiceValue";
+    protected static final String ATTRIBUTE_CHOICE_VALUE_ELEMENT = "ChoiceValue";
 
     protected static final String ATTRIBUTE_COS_QUALIFIER = "cosQualifier";
 
-    protected static final String ATTRIBUTE_BOOLEAN_VALUES_ELEMENT =
-        "BooleanValues";
+    protected static final String ATTRIBUTE_TRUE_BOOLEAN_ELEMENT = "BooleanTrueValue";
 
-    protected static final String ATTRIBUTE_TRUE_BOOLEAN_ELEMENT =
-        "BooleanTrueValue";
+    protected static final String ATTRIBUTE_FALSE_BOOLEAN_ELEMENT = "BooleanFalseValue";
 
-    protected static final String ATTRIBUTE_FALSE_BOOLEAN_ELEMENT =
-        "BooleanFalseValue";
+    /*
+     * The children of the node AttributeSchema
+     */
+    protected static final String ATTRIBUTE_OPTIONAL = "IsOptional";
+
+    protected static final String ATTRIBUTE_SERVICE_ID = "IsServiceIdentifier";
+
+    protected static final String ATTRIBUTE_RESOURCE_NAME = "IsResourceNameAllowed";
+
+    protected static final String ATTRIBUTE_STATUS_ATTR = "IsStatusAttribute";
+
+    protected static final String ATTRIBUTE_CHOICE_VALUES_ELEMENT = "ChoiceValues";
+
+    protected static final String ATTRIBUTE_BOOLEAN_VALUES_ELEMENT = "BooleanValues";
+
+    protected static final String ATTRIBUTE_DEFAULT_ELEMENT = "DefaultValues";
+
+    protected static final String ATTRIBUTE_EXAMPLE_ELEMENT = "ExampleValue";
+
+    protected static final String ATTRIBUTE_CONDITION_ELEMENT = "Condition";
+
+    /**
+     * Define the children order of the attribute schema.
+     * This order is define is the DTD. As we can't get it from there, this variable will give access to this order
+     */
+    protected enum ATTRIBUTE_SCHEMA_CHILD {
+
+        OPTIONAL(SMSUtils.ATTRIBUTE_OPTIONAL),
+        SERVICE_ID(SMSUtils.ATTRIBUTE_SERVICE_ID),
+        RESOURCE_NAME(SMSUtils.ATTRIBUTE_RESOURCE_NAME),
+        STATUS_ATTR(SMSUtils.ATTRIBUTE_STATUS_ATTR),
+        CHOICE_VALUES_ELEMENT(SMSUtils.ATTRIBUTE_CHOICE_VALUES_ELEMENT),
+        BOOLEAN_VALUES_ELEMENT(SMSUtils.ATTRIBUTE_BOOLEAN_VALUES_ELEMENT),
+        DEFAULT_ELEMENT(SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT),
+        EXAMPLE_ELEMENT(SMSUtils.ATTRIBUTE_EXAMPLE_ELEMENT),
+        CONDITION_ELEMENT(SMSUtils.ATTRIBUTE_CONDITION_ELEMENT);
+
+        private String name;
+
+        ATTRIBUTE_SCHEMA_CHILD(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Get the attribute schema child from its name
+         * @param name the name of the node
+         * @return the child type of the attribute schema or null if no mapping found
+         */
+        public static ATTRIBUTE_SCHEMA_CHILD valueOfName(String name) {
+            for (ATTRIBUTE_SCHEMA_CHILD value : ATTRIBUTE_SCHEMA_CHILD.values()) {
+                if (value.getNodeName().equals(name)) {
+                    return value;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Get the node type name
+         * @return
+         */
+        public String getNodeName() {
+            return name;
+        }
+    }
 
     public static final String RESOURCE_NAME = "resourceName";
     public static final String HIDE_CONFIG_UI = "hideConfigUI";
@@ -226,34 +272,30 @@ public class SMSUtils {
     }
 
     // Performs a deep copy of the Map
-    public static Map<String, Object> copyAttributes(Map<String, Object> attributes) {
+    public static Map<String, Set<String>> copyAttributes(Map<String, Set<String>> attributes) {
         if (attributes == null) {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
-        Map<String, Object> answer = attributes instanceof CaseInsensitiveHashMap ?
-                new CaseInsensitiveHashMap(attributes.size()) : new HashMap<String, Object>(attributes.size());
+        Map<String, Set<String>> answer = attributes instanceof CaseInsensitiveHashMap
+                ? new CaseInsensitiveHashMap<String, Set<String>>(attributes.size())
+                : new HashMap<String, Set<String>>(attributes.size());
 
         if (attributes.isEmpty()) {
             return answer;
         }
 
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+        for (Map.Entry<String, Set<String>> entry : attributes.entrySet()) {
             String attrName = entry.getKey();
-            Object value = entry.getValue();
-            if (value instanceof Set) {
-                Set<String> set = (Set<String>) value;
-                if (set.isEmpty()) {
-                    if (set == Collections.EMPTY_SET) {
-                        answer.put(attrName, Collections.EMPTY_SET);
-                    } else {
-                        answer.put(attrName, new HashSet<String>(0));
-                    }
+            Set<String> value = entry.getValue();
+            if (value.isEmpty()) {
+                if (value == Collections.EMPTY_SET) {
+                    answer.put(attrName, value);
                 } else {
-                    // Copy the HashSet
-                    answer.put(attrName, new HashSet(set));
+                    answer.put(attrName, new HashSet<String>(0));
                 }
             } else {
-                answer.put(attrName, value);
+                // Copy the HashSet
+                answer.put(attrName, new HashSet<>(value));
             }
         }
         return answer;

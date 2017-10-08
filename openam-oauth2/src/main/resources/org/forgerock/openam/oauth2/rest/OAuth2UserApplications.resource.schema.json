@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/OAuth2UserApplications#resource.id.title",
+      "description": "i18n:api-descriptor/OAuth2UserApplications#resource.id.description"
+    },
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/OAuth2UserApplications#resource.name.title",
+      "description": "i18n:api-descriptor/OAuth2UserApplications#resource.name.description"
+    },
+    "expiryDateTime": {
+      "type": "string",
+      "title": "i18n:api-descriptor/OAuth2UserApplications#resource.expiry.title",
+      "description": "i18n:api-descriptor/OAuth2UserApplications#resource.expiry.description"
+    },
+    "scopes": {
+      "type": "object",
+      "title": "i18n:api-descriptor/OAuth2UserApplications#resource.scopes.title",
+      "description": "i18n:api-descriptor/OAuth2UserApplications#resource.scopes.description",
+      "patternProperties": {
+        ".*": {
+          "type": "string",
+          "title": "i18n:api-descriptor/OAuth2UserApplications#resource.scopedescription.title",
+          "description": "i18n:api-descriptor/OAuth2UserApplications#resource.scopedescription.description"
+        }
+      }
+    }
+  }
+}

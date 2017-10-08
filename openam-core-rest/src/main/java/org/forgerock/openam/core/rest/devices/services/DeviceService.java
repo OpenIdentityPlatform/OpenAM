@@ -11,14 +11,15 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.core.rest.devices.services;
 
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 
 /**
- * Provides all necessary configuration information at a realm-wide level to 2FA authentication modules underneath it.
+ * Provides all necessary configuration information at a realm-wide level to device-based
+ * authentication modules underneath it.
  */
 public interface DeviceService {
 
@@ -35,4 +36,5 @@ public interface DeviceService {
      * @return the device profile storage strategy.
      */
     DeviceSerialisation getDeviceSerialisationStrategy();
+
 }

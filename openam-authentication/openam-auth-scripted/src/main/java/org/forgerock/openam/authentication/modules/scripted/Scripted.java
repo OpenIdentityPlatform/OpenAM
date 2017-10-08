@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
@@ -118,7 +118,7 @@ public class Scripted extends AMLoginModule {
     private ScriptingService initialiseScriptingService() {
         ScriptingServiceFactory scriptingServiceFactory =
                 InjectorHolder.getInstance(Key.get(new TypeLiteral<ScriptingServiceFactory>() {}));
-        return scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), getRequestOrg());
+        return scriptingServiceFactory.create(getRequestOrg());
     }
 
     /**

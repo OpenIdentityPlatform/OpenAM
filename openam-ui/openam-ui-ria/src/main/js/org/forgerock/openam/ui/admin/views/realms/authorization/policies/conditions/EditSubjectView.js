@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/EditSubjectView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView",
@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/EditSubjectTemplate.html",
         events: {
-            "change select.type-selection": "changeType"
+            "change [data-type-selection]": "changeType"
         },
         data: {},
         subjectI18n: {
@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
         IDENTITY_RESOURCE: "Identity",
 
-        render: function (schema, element, itemID, itemData, callback) {
+        render (schema, element, itemID, itemData, callback) {
             var self = this;
             this.setElement(element);
 
@@ -52,11 +52,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
-                self.setElement("#subject_" + itemID);
+                self.setElement(`#subject_${itemID}`);
 
                 if (itemData) {
-                    // Temporary fix: The name attribute is being added by the server after the policy is created.
-                    delete itemData.name;
 
                     if (itemData.type === self.IDENTITY_RESOURCE) { // client side fix for 'Identity'
                         self.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.subjectValues));
@@ -74,7 +72,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        createListItem: function (allSubjects, item) {
+        createListItem (allSubjects, item) {
             var self = this,
                 itemToDisplay = null,
                 itemData = item.data().itemData,
@@ -101,7 +99,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         if (key !== "subjectValues") {
                             list = "";
                             _.forOwn(val, function (prop) {
-                                list += prop + " ";
+                                list += `${prop} `;
                             });
 
                             itemToDisplay[self.subjectI18n.key + type + self.subjectI18n.props + key] = list;
@@ -118,11 +116,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 },
                 function (tpl) {
                     item.find(".item-data").html(tpl);
-                    self.setElement("#" + item.attr("id"));
+                    self.setElement(`#${item.attr("id")}`);
                 });
         },
 
-        changeType: function (e) {
+        changeType (e) {
             e.stopPropagation();
             var self = this,
                 itemData = {},
@@ -159,7 +157,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        buildHTML: function (itemData, hiddenData, schema) {
+        buildHTML (itemData, hiddenData, schema) {
             var self = this,
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
@@ -169,8 +167,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
                     new ArrayAttr().render({
-                        itemData: itemData,
-                        hiddenData: hiddenData,
+                        itemData,
+                        hiddenData,
                         data: hiddenData[identityType],
                         title: identityType,
                         i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
@@ -184,20 +182,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     switch (value.type) {
                         case "string":
                             new StringAttr().render({
-                                itemData: itemData,
-                                hiddenData: hiddenData,
+                                itemData,
+                                hiddenData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         case "array":
                             new ArrayAttr().render({
-                                itemData: itemData,
-                                hiddenData: hiddenData,
+                                itemData,
+                                hiddenData,
                                 data: itemData[key],
                                 title: key,
-                                i18nKey: i18nKey
+                                i18nKey
                             }, itemDataEl);
                             break;
                         default:
@@ -214,7 +212,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return htmlBuiltPromise;
         },
 
-        setDefaultJsonValues: function (schema) {
+        setDefaultJsonValues (schema) {
             var itemData = { type: schema.title };
             _.map(schema.config.properties, function (value, key) {
 
@@ -234,7 +232,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             return itemData;
         },
 
-        animateOut: function () {
+        animateOut () {
             // hide all items except the title selector
             this.$el.find(".no-float").fadeOut(500);
             this.$el.find(".clear-left").fadeOut(500);
@@ -245,7 +243,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.$el.removeClass("invalid-rule");
         },
 
-        animateIn: function () {
+        animateIn () {
             var self = this;
             setTimeout(function () {
                 self.$el.find(".field-float-pattern, .field-float-selectize")
@@ -254,7 +252,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }, 10);
         },
 
-        getUIDsFromUniversalValues: function (values) {
+        getUIDsFromUniversalValues (values) {
             var returnObj = { users: {}, groups: {} },
                 endIndex = -1,
                 startIndex = String("id=").length;

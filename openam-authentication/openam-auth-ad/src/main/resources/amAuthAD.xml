@@ -26,7 +26,7 @@
 
     $Id: amAuthAD.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
-    Portions Copyrighted 2013-2015 ForgeRock AS.
+    Portions Copyrighted 2013-2016 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -47,6 +47,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="primaryLdapServer">
                     <DefaultValues>
                         <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
@@ -56,12 +57,14 @@
                     type="list"
                     syntax="string"
                     i18nKey="a102"
+                    order="200"
                     resourceName="secondaryLdapServer">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                     type="list"
                     syntax="dn"
                     i18nKey="a103"
+                    order="300"
                                  resourceName="userSearchStartDN">
                     <DefaultValues>
                         <Value>@UM_NORMALIZED_ORGBASE@</Value>
@@ -71,6 +74,7 @@
                     type="single"
                     syntax="dn"
                     i18nKey="a104"
+                    order="400"
                     resourceName="userBindDN">
                     <DefaultValues>
                         <Value>@UM_DS_DIRMGRDN@</Value>
@@ -80,12 +84,14 @@
                     type="single"
                     syntax="password"
                     i18nKey="a105"
+                    order="500"
                     resourceName="userBindPassword">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-user-naming-attribute"
                     type="single"
                     syntax="string"
                     i18nKey="a106"
+                    order="600"
                     resourceName="userProfileRetrievalAttribute">
                     <DefaultValues>
                         <Value>@USER_NAMING_ATTR@</Value>
@@ -95,6 +101,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a107"
+                    order="700"
                     resourceName="userSearchAttributes">
                     <DefaultValues>
                         <Value>@USER_NAMING_ATTR@</Value>
@@ -104,12 +111,14 @@
                     type="single"
                     syntax="xml"
                     i18nKey="a108"
+                    order="800"
                     resourceName="userSearchFilter">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-search-scope"
                     type="single_choice"
                     syntax="string"
                     i18nKey="a109"
+                    order="900"
                     resourceName="searchScope">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceObject">OBJECT</ChoiceValue>
@@ -123,7 +132,8 @@
                 <AttributeSchema name="openam-auth-ldap-connection-mode"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    order="1000">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
                         <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
@@ -133,10 +143,25 @@
                         <Value>@LDAP_CONNECTION_MODE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-secure-protocol-version"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a11021"
+                                 order="1100">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a110211">TLSv1</ChoiceValue>
+                        <ChoiceValue i18nKey="a110212">TLSv1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>TLSv1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
                     type="single"
                     syntax="boolean"
                     i18nKey="a117"
+                    order="1400"
                     resourceName="trustAllServerCertificates">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -150,6 +175,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a111"
+                    order="1200"
                     resourceName="returnUserDN">
                     <DefaultValues>
                         <Value>true</Value>
@@ -159,6 +185,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a500"
+                    order="1800"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -168,6 +195,7 @@
                     type="list"
                     syntax="string"
                     i18nKey="a114"
+                    order="1300"
                     resourceName="profileAttributeMappings">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-invalid-chars"
@@ -182,6 +210,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a118"
+                    order="1500"
                     resourceName="connectionHeartbeatInterval">
                     <DefaultValues>
                         <Value>1</Value>
@@ -191,6 +220,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a119"
+                    order="1600"
                     resourceName="connectionHeartbeatTimeUnit">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a1191">SECONDS</ChoiceValue>
@@ -205,6 +235,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a120"
+                    order="1700"
                     resourceName="operationTimeout">
                     <DefaultValues>
                         <Value>0</Value>
@@ -215,6 +246,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="primaryLdapServer">
                         <DefaultValues>
                             <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
@@ -224,12 +256,14 @@
                         type="list"
                         syntax="string"
                         i18nKey="a102"
+                        order="200"
                         resourceName="secondaryLdapServer">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                         type="list"
                         syntax="dn"
                         i18nKey="a103"
+                        order="300"
                         resourceName="userSearchStartDN">
                         <DefaultValues>
                             <Value>@UM_NORMALIZED_ORGBASE@</Value>
@@ -239,6 +273,7 @@
                         type="single"
                         syntax="dn"
                         i18nKey="a104"
+                        order="400"
                         resourceName="userBindDN">
                         <DefaultValues>
                             <Value>@UM_DS_DIRMGRDN@</Value>
@@ -248,12 +283,14 @@
                         type="single"
                         syntax="password"
                         i18nKey="a105"
+                        order="500"
                         resourceName="userBindPassword">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-user-naming-attribute"
                         type="single"
                         syntax="string"
                         i18nKey="a106"
+                        order="600"
                         resourceName="userProfileRetrievalAttribute">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
@@ -263,6 +300,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a107"
+                        order="700"
                         resourceName="userSearchAttributes">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
@@ -272,12 +310,14 @@
                         type="single"
                         syntax="xml"
                         i18nKey="a108"
+                        order="800"
                         resourceName="userSearchFilter">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-search-scope"
                         type="single_choice"
                         syntax="string"
                         i18nKey="a109"
+                        order="900"
                         resourceName="searchScope">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceObject">OBJECT</ChoiceValue>
@@ -291,7 +331,8 @@
                     <AttributeSchema name="openam-auth-ldap-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a110">
+                        i18nKey="a110"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
@@ -301,10 +342,25 @@
                             <Value>@LDAP_CONNECTION_MODE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="openam-auth-ldap-secure-protocol-version"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a11021"
+                                     order="1100">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a110211">TLSv1</ChoiceValue>
+                            <ChoiceValue i18nKey="a110212">TLSv1.1</ChoiceValue>
+                            <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>TLSv1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
                         type="single"
                         syntax="boolean"
                         i18nKey="a117"
+                        order="1400"
                         resourceName="trustAllServerCertificates">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -318,6 +374,7 @@
                         type="single"
                         syntax="boolean"
                         i18nKey="a111"
+                        order="1200"
                         resourceName="returnUserDN">
                         <DefaultValues>
                             <Value>true</Value>
@@ -328,6 +385,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a500"
+                        order="1800"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
@@ -337,6 +395,7 @@
                         type="list"
                         syntax="string"
                         i18nKey="a114"
+                        order="1300"
                         resourceName="profileAttributeMappings">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-invalid-chars"
@@ -351,6 +410,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a118"
+                    order="1500"
                     resourceName="connectionHeartbeatInterval">
                     <DefaultValues>
                         <Value>1</Value>
@@ -360,6 +420,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a119"
+                    order="1600"
                     resourceName="connectionHeartbeatTimeUnit">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a1191">SECONDS</ChoiceValue>
@@ -374,6 +435,7 @@
                     type="single"
                     syntax="number"
                     i18nKey="a120"
+                    order="1700"
                     resourceName="operationTimeout">
                     <DefaultValues>
                         <Value>0</Value>

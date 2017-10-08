@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPolicyView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -26,36 +26,35 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/CreatedResourcesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/PolicyActionsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/SubjectResponseAttributesView",
+    "org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/CustomResponseAttributesView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "bootstrap-tabdrop",
     "selectize"
-], function ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
-             PoliciesDelegate, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
-             SubjectResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView, FormHelper) {
-    return AbstractView.extend({
+], ($, _, Backbone, Messages, AbstractView, EventManager, Router, Constants, PolicyModel, PolicySetModel,
+    PoliciesService, CreatedResourcesView, PolicyActionsView, StaticResponseAttributesView,
+    SubjectResponseAttributesView, CustomResponseAttributesView, ManageSubjectsView, ManageEnvironmentsView,
+    FormHelper) => AbstractView.extend({
         partials: [
-            "partials/breadcrumb/_Breadcrumb.html",
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
         validationFields: ["name", "resources"],
         events: {
-            "click input[name=submitForm]": "submitForm",
-            "change #availableResTypes": "changeResourceType",
-            "click #delete": "onDeleteClick"
+            "click [data-save]": "submitForm",
+            "click [data-delete]": "onDeleteClick"
         },
 
-        getAllResponseAttributes: function () {
+        getAllResponseAttributes () {
             this.model.attributes.resourceAttributes = _.union(
-                this.staticAttrsView.getCombinedAttrs(),
-                SubjectResponseAttributesView.getAttrs());
+                this.staticAttrsView.getGroupedData(),
+                SubjectResponseAttributesView.getAttrs(),
+                CustomResponseAttributesView.getAttrs());
         },
 
         tabs: [
@@ -67,8 +66,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             { name: "settings", attr: ["name", "description", "active"] }
         ],
 
-        render: function (args, callback) {
-            var policyName = args[2];
+        render (args, callback) {
+            const policyName = args[2];
 
             if (callback) {
                 this.renderCallback = callback;
@@ -79,13 +78,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             // This piece of information is necessary both when creating new and editing existing policy
             this.policySetModelPromise = new PolicySetModel({ name: this.data.policySetName }).fetch();
-            this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
+            this.resourceTypesPromise = PoliciesService.listResourceTypes();
 
             if (policyName) {
-                this.allSubjectsPromise = PoliciesDelegate.getSubjectConditions();
-                this.allEnvironmentsPromise = PoliciesDelegate.getEnvironmentConditions();
-                this.allUserAttributesPromise = PoliciesDelegate.getAllUserAttributes();
-
+                this.allSubjectsPromise = PoliciesService.getSubjectConditions();
+                this.allEnvironmentsPromise = PoliciesService.getEnvironmentConditions();
+                this.allUserAttributesPromise = PoliciesService.getAllUserAttributes();
+                this.data.headerActions = [
+                    { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policies" }
+                ];
                 this.template = "templates/admin/views/realms/authorization/policies/EditPolicyTemplate.html";
                 this.model = new PolicyModel({ name: policyName });
                 this.listenTo(this.model, "sync", this.renderPolicy);
@@ -94,20 +96,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 this.template = "templates/admin/views/realms/authorization/policies/NewPolicyTemplate.html";
                 this.newEntity = true;
                 this.model = new PolicyModel();
+                this.data.headerActions = [{ actionPartial: "util/_HelpLink", helpLink: "backstage.authz.policies" }];
                 this.listenTo(this.model, "sync", this.renderPolicy);
                 this.renderPolicy();
             }
         },
 
-        renderPolicy: function () {
+        renderPolicy () {
             var self = this;
-
-            this.data.backLink = {
-                href: "#" + Router.getLink(Router.configuration.routes.realmsPolicySetEdit,
-                    _.map([self.data.realmPath, self.data.policySetName], encodeURIComponent)),
-                text: self.data.policySetName,
-                icon: "fa-folder"
-            };
 
             this.data.entity = _.cloneDeep(this.model.attributes);
             // this line is needed for the correctly saving policy
@@ -127,77 +123,72 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
 
             if (self.newEntity) {
                 $.when(this.policySetModelPromise, this.resourceTypesPromise).done(
-                    function (policySetModel, resourceTypes) {
-                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
-                            return _.contains(policySetModel[0].resourceTypeUuids, item.uuid);
-                        });
-
-                        self.parentRender(function () {
-                            self.buildResourceTypeSelection();
-                        });
+                    (policySetModel, resourceTypes) => {
+                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
+                            (item) => _.contains(policySetModel[0].resourceTypeUuids, item.uuid));
+                        self.parentRender(() => { self.buildResourceTypeSelection(); });
                     });
             } else {
-                $.when(this.policySetModelPromise, this.allSubjectsPromise, this.allEnvironmentsPromise,
-                        this.allUserAttributesPromise, this.resourceTypesPromise)
-                    .done(function (policySetModel, allSubjects, allEnvironments, allUserAttributes, resourceTypes) {
-                        var resourceType,
-                            policySet = policySetModel[0];
+                $.when(
+                    this.policySetModelPromise,
+                    this.allSubjectsPromise,
+                    this.allEnvironmentsPromise,
+                    this.allUserAttributesPromise,
+                    this.resourceTypesPromise
+                ).done((policySetModel, allSubjects, allEnvironments, allUserAttributes, resourceTypes) => {
+                    const policySet = policySetModel[0];
 
-                        self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
-                            return _.contains(policySet.resourceTypeUuids, item.uuid);
-                        });
+                    self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
+                        (item) => _.contains(policySet.resourceTypeUuids, item.uuid));
 
-                        self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
-                        self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
-                        self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
+                    self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
+                    self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
+                    self.customAttributes = _.difference(self.model.attributes.resourceAttributes,
+                        self.staticAttributes, self.userAttributes);
+                    self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
-                        self.data.options.availableEnvironments =
-                            _.findByValues(allEnvironments[0].result, "title", policySet.conditions);
-                        self.data.options.availableSubjects =
-                            _.findByValues(allSubjects[0].result, "title", policySet.subjects);
+                    self.data.options.availableEnvironments =
+                        _.findByValues(allEnvironments[0].result, "title", policySet.conditions);
+                    self.data.options.availableSubjects =
+                        _.findByValues(allSubjects[0].result, "title", policySet.subjects);
 
-                        resourceType = _.find(self.data.options.availableResourceTypes, {
-                            uuid: self.model.attributes.resourceTypeUuid
-                        });
-
-                        self.data.options.availableActions = self.getAvailableActionsForResourceType(resourceType);
-                        self.data.options.availablePatterns = resourceType.patterns;
-
-                        self.parentRender(function () {
-                            var promises = [],
-                                resolve = function () {
-                                    return (promises[promises.length] = $.Deferred()).resolve;
-                                };
-
-                            self.$el.find(".tab-menu .nav-tabs").tabdrop();
-                            self.buildResourceTypeSelection();
-
-                            ManageSubjectsView.render(self.data, resolve());
-                            ManageEnvironmentsView.render(self.data, resolve());
-
-                            PolicyActionsView.render(self.data, resolve());
-                            CreatedResourcesView.render(self.data, resolve());
-
-                            self.staticAttrsView = new StaticResponseAttributesView();
-                            self.staticAttrsView.render(self.data.entity, self.staticAttributes, "#staticAttrs",
-                                resolve());
-
-                            SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes],
-                                resolve());
-
-                            $.when.apply($, promises).done(function () {
-                                FormHelper.setActiveTab(self);
-
-                                if (self.renderCallback) {
-                                    self.renderCallback();
-                                }
-                            });
-                        });
+                    const resourceType = _.find(self.data.options.availableResourceTypes, {
+                        uuid: self.model.attributes.resourceTypeUuid
                     });
+
+                    self.data.options.availableActions = self.getAvailableActionsForResourceType(resourceType);
+                    self.data.options.availablePatterns = resourceType.patterns;
+
+                    self.parentRender(() => {
+                        self.$el.find(".tab-menu .nav-tabs").tabdrop();
+                        self.buildResourceTypeSelection();
+
+                        ManageSubjectsView.render(self.data);
+                        ManageEnvironmentsView.render(self.data);
+
+                        PolicyActionsView.render(self.data);
+                        CreatedResourcesView.render(self.data);
+
+                        self.staticAttrsView = new StaticResponseAttributesView({
+                            staticAttributes: self.staticAttributes,
+                            el: "[data-static-attributes]"
+                        });
+                        self.staticAttrsView.render();
+
+                        SubjectResponseAttributesView.render([self.userAttributes, self.allUserAttributes]);
+                        CustomResponseAttributesView.render(self.customAttributes);
+
+                        FormHelper.setActiveTab(self);
+
+                        if (self.renderCallback) {
+                            self.renderCallback();
+                        }
+                    });
+                });
             }
         },
 
-        buildResourceTypeSelection: function () {
+        buildResourceTypeSelection () {
             var self = this;
             this.$el.find("#resTypesSelection").selectize({
                 sortField: "name",
@@ -205,13 +196,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 labelField: "name",
                 searchField: "name",
                 options: self.data.options.availableResourceTypes,
-                onChange: function (value) {
+                onChange (value) {
                     self.changeResourceType(value);
                 }
             });
         },
 
-        getAvailableActionsForResourceType: function (resourceType) {
+        getAvailableActionsForResourceType (resourceType) {
             var availableActions = [];
             if (resourceType) {
                 _.each(resourceType.actions, function (val, key) {
@@ -221,7 +212,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             return availableActions;
         },
 
-        changeResourceType: function (value) {
+        changeResourceType (value) {
             this.data.entity.resourceTypeUuid = value;
 
             var resourceType = _.find(this.data.options.availableResourceTypes, { uuid: value });
@@ -240,7 +231,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        updateFields: function () {
+        updateFields () {
             var app = this.data.entity,
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
@@ -256,7 +247,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             });
         },
 
-        submitForm: function () {
+        submitForm () {
             var savePromise,
                 self = this,
                 activeTabIndex,
@@ -287,14 +278,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             if (savePromise) {
                 savePromise
                     .done(function () {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
-
                         if (self.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetName, self.model.id],
                                     encodeURIComponent),
                                 trigger: true
                             });
+                        } else {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
                     });
             } else {
@@ -302,14 +293,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
             }
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.policy") },
                 _.bind(this.deletePolicy, this));
         },
 
-        deletePolicy: function () {
+        deletePolicy () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsPolicySetEdit, {
@@ -320,7 +311,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 },
                 onError = function (model, response) {
                     Messages.addMessage({
-                        response: response,
+                        response,
                         type: Messages.TYPE_DANGER
                     });
                 };
@@ -331,5 +322,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/EditPo
                 wait: true
             });
         }
-    });
-});
+    })
+);

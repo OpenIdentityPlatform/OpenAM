@@ -16,22 +16,24 @@
 
 package org.forgerock.openam.audit.context;
 
-import org.forgerock.util.thread.ExecutorServiceFactory;
-import org.forgerock.util.thread.listener.ShutdownManager;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.util.thread.ExecutorServiceFactory;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 /**
- * ExecutorServiceFactory decorator that ensures all ExecutorServices propagate {@link AuditRequestContext} from
- * task publishing thread to task consuming thread.
+ * {@link ExecutorServiceFactory} decorator that ensures all ExecutorServices propagate
+ * {@link AuditRequestContext} from task publishing thread to task consuming thread.
  *
  * @since 13.0.0
  */
-public class AuditRequestContextPropagatingExecutorServiceFactory extends ExecutorServiceFactory {
+public class AuditRequestContextPropagatingExecutorServiceFactory implements AMExecutorServiceFactory {
+
+    private final AMExecutorServiceFactory delegate;
 
     /**
      * Constructs a new {@code AuditRequestContextPropagatingExecutorServiceFactory}.
@@ -39,48 +41,39 @@ public class AuditRequestContextPropagatingExecutorServiceFactory extends Execut
      * @param shutdownManager The {@code ShutdownManager}.
      */
     public AuditRequestContextPropagatingExecutorServiceFactory(ShutdownManager shutdownManager) {
-        super(shutdownManager);
+        delegate = new ExtendedExecutorServiceFactory(shutdownManager);
     }
 
     @Override
-    public ScheduledExecutorService createScheduledService(int poolSize) {
-        return decorate(super.createScheduledService(poolSize));
+    public ScheduledExecutorService createScheduledService(int poolSize, String threadNamePrefix) {
+        return decorate(delegate.createScheduledService(poolSize, threadNamePrefix));
     }
 
     @Override
     public ExecutorService createFixedThreadPool(int pool, ThreadFactory factory) {
-        return decorate(super.createFixedThreadPool(pool, factory));
+        return decorate(delegate.createFixedThreadPool(pool, factory));
     }
 
     @Override
     public ExecutorService createFixedThreadPool(int pool, String threadName) {
-        return decorate(super.createFixedThreadPool(pool, threadName));
-    }
-
-    @Override
-    public ExecutorService createFixedThreadPool(int pool) {
-        return decorate(super.createFixedThreadPool(pool));
+        return decorate(delegate.createFixedThreadPool(pool, threadName));
     }
 
     @Override
     public ExecutorService createCachedThreadPool(ThreadFactory factory) {
-        return decorate(super.createCachedThreadPool(factory));
+        return decorate(delegate.createCachedThreadPool(factory));
     }
 
     @Override
     public ExecutorService createCachedThreadPool(String threadName) {
-        return decorate(super.createCachedThreadPool(threadName));
+        return decorate(delegate.createCachedThreadPool(threadName));
     }
 
     @Override
-    public ExecutorService createCachedThreadPool() {
-        return decorate(super.createCachedThreadPool());
-    }
-
-    @Override
-    public ExecutorService createThreadPool(int coreSize, int maxSize, long idleTimeout, TimeUnit timeoutTimeunit,
-            BlockingQueue<Runnable> runnables) {
-        return decorate(super.createThreadPool(coreSize, maxSize, idleTimeout, timeoutTimeunit, runnables));
+    public ExecutorService createThreadPool(int coreSize, int maxSize, long idleTimeout,
+            TimeUnit timeoutTimeunit, BlockingQueue<Runnable> runnables, String threadNamePrefix) {
+        return decorate(delegate.createThreadPool(
+                coreSize, maxSize, idleTimeout, timeoutTimeunit, runnables, threadNamePrefix));
     }
 
     private ExecutorService decorate(ExecutorService delegate) {

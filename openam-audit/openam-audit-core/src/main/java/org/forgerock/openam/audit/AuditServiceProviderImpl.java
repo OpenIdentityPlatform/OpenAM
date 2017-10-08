@@ -115,7 +115,7 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     @Override
     public AMAuditService getAuditService(String realm) {
-        AMAuditService auditService = auditServices.get(realm);
+        AMAuditService auditService = auditServices.get(realm.toLowerCase());
         if (auditService == null) {
             return defaultAuditService;
         } else {

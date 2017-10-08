@@ -18,8 +18,7 @@ package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.shared.xml.XMLUtils.*;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resourceTypeFromMap;
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import java.security.PrivilegedAction;
@@ -33,10 +32,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import com.sun.identity.entitlement.ApplicationManager;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -86,6 +87,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
 
     private final EntitlementConfiguration entitlementService;
     private final ResourceTypeConfiguration resourceTypeConfiguration;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final List<Node> missingApplicationTypes;
     private final List<Node> missingApps;
     private final List<Node> missingResourceTypes;
@@ -97,13 +99,16 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
     private final Map<String, String> changedCombiners;
 
     @Inject
-    public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
+    public UpgradeEntitlementSubConfigsStep(
+            @Named("RootRealmEntitlementConfiguration") final EntitlementConfiguration entitlementService,
             final ResourceTypeConfiguration resourceTypeConfiguration,
             final PrivilegedAction<SSOToken> adminTokenAction,
-            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory,
+            final ApplicationServiceFactory applicationServiceFactory) {
         super(adminTokenAction, connectionFactory);
         this.entitlementService = entitlementService;
         this.resourceTypeConfiguration = resourceTypeConfiguration;
+        this.applicationServiceFactory = applicationServiceFactory;
         missingApplicationTypes = new ArrayList<Node>();
         missingApps = new ArrayList<Node>();
         missingResourceTypes = new ArrayList<Node>();
@@ -339,7 +344,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
         }
 
         // Clear application cache to pick up any application changes.
-        ApplicationManager.clearCache("/");
+        applicationServiceFactory.create(getAdminSubject(), "/").clearCache();
     }
 
     /**

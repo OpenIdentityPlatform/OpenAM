@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
- /**
-  * @module org/forgerock/openam/ui/common/util/array/arrayify
-  */
-define("org/forgerock/openam/ui/common/util/array/arrayify", function () {
+/**
+ * @module org/forgerock/openam/ui/common/util/array/arrayify
+ */
+define(() => {
     /**
      * Wraps any value in an array.
      * <p/>
@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/common/util/array/arrayify", function () {
      * @param   {*} value Value to wrap in an array
      * @returns {Array}   Array containing the value
      */
-    var exports = function (value) {
+    const exports = function (value) {
         return [].concat(value);
     };
 

@@ -24,24 +24,23 @@
  *
  * $Id: SMSEventListenerManager.java,v 1.12 2009/01/28 05:35:03 ww203982 Exp $
  *
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.guava.common.collect.HashMultimap;
+import org.forgerock.guava.common.collect.Multimaps;
+import org.forgerock.guava.common.collect.SetMultimap;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.SearchScope;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Receives notifications for all SMS object changes from
@@ -51,62 +50,48 @@ import org.forgerock.opendj.ldap.SearchScope;
  */
 class SMSEventListenerManager implements SMSObjectListener {
 
-    // All Notification Objects list
-    protected static Map<String, NotificationObject> notificationObjects =
-        Collections.synchronizedMap(new HashMap<String, NotificationObject>());
-    
     // CachedSMSEntry objects
-    protected static Map<String, Set<?>> nodeChanges =
-        Collections.synchronizedMap(new HashMap());
+    private static final SetMultimap<DN, Subscription> nodeChanges = newSubscriberMultimap();
     
     // CachedSubEntries objects
-    protected static Map<String, Set<?>> subNodeChanges =
-        Collections.synchronizedMap(new HashMap());
-    
+    private static final SetMultimap<DN, Subscription> subNodeChanges = newSubscriberMultimap();
+
     // Static Initialization variables
-    private static Debug debug = SMSEntry.eventDebug; 
+    private static final Debug debug = SMSEntry.eventDebug;
     protected static boolean initialized;
 
-    static void initialize(SSOToken token) {
+    static void initialize() {
         if (!initialized) {
             try {
                 if (SMSNotificationManager.isCacheEnabled()) {
-                    SMSNotificationManager.getInstance()
-                        .registerCallbackHandler(new SMSEventListenerManager());
+                    SMSNotificationManager.getInstance().registerCallbackHandler(new SMSEventListenerManager());
                 }
-                if (debug.messageEnabled()) {
-                    debug.message("Initialized SMS Event listner");
-                }
+                debug.message("Initialized SMS Event listener");
                 initialized = true;
             } catch (Exception e) {
-                debug.error("SMSEventListenerManager::initialize " +
-                    "Unable to intialize SMS listener: " + e);
+                debug.error("SMSEventListenerManager::initialize Unable to initialize SMS listener: {}", e);
             }
         }
     }
 
-    SMSEventListenerManager() {
+    private SMSEventListenerManager() {
         // do nothing
     }
 
     // Processes object changed notifications
+    @Override
     public void objectChanged(String odn, int event) {
-        objectChanged(odn, event, false);
+        objectChanged(DN.valueOf(odn), event, false);
     }
 
     // Processes object changed notifications. The flag isLocal is used
     // distingush the self generated DELETE notifications for recursive
     // deletes, especially when data store notifications are disabled.
     // In which case, delete notifications will never be generated.
-    private void objectChanged(String odn, int event, boolean isLocal) {
-        if (debug.messageEnabled()) {
-            debug.message("SMSEventListener::entry changed for: " + odn +
-                " type: " + event);
-        }
+    private void objectChanged(DN dn, int event, boolean isLocal) {
+        debug.message("SMSEventListener::entry changed for: {} type: {}", dn, event);
 
         // Normalize the DN
-        DN sdn = DN.valueOf(odn);
-        String dn = sdn.toString().toLowerCase();
 
         // If event is delete, need to send notifications for sub-entries
         // Even if backend datastore notification is enabled, they woould
@@ -114,188 +99,123 @@ class SMSEventListenerManager implements SMSObjectListener {
         if (!isLocal && (event == SMSObjectListener.DELETE)) {
             // Collect the immediate children of the current sdn
             // from nodeChanges. All "subNodeChanges" entries would
-            // have an entry in "nodeChanges", hence donot have to
+            // have an entry in "nodeChanges", hence do not have to
             // iterate throught it
-            Set childDNs = new HashSet();
+            Set<DN> childDNs = new HashSet<>();
             synchronized (nodeChanges) {
-                Iterator keyitems = nodeChanges.keySet().iterator();
-                while (keyitems.hasNext()) {
-                    String cdn = (String) keyitems.next();
-                    if (DN.valueOf(cdn).isInScopeOf(sdn, SearchScope.SUBORDINATES)) {
-                        childDNs.add(cdn);
-                    }
+                childDNs.addAll(nodeChanges.keySet());
+            }
+            for (Iterator<DN> it = childDNs.iterator(); it.hasNext();) {
+                if (!it.next().isInScopeOf(dn, SearchScope.SUBORDINATES)) {
+                    it.remove();
                 }
             }
             // Send the notifications
-            if (debug.messageEnabled()) {
-                debug.message("SMSEventListener::objectChanged: Sending " +
-                    "delete event of: " + dn + " to child nodes: " + childDNs);
-            }
-            for (Iterator items = childDNs.iterator(); items.hasNext();) {
-                String item = (String) items.next();
+            debug.message("SMSEventListener::objectChanged: Sending delete event of: {} to child nodes: {}", dn,
+                    childDNs);
+
+            for (DN item : childDNs) {
                 objectChanged(item, event, true);
                 // Send notifications to external listeners also if
                 // data store notification is not enabled
                 if (!SMSNotificationManager.isDataStoreNotificationEnabled()) {
-                    SMSNotificationManager.getInstance().sendNotifications(
-                        item, event, true);
+                    SMSNotificationManager.getInstance().sendNotifications(item.toString().toLowerCase(), event, true);
                 }
             }
         }
 
         // Send notifications to CachedSMSEntries
-        sendNotifications((Set) nodeChanges.get(dn), odn, event);
+        sendNotifications(nodeChanges.get(dn), dn, event);
         
         // Process sub-entry changed events, not interested in attribute mods
-        if ((event == SMSObjectListener.ADD) ||
-            (event == SMSObjectListener.DELETE)) {
+        if (event == SMSObjectListener.ADD || event == SMSObjectListener.DELETE) {
             // Send notifications to CachedSubEntries
-            if (debug.messageEnabled()) {
-                debug.message("SMSEventListener::entry changed for: " + dn +
-                    " sending notifications to its parents");
-            }
-            sendNotifications((Set) subNodeChanges.get(DN.valueOf(dn).parent().toString().toLowerCase()), odn, event);
+            debug.message("SMSEventListener::entry changed for: {} sending notifications to its parents", dn);
+
+            sendNotifications(subNodeChanges.get(dn.parent()), dn, event);
         }
     }
 
+    @Override
     public void allObjectsChanged() {
         if (debug.messageEnabled()) {
             debug.message("SMSEventListenerManager::allObjectsChanged called");
         }
         // Collect all the DNs from "nodeChanges" and send notifications
-        Set<String> dns = new HashSet<>();
-        synchronized (nodeChanges) {
-            for (String item : nodeChanges.keySet()) {
-                dns.add(item);
-            }
-        }
         // Send MODIFY notifications
-        for (String item : dns) {
-            objectChanged(item, SMSObjectListener.MODIFY);
+        for (DN item : nodeChanges.keySet()) {
+            objectChanged(item, SMSObjectListener.MODIFY, false);
         }
     }
 
     /**
      * Registers notification for changes to nodes
      */
-    protected static String notifyChangesToNode(SSOToken token, String dn,
-        Method method, Object object, Object[] args) {
-        initialize(token);
-        String ndn = DN.valueOf(dn).toString().toLowerCase();
-        return (addNotificationObject(nodeChanges, ndn, method, object, args));
+    static Subscription registerForNotifyChangesToNode(String dn, SMSEventListener eventListener) {
+        initialize();
+        return addNotificationObject(nodeChanges, DN.valueOf(dn), eventListener);
     }
 
     /**
      * Registers notification for changes to its sub-nodes
      */
-    protected static String notifyChangesToSubNodes(SSOToken token, String dn,
-        Object o) {
-        initialize(token);
-        String ndn = DN.valueOf(dn).toString().toLowerCase();
-        return (addNotificationObject(subNodeChanges, ndn, null, o, null));
-    }
-
-    /**
-     * Removes notification objects
-     */
-    protected static void removeNotification(String notificationID) {
-        NotificationObject no = notificationObjects.get(notificationID);
-        if (no != null) {
-            no.set.remove(no);
-            notificationObjects.remove(notificationID);
-        }
+    static Subscription registerForNotifyChangesToSubNodes(String dn, SMSEventListener eventListener) {
+        initialize();
+        return addNotificationObject(subNodeChanges, DN.valueOf(dn), eventListener);
     }
 
     /**
      * Adds notification method to the map
      */
-    private static String addNotificationObject(Map<String, Set<?>> nChangesMap, String dn,
-        Method method, Object object, Object[] args) {
-        Set nObjects = null;
-        synchronized (nChangesMap) {
-            nObjects = (Set) nChangesMap.get(dn);
-            if (nObjects == null) {
-                nObjects = Collections.synchronizedSet(new HashSet());
-                nChangesMap.put(dn, nObjects);
-            }
-        }
-        NotificationObject no = new NotificationObject(method, object, args,
-            nObjects);
-        nObjects.add(no);
-        notificationObjects.put(no.getID(), no);
-        return (no.getID());
+    private static Subscription addNotificationObject(SetMultimap<DN, Subscription> nodeChangeSubscribers, DN dn,
+            SMSEventListener eventListener) {
+
+        final Subscription subscription = new Subscription(eventListener, dn, nodeChangeSubscribers);
+        nodeChangeSubscribers.put(dn, subscription);
+
+        return subscription;
     }
     
     /**
      * Sends notification to methods and objects within the set
      */
-    private static void sendNotifications(Set nObjects, String dn, int event) {
-        if ((nObjects == null) || (nObjects.isEmpty())) {
+    private static void sendNotifications(Set<Subscription> subscribers, DN dn, int event) {
+        if (CollectionUtils.isEmpty(subscribers)) {
             return;
         }
-        HashSet nobjs = new HashSet(2);
-        synchronized (nObjects) {
-            nobjs.addAll(nObjects);
-        }
-        Iterator items = nobjs.iterator();
 
-        while (items.hasNext()) {
+        for (Subscription no : subscribers) {
             try {
-                NotificationObject no = (NotificationObject) items.next();
-                if ((dn != null) && (no.object instanceof CachedSubEntries)) {
-                    CachedSubEntries cse = (CachedSubEntries) no.object;
-                    // We do not cache Realm names.
-                    // We cache only service names and policy names.
-                    if (!dn.startsWith(SMSEntry.ORG_PLACEHOLDER_RDN)) {
-                        if (event == SMSObjectListener.ADD) {
-                            cse.add(LDAPUtils.rdnValueFromDn(dn));
-                        } else {
-                            cse.remove(LDAPUtils.rdnValueFromDn(dn));
-                        }
-                    }
-                } else {
-                    no.method.invoke(no.object, no.args);
-                }
+                no.notifyEvent(dn, event);
             } catch (Exception e) {
-                debug.error("SMSEvent notification: " +
-                    "Unable to send notification: ", e);
+                debug.error("SMSEvent notification: Unable to send notification: ", e);
             }
         }
     }
 
-    private static class NotificationObject {
+    static class Subscription {
 
-        String id;
-        Method method;
-        Object object;
-        Object[] args;
-        Set set;
+        private final SMSEventListener eventListener;
+        private final DN dn;
+        private final SetMultimap<DN, Subscription> map;
 
-        NotificationObject(Method m, Object o, Object[] a, Set s) {
-            id = SMSUtils.getUniqueID();
-            method = m;
-            object = o;
-            args = a;
-            set = s;
+        Subscription(SMSEventListener eventListener, DN dn,
+                SetMultimap<DN, Subscription> map) {
+            this.eventListener = eventListener;
+            this.dn = dn;
+            this.map = map;
         }
 
-        String getID() {
-            return (id);
+        public void cancel() {
+            map.remove(dn, this);
         }
 
-        // @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 13 * hash + (id != null ? id.hashCode() : 0);
-            return hash;
+        private void notifyEvent(DN dn, int event) {
+            eventListener.notifySMSEvent(dn, event);
         }
+    }
 
-        public boolean equals(Object o) {
-            if (o instanceof NotificationObject) {
-                NotificationObject no = (NotificationObject) o;
-                return (id.equals(no.id));
-            }
-            return (false);
-        }
+    private static SetMultimap<DN, Subscription> newSubscriberMultimap() {
+        return Multimaps.synchronizedSetMultimap(HashMultimap.<DN, Subscription>create());
     }
 }

@@ -11,19 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-/*global define */
-
-define("config/validators/AMValidators", [
+define([
     "jquery"
 ], function ($) {
     var obj = {
         "validPhoneFormat": {
             "name": "Valid Phone Number",
             "dependencies": [],
-            "validator": function (el, input, callback) {
+            "validator": (el, input, callback) => {
                 var phonePattern = /^\+?([0-9\- \(\)])*$/,
                     value = input.val();
 
@@ -37,8 +35,8 @@ define("config/validators/AMValidators", [
         "validEmailAddressFormat": {
             "name": "Valid Email Address",
             "dependencies": [],
-            "validator": function (el, input, callback) {
-                var emailPattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+            "validator": (el, input, callback) => {
+                var emailPattern = /^([A-Za-z0-9_\-\.])+@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
                     value = input.val();
 
                 if (typeof value === "string" && value.length && !emailPattern.test(value)) {

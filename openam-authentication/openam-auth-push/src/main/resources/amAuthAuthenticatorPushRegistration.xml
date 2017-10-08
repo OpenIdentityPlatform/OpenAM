@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+
+<!--
+
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2016 ForgeRock AS.
+
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//forgerock//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthAuthenticatorPushRegistrationService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthAuthenticatorPushRegistrationService"
+                i18nFileName="amAuthAuthenticatorPushRegistration"
+                revisionNumber="1"
+                i18nKey="iPlanetAMAuthAuthenticatorPushRegistrationServiceDescription"
+                resourceName="authPushReg">
+
+            <Organization>
+                <AttributeSchema name="UrlValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.URLValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-am-auth-push-reg-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a650"
+                                 order="100"
+                                 resourceName="authenticationLevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-push-reg-issuer"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a651"
+                                 order="200"
+                                 resourceName="issuer">
+                    <DefaultValues>
+                        <Value>ForgeRock</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a652"
+                                 order="300"
+                                 resourceName="timeoutInMilliSecconds">
+                    <DefaultValues>
+                        <Value>120000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-hex-bgcolour"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a653"
+                                 order="400"
+                                 resourceName="bgcolour">
+                    <DefaultValues>
+                        <Value>#519387</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-img-url"
+                                 type="single"
+                                 syntax="string"
+                                 validator="UrlValidator"
+                                 i18nKey="a654"
+                                 order="500"
+                                 resourceName="imgUrl">
+                    <ExampleValue>
+                        <Value>http://example.com/image.png</Value>
+                    </ExampleValue>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-apple-link"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator UrlValidator"
+                                 i18nKey="a655"
+                                 order="600"
+                                 resourceName="appleLink">
+                    <DefaultValues>
+                        <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-am-auth-google-link"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator UrlValidator"
+                                 i18nKey="a656"
+                                 order="700"
+                                 resourceName="googleLink">
+                    <DefaultValues>
+                        <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                    <AttributeSchema name="UrlValidator" type="validator" syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.sm.validation.URLValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="RequiredValueValidator" type="validator" syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-am-auth-push-reg-auth-level"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a650"
+                                     order="100"
+                                     resourceName="authenticationLevel">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-push-reg-issuer"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a651"
+                                     order="200"
+                                     resourceName="issuer">
+                        <DefaultValues>
+                            <Value>ForgeRock</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-push-message-registration-response-timeout"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a652"
+                                     order="300"
+                                     resourceName="timeoutInMilliSecconds">
+                        <DefaultValues>
+                            <Value>120000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-hex-bgcolour"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a653"
+                                     order="400"
+                                     resourceName="bgcolour">
+                        <DefaultValues>
+                            <Value>#519387</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-img-url"
+                                     type="single"
+                                     syntax="string"
+                                     validator="UrlValidator"
+                                     i18nKey="a654"
+                                     order="500"
+                                     resourceName="imgUrl">
+                        <ExampleValue>
+                            <Value>http://example.com/image.png</Value>
+                        </ExampleValue>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-apple-link"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator UrlValidator"
+                                     i18nKey="a655"
+                                     order="600"
+                                     resourceName="appleLink">
+                        <DefaultValues>
+                            <Value>https://itunes.apple.com/app/forgerock-authenticator/id1038442926</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-am-auth-google-link"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator UrlValidator"
+                                     i18nKey="a656"
+                                     order="700"
+                                     resourceName="googleLink">
+                        <DefaultValues>
+                            <Value>https://play.google.com/store/apps/details?id=com.forgerock.authenticator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting.rest;
@@ -21,7 +21,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;
 import org.forgerock.openam.rest.RestRouteProvider;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
 
 /**
  * A {@link RestRouteProvider} that add route for the scripting endpoint.
@@ -35,8 +35,9 @@ public class ScriptingRestRouteProvider extends AbstractRestRouteProvider {
 
         realmRouter.route("scripts")
                 .auditAs(SCRIPT)
-                .authorizeWith(PrivilegeAuthzModule.class)
-                .toCollection(ScriptResource.class);
+                .authorizeWith(CrestPrivilegeAuthzModule.class)
+                .forVersion(1, 1)
+                .toAnnotatedCollection(ScriptResource.class);
 
     }
 }

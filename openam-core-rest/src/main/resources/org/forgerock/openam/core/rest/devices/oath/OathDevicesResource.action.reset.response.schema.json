@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.title",
+  "description": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.description",
+  "properties": {
+    "result": {
+      "constant": true,
+      "title": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.result.title",
+      "description": "i18n:api-descriptor/OathDevicesResource#action.reset.response.schema.result.description",
+      "type": "string"
+    }
+  }
+}

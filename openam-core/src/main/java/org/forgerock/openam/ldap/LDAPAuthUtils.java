@@ -25,7 +25,7 @@
  * $Id: LDAPAuthUtils.java,v 1.21 2009/12/28 03:01:26 222713 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.ldap;
@@ -125,6 +125,7 @@ public class LDAPAuthUtils {
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
     private boolean isAd = false;
+    private String protocolVersion;
 
     // Resource Bundle used to get l10N message
     private ResourceBundle bundle;
@@ -273,7 +274,7 @@ public class LDAPAuthUtils {
                 synchronized (connectionPools) {
                     connPool = connectionPools.get(configName);
                     Options options = Options.defaultOptions()
-                            .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.MILLISECONDS));
+                            .set(REQUEST_TIMEOUT, new Duration((long) operationsTimeout, TimeUnit.SECONDS));
 
                     if (connPool == null) {
                         if (debug.messageEnabled()) {
@@ -337,7 +338,7 @@ public class LDAPAuthUtils {
                                 builder.setTrustManager(TrustManagers.trustAll());
                             }
 
-                            SSLContext sslContext = builder.getSSLContext();
+                            SSLContext sslContext = builder.setProtocol(protocolVersion).getSSLContext();
                             options.set(SSL_CONTEXT, sslContext);
                             if (useStartTLS) {
                                 options.set(SSL_USE_STARTTLS, true);
@@ -1459,22 +1460,30 @@ public class LDAPAuthUtils {
         expiryTime = null;
         StringBuilder expTime = new StringBuilder();
 
-        int days = sec / (24*60*60);
-        int hours = (sec%(24*60*60)) / 3600;
-        int minutes = (sec%3600) / 60;
-        int seconds = sec%60;
+        int days = sec / (24 * 60 * 60);
+        int hours = (sec % (24 * 60 * 60)) / 3600;
+        int minutes = (sec % 3600) / 60;
+        int seconds = sec % 60;
 
-        if (hours <= 0 && minutes <= 0 && seconds <= 0) {
-            expTime.append(days).append(" days: ");
-            expiryTime = expTime.toString();
+        if (days > 0) {
+            expTime.append(days).append(SPACE).append(bundle.getString("days"));
+            if (hours > 0) {
+                expTime.append(SPACE).append(hours).append(SPACE).append(bundle.getString("hours"));
+            }
+        } else if (hours > 0) {
+            expTime.append(hours).append(SPACE).append(bundle.getString("hours"));
+            if (minutes > 0) {
+                expTime.append(SPACE).append(minutes).append(SPACE).append(bundle.getString("minutes"));
+            }
+        } else if (minutes > 0) {
+            expTime.append(minutes).append(SPACE).append(bundle.getString("minutes"));
+            if (seconds > 0) {
+                expTime.append(SPACE).append(seconds).append(SPACE).append(bundle.getString("seconds"));
+            }
         } else {
-            expTime.append(days).append(SPACE).append(bundle.getString("days")).append(COLON).append(SPACE);
-            expTime.append(hours).append(SPACE).append(bundle.getString("hours")).append(COLON).append(SPACE);
-            expTime.append(minutes).append(SPACE).append(bundle.getString("minutes")).append(COLON).append(SPACE);
             expTime.append(seconds).append(SPACE).append(bundle.getString("seconds"));
-
-            expiryTime = expTime.toString();
         }
+        expiryTime = expTime.toString();
     }
 
     /**
@@ -1554,6 +1563,15 @@ public class LDAPAuthUtils {
      */
     public void setUseStartTLS(boolean useStartTLS) {
         this.useStartTLS = useStartTLS;
+    }
+
+    /**
+     * Sets the LDAP Server connection protocol version.
+     *
+     * @param tlsVersion values TLSv1/TLSv1.1/TLSv1.2
+     */
+    public void setProtocolVersion(String tlsVersion) {
+        this.protocolVersion = tlsVersion;
     }
 
     class PasswordPolicyResult {

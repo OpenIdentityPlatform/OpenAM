@@ -24,14 +24,15 @@
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
-import com.sun.identity.entitlement.util.SearchAttribute;
 
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.PolicyConstants;
@@ -53,19 +54,9 @@ public class Application implements Cloneable {
     public static final String CREATED_BY_ATTRIBUTE = "createdby";
 
     /**
-     * Created by search attribute
-     */
-    public static final SearchAttribute CREATED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(CREATED_BY_ATTRIBUTE, "ou");
-
-    /**
      * Last modified by index key
      */
     public static final String LAST_MODIFIED_BY_ATTRIBUTE = "lastmodifiedby";
-
-    /**
-     * Last modified by search attribute
-     */
-    public static final SearchAttribute LAST_MODIFIED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(LAST_MODIFIED_BY_ATTRIBUTE, "ou");
 
     /**
      * Creation date index key
@@ -73,21 +64,9 @@ public class Application implements Cloneable {
     public static final String CREATION_DATE_ATTRIBUTE = "creationdate";
 
     /**
-     * Creation date search attribute
-     */
-    public static final SearchAttribute CREATION_DATE_SEARCH_ATTRIBUTE = new SearchAttribute(CREATION_DATE_ATTRIBUTE, "ou");
-
-    /**
      * Last modified date index key
      */
-    public static final String LAST_MODIFIED_DATE_ATTRIBUTE =
-            "lastmodifieddate";
-
-    /**
-     * Last modified date search attribute
-     */
-    public static final SearchAttribute LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE =
-            new SearchAttribute(LAST_MODIFIED_DATE_ATTRIBUTE, "ou");
+    public static final String LAST_MODIFIED_DATE_ATTRIBUTE = "lastmodifieddate";
 
     /**
      * Name attribute name,
@@ -95,19 +74,9 @@ public class Application implements Cloneable {
     public static final String NAME_ATTRIBUTE = "name";
 
     /**
-     * Name search attribute
-     */
-    public static final SearchAttribute NAME_SEARCH_ATTRIBUTE = new SearchAttribute(NAME_ATTRIBUTE, "ou");
-
-    /**
      * Description attribute name,
      */
     public static final String DESCRIPTION_ATTRIBUTE = "description";
-
-    /**
-     * Description search attribute
-     */
-    public static final SearchAttribute DESCRIPTION_SEARCH_ATTRIBUTE = new SearchAttribute(DESCRIPTION_ATTRIBUTE, "ou");
 
     private static final int LEN_CREATED_BY_ATTRIBUTE =
         CREATED_BY_ATTRIBUTE.length();
@@ -119,6 +88,7 @@ public class Application implements Cloneable {
         LAST_MODIFIED_DATE_ATTRIBUTE.length();
 
     private String name;
+    private String displayName;
     private String description;
     private ApplicationType applicationType;
     private Set<String> conditions;
@@ -175,6 +145,7 @@ public class Application implements Cloneable {
 
     protected void cloneAppl(Application clone) {
         clone.name = name;
+        clone.displayName = displayName;
         clone.description = description;
         clone.applicationType = applicationType;
 
@@ -272,6 +243,15 @@ public class Application implements Cloneable {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns application display name.
+     *
+     * @return application display name.
+     */
+    public String getDisplayName() {
+        return displayName;
     }
 
     /**
@@ -664,7 +644,7 @@ public class Application implements Cloneable {
                     creationDate = Long.parseLong(s);
                 } catch (NumberFormatException e) {
                     PolicyConstants.DEBUG.error("Application.setMetaData", e);
-                    Date date = new Date();
+                    Date date = newDate();
                     creationDate = date.getTime();
                 }
             } else if (m.startsWith(LAST_MODIFIED_BY_ATTRIBUTE + "=")) {
@@ -675,7 +655,7 @@ public class Application implements Cloneable {
                     lastModifiedDate = Long.parseLong(s);
                 } catch (NumberFormatException e) {
                     PolicyConstants.DEBUG.error("Application.setMetaData", e);
-                    Date date = new Date();
+                    Date date = newDate();
                     lastModifiedDate = date.getTime();
                 }
             }
@@ -684,6 +664,15 @@ public class Application implements Cloneable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets the application display name.
+     *
+     * @param displayName The application display name.
+     */
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public boolean canBeDeleted(String realm) {

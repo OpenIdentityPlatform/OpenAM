@@ -24,7 +24,7 @@
  *
  * $Id: ISAuthConstants.java,v 1.21 2009/11/25 12:05:07 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.util;
@@ -177,6 +177,11 @@ public interface ISAuthConstants {
      * Session Service Name
      */
     public static final String SESSION_SERVICE_NAME = "iPlanetAMSessionService";
+
+    /**
+     * Agent Service Name
+     */
+    public static final String AGENT_SERVICE_NAME = "AgentService";
 
     /**
      * Application Module Name
@@ -625,15 +630,9 @@ public interface ISAuthConstants {
     // blank string for service configurations.
     public static final String BLANK = "[Empty]";
 
-    // revision number for iPlanetAMAuthService in 7.0
-    public static final int AUTHSERVICE_REVISION7_0 = 30;
-
     // attribute to identify the auth module instance name passed in
     // AMConfiguration
     public static final String MODULE_INSTANCE_NAME = "moduleInstanceName";
-
-    // AuthContextLocal object index name in the transient HttpSession
-    public static final String AUTH_CONTEXT_OBJ = "authContextObject";
 
     // Attribute to enable or disable module based auth
     public static final String MODULE_BASED_AUTH = "sunEnableModuleBasedAuth";
@@ -659,22 +658,10 @@ public interface ISAuthConstants {
      public static final String COMPOSITE_ADVICE_XML =
          "CompositeAdviceXML";
 
-    // Indicates if Post Process Instances Need be added to Session
-    public static final String KEEP_POSTPROCESS_IN_SESSION = 
-        "sunAMAuthKeepPostProcessInstances";
-
-    // Indicates if Auth Module Instances Need be added to Session
-    public static final String KEEP_MODULES_IN_SESSION = 
-        "sunAMAuthKeepAuthModuleIntances";
-
     // Property name for Post Process Instances in Session
     public static final String POSTPROCESS_INSTANCE_SET = 
         "sunAMAuthPostProcessInstanceSet";
 
-    // Property name for Login Context in Session
-    public static final String LOGIN_CONTEXT = 
-        "sunAMAuthLoginContext";
-    
     // Property name for user password attribute
     public static final String ATTR_USER_PASSWORD = "userpassword";
 
@@ -691,4 +678,8 @@ public interface ISAuthConstants {
      */
     public static final String AUTHENTICATED_PRINCIPALS = "org.forgerock.openam.auth.authenticatedprincipals";
 
+    /**
+     * The name of the request attribute that stores whether this is a noSession authentication request.
+     */
+    public static final String NO_SESSION_REQUEST_ATTR = "org.forgerock.openam.auth.noSession";
 }

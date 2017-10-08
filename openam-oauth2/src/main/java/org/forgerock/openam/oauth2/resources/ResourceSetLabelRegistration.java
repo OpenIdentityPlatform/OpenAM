@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -28,8 +28,8 @@ import java.util.Set;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
@@ -62,7 +62,7 @@ public class ResourceSetLabelRegistration {
     void updateLabelsForNewResourceSet(ResourceSetDescription resourceSet) {
         JsonValue labels = resourceSet.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
         if (!labels.isNull() && labels.size() > 0) {
-            updateLabels(resourceSet, labels.asSet(String.class), Collections.<String>emptySet());
+            updateLabels(resourceSet, labels.asCollection(String.class), Collections.<String>emptySet());
         }
     }
 
@@ -77,7 +77,7 @@ public class ResourceSetLabelRegistration {
         if (newLabels.isNull()) {
             newLabels = json(array());
         }
-        Collection<String> addedLabels = new HashSet<>(newLabels.asSet(String.class));
+        Collection<String> addedLabels = new HashSet<>(newLabels.asCollection(String.class));
         try {
             Set<ResourceSetLabel> labels = labelsStore.forResourceSet(resourceSet.getRealm(),
                     resourceSet.getResourceOwnerId(), resourceSet.getId(), true);
@@ -103,7 +103,7 @@ public class ResourceSetLabelRegistration {
     void updateLabelsForDeletedResourceSet(ResourceSetDescription resourceSet) {
         JsonValue labels = resourceSet.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
         if (!labels.isNull() && labels.size() > 0) {
-            updateLabels(resourceSet, Collections.<String>emptySet(), labels.asSet(String.class));
+            updateLabels(resourceSet, Collections.<String>emptySet(), labels.asCollection(String.class));
         }
     }
 

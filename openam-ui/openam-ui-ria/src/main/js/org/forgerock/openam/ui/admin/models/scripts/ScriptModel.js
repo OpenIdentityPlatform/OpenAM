@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
+define([
     "backbone",
     "org/forgerock/commons/ui/common/util/Base64",
     "org/forgerock/openam/ui/common/util/URLHelper",
@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
     return Backbone.Model.extend({
         idAttribute: "_id",
         urlRoot: URLHelper.substitute("__api__/scripts"),
-        defaults: function () {
+        defaults () {
             return {
                 _id: null,
                 name: "",
@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
             };
         },
 
-        validate: function (attrs) {
+        validate (attrs) {
             if (attrs.name.trim() === "") {
                 return "scriptErrorNoName";
             }
@@ -43,14 +43,14 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
             }
         },
 
-        parse: function (resp) {
+        parse (resp) {
             if (resp && resp.script) {
                 resp.script = Base64.decodeUTF8(resp.script);
             }
             return resp;
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
 
             method = method.toLowerCase();
             if (method === "create" || model.id === null) {
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             if (method === "create" || method === "update") {

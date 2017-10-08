@@ -24,17 +24,24 @@
  *
  * $Id: DNUtils.java,v 1.6 2009/11/20 23:52:54 ww203982 Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common;
 
 import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.DN;
 
+import com.sun.identity.shared.debug.Debug;
+
 public class DNUtils {
+
+    private static final Debug DEBUG = Debug.getInstance("DNUtils");
+
     /**
      * Returns the normalized DN string.
      * 
@@ -82,10 +89,13 @@ public class DNUtils {
     public static String DNtoName(String dn,  boolean noTypes) {
         // String dn is guaranteed type of DN
         String id = dn;
-        try {
-            DN name = DN.valueOf(dn);
-            id = noTypes ? rdnValueFromDn(name) : name.rdn().toString();
-        } catch (Exception e) {
+        if (StringUtils.isNotEmpty(dn) && LDAPUtils.isDN(dn, 1)) {
+            try {
+                DN name = DN.valueOf(dn);
+                id = LDAPUtils.unescapeValue(noTypes ? rdnValueFromDn(name) : name.rdn().toString());
+            } catch (LocalizedIllegalArgumentException e) {
+                DEBUG.error("DNUtils.isDN: Invalid DN {}", dn, e);
+            }
         }
         return id;
     }

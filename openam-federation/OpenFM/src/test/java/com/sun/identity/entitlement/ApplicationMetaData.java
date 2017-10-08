@@ -24,21 +24,23 @@
  *
  * $Id: ApplicationMetaData.java,v 1.1 2009/09/25 05:52:56 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
+
+import static com.sun.identity.entitlement.Application.NAME_ATTRIBUTE;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
 import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.util.query.QueryFilter;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
@@ -53,8 +55,7 @@ public class ApplicationMetaData {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     @BeforeClass
     public void setup() 
@@ -73,7 +74,7 @@ public class ApplicationMetaData {
         // appResources.add("http://www.applicationmetadata.com");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -82,7 +83,7 @@ public class ApplicationMetaData {
             return;
         }
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test
@@ -90,8 +91,8 @@ public class ApplicationMetaData {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationManager.getApplication(adminSubject,
-            "/", APPL_NAME);
+        Application appl = ApplicationServiceTestHelper.getApplication(
+                adminSubject, "/", APPL_NAME);
         String createdBy = appl.getCreatedBy();
         long creationTime = appl.getCreationDate();
         long modifiedTime = appl.getLastModifiedDate();
@@ -100,7 +101,7 @@ public class ApplicationMetaData {
             throw new Exception(
                 "ApplicationMetaData.test: modified and creation time diff");
         }
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
         creationTime = appl.getCreationDate();
         modifiedTime = appl.getLastModifiedDate();
 
@@ -114,11 +115,9 @@ public class ApplicationMetaData {
                 "ApplicationMetaData.test: createdBy and modifiedBy should be the same");
         }
 
-        Set<SearchFilter> filters = new HashSet<SearchFilter>();
-        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE, APPL_NAME));
-        Set<String> results = ApplicationManager.search(
-            adminSubject, "/", filters);
-        if (!results.contains(APPL_NAME)) {
+        Set<Application> results = ApplicationServiceTestHelper.search(
+                adminSubject, "/", QueryFilter.equalTo(NAME_ATTRIBUTE, APPL_NAME));
+        if (!results.isEmpty()) {
             throw new Exception(
                 "ApplicationMetaData.test: search fails");
         }

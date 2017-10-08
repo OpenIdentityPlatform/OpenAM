@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
@@ -84,11 +84,17 @@ public class ConnectionConfigFactory {
             default:
                 throw new IllegalStateException();
         }
-        if (ConnectionType.CTS_REAPER.equals(connectionType)) {
+        if (isCtsWorkerConnectionType(connectionType)) {
             configuration = wrapCtsReaperConfiguration(configuration);
         }
         validator.validate(configuration);
         return configuration;
+    }
+
+    private boolean isCtsWorkerConnectionType(ConnectionType connectionType) {
+        return ConnectionType.CTS_EXPIRY_DATE_WORKER.equals(connectionType)
+                || ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER.equals(connectionType)
+                || ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER.equals(connectionType);
     }
 
     private ConnectionConfig getDefaultConfiguration() {
@@ -109,6 +115,11 @@ public class ConnectionConfigFactory {
             @Override
             public int getMaxConnections() {
                 return 1;
+            }
+
+            @Override
+            public boolean isAffinityEnabled() {
+                return false;
             }
         };
     }
@@ -139,6 +150,11 @@ public class ConnectionConfigFactory {
         @Override
         public final int getLdapHeartbeat() {
             return delegateConnectionConfig.getLdapHeartbeat();
+        }
+
+        @Override
+        public boolean isAffinityEnabled() {
+            return delegateConnectionConfig.isAffinityEnabled();
         }
     }
 }

@@ -32,17 +32,17 @@
 
 package com.sun.identity.authentication.service;
 
+import java.security.Principal;
+import java.util.Enumeration;
+
+import javax.security.auth.Subject;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.Enumeration;
 
 /**
  * The default session activator: creates a new session, sets that as the current session,
@@ -52,21 +52,21 @@ import java.util.Enumeration;
 public class DefaultSessionActivator implements SessionActivator {
     static final DefaultSessionActivator INSTANCE = new DefaultSessionActivator();
 
-    protected static final Debug DEBUG = AuthD.debug;
+    protected static final Debug DEBUG = Debug.getInstance(ISAuthConstants.AUTH_BUNDLE_NAME);
 
     protected DefaultSessionActivator() {
     }
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject, final Object loginContext)
+                                   final InternalSession authSession, final Subject subject)
             throws AuthException {
 
         //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
         final InternalSession session = createSession(sessionService, loginState);
         loginState.setSession(session);
 
-        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
+        return updateSessions(session, loginState, session, authSession, sessionService, subject);
     }
 
     /**
@@ -75,12 +75,12 @@ public class DefaultSessionActivator implements SessionActivator {
      */
     protected boolean updateSessions(InternalSession newSession, LoginState loginState,
                                      InternalSession sessionToActivate, InternalSession authSession,
-                                     SessionService sessionService, Subject subject, Object loginContext)
+                                     SessionService sessionService, Subject subject)
             throws AuthException {
 
         final SessionID authSessionId = authSession.getID();
 
-        newSession.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+        newSession.clearAuthContext();
 
         //session upgrade and anonymous conditions are handled in here
         loginState.setSessionProperties(newSession);
@@ -89,7 +89,7 @@ public class DefaultSessionActivator implements SessionActivator {
         putAllPropertiesFromAuthSession(authSession, sessionToActivate);
 
         //destroying the authentication session
-        sessionService.destroyInternalSession(authSessionId);
+        sessionService.destroyAuthenticationSession(authSessionId);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Activating session: " + newSession);
@@ -97,11 +97,6 @@ public class DefaultSessionActivator implements SessionActivator {
 
         //ensure that we've updated the subject (if appropriate, e.g. from anonymous -> known)
         loginState.setSubject(addSSOTokenPrincipal(subject, sessionToActivate.getID()));
-
-        //set the login context for this session
-        if (loginState.isModulesInSessionEnabled() && loginContext != null) {
-            newSession.setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
-        }
 
         try {
             return activateSession(sessionToActivate, loginState);
@@ -120,7 +115,7 @@ public class DefaultSessionActivator implements SessionActivator {
     }
 
     protected InternalSession createSession(SessionService sessionService, LoginState loginState) {
-        return sessionService.newInternalSession(loginState.getOrgDN(), null, false);
+        return sessionService.newInternalSession(loginState.getOrgDN(), false);
     }
 
     protected boolean activateSession(InternalSession session, LoginState loginState) throws SessionException {

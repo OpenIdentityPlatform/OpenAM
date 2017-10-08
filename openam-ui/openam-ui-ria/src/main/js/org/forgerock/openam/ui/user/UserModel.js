@@ -14,7 +14,7 @@
  * Portions copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/UserModel", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractModel",
@@ -22,23 +22,23 @@ define("org/forgerock/openam/ui/user/UserModel", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
-    "org/forgerock/openam/ui/common/util/object/flattenValues"
-], function ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, RealmHelper, Router,
-             ServiceInvoker, flattenValues) {
-    var baseUrl = Constants.host + "/" + Constants.context + "/json/__subrealm__/users",
+    "org/forgerock/openam/ui/common/util/object/flattenValues",
+    "org/forgerock/openam/ui/common/services/fetchUrl"
+], ($, _, AbstractModel, arrayify, Configuration, Constants, Messages, Router, ServiceInvoker, flattenValues,
+    fetchUrl) => {
+    var baseUrl = `${Constants.host}/${Constants.context}/json`,
         UserModel = AbstractModel.extend({
             idAttribute: "id",
             defaults: {
                 kbaInfo: []
             },
-            silentReset: function () {
+            silentReset () {
                 var previousAttributes = this.previousAttributes();
                 this.set(previousAttributes, { silent: true });
             },
-            sync: function (method, model, options) {
+            sync (method, model, options) {
                 var clearPassword = _.bind(function () {
                         delete this.currentPassword;
                         this.unset("password");
@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     errorCallback = function (response) {
                         Messages.addMessage({
                             type: Messages.TYPE_DANGER,
-                            response: response
+                            response
                         });
                         model.silentReset();
                     };
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     if (_.has(this.changed, "password")) {
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
-                            url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id + "?_action=changePassword"),
+                            url: baseUrl + fetchUrl.default(`/users/${this.id}?_action=changePassword`),
                             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             type: "POST",
                             suppressEvents: true,
@@ -89,7 +89,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                                         .value()
                                 ),
                                 suppressEvents: true,
-                                url: RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                                url: baseUrl + fetchUrl.default(`/users/${this.id}`),
                                 headers: {
                                     "If-Match": this.getMVCCRev(),
                                     "Accept-API-Version": "protocol=1.0,resource=2.0",
@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     // The only other supported operation is read
                     return ServiceInvoker.restCall(_.extend(
                         {
-                            "url" : RealmHelper.decorateURIWithRealm(baseUrl + "/" + this.id),
+                            "url" : baseUrl + fetchUrl.default(`/users/${this.id}`),
                             "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
@@ -119,7 +119,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
                     });
                 }
             },
-            parse: function (response) {
+            parse (response) {
                 delete response.userPassword;
 
                 /**
@@ -154,31 +154,13 @@ define("org/forgerock/openam/ui/user/UserModel", [
 
                 return user;
             },
-            getProfile: function () {
-                return ServiceInvoker.restCall({
-                    url: RealmHelper.decorateURIWithRealm(baseUrl + "?_action=idFromSession"),
-                    headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-                    type: "POST",
-                    errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
-                }).then(
-                    _.bind(function (data) {
-                        Configuration.globalData.auth.successURL = data.successURL;
-                        Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
-                        Configuration.globalData.auth.subRealm = data.realm.slice(1);
-
-                        // keep track of the current realm as a future default value, following logout:
-                        Router.configuration.routes.login.defaults[0] = data.realm;
-                        this.set("id", data.id);
-                        return this.fetch().then(_.bind(function () {
-                            return this;
-                        }, this));
-                    }, this)
-                );
+            fetchById (id) {
+                return this.set({ id }, { silent: true }).fetch().then(() => { return this; });
             },
-            getProtectedAttributes: function () {
+            getProtectedAttributes () {
                 return ["password"].concat(Configuration.globalData.protectedUserAttributes);
             },
-            setCurrentPassword: function (currentPassword) {
+            setCurrentPassword (currentPassword) {
                 this.currentPassword = currentPassword;
             },
             /**
@@ -186,7 +168,7 @@ define("org/forgerock/openam/ui/user/UserModel", [
              * @param   {string|array} roles Roles as either a string or array of roles
              * @returns {Boolean}      Whether this model has any of the roles specified
              */
-            hasRole: function (roles) {
+            hasRole (roles) {
                 return _.spread(_.partial(_.contains, this.uiroles))(arrayify(roles));
             }
         });

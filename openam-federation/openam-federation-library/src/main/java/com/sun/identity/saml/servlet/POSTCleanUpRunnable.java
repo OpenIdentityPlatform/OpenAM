@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: POSTCleanUpRunnable.java,v 1.2 2008/06/25 05:47:38 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.servlet;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -81,7 +84,7 @@ public class POSTCleanUpRunnable extends GeneralTaskRunnable {
     
     public void run() {
         String aIDString;
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         synchronized (keys) {
             for (Iterator iter = keys.iterator(); iter.hasNext();) {
                 aIDString = (String) iter.next();

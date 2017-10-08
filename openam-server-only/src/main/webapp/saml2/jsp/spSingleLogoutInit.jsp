@@ -82,7 +82,6 @@
     SAML2Auditor saml2Auditor = new SAML2Auditor(aep, aef, request);
 
     saml2Auditor.setMethod("spSingleLogoutInit");
-    saml2Auditor.setRealm(SAML2Utils.getRealm(request.getParameterMap()));
     saml2Auditor.setSessionTrackingId(session.getId());
     saml2Auditor.auditAccessAttempt();
 
@@ -155,6 +154,7 @@
                 }
             } 
         }
+        saml2Auditor.setRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
         if (metaAlias == null) {
             try {
                 SessionManager.getProvider().invalidateSession(ssoToken, request, response);

@@ -42,6 +42,21 @@
                 resourceName="session"
                 i18nKey="iplanet-am-session-service-description">
             <Global>
+                <AttributeSchema name="Base64Validator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.Base64EncodedBinaryValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="StatelessSessionSigningValidator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.sm.validation.StatelessSessionSigningAlgorithmValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="serviceObjectClasses"
                                  type="list"
                                  syntax="string"
@@ -50,25 +65,13 @@
                         <Value>iplanet-am-session-service</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-session-enable-session-trimming"
-                                 type="single_choice"
-                                 syntax="string"
-                                 resourceName="enableSessionTrimming"
-                                 i18nKey="a122">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
-                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>NO</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-max-session-list-size"
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
                                  resourceName="maxSessionListSize"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 order="400">
                     <DefaultValues>
                         <Value>120</Value>
                     </DefaultValues>
@@ -78,7 +81,8 @@
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
                                  resourceName="sessionListRetrievalTimeout"
-                                 i18nKey="a106">
+                                 i18nKey="a106"
+                                 order="500">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -87,7 +91,8 @@
                                  type="single_choice"
                                  syntax="string"
                                  resourceName="propertyChangeNotifications"
-                                 i18nKey="a116">
+                                 i18nKey="a116"
+                                 order="600">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
                         <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
@@ -100,7 +105,8 @@
                                  type="single_choice"
                                  syntax="string"
                                  resourceName="denyLoginWhenRepoDown"
-                                 i18nKey="a119c">
+                                 i18nKey="a119c"
+                                 order="1100">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
                         <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
@@ -113,12 +119,14 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="notificationPropertyList"
-                                 i18nKey="a120">
+                                 i18nKey="a120"
+                                 order="1200">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-enable-session-constraint"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a117">
+                                 i18nKey="a117"
+                                 order="700">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
                         <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
@@ -130,7 +138,8 @@
                 <AttributeSchema name="iplanet-am-session-constraint-resulting-behavior"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a119b">
+                                 i18nKey="a119b"
+                                 order="1000">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDenyAccess">DENY_ACCESS</ChoiceValue>
                         <ChoiceValue i18nKey="choiceDestroyOldSession">DESTROY_OLD_SESSION</ChoiceValue>
@@ -143,7 +152,8 @@
                                  type="single_choice"
                                  syntax="string"
                                  resourceName="behaviourWhenQuotaExhausted"
-                                 i18nKey="a119b">
+                                 i18nKey="a119b"
+                                 order="1000">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDenyAccess">org.forgerock.openam.session.service.DenyAccessAction
                         </ChoiceValue>
@@ -165,7 +175,8 @@
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
                                  resourceName="quotaConstraintMaxWaitTime"
-                                 i18nKey="a119">
+                                 i18nKey="a119"
+                                 order="900">
                     <DefaultValues>
                         <Value>6000</Value>
                     </DefaultValues>
@@ -174,7 +185,8 @@
                                  type="single"
                                  syntax="boolean"
                                  resourceName="dnRestrictionOnly"
-                                 i18nKey="a121b">
+                                 i18nKey="a121b"
+                                 order="1300">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -187,19 +199,26 @@
                                  type="list"
                                  syntax="string"
                                  resourceName="timeoutHandlers"
-                                 i18nKey="a123">
+                                 i18nKey="a123"
+                                 order="1800">
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-signing-type"
                                  type="single_choice"
                                  listOrder="insertion"
                                  syntax="string"
                                  resourceName="statelessSigningType"
-                                 i18nKey="a124">
+                                 i18nKey="a124"
+                                 order="1900"
+                                 validator="StatelessSessionSigningValidator">
                     <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS256">HS256</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
                         <ChoiceValue i18nKey="choiceHS512">HS512</ChoiceValue>
                         <ChoiceValue i18nKey="choiceRS256">RS256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES256">ES256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES384">ES384</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceES512">ES512</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>HS256</Value>
@@ -209,16 +228,18 @@
                                  type="single"
                                  syntax="string"
                                  resourceName="statelessSigningHmacSecret"
-                                 i18nKey="a125">
+                                 i18nKey="a125"
+                                 order="2000">
                     <DefaultValues>
-                        <Value>@128_BIT_RANDOM_SECURE@</Value>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-signing-rsa-certificate-alias"
                                  type="single"
                                  syntax="string"
                                  resourceName="statelessSigningRsaCertAlias"
-                                 i18nKey="a126">
+                                 i18nKey="a126"
+                                 order="2100">
                     <DefaultValues>
                         <Value>test</Value>
                     </DefaultValues>
@@ -228,28 +249,59 @@
                                  listOrder="insertion"
                                  syntax="string"
                                  resourceName="statelessEncryptionType"
-                                 i18nKey="a127">
+                                 i18nKey="a127"
+                                 order="2200">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
                         <ChoiceValue i18nKey="choiceRSA">RSA</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceAESKeyWrap">AES_KEYWRAP</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDirect">DIRECT</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>NONE</Value>
+                        <Value>DIRECT</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-encryption-rsa-certificate-alias"
                                  type="single"
                                  syntax="string"
                                  resourceName="statelessEncryptionRsaCertAlias"
-                                 i18nKey="a128">
+                                 i18nKey="a128"
+                                 order="2300">
                     <DefaultValues>
                         <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-encryption-aes-key"
+                                 type="single"
+                                 syntax="password"
+                                 resourceName="statelessEncryptionAesKey"
+                                 i18nKey="a133"
+                                 order="2800"
+                                 validator="Base64Validator">
+                    <DefaultValues>
+                        <Value>@256_BIT_RANDOM_SECURE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-compression-type"
+                                 type="single_choice"
+                                 listOrder="insertion"
+                                 syntax="string"
+                                 resourceName="statelessCompressionType"
+                                 i18nKey="a134"
+                                 order="2900">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDEFLATE">DEF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NONE</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-enable-session-blacklisting"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a129">
+                                 i18nKey="a129"
+                                 order="2400">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -263,7 +315,8 @@
                                  syntax="number_range"
                                  rangeStart="0"
                                  rangeEnd="2147483647"
-                                 i18nKey="a130">
+                                 i18nKey="a130"
+                                 order="2500">
                     <DefaultValues>
                         <Value>10000</Value>
                     </DefaultValues>
@@ -273,7 +326,8 @@
                                  syntax="number_range"
                                  rangeStart="0"
                                  rangeEnd="2147483647"
-                                 i18nKey="a131">
+                                 i18nKey="a131"
+                                 order="2600">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
@@ -282,128 +336,12 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a132">
+                                 i18nKey="a132"
+                                 order="2700">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="Site" inheritance="multiple" i18nKey="site" resourceName="site">
-                    <AttributeSchema name="iplanet-am-session-sfo-enabled"
-                                     type="single"
-                                     syntax="boolean"
-                                     resourceName="sfoEnabled"
-                                     i18nKey="a121">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-reduced-crosstalk-enabled"
-                                     type="single"
-                                     syntax="boolean"
-                                     resourceName="reducedCrosstalkEnabled"
-                                     i18nKey="a121c.session.reduced.crosstalk.enabled">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-logout-destroy-broadcast"
-                                     type="single_choice"
-                                     syntax="string"
-                                     resourceName="logoutBroadcastMode"
-                                     i18nKey="a121d.session.destroy.logout.broadcast">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="choiceBroadcastOff">OFF</ChoiceValue>
-                            <ChoiceValue i18nKey="choiceBroadcastToLocalSite">LOCAL_SITE</ChoiceValue>
-                            <ChoiceValue i18nKey="choiceBroadcastToAllSites">ALL_SITES</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>OFF</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-reduced-crosstalk-purge-delay"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="1" rangeEnd="2147483647"
-                                     resourceName="reducedCrosstalkPurgeDelay"
-                                     i18nKey="a121e.session.reduced.crosstalk.purge.delay">
-                        <DefaultValues>
-                            <Value>1</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a127 -->
-                    <AttributeSchema name="iplanet-am-session-store-username"
-                                     type="single"
-                                     syntax="string">
-                        <DefaultValues>
-                            <Value>guest</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a128 -->
-                    <AttributeSchema name="iplanet-am-session-store-password"
-                                     type="single"
-                                     syntax="password">
-                        <DefaultValues>
-                            <Value>guest</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a129 -->
-                    <AttributeSchema name="iplanet-am-session-min-pool-size"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="1" rangeEnd="100">
-                        <DefaultValues>
-                            <Value>8</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a130 -->
-                    <AttributeSchema name="iplanet-am-session-max-pool-size"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="1" rangeEnd="100">
-                        <DefaultValues>
-                            <Value>32</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a131 -->
-                    <AttributeSchema name="iplanet-am-session-store-cpl-max-wait-time"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="0" rangeEnd="2147483647">
-                        <DefaultValues>
-                            <Value>5000</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <AttributeSchema name="iplanet-am-session-JDBC-driver-Impl-classname"
-                                     type="single"
-                                     syntax="string">
-                        <DefaultValues>
-                            <Value>com.iplanet.dpro.session.jdbc.HADBConnectionImpl</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- Was i18Key a113 -->
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <AttributeSchema name="iplanet-am-session-jdbc-url"
-                                     type="single"
-                                     syntax="string">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                </SubSchema>
             </Global>
             <Dynamic>
                 <AttributeSchema name="iplanet-am-session-max-session-time"
@@ -411,7 +349,8 @@
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
                                  resourceName="maxSessionTime"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 order="100">
                     <DefaultValues>
                         <Value>120</Value>
                     </DefaultValues>
@@ -421,7 +360,8 @@
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
                                  resourceName="maxIdleTime"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="200">
                     <DefaultValues>
                         <Value>30</Value>
                     </DefaultValues>
@@ -431,7 +371,8 @@
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
                                  resourceName="maxCachingTime"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 order="300">
                     <DefaultValues>
                         <Value>3</Value>
                     </DefaultValues>
@@ -441,7 +382,8 @@
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
                                  resourceName="quotaLimit"
-                                 i18nKey="a118">
+                                 i18nKey="a118"
+                                 order="800">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -469,21 +411,14 @@
                                  syntax="string"
                                  i18nKey="">
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-session-add-session-listener-on-all-sessions"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="">
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
             </Dynamic>
             <User>
                 <AttributeSchema name="iplanet-am-session-max-session-time"
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 order="100">
                     <DefaultValues>
                         <Value>120</Value>
                     </DefaultValues>
@@ -492,7 +427,8 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 order="200">
                     <DefaultValues>
                         <Value>30</Value>
                     </DefaultValues>
@@ -501,7 +437,8 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 order="300">
                     <DefaultValues>
                         <Value>3</Value>
                     </DefaultValues>
@@ -510,7 +447,8 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
-                                 i18nKey="a118">
+                                 i18nKey="a118"
+                                 order="800">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>

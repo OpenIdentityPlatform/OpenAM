@@ -84,17 +84,6 @@
     showSortingRow="false" />
 </jato:content>
 
-<jato:content name="ForceReset">
-<div class="ConFldSetDiv">
-    <table border="0" cellpadding="0" cellspacing="0" title="">
-	<tr>
-	    <td valign="top">
-	    <div class="ConTblCl1Div"><span class="LblLev2Txt"><label for="psLbl1"><cc:text name="lblForceResetPwd" defaultValue="user.password.reset.force.reset.next.login" bundleID="amConsole" /></label>:</span></div></td>
-	    <td valign="top"><div class="ConTblCl2Div"><cc:checkbox name="cbForceResetPwd" /></div></td></tr>
-</table>
-</div>
-</jato:content>
-
 </cc:form>
 
 

@@ -16,23 +16,31 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import com.sun.identity.shared.debug.Debug;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.continuous.ContinuousQuery;
+import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DecodeException;
@@ -44,6 +52,12 @@ import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
+import com.iplanet.services.ldap.event.EventService;
+import com.sun.identity.shared.debug.Debug;
+
+/**
+ * Constructs LDAP queries for execution of a specific {@link Filter} over a specific {@link Connection}.
+ */
 public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
 
     // Represents the start and end state of the paged query.
@@ -52,31 +66,35 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     private final LdapDataLayerConfiguration dataLayerConfiguration;
     private final LdapSearchHandler handler;
     private final Map<Class, EntryConverter> converterMap;
+    private final ConnectionFactory<Connection> connectionFactory;
     protected ByteString pagingCookie;
 
     /**
      * Default constructor ensures the Object Class is defined.
      *
      * @param dataLayerConfiguration Required for data store dataLayerConfiguration.
+     * @param handler The Search handler to use on the LDAP store.
+     * @param debug To debug writer for this class.
+     * @param converterMap The map ldap entry types to Java objects (partials, strings, tokens).
+     * @param connectionFactoryProvider A producer of factories used to communicate down to the data layer with.
      */
     @Inject
     public LdapQueryBuilder(LdapDataLayerConfiguration dataLayerConfiguration, LdapSearchHandler handler,
-            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
-            Map<Class, EntryConverter> converterMap) {
+                            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
+                            Map<Class, EntryConverter> converterMap,
+                            LdapConnectionFactoryProvider connectionFactoryProvider) {
         super(debug);
         this.dataLayerConfiguration = dataLayerConfiguration;
         this.handler = handler;
         this.converterMap = converterMap;
+        this.connectionFactory = connectionFactoryProvider.createFactory();
     }
 
     /**
      * Perform the query and return the results as Entry instances.
      *
      * @param connection The connection used to perform the request.
-     *
      * @return A non null but possibly empty collection.
-     *
-     * @throws org.forgerock.openam.cts.exceptions.QueryFailedException If there was an error during the query.
      */
     public <T> Iterator<Collection<T>> executeRawResults(Connection connection, Class<T> returnType) {
         if (String.class.equals(returnType) && requestedAttributes.length != 1) {
@@ -86,7 +104,25 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
         if (entryConverter == null) {
             throw new IllegalArgumentException("Cannot convert LDAP Entry objects to " + returnType.getName());
         }
-        return new EntryIterator<T>(connection, entryConverter);
+        return new EntryIterator<>(connection, entryConverter);
+    }
+
+    @Override
+    public ContinuousQuery executeContinuousQuery(ContinuousQueryListener listener) throws DataLayerException {
+
+        CTSDJLDAPv3PersistentSearchBuilder builder = new CTSDJLDAPv3PersistentSearchBuilder(connectionFactory);
+
+        ContinuousQuery pSearch = builder
+                .withSearchFilter(getLDAPFilter())
+                .returnAttributes(requestedAttributes)
+                .withRetry(EventService.RETRY_INTERVAL)
+                .withSearchBaseDN(dataLayerConfiguration.getTokenStoreRootSuffix())
+                .withSearchScope(SearchScope.WHOLE_SUBTREE).build();
+
+        pSearch.addContinuousQueryListener(listener);
+        pSearch.startQuery();
+
+        return pSearch;
     }
 
     private Collection<Entry> getEntries(Connection connection) throws CoreTokenException {
@@ -96,8 +132,9 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
                 dataLayerConfiguration.getTokenStoreRootSuffix(),
                 SearchScope.WHOLE_SUBTREE,
                 ldapFilter,
-                requestedAttributes);
+                getRequestedAttributes());
         searchRequest.setSizeLimit(sizeLimit);
+        searchRequest.setTimeLimit((int) timeLimit.to(TimeUnit.SECONDS));
 
         if (isPagingResults()) {
             searchRequest = searchRequest.addControl(SimplePagedResultsControl.newControl(true, pageSize, pagingCookie));
@@ -142,26 +179,54 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
     }
 
     /**
+     * We modify the requested attributes here to ensure the etag is
+     * returned in addition to what is already being requested for.
+     *
+     * @return The attributes to be queried for.
+     */
+    private String[] getRequestedAttributes() {
+        String[] attributes;
+        if (requestedAttributes.length == 0) {
+            attributes = new String[] {"*", CoreTokenField.ETAG.toString()};
+        } else if (isETagRequested()) {
+            attributes = requestedAttributes;
+        } else {
+            attributes = Arrays.copyOf(requestedAttributes, requestedAttributes.length + 1);
+            attributes[attributes.length - 1] = CoreTokenField.ETAG.toString();
+        }
+        return attributes;
+    }
+
+    private boolean isETagRequested() {
+        for (String attr : requestedAttributes) {
+            if (CoreTokenField.ETAG.toString().equals(attr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return Creates a list based on the state of the builder.
      */
     private <T> Collection<T> createResultsList() {
         Collection<T> entries;
         if (isPagingResults()) {
-            entries = new ArrayList<T>(pageSize);
+            entries = new ArrayList<>(pageSize);
         } else if (sizeLimit != 0) {
-            entries = new ArrayList<T>(sizeLimit);
+            entries = new ArrayList<>(sizeLimit);
         } else {
-            entries = new ArrayList<T>();
+            entries = new ArrayList<>();
         }
         return entries;
     }
 
     private Filter getLDAPFilter() {
-        Filter objectClass = Filter.equality(CoreTokenConstants.OBJECT_CLASS, CoreTokenConstants.FR_CORE_TOKEN);
+        Filter objectClassFilter = Filter.equality(CoreTokenConstants.OBJECT_CLASS, CoreTokenConstants.FR_CORE_TOKEN);
         if (filter == null) {
-            return objectClass;
+            return objectClassFilter;
         } else {
-            return Filter.and(objectClass, filter);
+            return Filter.and(filter, objectClassFilter);
         }
     }
 
@@ -191,7 +256,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
      *
      * The details of this are managed by the ReaperIterator.
      *
-     * @see org.forgerock.openam.cts.impl.query.reaper.ReaperQuery
+     * @see CTSWorkerQuery
      *
      * @return Non null empty ByteString.
      */
@@ -221,7 +286,7 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
                 pagingCookie = getEmptyPagingCookie();
             }
 
-            Collection<Entry> entries = null;
+            final Collection<Entry> entries;
             try {
                 entries = getEntries(connection);
             } catch (CoreTokenException e) {

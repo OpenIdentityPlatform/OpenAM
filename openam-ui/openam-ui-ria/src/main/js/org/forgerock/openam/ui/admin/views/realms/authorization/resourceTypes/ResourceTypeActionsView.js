@@ -11,32 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypeActionsView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, _, AbstractView, EventManager, Constants, UIUtils) {
-
-    return AbstractView.extend({
+], ($, _, AbstractView, EventManager, Constants, UIUtils) =>
+    AbstractView.extend({
         element: "#actions",
         template: "templates/admin/views/realms/authorization/resourceTypes/ResourceTypesActionsTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click .radio-inline": "toggleRadio",
-            "keyup .radio-inline": "toggleRadio",
-            "click .editing button": "addItem",
-            "keyup .editing button": "addItem",
+            "click [data-toggle-item]": "toggleRadio",
+            "keyup [data-toggle-item]": "toggleRadio",
+            "click [data-add-item]": "addItem",
+            "keyup [data-add-item]": "addItem",
+            "keyup [data-editing-input]": "addItem",
             "click button[data-delete]": "deleteItem",
             "keyup button[data-delete]": "deleteItem"
         },
-        render: function (data, el, callback) {
+        render (data, el, callback) {
             var self = this;
             _.extend(this.data, data);
             this.element = el;
@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             });
         },
 
-        renderActionsTable: function (callback) {
+        renderActionsTable (callback) {
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/common/ActionsTableTemplate.html",
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
                 });
         },
 
-        updateEntity: function () {
+        updateEntity () {
             var actions = null;
 
             if (this.data.actions.length) {
@@ -72,29 +72,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             this.data.entity.actions = actions;
         },
 
-        isExistingItem: function (itemPending, itemFromCollection) {
+        isExistingItem (itemPending, itemFromCollection) {
             return itemPending.name === itemFromCollection.name;
         },
 
-        addItem: function (e) {
+        addItem (e) {
+            const actionName = this.$el.find("[data-editing-input]").val();
+
             if (e.type === "keyup" && e.keyCode !== 13) {
+                this.toggleAddButton(actionName !== "");
                 return;
             }
 
-            var editing = this.$el.find(".editing"),
-                actionName = editing.find(".form-control").val(),
-                pending = { "name": actionName, "value": true },
-                duplicateIndex = -1,
-                counter = 0,
-                self = this;
+            const pending = { "name": actionName, "value": true };
+            let duplicateIndex = -1;
+            let counter = 0;
 
             if (pending.name === "") {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidItem");
                 return;
             }
 
-            _.each(this.data.actions, function (item) {
-                if (self.isExistingItem(pending, item)) {
+            _.each(this.data.actions, (item) => {
+                if (this.isExistingItem(pending, item)) {
                     duplicateIndex = counter;
                     return;
                 }
@@ -106,13 +106,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             } else {
                 this.data.actions.push(pending);
                 this.updateEntity();
-                this.renderActionsTable(function () {
-                    self.$el.find(".editing input[type=text]").val("").focus();
+                this.renderActionsTable(() => {
+                    this.toggleAddButton(false);
+                    this.$el.find("[data-editing-input]").val("").focus();
                 });
             }
         },
 
-        deleteItem: function (e) {
+        deleteItem (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -125,7 +126,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             this.renderActionsTable();
         },
 
-        toggleRadio: function (e) {
+        toggleRadio (e) {
             var $target = $(e.target),
                 permitted,
                 actionName;
@@ -142,6 +143,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/R
             }).value = (permitted === "true");
 
             this.updateEntity();
+        },
+
+        toggleAddButton (enabled) {
+            this.$el.find("[data-add-item]").prop("disabled", !enabled);
         }
-    });
-});
+    })
+);

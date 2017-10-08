@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.uma.audit;
 
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Inject;
@@ -32,7 +33,7 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -48,13 +49,13 @@ import org.restlet.data.ChallengeResponse;
 public class UmaAuditLogger {
     private final TokenDataStore<UmaAuditEntry> delegate;
     private final Debug logger = Debug.getInstance("UmaAuditLogger");
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final TokenStore oauth2TokenStore;
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
 
     @Inject
     public UmaAuditLogger(@DataLayer(ConnectionType.UMA_AUDIT_ENTRY) TokenDataStore delegate,
-            TokenStore oauth2TokenStore, OAuth2RequestFactory<?, Request> requestFactory,
+            TokenStore oauth2TokenStore, OAuth2RequestFactory requestFactory,
             OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory) {
         this.delegate = delegate;
         this.requestFactory = requestFactory;

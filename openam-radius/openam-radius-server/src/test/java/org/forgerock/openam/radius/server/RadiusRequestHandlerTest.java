@@ -19,26 +19,27 @@
 
 package org.forgerock.openam.radius.server;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.forgerock.guava.common.eventbus.EventBus;
+import org.forgerock.openam.radius.common.AccessAccept;
+import org.forgerock.openam.radius.common.AccessReject;
+import org.forgerock.openam.radius.common.Packet;
+import org.forgerock.openam.radius.common.Utils;
+import org.forgerock.openam.radius.server.config.ClientConfig;
+import org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler;
+import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
+import org.testng.annotations.Test;
 
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import org.forgerock.guava.common.eventbus.EventBus;
-import org.forgerock.openam.radius.common.AccessAccept;
-import org.forgerock.openam.radius.common.AccessReject;
-import org.forgerock.openam.radius.common.Packet;
-import org.forgerock.openam.radius.common.PacketType;
-import org.forgerock.openam.radius.common.Utils;
-import org.forgerock.openam.radius.server.config.ClientConfig;
-import org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler;
-import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
-import org.forgerock.util.promise.PromiseImpl;
-import org.testng.annotations.Test;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for the <code>RadiusRequestHandler</code> class.
@@ -52,8 +53,8 @@ public class RadiusRequestHandlerTest {
             + "01 10 05 06 00 00 00 03";
 
     /**
-     * Test that when run is called with an AcceptAllHandler then the RadiusAuthResponse contains a success code and an
-     * AcceptResponse is sent.
+     * Test that when run is called with an AcceptAllHandler that the resultant packet sent via the request
+     * context is an ACCESS_ACCEPT packet.
      *
      * @throws InterruptedException - when an interrupt occurs.
      * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
@@ -73,26 +74,22 @@ public class RadiusRequestHandlerTest {
         when(clientConfig.getName()).thenReturn("TestConfig");
 
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
         EventBus eventBus = new EventBus();
 
         AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
         when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new AcceptAllHandler());
-        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
-                promise, eventBus);
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, eventBus);
+
+        //when
         handler.run();
 
-        // when
-        final RadiusResponse result = promise.getOrThrow();
-
         // then
-        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_ACCEPT);
         verify(reqCtx, times(1)).send(isA(AccessAccept.class));
     }
 
     /**
-     * Test that when run is called with an RejectAllHandler that the resultant promise returns a RadiusResponse
-     * containing an ACCESS_REJECT packet.
+     * Test that when run is called with an RejectAllHandler that the resultant packet sent via the request
+     * context is an ACCESS_REJECT packet.
      *
      * @throws InterruptedException - when an interrupt occurs.
      * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
@@ -114,32 +111,29 @@ public class RadiusRequestHandlerTest {
         when(clientConfig.getAccessRequestHandlerClass()).thenReturn(RejectAllHandler.class);
 
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
         EventBus eventBus = new EventBus();
 
         AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
         when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new RejectAllHandler());
 
-        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
-                promise, eventBus);
-        handler.run();
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, eventBus);
 
         // when
-        final RadiusResponse result = promise.getOrThrow();
+        handler.run();
 
         // then
-        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_REJECT);
         verify(reqCtx, times(1)).send(isA(AccessReject.class));
     }
 
     /**
-     * Test that when run is called with an CatestrophicHandler that the promise returns a RadiusProcessingException.
+     * Test that when run is called with an CatestrophicHandler that the run completes without sending any
+     * packet. (ie: the packet is silently dropped since it can't be handled.)
      *
      * @throws InterruptedException - when an interrupt occurs.
      * @throws RadiusProcessingException - when something goes wrong processing a RADIUS packet.
      * @throws UnknownHostException - if the host can't be determined
      */
-    @Test(expectedExceptions = RadiusProcessingException.class)
+    @Test(enabled = true)
     public void testRunCatestrophic() throws InterruptedException, RadiusProcessingException, UnknownHostException {
 
         // given
@@ -154,21 +148,17 @@ public class RadiusRequestHandlerTest {
         when(clientConfig.getAccessRequestHandlerClass()).thenReturn(CatastrophicHandler.class);
 
         final ByteBuffer bfr = Utils.toBuffer(res);
-        final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
         EventBus eventBus = new EventBus();
 
         AccessRequestHandlerFactory accessRequestHandlerFactory = mock(AccessRequestHandlerFactory.class);
         when(accessRequestHandlerFactory.getAccessRequestHandler(reqCtx)).thenReturn(new CatastrophicHandler());
 
-        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, promise,
-                promise, eventBus);
-        handler.run();
+        final RadiusRequestHandler handler = new RadiusRequestHandler(accessRequestHandlerFactory, reqCtx, bfr, eventBus);
 
         // when
-        final RadiusResponse result = promise.getOrThrow();
+        handler.run();
 
         // then
-        assertThat(result.getResponsePacket().getType()).isEqualTo(PacketType.ACCESS_REJECT);
         verify(reqCtx, never()).send(isA(Packet.class));
     }
 }

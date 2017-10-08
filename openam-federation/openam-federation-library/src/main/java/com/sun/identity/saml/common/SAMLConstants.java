@@ -24,7 +24,7 @@
  *
  * $Id: SAMLConstants.java,v 1.17 2009/06/12 22:21:39 mallas Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.common;
@@ -997,6 +997,8 @@ public final class SAMLConstants
         "com.sun.identity.saml.xmlsig.transformAlg";
     public static final String XMLSIG_ALGORITHM =
         "com.sun.identity.saml.xmlsig.xmlSigAlgorithm";    
+    public static final String DIGEST_ALGORITHM =
+        "com.sun.identity.saml.xmlsig.digestAlgorithm";
     public static final String JKS_KEY_PROVIDER = 
         "com.sun.identity.saml.xmlsig.JKSKeyProvider"; 
     public static final String KEY_PROVIDER_IMPL_CLASS =

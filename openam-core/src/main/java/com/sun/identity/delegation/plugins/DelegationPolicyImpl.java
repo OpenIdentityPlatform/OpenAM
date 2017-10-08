@@ -24,23 +24,12 @@
  *
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.delegation.plugins;
 
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.forgerock.openam.ldap.LDAPUtils;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
@@ -80,17 +69,30 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.openam.identity.idm.IdentityUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
+
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * The class <code>DelegationPolicyImpl</code> implements the interface
  * <code>DelegationInterface</code> using OpenAM Policy
- * Management and Evaluation APIs. It provides access control for access 
+ * Management and Evaluation APIs. It provides access control for access
  * manager using the OpenAM's internal policy framework.
  */
 
 public class DelegationPolicyImpl implements DelegationInterface, ServiceListener, IdEventListener, PolicyListener {
 
-    private static final String POLICY_REPOSITORY_REALM = 
+    private static final String POLICY_REPOSITORY_REALM =
                                        PolicyManager.DELEGATION_REALM;
     private static final String NAME_DELIMITER = "^^";
     private static final char REPLACEMENT_FOR_COMMA = '^';
@@ -101,15 +103,16 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
     private static final String DELEGATION_RULE = "delegation-rule";
     private static final String DELEGATION_SUBJECT = "delegation-subject";
     private static final String POLICY_SUBJECT = "AMIdentitySubject";
-    private static final String AUTHN_USERS_ID = 
+    private static final String AUTHN_USERS_ID =
         "id=All Authenticated Users,ou=role," +
         com.sun.identity.sm.ServiceManager.getBaseDN();
     private static final String DELEGATION_AUTHN_USERS = "AuthenticatedUsers";
-    private static final String AUTHENTICATED_USERS_SUBJECT = 
+    private static final String AUTHENTICATED_USERS_SUBJECT =
                                                   "AuthenticatedUsers";
     static final String READ = "READ";
     static final String DELEGATE = "DELEGATE";
     static final String GLOBALCONFIG = "globalconfig";
+    static final String SERVERINFO_VERSION = "serverinfo/version";
 
     /**
      *  To configure the delegation cache size, specify the attribute
@@ -122,9 +125,9 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      *  usertokenidstr (key) ---> resource names (value)
      *  resource name (key) ---> arraylist of two elements (value)
      *  arraylist(0) contains a <code>Map</code> object of env parameters
-     *  arraylist(1) contains a <code>PolicyDecision</code> regarding the 
+     *  arraylist(1) contains a <code>PolicyDecision</code> regarding the
      *  resource.
-     *  The cache is a LRU one and is updated based on subject change 
+     *  The cache is a LRU one and is updated based on subject change
      *  notification and policy change notification.
      */
     private Map<String, Map<String, List<Object>>> delegationCache;
@@ -161,13 +164,13 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             }
 
             pe = new PolicyEvaluator(POLICY_REPOSITORY_REALM, DelegationManager.DELEGATION_SERVICE);
-            
-            // listen on delegation policy changes. once there is 
+
+            // listen on delegation policy changes. once there is
             // delegation policy change, we need to update the cache.
             pe.addPolicyListener(this);
 
             // listen on root realm subject changes.
-            AMIdentityRepository idRepo = 
+            AMIdentityRepository idRepo =
                             new AMIdentityRepository(appToken, "/");
             idRepo.addEventListener(this);
             if (DelegationManager.debug.messageEnabled()) {
@@ -176,15 +179,15 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                  + "for root realm.");
             }
 
-            // listen on sub realm subject changes.     
-            OrganizationConfigManager ocm = 
-                         new OrganizationConfigManager(appToken, "/"); 
+            // listen on sub realm subject changes.
+            OrganizationConfigManager ocm =
+                         new OrganizationConfigManager(appToken, "/");
             Set orgNames = ocm.getSubOrganizationNames("*", true);
             if ((orgNames != null) && (!orgNames.isEmpty())) {
                 Iterator it = orgNames.iterator();
                 while (it.hasNext()) {
                     String org = (String)it.next();
-                    AMIdentityRepository idr = 
+                    AMIdentityRepository idr =
                             new AMIdentityRepository(appToken, org);
                     idr.addEventListener(this);
                     idRepoListeners.put(org, idRepo);
@@ -216,18 +219,18 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
 
     /**
      * Returns all the delegation privileges associated with a realm.
-     * 
+     *
      * @param  token  The <code>SSOToken</code> of the requesting user
-     * @param  orgName The name of the realm from which the 
+     * @param  orgName The name of the realm from which the
      *         delegation privileges are fetched.
-     * 
-     * @return <code>Set</code> of <code>DelegationPrivilege</code> objects 
+     *
+     * @return <code>Set</code> of <code>DelegationPrivilege</code> objects
      *         associated with the realm.
-     * 
+     *
      * @throws SSOException  invalid or expired single-sign-on token
      * @throws DelegationException  for any abnormal condition
      */
-    public Set getPrivileges(SSOToken token, String orgName) 
+    public Set getPrivileges(SSOToken token, String orgName)
         throws SSOException, DelegationException {
         try {
             Set privileges = new HashSet();
@@ -241,10 +244,10 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 POLICY_REPOSITORY_REALM);
             Set pnames = pm.getPolicyNames();
             if (pnames != null) {
-                /* the name of the policy is in the form of 
+                /* the name of the policy is in the form of
                  * orgName^^privilegeName, the privilegeName is the
-                 * name of the delegation privilege that the policy 
-                 * is corresponding to. In case the orgName is in a 
+                 * name of the delegation privilege that the policy
+                 * is corresponding to. In case the orgName is in a
                  * DN format, the special char ',' is replaced to avoid
                  * saving problem.
                  */
@@ -254,22 +257,22 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                     prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
                 } else {
                     prefix = NAME_DELIMITER;
-                }  
+                }
                 int prefixLength = prefix.length();
                 Iterator it = pnames.iterator();
                 while (it.hasNext()) {
                     String pname = (String)it.next();
                     if (pname.toLowerCase().startsWith(prefix)) {
                         Policy p = pm.getPolicy(pname);
-                        // converts the policy to its corresponding 
+                        // converts the policy to its corresponding
                         // delegation privilege
                         DelegationPrivilege dp = policyToPrivilege(p);
                         if (dp != null) {
-                            dp.setName(pname.substring(prefixLength)); 
+                            dp.setName(pname.substring(prefixLength));
                             privileges.add(dp);
                         }
                     }
-                } 
+                }
             }
             return (privileges);
         } catch (Exception e) {
@@ -285,14 +288,14 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * to add to an existing privilege.
      *
      * @param token  The <code>SSOToken</code> of the requesting user
-     * @param orgName The name of the realm to which the delegation privilege 
+     * @param orgName The name of the realm to which the delegation privilege
      *        is to be added.
      * @param privilege  The delegation privilege to be added.
-     * 
+     *
      * @throws SSOException invalid or expired single-sign-on token
      * @throws DelegationException if any abnormal condition occurred.
      */
-    public void addPrivilege(SSOToken token, String orgName, 
+    public void addPrivilege(SSOToken token, String orgName,
       DelegationPrivilege privilege) throws SSOException, DelegationException {
         if (privilege != null) {
             try {
@@ -329,23 +332,23 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             } catch (Exception e) {
                 throw new DelegationException(e);
             }
-        } 
+        }
     }
 
 
     /**
      * Removes a delegation privilege from a specific realm.
-     * 
+     *
      * @param token The <code>SSOToken</code> of the requesting user
-     * @param orgName The name of the realm from which the delegation 
+     * @param orgName The name of the realm from which the delegation
      *         privilege is to be removed.
      * @param privilegeName The name of the delegation privilege to be removed.
-     * 
+     *
      * @throws SSOException  invalid or expired single-sign-on token
      * @throws DelegationException for any abnormal condition
      */
 
-    public void removePrivilege(SSOToken token, String orgName, 
+    public void removePrivilege(SSOToken token, String orgName,
         String privilegeName) throws SSOException, DelegationException {
         try {
             // Need to check if user has "delegate" permissions for org
@@ -353,23 +356,23 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 // Replace token with AdminToken
                 token = (SSOToken) AccessController.doPrivileged(
                     AdminTokenAction.getInstance());
-            }            
+            }
             PolicyManager pm = new PolicyManager(token,
                                     POLICY_REPOSITORY_REALM);
             String prefix = null;
             if (orgName != null) {
-                /* the name of the policy is in the form of 
+                /* the name of the policy is in the form of
                  * orgName^^privilegeName, the privilegeName is the
-                 * name of the delegation privilege that the policy 
-                 * is corresponding to. In case the orgName is in a 
-                 * DN format, the special char ',' is replaced to 
+                 * name of the delegation privilege that the policy
+                 * is corresponding to. In case the orgName is in a
+                 * DN format, the special char ',' is replaced to
                  * avoid saving problem.
                  */
                  prefix = orgName.toLowerCase() + NAME_DELIMITER;
                  prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
             } else {
                 prefix = NAME_DELIMITER;
-            }  
+            }
             pm.removePolicy(prefix + privilegeName);
         } catch (Exception e) {
             throw new DelegationException(e);
@@ -381,25 +384,25 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * pattern in the given realm. The pattern accepts "*" as the wild card for
      * searching subjects. For example, "a*c" matches with any subject starting
      * with a and ending with c.
-     * 
+     *
      * @param token The <code>SSOToken</code> of the requesting user
      * @param orgName The name of the realm from which the subjects are fetched.
      * @param types a set of subject types. e.g. ROLE, GROUP.
      * @param pattern a filter used to select the subjects.
-     * 
+     *
      * @return a set of subjects associated with the realm.
-     * 
+     *
      * @throws SSOException invalid or expired single-sign-on token
      * @throws DelegationException for any abnormal condition
      *
-     * @return <code>Set</code> of universal Ids of the subjects associated 
+     * @return <code>Set</code> of universal Ids of the subjects associated
      *         with the realm.
      *
      * @throws SSOException invalid or expired single-sign-on token
      * @throws DelegationException for any abnormal condition
      */
 
-    public Set getSubjects(SSOToken token, String orgName, Set types, 
+    public Set getSubjects(SSOToken token, String orgName, Set types,
         String pattern) throws SSOException, DelegationException {
         Set results = new HashSet();
         // All Authenticated Users would be returned only if pattern is *
@@ -413,7 +416,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
 
         try {
-            AMIdentityRepository idRepo = 
+            AMIdentityRepository idRepo =
                 new AMIdentityRepository(appToken, orgName);
             Set supportedTypes = idRepo.getSupportedIdTypes();
             if (DelegationManager.debug.messageEnabled()) {
@@ -435,18 +438,18 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                                                 idType, pattern, ctrl);
                         if (idsr != null) {
                             Set searchRes = idsr.getSearchResults();
-                            if ((searchRes !=null) && 
+                            if ((searchRes !=null) &&
                                 (!searchRes.isEmpty())) {
-                                Iterator iter = searchRes.iterator(); 
+                                Iterator iter = searchRes.iterator();
                                 while (iter.hasNext()) {
                                     AMIdentity id = (AMIdentity)iter.next();
                                     results.add(IdUtils.getUniversalId(id));
                                 }
                             }
-                        } 
+                        }
                     }
                 }
-            }  
+            }
             return results;
         } catch (IdRepoException ide) {
             throw new DelegationException(ide);
@@ -459,24 +462,24 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * Returns a set of realm names, based on the input parameter
      * <code>organizationNames</code>, in which the "user" has some
      * delegation permissions.
-     * 
+     *
      * @param token The <code>SSOToken</code> of the requesting user
      * @param organizationNames  a <code>Set</code> of realm names.
-     * 
-     * @return a <code>Set</code> of realm names in which the user has some 
-     *         delegation permissions. It is a subset of 
+     *
+     * @return a <code>Set</code> of realm names in which the user has some
+     *         delegation permissions. It is a subset of
      *         <code>organizationNames</code>
-     * 
+     *
      * @throws SSOException invalid or expired single-sign-on token
      * @throws DelegationException for any abnormal condition
      */
 
-    public Set getManageableOrganizationNames(SSOToken token, 
+    public Set getManageableOrganizationNames(SSOToken token,
       Set organizationNames) throws SSOException, DelegationException {
         Set names = new HashSet();
 
-        if ((organizationNames != null) && 
-            (!organizationNames.isEmpty())) {    
+        if ((organizationNames != null) &&
+            (!organizationNames.isEmpty())) {
             Iterator it = organizationNames.iterator();
             while (it.hasNext()) {
                 String orgName = (String)it.next();
@@ -486,23 +489,23 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 }
             }
         }
-        return names; 
+        return names;
     }
 
 
     /**
      * Returns a boolean value;  if a user has the specified
      * permission returns true, false otherwise.
-     * 
+     *
      * @param token Single sign on token of the user evaluating permission.
      * @param permission Delegation permission to be evaluated
      * @param envParams Run-time environment parameters.
      * @return the result of the evaluation as a boolean value
-     * 
+     *
      * @throws SSOException single-sign-on token invalid or expired.
      * @throws DelegationException for any other abnormal condition.
      */
-    public boolean isAllowed(SSOToken token, DelegationPermission permission, 
+    public boolean isAllowed(SSOToken token, DelegationPermission permission,
         Map envParams) throws SSOException, DelegationException {
         SSOTokenID tokenId;
         PolicyDecision pd;
@@ -514,15 +517,23 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 "DelegationPolicyImpl.isAllowed() is called");
         }
 
-        if ((token != null) && ((tokenId = token.getTokenID()) != null) 
+        if ((token != null) && ((tokenId = token.getTokenID()) != null)
             && (permission != null)) {
             String tokenIdStr = tokenId.toString();
             Set actions = permission.getActions();
             if ((actions != null) && (!actions.isEmpty())) {
-                //If the user has delegated admin permissions in the realm they are currently logged in to,
-                //they have read access to global-config endpoints
-                if(GLOBALCONFIG.equals(permission.getConfigType()) && actions.equals(Collections.singleton(READ))) {
-                    return hasDelegationPermissionsForRealm(token, token.getProperty(ISAuthConstants.ORGANIZATION));
+                // If the user has delegated admin permissions in the realm they are currently logged in to,
+                // they have read access to global-config endpoints
+                if (GLOBALCONFIG.equals(permission.getConfigType()) && actions.equals(Collections.singleton(READ))) {
+                    if (hasDelegationPermissionsForRealm(token, token.getProperty(ISAuthConstants.ORGANIZATION))) {
+                        return true;
+                    }
+                } else if (SERVERINFO_VERSION.equals(permission.getConfigType())
+                        && actions.equals(Collections.singleton(READ))
+                        && IdentityUtils.isCASPAorJASPA(token)) {
+
+                    // Allow the C and Java Agents read access to the serverinfo endpoint
+                    return true;
                 }
 
                 try {
@@ -535,10 +546,10 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         }
                     } else {
                         // decision not found in the cache. compute it.
-                        pd = pe.getPolicyDecision(token, resource, 
+                        pd = pe.getPolicyDecision(token, resource,
                                                   null, envParams);
                         // add the result in the cache.
-                        putResultIntoCache(tokenIdStr, resource, 
+                        putResultIntoCache(tokenIdStr, resource,
                                            envParams, pd);
                         if (DelegationManager.debug.messageEnabled()) {
                             DelegationManager.debug.message(
@@ -551,7 +562,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         Iterator it = actions.iterator();
                         while (it.hasNext() && result) {
                             String actionName = (String)it.next();
-                            ActionDecision ad = 
+                            ActionDecision ad =
                                 (ActionDecision)ads.get(actionName);
                             if (ad != null) {
                                 Set values = ad.getValues();
@@ -571,7 +582,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             if (DelegationManager.debug.messageEnabled()) {
                 DelegationManager.debug.message(
                     "DelegationPolicyImpl.isAllowed(): " +
-                    "actions=" + actions + 
+                    "actions=" + actions +
                     "  resource=" + resource +
                     "  result is:" + result);
             }
@@ -586,7 +597,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * @param  resource resource for which results are sought.
      * @param  envParams  <code>Map</code> of environment params to be
      *         used to fetch the decisions.
-     * @return policy decision 
+     * @return policy decision
      */
     private PolicyDecision getResultFromCache(String tokenIdStr, String resource, Map envParams)
             throws SSOException, DelegationException {
@@ -606,7 +617,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         PolicyDecision pd = (PolicyDecision) al.get(1);
                         if (pd != null) {
                             long pdTTL = pd.getTimeToLive();
-                            long currentTime = System.currentTimeMillis();
+                            long currentTime = currentTimeMillis();
                             if (pdTTL > currentTime) {
                                 return pd;
                             } else {
@@ -631,7 +642,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * @param  envParams  <code>Map</code> of environment params applicable
                for the decision.
      * @param pd policy decision being cached.
-     * 
+     *
      */
     private void putResultIntoCache(String tokenIdStr, String resource, Map envParams, PolicyDecision pd)
             throws SSOException, DelegationException {
@@ -674,20 +685,20 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
     }
 
- 
+
     /**
      * Returns a set of permissions that a user has.
-     * 
+     *
      * @param token sso token of the user requesting permissions
-     * @param orgName The name of the realm from which the delegation 
+     * @param orgName The name of the realm from which the delegation
      *        permissions are fetched.
-     * 
+     *
      * @return a <code>Set</code> of permissions that a user has
-     * 
+     *
      * @throws SSOException if single-sign-on token invalid or expired
      * @throws DelegationException for any other abnormal condition
      */
-    public Set getPermissions(SSOToken token, String orgName) 
+    public Set getPermissions(SSOToken token, String orgName)
         throws SSOException, DelegationException {
 
         DelegationPrivilege dp;
@@ -705,7 +716,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             }
             return perms;
         }
-        
+
         try {
             userIdentity = IdUtils.getIdentity(token);
             if (userIdentity == null) {
@@ -716,10 +727,10 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 }
                 return perms;
             }
-  
+
             Set privileges = getPrivileges(appToken, orgName);
             if ((privileges != null) && (!privileges.isEmpty())) {
-                AMIdentityRepository idRepo = 
+                AMIdentityRepository idRepo =
                     new AMIdentityRepository(appToken, orgName);
                 IdSearchControl ctrl = new IdSearchControl();
                 ctrl.setRecursive(true);
@@ -731,7 +742,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                     subjects = dp.getSubjects();
                     if ((subjects != null) && (!subjects.isEmpty())) {
                         Iterator sit = subjects.iterator();
-                        while (sit.hasNext()) { 
+                        while (sit.hasNext()) {
                             String subject = (String)sit.next();
                             String subjectId = LDAPUtils.rdnValueFromDn(subject);
                             if (subjectId != null) {
@@ -759,8 +770,8 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         return perms;
     }
 
-        
-    /** 
+
+    /**
      * Converts a delegation privilege to a policy.
      * @param pm PolicyManager object to be used to create the <code>Policy
      *         </code> object.
@@ -774,11 +785,11 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         String orgName
     ) throws DelegationException {
         try {
-            /* the name of the policy is in the form of 
+            /* the name of the policy is in the form of
              * orgName^^privilegeName, the privilegeName is the
-             * name of the delegation privilege that the policy 
-             * is corresponding to. In case the orgName is in a 
-             * DN format, the special char ',' is replaced to 
+             * name of the delegation privilege that the policy
+             * is corresponding to. In case the orgName is in a
+             * DN format, the special char ',' is replaced to
              * avoid saving problem.
              */
             String prefix = null;
@@ -790,7 +801,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             }
             String name = prefix + priv.getName();
             Policy policy = new Policy(name);
-            
+
             Set permissions = priv.getPermissions();
             if ((permissions != null) && (!permissions.isEmpty())) {
                 Iterator pmit = permissions.iterator();
@@ -813,7 +824,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                     String ruleName = DELEGATION_RULE;
                     if (seqNum != 0) {
                         ruleName += seqNum;
-                    } 
+                    }
                     Rule rule = new Rule(ruleName,
                                DelegationManager.DELEGATION_SERVICE,
                                resourceName, actions);
@@ -822,17 +833,17 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 }
             }
             Set sv = new HashSet(priv.getSubjects());
-            if ((sv != null) && (sv.contains(AUTHN_USERS_ID))) { 
-                Subject allauthNUsers = 
+            if ((sv != null) && (sv.contains(AUTHN_USERS_ID))) {
+                Subject allauthNUsers =
                     pm.getSubjectTypeManager().getSubject(
                         AUTHENTICATED_USERS_SUBJECT);
                 policy.addSubject(DELEGATION_AUTHN_USERS, allauthNUsers);
                 sv.remove(AUTHN_USERS_ID);
             }
-            if ((sv != null) && (!sv.isEmpty())) {  
-                Subject subject = 
+            if ((sv != null) && (!sv.isEmpty())) {
+                Subject subject =
                     pm.getSubjectTypeManager().getSubject(POLICY_SUBJECT);
-                subject.setValues(sv); 
+                subject.setValues(sv);
                 policy.addSubject(DELEGATION_SUBJECT, subject);
             }
             return policy;
@@ -849,7 +860,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * @param policy policy to be converted
      * @return priv <code>DelegationPrivilege</code> represting policy.
      */
-    private DelegationPrivilege policyToPrivilege(Policy policy) 
+    private DelegationPrivilege policyToPrivilege(Policy policy)
         throws DelegationException {
 
         String pname = null;
@@ -862,7 +873,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         try {
             // get policy name, which is the privilege name as well
             pname = policy.getName();
- 
+
             // get privilege subjects
             Set snames = policy.getSubjectNames();
             if ((snames != null) && (!snames.isEmpty())) {
@@ -877,7 +888,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                     }
                 }
             }
- 
+
             if (DelegationManager.debug.messageEnabled()) {
                 DelegationManager.debug.message(
                     "SubjectValues=" + svalues);
@@ -902,10 +913,10 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         DelegationManager.DELEGATION_SERVICE)) {
                         resource = rule.getResourceName();
                         actions = rule.getActionNames();
-                        // parse the resource to get information 
+                        // parse the resource to get information
                         // required to construct a delegation permission
                         if (resource.startsWith(PREFIX)) {
-                            String suffix = 
+                            String suffix =
                                 resource.substring(PREFIX.length());
                             if (suffix != null) {
                                 StringTokenizer st = new StringTokenizer(
@@ -920,8 +931,8 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                                             if (st.hasMoreTokens()) {
                                                 subconfigName = st.nextToken();
                                                 while (st.hasMoreTokens()) {
-                                                    subconfigName += 
-                                                        DELIMITER 
+                                                    subconfigName +=
+                                                        DELIMITER
                                                         + st.nextToken();
                                                 }
                                             }
@@ -934,21 +945,21 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                             DelegationManager.debug.message(
                                 "DelegationPolicyImpl.policyToPrivilege(): "
                                 + "create DelegationPermission object with: "
-                                + "realm=" + realmName + "; service=" 
+                                + "realm=" + realmName + "; service="
                                 + serviceName + "; version=" + version
-                                + "; configType=" + configType 
-                                + "; subconfig=" + subconfigName 
-                                + "; actions=" + actions); 
+                                + "; configType=" + configType
+                                + "; subconfig=" + subconfigName
+                                + "; actions=" + actions);
                         }
                         DelegationPermission dp = new DelegationPermission(
                             realmName, serviceName, version, configType,
-                            subconfigName, actions, null); 
-                        permissions.add(dp);                
-                                
+                            subconfigName, actions, null);
+                        permissions.add(dp);
+
                     }
                 }
             }
-            return new DelegationPrivilege(pname, permissions, svalues); 
+            return new DelegationPrivilege(pname, permissions, svalues);
         } catch (Exception e) {
             throw new DelegationException(e);
         }
@@ -980,7 +991,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             sb.append(DELIMITER);
             sb.append(version);
         }
-        if (configType != null) { 
+        if (configType != null) {
             sb.append(DELIMITER);
             sb.append(configType);
         }
@@ -1010,7 +1021,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * the name of the configuration grouping (e.g. default) and
      * <code>serviceComponent</code> denotes the service's sub-component
      * that changed (e.g. <code>/NamedPolicy</code>, <code>/Templates</code>).
-     * 
+     *
      * @param serviceName name of the service.
      * @param version version of the service.
      * @param groupName name of the configuration grouping.
@@ -1026,8 +1037,8 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
     /**
      * This method will be invoked when a service's organization
      * configuration data has been changed. The parameters orgName,
-     * groupName and serviceComponent denotes the organization name, 
-     * configuration grouping name and service's sub-component that 
+     * groupName and serviceComponent denotes the organization name,
+     * configuration grouping name and service's sub-component that
      * are changed respectively.
      *
      * @param serviceName name of the service
@@ -1038,8 +1049,8 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      *                          changed
      * @param type change type, i.e., ADDED, REMOVED or MODIFIED
      */
-    public void organizationConfigChanged(String serviceName, 
-        String version, String orgName, String groupName, 
+    public void organizationConfigChanged(String serviceName,
+        String version, String orgName, String groupName,
         String serviceComponent, int type) {
         if (DelegationManager.debug.messageEnabled()) {
             DelegationManager.debug.message(
@@ -1049,7 +1060,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             if (type == ServiceListener.ADDED) {
                 if (idRepoListeners.get(orgName) == null) {
                     try {
-                        AMIdentityRepository idRepo = 
+                        AMIdentityRepository idRepo =
                             new AMIdentityRepository(appToken, orgName);
                         idRepo.addEventListener(this);
                         idRepoListeners.put(orgName, idRepo);
@@ -1061,7 +1072,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                     } catch (Exception e) {
                         DelegationManager.debug.error(
                         "DelegationPolicyImpl: failed to process " +
-                        "organization config changes. ", e); 
+                        "organization config changes. ", e);
                     }
                 }
             } else if (type == ServiceListener.REMOVED) {
@@ -1090,10 +1101,10 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
         cleanupCache();
     }
-      
+
     /**
      * This method is called back for all identities that are
-     * deleted from a repository. The universal identifier 
+     * deleted from a repository. The universal identifier
      * of the identity is passed in as an argument
      * @param universalId Univerval Identifier
      */
@@ -1104,7 +1115,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
         cleanupCache();
     }
-    
+
     /**
      * This method is called for all identities that are
      * renamed in a repository. The universal identifier
@@ -1118,7 +1129,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
         cleanupCache();
     }
- 
+
    /**
     * The method is called when all identities in the repository are
     * changed. This could happen due to a organization deletion or
@@ -1144,9 +1155,9 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
          return DelegationManager.DELEGATION_SERVICE;
      }
 
-    /** This method is called by the policy framework whenever 
+    /** This method is called by the policy framework whenever
      *  a policy is added, removed or changed. The notification
-     *  is sent only if the policy has any rule that has the 
+     *  is sent only if the policy has any rule that has the
      *  <code>serviceTypeName</code> of this listener
      *
      *  @param policyEvent event object sent by the policy framework
@@ -1159,7 +1170,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
         }
         cleanupCache();
     }
-     
+
     /**
      * Returns true if the user has delegation permissions for the
      * organization

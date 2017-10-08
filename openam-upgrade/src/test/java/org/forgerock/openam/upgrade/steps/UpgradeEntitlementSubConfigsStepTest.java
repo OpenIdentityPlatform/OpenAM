@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -28,8 +28,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+
 import com.sun.identity.entitlement.EntitlementCombiner;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.mockito.ArgumentMatcher;
@@ -68,6 +72,8 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private PrivilegedAction<SSOToken> adminTokenAction;
     private ConnectionFactory connectionFactory;
     private ResourceTypeConfiguration resourceTypeConfiguration;
+    private ApplicationServiceFactory applicationServiceFactory;
+    private ApplicationService applicationService;
 
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
@@ -103,8 +109,11 @@ public class UpgradeEntitlementSubConfigsStepTest {
         adminTokenAction = mock(PrivilegedAction.class);
         connectionFactory = mock(ConnectionFactory.class);
         resourceTypeConfiguration = mock(ResourceTypeConfiguration.class);
-        upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(
-                entitlementService, resourceTypeConfiguration, adminTokenAction, connectionFactory);
+        applicationServiceFactory = mock(ApplicationServiceFactory.class);
+        applicationService = mock(ApplicationService.class);
+        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(entitlementService, resourceTypeConfiguration,
+                adminTokenAction, connectionFactory, applicationServiceFactory);
 
         final HashSet<String> conditions = new HashSet<String>();
         conditions.add("condition.entry.1");
@@ -372,10 +381,11 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private static final class SafeUpgradeEntitlementSubConfigsStep extends UpgradeEntitlementSubConfigsStep {
 
         public SafeUpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
-                                                    final ResourceTypeConfiguration resourceTypeConfiguration,
-                                                    final PrivilegedAction<SSOToken> adminTokenAction,
-                                                    final ConnectionFactory connectionFactory) {
-            super(entitlementService, resourceTypeConfiguration, adminTokenAction, connectionFactory);
+                final ResourceTypeConfiguration resourceTypeConfiguration,
+                final PrivilegedAction<SSOToken> adminTokenAction, final ConnectionFactory connectionFactory,
+                final ApplicationServiceFactory applicationServiceFactory) {
+            super(entitlementService, resourceTypeConfiguration, adminTokenAction, connectionFactory,
+                    applicationServiceFactory);
         }
 
         @Override

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -19,10 +19,12 @@ package org.forgerock.openam.rest.authz;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.forgerock.openam.authz.PrivilegeDefinition;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.session.SessionCache;
 
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 
@@ -31,12 +33,14 @@ import com.sun.identity.delegation.DelegationPermissionFactory;
  *
  * @since 13.0.0
  */
-public class AnyPrivilegeAuthzModule extends PrivilegeAuthzModule {
+public class AnyPrivilegeAuthzModule extends CrestPrivilegeAuthzModule {
 
     @Inject
-    public AnyPrivilegeAuthzModule(DelegationEvaluator evaluator, Map<String, PrivilegeDefinition> actionToDefinition,
-            DelegationPermissionFactory permissionFactory, SessionCache sessionCache, CoreWrapper coreWrapper) {
-        super(evaluator, actionToDefinition, permissionFactory, sessionCache, coreWrapper);
+    public AnyPrivilegeAuthzModule(DelegationEvaluator evaluator,
+            @Named("CrestPrivilegeDefinitions") Map<String, PrivilegeDefinition> actionToDefinition,
+            DelegationPermissionFactory permissionFactory, CoreWrapper coreWrapper,
+            SSOTokenManager ssoTokenManager) {
+        super(evaluator, actionToDefinition, permissionFactory, coreWrapper, ssoTokenManager);
     }
 
     @Override

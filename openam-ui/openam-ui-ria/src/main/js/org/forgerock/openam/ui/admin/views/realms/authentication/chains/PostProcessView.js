@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "handlebars"
@@ -26,18 +26,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
     var PostProcessView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/PostProcessTemplate.html",
         events: {
-            "click .delete-btn": "remove",
-            "click #addBtn": "add",
-            "change #newProcessClass": "change",
-            "keyup  #newProcessClass": "change"
+            "click [data-delete-process-class]": "remove",
+            "click [data-add-process-class]"   : "add",
+            "change [data-new-process-class]"  : "change",
+            "keyup  [data-new-process-class]"  : "change"
         },
         element: "#postProcessView",
         partials: [
             "partials/alerts/_Alert.html"
         ],
 
-        add: function () {
-            var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
+        add () {
+            var newProcessClass = this.$el.find("[data-new-process-class]").val().trim(),
                 invalidName = _.find(this.data.chainData.loginPostProcessClass, function (className) {
                     return className === newProcessClass;
                 });
@@ -52,22 +52,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
             }
         },
 
-        remove: function (e) {
+        remove (e) {
             var index = $(e.currentTarget).closest("tr").index();
             this.data.chainData.loginPostProcessClass[index] = "";
             this.render(this.data.chainData);
         },
 
-        change: function (e) {
-            this.$el.find("#addBtn").prop("disabled", (e.currentTarget.value.length === 0));
+        change (e) {
+            this.$el.find("[data-add-process-class]").prop("disabled", (e.currentTarget.value.length === 0));
         },
 
-        addClassNameDialog: function () {
+        addClassNameDialog () {
             var self = this,
                 promise = $.Deferred(),
-                newProcessClass = this.$el.find("#newProcessClass").val().trim();
+                newProcessClass = this.$el.find("[data-new-process-class]").val().trim();
             if (newProcessClass === "") {
-                self.$el.find("#newProcessClass").val("");
+                self.$el.find("[data-new-process-class]").val("");
                 promise.resolve();
             } else {
                 BootstrapDialog.show({
@@ -77,8 +77,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
                     closable: false,
                     buttons: [{
                         label: $.t("common.form.cancel"),
-                        action: function (dialog) {
-                            self.$el.find("#newProcessClass").val("");
+                        action (dialog) {
+                            self.$el.find("[data-new-process-class]").val("");
                             dialog.close();
                             promise.resolve();
                         }
@@ -86,7 +86,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
                         id: "btnOk",
                         label: $.t("common.form.ok"),
                         cssClass: "btn-primary",
-                        action: function (dialog) {
+                        action (dialog) {
                             self.add();
                             dialog.close();
                             promise.resolve();
@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
             return promise;
         },
 
-        render: function (chainData) {
+        render (chainData) {
             this.data.chainData = chainData;
             this.parentRender();
         }

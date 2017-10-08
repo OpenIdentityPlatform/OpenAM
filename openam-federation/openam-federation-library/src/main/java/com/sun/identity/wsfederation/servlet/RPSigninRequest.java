@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -28,6 +28,8 @@
  */
 
 package com.sun.identity.wsfederation.servlet;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.DateUtils;
@@ -302,7 +304,7 @@ public class RPSigninRequest extends WSFederationAction {
         url.append("&wreply=");
         url.append(URLEncDec.encode(replyURL));
         url.append("&wct=");
-        url.append(URLEncDec.encode(DateUtils.toUTCDateFormat(new Date())));
+        url.append(URLEncDec.encode(DateUtils.toUTCDateFormat(newDate())));
         url.append("&wtrealm=");
         url.append(URLEncDec.encode(spIssuerName));
         if (debug.messageEnabled()) {

@@ -35,6 +35,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.resource.NotFoundException;
@@ -48,6 +52,7 @@ import org.forgerock.openam.entitlement.rest.ConditionTypesResource;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,25 +62,33 @@ public class ConditionTypesResourceTest {
     ObjectMapper mockMapper = mock(ObjectMapper.class);
     EntitlementRegistry mockRegistry = new EntitlementRegistry();
     Debug mockDebug = mock(Debug.class);
+    RealmTestHelper realmTestHelper;
 
     private final String TEST_CONDITION_WITH_NAME = "testConditionWithName";
     private final String TEST_LOGICAL_CONDITION = "testLogicalCondition";
 
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         mockRegistry.registerConditionType(TEST_CONDITION_WITH_NAME, TestConditionTypeWithName.class);
         mockRegistry.registerConditionType(TEST_LOGICAL_CONDITION, TestLogicalConditionTypeWithName.class);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         testResource = new ConditionTypesResource(mockDebug, mockRegistry);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test (expectedExceptions = NotFoundException.class)
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException, ResourceException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -98,7 +111,7 @@ public class ConditionTypesResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
 
@@ -124,7 +137,7 @@ public class ConditionTypesResourceTest {
             throws JsonMappingException, ExecutionException, InterruptedException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -157,7 +170,7 @@ public class ConditionTypesResourceTest {
             throws JsonMappingException, ExecutionException, InterruptedException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, Realm.root());
         Context mockServerContext = ClientContext.newInternalClientContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -178,6 +191,12 @@ public class ConditionTypesResourceTest {
         assertThat(resultMap.containsKey("logical")).isTrue();
         assertThat(resultMap.get("logical")).isEqualTo(true);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(ConditionTypesResource.class).hasValidAnnotations();
+    }
+
 
     /**
      * Test condition type:

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,12 @@
  *
  * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.ldap;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.authentication.spi.AMAuthCallBackException;
@@ -82,6 +84,7 @@ public class LDAP extends AMLoginModule {
     private String regEx;
     private String currentConfigName;
     private String bindDN;
+    private String protocolVersion;
     private int currentState;
     protected LDAPAuthUtils ldapUtil;
     private boolean isReset;
@@ -202,6 +205,8 @@ public class LDAP extends AMLoginModule {
                 currentConfig, "openam-auth-ldap-connection-mode", "LDAP");
             useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
             isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
+            protocolVersion = CollectionHelper.getMapAttr(
+                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLSv1");
 
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,
@@ -263,6 +268,7 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setHeartBeatInterval(heartBeatInterval);
             ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
             ldapUtil.setOperationTimeout(operationTimeout);
+            ldapUtil.setProtocolVersion(protocolVersion);
 
             if (debug.messageEnabled()) {
                 debug.message("bindDN-> " + bindDN
@@ -627,6 +633,7 @@ public class LDAP extends AMLoginModule {
                 }
                     currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                 case USER_NOT_FOUND:
+                    setFailureID(userName);
                     throw new LDAPUtilException("noUserMatchFound", (Object[])null);
                 case SERVER_DOWN:
                     throw new AuthLoginException(AM_AUTH, "LDAPex", null);
@@ -660,7 +667,7 @@ public class LDAP extends AMLoginModule {
                         AMAuthCallBackImpl.getInstance(this.getRequestOrg());
                     // We need the current system time since this is required
                     // as part of the callback method parameter.
-                    Long now = new Long(System.currentTimeMillis());
+                    Long now = new Long(currentTimeMillis());
                     // We now notify the plug-in that a successful
                     // password change was performed.
                     callbackImpl.processedPasswordChange(now, validatedUserID);

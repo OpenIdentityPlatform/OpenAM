@@ -1,0 +1,76 @@
+{
+  "type": "object",
+  "properties": {
+    "directoryConfiguration": {
+      "type": "object",
+      "title": "amconfig.serverconfig.xml.server.header",
+      "propertyOrder": 0,
+      "properties": {
+        "minConnectionPool": {
+          "title": "amconfig.serverconfig.server.min.pool",
+          "propertyOrder": 0,
+          "type": "number"
+        },
+        "maxConnectionPool": {
+          "title": "amconfig.serverconfig.server.max.pool",
+          "propertyOrder": 1,
+          "type": "number"
+        },
+        "bindDn": {
+          "title": "amconfig.serverconfig.user.binddn",
+          "propertyOrder": 2,
+          "type": "string"
+        },
+        "bindPassword": {
+          "title": "amconfig.serverconfig.user.bindpwd",
+          "propertyOrder": 3,
+          "type": "string",
+          "format": "password"
+        }
+      }
+    },
+    "directoryServers": {
+      "type": "array",
+      "title": "amconfig.serverconfig.xml.server.table.header",
+      "propertyOrder": 1,
+      "items": {
+        "type": "object",
+        "required" : [
+          "serverName", "hostName", "portNumber", "connectionType"
+        ],
+        "properties": {
+          "serverName": {
+            "title": "amconfig.serverconfig.xml.server.table.column.name",
+            "type": "string",
+            "propertyOrder": 0
+          },
+          "hostName": {
+            "title": "amconfig.serverconfig.xml.server.table.column.host",
+            "type": "string",
+            "propertyOrder": 1
+          },
+          "portNumber": {
+            "title": "amconfig.serverconfig.xml.server.table.column.port",
+            "type": "string",
+            "propertyOrder": 2
+          },
+          "connectionType": {
+            "type": "string",
+            "enum": [
+              "SIMPLE",
+              "SSL"
+            ],
+            "options": {
+              "enum_titles": [
+                "SIMPLE",
+                "SSL"
+              ]
+            },
+            "title": "amconfig.serverconfig.xml.server.table.column.type",
+            "propertyOrder": 3
+          }
+        }
+      }
+    }
+  }
+}

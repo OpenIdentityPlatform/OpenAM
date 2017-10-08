@@ -50,6 +50,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a100"
+                    order="100"
                     resourceName="enabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
@@ -64,6 +65,7 @@
                     syntax="number_range"
                     rangeStart="0" rangeEnd="65535"
                     i18nKey="a101"
+                    order="200"
                     resourceName="httpPort">
                     <DefaultValues>
                         <Value>8082</Value>
@@ -73,6 +75,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a102"
+                    order="300"
                     resourceName="httpEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
@@ -86,6 +89,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a1021"
+                    order="400"
                     resourceName="authfilePath">
                     <DefaultValues>
                         <Value>%BASE_DIR%/%SERVER_URI%/openam_mon_auth</Value>
@@ -96,6 +100,7 @@
                     syntax="number_range"
                     rangeStart="0" rangeEnd="65535"
                     i18nKey="a103"
+                    order="500"
                     resourceName="rmiPort">
                     <DefaultValues>
                         <Value>9999</Value>
@@ -105,6 +110,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a104"
+                    order="600"
                     resourceName="rmiEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
@@ -119,6 +125,7 @@
                     syntax="number_range"
                     rangeStart="0" rangeEnd="65535"
                     i18nKey="a105"
+                    order="700"
                     resourceName="snmpPort">
                     <DefaultValues>
                         <Value>8085</Value>
@@ -128,6 +135,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a106"
+                    order="800"
                     resourceName="snmpEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
@@ -142,7 +150,8 @@
                                  syntax="number_range"
                                  rangeStart="100" rangeEnd="1000000"
                                  resourceName="policyHistoryWindowSize"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 order="900">
                     <DefaultValues>
                         <Value>10000</Value>
                     </DefaultValues>
@@ -152,7 +161,8 @@
                                  syntax="number_range"
                                  rangeStart="100" rangeEnd="1000000"
                                  resourceName="sessionHistoryWindowSize"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 order="1000">
                     <DefaultValues>
                         <Value>10000</Value>
                     </DefaultValues>

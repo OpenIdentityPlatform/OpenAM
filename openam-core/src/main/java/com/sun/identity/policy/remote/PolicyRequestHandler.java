@@ -24,14 +24,16 @@
  *
  * $Id: PolicyRequestHandler.java,v 1.8 2008/12/04 00:38:52 dillidorai Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.policy.remote;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
 import static org.forgerock.openam.audit.AuditConstants.NO_REALM;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
@@ -40,8 +42,9 @@ import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -61,6 +64,7 @@ import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SMSException;
+
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -68,6 +72,7 @@ import javax.security.auth.Subject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -157,7 +162,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 pRes.setMethodID(PolicyResponse.POLICY_EXCEPTION);
                 pRes.setRequestId(pe.getRequestId());
                 pRes.setExceptionMsg(pe.getMessage());
-                pRes.setIssueInstant(System.currentTimeMillis());
+                pRes.setIssueInstant(currentTimeMillis());
                 ps.setMethodID(PolicyService.POLICY_RESPONSE_ID);
                 ps.setPolicyResponse(pRes);
                 res = new Response(ps.toXMLString());
@@ -242,7 +247,7 @@ public class PolicyRequestHandler implements RequestHandler {
             psRes.setRevision(getPolicyServiceRevision());
 
             PolicyResponse policyRes = processPolicyRequest(policyReq, auditor);
-            policyRes.setIssueInstant(System.currentTimeMillis());
+            policyRes.setIssueInstant(currentTimeMillis());
             psRes.setMethodID(PolicyService.POLICY_RESPONSE_ID);
             psRes.setPolicyResponse(policyRes);
             return psRes;
@@ -396,18 +401,12 @@ public class PolicyRequestHandler implements RequestHandler {
             ResourceResults resourceRst = null;
 
             // check if the request contains user response attributes
-            Set respAttrs = resourceResultReq.getResponseAttributes(); 
-            if (debug.messageEnabled()) {
-                debug.message(
-                   "PolicyRequestHandler.processPolicyRequest(): "
-                   + "respAttrs=\n" 
-                   + respAttrs);
-            }
+            Set responseAttributes = resourceResultReq.getResponseAttributes();
+            debug.message("PolicyRequestHandler.processPolicyRequest(): respAttrs={}", responseAttributes);
 
-            Map respDecisions = null;
-            if ((respAttrs != null) && (userToken != null)) {
-                // get the response decisions wrt the attributes  
-                respDecisions = getResponseDecisions(userToken, respAttrs);
+            Map<String, Set<String>> responseAttributeValues = null;
+            if ((responseAttributes != null) && (userToken != null)) {
+                responseAttributeValues = getResponseAttributeValues(userToken, responseAttributes);
             }
            
             // Get the service name and resource name of the request
@@ -461,7 +460,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 }
             }
 
-            resourceRst.setResponseDecisions(respDecisions);
+            resourceRst.setResponseDecisions(responseAttributeValues);
             resourceResults.addAll(resourceRst.getResourceResults());
             policyRes.setResourceResults(resourceResults);
             policyRes.setMethodID(
@@ -475,33 +474,33 @@ public class PolicyRequestHandler implements RequestHandler {
     }
 
     /**
-     * Returns the response decisions based on the response attributes.
+     * Returns the response attributes.
      *
      * @param token the user's SSO token
-     * @param attrs a set of response attributes
-     * @return a map which contains the response decisions.
+     * @param attrs the set of response attributes to get for the user.
+     * @return a map which contains the user attribute values.
      */
-    private Map getResponseDecisions(SSOToken token, Set attrs)
-        throws PolicyEvaluationException
-    {
-        if ((attrs == null) || (attrs.isEmpty())) {
-            return null;
+    private Map<String, Set<String>> getResponseAttributeValues(SSOToken token, Set attrs) throws PolicyEvaluationException {
+
+        Map<String, Set<String>>  attributeValues = null;
+        if (CollectionUtils.isNotEmpty(attrs)) {
+            try {
+                // No point in trying to get the user attributes if profile mode set to ignore
+                if (!ISAuthConstants.IGNORE.equals(token.getProperty(ISAuthConstants.USER_PROFILE))) {
+                    AMIdentity id = IdUtils.getIdentity(token);
+                    attributeValues = id.getAttributes(attrs);
+                }
+            } catch (IdRepoException ie) {
+                debug.error("PolicyRequestHandler.getResponseAttributeValues: failed to get user attributes: {}", attrs, ie);
+                throw new PolicyEvaluationException(ie);
+            } catch (SSOException se) {
+                debug.error("PolicyRequestHandler.getResponseAttributeValues: bad sso token", se);
+                throw new PolicyEvaluationException(se);
+            }
         }
 
-        Map userAttrMap = null;
-        try {
-            AMIdentity id = IdUtils.getIdentity(token);
-            userAttrMap = id.getAttributes(attrs);            
-        } catch (IdRepoException ie) {
-            debug.error("PolicyRequestHandler: " +
-                        "failed to get user attributes.", ie);
-            throw new PolicyEvaluationException(ie);
-        } catch (SSOException se) {
-            debug.error("PolicyRequestHandler: bad sso token", se);
-            throw new PolicyEvaluationException(se);
-        }
-        return userAttrMap;
-    } 
+        return attributeValues;
+    }
 
     /*
      *  Register a policy change listener to the policy framework.
@@ -732,7 +731,7 @@ public class PolicyRequestHandler implements RequestHandler {
                     appAttributes.get(EVALUATION_APPLICATION), serviceTypeName);
 
             final Subject appSubject = SubjectUtils.createSubject(appToken);
-            final Application application = ApplicationManager.getApplication(appSubject, realm, applicationName);
+            final Application application = getApplicationService(appSubject, realm).getApplication(applicationName);
 
             if (application == null) {
                 throw new PolicyException(
@@ -763,20 +762,19 @@ public class PolicyRequestHandler implements RequestHandler {
     /**
      * Returns sso token based on the sso token id string.
      */
-    private SSOToken getSSOToken(String idString, SSOToken context)
-        throws PolicyException
-    {
+    private SSOToken getSSOToken(String idString, SSOToken context) throws PolicyException {
         SSOToken token = null;
-
         // Get the user's SSO token based on the token id string
         try {
-            token = RestrictedTokenHelper.resolveRestrictedToken(
-                idString, context);
+            token = RestrictedTokenHelper.resolveRestrictedToken(idString, context);
+            if (token != null && SSOTokenManager.getInstance().isValidToken(token)) {
+                return token;
+            } else {
+                throw new PolicyException("Invalid token");
+            }
         } catch (Exception e) {
-            throw new PolicyException(ResBundleUtils.rbName,
-                "invalid_sso_token", null, e);
+            throw new PolicyException(ResBundleUtils.rbName, "invalid_sso_token", null, e);
         }
-        return token;
     }
 
     /**

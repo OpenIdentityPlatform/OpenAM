@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.authentication.modules.fr.oath.validators;
 
@@ -27,16 +27,15 @@ public class CodeLengthValidator implements ServiceAttributeValidator {
 
     /**
      * Validates each of the provided members of the Set to confirm that they are
-     * greater than the
+     * greater than the minimum value.
      *
      * @param values the <code>Set</code> of attribute values to validate
      * @return true if everything is valid, false otherwise.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean validate(Set values) {
+    public boolean validate(Set<String> values) {
         try {
-            for (String toTest : (Set<String>) values) {
+            for (String toTest : values) {
                 if (Integer.valueOf(toTest) < MIN_CODE_LENGTH) {
                     return false;
                 }

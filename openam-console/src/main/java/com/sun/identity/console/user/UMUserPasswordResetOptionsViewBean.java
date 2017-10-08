@@ -69,7 +69,6 @@ public class UMUserPasswordResetOptionsViewBean
     public static final String PAGETITLE = "pgtitle";
     public static final String CHILD_USER_PWD_RESET_TILED_VIEW =
         "pwdResetTiledView";
-    public static final String CB_FORCE_RESET_PWD = "cbForceResetPwd";
 
     private CCActionTableModel tblModel = null;
     private CCPageTitleModel ptModel;
@@ -96,7 +95,6 @@ public class UMUserPasswordResetOptionsViewBean
         super.registerChildren();
         registerChild(PAGETITLE, CCPageTitle.class);
         registerChild(TBL_SEARCH, CCActionTable.class);
-        registerChild(CB_FORCE_RESET_PWD, CCCheckBox.class);
         registerChild(CHILD_USER_PWD_RESET_TILED_VIEW,
             UMUserPasswordResetOptionsTiledView.class);
         ptModel.registerChildren(this);
@@ -134,13 +132,10 @@ public class UMUserPasswordResetOptionsViewBean
 
         if (!tblModelPopulated) {
             getQuestions();
-            CCCheckBox cbForceResetPwd = (CCCheckBox)getChild(
-                CB_FORCE_RESET_PWD);
             UMUserPasswordResetOptionsModel model =
                 (UMUserPasswordResetOptionsModel)getModel();
             String userId = (String)getPageSessionAttribute(
                 EntityEditViewBean.UNIVERSAL_ID);
-            cbForceResetPwd.setChecked(model.isForceReset(userId));
         }
     }
     
@@ -272,8 +267,6 @@ public class UMUserPasswordResetOptionsViewBean
         throws ModelControlException
     {
         List optionData = restoreOptionsData();
-        CCCheckBox cbForceResetPwd = (CCCheckBox)getChild(CB_FORCE_RESET_PWD);
-        boolean forceResetPwd = cbForceResetPwd.isChecked();
 
         UMUserPasswordResetOptionsModel model =
             (UMUserPasswordResetOptionsModel)getModel();
@@ -281,7 +274,7 @@ public class UMUserPasswordResetOptionsViewBean
             EntityEditViewBean.UNIVERSAL_ID);
 
         try {
-            model.modifyUserOption(optionData, userId, forceResetPwd);
+            model.modifyUserOption(optionData, userId, false);
 
             setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
                 model.getLocalizedString("profile.updated"));

@@ -25,7 +25,7 @@
  * $Id: ServiceProviderUtility.cs,v 1.9 2010/01/26 01:20:14 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 using System;
@@ -195,6 +195,8 @@ namespace Sun.Identity.Saml2
                             artifactResolveXml,
                             artifactResolve.Id,
                             true,
+                            idp.RequestedSignatureSigningAlgorithm,
+                            idp.RequestedDigestMethod,
                             this.ServiceProvider);
                     }
                 }
@@ -546,6 +548,8 @@ namespace Sun.Identity.Saml2
                         authnRequestXml,
                         authnRequest.Id,
                         true,
+                        idp.RequestedSignatureSigningAlgorithm,
+                        idp.RequestedDigestMethod,
                         this.ServiceProvider);
                     FedletLogger.Info("Signed AuthnRequest:\r\n" + authnRequestXml.InnerXml);
                 }
@@ -635,7 +639,7 @@ namespace Sun.Identity.Saml2
                 else
                 {
                     queryString += "&" + Saml2Constants.SignatureAlgorithm;
-                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString += "=" + HttpUtility.UrlEncode(idp.RequestedSignatureSigningAlgorithm);
                     queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
                 }
             }
@@ -704,6 +708,8 @@ namespace Sun.Identity.Saml2
                         logoutRequestXml,
                         logoutRequest.Id,
                         true,
+                        idp.RequestedSignatureSigningAlgorithm,
+                        idp.RequestedDigestMethod,
                         this.ServiceProvider);
                 }
             }
@@ -792,7 +798,7 @@ namespace Sun.Identity.Saml2
                 else
                 {
                     queryString += "&" + Saml2Constants.SignatureAlgorithm;
-                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString += "=" + HttpUtility.UrlEncode(idp.RequestedSignatureSigningAlgorithm);
                     queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
                 }
             }
@@ -861,6 +867,8 @@ namespace Sun.Identity.Saml2
                         logoutResponseXml,
                         logoutResponse.Id,
                         true,
+                        idp.RequestedSignatureSigningAlgorithm,
+                        idp.RequestedDigestMethod,
                         this.ServiceProvider);
                 }
             }
@@ -949,7 +957,7 @@ namespace Sun.Identity.Saml2
                 else
                 {
                     queryString += "&" + Saml2Constants.SignatureAlgorithm;
-                    queryString += "=" + HttpUtility.UrlEncode(Saml2Constants.SignatureAlgorithmRsa);
+                    queryString += "=" + HttpUtility.UrlEncode(idp.RequestedSignatureSigningAlgorithm);
                     queryString = Saml2Utils.SignQueryString(this.ServiceProvider.SigningCertificateAlias, queryString);
                 }
             }
@@ -1148,6 +1156,8 @@ namespace Sun.Identity.Saml2
                             logoutRequestXml,
                             logoutRequest.Id,
                             true,
+                            idp.RequestedSignatureSigningAlgorithm,
+                            idp.RequestedDigestMethod,
                             this.ServiceProvider);
                     }
                 }
@@ -1300,6 +1310,8 @@ namespace Sun.Identity.Saml2
                         logoutResponseXml,
                         logoutResponse.Id,
                         true,
+                        idp.RequestedSignatureSigningAlgorithm,
+                        idp.RequestedDigestMethod,
                         this.ServiceProvider);
                 }
             }
@@ -1447,6 +1459,8 @@ namespace Sun.Identity.Saml2
                          attrQueryRequestXml,
                          attrQueryRequest.Id,
                          true,
+                         idp.RequestedSignatureSigningAlgorithm,
+                         idp.RequestedDigestMethod,
                          this.ServiceProvider);
                 }
 

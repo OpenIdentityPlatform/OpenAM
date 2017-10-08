@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/BackgridUtils", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "backbone",
     "moment",
     "org/forgerock/commons/ui/common/backgrid/Backgrid",
@@ -38,11 +38,11 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.DatetimeAgoCell = Backgrid.Cell.extend({
         className: "date-time-ago-cell",
         formatter: {
-            fromRaw: function (rawData) {
+            fromRaw (rawData) {
                 return moment(rawData).fromNow();
             }
         },
-        render: function () {
+        render () {
             obj.DatetimeAgoCell.__super__.render.apply(this);
             this.$el.attr("title", moment(this.model.get(this.column.get("name"))).format("Do MMMM YYYY, h:mm:ssa"));
             return this;
@@ -57,15 +57,15 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.ArrayCell = Backgrid.Cell.extend({
         className: "array-formatter-cell",
 
-        buildHtml: function (arrayVal) {
+        buildHtml (arrayVal) {
             var result = "<ul>",
                 i = 0;
 
             for (; i < arrayVal.length; i++) {
                 if (_.isString(arrayVal[i])) {
-                    result += "<li>" + arrayVal[i] + "</li>";
+                    result += `<li>${arrayVal[i]}</li>`;
                 } else {
-                    result += "<li>" + JSON.stringify(arrayVal[i]) + "</li>";
+                    result += `<li>${JSON.stringify(arrayVal[i])}</li>`;
                 }
             }
             result += "</ul>";
@@ -73,7 +73,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             return result;
         },
 
-        render: function () {
+        render () {
             this.$el.empty();
 
             var arrayVal = this.model.get(this.column.attributes.name);
@@ -92,7 +92,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.ObjectCell = Backgrid.Cell.extend({
         className: "object-formatter-cell",
 
-        render: function () {
+        render () {
             this.$el.empty();
 
             var object = this.model.get(this.column.attributes.name),
@@ -101,9 +101,9 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
             for (prop in object) {
                 if (_.isString(object[prop])) {
-                    result += "<dt>" + prop + "</dt><dd>" + object[prop] + "</dd>";
+                    result += `<dt>${prop}</dt><dd>${object[prop]}</dd>`;
                 } else {
-                    result += "<dt>" + prop + "</dt><dd>" + JSON.stringify(object[prop]) + "</dd>";
+                    result += `<dt>${prop}</dt><dd>${JSON.stringify(object[prop])}</dd>`;
                 }
             }
             result += "</dl>";
@@ -117,11 +117,11 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     obj.UniversalIdToUsername = Backgrid.Cell.extend({
         formatter: {
-            fromRaw: function (rawData) {
+            fromRaw (rawData) {
                 return rawData.substring(3, rawData.indexOf(",ou=user"));
             }
         },
-        render: function () {
+        render () {
             obj.UniversalIdToUsername.__super__.render.apply(this);
             this.$el.attr("title", this.model.get(this.column.get("name")));
             return this;
@@ -139,10 +139,17 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
      */
     obj.ClickableRow = Backgrid.Row.extend({
         events: {
-            "click": "onClick"
+            "click": "onClick",
+            "keyup": "onKeyup"
         },
 
-        onClick: function (e) {
+        onKeyup (e) {
+            if (e.keyCode === 13 && this.callback) {
+                this.callback(e);
+            }
+        },
+
+        onClick (e) {
             if (this.callback) {
                 this.callback(e);
             }
@@ -160,7 +167,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
      */
     obj.TemplateCell = Backgrid.Cell.extend({
         className: "template-cell",
-        render: function () {
+        render () {
             var self = this;
 
             UIUtils.fillTemplateWithData(this.template, this.model, function (content) {
@@ -178,7 +185,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     obj.ClassHeaderCell = Backgrid.HeaderCell.extend({
         className: "",
-        render: function () {
+        render () {
             obj.ClassHeaderCell.__super__.render.apply(this);
             this.delegateEvents();
             return this;
@@ -189,7 +196,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         events: {
             "click": "gotoUrl"
         },
-        render: function () {
+        render () {
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
                 formattedValue = this.formatter.fromRaw(rawValue, this.model),
@@ -210,7 +217,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             return this;
         },
 
-        gotoUrl: function (e) {
+        gotoUrl (e) {
             e.preventDefault();
             var href = $(e.currentTarget).data("href");
             Router.navigate(href, { trigger: true });
@@ -219,8 +226,8 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     });
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
-        className: "filter-header-cell",
-        render: function () {
+        className: "filter-header-cell enable-pointer",
+        render () {
             var filter = new Backgrid.Extension.ThemeableServerSideFilter({
                 name: this.column.get("name"),
                 placeholder: $.t("common.form.filter"),
@@ -248,10 +255,10 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
                 return data && data.filterName && data.filterName === "eq"
                     ? function (filterName, filterQuery) {
                         // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
-                        return filterName + "+eq+" + encodeURIComponent('"*' + filterQuery + '*"');
+                        return `${filterName}+eq+${encodeURIComponent(`"*${filterQuery}*"`)}`;
                     }
                     : function (filterName, filterQuery) {
-                        return filterName + "+co+" + encodeURIComponent('"' + filterQuery + '"');
+                        return `${filterName}+co+${encodeURIComponent(`"${filterQuery}"`)}`;
                     };
             }());
 
@@ -280,7 +287,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     };
 
     obj.sortKeys = function () {
-        return this.state.order === 1 ? "-" + this.state.sortKey : this.state.sortKey;
+        return this.state.order === 1 ? `-${this.state.sortKey}` : this.state.sortKey;
     };
 
     obj.sync = function (method, model, options) {
@@ -297,7 +304,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
         _.forIn(options.data, function (val, key) {
             if (_.include(includeList, key)) {
-                params.push(key + "=" + val);
+                params.push(`${key}=${val}`);
             }
         });
 
@@ -313,7 +320,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         options.error = function (response) {
             Messages.addMessage({
                 type: Messages.TYPE_DANGER,
-                response: response
+                response
             });
         };
 
@@ -329,7 +336,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
         return {
             _sortKeys: this.sortKeys,
-            _queryFilter: function () {
+            _queryFilter () {
                 return obj.queryFilter.call(this, data);
             },
             pageSize: "_pageSize",

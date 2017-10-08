@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: IDPSingleLogoutServiceSOAP.java,v 1.10 2009/10/14 23:59:44 exu Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 
@@ -195,14 +195,14 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
         LogoutResponse loRes = null;
         try {
             // process LogoutRequestElement
-            loRes = IDPSingleLogout.processLogoutRequest(logoutReq, request, 
-                response, SAML2Constants.SOAP, null, idpEntityID, realm, false);
-            LogoutUtil.signSLOResponse(loRes, realm, idpEntityID, 
+            loRes = IDPSingleLogout.processLogoutRequest(logoutReq, request, response, response.getWriter(),
+                    SAML2Constants.SOAP, null, idpEntityID, realm, false);
+            LogoutUtil.signSLOResponse(loRes, realm, idpEntityID,
                     SAML2Constants.IDP_ROLE, logoutReq.getIssuer().getValue());
-        } catch (SAML2Exception e) {
+        } catch (IOException | SAML2Exception e) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP.onMessage;", e);
-            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT,
-                    "errorLogoutResponse", e.getMessage());
+            return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.SERVER_FAULT, "errorLogoutResponse",
+                    e.getMessage());
         }
 
         if (loRes == null) {

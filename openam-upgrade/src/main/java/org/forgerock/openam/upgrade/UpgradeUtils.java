@@ -156,7 +156,7 @@ public class UpgradeUtils {
             "iplanet-am-auth-login-success-url";
     static final String ATTR_AUTH_FAIL_URL =
             "iplanet-am-auth-login-failure-url";
-    static final String ATTR_AUTH_POST_CLASS =
+    public static final String ATTR_AUTH_POST_CLASS =
             "iplanet-am-auth-post-login-process-class";
     static final String START_VALUE = "<Value>";
     static final String END_VALUE = "</Value>";

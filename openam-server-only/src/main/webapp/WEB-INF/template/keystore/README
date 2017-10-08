@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
-README file for Open Web Single Sign-On
+README file for the sample keystores.
 ------------------------------------------------------------------------------
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
@@ -24,11 +24,18 @@ with the fields enclosed by brackets [] replaced by
 your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
-$Id: README,v 1.5 2008/08/19 19:09:37 veiming Exp $
+Portions copyright 2016 ForgeRock AS.
 
 ------------------------------------------------------------------------------
 
-This directory contains a sample JKS keystore file. The file will be used as 
-default keystore after configuring the OpenSSO WAR.
-The keystore contains one key entry with alias name "test". Keystore 
+This directory contains sample JKS and JCEKS keystores. The JKS keystore will 
+be used as the default keystore after configuring the OpenAM WAR. 
+The JKS keystore contains one key entry with alias name "test". Keystore 
 password and key password for the entry are "changeit".
+The JCEKS keystore contains three key entries, one with alias name "test", 
+another with alias name "selfserviceenctest", and another with alias name
+"selfservicesigntest". Keystore password and key password for the entries are
+"changeit".
+
+keytool -list -v -keystore keystore.jks
+keytool -list -v -keystore keystore.jceks -storetype jceks

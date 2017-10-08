@@ -24,6 +24,7 @@
  *
  * $Id: NameIDPolicyImpl.java,v 1.5 2008/08/31 05:49:48 bina Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
@@ -34,6 +35,7 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -191,7 +193,6 @@ public class NameIDPolicyImpl implements NameIDPolicy {
     
     public String toXMLString(boolean includeNSPrefix,boolean declareNS)
     throws SAML2Exception {
-	validateData();
 	StringBuffer xmlString = new StringBuffer(150);
 	xmlString.append(SAML2Constants.START_TAG);
 	if (includeNSPrefix) {
@@ -204,14 +205,14 @@ public class NameIDPolicyImpl implements NameIDPolicy {
             xmlString.append(SAML2Constants.PROTOCOL_DECLARE_STR);
 	}
 
-	if ((format != null) && (format.length() > 0)) {
+	if (StringUtils.isNotEmpty(format)) {
 	    xmlString.append(SAML2Constants.SPACE)
 		     .append(FORMAT).append(SAML2Constants.EQUAL)
 		     .append(SAML2Constants.QUOTE)
 		     .append(format).append(SAML2Constants.QUOTE);
 	}
 
-	if ((spNameQualifier != null) && (spNameQualifier.length() > 0)) {
+	if (StringUtils.isNotEmpty(spNameQualifier)) {
 	    xmlString.append(SAML2Constants.SPACE)
 	             .append(SPNAMEQUALIFIER).append(SAML2Constants.EQUAL)
 		     .append(SAML2Constants.QUOTE)
@@ -263,13 +264,4 @@ public class NameIDPolicyImpl implements NameIDPolicy {
 	}
     }
 
-    /* Validates the attributes in the  NameIDPolicy Element */
-    private void validateData() throws SAML2Exception {
-	if (((format == null) || (format.length() == 0)) &&
-	   ((spNameQualifier == null) || (spNameQualifier.length() == 0))
-	    && (allowCreate == null)) {
-		throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString("noAttributes"));
-	}
-    }
 }

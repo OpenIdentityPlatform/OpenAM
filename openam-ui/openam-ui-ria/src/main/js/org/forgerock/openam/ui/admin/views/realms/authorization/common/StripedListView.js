@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {
@@ -25,13 +25,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
         noBaseTemplate: true,
         template: "templates/admin/views/realms/authorization/common/StripedListWrapperTemplate.html",
         events: {
-            "click .list-group-item": "clickItem",
-            "keyup .list-group-item": "clickItem",
-            "click .striped-list-filter": "filterItems",
-            "keyup .striped-list-filter": "filterItems"
+            "click [data-list-item]":   "clickItem",
+            "keyup [data-list-item]":   "clickItem",
+            "click [data-list-filter]": "filterItems",
+            "keyup [data-list-filter]": "filterItems"
         },
 
-        render: function (data, el, callback) {
+        render (data, el, callback) {
             this.data = data;
             this.element = el;
             this.items = data.items ? _.cloneDeep(data.items).sort() : [];
@@ -49,11 +49,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             });
         },
 
-        setItems: function (items) {
+        setItems (items) {
             this.items = _.cloneDeep(items).sort();
         },
 
-        renderItems: function () {
+        renderItems () {
             var self = this;
             this.data.items = this.filter ? this.getFilteredItems() : this.getAllItems();
             UIUtils.fillTemplateWithData(this.data.itemTpl, this.data, function (tpl) {
@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             });
         },
 
-        clickItem: function (e) {
+        clickItem (e) {
             if (e.type === "keyup") {
                 switch (e.keyCode) {
                     case 38: // arrow down
@@ -96,7 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             }
         },
 
-        filterItems: function (e) {
+        filterItems (e) {
             if (e.type === "keyup" && e.keyCode === 40) {
                 $(e.target).parent().next().find("li:first-child").focus();
                 return;
@@ -106,21 +106,21 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             this.renderItems();
         },
 
-        emptyFilter: function () {
+        emptyFilter () {
             this.setFilter("");
 
-            this.$el.find(".striped-list-filter").val("");
+            this.$el.find("[data-list-filter]").val("");
         },
 
-        setFilter: function (filter) {
+        setFilter (filter) {
             this.filter = filter.toString().toLowerCase();
         },
 
-        getAllItems: function () {
+        getAllItems () {
             return this.items;
         },
 
-        getFilteredItems: function () {
+        getFilteredItems () {
             var filter = this.filter;
 
             return _.filter(this.items, function (item) {
@@ -128,11 +128,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedL
             });
         },
 
-        removeItem: function (item) {
+        removeItem (item) {
             this.items = _.without(this.items, item);
         },
 
-        addItem: function (item) {
+        addItem (item) {
             this.items.push(item);
             this.items.sort();
         }

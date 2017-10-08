@@ -25,29 +25,29 @@
  */
 
 /*
- * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sso.providers.stateless;
 
+import java.net.InetAddress;
+import java.security.Principal;
+
+import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.utils.StringUtils;
+
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionListener;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.iplanet.sso.providers.dpro.SSOPrincipal;
 import com.iplanet.sso.providers.dpro.SSOProviderBundle;
-import com.iplanet.sso.providers.dpro.SSOSessionListener;
 import com.iplanet.sso.providers.dpro.SSOTokenIDImpl;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionURL;
-import org.forgerock.openam.utils.StringUtils;
-
-import java.net.InetAddress;
-import java.security.Principal;
 
 /**
  * {@link SSOToken} implementation for stateless (client-side) sessions. The state of the session is encoded into a
@@ -69,8 +69,8 @@ final class StatelessSSOToken implements SSOToken {
      */
     public boolean isValid(boolean reset) {
         try {
-            final int state = session.getState(reset);
-            return (state == SessionConstants.VALID || state == SessionConstants.INACTIVE) && !session.isTimedOut();
+            final SessionState state = session.getState(reset);
+            return state == SessionState.VALID && !session.isTimedOut();
         } catch (SessionException e) {
             return false;
         }
@@ -217,13 +217,7 @@ final class StatelessSSOToken implements SSOToken {
 
     @Override
     public void addSSOTokenListener(SSOTokenListener listener) throws SSOException {
-        try {
-            SessionListener ssoListener = new SSOSessionListener(listener);
-            session.addSessionListener(ssoListener);
-        } catch (Exception e) {
-            DEBUG.error("Couldn't add listener to the token {}", session.getID(), e);
-            throw new SSOException(e);
-        }
+        throw new SSOTokenListenersUnsupportedException(StatelessSession.SSOTOKEN_LISTENERS_UNSUPPORTED);
     }
 
     @Override

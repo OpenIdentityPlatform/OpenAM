@@ -11,20 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.tokens;
 
-import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.testng.annotations.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.tokens.CoreTokenField.*;
+import static org.forgerock.openam.utils.Time.*;
+import static org.testng.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.testng.Assert.assertEquals;
+import org.forgerock.openam.cts.TokenTestUtils;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.testng.annotations.Test;
 
 public class TokenTest {
     @Test
@@ -36,19 +41,19 @@ public class TokenTest {
         // When
         token.setAttribute(key, value);
         // Then
-        assertEquals(value, token.getValue(key));
+        assertEquals(value, token.getAttribute(key));
     }
 
     @Test
     public void shouldStoreDate() {
         // Given
-        Calendar now = Calendar.getInstance();
+        Calendar now = getCalendarInstance();
         CoreTokenField key = CoreTokenField.EXPIRY_DATE;
         Token token = new Token("", TokenType.SESSION);
         // When
         token.setAttribute(key, now);
         // Then
-        Calendar result = token.getValue(key);
+        Calendar result = token.getAttribute(key);
         assertEquals(now.getTimeInMillis(), result.getTimeInMillis());
     }
 
@@ -61,7 +66,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, value);
         // Then
-        assertEquals(value, token.getValue(key));
+        assertEquals(value, token.getAttribute(key));
     }
 
     @Test
@@ -73,7 +78,7 @@ public class TokenTest {
         // When
         token.setAttribute(key, data);
         // Then
-        assertArrayEquals(data, token.<byte[]>getValue(key));
+        assertThat(data).isEqualTo(token.<byte[]>getAttribute(key));
     }
 
     @Test
@@ -111,7 +116,7 @@ public class TokenTest {
         Token token = new Token("badger", TokenType.SAML2);
         token.setAttribute(CoreTokenField.INTEGER_ONE, 1234);
         token.setAttribute(CoreTokenField.STRING_ONE, "Weasel");
-        token.setAttribute(CoreTokenField.DATE_ONE, Calendar.getInstance());
+        token.setAttribute(DATE_ONE, getCalendarInstance());
 
         // When
         Token result = new Token(token);
@@ -129,5 +134,37 @@ public class TokenTest {
         Token token = new Token("", TokenType.SESSION);
         // When/Then
         token.setAttribute(key, "");
+    }
+
+
+    @Test
+    public void shouldAllowMultipleSettings() {
+        // Given
+        Token token = new Token("id", TokenType.SESSION);
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "one");
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "two");
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "three");
+
+        // When
+        Set<String> values = token.getAttribute(CoreTokenField.MULTI_STRING_ONE);
+
+        // Then
+        assertEquals(values, new HashSet<>(Arrays.asList("one", "two", "three")));
+    }
+
+    @Test
+    public void shouldCopy() {
+        // Given
+        Token token = new Token("id", TokenType.SESSION);
+        token.setMultiAttribute(CoreTokenField.MULTI_STRING_ONE, "one");
+
+        Token token2 = new Token(token);
+
+        // When
+        Set<String> set = token2.getAttribute(CoreTokenField.MULTI_STRING_ONE);
+
+        // Then
+
+        assert(set.contains("one"));
     }
 }

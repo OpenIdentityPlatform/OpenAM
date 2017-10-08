@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
@@ -33,12 +33,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
 
     return AbstractView.extend({
         partials: [
-            "templates/admin/views/realms/partials/_HeaderDeleteButton.html",
             "partials/util/_HelpLink.html"
         ],
         events: {
-            "click #saveChanges": "submitForm",
-            "click #delete": "onDeleteClick"
+            "click [data-save]": "submitForm",
+            "click [data-delete]": "onDeleteClick"
         },
         tabs: [
             { name: "patterns", attr: ["patterns"] },
@@ -46,11 +45,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             { name: "settings", attr: ["name", "description"] }
         ],
 
-        onModelSync: function () {
+        onModelSync () {
             this.renderAfterSyncModel();
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var uuid;
 
             this.data.realmPath = args[0];
@@ -66,19 +65,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             if (uuid) {
                 this.template =
                     "templates/admin/views/realms/authorization/resourceTypes/EditResourceTypeTemplate.html";
-                this.model = new ResourceTypeModel({ uuid: uuid });
+                this.data.headerActions = [
+                    { actionPartial: "form/_Button", data:"delete", title:"common.form.delete", icon:"fa-times" },
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }
+                ];
+                this.model = new ResourceTypeModel({ uuid });
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
                 this.template = "templates/admin/views/realms/authorization/resourceTypes/NewResourceTypeTemplate.html";
-                this.newEntity = true;
+                this.data.headerActions = [
+                    { actionPartial: "util/_HelpLink", helpLink: "backstage.authz.resourceTypes" }
+                ];
+                this.data.newEntity = true;
                 this.model = new ResourceTypeModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
             }
         },
 
-        renderAfterSyncModel: function () {
+        renderAfterSyncModel () {
             var self = this,
                 data = this.data;
             this.data.entity = _.cloneDeep(this.model.attributes);
@@ -105,24 +111,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                 self.actionsList = new ResourceTypeActionsView();
                 self.actionsList.render(data, "#resTypeActions", resolve());
 
-                $.when.apply($, promises).done(function () {
+                $.when(...promises).done(function () {
                     FormHelper.setActiveTab(self);
                     if (self.renderCallback) { self.renderCallback(); }
                 });
             });
         },
 
-        renderSettings: function () {
+        renderSettings () {
             var self = this;
             UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/resourceTypes/ResourceTypeSettingsTemplate.html",
                 this.data,
                 function (tpl) {
                     self.$el.find("#resTypeSetting").html(tpl);
+                    self.$el.find("#resTypeSetting [autofocus]").focus();
                 });
         },
 
-        updateFields: function () {
+        updateFields () {
             var app = this.data.entity,
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
@@ -140,7 +147,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             });
         },
 
-        submitForm: function (e) {
+        submitForm (e) {
             e.preventDefault();
 
             var self = this,
@@ -152,7 +159,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             this.updateFields();
             this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
-            if (this.newEntity) {
+            if (this.data.newEntity) {
                 _.extend(this.model.attributes, this.data.entity);
             } else {
                 activeTabProperties = _.pick(this.data.entity, this.tabs[activeTab.index()].attr);
@@ -164,14 +171,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             if (savePromise) {
                 savePromise
                     .done(function () {
-                        if (self.newEntity) {
+                        if (self.data.newEntity) {
                             Router.routeTo(Router.configuration.routes.realmsResourceTypeEdit, {
                                 args: _.map([self.data.realmPath, self.model.id], encodeURIComponent),
                                 trigger: true
                             });
+                        } else {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                         }
-
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
@@ -179,14 +186,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
             }
         },
 
-        onDeleteClick: function (e) {
+        onDeleteClick (e) {
             e.preventDefault();
 
             FormHelper.showConfirmationBeforeDeleting({ type: $.t("console.authorization.common.resourceType") },
                 _.bind(this.deleteResourceType, this));
         },
 
-        deleteResourceType: function () {
+        deleteResourceType () {
             var self = this,
                 onSuccess = function () {
                     Router.routeTo(Router.configuration.routes.realmsResourceTypes, {
@@ -196,7 +203,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/E
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response) {
-                    Messages.addMessage({ response: response, type: Messages.TYPE_DANGER });
+                    Messages.addMessage({ response, type: Messages.TYPE_DANGER });
                 };
 
             this.model.destroy({

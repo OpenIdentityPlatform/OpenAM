@@ -4,11 +4,9 @@
     "cookieMode": null,
     "cookieStr": null,
     "creationTime": 1396296561,
-    "isISStored": true,
     "maxCachingTime": 3,
     "maxIdleTime": 30,
     "maxSessionTime": 120,
-    "reschedulePossible": false,
     "restrictedTokensByRestriction": {
         "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=": {
             "comingFromAuth": false,

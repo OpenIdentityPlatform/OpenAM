@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -160,8 +162,8 @@ public class TokenSpecification {
         unt.setUserInfo(username, password);
         unt.setPasswordType(WSConstants.PASSWORD_TEXT);
         unt.addCreated();
-        Date expirationDate = new Date();
-        expirationDate.setTime(System.currentTimeMillis() + (1000 * 60));
+        Date expirationDate = newDate();
+        expirationDate.setTime(currentTimeMillis() + (1000 * 60));
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             unt.prepare(document);

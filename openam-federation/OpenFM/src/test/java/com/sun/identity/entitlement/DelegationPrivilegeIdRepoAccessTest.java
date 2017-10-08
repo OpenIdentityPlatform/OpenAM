@@ -24,7 +24,7 @@
  *
  * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -42,6 +42,8 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.OrganizationConfigManager;
+
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -95,17 +97,15 @@ public class DelegationPrivilegeIdRepoAccessTest {
             adminToken, SUB_REALM);
         orgMgr.createSubOrganization(SUB_SUB_REALM, Collections.EMPTY_MAP);
 
-        Application appl = ApplicationManager.newApplication(APPLICATION_NAME,
-            ApplicationTypeManager.getAppplicationType(
-                PrivilegeManager.superAdminSubject,
-                ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
+        Application appl = EntitlementUtils.newApplication(APPLICATION_NAME, ApplicationTypeManager.getAppplicationType(
+                PrivilegeManager.superAdminSubject, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
         // Test disabled, unable to make model change.
         // Set<String> resources = new HashSet<String>();
         // resources.add(DELEGATED_RESOURCE);
         // appl.setResources(resources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
+        ApplicationServiceTestHelper.saveApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
     }
 
     @AfterTest
@@ -115,9 +115,8 @@ public class DelegationPrivilegeIdRepoAccessTest {
         identities.add(delegatedUser1);
         IdRepoUtils.deleteIdentities(SUB_REALM, identities);
 
-        ApplicationManager.deleteApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM,
-            APPLICATION_NAME);
+        ApplicationServiceTestHelper.deleteApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM, APPLICATION_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");

@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
+
 package org.forgerock.openam.sm.datalayer.api;
 
 /**
@@ -24,7 +25,7 @@ public class DataLayerConstants {
      * Constants to define the timeout system properties.
      */
     public static final String CORE_TOKEN_ASYNC_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.async";
-    public static final String CORE_TOKEN_REAPER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.reaper";
+    public static final String CORE_TOKEN_WORKER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.reaper";
     public static final String DATA_LAYER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout";
     public static final String RESOURCE_SETS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.resourcesets";
     public static final String UMA_AUDIT_ENTRY_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.umaauditentry";

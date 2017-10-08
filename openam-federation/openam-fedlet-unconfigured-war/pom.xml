@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2016 ForgeRock AS.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>openam-federation</artifactId>
+        <groupId>org.forgerock.openam</groupId>
+        <version>14.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>openam-fedlet-unconfigured-war</artifactId>
+    <name>OpenAM Fedlet WAR</name>
+    <packaging>war</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Fedlet WAR</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM Fedlet WAR</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                    </archive>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
+                    <webResources>
+                        <resource>
+                            <targetPath>com_sun_web_ui/css</targetPath>
+                            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/com_sun_web_ui/css
+                            </directory>
+                            <includes>
+                                <include>css_ns6up.css</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>com_sun_web_ui/images/masthead</targetPath>
+                            <directory>
+                                ${project.basedir}/../../openam-server-only/src/main/webapp/com_sun_web_ui/images/masthead
+                            </directory>
+                            <includes>
+                                <include>masthead-background.jpg</include>
+                                <include>masthead-sunname.gif</include>
+                                <include>masthead-sun-background.jpg</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>com_sun_web_ui/images/other</targetPath>
+                            <directory>
+                                ${project.basedir}/../../openam-server-only/src/main/webapp/com_sun_web_ui/images/other
+                            </directory>
+                            <includes>
+                                <include>dot.gif</include>
+                                <include>javalogo.gif</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>console/images</targetPath>
+                            <directory>${project.basedir}/../../openam-console/src/main/webapp/console/images
+                            </directory>
+                            <includes>
+                                <include>PrimaryProductName.png</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>saml2/jsp</targetPath>
+                            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/saml2/jsp</directory>
+                            <includes>
+                                <include>default.jsp</include>
+                                <include>exportmetadata.jsp</include>
+                                <include>saml2error.jsp</include>
+                                <include>spSingleLogoutInit.jsp</include>
+                                <include>spSingleLogoutPOST.jsp</include>
+                                <include>spSingleLogoutRedirect.jsp</include>
+                                <include>autosubmitaccessrights.jsp</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources</directory>
+                            <includes>
+                                <include>fmConfigurationService.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/de_DE</directory>
+                            <includes>
+                                <include>fmConfigurationService_de.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/es_ES</directory>
+                            <includes>
+                                <include>fmConfigurationService_es.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/fr_FR</directory>
+                            <includes>
+                                <include>fmConfigurationService_fr.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/ja_JP</directory>
+                            <includes>
+                                <include>fmConfigurationService_ja.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/ko_KR</directory>
+                            <includes>
+                                <include>fmConfigurationService_ko.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/zh_CN</directory>
+                            <includes>
+                                <include>fmConfigurationService_zh.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/zh_TW</directory>
+                            <includes>
+                                <include>fmConfigurationService_zh_TW.properties</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${project.basedir}/../../openam-server-only/src/main/resources/config</directory>
+                            <includes>
+                                <include>debugconfig.properties</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-federation-library</artifactId>
+        </dependency>
+    </dependencies>
+</project>

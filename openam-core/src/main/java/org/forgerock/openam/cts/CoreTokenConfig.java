@@ -15,51 +15,90 @@
  */
 package org.forgerock.openam.cts;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
 
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 /**
  * Represents any configuration required for the Core Token Service.
  */
 public class CoreTokenConfig {
 
-    private final boolean caseSensitiveUserId;
-    private final int sessionExpiryGracePeriod;
-    private final int expiredSessionsSearchLimit;
+    private final CopyOnWriteArraySet<CoreTokenConfigListener> listeners = new CopyOnWriteArraySet<>();
 
-    private final int cleanupPeriod;
-    private final int healthCheckPeriod;
-    private final int runPeriod;
-    private final int cleanupPageSize;
+    private volatile boolean coreTokenResourceEnabled;
 
-    private final int sleepInterval;
+    private volatile boolean caseSensitiveUserId;
+    private volatile int sessionExpiryGracePeriod;
+    private volatile int expiredSessionsSearchLimit;
+
+    private volatile int runPeriod;
+    private volatile int cleanupPageSize;
+    private volatile int sleepInterval;
 
     // Token Blob strategy flags
-    private final boolean tokensEncrypted;
-    private final boolean tokensCompressed;
-    private final boolean attributeNamesCompressed;
+    private volatile boolean tokensEncrypted;
+    private volatile boolean tokensCompressed;
+    private volatile boolean attributeNamesCompressed;
+
+    /**
+     * Create a new default instance of the CoreTokenConfig.
+     * <p>
+     * This factory method should be used to ensure that config is updated as underlying
+     * system properties are changed.
+     */
+    static CoreTokenConfig newCoreTokenConfig() {
+        final CoreTokenConfig coreTokenConfig = new CoreTokenConfig();
+        String[] observedSystemProperties = new String[]{
+                com.sun.identity.shared.Constants.CASE_SENSITIVE_UUID,
+                CoreTokenConstants.SYS_PROPERTY_EXPIRED_SEARCH_LIMIT,
+                Constants.SESSION_REPOSITORY_ENCRYPTION,
+                Constants.SESSION_REPOSITORY_COMPRESSION,
+                Constants.SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION,
+                Constants.SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION,
+                Constants.CORE_TOKEN_RESOURCE_ENABLED,
+                CLEANUP_PERIOD,
+                HEALTH_CHECK_PERIOD
+        };
+        ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void notifyChanges() {
+                coreTokenConfig.loadSystemProperties();
+                coreTokenConfig.notifyListeners();
+            }
+        };
+        SystemProperties.observe(listener, observedSystemProperties);
+        return coreTokenConfig;
+    }
 
     /**
      * Create a new default instance of the CoreTokenConfig which will establish the various configuration
      * it requires from System Properties.
      */
-    public CoreTokenConfig() {
+    @VisibleForTesting
+    CoreTokenConfig() {
+        loadSystemProperties();
+    }
+
+    private void loadSystemProperties() {
         caseSensitiveUserId = SystemProperties.getAsBoolean(com.sun.identity.shared.Constants.CASE_SENSITIVE_UUID);
         // 5 minutes
         sessionExpiryGracePeriod = 5 * 60;
         // Derive the expired Session Search Limit from system properties
         expiredSessionsSearchLimit = getSystemManagerPropertyAsInt(CoreTokenConstants.SYS_PROPERTY_EXPIRED_SEARCH_LIMIT, 250);
 
-        // Derive the run period for the Core Token Service, controls how often token cleanup occurs.
-        cleanupPeriod = getSystemManagerPropertyAsInt(CoreTokenConstants.CLEANUP_PERIOD, 5 * 60 * 1000);
-        healthCheckPeriod = getSystemManagerPropertyAsInt(CoreTokenConstants.HEALTH_CHECK_PERIOD, 1 * 60 * 1000);
-
+        int cleanupPeriod = getSystemManagerPropertyAsInt(CoreTokenConstants.CLEANUP_PERIOD, 5 * 60 * 1000);
+        int healthCheckPeriod = getSystemManagerPropertyAsInt(CoreTokenConstants.HEALTH_CHECK_PERIOD, 1 * 60 * 1000);
         runPeriod = Math.min(cleanupPeriod, healthCheckPeriod);
 
         // Sleep interval between cycles in Core Token Service thread.
@@ -76,6 +115,9 @@ public class CoreTokenConfig {
 
         // Controls the size of pages requested for CTS Reaper
         cleanupPageSize = 1000;
+
+        // Whether or not use of the CoreTokenResource is enabled.
+        coreTokenResourceEnabled = SystemProperties.getAsBoolean(Constants.CORE_TOKEN_RESOURCE_ENABLED);
     }
 
     /**
@@ -132,6 +174,10 @@ public class CoreTokenConfig {
         return runPeriod;
     }
 
+    public boolean isCoreTokenResourceEnabled() {
+        return coreTokenResourceEnabled;
+    }
+
     /**
      * @return The interval in milliseconds for the
      */
@@ -185,4 +231,20 @@ public class CoreTokenConfig {
     public int getCleanupPageSize() {
         return cleanupPageSize;
     }
+
+    /**
+     * Register a listener to be notified when {@link CoreTokenConfig} changes.
+     *
+     * @param listener the event listener to call when {@link CoreTokenConfig} changes.
+     */
+    public void addListener(CoreTokenConfigListener listener) {
+        this.listeners.add(listener);
+    }
+
+    private void notifyListeners() {
+        for (final CoreTokenConfigListener listener : listeners) {
+            listener.configChanged();
+        }
+    }
+
 }

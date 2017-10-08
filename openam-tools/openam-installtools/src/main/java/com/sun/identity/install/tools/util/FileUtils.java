@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: FileUtils.java,v 1.3 2010/02/09 21:34:01 hari44 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.install.tools.util;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -61,7 +60,7 @@ public class FileUtils {
 
     /**
      * Copies a file
-     * 
+     *
      * @param source
      *            file
      * @param destination
@@ -115,10 +114,11 @@ public class FileUtils {
 
     /**
      * Method copyJarFile to destination directory
-     * 
-     * @param src
-     * @param dest
-     * 
+     *
+     * @param srcDir
+     * @param destDir
+     * @param filename
+     *
      */
     public static void copyJarFile(String srcDir, String destDir,
             String filename) throws Exception {
@@ -173,10 +173,10 @@ public class FileUtils {
 
     /**
      * Method copyDirContents
-     * 
+     *
      * @param srcDir
      * @param destDir
-     * 
+     *
      */
     public static void copyDirContents(File srcDir, File destDir)
             throws Exception {
@@ -203,8 +203,8 @@ public class FileUtils {
 
     /**
      * Method removeDir. All the files in the directory will be removed
-     * 
-     * @param directory
+     *
+     * @param dir
      * to be removed. @ return true if the directory is deleted. False other
      *            wise
      */
@@ -240,12 +240,12 @@ public class FileUtils {
      * Method removeJarFiles. jar files will be removed from source directory
      *
      * @param srcDir - Source directory
-     * @param filename - file to be deleted
+     * @param fileName - file to be deleted
      *
      */
-    public static void removeJarFiles(String srcDir, String fileName) { 
-     
-      String src = srcDir + FILE_SEP + fileName; 
+    public static void removeJarFiles(String srcDir, String fileName) {
+
+      String src = srcDir + FILE_SEP + fileName;
       File file = new File(src);
       if (file.exists()) {
           file.delete();
@@ -253,10 +253,10 @@ public class FileUtils {
       else
           Debug.log("FileUtils.removeJarFiles() Unable to remove file");
     }
- 
+
 
     /**
-     * Method removeFiles. All the files existing in source directory 
+     * Method removeFiles. All the files existing in source directory
      * will be removed from Destination Directory
      *
      * @param srcDir  - Source directory to compare files
@@ -264,7 +264,7 @@ public class FileUtils {
      *
      */
     public static void removeFiles(String srcDir, String desDir) {
-      File srcFile = new File(srcDir); 
+      File srcFile = new File(srcDir);
       String[] list = srcFile.list();
       if (list != null) {
          int count = list.length;
@@ -278,9 +278,9 @@ public class FileUtils {
              }
          }
       }
-    }   
+    }
 
-   
+
     public static void removeLines(String fileName, String value) throws Exception {
       ArrayList list = new ArrayList();
       BufferedReader in   = new BufferedReader(new FileReader(fileName));
@@ -299,7 +299,7 @@ public class FileUtils {
       fw.close();
     }
 
-   
+
 
     public static void appendDataToFile(String fileName, String data)
             throws Exception {
@@ -329,7 +329,7 @@ public class FileUtils {
     public static void backupFile(String fileName, String suffix)
             throws Exception {
         // Obtain the current time
-        Date currentDate = new Date();
+        Date currentDate = newDate();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
         String tstamp = formatter.format(currentDate);
 
@@ -341,7 +341,7 @@ public class FileUtils {
 
     /*
      * Is file valid @param filename
-     * 
+     *
      * @return boolean
      */
     public static boolean isFileValid(String filename) {
@@ -358,12 +358,12 @@ public class FileUtils {
 
     /**
      * Method replaceBackWithForward
-     * 
-     * 
+     *
+     *
      * @param str
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static String replaceBackWithForward(String str) {
         char backSlash = '\\';
@@ -379,7 +379,7 @@ public class FileUtils {
 
     /*
      * Is directory valid @param directory
-     * 
+     *
      * @return boolean
      */
     public static boolean isDirValid(String directory) {
@@ -398,13 +398,13 @@ public class FileUtils {
 
     /**
      * Method getLineByNumber
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param lineNum
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static String getLineByNumber(String filePath, int lineNum) {
 
@@ -435,16 +435,16 @@ public class FileUtils {
 
     /**
      * Method matchPattern
-     * 
-     * 
+     *
+     *
      * @param line
      * @param pattern
      * @param matchBegin
      * @param matchEnd
      * @param ignoreCase
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static boolean matchPattern(String line, String pattern,
             boolean matchBegin, boolean matchEnd, boolean ignoreCase) {
@@ -492,17 +492,17 @@ public class FileUtils {
 
     /**
      * Method getLineWithPattern
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param pattern
      * @param matchBegin
      * @param matchEnd
      * @param ignoreCase
      * @param beginAtLine
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static String getLineWithPattern(String filePath, String pattern,
             boolean matchBegin, boolean matchEnd, boolean ignoreCase,
@@ -553,17 +553,17 @@ public class FileUtils {
 
     /**
      * Method getFirstOccurence
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param pattern
      * @param matchBegin
      * @param matchEnd
      * @param ignoreCase
      * @param beginAtLine
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static int getFirstOccurence(String filePath, String pattern,
             boolean matchBegin, boolean matchEnd, boolean ignoreCase,
@@ -613,16 +613,16 @@ public class FileUtils {
 
     /**
      * Method getFirstOccurence
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param pattern
      * @param matchBegin
      * @param matchEnd
      * @param ignoreCase
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static int getFirstOccurence(String filePath, String pattern,
             boolean matchBegin, boolean matchEnd, boolean ignoreCase) {
@@ -632,16 +632,16 @@ public class FileUtils {
 
     /**
      * Method getLastOccurence
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param pattern
      * @param matchBegin
      * @param matchEnd
      * @param ignoreCase
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static int getLastOccurence(String filePath, String pattern,
             boolean matchBegin, boolean matchEnd, boolean ignoreCase) {
@@ -682,17 +682,17 @@ public class FileUtils {
 
     /**
      * Method addMapProperty
-     * 
+     *
      * Adds a map property like <b>key[name]=value</b> in PRODUCT
      * Config.properties
-     * 
+     *
      * @param key
      *            key name of the property
      * @param name
      *            name of the property
      * @param value
      *            value of the property
-     * 
+     *
      */
     public static boolean addMapProperty(String configPath, String key,
             String name, String value) {
@@ -753,20 +753,20 @@ public class FileUtils {
 
     /**
      * Adds an entry to a list property in Product Config properties
-     * 
-     * 
+     *
+     *
      * @param fileName
      *            name of the config file
-     * @param list
+     * @param property
      *            property name of the property for the list
      * @param value
      *            name of the list property to be added
-     * 
+     *
      * Ex: Adds a property like <b>property[index] = value</b> in Product
      * Config properties
-     * 
+     *
      * @return boolean true or false
-     * 
+     *
      */
     public static boolean addListProperty(String fileName, String property,
             String value) {
@@ -813,14 +813,14 @@ public class FileUtils {
 
     /**
      * Method declaration
-     * 
-     * 
+     *
+     *
      * @param fileName
      * @param property
      * @param value
-     * 
+     *
      * @return
-     * 
+     *
      * @see
      */
     private static ArrayList createListValue(String fileName, String property,
@@ -891,12 +891,12 @@ public class FileUtils {
 
     /**
      * Method declaration
-     * 
-     * 
+     *
+     *
      * @param line
-     * 
+     *
      * @return
-     * 
+     *
      * @see
      */
     private static String isPropertyValid(String line) {
@@ -918,12 +918,12 @@ public class FileUtils {
 
     /**
      * Method declaration
-     * 
-     * 
+     *
+     *
      * @param fileName
-     * 
+     *
      * @return
-     * 
+     *
      * @see
      */
     public static int getTotalLineNums(String fileName) {
@@ -950,14 +950,14 @@ public class FileUtils {
 
     /**
      * Method insertLineByNumber
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param lineNum
      * @param line
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static boolean insertLineByNumber(String filePath, int lineNum,
             String line) {
@@ -1004,16 +1004,16 @@ public class FileUtils {
 
     /**
      * Method removeLinesByNum
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param lineNum
      *            begining line number
      * @param numLines
      *            total number of lines to remove
-     * 
+     *
      * @return true if removal is successful
-     * 
+     *
      */
     public static boolean removeLinesByNum(String filePath, int lineNum,
             int numLines) {
@@ -1032,14 +1032,14 @@ public class FileUtils {
 
     /**
      * Method removeLinesByNumber
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param lineNum
      * @param numLines
-     * 
+     *
      * @return
-     * 
+     *
      */
     public static String removeLinesByNumber(String filePath, int lineNum,
             int numLines) {
@@ -1079,7 +1079,7 @@ public class FileUtils {
                 tempFile.delete();
             }
         } catch (Exception ex) {
-            Debug.log("FileUtils.removeLinesByNumber() threw exception : ", 
+            Debug.log("FileUtils.removeLinesByNumber() threw exception : ",
                     ex);
         }
 
@@ -1100,7 +1100,7 @@ public class FileUtils {
 
     /**
      * Appends the given set of lines to the specified file.
-     * 
+     *
      * @param filePath
      * @param linesToAppend
      * @param create should the file be created if it does not exist
@@ -1146,10 +1146,10 @@ public class FileUtils {
 
     /**
      * Method getProperties
-     * 
+     *
      * Loads a properties file into memory and creates a
      * <code>java.util.Properties</code> object
-     * 
+     *
      * @param configPath
      *            path to the properties file
      * @return prop a <code>java.util.Properties</code> object from the
@@ -1175,13 +1175,13 @@ public class FileUtils {
 
     /**
      * Method writeToFile
-     * 
-     * 
+     *
+     *
      * @param filePath
      * @param writer
-     * 
+     *
      * @return
-     * 
+     *
      */
     private static boolean writeToFile(String filePath, Writer writer) {
 
@@ -1214,11 +1214,11 @@ public class FileUtils {
 
     /**
      * Method writeLine
-     * 
-     * 
+     *
+     *
      * @param writer
      * @param line
-     * 
+     *
      */
     private static void writeLine(Writer writer, String line) {
 
@@ -1234,14 +1234,14 @@ public class FileUtils {
 
     /**
      * Method copyTillLine
-     * 
-     * 
+     *
+     *
      * @param reader
      * @param writer
      * @param lineNum
-     * 
+     *
      * @return
-     * 
+     *
      */
     private static Reader copyTillLine(LineNumberReader reader, Writer writer,
             int lineNum) {
@@ -1269,13 +1269,13 @@ public class FileUtils {
 
     /**
      * Method copyTillEnd
-     * 
-     * 
+     *
+     *
      * @param reader
      * @param writer
-     * 
+     *
      * @return
-     * 
+     *
      */
     private static boolean copyTillEnd(BufferedReader reader, Writer writer) {
 
@@ -1303,13 +1303,13 @@ public class FileUtils {
 
     /**
      * Method declaration
-     * 
-     * 
+     *
+     *
      * @param fileName
      * @param property
-     * 
+     *
      * @return
-     * 
+     *
      * @see
      */
     private static int findPropertyIndex(String fileName, String property) {
@@ -1366,13 +1366,13 @@ public class FileUtils {
 
     /**
      * Method getLineNumReader
-     * 
-     * 
+     *
+     *
      * @param filePath the path to the file
      * @param create should we create the file if it does not exist
      *
      * @return
-     * 
+     *
      */
     private static LineNumberReader getLineNumReader(String filePath, boolean create) {
 
@@ -1398,10 +1398,10 @@ public class FileUtils {
 
     /**
      * Returns the parent folder upper level count to the current path
-     * 
+     *
      * @param path path to a file/folder
      * @param level how much should we go upper in the path
-     * @return path to the parent upper the given level, for example: 
+     * @return path to the parent upper the given level, for example:
      * (/a/b/c/d, 3) will result in /a
      */
     public static String getParentDirPath(String path, int level) {
@@ -1426,10 +1426,10 @@ public class FileUtils {
         return dir.getParent();
     }
 
-    private static final String FILE_SEP = 
+    private static final String FILE_SEP =
         System.getProperty("file.separator");
 
-    private static final String LINE_SEP = 
+    private static final String LINE_SEP =
         System.getProperty("line.separator");
 
     /** Field SQRBRACKET_OPEN * */

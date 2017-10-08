@@ -11,9 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
@@ -22,10 +25,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
-import static org.junit.matchers.JUnitMatchers.hasItems;
-import static org.testng.Assert.assertEquals;
 
 public class OAuthValuesTest {
     @Test
@@ -40,7 +39,7 @@ public class OAuthValuesTest {
 
         // Then
         assertEquals(1, result.size());
-        assertThat(result, hasItem(date));
+        assertThat(result).contains(date);
     }
 
     @Test
@@ -58,7 +57,7 @@ public class OAuthValuesTest {
 
         // Then
         assertEquals(3, result.size());
-        assertThat(result, hasItems(one, two, three));
+        assertThat(result).contains(one, two, three);
     }
 
     @Test

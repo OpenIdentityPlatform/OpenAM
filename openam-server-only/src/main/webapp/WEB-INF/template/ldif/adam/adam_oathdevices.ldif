@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+# Copyright (c) 2015-2016 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -34,7 +34,7 @@ instanceType: 4
 isSingleValued: TRUE
 objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
 objectClass: attributeSchema
-schemaIDGUID: 9t5sOFuJm0uzCYa5kkW5Iw==
+schemaIDGUID:: hpeBA03ZXkCruSNG14eq9w==
 searchFlags: 0
 systemOnly: FALSE
 
@@ -55,11 +55,23 @@ lDAPDisplayName: oathDeviceProfilesContainer
 mayContain: oathDeviceProfiles
 objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
 objectClass: classSchema
-objectClassCategory: 1
+objectClassCategory: 3
 rDNAttID: cn
 subClassOf: top
-schemaIDGUID: W+EbAAhMnkemsN9cBkG2BA==
+schemaIDGUID:: 8ktC5FRhKUKKMMS7EpCgjw==
 systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: oathDeviceProfilesContainer
+-
 
 dn:
 changetype: modify

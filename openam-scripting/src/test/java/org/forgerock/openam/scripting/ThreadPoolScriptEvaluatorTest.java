@@ -25,21 +25,17 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
+import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
-import org.forgerock.util.thread.ExecutorServiceFactory;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -218,29 +214,6 @@ public class ThreadPoolScriptEvaluatorTest {
             return;
         }
 
-    }
-
-    //extended to allow us to mock this out, using a shutdownmanager
-    private class ExtendedExecutorServiceFactory extends ExecutorServiceFactory {
-
-        private ShutdownManager shutdownmanager;
-
-        public ExtendedExecutorServiceFactory(ShutdownManager shutdownManager) {
-            super(shutdownManager);
-            this.shutdownmanager = shutdownManager;
-        }
-
-        protected ShutdownManager getShutdownManager() {
-            return shutdownmanager;
-        }
-
-        private void registerShutdown(final ExecutorService service) {
-            getShutdownManager().addShutdownListener(new ShutdownListener() {
-                public void shutdown() {
-                    service.shutdownNow();
-                }
-            });
-        }
     }
 
 }

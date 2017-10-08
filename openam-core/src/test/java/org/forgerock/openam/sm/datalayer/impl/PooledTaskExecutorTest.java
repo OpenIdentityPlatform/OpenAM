@@ -16,21 +16,20 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 
-import javax.inject.Provider;
 import java.text.MessageFormat;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Provider;
+
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
@@ -39,6 +38,8 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.Test;
+
+import com.sun.identity.shared.debug.Debug;
 
 public class PooledTaskExecutorTest {
 
@@ -60,9 +61,9 @@ public class PooledTaskExecutorTest {
         }).when(debug).message(anyString());
 
         Provider<SimpleTaskExecutor> simpleTaskExecutorProvider = mock(Provider.class);
-        when(simpleTaskExecutorProvider.get()).thenAnswer(new Answer<SimpleTaskExecutor<?>>() {
-            public SimpleTaskExecutor<?> answer(InvocationOnMock invocation) throws Throwable {
-                return new SimpleTaskExecutor<Object>(mock(ConnectionFactory.class), null, null);
+        when(simpleTaskExecutorProvider.get()).thenAnswer(new Answer<SimpleTaskExecutor>() {
+            public SimpleTaskExecutor answer(InvocationOnMock invocation) throws Throwable {
+                return new SimpleTaskExecutor(null, null);
             }
         });
 
@@ -90,11 +91,11 @@ public class PooledTaskExecutorTest {
         debug("Tasks 1 and 2 should now be executing and will shortly be blocked - starting task 3");
         task3.start();
 
-        long timeout = System.currentTimeMillis() + 5000;
+        long timeout = currentTimeMillis() + 5000;
         while (!semaphore.hasQueuedThreads()) {
             debug("Waiting for task 3 to be queued on semaphore");
             Thread.sleep(50);
-            if (System.currentTimeMillis() > timeout) {
+            if (currentTimeMillis() > timeout) {
                 fail("Where did my thread go?");
             }
         }
@@ -119,7 +120,7 @@ public class PooledTaskExecutorTest {
         assertThat(task2.isAlive()).as("Task 2 thread running").isFalse();
         assertThat(task3.isAlive()).as("Task 3 thread running").isFalse();
 
-        verify(task3.task).execute(null, null);
+        verify(task3.task).execute(null);
         verify(simpleTaskExecutorProvider, times(2)).get();
         assertThat(semaphore.availablePermits()).isEqualTo(2);
     }
@@ -150,7 +151,7 @@ public class PooledTaskExecutorTest {
         private Thread executingThread;
 
         @Override
-        public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
+        public void execute(TokenStorageAdapter adapter) throws DataLayerException {
             this.executingThread = Thread.currentThread();
             debug("Locking");
             locked.set(true);

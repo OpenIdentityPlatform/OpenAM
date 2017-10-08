@@ -29,6 +29,7 @@
 
 package com.sun.identity.saml2.plugins;
 
+import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.plugin.configuration.ConfigurationInstance;
 import com.sun.identity.plugin.configuration.ConfigurationManager;
@@ -36,6 +37,8 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 
 import java.util.Map;
+
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * The <code>SAML2PluginsUtils</code> contains utility methods for SAML 2.0 plugins classes.
@@ -87,10 +90,18 @@ public class SAML2PluginsUtils {
 
     /**
      * Checks if ignore profile is enabled.
+     * @param session SSOToken to check the profile creation attributes.
      * @param realm realm to check for the profile creation attribute.
      * @return true if ignore profile is enabled, false otherwise.
      */
-    public static boolean isIgnoredProfile(String realm) {
+    public static boolean isIgnoredProfile(Object session, String realm) {
+        if (session != null) {
+            try {
+                return SAML2Utils.isIgnoreProfileSet(session);
+            } catch (SessionException e) {
+                SAML2Utils.debug.message("Failed to get 'UserProfile' property from user session", e);
+            }
+        }
         return IGNORE_PROFILE.equalsIgnoreCase(getProfileAttribute(realm));
     }
 

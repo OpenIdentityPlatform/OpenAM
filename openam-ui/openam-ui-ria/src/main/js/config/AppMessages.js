@@ -11,11 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("config/AppMessages", [
+define([
 ], function () {
     return {
         /**
@@ -47,6 +46,10 @@ define("config/AppMessages", [
         },
         "errorNoName": {
             msg: "config.messages.AdminMessages.policies.error.noName",
+            type: "error"
+        },
+        "errorNoId": {
+            msg: "config.messages.AdminMessages.policies.error.noId",
             type: "error"
         },
         "errorCantStartWithHash": {
@@ -128,6 +131,11 @@ define("config/AppMessages", [
         "resTypeErrorNoActions": {
             msg: "config.messages.AdminMessages.policies.error.noActions",
             type: "error"
+        },
+
+        "invalidationSuccessful": {
+            msg: "console.sessions.invalidationSuccessful",
+            type: "info"
         }
     };
 });

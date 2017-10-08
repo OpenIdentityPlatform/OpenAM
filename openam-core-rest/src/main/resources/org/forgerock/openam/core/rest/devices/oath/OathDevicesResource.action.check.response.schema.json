@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/OathDevicesResource#action.check.response.schema.title",
+  "description": "i18n:api-descriptor/OathDevicesResource#action.check.response.schema.description",
+  "properties": {
+    "result": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/OathDevicesResource#action.check.response.schema.result.title",
+      "description": "i18n:api-descriptor/OathDevicesResource#action.check.response.schema.result.description"
+    }
+  },
+  "required": [
+    "result"
+  ]
+}

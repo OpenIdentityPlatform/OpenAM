@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2015 ForgeRock AS.
-  -->
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015-2016 ForgeRock AS.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-ui</artifactId>
-        <version>13.0.0</version>
+        <version>14.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
@@ -49,6 +49,12 @@
             <artifactId>selectize-non-standalone</artifactId>
             <version>0.12.1</version>
             <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>text</artifactId>
+            <version>2.0.15</version>
             <type>js</type>
         </dependency>
         <dependency>
@@ -132,6 +138,47 @@
             <type>js</type>
             <classifier>min</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>redux</artifactId>
+            <version>3.5.2</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>react-bootstrap</artifactId>
+            <version>0.30.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>classnames</artifactId>
+            <version>2.2.5</version>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>react-input-autosize</artifactId>
+            <version>1.1.0</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>react-select</artifactId>
+            <version>1.0.0-rc.2</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>react-select</artifactId>
+            <version>1.0.0-rc.2</version>
+            <classifier>min</classifier>
+            <type>css</type>
+        </dependency>
 
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
@@ -160,6 +207,13 @@
             <version>0.2.0</version>
             <type>js</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>base64</artifactId>
+            <version>1.0.0</version>
+            <classifier>min</classifier>
+            <type>js</type>
         </dependency>
     </dependencies>
 
@@ -265,7 +319,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>0.0.26</version>
+                <version>1.1</version>
                 <configuration>
                     <installDirectory>${node.install.directory}</installDirectory>
                 </configuration>
@@ -277,9 +331,9 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.2.3</nodeVersion>
-                            <npmVersion>3.5.2</npmVersion>
-                            <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
+                            <nodeVersion>v4.6.1</nodeVersion>
+                            <npmVersion>3.10.7</npmVersion>
+                            <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot>
                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
                         </configuration>
                     </execution>
@@ -291,16 +345,19 @@
                         <phase>initialize</phase>
                         <configuration>
                             <arguments>install</arguments>
+                            <environmentVariables>
+                                <PHANTOMJS_CDNURL>http://maven.forgerock.org/repo/forgerock-third-party-virtual</PHANTOMJS_CDNURL>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>grunt</id>
+                        <id>npm-build</id>
                         <goals>
-                            <goal>grunt</goal>
+                            <goal>npm</goal>
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <arguments>prod --target-version=${project.version}</arguments>
+                            <arguments>run build:production -- --target-version=${project.version}</arguments>
                         </configuration>
                     </execution>
                 </executions>

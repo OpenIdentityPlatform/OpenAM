@@ -11,10 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
+import static org.forgerock.opendj.ldap.LdapException.newLdapException;
 import static org.mockito.BDDMockito.*;
 
 import com.sun.identity.shared.debug.Debug;
@@ -59,7 +60,7 @@ public class LdapSearchHandlerTest {
         // Given
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(null);
-        given(mockConnection.search(mockRequest, entries)).willThrow(LdapException.class);
+        given(mockConnection.search(mockRequest, entries)).willThrow(newLdapException(ResultCode.SIZE_LIMIT_EXCEEDED));
 
         // When / Then
         handler.performSearch(mockConnection, mockRequest, entries);
@@ -67,7 +68,7 @@ public class LdapSearchHandlerTest {
 
     @Test (expectedExceptions = QueryFailedException.class)
     public void shouldThrowExceptionOnFailure() throws QueryFailedException, LdapException {
-        LdapException error = LdapException.newLdapException(ResultCode.NO_SUCH_OBJECT);
+        LdapException error = newLdapException(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.search(any(SearchRequest.class), anyCollection())).willThrow(error);
         handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
     }

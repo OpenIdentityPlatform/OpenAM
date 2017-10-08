@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
@@ -36,7 +37,8 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public final class Assertions {
 
-    public static void assertAllPrivilegesEquivalent(Collection<Privilege> first, Collection<Privilege> second) {
+    public static void assertAllPrivilegesEquivalent(Collection<Privilege> first, Collection<Privilege> second)
+            throws EntitlementException {
         assertThat(first.size()).isEqualTo(second.size());
 
         Set<Privilege> sortedFirst = new TreeSet<Privilege>(new PrivilegeComparator());
@@ -52,7 +54,8 @@ public final class Assertions {
         }
     }
 
-    public static void assertPrivilegesEquivalent(Privilege first, Privilege second) {
+    public static void assertPrivilegesEquivalent(Privilege first, Privilege second)
+            throws EntitlementException {
         if (first == null || second == null) {
             assertThat(first).isEqualTo(second);
             return;
@@ -95,7 +98,8 @@ public final class Assertions {
         assertThat(first.getState()).isEqualTo(second.getState());
     }
 
-    private static void assertEntitlementSubjectsEquivalent(EntitlementSubject first, EntitlementSubject second) {
+    private static void assertEntitlementSubjectsEquivalent(EntitlementSubject first, EntitlementSubject second)
+            throws EntitlementException {
         if (first == null || second == null) {
             assertThat(first).isEqualTo(second);
             return;

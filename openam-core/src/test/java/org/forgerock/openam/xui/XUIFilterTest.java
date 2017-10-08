@@ -61,7 +61,8 @@ public class XUIFilterTest {
     public void loginRedirectsToXUIWithQuery() throws Exception {
         String pathInfo = "/UI/Login";
         String query = "locale=fr&realm=/";
-        String xuiLoginPath = "/XUI/#login/";
+        String xuiBasePath = "/XUI";
+        String xuiLoginHash = "#login/";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse responseLogin = mock(HttpServletResponse.class);
@@ -75,7 +76,7 @@ public class XUIFilterTest {
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseLogin).sendRedirect(captor.capture());
 
-        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLoginPath + "&" + query);
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiBasePath + "?" + query + xuiLoginHash);
     }
 
     @Test
@@ -84,7 +85,8 @@ public class XUIFilterTest {
         String query = "locale=fr&realm=%2F";
         String compositeAdvice = "<Advices><AttributeValuePair><Attribute name=\"AuthLevelConditionAdvice\"/>"
                 + "<Value>1</Value></AttributeValuePair></Advices>";
-        String xuiLoginPath = "/XUI/#login/";
+        String xuiBasePath = "/XUI";
+        String xuiLoginHash = "#login/";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse responseLogin = mock(HttpServletResponse.class);
@@ -110,12 +112,13 @@ public class XUIFilterTest {
         
         query += "&authIndexType=composite_advice&authIndexValue=" + ESAPI.encoder().encodeForURL(compositeAdvice);
 
-        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLoginPath + "&" + query);
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiBasePath + "?" + query + xuiLoginHash);
     }
 
     @Test
     public void testLogout() throws Exception {
-        String xuiLogoutPath = "/XUI/#logout/";
+        String xuiBasePath = "/XUI";
+        String xuiLogoutHash = "#logout/";
         String logoutPath = "/UI/Logout";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -128,12 +131,13 @@ public class XUIFilterTest {
         filter.doFilter(request, responseLogout, filterChain);
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseLogout).sendRedirect(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLogoutPath);
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiBasePath + xuiLogoutHash);
     }
 
     @Test
     public void testEndUserPage() throws Exception {
-        String profilePage = "/XUI/#profile/";
+        String xuiBasePath = "/XUI";
+        String profileHash = "#profile/";
         String endUserPath = "/idm/EndUser";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -147,6 +151,6 @@ public class XUIFilterTest {
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseEndUser).sendRedirect(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(CONTEXT + profilePage);
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiBasePath + profileHash);
     }
 }

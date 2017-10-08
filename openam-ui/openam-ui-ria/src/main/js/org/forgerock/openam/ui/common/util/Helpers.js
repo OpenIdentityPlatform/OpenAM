@@ -16,11 +16,12 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/Helpers", [
+define([
+    "jquery",
     "handlebars",
     "lodash",
     "org/forgerock/openam/ui/common/util/ExternalLinks"
-], function (Handlebars, _, ExternalLinks) {
+], function ($, Handlebars, _, ExternalLinks) {
 
     Handlebars.registerHelper("externalLink", function (key) {
         return _.get(ExternalLinks, key, "");
@@ -31,8 +32,18 @@ define("org/forgerock/openam/ui/common/util/Helpers", [
         result = result.replace(/\*/g,
             '<input class="form-control" required type="text" value="*" placeholder="*" />');
         result = result.replace("̂",
-            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+            '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^/]+" />');
 
         return new Handlebars.SafeString(result);
+    });
+
+    // TODO: Commons Candidate
+    Handlebars.registerHelper("debug", function () {
+        console.warn("[handlebars] debug. Value of `this`");
+        console.warn(this);
+    });
+
+    Handlebars.registerHelper("ternary", (testExpression, yes, no) => {
+        return testExpression ? yes : no;
     });
 });

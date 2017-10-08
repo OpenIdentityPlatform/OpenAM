@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,6 +23,8 @@
  *
  */
 package org.forgerock.openam.authentication.plugins;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
@@ -64,7 +66,7 @@ public class AccountExpirePlugin implements AMPostAuthProcessInterface {
             String daysToExpireDefault = SystemProperties.get(EXPIRPROPERTY);
             int daysToExpire = Integer.getInteger(daysToExpireDefault, 30);
 
-            Calendar cal = Calendar.getInstance();
+            Calendar cal = getCalendarInstance();
             cal.add(Calendar.DATE, daysToExpire);
             Set attrValue = new HashSet();
             attrValue.add(Locale.getNormalizedDateString(cal.getTime()));

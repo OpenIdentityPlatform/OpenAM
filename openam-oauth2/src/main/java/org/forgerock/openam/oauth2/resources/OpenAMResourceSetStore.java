@@ -11,30 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
 
 import javax.inject.Inject;
-
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.ResourceSetFilter;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
@@ -47,10 +42,8 @@ import org.forgerock.util.query.QueryFilter;
  */
 public class OpenAMResourceSetStore implements ResourceSetStore {
 
-    private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final String realm;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2UrisFactory<RealmInfo> oauth2UrisFactory;
+    private final OAuth2UrisFactory oauth2UrisFactory;
     private final TokenDataStore<ResourceSetDescription> delegate;
     private final TokenIdGenerator idGenerator;
 
@@ -58,15 +51,12 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
      * Constructs a new OpenAMResourceSetStore instance.
      *
      * @param realm The realm this ResourceSetStore is in.
-     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param oauth2UrisFactory An instance of the OAuth2UrisFactory.
      */
     @Inject
-    public OpenAMResourceSetStore(@Assisted String realm, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2UrisFactory<RealmInfo> oauth2UrisFactory, TokenIdGenerator idGenerator,
-            @DataLayer(ConnectionType.RESOURCE_SETS) TokenDataStore delegate) {
+    public OpenAMResourceSetStore(@Assisted String realm, OAuth2UrisFactory oauth2UrisFactory,
+            TokenIdGenerator idGenerator, @DataLayer(ConnectionType.RESOURCE_SETS) TokenDataStore delegate) {
         this.realm = realm;
-        this.providerSettingsFactory = providerSettingsFactory;
         this.oauth2UrisFactory = oauth2UrisFactory;
         this.delegate = delegate;
         this.idGenerator = idGenerator;

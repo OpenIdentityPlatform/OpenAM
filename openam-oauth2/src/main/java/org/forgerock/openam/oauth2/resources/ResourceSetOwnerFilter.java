@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.ResourceSetFilter;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 
 /**
  * Filters the ResourceSets based on whether they are owned by the specified user.

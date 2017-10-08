@@ -25,20 +25,19 @@
  * $Id: SessionNotificationHandler.java,v 1.5 2008/07/23 18:13:55 ww203982 Exp $
  *
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session;
+
+import java.util.Vector;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionNotification;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
-import org.forgerock.util.annotations.VisibleForTesting;
-
-import java.util.Vector;
+import org.forgerock.openam.session.SessionEventType;
 
 /**
  * <code>SessionNotificationHandler</code> implements
@@ -53,11 +52,6 @@ public class SessionNotificationHandler implements NotificationHandler {
 
     private final SessionCache sessionCache;
 
-    public SessionNotificationHandler() {
-        sessionCache = InjectorHolder.getInstance(SessionCache.class);
-    }
-
-    @VisibleForTesting
     SessionNotificationHandler(SessionCache sessionCache) {
         this.sessionCache = sessionCache;
     }
@@ -71,49 +65,25 @@ public class SessionNotificationHandler implements NotificationHandler {
      *
      * @param notifications array of notifications to be processed.
      */
-    public void process(Vector notifications) {
+    public void process(Vector<Notification> notifications) {
         for (int i = 0; i < notifications.size(); i++) {
-            processRemoteNotification((Notification) notifications.elementAt(i));
+            Notification notification = notifications.elementAt(i);
+            processNotification(SessionNotification.parseXML(notification.getContent()));
         }
     }
 
     /**
      * Process the notification.
      *
-     * @param notification An XML Notification object describing changes to a remote Session
+     * @param notification A SessionNotification object describing changes to the Session
      */
-    public void processRemoteNotification(Notification notification) {
-        SessionNotification snot = SessionNotification.parseXML(notification.getContent());
-        if (snot != null) {
-            processNotification(snot, false);
-        }
-    }
-
-    /**
-     * Process the notification.
-     *
-     * @param sessionNotification A SessionNotification object describing changes to a local Session
-     */
-    public void processLocalNotification(SessionNotification sessionNotification) {
-        processNotification(sessionNotification, true);
-    }
-
-    /**
-     * Process the notification.
-     *
-     * @param snot Session Notification object.
-     */
-    private void processNotification(SessionNotification snot, boolean isLocal) {
-        SessionInfo info = snot.getSessionInfo();
+    public void processNotification(SessionNotification notification) {
+        SessionInfo info = notification.getSessionInfo();
 
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
         if (!info.getState().equals("valid")) {
-            if (isLocal) {
-                sessionCache.removeLocalSID(info);
-            } else {
-                sessionCache.removeRemoteSID(info);
-            }
+            sessionCache.removeSID(new SessionID(info.getSessionID()));
             return;
         }
 
@@ -131,8 +101,9 @@ public class SessionNotificationHandler implements NotificationHandler {
             sessionCache.removeSID(sid);
             return;
         }
-        SessionEvent evt = new SessionEvent(session, snot.getNotificationType(), snot.getNotificationTime());
-        SessionEvent.invokeListeners(evt);
+        SessionEventType sessionEventType = SessionEventType.fromCode(notification.getNotificationType());
+        SessionEvent evt = new SessionEvent(session, sessionEventType, notification.getNotificationTime());
+        Session.invokeListeners(evt);
     }
 
 }

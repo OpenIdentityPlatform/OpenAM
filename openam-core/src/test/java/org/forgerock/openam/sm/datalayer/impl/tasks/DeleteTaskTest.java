@@ -11,10 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -22,44 +23,47 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class DeleteTaskTest {
     private DeleteTask task;
-    private Connection mockConnection;
     private LdapAdapter mockAdapter;
     private String tokenId;
-    private ResultHandler<String, ?> mockResultHandler;
+    private Options options;
+    private ResultHandler<PartialToken, ?> mockResultHandler;
 
     @BeforeMethod
     public void setup() {
         tokenId = "badger";
+        options = Options.defaultOptions().set(OPTIMISTIC_CONCURRENCY_CHECK_OPTION, "ETAG");
         mockAdapter = mock(LdapAdapter.class);
-        mockConnection = mock(Connection.class);
         mockResultHandler = mock(ResultHandler.class);
 
-        task = new DeleteTask(tokenId, mockResultHandler);
+        task = new DeleteTask(tokenId, options, mockResultHandler);
     }
 
     @Test
     public void shouldUseAdapterForDelete() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).delete(any(Connection.class), eq(tokenId));
+        task.execute(mockAdapter);
+        verify(mockAdapter).delete(eq(tokenId), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).delete(any(Connection.class), anyString());
-        task.execute(mockConnection, mockAdapter);
+                .when(mockAdapter).delete(anyString(), any(Options.class));
+        task.execute(mockAdapter);
         verify(mockResultHandler).processError(any(CoreTokenException.class));
     }
 
     @Test
     public void shouldNotifyResultHandlerOnSuccess() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockResultHandler).processResults(eq(tokenId));
+        PartialToken partialToken = mock(PartialToken.class);
+        given(mockAdapter.delete(tokenId, options)).willReturn(partialToken);
+        task.execute(mockAdapter);
+        verify(mockResultHandler).processResults(partialToken);
     }
 }

@@ -24,9 +24,12 @@
  *
  * $Id: DSAMECallbackHandler.java,v 1.7 2008/08/19 19:08:54 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
+
 package com.sun.identity.authentication.service;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 
@@ -51,6 +54,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
 
     static Debug debug = Debug.getInstance("amCallback");
     AMLoginContext am;
+    private boolean isPureJAAS;
     LoginState loginState;
 
     // this will be sent by AuthContext for module to read.
@@ -65,8 +69,9 @@ public class DSAMECallbackHandler implements CallbackHandler {
      * login thread and login state with callback hndler 
      * @param am <code>AMLoginContext</code> for this callback
      */
-    public DSAMECallbackHandler(AMLoginContext am) {
+    public DSAMECallbackHandler(AMLoginContext am, boolean isPureJAAS) {
         this.am = am;
+        this.isPureJAAS = isPureJAAS;
         this.authThreadManager= am.authThread;
         this.loginState = am.getLoginState();
     }
@@ -74,7 +79,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
     private void setPageTimeout(Callback[] callbacks) {
         long pageTimeOut = getTimeOut(callbacks);
         loginState.setPageTimeOut(pageTimeOut);
-        long lastCallbackSent = System.currentTimeMillis();
+        long lastCallbackSent = currentTimeMillis();
         loginState.setLastCallbackSent(lastCallbackSent);
     }
         
@@ -106,7 +111,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
             debug.message("LoginState Callbacks");
             ((LoginStateCallback) callbacks[0]).setLoginState(loginState);
         } else {
-            if (am.isPureJAAS()) {
+            if (isPureJAAS) {
                 setPageTimeout(callbacks);
                 loginState.setSubmittedCallback(null,am) ;
                     loginState.setReceivedCallback(callbacks,am) ;
@@ -146,7 +151,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
             if (debug.messageEnabled()) {
                 debug.message("DSAMECAllbackhandler..."+ callbacks);
             }
-            if (am.isPureJAAS()) {
+            if (isPureJAAS) {
                 loginState.setReceivedCallback(null,am) ;
             }
         }
@@ -222,7 +227,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
 
         long lastCallbackSent = loginState.getLastCallbackSent();
         long pageTimeOut = loginState.getPageTimeOut();
-        long now = System.currentTimeMillis();
+        long now = currentTimeMillis();
         if ((lastCallbackSent + ((pageTimeOut-3)*1000)) < now) {
             debug.message("Page Timeout");
             loginState.setTimedOut(true);

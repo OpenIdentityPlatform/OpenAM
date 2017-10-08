@@ -11,16 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
+define([
     "lodash",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/anonymousProcess/AnonymousProcessView",
-    "org/forgerock/commons/ui/user/anonymousProcess/SelfRegistrationView"
-], function (_, Constants, AnonymousProcessView, SelfRegistrationView) {
+    "org/forgerock/commons/ui/user/anonymousProcess/SelfRegistrationView",
+    "org/forgerock/commons/ui/user/anonymousProcess/KBAView",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/openam/ui/user/login/RESTLoginView",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken"
+], (_, Constants, AnonymousProcessView, SelfRegistrationView, KBAView, Configuration, RESTLoginView,
+    SessionToken) => {
+
+    function shouldRouteToLoginView (response, destination) {
+        return response.type === "selfRegistration" && response.tag === "end" && destination === "login";
+    }
+
+    function shouldAutoLogin (response, destination) {
+        return response.type === "autoLoginStage" && response.tag === "end" && destination === "auto-login";
+    }
 
     function AMSelfRegistrationView () { }
 
@@ -28,6 +40,27 @@ define("org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView", [
     AMSelfRegistrationView.prototype.endpoint = Constants.SELF_SERVICE_REGISTER;
 
     _.extend(AMSelfRegistrationView.prototype, AnonymousProcessView.prototype);
+
+    AMSelfRegistrationView.prototype.renderProcessState = function (response) {
+
+        const destination = _.get(Configuration, "globalData.successfulUserRegistrationDestination");
+        const realm = _.get(Configuration, "globalData.realm", "");
+
+        if (shouldAutoLogin(response, destination)) {
+            const tokenId = _.get(response, "additions.tokenId");
+            SessionToken.set(tokenId);
+            RESTLoginView.handleExistingSession(response.additions);
+
+        } else if (shouldRouteToLoginView(response, destination)) {
+            window.location.href = `#login${realm}`;
+        } else {
+            AnonymousProcessView.prototype.renderProcessState.call(this, response).then(() => {
+                if (response.type === "kbaSecurityAnswerDefinitionStage" && response.tag === "initial") {
+                    KBAView.render(response.requirements.properties.kba);
+                }
+            });
+        }
+    };
 
     return new AMSelfRegistrationView();
 });

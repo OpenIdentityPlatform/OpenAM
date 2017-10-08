@@ -31,10 +31,12 @@ package com.sun.identity.config.util;
 
 import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
@@ -61,7 +63,6 @@ import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.util.Options;
 import org.forgerock.util.time.Duration;
-import org.publicsuffix.PSS;
 
 public abstract class AjaxPage extends Page {
 
@@ -169,7 +170,9 @@ public abstract class AjaxPage extends Page {
                 .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDN, bindPwd));
 
         if (isSSl) {
-            ldapOptions = ldapOptions.set(SSL_CONTEXT, new SSLContextBuilder().getSSLContext());
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            ldapOptions = ldapOptions.set(SSL_CONTEXT,
+                    new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
         }
 
         ConnectionFactory factory = new LDAPConnectionFactory(host, port, ldapOptions);
@@ -326,25 +329,7 @@ public abstract class AjaxPage extends Page {
     }
     
     public String getCookieDomain() {
-        String hostname = getHostName();
-
-        try {
-            PSS pss = new PSS();
-            int idx = pss.getEffectiveTLDLength(hostname);
-            int lastidx = hostname.lastIndexOf('.', idx - 1);
-            if (lastidx == -1) {
-                if (hostname.indexOf('.', idx + 1) != -1) {
-                    return "." + hostname;
-                } else {
-                    return "";
-                }
-            } else {
-                return hostname.substring(lastidx);
-            }
-        } catch (IOException ioe) {
-            debug.error("Unable to load public suffix database", ioe);
-            return "";
-        }
+        return getHostName();
     }
 
     public boolean validateInput() {

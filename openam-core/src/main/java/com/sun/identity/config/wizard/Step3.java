@@ -25,6 +25,7 @@
  * $Id: Step3.java,v 1.39 2009/12/17 17:43:39 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyright 2016 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.config.wizard;
@@ -42,11 +43,11 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import org.apache.click.Context;
 import org.apache.click.control.ActionLink;
-import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Step 3 is for selecting the embedded or external configuration store 
@@ -621,11 +622,18 @@ public class Step3 extends LDAPStoreWizardPage {
             rootSuffix = Constants.DEFAULT_ROOT_SUFFIX;
         }
 
+        /*
+         * Check if the provided root suffix exists and 'services' entry does not exist under the suffix in the existing
+         * SM host. If not, OpenAM denies setting up.
+         */
         try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
-            String filter = "cn=" + "\"" + rootSuffix + "\"";
-            String[] attrs = {""};
-            conn.search(LDAPRequests.newSearchRequest(rootSuffix, SearchScope.BASE_OBJECT, filter, attrs));
-            writeToResponse("ok");
+            conn.readEntry(DN.valueOf(rootSuffix));
+            try {
+                conn.readEntry(DN.valueOf(rootSuffix).child("ou", "services"));
+                writeToResponse(getLocalizedString("config.data.already.exist"));
+            } catch (EntryNotFoundException enfe) {
+                writeToResponse("ok");
+            }
         } catch (LdapException lex) {
             if (!writeErrorToResponse(lex.getResult().getResultCode())) {
                 writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));

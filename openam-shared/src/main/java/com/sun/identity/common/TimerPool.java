@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: TimerPool.java,v 1.6 2008/10/20 22:00:05 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
@@ -47,7 +46,8 @@ import java.util.TreeMap;
  */
 
 public class TimerPool implements Triggerable {
-    
+
+    static final String SCHEDULER_SUFFIX = "-Scheduler";
     private int poolSize;
     private String name;
     private int busyThreadCount;
@@ -148,7 +148,7 @@ public class TimerPool implements Triggerable {
                     }
                 }
                 if (nextRun != null) {
-                    long now = System.currentTimeMillis();
+                    long now = currentTimeMillis();
                     if (nextRun.getTime() <= now ) {
                         if ((task = (HeadTaskRunnable) taskList.remove(nextRun)) 
                             != null) {
@@ -267,7 +267,7 @@ public class TimerPool implements Triggerable {
                             (time.getTime() < nextRun.getTime())) {
                             nextRun = time;
                             long delay = time.getTime() -
-                                System.currentTimeMillis();
+                                    currentTimeMillis();
                             scheduler.setWait(((delay < 0) ? 0 : delay));
                         }
                     }
@@ -302,7 +302,7 @@ public class TimerPool implements Triggerable {
     
     public void schedule(TaskRunnable task, long delay) throws
         IllegalArgumentException, IllegalStateException {
-        schedule(task, new Date(System.currentTimeMillis() + delay));
+        schedule(task, new Date(currentTimeMillis() + delay));
     }
     
     /**
@@ -582,7 +582,7 @@ public class TimerPool implements Triggerable {
             this.beingNotified = false;
             this.delay = -1;
             this.pool = pool;
-            setName(pool.name + "-Scheduler");
+            setName(pool.name + SCHEDULER_SUFFIX);
         }
         
         /**

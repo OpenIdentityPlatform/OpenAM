@@ -11,17 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/views/error/ForbiddenView", [
+define([
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function (AbstractView, Configuration) {
     var ForbiddenView = AbstractView.extend({
         template: "templates/common/error/403.html",
         data: {},
-        render: function () {
+        render () {
             if (!Configuration.loggedUser) {
                 this.baseTemplate = "templates/common/LoginBaseTemplate.html";
             }

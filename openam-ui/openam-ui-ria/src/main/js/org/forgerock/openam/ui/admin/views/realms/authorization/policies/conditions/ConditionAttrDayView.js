@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrDayView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         },
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
 
             this.data.weekdays = this.getWeekDays();
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        getWeekDays: function () {
+        getWeekDays () {
             var weekdays = [], i = 0, self = this;
             _.invoke(self.days, function () {
                 weekdays[i] = {};

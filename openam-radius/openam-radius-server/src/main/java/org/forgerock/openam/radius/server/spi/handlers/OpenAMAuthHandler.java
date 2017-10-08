@@ -12,8 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package org.forgerock.openam.radius.server.spi.handlers;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -254,6 +257,13 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
 
             final UserNameAttribute usrAtt = (UserNameAttribute) request.getAttribute(UserNameAttribute.class);
 
+            if (usrAtt == null) {
+                LOG.error("Request is missing USER_NAME attribute. Denying Access.");
+                rejectAccessAndTerminateProcess(response, holder);
+                LOG.message("Leaving OpenAMAuthHandler.handle()");
+                return;
+            }
+
             holder = startAuthProcess(holder, response, usrAtt, credential);
             if (holder == null || holder.getAuthPhase() == ContextHolder.AuthPhase.TERMINATED) {
                 // oops. something happened and reject message was already sent. so drop out here.
@@ -439,7 +449,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             }
             // update the
             holder.setMillisExpiryForCurrentCallbacks(1000L * pp.getTimeOutValue());
-            holder.setMillisExpiryPoint(System.currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
+            holder.setMillisExpiryPoint(currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
         } else {
             LOG.error("Callback at index 0 is not of type PagePropertiesCallback!!!");
             rejectAccessAndTerminateProcess(response, holder);
@@ -616,7 +626,7 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             return false;
         }
         // reset the timeout since we just received confirmation that the user is still there.
-        holder.setMillisExpiryPoint(System.currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
+        holder.setMillisExpiryPoint(currentTimeMillis() + holder.getMillisExpiryForCurrentCallbacks());
         return true;
     }
 
@@ -819,7 +829,10 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
             final ConfirmationCallback cc = (ConfirmationCallback) cb;
             final StringBuilder sb = new StringBuilder();
             sb.append(header);
-            sb.append(cc.getPrompt());
+            String prompt = cc.getPrompt();
+            if (prompt != null) {
+                sb.append(prompt);
+            }
             if (cc.getDefaultOption() >= 0) {
                 // ugh. ditto on above translation concern
                 sb.append(" (Default is ");

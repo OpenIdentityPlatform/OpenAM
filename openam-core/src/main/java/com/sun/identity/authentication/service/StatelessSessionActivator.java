@@ -20,7 +20,7 @@ import javax.security.auth.Subject;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import com.iplanet.dpro.session.SessionException;
@@ -35,12 +35,12 @@ import com.iplanet.dpro.session.share.SessionInfo;
 class StatelessSessionActivator extends DefaultSessionActivator {
     static final StatelessSessionActivator INSTANCE = new StatelessSessionActivator();
 
-    private volatile StatelessSessionFactory statelessSessionFactory;
+    private volatile StatelessSessionManager statelessSessionManager;
     private StatelessSession oldSession;
 
     @VisibleForTesting
-    StatelessSessionActivator(final StatelessSessionFactory statelessSessionFactory) {
-        this.statelessSessionFactory = statelessSessionFactory;
+    StatelessSessionActivator(final StatelessSessionManager statelessSessionManager) {
+        this.statelessSessionManager = statelessSessionManager;
     }
 
     private StatelessSessionActivator() {
@@ -48,7 +48,7 @@ class StatelessSessionActivator extends DefaultSessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject, final Object loginContext)
+                                   final InternalSession authSession, final Subject subject)
             throws AuthException {
 
         if (loginState.getForceFlag()) {
@@ -62,8 +62,8 @@ class StatelessSessionActivator extends DefaultSessionActivator {
             //set our old session -- necessary as if the currently owned token is stateless this won't be set
             SessionID sid = new SessionID(loginState.getHttpServletRequest());
             try {
-                SessionInfo info = getStatelessSessionFactory().getSessionInfo(sid);
-                oldSession = getStatelessSessionFactory().generate(info);
+                SessionInfo info = getStatelessSessionManager().getSessionInfo(sid);
+                oldSession = getStatelessSessionManager().generate(info);
                 loginState.setOldStatelessSession(oldSession);
             } catch (SessionException e) {
                 throw new AuthException(AMAuthErrorCode.SESSION_UPGRADE_FAILED, null);
@@ -74,23 +74,21 @@ class StatelessSessionActivator extends DefaultSessionActivator {
         final InternalSession session = createSession(sessionService, loginState);
         loginState.setSession(session);
 
-        return updateSessions(session, loginState, session, authSession, sessionService, subject, loginContext);
+        return updateSessions(session, loginState, session, authSession, sessionService, subject);
     }
 
     @Override
     protected InternalSession createSession(SessionService sessionService, LoginState loginState) {
-        return sessionService.newInternalSession(loginState.getOrgDN(), null, true);
+        return sessionService.newInternalSession(loginState.getOrgDN(), true);
     }
 
     @Override
     protected boolean activateSession(InternalSession session, LoginState loginState) throws SessionException {
-        boolean activated = session.activate(loginState.getUserDN(), true);
+        boolean activated = session.activate(loginState.getUserDN());
         if (activated) {
             // Update the session id in the login state to reflect the activated session
-            loginState.setSessionID(getStatelessSessionFactory().generate(session).getID());
+            loginState.setSessionID(getStatelessSessionManager().generate(session).getID());
         }
-        // Make sure that session is never scheduled
-        session.cancel();
 
         if (oldSession != null) {
             try {
@@ -103,10 +101,10 @@ class StatelessSessionActivator extends DefaultSessionActivator {
         return activated;
     }
 
-    private StatelessSessionFactory getStatelessSessionFactory() {
-        if (statelessSessionFactory == null) {
-            statelessSessionFactory = InjectorHolder.getInstance(StatelessSessionFactory.class);
+    private StatelessSessionManager getStatelessSessionManager() {
+        if (statelessSessionManager == null) {
+            statelessSessionManager = InjectorHolder.getInstance(StatelessSessionManager.class);
         }
-        return statelessSessionFactory;
+        return statelessSessionManager;
     }
 }

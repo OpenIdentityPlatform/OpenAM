@@ -24,7 +24,7 @@
  *
  * $Id: TestGroupEvaluator.java,v 1.2 2009/11/12 18:37:40 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -48,6 +48,8 @@ import javax.security.auth.Subject;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.notifications.NotificationBroker;
+import org.forgerock.openam.notifications.NotificationsConfig;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -63,15 +65,15 @@ public class TestGroupEvaluator {
     private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = true;
 
     private AMIdentity user1;
     private AMIdentity group1;
     private ResourceTypeService resourceTypeService;
     private ConstraintValidator constraintValidator;
     private ApplicationServiceFactory applicationServiceFactory;
-    
+    private NotificationBroker broker;
+    private NotificationsConfig notificationsConfig;
 
     @BeforeClass
     public void setup() throws Exception {
@@ -82,6 +84,8 @@ public class TestGroupEvaluator {
         resourceTypeService = Mockito.mock(ResourceTypeService.class);
         constraintValidator = Mockito.mock(ConstraintValidator.class);
         applicationServiceFactory = Mockito.mock(ApplicationServiceFactory.class);
+        broker = Mockito.mock(NotificationBroker.class);
+        notificationsConfig = Mockito.mock(NotificationsConfig.class);
         
         Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
@@ -92,10 +96,10 @@ public class TestGroupEvaluator {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceTestHelper.saveApplication(adminSubject, "/", appl);
 
         PrivilegeManager pm = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pm.initialize("/", adminSubject);
         Map<String, Boolean> actions = new HashMap<String, Boolean>();
         actions.put("GET", Boolean.TRUE);
@@ -118,7 +122,7 @@ public class TestGroupEvaluator {
             return;
         }
         PrivilegeManager pm = new PolicyPrivilegeManager(
-                applicationServiceFactory, resourceTypeService, constraintValidator);
+                applicationServiceFactory, resourceTypeService, constraintValidator, broker, notificationsConfig);
         pm.initialize("/", SubjectUtils.createSubject(adminToken));
         pm.remove(PRIVILEGE1_NAME);
 
@@ -127,7 +131,7 @@ public class TestGroupEvaluator {
         identities.add(group1);
         IdRepoUtils.deleteIdentities("/", identities);
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceTestHelper.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test

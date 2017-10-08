@@ -24,7 +24,7 @@
  *
  * $Id: ServiceSchemaManager.java,v 1.12 2009/07/25 05:11:55 qcheng Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -39,9 +39,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-
 import org.forgerock.util.Function;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -413,7 +411,7 @@ public class ServiceSchemaManager {
      *
      * @supported.api
      */
-    public Set getSchemaTypes() throws SMSException {
+    public Set<SchemaType> getSchemaTypes() throws SMSException {
         SMSEntry.validateToken(token);
         validate();
         return (ssm.getSchemaTypes());

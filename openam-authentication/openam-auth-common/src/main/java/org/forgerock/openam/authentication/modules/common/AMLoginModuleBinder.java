@@ -11,16 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.common;
 
-import com.sun.identity.authentication.spi.AuthLoginException;
-
 import javax.security.auth.callback.CallbackHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.sun.identity.authentication.spi.AMLoginModule;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 
 /**
  * The idea behind this interface is that implementations of this interface will also extend the AMLoginModule
@@ -31,8 +33,6 @@ import javax.servlet.http.HttpServletResponse;
  * away.
  *
  * @see AbstractLoginModuleBinder
- *
- * @author Phill Cunnington phill.cunnington@forgerock.com
  */
 public interface AMLoginModuleBinder {
 
@@ -75,4 +75,25 @@ public interface AMLoginModuleBinder {
      * @throws AuthLoginException If the user session is invalid.
      */
     void setUserSessionProperty(String name, String value) throws AuthLoginException;
+
+    /**
+     * Returns the username of the currently authenticating user, if known. This can be set by authentication modules
+     * using the {@link #setAuthenticatingUserName(String)} method to communicate the username with subsequent
+     * modules in the authentication chain.
+     * <p>
+     * Note that the username returned here is based on user input, and it may not correspond to the user's actual
+     * username determined by the data store.
+     *
+     * @return the name of the user currently authenticating, if known, or {@code null} if not supplied.
+     * @see ISAuthConstants#SHARED_STATE_USERNAME
+     */
+    String getAuthenticatingUserName();
+
+    /**
+     * Sets the username of the user that is currently authenticating as determined by the current login module.
+     *
+     * @param username the name of the currently authenticating user.
+     * @see AMLoginModule#storeUsername(String)
+     */
+    void setAuthenticatingUserName(String username);
 }

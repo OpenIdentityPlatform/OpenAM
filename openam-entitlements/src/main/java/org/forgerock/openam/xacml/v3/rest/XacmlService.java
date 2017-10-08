@@ -16,42 +16,8 @@
 
 package org.forgerock.openam.xacml.v3.rest;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.delegation.DelegationPermission;
-import com.sun.identity.delegation.DelegationPermissionFactory;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
-import com.sun.identity.entitlement.xacml3.XACMLExportImport;
-import com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
-import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.rest.service.RestletRealmRouter;
-import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
-import org.forgerock.util.annotations.VisibleForTesting;
-import org.restlet.Request;
-import org.restlet.data.Disposition;
-import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
-import org.restlet.representation.OutputRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
+import static org.forgerock.json.resource.ResourceException.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
@@ -66,7 +32,42 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.json.resource.ResourceException.*;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
+import org.forgerock.openam.xacml.v3.ImportStep;
+import org.forgerock.util.annotations.VisibleForTesting;
+import org.restlet.Request;
+import org.restlet.data.Disposition;
+import org.restlet.data.Status;
+import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
+import com.sun.identity.delegation.DelegationPermissionFactory;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport;
+import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
+import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Provides XACML based services
@@ -138,11 +139,12 @@ public class XacmlService extends ServerResource {
                         "No policies found in XACML document", null, null));
             }
 
-            List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-            for (XACMLExportImport.ImportStep step : steps) {
-                Map<String, String> stepResult = new HashMap<String, String>();
+            List<Map<String, String>> result = new ArrayList<>();
+            for (ImportStep step : steps) {
+                Map<String, String> stepResult = new HashMap<>();
                 stepResult.put("status", String.valueOf(step.getDiffStatus().getCode()));
-                stepResult.put("name", step.getPrivilege().getName());
+                stepResult.put("name", step.getName());
+                stepResult.put("type", step.getType());
                 result.add(stepResult);
             }
             getResponse().setStatus(Status.SUCCESS_OK);

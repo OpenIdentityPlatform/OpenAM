@@ -27,20 +27,20 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS
  */
 
 package com.iplanet.dpro.session.share;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.iplanet.dpro.session.SessionException;
 import com.sun.identity.common.SearchResults;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This <code>SessionResponse</code> class represents a
@@ -385,15 +385,6 @@ public class SessionResponse {
                 xml.append("<OK></OK>").append(NL);
             }
             xml.append("</AddSessionListener>").append(NL);
-            break;
-        case SessionRequest.AddSessionListenerOnAllSessions:
-            xml.append("<AddSessionListenerOnAllSessions>").append(NL);
-            if (exception != null) {
-                xml.append("<Exception>").append(exception).append("</Exception>").append(NL);
-            } else {
-                xml.append("<OK></OK>").append(NL);
-            }
-            xml.append("</AddSessionListenerOnAllSessions>").append(NL);
             break;
         case SessionRequest.SetProperty:
             xml.append("<SetProperty>").append(NL);

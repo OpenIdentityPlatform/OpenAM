@@ -16,15 +16,23 @@
 package org.forgerock.openam.uma;
 
 import com.sun.identity.shared.Constants;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.security.AccessController;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
 import org.forgerock.openam.core.rest.UiRolePredicate;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -37,6 +45,8 @@ import org.forgerock.services.context.Context;
 public class UmaUserUiRolePredicate implements UiRolePredicate {
     private final Config<SessionService> sessionService;
     private final Debug logger;
+    private volatile ServiceConfigManager serviceConfigManager;
+    private static Map<String, ServiceConfig> configMap = new ConcurrentHashMap<String, ServiceConfig>();
 
     @Inject
     public UmaUserUiRolePredicate(Config<SessionService> sessionService, @Named("frRest") Debug logger) {
@@ -56,14 +66,35 @@ public class UmaUserUiRolePredicate implements UiRolePredicate {
             if (sessionService.get().isSuperUser(id)) {
                 return false;
             }
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token, UmaConstants.SERVICE_NAME,
-                    UmaConstants.SERVICE_VERSION);
-            return serviceConfigManager.getOrganizationConfig(realm, null).exists();
-        } catch (Exception e) {
+            String realm = context.asContext(RealmContext.class).getRealm().asPath();
+            return checkIfUmaConfigExists(realm);
+        } catch (SMSException | SSOException e) {
+            serviceConfigManager = null;
             logger.message("Could not access realm config", e);
             return false;
         }
+    }
+    
+    private boolean checkIfUmaConfigExists(String realm) throws SMSException, SSOException {
+        ServiceConfig orgConfig = configMap.get(realm);
+        if (orgConfig != null && orgConfig.isValid()) {
+            return orgConfig.exists();
+        } else {
+            if (serviceConfigManager == null) {
+                synchronized(this) {
+                    SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                    if (serviceConfigManager == null) {
+                        serviceConfigManager = new ServiceConfigManager(token, UmaConstants.SERVICE_NAME, 
+                                UmaConstants.SERVICE_VERSION);
+                    }
+                }
+            }
+            orgConfig = serviceConfigManager.getOrganizationConfig(realm, null);
+            if (orgConfig != null && orgConfig.isValid()) {
+                configMap.put(realm, orgConfig);
+                return orgConfig.exists();
+            }
+        }
+        return false;
     }
 }

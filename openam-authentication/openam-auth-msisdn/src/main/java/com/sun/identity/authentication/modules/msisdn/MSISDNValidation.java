@@ -24,7 +24,7 @@
  *
  * $Id: MSISDNValidation.java,v 1.3 2008/06/25 05:41:59 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.msisdn;
@@ -38,7 +38,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import org.forgerock.openam.ldap.LDAPAuthUtils;
-import org.forgerock.openam.ldap.ModuleState;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * A class that searches LDAP for the user having
@@ -208,6 +208,7 @@ public class MSISDNValidation {
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setAuthDN(principalUser);
             ldapUtil.setAuthPassword(principalPasswd.toCharArray());
+            ldapUtil.setScope(SearchScope.WHOLE_SUBTREE);
             ldapUtil.searchForUser();
             switch  (ldapUtil.getState()) {
                 case USER_FOUND:

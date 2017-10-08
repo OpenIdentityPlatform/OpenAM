@@ -54,6 +54,7 @@
                     type="single"
                     syntax="boolean"
                     i18nKey="a103"
+                    order="300"
                     resourceName="enabled">
                     <DefaultValues>
                         <Value>false</Value>
@@ -63,6 +64,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a102"
+                    order="200"
                     resourceName="detectionClass">
                     <DefaultValues>
                         <Value>com.iplanet.services.cdm.ClientDetectionDefaultImpl</Value>
@@ -82,6 +84,7 @@
                     type="single"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="defaultClientType">
                     <DefaultValues>
                         <Value>genericHTML</Value>

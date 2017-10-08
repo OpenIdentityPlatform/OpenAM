@@ -1,0 +1,26 @@
+<div class="col-sm-12 col-md-6">
+    <div class="panel-default panel am-panel-card" data-realm-path="{{path}}">
+        <div class="btn-group card-menu">
+            <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-v fa-lg"></i>
+            </button>
+            <ul class="dropdown-menu pull-left" role="menu">
+                <li><a href="{{routeTo 'editServerGeneral' _id}}"><i class="fa fa-pencil"></i> {{t "common.form.edit"}}</a></li>
+                <li><a href="{{routeTo 'cloneServer' _id}}"><i class="fa fa-clone"></i> {{t "console.servers.list.clone"}}</a></li>
+                <li class="divider"></li>
+                <li><a href="#" data-delete-item="{{_id}}"><i class="fa fa-times"></i> {{t "common.form.delete"}}</a></li>
+            </ul>
+        </div>
+        <a href="{{routeTo 'editServerGeneral' _id}}">
+            <div class="card-body card-body-with-menu">
+                <div class="card-icon-circle bg-primary">
+                    <i class="fa fa-server"></i>
+                </div>
+                <h3 class="card-name am-text-lines-one text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{{url}}">{{url}}</h3>
+                <div class="card-subtext am-text-lines-one">
+                    <div class="ellipsis">{{{siteName}}}</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

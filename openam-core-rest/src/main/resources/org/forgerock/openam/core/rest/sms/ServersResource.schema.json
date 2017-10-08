@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/ServersResource#schema.title",
+  "description": "i18n:api-descriptor/ServersResource#schema.description",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ServersResource#schema._id.title",
+      "description": "i18n:api-descriptor/ServersResource#schema._id.description"
+    },
+    "siteName": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ServersResource#schema.siteName.title",
+      "description": "i18n:api-descriptor/ServersResource#schema.siteName.description"
+    },
+    "url": {
+      "type": "string",
+      "title": "i18n:api-descriptor/ServersResource#schema.url.title",
+      "description": "i18n:api-descriptor/ServersResource#schema.url.description"
+    }
+  }
+}

@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.user.invocation;
 
 import org.forgerock.openam.sts.TokenType;
 import org.testng.annotations.Test;
+
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -27,7 +29,7 @@ public class STSIssuedTokenStateTest {
     private static final String STS_ID = "sts_id";
     private static final String USER_ID = "user_id";
     private static final TokenType TOKEN_TYPE = TokenType.OPENIDCONNECT;
-    private static final long TOKEN_EXPIRATION = System.currentTimeMillis()/1000 + 600;
+    private static final long TOKEN_EXPIRATION = currentTimeMillis() / 1000 + 600;
 
     @Test
     public void testEquals() {

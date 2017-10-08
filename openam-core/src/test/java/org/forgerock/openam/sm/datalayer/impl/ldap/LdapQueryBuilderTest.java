@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
@@ -29,9 +30,10 @@ import java.util.Map;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
-import org.forgerock.openam.sm.SMSDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Connection;
@@ -54,6 +56,8 @@ public class LdapQueryBuilderTest {
     private Connection mockConnection;
     private EntryConverter<PartialToken> partialTokenEntryConverter;
     private EntryConverter<Token> tokenEntryConverter;
+    private ConnectionFactory mockConnectionFactory;
+    private LdapConnectionFactoryProvider mockConnectionFactoryProvider;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -62,7 +66,12 @@ public class LdapQueryBuilderTest {
         mockConnection = mock(Connection.class);
         partialTokenEntryConverter = mock(EntryConverter.class);
         tokenEntryConverter = mock(EntryConverter.class);
-        Map<Class, EntryConverter> converterMap = new HashMap<Class, EntryConverter>();
+        mockConnectionFactory = mock(ConnectionFactory.class);
+        mockConnectionFactoryProvider = mock(LdapConnectionFactoryProvider.class);
+
+        given(mockConnectionFactoryProvider.createFactory()).willReturn(mockConnectionFactory);
+
+        Map<Class, EntryConverter> converterMap = new HashMap<>();
         converterMap.put(PartialToken.class, partialTokenEntryConverter);
         converterMap.put(Token.class, tokenEntryConverter);
 
@@ -70,8 +79,8 @@ public class LdapQueryBuilderTest {
                 config,
                 searchHandler,
                 mock(Debug.class),
-                converterMap
-                );
+                converterMap,
+                mockConnectionFactoryProvider);
     }
 
     @Test
@@ -107,7 +116,7 @@ public class LdapQueryBuilderTest {
 
         // Ensure that the Token Conversion returns a Token
         given(tokenEntryConverter.convert(any(Entry.class), any(String[].class))).willReturn(
-                new Token(Long.toString(System.currentTimeMillis()), TokenType.SESSION));
+                new Token(Long.toString(currentTimeMillis()), TokenType.SESSION));
 
         // When
         Iterator<Collection<Token>> results = builder.execute(mockConnection);

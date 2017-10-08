@@ -11,10 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -25,45 +26,48 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class CreateTaskTest {
 
     private CreateTask task;
-    private Connection mockConnection;
     private LdapAdapter mockAdapter;
     private Token mockToken;
+    private Token mockCreated;
+    private Options options;
     private ResultHandler<Token, ?> mockHandler;
 
     @BeforeMethod
-    public void setup() {
+    public void setup() throws DataLayerException {
         mockToken = mock(Token.class);
+        mockCreated = mock(Token.class);
         mockAdapter = mock(LdapAdapter.class);
-        mockConnection = mock(Connection.class);
+        options = Options.defaultOptions();
         mockHandler = mock(ResultHandler.class);
+        given(mockAdapter.create(mockToken, options)).willReturn(mockCreated);
 
-        task = new CreateTask(mockToken, mockHandler);
+        task = new CreateTask(mockToken, options, mockHandler);
     }
 
     @Test
     public void shouldUseAdapterForCreate() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).create(any(Connection.class), eq(mockToken));
+        task.execute(mockAdapter);
+        verify(mockAdapter).create(eq(mockToken), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
         doThrow(new LdapOperationFailedException("test"))
-                .when(mockAdapter).create(any(Connection.class), any(Token.class));
-        task.execute(mockConnection, mockAdapter);
+                .when(mockAdapter).create(any(Token.class), eq(options));
+        task.execute(mockAdapter);
         verify(mockHandler).processError(any(CoreTokenException.class));
     }
 
     @Test
     public void shouldUpdateHandlerOnSuccess() throws Exception {
-        task.execute(mockConnection, mockAdapter);
-        verify(mockHandler).processResults(mockToken);
+        task.execute(mockAdapter);
+        verify(mockHandler).processResults(mockCreated);
     }
 }

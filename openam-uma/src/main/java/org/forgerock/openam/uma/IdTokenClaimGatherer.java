@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
@@ -35,11 +35,11 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +57,14 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
     private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
-    private final OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory;
+    private final OAuth2UrisFactory oAuth2UrisFactory;
     private final ClientRegistrationStore clientRegistrationStore;
     private final JwtReconstruction jwtReconstruction;
     private final SigningManager signingManager;
 
     @Inject
     public IdTokenClaimGatherer(OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory,
-            OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, ClientRegistrationStore clientRegistrationStore,
+            OAuth2UrisFactory oAuth2UrisFactory, ClientRegistrationStore clientRegistrationStore,
             JwtReconstruction jwtReconstruction, SigningManager signingManager) {
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
         this.oAuth2UrisFactory = oAuth2UrisFactory;
@@ -79,12 +79,13 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
         try {
             SignedJwt idToken = jwtReconstruction.reconstructJwt(claimToken.asString(), SignedJwt.class);
+            oAuth2Request.setToken(OpenIdConnectToken.class, new OpenIdConnectToken(idToken.getClaimsSet()));
 
             OAuth2ProviderSettings oAuth2ProviderSettings = oauth2ProviderSettingsFactory.get(oAuth2Request);
             OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
             byte[] clientSecret = clientRegistrationStore.get(authorizationApiToken.getClientId(), oAuth2Request)
                     .getClientSecret().getBytes(Utils.CHARSET);
-            KeyPair keyPair = oAuth2ProviderSettings.getServerKeyPair();
+            KeyPair keyPair = oAuth2ProviderSettings.getSigningKeyPair(idToken.getHeader().getAlgorithm());
 
             if (!idToken.getClaimsSet().getIssuer().equals(oAuth2Uris.getIssuer())) {
                 logger.warn("Issuer of id token, {0}, does not match issuer of authorization server, {1}.",

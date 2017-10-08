@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,7 @@
  *
  * $Id: XMLUtils.java,v 1.15 2009/10/19 18:19:20 asyhuang Exp $
  *
- */
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.shared.xml;
 
@@ -581,7 +579,7 @@ public class XMLUtils {
     /**
      * Method to get Values within AttributeValuePair as a java.util.Set
      */
-    public static Set getAttributeValuePair(Node node) {
+    public static Set<String> getAttributeValuePair(Node node) {
         return (getAttributeValuePair(node, true));
     }
 
@@ -590,12 +588,12 @@ public class XMLUtils {
      * If <class>unescape<class> is set to false, xml escaped chars will not
      * be unescaped.
      */
-    public static Set getAttributeValuePair(Node node, boolean unescape) {
+    public static Set<String> getAttributeValuePair(Node node, boolean unescape) {
         if (!node.getNodeName().equals(ATTR_VALUE_PAIR_NODE)) {
             return (null);
         }
 
-        Set retVal = new OrderedSet();
+        Set<String> retVal = new LinkedHashSet<>();
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);

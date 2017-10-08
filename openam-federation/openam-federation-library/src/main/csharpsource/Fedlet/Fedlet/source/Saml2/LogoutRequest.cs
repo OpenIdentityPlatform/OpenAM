@@ -23,11 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * 
  * $Id: LogoutRequest.cs,v 1.2 2010/01/19 18:23:09 ggennaro Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 using System;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -41,7 +44,8 @@ namespace Sun.Identity.Saml2
     /// from an Identity Provider for the hosted Service Provider or generated
     /// by this Service Provider to be sent to a desired Identity Provider.
     /// </summary>
-    public class LogoutRequest
+    [Serializable]
+    public class LogoutRequest : ISerializable
     {
         #region Members
         /// <summary>
@@ -182,6 +186,51 @@ namespace Sun.Identity.Saml2
             {
                 throw new Saml2Exception(Resources.LogoutRequestXmlException, xe);
             }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the LogoutRequest class.
+        /// This method is used by the de-serializer to reconstruct the object.
+        /// </summary>
+        /// <param name="info">The serialized version of the object.</param>
+        /// <param name="context">Describes the source and destination of the serialized stream.</param>
+        public LogoutRequest(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                this.xml = new XmlDocument();
+                this.xml.PreserveWhitespace = true;
+                this.nsMgr = new XmlNamespaceManager(this.xml.NameTable);
+                this.nsMgr.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+                this.nsMgr.AddNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
+                this.nsMgr.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+
+                string sourceXml = info.GetString("LogOutRequestXMLParams");
+                if (!string.IsNullOrEmpty(sourceXml))
+                {
+                    this.xml.LoadXml(sourceXml);
+                }
+            }
+            catch (ArgumentNullException ane)
+            {
+                throw new Saml2Exception(Resources.LogoutRequestNullArgument, ane);
+            }
+            catch (XmlException xe)
+            {
+                throw new Saml2Exception(Resources.LogoutRequestXmlException, xe);
+            }
+        }
+        #endregion
+
+        #region ISerializable Members
+        /// <summary>
+        /// Converts an LogoutRequest object into its serialized form.
+        /// </summary>
+        /// <param name="info">The serialized version of the object.</param>
+        /// <param name="context">Describes the source and destination of the serialized stream.</param>
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("LogOutRequestXMLParams", ((this.xml != null) ? this.xml.OuterXml : (string)null));
         }
         #endregion
 

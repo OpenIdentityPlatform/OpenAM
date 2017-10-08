@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package com.sun.identity.log.service;
 
@@ -31,7 +31,7 @@ final class AgentLogParser {
 
     private enum Extractor {
 
-        WEB_AGENT("^user\\s+(\\S+)\\s*was\\s*(\\S+)\\s*access to\\s*(\\S+)$", 3, 1, 2),
+        WEB_AGENT("^user\\s+(\\S+)\\s+(\\(\\S*\\))?\\s*was\\s*(\\S+)\\s*access to\\s*(\\S+)$", 4, 1, 3),
         JAVA_AGENT("^access to\\s*(\\S+)\\s+(\\S+)\\s*for user\\s*(\\S+)$", 1, 3, 2);
 
         final Pattern pattern;

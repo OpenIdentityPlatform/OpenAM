@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -21,7 +21,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManagementDAO;
-import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.entitlement.indextree.events.ErrorEventType;
 import org.forgerock.openam.entitlement.indextree.events.EventType;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeEvent;

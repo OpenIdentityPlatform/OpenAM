@@ -52,7 +52,8 @@
                     type="list"
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    order="100">
                     <DefaultValues>
                         <Value>instanceID=@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@|siteid=SAML_SITEID|issuerName=@SERVER_HOST@:@SERVER_PORT@</Value>
                     </DefaultValues>
@@ -60,7 +61,8 @@
                 <AttributeSchema name="iplanet-am-saml-signrequest"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    order="200">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -68,7 +70,8 @@
                 <AttributeSchema name="iplanet-am-saml-signresponse"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    order="300">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -76,7 +79,8 @@
                 <AttributeSchema name="iplanet-am-saml-signassertion"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    order="400">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -84,7 +88,8 @@
                 <AttributeSchema name="iplanet-am-saml-artifact-name"
                     type="single"
                     syntax="string"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    order="500">
                     <DefaultValues>
                         <Value>SAMLart</Value>
                     </DefaultValues>
@@ -92,7 +97,8 @@
                 <AttributeSchema name="iplanet-am-saml-target-specifier"
                     type="single"
                     syntax="string"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    order="600">
                     <DefaultValues>
                         <Value>TARGET</Value>
                     </DefaultValues>
@@ -100,7 +106,8 @@
                 <AttributeSchema name="iplanet-am-saml-artifact-timeout"
                     type="single"
                     syntax="number"
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    order="700">
                     <DefaultValues>
                         <Value>400</Value>
                     </DefaultValues>
@@ -108,7 +115,8 @@
                 <AttributeSchema name="iplanet-am-saml-notbefore-timeskew"
                     type="single"
                     syntax="number"
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    order="800">
                     <DefaultValues>
                         <Value>180</Value>
                     </DefaultValues>
@@ -116,7 +124,8 @@
                 <AttributeSchema name="iplanet-am-saml-assertion-timeout"
                     type="single"
                     syntax="number"
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    order="900">
                     <DefaultValues>
                         <Value>420</Value>
                     </DefaultValues>
@@ -141,17 +150,20 @@
                     type="list"
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="a120">
+                    i18nKey="a120"
+                    order="1000">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-saml-post-to-target-urls"
                     type="list"
                     syntax="string"
-                    i18nKey="a121">
+                    i18nKey="a121"
+                    order="1100">
                 </AttributeSchema>
                 <AttributeSchema name="DefaultAssertionVersion"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a122">
+                    i18nKey="a122"
+                    order="1200">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
                         <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
@@ -163,7 +175,8 @@
                 <AttributeSchema name="DefaultProtocolVersion"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a123">
+                    i18nKey="a123"
+                    order="1300">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
                         <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
@@ -175,7 +188,8 @@
                 <AttributeSchema name="RemoveAssertion"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a124">
+                    i18nKey="a124"
+                    order="1400">
                     <DefaultValues>
                         <Value>true</Value>
                     </DefaultValues>
@@ -183,17 +197,20 @@
                 <AttributeSchema name="AttributeListForAttributeQuery"
                     type="list"
                     syntax="string"
-                    i18nKey="a125">
+                    i18nKey="a125"
+                    order="1500">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-saml-name-id-format-attr-map"
                     type="list"
                     syntax="string"
-                    i18nKey="a126">
+                    i18nKey="a126"
+                    order="1600">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-saml-attr-map"
                     type="list"
                     syntax="string"
-                    i18nKey="a127">
+                    i18nKey="a127"
+                    order="1700">
                 </AttributeSchema>
             </Global>
 
@@ -202,13 +219,15 @@
                     type="single"
                     syntax="string"
                     any="adminDisplay"
-                    i18nKey="a130">
+                    i18nKey="a130"
+                    order="1800">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-saml-password"
                     type="single"
                     syntax="encrypted_password"
                     any="adminDisplay"
-                    i18nKey="a131">
+                    i18nKey="a131"
+                    order="1900">
                 </AttributeSchema>
             </User>
         </Schema>

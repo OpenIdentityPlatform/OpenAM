@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper", [
+define([
     "org/forgerock/commons/ui/common/util/URIUtils"
 ], function (URIUtils) {
     return {
@@ -22,7 +22,7 @@ define("org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper", [
          * Extracts from the URI hash fragment and returns realm which is being currently edited by administrator
          * @returns {String} current realm decoded
          */
-        getCurrentRealm: function () {
+        getCurrentRealm () {
             return decodeURIComponent(URIUtils.getCurrentFragment().split("/")[1]);
         }
     };

@@ -37,7 +37,7 @@ public final class GenerationUtils {
      * Minimum version number to be capable of QR encoding the Authenticator App Registration URI's number of
      * characters at {@link ErrorCorrectionLevel} "LOW".
     */
-    private static final int MINIMUM_VERSION_NUMBER_FOR_AUTH_APP = 10;
+    private static final int MINIMUM_VERSION_NUMBER_FOR_AUTH_APP = 20;
 
     private GenerationUtils() {}
 

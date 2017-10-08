@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSLogoutResponse.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
- * Portions Copyrighted 2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.message;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
@@ -84,7 +87,7 @@ public class FSLogoutResponse extends AbstractResponse {
      */
     public FSLogoutResponse() {
         try {
-            setIssueInstant(new Date());
+            setIssueInstant(newDate());
             providerId = new String();
             StatusCode statusCode = new StatusCode(IFSConstants.SAML_SUCCESS);
             status = new Status(statusCode);
@@ -132,7 +135,7 @@ public class FSLogoutResponse extends AbstractResponse {
         this.status = status;
         this.providerId = providerId;
         this.relayState = relayState;
-        setIssueInstant(new Date());
+        setIssueInstant(newDate());
     }
     
     /**

@@ -24,10 +24,7 @@
  *
  * $Id: CreateFedlet.java,v 1.20 2010/01/08 22:41:43 exu Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
@@ -39,7 +36,6 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.encode.Base64;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,83 +54,31 @@ import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.jar.JarOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.collections.PrefixSet;
-import org.forgerock.openam.utils.collections.SimplePrefixSet;
 import org.forgerock.openam.utils.file.ZipUtils;
 
 /**
- * Creates Fedlet.
+ * Creates a Fedlet configuration that can be used in conjunction with the un-configured Fedlet WAR.
  */
 public class CreateFedlet extends Task {
 
-    private static final Map<String, String> fedletBits = new HashMap<>();
     private static final Map<String, String> FedConfigTagSwap = new LinkedHashMap<>();
-    private static final Map<String, PrefixSet> jarExtracts = new HashMap<>();
     private static final String FEDLET_DEFAULT_SHARED_KEY = "JKEK7DosAgR3Aw3Ece20F8qZdXtiMYJ+";
 
-    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\s*,\\s*");
- 
     static {
         FedConfigTagSwap.put("@AM_ENC_PWD@", getRandomString());
-        FedConfigTagSwap.put("@CONFIGURATION_PROVIDER_CLASS@", 
-            "com.sun.identity.plugin.configuration.impl.FedletConfigurationImpl");
-        FedConfigTagSwap.put("@DATASTORE_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.datastore.impl.FedletDataStoreProvider");
-        FedConfigTagSwap.put("@LOG_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.log.impl.FedletLogger");
-        FedConfigTagSwap.put("@SESSION_PROVIDER_CLASS@", 
-            "com.sun.identity.plugin.session.impl.FedletSessionProvider");
-        FedConfigTagSwap.put("@MONAGENT_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.monitoring.impl.FedletAgentProvider");
-        FedConfigTagSwap.put("@MONSAML1_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.monitoring.impl.FedletMonSAML1SvcProvider");
-        FedConfigTagSwap.put("@MONSAML2_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.monitoring.impl.FedletMonSAML2SvcProvider");
-        FedConfigTagSwap.put("@MONIDFF_PROVIDER_CLASS@",
-            "com.sun.identity.plugin.monitoring.impl.FedletMonIDFFSvcProvider");
-        FedConfigTagSwap.put("@XML_SIGNATURE_PROVIDER@",
-            "com.sun.identity.saml.xmlsig.AMSignatureProvider");
-        FedConfigTagSwap.put("@XMLSIG_KEY_PROVIDER@", 
-            "com.sun.identity.saml.xmlsig.JKSKeyProvider");
-        FedConfigTagSwap.put("@PASSWORD_DECODER_CLASS@", 
-            "com.sun.identity.fedlet.FedletEncodeDecode");
         FedConfigTagSwap.put("%BASE_DIR%%SERVER_URI%", "@FEDLET_HOME@");
-        FedConfigTagSwap.put("%BASE_DIR%", "@FEDLET_HOME@"); 
-        FedConfigTagSwap.put("com.sun.identity.common.serverMode=true",
-            "com.sun.identity.common.serverMode=false");
-        FedConfigTagSwap.put("@SERVER_PROTO@", "http");
-        FedConfigTagSwap.put("@SERVER_HOST@", "example.identity.sun.com");
-        FedConfigTagSwap.put("@SERVER_PORT@", "80");
-        FedConfigTagSwap.put("/@SERVER_URI@", "/fedlet");
-
-        ResourceBundle rb = ResourceBundle.getBundle("fedletBits");
-        for (String key : rb.keySet()) {
-            fedletBits.put(key, rb.getString(key));
-        }
-        
-        rb = ResourceBundle.getBundle("fedletJarExtract");
-        for (String jarName : rb.keySet()) {
-            String pkgNames = rb.getString(jarName);
-            PrefixSet set = SimplePrefixSet.of(SPLIT_PATTERN.split(pkgNames));
-            jarExtracts.put(jarName, set);
-        }
-        
+        FedConfigTagSwap.put("%BASE_DIR%", "@FEDLET_HOME@");
     }
     
     /**
@@ -171,10 +115,7 @@ public class CreateFedlet extends Task {
             dir.getParentFile().mkdir();
         }
         dir.mkdir();
-        String warDir = workDir + "/war"; 
-        dir = new File(warDir);
-        dir.mkdir();
-        String confDir = warDir + "/conf";
+        String confDir = workDir + "/conf";
         dir = new File(confDir);
         dir.mkdir();
         
@@ -184,9 +125,7 @@ public class CreateFedlet extends Task {
         
         ServletContext servletCtx = (ServletContext) params.get(ParameterKeys.P_SERVLET_CONTEXT);
         copyBits(servletCtx, workDir);
-        extractJars(servletCtx, warDir);
         createFederationConfigProperties(servletCtx, confDir);
-        createWar(workDir);
 
         String zipFileName = createZip(workDir);
         
@@ -194,51 +133,8 @@ public class CreateFedlet extends Task {
     }
     
     private void copyBits(ServletContext servletCtx, String workDir) throws WorkflowException {
-        String dir = workDir + "/war";
-        new File(dir).mkdir();
-        
+
         copyFile(servletCtx, "/WEB-INF/fedlet/README", workDir + "/README");
-
-        for (Map.Entry<String, String> entry : fedletBits.entrySet()) {
-            String file = entry.getKey();
-            String target = entry.getValue();
-            if (StringUtils.isBlank(target)) {
-                target = file;
-            }
-
-            copyFile(servletCtx, file, dir + "/" + target);
-        }
-    }
-    
-    private void extractJars(ServletContext servletCtx, String workDir) throws WorkflowException {
-        for (final Map.Entry<String, PrefixSet> jarFilter : jarExtracts.entrySet()) {
-            final String fileName = jarFilter.getKey();
-            final PrefixSet pkgNames = jarFilter.getValue();
-
-            if (StringUtils.isEmpty(fileName)) {
-                continue;
-            }
-
-
-            try (JarInputStream jarInputStream = new JarInputStream(servletCtx.getResourceAsStream(fileName));
-                JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(workDir + fileName))) {
-
-                JarEntry entry = jarInputStream.getNextJarEntry();
-
-                while (entry != null) {
-                    if (entry.getSize() != 0) {
-                        String name = entry.getName();
-                        if (pkgNames.containsPrefixOf(name)) {
-                            jarOutputStream.putNextEntry(entry);
-                            IOUtils.copyStream(jarInputStream, jarOutputStream);
-                        }
-                    }
-                    entry = jarInputStream.getNextJarEntry();
-                }
-            } catch (IOException ex) {
-                throw new WorkflowException(ex.getMessage());
-            }
-        }
     }
     
     private void copyFile(ServletContext servletCtx, String source, String dest)
@@ -396,34 +292,6 @@ public class CreateFedlet extends Task {
             }
         }
         return xml;
-    }
-    
-    private void createWar(String workDir) throws WorkflowException {
-        String warDir = workDir + "/war";
-        int lenWorkDir = warDir.length() + 1;
-        String jarName = workDir + "/fedlet.war";
-
-        try (JarOutputStream out = new JarOutputStream(new FileOutputStream(jarName))) {
-            List<String> files = getAllFiles(warDir, true);
-
-            for (final String fname : files) {
-                try (FileInputStream in = new FileInputStream(fname)) {
-                    String jarEntryName = fname.substring(lenWorkDir);
-                    // use forward slash in jar path to avoid windows issue
-                    if (File.separatorChar == '\\') {
-                        jarEntryName = jarEntryName.replace('\\', '/');
-                    }
-                    out.putNextEntry(new JarEntry(jarEntryName));
-                    IOUtils.copyStream(in, out);
-                    out.closeEntry();
-                }
-            }
-
-            deleteAllFiles(warDir, files);
-            (new File(warDir)).delete();
-        } catch (IOException e) {
-            throw new WorkflowException(e.getMessage());
-        }
     }
     
     private String createZip(String workDir) throws WorkflowException {

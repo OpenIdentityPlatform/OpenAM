@@ -49,6 +49,7 @@
                     type="single_choice"
                     syntax="string"
                     i18nKey="a101"
+                    order="100"
                     resourceName="backendModuleName">
                     <ChoiceValues>
                         <ChoiceValuesClassName
@@ -60,6 +61,7 @@
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                     i18nKey="a102"
+                    order="200"
                     resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
@@ -70,6 +72,7 @@
                         type="single_choice"
                         syntax="string"
                         i18nKey="a101"
+                        order="100"
                         resourceName="backendModuleName">
                         <ChoiceValues>
                         <ChoiceValuesClassName
@@ -81,6 +84,7 @@
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                         i18nKey="a102"
+                        order="200"
                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>

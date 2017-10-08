@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright 2016 ForgeRock AS
+-->
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>API Explorer</title>
+    <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16" />
+    <link href="css/typography.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="css/reset.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="css/screen.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="css/reset.css" media="print" rel="stylesheet" type="text/css"/>
+    <link href="css/print.css" media="print" rel="stylesheet" type="text/css"/>
+
+    <script src="lib/object-assign-pollyfill.js" type="text/javascript"></script>
+    <script src="lib/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.slideto.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.wiggle.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.ba-bbq.min.js" type="text/javascript"></script>
+    <script src="lib/handlebars-4.0.5.js" type="text/javascript"></script>
+    <script src="lib/lodash.min.js" type="text/javascript"></script>
+    <script src="lib/backbone-min.js" type="text/javascript"></script>
+    <script src="swagger-ui.js" type="text/javascript"></script>
+    <script src="lib/highlight.9.1.0.pack.js" type="text/javascript"></script>
+    <script src="lib/highlight.9.1.0.pack_extended.js" type="text/javascript"></script>
+    <script src="lib/jsoneditor.min.js" type="text/javascript"></script>
+    <script src="lib/marked.js" type="text/javascript"></script>
+    <script src="lib/swagger-oauth.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var path = window.location.pathname.replace(new RegExp("^/|/$", "g"), "").split("/");
+            path.splice(-1);
+            var joinedPath = path.join("/");
+
+            var url = window.location.search.match(/url=([^&]+)/);
+            if (url && url.length > 1) {
+                url = decodeURIComponent(url[1]);
+            } else {
+                url = "/" + joinedPath + "/json?_api";
+            }
+
+            var getCookie = function (c_name) {
+                var i, x, y, cookies = document.cookie.split(";");
+                for (i = 0; i < cookies.length; i++) {
+                    x = cookies[i].substr(0, cookies[i].indexOf("="));
+                    y = cookies[i].substr(cookies[i].indexOf("=") + 1);
+                    x = x.replace(/^\s+|\s+$/g, "");
+                    if (x === c_name) {
+                        return unescape(y);
+                    }
+                }
+            };
+
+            window.swaggerUi = new SwaggerUi({
+                url: url,
+                validatorUrl : null,
+                dom_id: "swagger-ui-div",
+                defaultModelRendering: 'schema',
+                supportedSubmitMethods: ['get', 'delete', 'patch', 'post', 'put'],
+                docExpansion: "list",
+                onComplete: function (swaggerApi, swaggerUi) {
+                    $('pre code').each(function (i, e) {
+                        hljs.highlightBlock(e)
+                    });
+
+                    var cookieValue = getCookie("iPlanetDirectoryPro");
+
+                    window.swaggerUi.api.clientAuthorizations.add("iPlanetDirectoryPro",
+                            new SwaggerClient.ApiKeyAuthorization("iPlanetDirectoryPro", cookieValue, "header"));
+                }
+            });
+
+            window.swaggerUi.load();
+        });
+    </script>
+</head>
+<body class="swagger-section">
+<div id="swagger-ui-div" class="swagger-ui-wrap" style="margin-left: 0px; min-width: 0px">
+</div>
+</body>
+</html>

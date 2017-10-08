@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl;
@@ -19,7 +19,7 @@ package org.forgerock.openam.sm.datalayer.impl;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapterFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;

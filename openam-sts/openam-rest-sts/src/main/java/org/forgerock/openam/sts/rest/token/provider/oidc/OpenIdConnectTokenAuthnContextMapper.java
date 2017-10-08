@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.provider.oidc;
@@ -27,6 +27,8 @@ import org.forgerock.openam.sts.TokenTypeId;
  * can implement this interface with a classpath-resident class, and specify the name of this class in the OpenIdConnectTokenConfig
  * state associated with the published sts, and that class will be consulted to provide the value of the acr claim corresponding
  * to the input token state.
+ *
+ * @supported.all.api
  */
 public interface OpenIdConnectTokenAuthnContextMapper {
     /**

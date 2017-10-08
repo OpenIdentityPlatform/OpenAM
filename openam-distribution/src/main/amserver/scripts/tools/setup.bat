@@ -26,7 +26,7 @@
 : $Id: setup.bat,v 1.13 2009/01/28 05:34:46 ww203982 Exp $
 :
 
-: Portions Copyrighted 2013-2015 ForgeRock AS.
+: Portions Copyrighted 2013-2016 ForgeRock AS.
 set TOOLS_HOME="."
 
 if not "%JAVA_HOME%" == "" goto checkJavaHome
@@ -114,4 +114,4 @@ set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%\resources"
 ENDLOCAL
 
 :exit
-exit /b 1
+exit /b

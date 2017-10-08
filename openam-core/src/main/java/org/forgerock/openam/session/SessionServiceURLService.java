@@ -1,32 +1,48 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.session;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Singleton;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.service.ServicesClusterMonitorHandler;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNaming;
-import org.forgerock.guice.core.InjectorHolder;
-
-import javax.inject.Singleton;
-import java.net.URL;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ClientSDK: This code is ClientSDK aware and will only use the Server SessionService
@@ -120,14 +136,10 @@ public class SessionServiceURLService {
              */
             sid.validate();
 
-            SessionService ss = InjectorHolder.getInstance(SessionService.class);
-            if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
-                if (ss.isSessionFailoverEnabled()) {
-                    return getSessionServiceURL(ss.getCurrentHostServer(sid));
-                } else {
-                    primaryId = sid.getExtension().getPrimaryID();
-                    return getSessionServiceURL(primaryId);
-                }
+            SessionServerConfig sessionServerConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+            ServicesClusterMonitorHandler servicesClusterMonitorHandler = InjectorHolder.getInstance(ServicesClusterMonitorHandler.class);
+            if (sessionServerConfig.isSiteEnabled() && sessionServerConfig.isLocalSite(sid)) {
+                return getSessionServiceURL(servicesClusterMonitorHandler.getCurrentHostServer(sid));
             }
         } else {
             primaryId = sid.getExtension().getPrimaryID();

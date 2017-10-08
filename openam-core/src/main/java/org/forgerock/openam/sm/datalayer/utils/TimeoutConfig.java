@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
+
 package org.forgerock.openam.sm.datalayer.utils;
 
 import com.iplanet.am.util.SystemProperties;
@@ -39,8 +40,10 @@ public class TimeoutConfig {
         switch (type) {
             case CTS_ASYNC:
                 return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_ASYNC_TIMEOUT, 10);
-            case CTS_REAPER:
-                return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_REAPER_TIMEOUT, NO_TIMEOUT);
+            case CTS_EXPIRY_DATE_WORKER:
+            case CTS_MAX_SESSION_TIMEOUT_WORKER:
+            case CTS_SESSION_IDLE_TIMEOUT_WORKER:
+                return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_WORKER_TIMEOUT, NO_TIMEOUT);
             case DATA_LAYER:
                 return SystemProperties.getAsInt(DataLayerConstants.DATA_LAYER_TIMEOUT, 10);
             case RESOURCE_SETS:

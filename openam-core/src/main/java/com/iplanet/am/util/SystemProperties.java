@@ -26,17 +26,8 @@
  */
 package com.iplanet.am.util;
 
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.AttributeStruct;
-import com.sun.identity.common.PropertiesFinder;
-import com.sun.identity.common.configuration.ConfigurationListener;
-import com.sun.identity.common.configuration.ConfigurationObserver;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.SMSEntry;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,13 +44,23 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.annotation.Nullable;
 
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guava.common.collect.ImmutableMap;
 import org.forgerock.guava.common.collect.Maps;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.utils.StringUtils;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.AttributeStruct;
+import com.sun.identity.common.PropertiesFinder;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * This class provides functionality that allows single-point-of-access to all
@@ -124,8 +125,6 @@ public class SystemProperties {
             .put("%SERVER_HOST%", Constants.AM_SERVER_HOST)
             .put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL)
             .put("%BASE_DIR%", CONFIG_PATH)
-            .put("%SESSION_ROOT_SUFFIX%", CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX)
-            .put("%SESSION_STORE_TYPE%", CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE)
             .build();
 
     private static final boolean SITEMONITOR_DISABLED;
@@ -749,7 +748,7 @@ public class SystemProperties {
         PropertiesHolder() {
             this.properties = Collections.emptyMap();
             this.tagSwapValues = Collections.emptyMap();
-            this.lastModified = System.currentTimeMillis();
+            this.lastModified = currentTimeMillis();
         }
 
         PropertiesHolder(final Map<String, String> properties) {
@@ -765,7 +764,7 @@ public class SystemProperties {
             }
             this.properties = Collections.unmodifiableMap(properties);
             this.tagSwapValues = Collections.unmodifiableMap(tagSwapMap);
-            this.lastModified = System.currentTimeMillis();
+            this.lastModified = currentTimeMillis();
         }
 
         String getProperty(String name) {

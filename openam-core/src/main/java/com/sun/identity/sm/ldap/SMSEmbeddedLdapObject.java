@@ -24,9 +24,49 @@
 *
 * $Id: SMSEmbeddedLdapObject.java,v 1.3 2009/10/28 04:24:27 hengming Exp $
 *
-* Portions Copyrighted 2011-2015 ForgeRock AS.
+* Portions Copyrighted 2011-2016 ForgeRock AS.
 */
 package com.sun.identity.sm.ldap;
+
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.auditors.SMSAuditor;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.opends.server.core.AddOperation;
+import org.opends.server.core.DeleteOperation;
+import org.opends.server.core.ModifyOperation;
+import org.opends.server.protocols.internal.InternalClientConnection;
+import org.opends.server.protocols.internal.InternalSearchOperation;
+import org.opends.server.protocols.internal.Requests;
+import org.opends.server.protocols.internal.SearchRequest;
+import org.opends.server.protocols.ldap.LDAPAttribute;
+import org.opends.server.types.DirectoryException;
+import org.opends.server.types.SearchFilter;
+import org.opends.server.types.SearchResultEntry;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,44 +81,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSNotificationManager;
 import com.sun.identity.sm.SMSObjectDB;
 import com.sun.identity.sm.SMSObjectListener;
-
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.auditors.SMSAuditor;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.opendj.ldap.DN;
-import org.forgerock.opendj.ldap.ModificationType;
-import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SearchScope;
-import org.opends.server.core.AddOperation;
-import org.opends.server.core.DeleteOperation;
-import org.opends.server.core.ModifyOperation;
-import org.opends.server.protocols.internal.InternalClientConnection;
-import org.opends.server.protocols.internal.InternalSearchOperation;
-import org.opends.server.protocols.internal.Requests;
-import org.opends.server.protocols.internal.SearchRequest;
-import org.opends.server.protocols.ldap.LDAPAttribute;
-import org.opends.server.protocols.ldap.LDAPModification;
-import org.opends.server.types.DirectoryException;
-import org.opends.server.types.SearchResultEntry;
 /**
  * This object represents an LDAP entry in the directory server. The UMS have an
  * equivalent class called PersistentObject. The SMS could not integrate with
@@ -216,46 +218,38 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
             return (null);
         }
 
-        try {
-            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.BASE_OBJECT, "(objectclass=*)",
-                    smsAttributes.toArray(new String[smsAttributes.size()]));
-            InternalSearchOperation iso = icConn.processSearch(request);
-            ResultCode resultCode = iso.getResultCode();
+        SearchRequest request = Requests.newSearchRequest(DN.valueOf(dn), SearchScope.BASE_OBJECT,
+                SearchFilter.objectClassPresent(), smsAttributes.toArray(new String[smsAttributes.size()]));
+        InternalSearchOperation iso = icConn.processSearch(request);
+        ResultCode resultCode = iso.getResultCode();
 
-            if (resultCode == ResultCode.SUCCESS) {
-                LinkedList searchResult = iso.getSearchEntries();
-                if (!searchResult.isEmpty()) {
-                    SearchResultEntry entry =
-                        (SearchResultEntry)searchResult.get(0);
-                    List attributes = entry.getAttributes();
+        if (resultCode == ResultCode.SUCCESS) {
+            LinkedList searchResult = iso.getSearchEntries();
+            if (!searchResult.isEmpty()) {
+                SearchResultEntry entry =
+                    (SearchResultEntry)searchResult.get(0);
+                List attributes = entry.getAttributes();
 
-                    return EmbeddedSearchResultIterator.
-                        convertLDAPAttributeSetToMap(attributes);
-                } else {
-                    return null;
-                }
-            } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
-                // Add to not present Set
-                objectChanged(dn, DELETE);
-                if (debug.messageEnabled()) {
-                    debug.message("SMSEmbeddedLdapObject.read: " +
-                        "entry not present:"+ dn);
-                }
-                return null;
+                return EmbeddedSearchResultIterator.
+                    convertLDAPAttributeSetToMap(attributes);
             } else {
-                if (debug.warningEnabled()) {
-                    debug.warning("SMSEmbeddedLdapObject.read: " +
-                       "Error in accessing entry DN: " + dn +
-                       ", error code = " + resultCode);
-                }
-                throw new SMSException("", "sms-entry-cannot-access");
+                return null;
             }
-        } catch (DirectoryException dex) {
+        } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
+            // Add to not present Set
+            objectChanged(dn, DELETE);
+            if (debug.messageEnabled()) {
+                debug.message("SMSEmbeddedLdapObject.read: " +
+                    "entry not present:"+ dn);
+            }
+            return null;
+        } else {
             if (debug.warningEnabled()) {
                 debug.warning("SMSEmbeddedLdapObject.read: " +
-                   "Error in accessing entry DN: " + dn, dex);
+                   "Error in accessing entry DN: " + dn +
+                   ", error code = " + resultCode);
             }
-            throw new SMSException(dex, "sms-entry-cannot-access");
+            throw new SMSException("", "sms-entry-cannot-access");
         }
     }
 
@@ -308,8 +302,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     public void modify(SSOToken token, String dn, ModificationItem mods[])
         throws SMSException, SSOException {
         SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
-        List modList = copyModItemsToLDAPModList(mods);
-        ModifyOperation mo = icConn.processModify(dn, modList);
+        ModifyRequest request = org.forgerock.opendj.ldap.requests.Requests.newModifyRequest(dn);
+        copyModItemsToLDAPModifyRequest(mods, request);
+        ModifyOperation mo = icConn.processModify(request);
         ResultCode resultCode = mo.getResultCode();
         if (resultCode == ResultCode.SUCCESS) {
             if (debug.messageEnabled()) {
@@ -409,8 +404,8 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         // sorting is not implemented
         // Get the sub entries
         try {
-            SearchRequest request = Requests.newSearchRequest(dn, SearchScope.SINGLE_LEVEL, filter,
-                    orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
+            SearchRequest request = Requests.newSearchRequest(DN.valueOf(dn), SearchScope.SINGLE_LEVEL,
+                    SearchFilter.createFilterFromString(filter), orgUnitAttr.toArray(new String[orgUnitAttr.size()]));
             InternalSearchOperation iso = icConn.processSearch(request);
 
             ResultCode resultCode = iso.getResultCode();
@@ -442,8 +437,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                 if (!edn.toLowerCase().startsWith("ou=")) {
                     continue;
                 }
-                String rdn = entry.getName().getRDN(0).getAttributeValue(0)
-                    .toString();
+                String rdn = entry.getName().rdn().getFirstAVA().getAttributeValue().toString();
                 answer.add(rdn);
             }
             if (debug.messageEnabled()) {
@@ -451,7 +445,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                     "Successfully obtained sub-entries for : " + dn);
             }
             return answer;
-        } catch (DirectoryException dex) {
+        } catch (DirectoryException | IllegalArgumentException dex) {
             if (debug.warningEnabled()) {
                 debug.warning("SMSEmbeddedLdapObject.getSubEntries: " +
                     "Unable to search for " + "sub-entries: " + dn, dex);
@@ -693,22 +687,19 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         return attrList;
     }
 
-    // Method to covert JNDI ModificationItems to LDAPModificationSet
-    private static List copyModItemsToLDAPModList(
-        ModificationItem mods[]) throws SMSException {
+    // Method to covert JNDI ModificationItems to LDAP ModifyRequest
+    private static void copyModItemsToLDAPModifyRequest(ModificationItem mods[], ModifyRequest modifyRequest)
+            throws SMSException {
 
         if ((mods == null) || (mods.length == 0)) {
-            return null;
+            return;
         }
-        List<LDAPModification> modList = new ArrayList<>(mods.length);
         try {
             for (ModificationItem mod : mods) {
                 Attribute dAttr = mod.getAttribute();
                 String attrName = dAttr.getID();
-                List<String> values = new ArrayList<>();
-                for (NamingEnumeration ne = dAttr.getAll(); ne.hasMore(); ) {
-                    values.add((String) ne.next());
-                }
+                @SuppressWarnings("unchecked")
+                List<String> values = Collections.list((Enumeration<String>) dAttr.getAll());
                 ModificationType modType = null;
                 switch (mod.getModificationOp()) {
                     case DirContext.ADD_ATTRIBUTE:
@@ -722,14 +713,12 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
                         break;
                 }
                 if (modType != null) {
-                    modList.add(new LDAPModification(modType, new LDAPAttribute(attrName, values)));
+                    modifyRequest.addModification(modType, attrName, values.toArray());
                 }
             }
         } catch (NamingException nne) {
-            throw (new SMSException(nne,
-                "sms-cannot-copy-fromModItemToModSet"));
+            throw new SMSException(nne, "sms-cannot-copy-fromModItemToModSet");
         }
-        return (modList);
     }
 
     public void objectChanged(String dn, int type) {

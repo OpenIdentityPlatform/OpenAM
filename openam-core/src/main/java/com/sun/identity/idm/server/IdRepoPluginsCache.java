@@ -1,33 +1,48 @@
-/**
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-*
-* Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
-*
-* The contents of this file are subject to the terms
-* of the Common Development and Distribution License
-* (the License). You may not use this file except in
-* compliance with the License.
-*
-* You can obtain a copy of the License at
-* https://opensso.dev.java.net/public/CDDLv1.0.html or
-* opensso/legal/CDDLv1.0.txt
-* See the License for the specific language governing
-* permission and limitations under the License.
-*
-* When distributing Covered Code, include this CDDL
-* Header Notice in each file and include the License file
-* at opensso/legal/CDDLv1.0.txt.
-* If applicable, add the following below the CDDL Header,
-* with the fields enclosed by brackets [] replaced by
-* your own identifying information:
-* "Portions Copyrighted [year] [name of copyright owner]"
-*
-* $Id: IdRepoPluginsCache.java,v 1.8 2009/11/10 01:52:37 hengming Exp $
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: IdRepoPluginsCache.java,v 1.8 2009/11/10 01:52:37 hengming Exp $
+ *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.idm.server;
+
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -53,15 +68,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  *
@@ -79,16 +85,23 @@ public class IdRepoPluginsCache implements ServiceListener {
     private Map idrepoPlugins = new HashMap();
     // Needs to synchronized for get(), put() and clear()
     private Map readonlyPlugins = new Hashtable();
+
+    private final ScheduledExecutorService scheduler;
     
     protected IdRepoPluginsCache() {
         // Initialize listeners
         if (debug.messageEnabled()) {
             debug.message("IdRepoPluginsCache constructor called");
         }
+
+        this.scheduler = InjectorHolder.getInstance(AMExecutorServiceFactory.class)
+                .createScheduledService(1, "IdRepoPlugin");
+
         initializeListeners();
     }
-    
-    protected Set getIdRepoPlugins(String orgName)
+
+    @SuppressWarnings("unchecked")
+    protected Set<IdRepo> getIdRepoPlugins(String orgName)
         throws IdRepoException, SSOException {
         if (debug.messageEnabled()) {
             debug.message("IdRepoPluginsCache.getIdRepoPlugins orgName: " +
@@ -168,8 +181,9 @@ public class IdRepoPluginsCache implements ServiceListener {
         }
         return (readOrgRepos);
     }
-    
-    protected Set getIdRepoPlugins(String orgName, IdOperation op,
+
+    @SuppressWarnings("unchecked")
+    protected Set<IdRepo> getIdRepoPlugins(String orgName, IdOperation op,
         IdType type) throws IdRepoException, SSOException {
         if (debug.messageEnabled()) {
             debug.message("IdRepoPluginsCache.getIdRepoPlugins for " +
@@ -286,7 +300,7 @@ public class IdRepoPluginsCache implements ServiceListener {
         ShutdownIdRepoPlugin shutdownrepos = new ShutdownIdRepoPlugin(idrepos);
         // Provide a delay of 500ms for existing operations
         // to complete. the delay is in the forked thread.
-        SMSThreadPool.scheduleTask(shutdownrepos);
+        scheduler.schedule(shutdownrepos, 500, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -689,15 +703,6 @@ public class IdRepoPluginsCache implements ServiceListener {
 
         public void run() {
             // Shutdown the repo
-            try {
-                // Provide a delay of 500ms for caller operations
-                // to complete
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                if (debug.messageEnabled()) {
-                   debug.message("IdRepoPluginsCache.ShutdownIdRepoPlugin: " + e );
-                }
-            }
             if (plugin != null) {
                 plugin.removeListener();
                 plugin.shutdown();

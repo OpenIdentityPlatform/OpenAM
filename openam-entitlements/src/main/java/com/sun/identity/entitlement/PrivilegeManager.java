@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,23 @@
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.newDate;
 
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -42,14 +51,8 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
@@ -77,12 +80,6 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      * @return instance of configured <code>PrivilegeManager</code>
      */
     static public PrivilegeManager getInstance(String realm, Subject subject) {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(subject, realm);
-        if (!ec.migratedToEntitlementService()) {
-            throw new UnsupportedOperationException(
-                "Updating of DITs is required before using the entitlement service");
-        }
-
         try {
             final Class<? extends PrivilegeManager> clazz = Class
                     .forName("com.sun.identity.entitlement.opensso.PolicyPrivilegeManager")
@@ -214,7 +211,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     @Override
     public void add(Privilege privilege) throws EntitlementException {
         validate(privilege);
-        Date date = new Date();
+        Date date = newDate();
         privilege.setCreationDate(date.getTime());
         privilege.setLastModifiedDate(date.getTime());
 
@@ -349,6 +346,19 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     public abstract List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException;
 
     /**
+     * Finds all policies based on the identity uid, whether user or group uid.
+     *
+     * @param uid
+     *         identity uid
+     *
+     * @return list of matching policies else an empty list
+     *
+     * @throws EntitlementException
+     *         should some query error occur
+     */
+    public abstract List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException;
+
+    /**
      * Returns realm name.
      *
      * @return realm name.
@@ -357,51 +367,12 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         return realm;
     }
 
-    /**
-     * Returns the XML representation of this privilege.
-     *
-     * @param name Name of Privilege.
-     * @return XML representation of this privilege.
-     * @throws EntitlementException if privilege is not found, or cannot
-     * be obtained.
-     */
-    public abstract String getPrivilegeXML(String name) throws EntitlementException;
-
-    /**
-     * Returns the XML representation of this privilege.
-     *
-     * @param names Name of Privileges to export as XML.
-     * @return XML representation of the specified privileges
-     * @throws EntitlementException if a specified privilege is not found, or cannot
-     * be obtained.
-     */
-    public abstract String getPrivilegesXML(Set<String> names) throws EntitlementException;
-
     protected Subject getAdminSubject() {
         return adminSubject;
     }
 
-    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current)
-            throws EntitlementException {
-
-        Set<String> resourceNames = new HashSet<String>();
-        if (previous != null) {
-            Set<String> r = previous.getEntitlement().getResourceNames();
-            if (r != null) {
-                resourceNames.addAll(r);
-            }
-        }
-
-        Set<String> r = current.getEntitlement().getResourceNames();
-        if (r != null) {
-            resourceNames.addAll(r);
-        }
-
-        String applicationName = current.getEntitlement().getApplicationName();
-
-        PrivilegeChangeNotifier.getInstance().notify(adminSubject, realm,
-            applicationName, current.getName(), resourceNames);
-    }
+    protected abstract void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current,
+            PolicyEventType eventType) throws EntitlementException;
 
     public static boolean isNameValid(String target) {
         return PRIVILEGE_NAME_PATTERN.matcher(target).matches();

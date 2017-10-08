@@ -24,10 +24,26 @@
  *
  * $Id: SessionID.java,v 1.10 2009/10/02 23:45:42 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.utils.PerThreadCache;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionServerConfig;
@@ -39,24 +55,12 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
-import org.forgerock.openam.utils.PerThreadCache;
-import org.forgerock.openam.utils.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.util.Map;
 
 /**
  * The <code>SessionID</code> class is used to identify a Session object. It
  * contains a random String and the name of the session server. The random
  * String in the Session ID is unique on a given session server.
- * 
+ *
  * @see com.iplanet.dpro.session.Session
  */
 
@@ -95,7 +99,7 @@ public class SessionID implements Serializable {
                     try {
                         try {
                             return SecureRandom.getInstance("SHA1PRNG", "SUN");
-                        } catch (NoSuchProviderException e) {
+                        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
                             return SecureRandom.getInstance("SHA1PRNG");
                         }
                     } catch (Exception e) {
@@ -108,7 +112,7 @@ public class SessionID implements Serializable {
      * Constructs a <code>SessionID</code> object based on a
      * <code>HttpServletRequest</code> object. but if cookie is not found it
      * checks the URL for session ID.
-     * 
+     *
      * @param request <code>HttpServletRequest</code> object which contains
      *        the encrypted session string.
      */
@@ -123,12 +127,12 @@ public class SessionID implements Serializable {
             // check if this is a forward from authentication service case.
             // if yes, find Session ID in the request URL first, otherwise
             // find Session ID in the cookie first
-            String isForward = (String) 
+            String isForward = (String)
                 request.getAttribute(Constants.FORWARD_PARAM);
             if (debug.messageEnabled()) {
                 debug.message("SessionID(HttpServletRequest) : is forward = "
-                    + isForward); 
-            } 
+                    + isForward);
+            }
             if ((isForward != null) &&
                 isForward.equals(Constants.FORWARD_YES_VALUE)) {
                 String realReqSid = SessionEncodeURL.getSidFromURL(request);
@@ -171,7 +175,7 @@ public class SessionID implements Serializable {
 
     /**
      * Constructs a <code>SessionID</code> object based on a Session ID.
-     * 
+     *
      * @param sid The session ID String in an encrypted format.
      */
     public SessionID(String sid) {
@@ -181,7 +185,7 @@ public class SessionID implements Serializable {
 
     /**
      * Checks if encrypted string is null or empty
-     * 
+     *
      * @return true if encrypted string is null or empty.
      */
     public boolean isNull() {
@@ -190,7 +194,7 @@ public class SessionID implements Serializable {
 
     /**
      * Utility method to check if argument is null or empty string
-     * 
+     *
      * @param s string to check
      * @return true if <code>s</code> is null or empty.
      */
@@ -250,7 +254,7 @@ public class SessionID implements Serializable {
 
      /**
      * Returns the session server name in this object.
-     * 
+     *
      * @return The session server protocol in this object.
      */
     public String getSessionServerProtocol() {
@@ -262,7 +266,7 @@ public class SessionID implements Serializable {
 
     /**
      * Gets the session server port in this object
-     * 
+     *
      * @return The session server port in this object.
      */
     public String getSessionServerPort() {
@@ -274,7 +278,7 @@ public class SessionID implements Serializable {
 
     /**
      * Gets the session server name in this object.
-     * 
+     *
      * @return The session server name in this object.
      */
     public String getSessionServer() {
@@ -286,7 +290,7 @@ public class SessionID implements Serializable {
 
     /**
      * Gets the domain where this session belongs to.
-     * 
+     *
      * @return The session domain name.
      */
     public String getSessionDomain() {
@@ -295,7 +299,7 @@ public class SessionID implements Serializable {
 
     /**
      * Gets the session server id in this object.
-     * 
+     *
      * @return The session server id in this object.
      */
     public String getSessionServerID() {
@@ -308,7 +312,7 @@ public class SessionID implements Serializable {
     /**
      * Returns the encrypted session string. By doing so it also makes it possible to use this string representation
      * for serializing/deserializing SessionID objects for session failover.
-     * 
+     *
      * @return An encrypted session string.
      * @see org.forgerock.openam.cts.utils.JSONSerialisation
      */
@@ -320,7 +324,7 @@ public class SessionID implements Serializable {
      * Compares this Session ID to the specified object. The result is true if
      * and only if the argument is not null and the random string and server
      * name are the same in both objects.
-     * 
+     *
      * @param object the object to compare this Session ID against.
      * @return true if the Session ID are equal; false otherwise.
      */
@@ -334,7 +338,7 @@ public class SessionID implements Serializable {
 
     /**
      * Returns a hash code for this object.
-     * 
+     *
      * @return a hash code value for this object.
      */
     public int hashCode() {
@@ -344,7 +348,7 @@ public class SessionID implements Serializable {
 
     /**
      * Extracts the  server, protocol, port, extensions and tail from Session ID
-     * 
+     *
      */
     private void parseSessionString() {
         // parse only once
@@ -395,8 +399,8 @@ public class SessionID implements Serializable {
             }
 
         } catch (Exception e) {
-            debug.error("Invalid sessionid format:["+serverID+"]", e);
-            throw new IllegalArgumentException("Invalid sessionid format:["+serverID+"]" + e);
+            debug.error("Invalid sessionid format:[" + encryptedString + "]", e);
+            throw new IllegalArgumentException("Invalid sessionid format:[" + encryptedString + "]" + e);
         }
         isParsed = true;
     }
@@ -429,7 +433,7 @@ public class SessionID implements Serializable {
 
     /**
      * Returns tail part of session id
-     * 
+     *
      * @return An opaque tail part of session id
      */
     public String getTail() {
@@ -439,8 +443,8 @@ public class SessionID implements Serializable {
 
     /**
      * Returns the if the cookies are supported.
-     * 
-     * @return Boolean object value which is Boolean.<code>TRUE<code> if 
+     *
+     * @return Boolean object value which is Boolean.<code>TRUE<code> if
      *         supported <code>FALSE</code> otherwise
      */
     public Boolean getCookieMode() {
@@ -450,11 +454,11 @@ public class SessionID implements Serializable {
     /**
      * Retrieves extension value by name Currently used session id extensions
      * are
-     * 
+     *
      * <code>SessionService.SITE_ID</code> server id (from platform server list)
      * hosting this session (in failover mode this will be server id of the
      * load balancer)
-     * 
+     *
      * <code>SessionService.PRIMARY_ID</code>,
      * <code>SessionService.SECONDARY_ID</code> used if internal request
      * routing mode is enabled.
@@ -468,7 +472,7 @@ public class SessionID implements Serializable {
     /**
      * Generates properly encoded session id string given the encrypted ID,
      * extension map and tail part
-     * 
+     *
      * @param encryptedID encrypted part of session ID.
      * @param extensions map of session ID extensions.
      * @param tail tail part of session ID (currently used to carry associated
@@ -528,7 +532,7 @@ public class SessionID implements Serializable {
 
     /**
      * Checks whether session id needs to be c66 encoded to convert to cookie
-     * value. 
+     * value.
      * @return <code>true</code> if session id needs to be c66 encoded to
      * convert to cookie value. Otherwise returns <code>false</code>.
      * c66 encoding is opensso specific url safe char66 encoding.
@@ -538,23 +542,23 @@ public class SessionID implements Serializable {
      */
     private static boolean c66EncodeCookie() {
         return Boolean.valueOf(
-                SystemProperties.get(Constants.C66_ENCODE_AM_COOKIE, 
+                SystemProperties.get(Constants.C66_ENCODE_AM_COOKIE,
                 "false")).booleanValue();
     }
 
-    /** 
+    /**
      * Converts native session id  string to opensso specific url safe char66
      * encoded string.
-     * This is not a general purpose utility. 
+     * This is not a general purpose utility.
      * This is meant only for internal use
      *
      * @param sidString plain text string
      * @return url safe modifed char66 encoded string
      *
      * @see #c66DecodeCookieString(String)
-     * 
+     *
      * Sample session id string:
-     * AQIC5wM2LY4SfcxPEcjVKCEI7QdmYvlOZvKZpdEErxVPvx8=@AAJTSQACMDE=# 
+     * AQIC5wM2LY4SfcxPEcjVKCEI7QdmYvlOZvKZpdEErxVPvx8=@AAJTSQACMDE=#
      *
      * We would replace
      * + with -
@@ -564,7 +568,7 @@ public class SessionID implements Serializable {
      * # with star
      *
      * while reconstucting the original cookie value first occurence of
-     * star would be replaced with @ and the subsequent occurunce star would 
+     * star would be replaced with @ and the subsequent occurunce star would
      * be replaced with #
      */
     private static String c66EncodeSidString(String sidString) {
@@ -589,14 +593,14 @@ public class SessionID implements Serializable {
                 chars[i] = c;
             }
         }
-        return new String(chars); 
+        return new String(chars);
     }
 
 
-    /** 
+    /**
      * Converts opensso specific url safe char66
      * encoded string to native session id  string.
-     * This is not a general purpose utility. 
+     * This is not a general purpose utility.
      * This is meant only for internal use
      *
      * @param urlEncodedString  opensso specific url safe char66 encoded string
@@ -637,7 +641,7 @@ public class SessionID implements Serializable {
                 chars[i] = c;
             }
         }
-        return new String(chars); 
+        return new String(chars);
     }
 
 
@@ -693,39 +697,60 @@ public class SessionID implements Serializable {
      *
      * @param serverConfig Required server configuration
      * @param domain session domain
-     * @param jwt The JWT to encode as part of Stateless Sessions.
-     *            
+     *
      * @return newly generated session id
      * @throws SessionException
      */
-    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain, String jwt) throws SessionException {
+    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain) throws SessionException {
 
-        SessionID sid;
         String encryptedID = generateEncryptedID(serverConfig);
 
         String siteID = serverConfig.getPrimaryServerID();
+        String primaryID = getPrimaryId(serverConfig);
+        // AME-129, always set a Storage Key regardless of persisting or not.
+        String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());
+        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, storageKey);
+
+        String sessionID = SessionID.makeSessionID(encryptedID, ext, null);
+
+        return new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
+    }
+
+    /**
+     * Generates a new stateless session ID.
+     *
+     * @param serverConfig Required server configuration.
+     * @param domain session domain.
+     * @param jwt the stateless session JWT.
+     * @return the stateless session ID.
+     * @throws SessionException if an error occurs encoding the session ID.
+     */
+    public static SessionID generateStatelessSessionID(SessionServerConfig serverConfig, String domain, String jwt)
+            throws SessionException {
+        Reject.ifNull(jwt);
+
+        String siteID = serverConfig.getPrimaryServerID();
+        String primaryID = getPrimaryId(serverConfig);
+        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, null);
+
+        final String sessionId = makeSessionID("", ext, jwt);
+
+        return new SessionID(sessionId, serverConfig.getLocalServerID(), domain);
+    }
+
+
+    private static String getPrimaryId(SessionServerConfig serverConfig) {
         String primaryID = "";
         // AME-129 Required for Automatic Session Failover Persistence
         if (serverConfig.isSiteEnabled() &&
                 serverConfig.getLocalServerID() != null &&
                 !serverConfig.getLocalServerID().isEmpty()) {
 
-            if (StringUtils.isNotBlank(jwt)) {
-                primaryID = serverConfig.getPrimaryServerID();
-            } else {
-                primaryID = serverConfig.getLocalServerID();
-            }
+            primaryID = serverConfig.getLocalServerID();
         }
-        // AME-129, always set a Storage Key regardless of persisting or not.
-        String storageKey = String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong());
-        LegacySessionIDExtensions ext = new LegacySessionIDExtensions(primaryID, siteID, storageKey);
-
-        String sessionID = SessionID.makeSessionID(encryptedID, ext, jwt);
-
-        sid = new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
-
-        return sid;
+        return primaryID;
     }
+
 
     private SessionID(String sid, String serverID, String domain) {
         this(sid);
@@ -752,7 +777,10 @@ public class SessionID implements Serializable {
         String siteID = getExtension().getSiteID();
         String primaryID = getExtension().getPrimaryID();
         String errorMessage = null;
-        if (primaryID == null) {
+
+        if (StringUtils.isEmpty(siteID)) {
+            errorMessage = "Invalid session ID, Site ID is null or empty";
+        } else if (primaryID == null) {
             //In this case by definition the server is not assigned to a site, so we want to ensure that the
             //SITE_ID points to a server
             if (!WebtopNaming.isServer(siteID)) {

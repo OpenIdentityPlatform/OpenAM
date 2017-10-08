@@ -11,81 +11,108 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
-    "jquery",
+define([
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants"
-], function ($, AbstractDelegate, Configuration, Constants) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
-        redirector = function (tab) {
-            return function (realm) {
-                obj.realm.redirectToTab(tab, realm);
-            };
-        };
+], (AbstractDelegate, Constants) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`);
+    const realmsRedirector = (tab) => (realm) => {
+        obj.realm.redirectToTab(tab, realm);
+    };
+    const agentsRedirector = (tab) => (realm) => {
+        obj.agents.redirectToTab(tab, realm);
+    };
 
     obj.global = {
-        accessControl: function () { obj.global.redirectToTab(1); },
-        federation   : function () { obj.global.redirectToTab(2); },
-        configuration: function () { obj.global.redirectToTab(4); },
-        sessions     : function () { obj.global.redirectToTab(5); },
-        redirectToTab: function (tabIndex) {
-            obj.getJATOPageSession("/").done(function (session) {
+        accessControl () { obj.global.redirectToTab(1); },
+        federation () { obj.global.redirectToTab(2); },
+        sessions () { obj.global.redirectToTab(5); },
+        redirectToTab (tabIndex) {
+            obj.getJATOPageSession("/").done((session) => {
                 if (session) {
-                    window.location.href = "/" + Constants.context + "/task/Home?" +
-                        "Home.tabCommon.TabHref=" + tabIndex +
-                        "&jato.pageSession=" + session + "&requester=XUI";
+                    window.location.href = `/${Constants.context}/task/Home?Home.tabCommon.TabHref=${
+                        tabIndex
+                        }&jato.pageSession=${session}&requester=XUI`;
                 } else {
-                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
+                }
+            });
+        },
+        configuration () {
+            obj.getJATOPageSession("/").done((session) => {
+                if (session) {
+                    window.location.href = `/${
+                        Constants.context
+                        }/service/SCConfigAuth?SCConfigAuth.tabCommon.TabHref=445&jato.pageSession=${
+                        session
+                        }&requester=XUI`;
+                } else {
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
         }
     };
 
     obj.commonTasks = function (realm, link) {
-        var query = link.indexOf("?") === -1 ? "?" : "&";
-        window.location.href = "/" + Constants.context + "/" + link + query + "realm=" + encodeURIComponent(realm);
+        const query = link.indexOf("?") === -1 ? "?" : "&";
+        window.location.href = `/${Constants.context}/${link}${query}realm=${encodeURIComponent(realm)}`;
+    };
+
+    obj.serverSite = function () {
+        window.location.href = `/${Constants.context}/service/ServerSite`;
     };
 
     obj.realm = {
-        services      : redirector(13),
-        dataStores    : redirector(14),
-        privileges    : redirector(15),
-        subjects      : redirector(17),
-        agents        : redirector(18),
-        sts           : redirector(19),
-        redirectToTab : function (tabIndex, realm) {
-            obj.getJATOPageSession(realm).done(function (session) {
+        dataStores    : realmsRedirector(14),
+        privileges    : realmsRedirector(15),
+        subjects      : realmsRedirector(17),
+        sts           : realmsRedirector(19),
+        redirectToTab (tabIndex, realm) {
+            obj.getJATOPageSession(realm).done((session) => {
                 if (session) {
-                    window.location.href = "/" + Constants.context + "/realm/RealmProperties?" +
-                        "RMRealm.tblDataActionHref=" + realm +
-                        "&RealmProperties.tabCommon.TabHref=" + tabIndex +
-                        "&jato.pageSession=" + session + "&requester=XUI";
+                    window.location.href = `/${Constants.context}/realm/RealmProperties?RMRealm.tblDataActionHref=${
+                        realm
+                        }&RealmProperties.tabCommon.TabHref=${tabIndex}&jato.pageSession=${session}&requester=XUI`;
                 } else {
-                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
         }
     };
 
-    obj.getJATOPageSession = function (realm) {
-        var promise = obj.serviceCall({
-            url: "/realm/RMRealm?RMRealm.tblDataActionHref=" + realm + "&requester=XUI",
-            dataType: "html"
-        });
-
-        return $.when(promise)
-            .then(function (data) {
-                var sessionRegEx = /jato.pageSession=(.*?)"/;
-                if (sessionRegEx.test(data)) {
-                    return data.match(sessionRegEx)[1];
+    obj.agents = {
+        java       : agentsRedirector(181),
+        oauth20    : agentsRedirector(183),
+        web        : agentsRedirector(180),
+        redirectToTab (tabIndex, realm) {
+            obj.getJATOPageSession(realm).done((session) => {
+                if (session) {
+                    window.location.href = `/${
+                        Constants.context}/agentconfig/Agents?Agents.tabCommon.TabHref=${
+                            tabIndex}&jato.pageSession=${session}&requester=XUI`;
                 } else {
-                    return null;
+                    window.location.href = `/${Constants.context}/UI/Login?service=adminconsoleservice`;
                 }
             });
+        }
+    };
+
+
+    obj.getJATOPageSession = function (realm) {
+        return obj.serviceCall({
+            url: `/realm/RMRealm?RMRealm.tblDataActionHref=${realm}&requester=XUI`,
+            dataType: "html"
+        }).then((data) => {
+            const sessionRegEx = /jato.pageSession=(.*?)"/;
+            if (sessionRegEx.test(data)) {
+                return data.match(sessionRegEx)[1];
+            } else {
+                return null;
+            }
+        });
     };
 
     return obj;

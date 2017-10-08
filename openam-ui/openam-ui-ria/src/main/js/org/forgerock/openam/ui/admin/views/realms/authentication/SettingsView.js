@@ -14,36 +14,34 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/services/SMSServiceUtils",
+    "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, _, AbstractView, Configuration, Constants, Form, FormHelper, Messages, SMSDelegateUtils,
-             SMSRealmDelegate) {
+], function ($, _, AbstractView, Constants, EventManager, Form, Messages, SMSServiceUtils, AuthenticationService) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            "click #revert": "revert",
-            "click #save": "save",
+            "click [data-revert]"          : "revert",
+            "click [data-save]"            : "save",
             "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
-        render: function (args, callback) {
+        render (args, callback) {
             var self = this;
 
             this.data.realmLocation = args[0];
 
-            SMSRealmDelegate.authentication.get(this.data.realmLocation).then(function (data) {
+            AuthenticationService.authentication.get(this.data.realmLocation).then((data) => {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -56,37 +54,40 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                         callback();
                     }
                 });
-            }, function (response) {
+            }, (response) => {
                 Messages.addMessage({
                     type: Messages.TYPE_DANGER,
-                    response: response
+                    response
                 });
             });
         },
-        renderTab: function (event) {
+        renderTab (event) {
             this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr("href").slice(1),
-                schema = SMSDelegateUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
+                schema = SMSServiceUtils.sanitizeSchema(this.data.formData.schema.properties[id]),
                 element = this.$el.find("#tabpanel").get(0);
 
-            this.data.form = new Form(element, schema, this.data.formData.values);
+            this.data.form = new Form(element, schema, this.data.formData.values[id]);
+            this.$el.find("[data-header]").parent().hide();
         },
-        revert: function () {
+        revert () {
             this.data.form.reset();
         },
-        save: function (event) {
-            var data = this.data.form.data(),
-                promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, data),
+        save () {
+            var formData = this.data.form.data(),
                 self = this;
 
-            promise.then(function () {
+            AuthenticationService.authentication.update(this.data.realmLocation, formData).then((data) => {
                 // update formData for correct re-render tab after saving
                 _.extend(self.data.formData.values, data);
-
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+            }, (response) => {
+                Messages.addMessage({
+                    type: Messages.TYPE_DANGER,
+                    response
+                });
             });
-            // animate save button
-            FormHelper.bindSavePromiseToElement(promise, event.currentTarget);
         }
     });
 

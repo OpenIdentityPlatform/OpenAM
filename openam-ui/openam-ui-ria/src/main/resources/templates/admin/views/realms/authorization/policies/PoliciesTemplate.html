@@ -1,5 +1,5 @@
 {{#if items.length}}
-    <div class="btn-toolbar" id="gridToolbar" role="toolbar" aria-label="toolbar"></div>
+    <div class="btn-toolbar" role="toolbar" aria-label="toolbar" data-grid-toolbar></div>
 {{/if}}
 
 <p class="panel-description">{{t "console.authorization.policies.list.description"}}</p>
@@ -10,7 +10,7 @@
 {{else}}
     <div class="call-to-action-block">
         <h3>{{t "console.authorization.policies.list.noPolicies"}}</h3>
-        <button type="button" id="addNewPolicy" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" data-add-entity>
             <i class="fa fa-plus"></i> {{t "console.authorization.policies.list.addNew"}}
         </button>
     </div>

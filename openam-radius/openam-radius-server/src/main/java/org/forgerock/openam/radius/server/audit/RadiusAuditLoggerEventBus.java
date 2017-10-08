@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
 import org.forgerock.guava.common.base.Strings;
 import org.forgerock.guava.common.eventbus.EventBus;

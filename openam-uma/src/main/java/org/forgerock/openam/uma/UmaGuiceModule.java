@@ -28,6 +28,7 @@ import javax.security.auth.Subject;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
@@ -38,8 +39,6 @@ import com.sun.identity.idm.IdRepoCreationListener;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -51,6 +50,7 @@ import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
+import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
@@ -60,8 +60,6 @@ import org.forgerock.openam.uma.rest.UmaPolicyServiceImpl;
 import org.forgerock.openam.uma.rest.UmaResourceSetRegistrationHook;
 import org.forgerock.openam.uma.rest.UmaRouterProvider;
 import org.forgerock.openam.utils.Config;
-import org.forgerock.services.context.RootContext;
-import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
@@ -99,6 +97,10 @@ public class UmaGuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), UiRolePredicate.class)
                 .addBinding().to(UmaUserUiRolePredicate.class);
+
+        bind(Client.class)
+                .annotatedWith(Names.named("UMA"))
+                .toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
     }
 
     @Provides
@@ -162,7 +164,7 @@ public class UmaGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     @Named(UmaConstants.PERMISSION_REQUEST_ENDPOINT)
-    public Restlet createPermissionRequestEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> requestFactory) {
+    public Restlet createPermissionRequestEndpoint(TokenStore store, OAuth2RequestFactory requestFactory) {
         return new AccessTokenProtectionFilter(UmaConstants.PAT_SCOPE, store, requestFactory,
                         wrap(PermissionRequestEndpoint.class));
     }
@@ -171,19 +173,9 @@ public class UmaGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     @Named(UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT)
-    public Restlet createAuthorizationRequestEndpoint(TokenStore store, OAuth2RequestFactory<?, Request> requestFactory) {
+    public Restlet createAuthorizationRequestEndpoint(TokenStore store, OAuth2RequestFactory requestFactory) {
         return new AccessTokenProtectionFilter(UmaConstants.AAT_SCOPE, store, requestFactory,
                         wrap(AuthorizationRequestEndpoint.class));
     }
 
-    @Provides
-    @Named("UMA")
-    Client getHttpClient() {
-        try {
-            return new Client(new HttpClientHandler(), new RootContext());
-        } catch (HttpApplicationException e) {
-            throw new RuntimeException("Failed to create HTTP Client. "
-                    + "Is the HTTP Client binding present on the classpath?", e);
-        }
-    }
 }

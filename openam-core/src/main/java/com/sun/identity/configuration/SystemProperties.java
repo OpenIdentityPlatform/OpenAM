@@ -24,10 +24,7 @@
  *
  * $Id: SystemProperties.java,v 1.6 2008/10/04 03:32:55 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.configuration;
@@ -59,7 +56,12 @@ public class SystemProperties implements ISystemProperties {
     public String get(String key) {
         return com.iplanet.am.util.SystemProperties.get(key);
     }
-    
+
+    @Override
+    public String getOrDefault(final String key, final String defaultValue) {
+        return com.iplanet.am.util.SystemProperties.get(key, defaultValue);
+    }
+
     /**
      * Returns server list.
      *

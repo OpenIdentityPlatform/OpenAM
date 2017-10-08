@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -24,8 +24,7 @@ import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -37,7 +36,8 @@ import com.sun.identity.entitlement.opensso.OpenSSOPrivilege;
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -69,7 +69,9 @@ import java.util.Set;
 public final class RemoveReferralsStepTest {
 
     @Mock
-    private ApplicationManagerWrapper applicationService;
+    private ApplicationServiceFactory applicationServiceFactory;
+    @Mock
+    private ApplicationService applicationService;
     @Mock
     private ResourceTypeService resourceTypeService;
     @Mock
@@ -106,8 +108,9 @@ public final class RemoveReferralsStepTest {
         SSOToken token = mock(SSOToken.class);
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("abc");
         given(privilegedAction.run()).willReturn(token);
+        given(applicationServiceFactory.create(isA(Subject.class), anyString())).willReturn(applicationService);
 
-        testStep = new RemoveReferralsStep(applicationService, resourceTypeService,
+        testStep = new RemoveReferralsStep(applicationServiceFactory, resourceTypeService,
                 policyServiceFactory, connectionFactory, privilegedAction, "ou=forgerock,ou=org");
     }
 
@@ -122,9 +125,8 @@ public final class RemoveReferralsStepTest {
 
         JsonValue jsonValue = json(
                 object(
-                        field("name", "ref"),
-                        field("mapApplNameToResources", object(field("app1", array("*://*:*/*")))),
-                        field("realms", array("/a"))));
+                        field("name", "ref"), field("mapApplNameToResources", object(field("app1", array("*://*:*/*")
+                                        ))), field("realms", array("/a"))));
 
         Set<String> values = singleton("serializable=" + jsonValue.toString());
 
@@ -136,7 +138,7 @@ public final class RemoveReferralsStepTest {
         app1.setName("app1");
         app1.addAllResourceTypeUuids(singleton("123"));
 
-        given(applicationService.getApplication(isA(Subject.class), eq("/"), eq("app1"))).willReturn(app1);
+        given(applicationService.getApplication(eq("app1"))).willReturn(app1);
         given(policyServiceFactory.get(eq("/a"), isA(Subject.class))).willReturn(policyService);
 
         Privilege policy1 = new OpenSSOPrivilege();
@@ -165,7 +167,7 @@ public final class RemoveReferralsStepTest {
         assertThat(longReport).containsSequence("app1", "ou=test,ou=forgerock,ou=org");
 
         verify(resourceTypeService).saveResourceType(isA(Subject.class), eq("/a"), resourceTypeCaptor.capture());
-        verify(applicationService).saveApplication(isA(Subject.class), eq("/a"), applicationCaptor.capture());
+        verify(applicationService).saveApplication(applicationCaptor.capture());
         verify(policyService).modify(policyCaptor.capture());
 
         ResourceType clonedResourceType = resourceTypeCaptor.getValue();

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.config.user;
@@ -23,6 +23,8 @@ import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -32,6 +34,7 @@ import java.util.Set;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
 
 
 /**
@@ -190,7 +193,7 @@ public class DeploymentConfig {
         return json(object(field(URI_ELEMENT, uriElement), field(REALM, realm),
                 field(AuthTargetMapping.AUTH_TARGET_MAPPINGS, authTargetMapping.toJson()),
                 field(OFFLOADED_TWO_WAY_TLS_HEADER_KEY, offloadedTwoWayTLSHeaderKey),
-                field(TLS_OFFLOAD_ENGINE_HOSTS, tlsOffloadEngineHostIpAddrs)));
+                field(TLS_OFFLOAD_ENGINE_HOSTS, new ArrayList<>(tlsOffloadEngineHostIpAddrs))));
     }
 
     public static DeploymentConfig fromJson(JsonValue json) {
@@ -220,8 +223,8 @@ public class DeploymentConfig {
         won't be addressed by this generic approach).
          */
         Object tlsOffloadHostsObject = preMap.get(TLS_OFFLOAD_ENGINE_HOSTS);
-        if (tlsOffloadHostsObject instanceof Set) {
-            interimMap.put((TLS_OFFLOAD_ENGINE_HOSTS), (Set)tlsOffloadHostsObject);
+        if (tlsOffloadHostsObject instanceof Collection) {
+            interimMap.put((TLS_OFFLOAD_ENGINE_HOSTS), new HashSet<>((Collection<String>)tlsOffloadHostsObject));
         } else {
             throw new IllegalStateException("Type corresponding to " + (TLS_OFFLOAD_ENGINE_HOSTS) + " key unexpected. Type: "
                     + (tlsOffloadHostsObject != null ? tlsOffloadHostsObject.getClass().getName() :" null"));
@@ -236,7 +239,9 @@ public class DeploymentConfig {
         Map<String, Object> jsonMap = MapMarshallUtils.toJsonValueMap(attributeMap);
         jsonMap.put(AuthTargetMapping.AUTH_TARGET_MAPPINGS, targetMapping.toJson());
 
-        jsonMap.put(TLS_OFFLOAD_ENGINE_HOSTS, new JsonValue(attributeMap.get(TLS_OFFLOAD_ENGINE_HOSTS)));
+        Set<String> tlsOffloadEngineHosts = attributeMap.get(TLS_OFFLOAD_ENGINE_HOSTS);
+        jsonMap.put(TLS_OFFLOAD_ENGINE_HOSTS,
+                json(newList(tlsOffloadEngineHosts)));
 
         return fromJson(new JsonValue(jsonMap));
     }

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+
 import javax.naming.InvalidNameException;
 
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
@@ -50,6 +51,7 @@ import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Option;
 import org.forgerock.util.Options;
 import org.forgerock.util.Reject;
 import org.forgerock.util.time.Duration;
@@ -71,7 +73,11 @@ import org.forgerock.util.time.Duration;
  */
 public final class LDAPUtils {
 
-    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
+    /**
+     * An {@link Option} that tells whether affinity based load balancing is enabled for the connections.
+     */
+    public static final Option<Boolean> AFFINITY_ENABLED = Option.withDefault(false);
+    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';', '='};
     private static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
     private static final String LDAP_SCOPE_ONE = "SCOPE_ONE";
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
@@ -146,7 +152,7 @@ public final class LDAPUtils {
             factories.add(cf);
         }
 
-        return loadBalanceFactories(factories);
+        return loadBalanceFactories(factories, ldapOptions);
     }
 
     /**
@@ -200,7 +206,7 @@ public final class LDAPUtils {
             factories.add(newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
                     ldapOptions));
         }
-        return loadBalanceFactories(factories);
+        return loadBalanceFactories(factories, ldapOptions);
     }
 
     /**
@@ -223,13 +229,13 @@ public final class LDAPUtils {
         Boolean ssl = ldapurl.isSSL();
         int heartBeatTimeout =
                 SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
-
         if (ssl != null && ssl.booleanValue()) {
+            String defaultProtocolVersion = SystemPropertiesManager.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
                 //needs to be established.
                 ldapOptions = Options.copyOf(ldapOptions).set(LDAPConnectionFactory.SSL_CONTEXT,
-                        new SSLContextBuilder().getSSLContext());
+                         new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
             } catch (GeneralSecurityException gse) {
                 DEBUG.error("An error occurred while creating SSLContext", gse);
             }
@@ -252,8 +258,12 @@ public final class LDAPUtils {
         return new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
     }
 
-    private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories) {
-        return Connections.newFailoverLoadBalancer(factories, Options.defaultOptions());
+    private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories, Options options) {
+        if (options.get(AFFINITY_ENABLED)) {
+            return Connections.newShardedRequestLoadBalancer(factories, options);
+        } else {
+            return Connections.newFailoverLoadBalancer(factories, options);
+        }
     }
 
     /**
@@ -535,7 +545,22 @@ public final class LDAPUtils {
      * @return {@code true} if the string is a DN.
      */
     public static boolean isDN(String candidateDN) {
-        return newDN(candidateDN).size() > 0;
+        return isDN(candidateDN, 0);
+    }
+
+    /**
+     * Tests whether the supplied string is a DN, and is not the root DN.
+     * @param candidateDN The possible DN.
+     * @param minNumComponent Check if dn has more than minimum components
+     * @return {@code true} if the string is a DN.
+     */
+    public static boolean isDN(String candidateDN, int minNumComponent) {
+        try {
+            return newDN(candidateDN).size() > minNumComponent;
+        } catch (LocalizedIllegalArgumentException e) {
+            DEBUG.error("LDAPUtils.isDN: Invalid DN", e);
+        }
+        return false;
     }
 
     /**
@@ -545,18 +570,32 @@ public final class LDAPUtils {
      * @return The escaped string.
      */
     public static String escapeValue(String str) {
+        return DN.escapeAttributeValue(str);
+    }
+
+    /**
+     * Unescape characters that should be unescaped.
+     *
+     * @param str The string to unescape.
+     * @return The unescaped string.
+     */
+    public static String unescapeValue(String str) {
         StringBuilder retbuf = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             char currentChar = str.charAt(i);
-            if (shouldEscapeCharacter(currentChar)) {
-                retbuf.append('\\');
+            if (currentChar == '\\') {
+                char nextChar = str.charAt(i + 1);
+                if (isEscapeCharacter(nextChar)) {
+                    currentChar = nextChar;
+                    i++;
+                }
             }
             retbuf.append(currentChar);
         }
         return retbuf.toString();
     }
 
-    private static boolean shouldEscapeCharacter(char c) {
+    private static boolean isEscapeCharacter(char c) {
         for (char escaped : ESCAPED_CHAR) {
             if (c == escaped) {
                 return true;
@@ -669,7 +708,7 @@ public final class LDAPUtils {
             for (int i = 0; i < hostCount; i++) {
                 factories.add(createSingleHostConnectionFactory(hostList[i], portList[i], authDN, authPasswd, options));
             }
-            return Connections.newFailoverLoadBalancer(factories, options);
+            return loadBalanceFactories(factories, options);
         } else {
             return createSingleHostConnectionFactory(hostList[0], portList[0], authDN, authPasswd, options);
         }

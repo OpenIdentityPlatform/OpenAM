@@ -17,36 +17,28 @@
 package org.forgerock.openam.upgrade.steps.policy;
 
 import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.APPLICATION;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_APPLICATION_TYPE;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCES;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCE_TYPE_UUIDS;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.REGISTERED_APPLICATIONS;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.VersionUtils.isCurrentVersionLessThan;
-import static org.forgerock.openam.utils.CollectionUtils.isEmpty;
-import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
-import static org.forgerock.openam.utils.CollectionUtils.transformSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.DataStore;
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSUtils;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
+import java.security.PrivilegedAction;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -64,16 +56,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.security.PrivilegedAction;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.DataStore;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * This upgrade step is responsible for introducing the Resource Type policy model object. It runs after
@@ -104,6 +99,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     private final ServiceConfigManager configManager;
     private final Set<String> defaultApplicationNames;
     private final Set<String> removedDefaultApplications;
+    private final ApplicationServiceFactory applicationServiceFactory;
 
     private class ResourceTypeState {
         private boolean applicationNeedsResourceType = false;
@@ -126,7 +122,8 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             final ResourceTypeService resourceTypeService,
             final PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory,
-            @Named("removedDefaultApplications") Set<String> removedDefaultApplications) {
+            @Named("removedDefaultApplications") Set<String> removedDefaultApplications,
+            ApplicationServiceFactory applicationServiceFactory) {
         super(adminTokenAction, connectionFactory);
 
         this.configManager = configManager;
@@ -134,6 +131,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         this.defaultApplicationNames = new HashSet<String>();
         this.resourceTypeStatePerRealm = new HashMap<String, Set<ResourceTypeState>>();
         this.removedDefaultApplications = removedDefaultApplications;
+        this.applicationServiceFactory = applicationServiceFactory;
     }
 
     /**
@@ -230,15 +228,16 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
         for (Map.Entry<String, Set<ResourceTypeState>> entry : resourceTypeStatePerRealm.entrySet()) {
             final String realm = entry.getKey();
-            final EntitlementConfiguration ec = EntitlementConfiguration.getInstance(getAdminSubject(), realm);
+            final EntitlementConfiguration ec = getEntitlementConfiguration(getAdminSubject(), realm);
             final PrivilegeManager pm = PrivilegeManager.getInstance(realm, getAdminSubject());
+            ApplicationService applicationService = applicationServiceFactory.create(getAdminSubject(), realm);
 
             for (ResourceTypeState state : entry.getValue()) {
                 if (state.applicationNeedsResourceType) {
                     ResourceType resourceType = createResourceType(state, realm);
                     upgradeApplication(ec, state.appName, resourceType.getUUID());
                     // Application modified, clear cache.
-                    ApplicationManager.clearCache(realm);
+                    applicationService.clearCache();
                 }
 
                 if (state.policiesNeedsResourceType) {

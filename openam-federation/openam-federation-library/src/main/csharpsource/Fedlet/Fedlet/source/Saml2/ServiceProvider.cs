@@ -25,7 +25,7 @@
  * $Id: ServiceProvider.cs,v 1.6 2010/01/26 01:20:14 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 using System;
@@ -287,7 +287,7 @@ namespace Sun.Identity.Saml2
         /// <summary>
         /// Gets a value indicating whether the IPD Proxy setting is true or false.
         /// </summary>
-        public bool ScopingIDPProxyEnabled
+        public bool IDPProxyEnabled
         {
             get
             {
@@ -304,21 +304,18 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the IPD Proxy count
+        /// Gets the IDP Proxy count
         /// </summary>
-        public int ScopingProxyCount
+        public int IDPProxyCount
         {
             get
             {
                 string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='idpProxyCount']/mdx:Value";
-                if (this.ScopingIDPProxyEnabled)
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
                 {
-                    XmlNode root = this.extendedMetadata.DocumentElement;
-                    XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
-                    if (node != null)
-                    {
-                        return Convert.ToInt32(node.InnerText.Trim(), CultureInfo.InvariantCulture);
-                    }
+                    return Convert.ToInt32(node.InnerText.Trim(), CultureInfo.InvariantCulture);
                 }
                 return 0;
             }
@@ -670,11 +667,17 @@ namespace Sun.Identity.Saml2
         /// <param name="signMetadata">
         /// Flag to specify if the exportable metadata should be signed.
         /// </param>
+        /// <param name="signatureSigningAlgorithm">
+        /// The algorithm used to sign the xml.
+        /// </param>   
+        /// <param name="digestAlgorithm">
+        /// The method used to create the message digest.
+        /// </param>     
         /// <returns>
         /// String with runtime representation of the metadata for this
         /// service provider.
         /// </returns>
-        public string GetExportableMetadata(bool signMetadata)
+        public string GetExportableMetadata(bool signMetadata, string signatureSigningAlgorithm, string digestAlgorithm)
         {
             XmlDocument exportableXml = (XmlDocument)this.metadata.CloneNode(true);
             XmlNode entityDescriptorNode
@@ -696,10 +699,31 @@ namespace Sun.Identity.Saml2
                 descriptorId.Value = Saml2Utils.GenerateId();
                 entityDescriptorNode.Attributes.Append(descriptorId);
 
-                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true, this);
+                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true, signatureSigningAlgorithm, digestAlgorithm, this);
             }
 
             return exportableXml.InnerXml;
+        }
+
+        /// <summary>
+        /// Returns a string representing the configured metadata for
+        /// this service provider.  This will include key information
+        /// as well if the metadata and extended metadata have this
+        /// information specified. This version will, if signing is
+        /// enabled, use the default SHA1 based digest and signature
+        /// algorithms. This public method is provided for consistency
+        /// with earlier releases.
+        /// </summary>
+        /// <param name="signMetadata">
+        /// Flag to specify if the exportable metadata should be signed.
+        /// </param>  
+        /// <returns>
+        /// String with runtime representation of the metadata for this
+        /// service provider.
+        /// </returns>
+        public string GetExportableMetadata(bool signMetadata)
+        {
+            return GetExportableMetadata(signMetadata, null, null);
         }
 
         /// <summary>

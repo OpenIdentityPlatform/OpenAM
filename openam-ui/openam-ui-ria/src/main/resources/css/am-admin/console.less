@@ -11,14 +11,19 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 
 
 .block {
-    margin-bottom: 50px;
+    padding-bottom: 40px;
+
     &:last-of-type {
-        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .block-description {
+        margin-bottom: 20px;
     }
 }
 
@@ -28,11 +33,15 @@ h3.block-header {
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 1px;
-    color: #5F686E;
     padding-bottom: 10px;
     margin-top: 0;
     border-bottom: 1px solid #ddd;
     margin-bottom: 20px;
+    .transition(color, 0.5s);
+
+    &.block-header-inactive {
+        color: #bbb;
+    }
 }
 
 .fr-panel-tab{
@@ -44,12 +53,14 @@ h3.block-header {
     }
 }
 
-.form-horizontal .form-group .info-button{
-    margin-left: -15px;
+
+.form-horizontal .form-group {
+    [class*="col-"] + .help-block + .info-button {
+        margin-left: -15px;
+    }
 }
 
-.info-button{
-
+.info-button {
     background-color: transparent;
     background-image: none;
     border-color: transparent;
@@ -75,22 +86,32 @@ h3.block-header {
 }
 
 // json-editor
-div[data-schemaid] {
-
-    > h3 {
-        display: none;
-    }
-
-    .well {
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
+div[data-schemaid=root] {
+    /* because JSONEditor creates empty headers */
+    > h3 { display: none;}
+    h3 { margin: 0;}
 
     .selectize-control {
         margin-bottom: -5px;
     }
+}
 
+.jsoneditor-block{
+    &:first-of-type {
+        margin-top: 5px;
+    }
+    .form-horizontal:last-of-type {
+        margin-bottom: 60px;
+    }
+    &:last-of-type .form-horizontal:last-of-type {
+        margin-bottom: 0;
+    }
+
+    // A Bootstrap override for the toggle
+    .form-inline .checkbox input[type="checkbox"][data-json-editor-toggle] {
+        margin-left: -20px;
+        position: absolute;
+    }
 }
 
 
@@ -113,22 +134,31 @@ div[data-schemaid] {
     padding-top:15px;
 }
 
-
 .realm-card-location{
     padding-top:8px;
 }
 
+.am-text-lines-one {
+   height: 20px;
+}
+
+.am-text-lines-two {
+   height: 35px;
+}
+
+.am-text-lines-three {
+   height: 60px;
+}
+
+.am-text-lines-four {
+   height: 80px;
+}
+
 .realm-card-aliases {
-    height: 35px; // 2 lines
-    overflow: hidden;
-    font-size: 85%;
     color:#666;
     margin-top: 8px;
  }
 
-.dashboard-card-name {
-    height: 60px; // three lines
-}
 
 #commonTasksBtn {
     cursor:pointer;
@@ -178,17 +208,31 @@ a[data-toggle="popover"] {
 .call-to-action-block {
 
     text-align: center;
-    border: solid #ccc;
-    border-width: 1px 0;
-    padding: 70px 0;
-    background-color: @background-color;
+    border: 1px solid #ccc;
+    padding: 35px;
 
     h3 {
-        font-size: 18px;
-        color: @base-theme-color;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        display: inline-block;
+        margin: 0 10px;
     }
+}
 
-    .btn {
-        margin: 15px auto 0;
+.am-btn-single-icon {
+    width: 34px;
+    height: 34px;
+}
+
+@media (min-width: 992px) {
+    .container {
+        width: 980px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1180px;
     }
 }

@@ -31,18 +31,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
 
+import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -50,23 +50,35 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import org.forgerock.http.session.Session;
+import org.forgerock.http.session.SessionContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.AdviceContext;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
+import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
-import org.forgerock.services.context.SecurityContext;
 import org.forgerock.services.context.RootContext;
-import org.forgerock.http.session.Session;
-import org.forgerock.http.session.SessionContext;
+import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -78,8 +90,11 @@ public class SessionResourceTest {
     private SessionResource sessionResource;
     private SSOTokenManager ssoTokenManager;
     private AuthUtilsWrapper authUtilsWrapper;
+    private SessionResourceUtil sessionResourceUtil;
     private SessionPropertyWhitelist propertyWhitelist;
+    private WebtopNamingQuery webtopNamingQuery;
     private RealmContext realmContext;
+    private RealmTestHelper realmTestHelper;
 
     private AMIdentity amIdentity;
 
@@ -87,34 +102,53 @@ public class SessionResourceTest {
     private String urlResponse;
     private String cookieResponse;
 
+
+
     @BeforeMethod
-    public void setUp() throws IdRepoException, SSOException {
+    public void setUp() throws Exception {
         SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
         propertyWhitelist = mock(SessionPropertyWhitelist.class);
+        webtopNamingQuery = mock(WebtopNamingQuery.class);
         headerResponse = null;
         urlResponse = null;
         cookieResponse = null;
 
         given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
 
-        realmContext = new RealmContext(mockContext);
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
+
+        realmContext = new RealmContext(mockContext, Realm.root());
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         configureWhitelist();
-        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper,
-                propertyWhitelist) {
+
+        String badger = "badger";
+        String weasel = "weasel";
+        final List<String> list = Arrays.asList(badger, weasel);
+        given(webtopNamingQuery.getAllServerIDs()).willReturn(list);
+
+        sessionResourceUtil = spy(new SessionResourceUtil(ssoTokenManager, sessionQueryManager, webtopNamingQuery) {
+
             @Override
-            AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
+            public Collection<String> getAllServerIds() {return list; }
+
+            @Override
+            public AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
                 return amIdentity;
             }
 
             @Override
-            String convertDNToRealm(String dn) {
-                return "/";
+            public String convertDNToRealm(String dn) {
+                return "/example/com";
             }
+        });
+
+        sessionResource = new SessionResource(ssoTokenManager, authUtilsWrapper,
+                propertyWhitelist, sessionResourceUtil) {
 
             @Override
             protected String getTokenIdFromHeader(Context context, String cookieName) {
@@ -130,7 +164,13 @@ public class SessionResourceTest {
             protected String getTokenIdFromCookie(Context context, String cookieName) {
                 return cookieResponse;
             }
+
         };
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     private void configureWhitelist() {
@@ -139,8 +179,7 @@ public class SessionResourceTest {
         whitelist.add("two");
         whitelist.add("three");
 
-        given(propertyWhitelist.getAllListedProperties(any(SSOToken.class), any(String.class))).willReturn(whitelist);
-
+        given(propertyWhitelist.getAllListedProperties(any(String.class))).willReturn(whitelist);
     }
 
     @Test
@@ -154,9 +193,11 @@ public class SessionResourceTest {
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
+        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
         List<String> list = Arrays.asList(badger, weasel);
-        doReturn(list).when(resource).getAllServerIds();
+        doReturn(list).when(sessionResourceUtil).getAllServerIds();
+        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
+
 
         // When
         resource.queryCollection(null, request, handler);
@@ -176,13 +217,15 @@ public class SessionResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(badger);
 
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
+
+        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
+        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
 
         // When
         resource.queryCollection(null, request, mockHandler);
 
         // Then
-        verify(resource, times(0)).getAllServerIds();
+        verify(sessionResourceUtil, times(0)).getAllServerIds();
 
         List<String> result = Collections.singletonList(badger);
         verify(mockManager, times(1)).getAllSessions(result);
@@ -220,6 +263,7 @@ public class SessionResourceTest {
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
         given(ssoTokenManager.createSSOToken(ssoTokenId.toString())).willReturn(ssoToken);
+        given(sessionResourceUtil.convertDNToRealm(anyString())).willReturn("/");
 
         //When
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionCollection(context, request);
@@ -270,7 +314,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException, IdRepoException {
         //Given
         final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
@@ -278,11 +322,14 @@ public class SessionResourceTest {
         final SSOToken ssoToken = mock(SSOToken.class);
         final Principal principal = mock(Principal.class);
 
+
         given(request.getAction()).willReturn(VALIDATE_ACTION_ID);
         given(ssoTokenManager.createSSOToken("SSO_TOKEN_ID")).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn("PRINCIPAL");
+        given(sessionResourceUtil.convertDNToRealm(anyString())).willReturn("/");
+
 
         //When
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
@@ -372,7 +419,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("maxtime").isEqualTo(TIME_LEFT);
+        assertThat(promise).succeeded().withContent().longAt("maxtime").isEqualTo(TIME_LEFT);
     }
 
     @Test
@@ -391,7 +438,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("maxtime").isEqualTo(-1);
+        assertThat(promise).succeeded().withContent().longAt("maxtime").isEqualTo(-1);
     }
 
     @Test
@@ -414,7 +461,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("idletime").isEqualTo(IDLE);
+        assertThat(promise).succeeded().withContent().longAt("idletime").isEqualTo(IDLE);
     }
 
     @Test
@@ -433,7 +480,7 @@ public class SessionResourceTest {
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(context, resourceId, request);
 
         //Then
-        assertThat(promise).succeeded().withContent().integerAt("idletime").isEqualTo(-1);
+        assertThat(promise).succeeded().withContent().longAt("idletime").isEqualTo(-1);
     }
 
     @Test
@@ -552,6 +599,7 @@ public class SessionResourceTest {
         given(request.getAction()).willReturn(SET_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(jsonContent);
         given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+        given(propertyWhitelist.isPropertyMapSettable(any(SSOToken.class), anyMapOf(String.class, String.class))).willReturn(true);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -619,6 +667,7 @@ public class SessionResourceTest {
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
         given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
+        given(propertyWhitelist.isPropertySetSettable(any(SSOToken.class), anySetOf(String.class))).willReturn(true);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -816,9 +865,15 @@ public class SessionResourceTest {
 
         // When
         ActionResponse response = sessionResource.actionInstance(context, sessionId, request)
-                                                 .getOrThrowUninterruptibly();
+                .getOrThrowUninterruptibly();
 
         // Then
         assertThat(response).isNotNull().withContent().stringAt("goto").isEqualTo(logoutUrl);
     }
+
+    @Test
+    public void shouldFailIfAnnotationsAreNotValid() {
+        ApiAnnotationAssert.assertThat(SessionResource.class).hasValidAnnotations();
+    }
+
 }

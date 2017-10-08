@@ -24,13 +24,15 @@
  *
  * $Id: GetComplete.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.common.SAML2Exception;
-import org.w3c.dom.Element;
+import com.sun.identity.saml2.protocol.impl.GetCompleteImpl;
 
 /** 
  * This interface contains methods for the <code>GetComplete</code> 
@@ -40,6 +42,9 @@ import org.w3c.dom.Element;
  *
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = GetCompleteImpl.class)
 public interface GetComplete {
     /** 
      * Returns the value of the <code>GetComplete</code> URI.

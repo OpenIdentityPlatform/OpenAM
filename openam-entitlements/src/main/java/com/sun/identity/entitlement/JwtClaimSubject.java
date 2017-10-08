@@ -12,23 +12,28 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2016 Agile Digital Engineering
  */
 
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.debug.Debug;
+
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.json.JsonValue;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.security.auth.Subject;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * A policy subject condition that examines claims in a Json Web Token (JWT) subject, such as an OpenID Connect
- * ID token. Currently only supports testing claims for string equality.
+ * ID token. Currently only supports testing claims for string equality and contained in collection.
  */
 public class JwtClaimSubject implements EntitlementSubject {
     private static final Debug DEBUG = Debug.getInstance("amEntitlements");
@@ -88,10 +93,22 @@ public class JwtClaimSubject implements EntitlementSubject {
         }
 
         final JwtPrincipal jwt = jwts.iterator().next();
-        final String value = jwt.getClaim(claimName);
-
-        final boolean match = StringUtils.equals(claimValue, value);
+        JsonValue claim = jwt.getClaim(claimName);
+        
+        final boolean match = claimMatches(claim, claimValue);
         return new SubjectDecision(match, NO_ADVICE);
+    }
+    
+    public boolean claimMatches(JsonValue claim, String claimValue) {
+        if (claim.isNull()) {
+            return false;
+        } else if (claim.isString()) {
+            return StringUtils.equals(claim.asString(), claimValue);
+        } else if (claim.isCollection()) {
+            return claim.asCollection(String.class).contains(claimValue);
+        } else {
+            throw new IllegalArgumentException("Claim [" + claim + "] is an unsupported type");
+        }
     }
 
     @Override

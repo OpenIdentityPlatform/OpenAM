@@ -17,8 +17,17 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
+import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionContextFilter;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.resource.Resources.newInternalConnectionFactory;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
+import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -28,17 +37,20 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
+import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.caf.authentication.framework.AuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Handler;
+import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.json.resource.Applications;
+import org.forgerock.json.resource.CrestApplication;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -47,15 +59,10 @@ import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.rest.router.ApiRouteMatcher;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Guice module for bindings for the REST routers and route registration.
@@ -122,7 +129,8 @@ public class RestGuiceModule extends AbstractModule {
     @Named("AuthenticationFilter")
     @Singleton
     org.forgerock.http.Filter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
-            AuditApi auditApi, @Named("OptionalSsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule) {
+            AuditApi auditApi, @Named("OptionalSsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule)
+            throws AuthenticationException {
         return AuthenticationFilter.builder()
                 .logger(logger)
                 .auditApi(auditApi)
@@ -133,10 +141,18 @@ public class RestGuiceModule extends AbstractModule {
     @Provides
     @Named("RestHandler")
     @Singleton
-    Handler getRestHandler(@Named("ChfRootRouter") org.forgerock.http.routing.Router chfRootRouter,
+    DescribableHandler getRestHandler(@Named("ChfRootRouter") org.forgerock.http.routing.Router chfRootRouter,
             @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter,
+            @Named("CrestRootRouter") Router crestRootRouter,
             @Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter) {
-        return Handlers.chainOf(chfRootRouter, authenticationFilter,
+
+        org.forgerock.http.routing.Router apiRouter = new org.forgerock.http.routing.Router();
+        CrestApplication crestApplication = Applications.simpleCrestApplication(
+                newInternalConnectionFactory(crestRootRouter), "frapi:openam", "1.0");
+        apiRouter.addRoute(new ApiRouteMatcher(), newHttpHandler(crestApplication));
+        apiRouter.setDefaultRoute(chfRootRouter);
+
+        return Handlers.chainOf(apiRouter, authenticationFilter,
                 resourceApiVersionFilter);
     }
 
@@ -153,8 +169,12 @@ public class RestGuiceModule extends AbstractModule {
     @Singleton
     org.forgerock.http.routing.Router getChfRootRouter(
             @Named("ChfRealmRouter") org.forgerock.http.routing.Router chfRealmRouter,
-            RealmContextFilter realmContextFilter) {
+            RealmContextFilter realmContextFilter, RealmRoutingFactory realmRoutingFactory) {
         org.forgerock.http.routing.Router chfRootRouter = new org.forgerock.http.routing.Router();
+        chfRootRouter.addRoute(requestUriMatcher(STARTS_WITH, REALM_ROUTE),
+                Handlers.chainOf(realmRoutingFactory.createRouter(chfRootRouter),
+                        realmRoutingFactory.createHostnameFilter()));
+
         chfRootRouter.setDefaultRoute(Handlers.chainOf(chfRealmRouter, realmContextFilter));
         return chfRootRouter;
     }
@@ -163,11 +183,11 @@ public class RestGuiceModule extends AbstractModule {
     @Named("ChfRealmRouter")
     @Singleton
     org.forgerock.http.routing.Router getChfRealmRouter(@Named("CrestRealmHandler") RequestHandler crestRealmHandler,
-            ContextFilter contextFilter, CrestProtocolEnforcementFilter crestProtocolEnforcementFilter) {
+            ContextFilter contextFilter) {
         org.forgerock.http.routing.Router chfRealmRouter = new org.forgerock.http.routing.Router();
-        chfRealmRouter.setDefaultRoute(Handlers.chainOf(
-                newHttpHandler(new FilterChain(crestRealmHandler, contextFilter)),
-                crestProtocolEnforcementFilter));
+
+        chfRealmRouter.setDefaultRoute(newHttpHandler(newInternalConnectionFactory(new FilterChain(crestRealmHandler,
+                contextFilter))));
         return chfRealmRouter;
     }
 
@@ -177,7 +197,7 @@ public class RestGuiceModule extends AbstractModule {
     Router getCrestRootRouter(@Named("CrestRealmRouter") Router crestRealmRouter) {
         Router crestRootRouter = new Router();
         crestRootRouter.setDefaultRoute(crestRealmRouter);
-        return crestRealmRouter;
+        return crestRootRouter;
     }
 
     @Provides
@@ -215,12 +235,11 @@ public class RestGuiceModule extends AbstractModule {
     @Named("RootResourceRouter")
     ResourceRouter getRootResourceRouter(@Named("CrestRootRouter") Router crestRootRouter,
             @Named("ChfRootRouter")org.forgerock.http.routing.Router chfRootRouter,
-            CrestProtocolEnforcementFilter crestProtocolEnforcementFilter,
             @Named("InvalidRealmNames") Set<String> invalidRealms,
             AuthenticationEnforcer defaultAuthenticationEnforcer, AuditFilter auditFilter,
             ContextFilter contextFilter, @Named("LoggingFilter") Filter loggingFilter) {
-        return new Routers.RootResourceRouterImpl(crestRootRouter, chfRootRouter, crestProtocolEnforcementFilter,
-                invalidRealms, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
+        return new Routers.RootResourceRouterImpl(crestRootRouter, chfRootRouter, invalidRealms,
+                defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
     }
 
     @Provides

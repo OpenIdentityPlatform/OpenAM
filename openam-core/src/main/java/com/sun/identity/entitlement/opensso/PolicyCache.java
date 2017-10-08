@@ -24,7 +24,7 @@
  *
  * $Id: PolicyCache.java,v 1.3 2009/12/12 00:03:13 veiming Exp $
  *
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2016 ForgeRock, Inc.
  */
 
 package com.sun.identity.entitlement.opensso;

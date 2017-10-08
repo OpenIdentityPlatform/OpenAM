@@ -11,36 +11,36 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sso.providers.stateless;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenID;
-import com.iplanet.sso.SSOTokenListener;
-import com.iplanet.sso.providers.dpro.SSOPrincipal;
-import com.iplanet.sso.providers.dpro.SSOSessionListener;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import org.forgerock.openam.session.SessionConstants;
+import java.net.InetAddress;
+import java.security.Principal;
+
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.net.InetAddress;
-import java.security.Principal;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.SessionState;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
+import com.iplanet.sso.providers.dpro.SSOPrincipal;
+import com.sun.identity.authentication.util.ISAuthConstants;
 
 public class StatelessSSOTokenTest {
 
@@ -58,13 +58,13 @@ public class StatelessSSOTokenTest {
     @Test
     public void shouldBeInvalidIfTimedOut() throws Exception {
         given(mockSession.isTimedOut()).willReturn(true);
-        given(mockSession.getState(false)).willReturn(SessionConstants.VALID);
+        given(mockSession.getState(false)).willReturn(SessionState.VALID);
 
         assertFalse(statelessSSOToken.isValid(false));
     }
     
     @Test(dataProvider = "sessionStates")
-    public void shouldBeInvalidIfNotValidOrInactive(int state) throws Exception {
+    public void shouldBeInvalidIfNotValidOrInactive(SessionState state) throws Exception {
         // Given
         given(mockSession.isTimedOut()).willReturn(false);
         given(mockSession.getState(false)).willReturn(state);
@@ -73,7 +73,7 @@ public class StatelessSSOTokenTest {
         boolean result = statelessSSOToken.isValid(false);
 
         // Then
-        if (state == SessionConstants.INACTIVE || state == SessionConstants.VALID) {
+        if (state == SessionState.VALID) {
             assertTrue(result, "Token should be valid in state: " + state);
         } else {
             assertFalse(result, "Token should NOT be valid in state: " + state);
@@ -83,10 +83,9 @@ public class StatelessSSOTokenTest {
     @DataProvider
     public Object[][] sessionStates() {
         return new Object[][] {
-                { SessionConstants.VALID },
-                { SessionConstants.INACTIVE },
-                { SessionConstants.INVALID },
-                { SessionConstants.DESTROYED }
+                { SessionState.VALID },
+                { SessionState.INVALID },
+                { SessionState.DESTROYED }
         };
     }
 
@@ -361,8 +360,8 @@ public class StatelessSSOTokenTest {
         // Then - exception
     }
 
-    @Test
-    public void shouldAddListenersToSession() throws Exception {
+    @Test(expectedExceptions = SSOTokenListenersUnsupportedException.class)
+    public void shouldNotSupportListeners() throws Exception {
         // Given
         SSOTokenListener listener = mock(SSOTokenListener.class);
 
@@ -370,6 +369,6 @@ public class StatelessSSOTokenTest {
         statelessSSOToken.addSSOTokenListener(listener);
 
         // Then
-        verify(mockSession).addSessionListener(any(SSOSessionListener.class));
+        // throws exception
     }
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 /**
@@ -19,5 +19,7 @@
  * assertions. End-users can implement a specific interface, and specify this class in the SAML2Config associated with
  * a published STS instance, and their class will be invoked to produce the specific statement type for inclusion in the
  * SAML2 assertion.
+ *
+ * @supported.api
  */
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;

@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,10 +25,8 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -63,7 +62,7 @@ public class UmaTokenStore {
         UmaProviderSettings settings = settingsFactory.get(realm);
         Permission permission = new Permission(permissionTicket.getResourceSetId(), permissionTicket.getScopes());
         RequestingPartyToken rpt = new RequestingPartyToken(null, permissionTicket.getResourceServerClientId(),
-                asSet(permission), System.currentTimeMillis() + (settings.getRPTLifetime() * 1000),
+                asSet(permission), currentTimeMillis() + (settings.getRPTLifetime() * 1000),
                 permissionTicket.getId(), permissionTicket.getClientClientId());
         rpt.setRealm(realm);
         try {
@@ -79,7 +78,7 @@ public class UmaTokenStore {
         UmaProviderSettings settings = settingsFactory.get(realm);
         PermissionTicket permissionTicket = new PermissionTicket(null, resourceSetId, scopes, clientId);
         permissionTicket.setRealm(realm);
-        permissionTicket.setExpiryTime(System.currentTimeMillis() + (settings.getPermissionTicketLifetime() * 1000));
+        permissionTicket.setExpiryTime(currentTimeMillis() + (settings.getPermissionTicketLifetime() * 1000));
         try {
             cts.create(permissionTicketAdapter.toToken(permissionTicket));
         } catch (CoreTokenException e) {

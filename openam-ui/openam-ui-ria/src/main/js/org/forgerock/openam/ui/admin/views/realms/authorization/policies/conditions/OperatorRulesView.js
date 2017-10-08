@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/OperatorRulesView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {
@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
         operatorI18nKey: "console.authorization.policies.edit.operators.",
 
-        render: function (args, element, itemID, firstChild, callback) {
+        render (args, element, itemID, firstChild, callback) {
             var self = this;
 
             this.data = $.extend(true, {}, args);
@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
-                self.setElement("#operator" + itemID);
+                self.setElement(`#operator${itemID}`);
                 self.select = self.$el.find("select");
                 self.delegateEvents();
 
@@ -68,15 +68,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        setValue: function (value) {
+        setValue (value) {
             this.select.focus().val(value).trigger("change");
         },
 
-        rebindElement: function () {
+        rebindElement () {
             this.delegateEvents();
         },
 
-        onSelect: function (e) {
+        onSelect (e) {
             var item = $(e.currentTarget).parent(),
                 value = e.currentTarget.value,
                 itemData = {},
@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             item.addClass(value.toLowerCase());
         },
 
-        checkOptions: function (e) {
+        checkOptions (e) {
             var parent = $(e.target).parent(),
                 dropbox = parent.children("ol.dropbox"),
                 select = dropbox.parent().children("select"),
@@ -105,7 +105,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
             if (dropbox.children(":not(.dragged)").length > 1) {
                 _.each(this.data.operators, function (obj) {
-                    option = select.find('option[value="' + obj.title + '"]');
+                    option = select.find(`option[value="${obj.title}"]`);
                     var isDisabled = !!(obj.config.properties.condition || obj.config.properties.subject);
                     option.prop("disabled", isDisabled);
                 });

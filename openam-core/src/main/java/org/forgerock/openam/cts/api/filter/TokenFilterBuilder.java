@@ -11,17 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.filter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.time.Duration;
 
 /**
  * Allows the assembly of {@link TokenFilter} instances for use with the {@link CTSPersistentStore}
@@ -94,6 +94,30 @@ public class TokenFilterBuilder {
     }
 
     /**
+     * Sets the size limit for the query request. Defaults to 0. The size limit will be enforced by the underlying
+     * backend technology.
+     *
+     * @param sizeLimit The non-negative amount of entries that should be returned at most via the query.
+     * @return This builder.
+     */
+    public TokenFilterBuilder withSizeLimit(int sizeLimit) {
+        tokenFilter.setSizeLimit(sizeLimit);
+        return this;
+    }
+
+    /**
+     * Sets the time limit for the query request. Defaults to 0 seconds - no time limit. The time limit will be
+     * enforced by the underlying backend technology.
+     *
+     * @param timeLimit The non-negative time duration under which the query must finish.
+     * @return This builder.
+     */
+    public TokenFilterBuilder withTimeLimit(Duration timeLimit) {
+        tokenFilter.setTimeLimit(timeLimit);
+        return this;
+    }
+
+    /**
      * If you only require the returned CTS Tokens to contains a subset of the standard
      * {@link CoreTokenField#values()} then this method allows the caller to specify the
      * fields they would like in the returned CTS Tokens.
@@ -121,7 +145,7 @@ public class TokenFilterBuilder {
      */
     public class FilterAttributeBuilder {
         private final Type type;
-        private List<QueryFilter<CoreTokenField>> criteria = new ArrayList<>();
+        private LinkedList<QueryFilter<CoreTokenField>> criteria = new LinkedList<>();
 
         private FilterAttributeBuilder(TokenFilter tokenFilter, Type type) {
             Reject.ifTrue(tokenFilter.getQuery() != null, "TokenFilter already has query assigned, invalid state.");
@@ -139,6 +163,20 @@ public class TokenFilterBuilder {
          */
         public FilterAttributeBuilder withAttribute(CoreTokenField field, Object value) {
             criteria.add(QueryFilter.equalTo(field, value));
+            return this;
+        }
+
+        /**
+         * A variant of {@link #withAttribute(CoreTokenField, Object)} which changes the order of the filter arguments
+         * to allow the underlying backend to efficiently run the query.
+         *
+         * @param field Non null {@link CoreTokenField} to filter on.
+         * @param value Non null value that matching CTS Tokens must contain.
+         * @return This FilterAttributeBuilder.
+         * @see #withAttribute(CoreTokenField, Object)
+         */
+        public FilterAttributeBuilder withPriorityAttribute(CoreTokenField field, Object value) {
+            criteria.addFirst(QueryFilter.equalTo(field, value));
             return this;
         }
 

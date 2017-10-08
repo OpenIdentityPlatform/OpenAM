@@ -1,10 +1,6 @@
-{{> breadcrumb/_Breadcrumb backLink=backLink}}
-{{> headers/_Title title="console.authorization.policies.edit.createNew" helpLink="backstage.authz.policies" }}
+{{> headers/_Title title="console.authorization.policies.edit.createNew" }}
 
-<div class="panel panel-default panel-collapse fr-panel-with-border">
-    <div class="panel-heading">
-        <h4 class="panel-title"><a class="no-caret">{{t "common.form.details"}}</a></h4>
-    </div>
+<div class="panel panel-default fr-panel-with-border">
 
     <div class="panel-body">
         <div class="block clearfix form-horizontal">
@@ -15,14 +11,6 @@
                     <input class="form-control" id="policyName" name="entityName" type="text"
                            value="{{entity.name}}" data-field="name" autofocus required
                            placeholder="{{t 'common.form.validation.required'}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-sm-2 control-label" for="policyDescription">{{t "console.common.description"}}</label>
-
-                <div class="col-sm-9">
-                    <textarea class="form-control" id="policyDescription" data-field="description">{{entity.description}}</textarea>
                 </div>
             </div>
 
@@ -51,7 +39,7 @@
             <a class="btn btn-default" href="{{routeTo 'realmsPolicySetEdit' realmPath policySetName}}">
                 {{t "common.form.cancel"}}
             </a>
-            <input type="button" name="submitForm" value="{{t 'common.form.create'}}" class="btn btn-primary">
+            <input data-save type="button" name="submitForm" value="{{t 'common.form.create'}}" class="btn btn-primary">
         </div>
     </div>
 </div>

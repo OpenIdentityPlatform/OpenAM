@@ -11,42 +11,42 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.dashboard;
 
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DASHBOARD_RESOURCE;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PATH_PARAM;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.READ_DESCRIPTION;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.TITLE;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.HashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.HashMap;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.services.context.Context;
+import org.forgerock.api.annotations.CollectionProvider;
+import org.forgerock.api.annotations.Handler;
+import org.forgerock.api.annotations.Operation;
+import org.forgerock.api.annotations.Parameter;
+import org.forgerock.api.annotations.Read;
+import org.forgerock.api.annotations.Schema;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.PermanentException;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.dashboard.Dashboard;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * JSON REST interface to return specific information from the Dashboard service.
@@ -54,7 +54,16 @@ import org.forgerock.util.promise.Promise;
  * This endpoint only supports the READ operation - and then only for specific
  * values (referred to as the resourceId).
  */
-public final class DashboardResource implements CollectionResourceProvider {
+@CollectionProvider(
+        details = @Handler(
+                title = DASHBOARD_RESOURCE + TITLE,
+                description = DASHBOARD_RESOURCE + DESCRIPTION,
+                resourceSchema = @Schema(
+                        schemaResource = "Dashboard.resource.schema.json"),
+                mvccSupported = false),
+        pathParam = @Parameter(name = "resourceId", type = "string", description = DASHBOARD_RESOURCE +
+                PATH_PARAM + DESCRIPTION))
+public final class DashboardResource {
 
     private final Debug debug;
 
@@ -66,59 +75,8 @@ public final class DashboardResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
-            ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
-            DeleteRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
-            PatchRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
-            QueryResourceHandler handler) {
-        return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    @Read(operationDescription = @Operation(
+            description = DASHBOARD_RESOURCE + READ_DESCRIPTION))
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
@@ -152,12 +110,4 @@ public final class DashboardResource implements CollectionResourceProvider {
         return newResultPromise(resource);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
-            UpdateRequest request) {
-        return RestUtils.generateUnsupportedOperation();
-    }
 }

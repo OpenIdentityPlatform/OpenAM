@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
-
 package org.forgerock.openam.core.rest;
 
 import static org.forgerock.json.resource.Responses.newQueryResponse;
@@ -58,6 +57,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
@@ -198,10 +198,10 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
             final QueryRequest request, final QueryResourceHandler handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
-            SSOToken admin = getSSOToken(RestUtils.getToken().getTokenID().toString());
+            SSOToken admin = context.asContext(SSOTokenContext.class).getCallerSSOToken();
             IdentityServicesImpl identityServices = getIdentityServices();
             List<IdentityDetails> userDetails = null;
 
@@ -232,13 +232,8 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
                     + principalName);
 
             for (IdentityDetails userDetail : userDetails) {
-                ResourceResponse resource;
-                resource = newResourceResponse(userDetail.getName(),
-                        "0",
-                        identityResourceV2.addRoleInformation(context,
-                                userDetail.getName(),
-                                identityDetailsToJsonValue(userDetail)));
-                handler.handleResource(resource);
+                handler.handleResource(
+                        this.identityResourceV2.buildResourceResponse(userDetail.getName(), context, userDetail));
             }
 
         } catch (ResourceException resourceException) {
@@ -271,7 +266,7 @@ public final class IdentityResourceV3 implements CollectionResourceProvider {
         }
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getResolvedRealm();
+        final String realm = realmContext.getRealm().asPath();
 
         try {
             if (!isAdmin(context)) {

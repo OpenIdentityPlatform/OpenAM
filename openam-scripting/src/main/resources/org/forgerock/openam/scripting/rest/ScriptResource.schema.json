@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/ScriptResource#schema.title",
+  "description": "i18n:api-descriptor/ScriptResource#schema.description",
+  "properties": {
+    "_id": {
+      "title": "i18n:api-descriptor/ScriptResource#id.title",
+      "description": "i18n:api-descriptor/ScriptResource#id.description",
+      "type": "string"
+    },
+    "name": {
+      "title": "i18n:api-descriptor/ScriptResource#name.title",
+      "description": "i18n:api-descriptor/ScriptResource#name.description",
+      "type": "string"
+    },
+    "description": {
+      "title": "i18n:api-descriptor/ScriptResource#description.title",
+      "description": "i18n:api-descriptor/ScriptResource#description.description",
+      "type": "string"
+    },
+    "script": {
+      "title": "i18n:api-descriptor/ScriptResource#script.title",
+      "description": "i18n:api-descriptor/ScriptResource#script.description",
+      "type": "string"
+    },
+    "language": {
+      "title": "i18n:api-descriptor/ScriptResource#language.title",
+      "description": "i18n:api-descriptor/ScriptResource#language.description",
+      "type": "string"
+    },
+    "context": {
+      "title": "i18n:api-descriptor/ScriptResource#context.title",
+      "description": "i18n:api-descriptor/ScriptResource#context.description",
+      "type": "string"
+    },
+    "createdBy": {
+      "title": "i18n:api-descriptor/ScriptResource#createdBy.title",
+      "description": "i18n:api-descriptor/ScriptResource#createdBy.description",
+      "type": "string"
+    },
+    "creationDate": {
+      "title": "i18n:api-descriptor/ScriptResource#creationDate.title",
+      "description": "i18n:api-descriptor/ScriptResource#creationDate.description",
+      "type": "number"
+    },
+    "lastModifiedBy": {
+      "title": "i18n:api-descriptor/ScriptResource#lastModifiedBy.title",
+      "description": "i18n:api-descriptor/ScriptResource#lastModifiedBy.description",
+      "type": "string"
+    },
+    "lastModifiedDate": {
+      "title": "i18n:api-descriptor/ScriptResource#lastModifiedDate.title",
+      "description": "i18n:api-descriptor/ScriptResource#lastModifiedDate.description",
+      "type": "number"
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "script",
+    "language",
+    "context"
+  ]
+}

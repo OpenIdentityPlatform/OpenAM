@@ -25,11 +25,10 @@
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
-<%@ page import="org.forgerock.openam.openidconnect.CheckSessionImpl" %>
 <%@ page import="org.forgerock.openidconnect.CheckSession" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 <%
-    CheckSession checkSession = new CheckSessionImpl();
+    CheckSession checkSession = new CheckSession();
     String cookieName = checkSession.getCookieName();
     String clientSessionURI = checkSession.getClientSessionURI(request);
     Boolean validSession = checkSession.getValidSession(request);

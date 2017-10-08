@@ -11,12 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValueFunctions.setOf;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
+
+import java.util.Calendar;
+import java.util.Set;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
@@ -24,9 +33,6 @@ import org.forgerock.openam.tokens.JsonValueToJsonBytesConverter;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 import org.forgerock.opendj.ldap.GeneralizedTime;
-
-import java.util.Calendar;
-import java.util.Set;
 
 /**
  * A data layer persistent object for UMA Pending requests.
@@ -59,7 +65,7 @@ public class UmaPendingRequest {
 
     public UmaPendingRequest() {
         this.blob = json(object(
-                field("requestedAt", GeneralizedTime.valueOf(Calendar.getInstance()).toString())));
+                field("requestedAt", GeneralizedTime.valueOf(getCalendarInstance()).toString())));
     }
 
     public UmaPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId, String realm,
@@ -70,8 +76,8 @@ public class UmaPendingRequest {
         this.realm = realm;
         this.requestingPartyId = requestingPartyId;
         this.blob = json(object(
-                field("scopes", scopes),
-                field("requestedAt", GeneralizedTime.valueOf(Calendar.getInstance()).toString())));
+                field("scopes", newList(scopes)),
+                field("requestedAt", GeneralizedTime.valueOf(getCalendarInstance()).toString())));
     }
 
     public String getId() {
@@ -131,7 +137,7 @@ public class UmaPendingRequest {
     }
 
     public Set<String> getScopes() {
-        return blob.get("scopes").asSet(String.class);
+        return blob.get("scopes").as(setOf(String.class));
     }
 
     public Calendar getRequestedAt() {
@@ -144,6 +150,6 @@ public class UmaPendingRequest {
                 field("user", requestingPartyId),
                 field("resource", resourceSetName),
                 field("when", getRequestedAt()),
-                field("permissions", getScopes())));
+                field("permissions", newList(getScopes()))));
     }
 }

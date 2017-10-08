@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2016 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -26,9 +26,13 @@ import java.util.List;
 /**
  * Defines the concerns of generating the AttributeStatement list to be included in the SAML2 assertion. If no custom
  * class is specified in the SAML2Config, then the DefaultAttributeStatementsProvider will be used.
+ *
+ * @supported.all.api
  */
 public interface AttributeStatementsProvider {
+
     /**
+     * Invoked to obtain the List of AttributeStatement instances to be included in the generated SAML2 assertion.
      *
      * @param ssoToken The SSOToken corresponding to asserted subject
      * @param saml2Config The STS-instance-specific SAML2 configurations

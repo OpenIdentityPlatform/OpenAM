@@ -34,6 +34,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a101"
+                                 order="100"
                                  resourceName="rptLifetime">
                     <DefaultValues>
                         <Value>3600</Value>
@@ -45,6 +46,7 @@
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
                                  i18nKey="a102"
+                                 order="200"
                                  resourceName="permissionTicketLifetime">
                     <DefaultValues>
                         <Value>120</Value>
@@ -55,6 +57,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a103"
+                                 order="300"
                                  resourceName="deletePoliciesOnDeleteRS">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -69,6 +72,7 @@
                                  type="single"
                                  syntax="boolean"
                                  i18nKey="a104"
+                                 order="400"
                                  resourceName="deleteResourceSetsOnDeleteRS">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -82,7 +86,8 @@
                 <AttributeSchema name="emailResourceOwnerOnPendingRequestCreation"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 order="500">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -95,7 +100,8 @@
                 <AttributeSchema name="emailRequestingPartyOnPendingRequestApproval"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a106">
+                                 i18nKey="a106"
+                                 order="600">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -108,7 +114,8 @@
                 <AttributeSchema name="userProfileLocaleAttribute"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 order="700">
                     <DefaultValues>
                         <Value>inetOrgPerson</Value>
                     </DefaultValues>
@@ -117,7 +124,8 @@
                 <AttributeSchema name="resharingMode"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 order="800">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="resharingModeChoiceOff">OFF</ChoiceValue>
                         <ChoiceValue i18nKey="resharingModeChoiceImplicit">IMPLICIT</ChoiceValue>
@@ -130,7 +138,8 @@
                 <AttributeSchema name="requireTrustElevation"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a109">
+                                 i18nKey="a109"
+                                 order="900">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

@@ -16,23 +16,34 @@
 
 package com.iplanet.dpro.session.operations.strategies;
 
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
-import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.blacklist.Blacklist;
+import org.forgerock.openam.blacklist.BlacklistException;
+import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.session.authorisation.SessionChangeAuthorizer;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
+import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.Time;
 
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
+import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.SessionAuditor;
 import com.iplanet.dpro.session.service.SessionLogging;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.forgerock.openam.session.blacklist.SessionBlacklist;
-import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-
-import javax.inject.Inject;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 
 /**
  * Handles client-side sessions.
@@ -40,32 +51,33 @@ import javax.inject.Inject;
  * @since 13.0.0
  */
 public class StatelessOperations implements SessionOperations {
+
     private final SessionOperations localOperations;
-    private final SessionService sessionService;
-    private final StatelessSessionFactory statelessSessionFactory;
-    private final SessionBlacklist sessionBlacklist;
+    private final StatelessSessionManager statelessSessionManager;
+    private final Blacklist<Session> sessionBlacklist;
     private final SessionLogging sessionLogging;
     private final SessionAuditor sessionAuditor;
+    private final SessionChangeAuthorizer sessionChangeAuthorizer;
 
     @Inject
     public StatelessOperations(final LocalOperations localOperations,
-                               final SessionService sessionService,
-                               final StatelessSessionFactory statelessSessionFactory,
-                               final SessionBlacklist sessionBlacklist,
+                               final StatelessSessionManager statelessSessionManager,
+                               final Blacklist<Session> sessionBlacklist,
                                final SessionLogging sessionLogging,
-                               final SessionAuditor sessionAuditor) {
+                               final SessionAuditor sessionAuditor,
+                               final SessionChangeAuthorizer sessionChangeAuthorizer) {
         this.localOperations = localOperations;
-        this.sessionService = sessionService;
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.statelessSessionManager = statelessSessionManager;
         this.sessionBlacklist = sessionBlacklist;
         this.sessionLogging = sessionLogging;
         this.sessionAuditor = sessionAuditor;
+        this.sessionChangeAuthorizer = sessionChangeAuthorizer;
     }
 
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
-        final SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
-        if (sessionInfo.getExpiryTime() < System.currentTimeMillis()) {
+        final SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
+        if (sessionInfo.getExpiryTime(TimeUnit.MILLISECONDS) < currentTimeMillis()) {
             throw new SessionTimedOutException("Stateless session corresponding to client "
                     + sessionInfo.getClientID() + " timed out.");
         }
@@ -74,35 +86,90 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public void logout(final Session session) throws SessionException {
-        if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEvent.LOGOUT);
-            // Required since not possible to mock SessionAuditor in test case
-            if (sessionAuditor != null) {
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_LOGGED_OUT);
-            }
-        }
-        sessionBlacklist.blacklist(session);
+        blacklist(session, SessionEventType.LOGOUT);
+    }
+
+    @Override
+    public Session resolveSession(SessionID sessionID) throws SessionException {
+        return statelessSessionManager.generate(sessionID);
+    }
+
+    @Override
+    public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * This implementation will forward the query call to the local operations in order to allow the return of stateful
+     * sessions even when the request was initiated using a stateless session.
+     * Since stateless sessions are not tracked by OpenAM, it is not possible to query for them.
+     *
+     * @param crestQuery {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws SessionException {@inheritDoc}
+     */
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
+        return localOperations.getMatchingSessions(crestQuery);
     }
 
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
-        sessionService.checkPermissionToDestroySession(requester, session.getID());
-        if (session instanceof StatelessSession) {
-            SessionInfo sessionInfo = statelessSessionFactory.getSessionInfo(session.getID());
-            sessionLogging.logEvent(sessionInfo, SessionEvent.DESTROY);
-            // Required since not possible to mock SessionAuditor in test case
-            if (sessionAuditor != null) {
-                sessionAuditor.auditActivity(sessionInfo, AM_SESSION_DESTROYED);
-            }
-        }
-
-        sessionBlacklist.blacklist(session);
+        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
+        blacklist(session, SessionEventType.DESTROY);
     }
 
     @Override
     public void setProperty(final Session session, final String name, final String value) throws SessionException {
         localOperations.setProperty(session, name, value);
+    }
+
+    @Override
+    public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
+        return statelessSessionManager.getSessionInfo(sid);
+    }
+
+    @Override
+    public void addSessionListener(Session session, String url) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        return statelessSessionManager.containsJwt(sessionId);
+    }
+
+    @Override
+    public String getRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String deferenceRestrictedID(Session session, SessionID restrictedID) throws SessionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
+        localOperations.setExternalProperty(clientToken, sessionId, name, value);
+    }
+
+    private void blacklist(final Session session, final SessionEventType destroy) throws SessionException {
+        if (session instanceof StatelessSession) {
+            logAuditEvent(session, destroy);
+        }
+        try {
+            sessionBlacklist.blacklist(session);
+        } catch (BlacklistException e) {
+            throw new SessionException(e);
+        }
+    }
+
+    private void logAuditEvent(final Session session, final SessionEventType sessionEventType) throws SessionException {
+        long timestamp = Time.currentTimeMillis();
+        SessionInfo sessionInfo = statelessSessionManager.getSessionInfo(session.getID());
+        sessionLogging.logEvent(sessionInfo, sessionEventType, timestamp);
+        sessionAuditor.auditActivity(sessionInfo, sessionEventType, timestamp);
     }
 
 }

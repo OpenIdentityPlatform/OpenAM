@@ -24,6 +24,8 @@
 
    $Id: SAML2LogMessageIDs.xml,v 1.9 2010/01/23 00:06:23 exu Exp $
 
+   Portions Copyrighted 2016 ForgeRock AS.
+
 -->
 
 
@@ -2211,6 +2213,19 @@
         </triggers>
         <actions>
             <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="DATE_CONDITION_NOT_MET" id="168"
+        loglevel="LL_INFO"
+        description="Assertion NotBefore or NotOnOrAfter condition not met.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>The NotBefore or NotOnOrAfter condition of the single sign on assertion was not met.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Check assertion clock skew. Contact identity provider if needed.</item>
         </actions>
     </logmessage>
 </logmessages>

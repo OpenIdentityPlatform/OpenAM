@@ -24,9 +24,30 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.cli.entitlement;
+
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.security.auth.Subject;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -50,20 +71,7 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.cli.entitlement.XACMLUtils;
-
-import javax.security.auth.Subject;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Gets policies in a realm.
@@ -91,24 +99,6 @@ public class ListXACML extends AuthenticatedCommand {
         super.handleRequest(rc);
         ldapLogin();
 
-        // FIXME: change to use entitlementService.xacmlPrivilegeEnabled()
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
-        if(!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY",
-                    "list-xacml not supported in  legacy policy mode"};
-            debugError("ListXACML.handleRequest(): "
-                    + "list-xacml not supported in  legacy policy mode");
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM",
-                args);
-            throw new CLIException(
-                getResourceString(
-                    "list-xacml-not-supported-in-legacy-policy-mode"),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                "list-xacml");
-        }
-
         adminSSOToken = getAdminSSOToken();
 
         if (!XACMLUtils.hasPermission(realm, adminSSOToken, "READ")) {
@@ -122,7 +112,7 @@ public class ListXACML extends AuthenticatedCommand {
         adminSubject = SubjectUtils.createSubject(adminSSOToken);
         realm = getStringOptionValue(IArgument.REALM_NAME);
         getPolicyNamesOnly = isOptionSet("namesonly");
-        filters = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
+        filters = convertToSearchFilters((List)rc.getOption(ARGUMENT_POLICY_NAMES));
         outfile = getStringOptionValue(IArgument.OUTPUT_FILE);
         outputWriter = getOutputWriter();
 
@@ -132,6 +122,22 @@ public class ListXACML extends AuthenticatedCommand {
             getPolicies();
         }
 
+    }
+
+    /**
+     * Prefix the filters with name= for use with the {@link SearchFilterFactory}.
+     * ssoadm sends the policyname value only, in the argument --policynames.
+     * @param filters can be null or empty.
+     * @return PrefixedFilters.
+     */
+    private List<String> convertToSearchFilters(List<String> filters) {
+        if (CollectionUtils.isEmpty(filters)) {
+            return Collections.EMPTY_LIST;
+        }
+        for (int idx = 0; idx < filters.size(); idx++) {
+            filters.set(idx, "name=" + filters.get(idx).trim());
+        }
+        return filters;
     }
 
     /**
@@ -291,12 +297,16 @@ public class ListXACML extends AuthenticatedCommand {
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
+            ApplicationServiceFactory factory = InjectorHolder.getInstance(ApplicationServiceFactory.class);
+            ResourceTypeService service = InjectorHolder.getInstance(ResourceTypeService.class);
             XACMLExportImport importExport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),
-                    PrivilegeManager.debug);
+                    PrivilegeManager.debug,
+                    factory,
+                    service);
 
             policySet = importExport.exportXACML(realm, adminSubject, filters);
         } catch (EntitlementException e) {

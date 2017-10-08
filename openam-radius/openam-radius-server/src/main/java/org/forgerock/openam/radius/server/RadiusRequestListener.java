@@ -15,6 +15,14 @@
  */
 package org.forgerock.openam.radius.server;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guava.common.eventbus.EventBus;
+import org.forgerock.openam.radius.server.config.ClientConfig;
+import org.forgerock.openam.radius.server.config.RadiusServerConstants;
+import org.forgerock.openam.radius.server.config.RadiusServiceConfig;
+import org.forgerock.openam.radius.server.events.PacketDroppedSilentlyEvent;
+import org.forgerock.openam.radius.server.events.PacketReceivedEvent;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,19 +33,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.DatagramChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.forgerock.guava.common.eventbus.EventBus;
-import org.forgerock.openam.radius.server.config.ClientConfig;
-import org.forgerock.openam.radius.server.config.RadiusServerConstants;
-import org.forgerock.openam.radius.server.config.RadiusServiceConfig;
-import org.forgerock.openam.radius.server.events.PacketProcessedEvent;
-import org.forgerock.openam.radius.server.events.PacketReceivedEvent;
-import org.forgerock.util.promise.PromiseImpl;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Listens for incoming radius requests, validates they are for defined clients, drops packets that aren't, and queues
@@ -135,6 +137,26 @@ public class RadiusRequestListener implements Runnable {
         } catch (final SocketException e) {
             this.startedSuccessfully = false;
             throw new RadiusLifecycleException("RADIUS listener unable to bind to port " + config.getPort(), e);
+        }
+
+        // verify necessary resources are available that will prevent any handling if not found. Should never happen
+        // but allows us to avoid propagating these exceptions in RadiusRequestContext.injectResponseAuthenticator()
+        // (which uses these objects) back up to this level to terminate the listener. Alternatively, we could pass
+        // this listener into the RadiusRequestHandler so that it can catch that exception and call the
+        // listener's terminate method.
+        try {
+            MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required MD5 "
+                    + "MessageDigest type.", e);
+        }
+        if (Charset.isSupported("UTF-8")) {
+            try {
+                Charset.forName("UTF-8");
+            } catch (UnsupportedCharsetException e) {
+                throw new RadiusLifecycleException("RADIUS listener unable to start due to missing required UTF-8 "
+                        + "Charset.", e);
+            }
         }
 
         // final DroppedRequestHandler dropsHandler = new DroppedRequestHandler();
@@ -269,11 +291,13 @@ public class RadiusRequestListener implements Runnable {
 
                 if (clientConfig == null) {
                     LOG.warning("No Defined RADIUS Client matches IP address " + ipAddr + ". Dropping request.");
+                    eventBus.post(new PacketDroppedSilentlyEvent());
                     continue;
                 }
                 if (!clientConfig.isClassIsValid()) {
                     LOG.warning("Declared Handler Class for Client '" + clientConfig.getName()
                             + "' is not valid. See earlier loading exception. Dropping request.");
+                    eventBus.post(new PacketDroppedSilentlyEvent());
                     continue;
                 }
 
@@ -281,36 +305,10 @@ public class RadiusRequestListener implements Runnable {
                 bfr.flip();
                 final RadiusRequestContext reqCtx = new RadiusRequestContext(clientConfig, channel, iAddr);
 
-                final PromiseImpl<RadiusResponse, RadiusProcessingException> promise = PromiseImpl.create();
                 final RadiusRequestHandler requestHandler = new RadiusRequestHandler(accessRequestHandlerFactory,
-                        reqCtx, bfr, promise, promise,
-                        eventBus);
+                        reqCtx, bfr, eventBus);
 
                 executorService.execute(requestHandler);
-
-                try {
-                    final RadiusResponse result = promise.getOrThrow();
-                    eventBus.post(new PacketProcessedEvent());
-
-                } catch (final RadiusProcessingException e) {
-                    final RadiusProcessingExceptionNature nature = e.getNature();
-                    switch (nature) {
-                    case CATASTROPHIC:
-                        LOG.error("Catestrophic error processing a RADIUS request.", e);
-                        terminated = true;
-                        break;
-                    case INVALID_RESPONSE:
-                        LOG.error("Failed to handle request. This request will be ignored.", e);
-                        break;
-                    case TEMPORARY_FAILURE:
-                        final String errStr = "Failed to handle request. This request could be retried, but that is"
-                                + " currently not implemented.";
-                        LOG.error(errStr, e);
-                        break;
-                    default:
-                        break;
-                    }
-                }
             } catch (final Exception t) {
                 LOG.error("Error receiving request.", t);
             }

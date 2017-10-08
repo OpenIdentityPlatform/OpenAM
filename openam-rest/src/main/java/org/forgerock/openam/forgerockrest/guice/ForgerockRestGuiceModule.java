@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -23,6 +23,8 @@ import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
@@ -31,7 +33,8 @@ import org.forgerock.openam.forgerockrest.utils.AgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
-import org.forgerock.openam.rest.authz.PrivilegeDefinition;
+import org.forgerock.openam.rest.RestConstants;
+import org.forgerock.openam.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.util.SignatureUtil;
@@ -70,8 +73,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     }
 
     @Provides
+    @Named("CrestPrivilegeDefinitions")
     @Singleton
-    public Map<String, PrivilegeDefinition> getPrivilegeDefinitions() {
+    public Map<String, PrivilegeDefinition> getCrestPrivilegeDefinitions() {
         final Map<String, PrivilegeDefinition> definitions = new HashMap<>();
 
         final PrivilegeDefinition evaluateDefinition = PrivilegeDefinition
@@ -86,9 +90,16 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 PrivilegeDefinition.getInstance("schema", PrivilegeDefinition.Action.READ));
         definitions.put("validate",
                 PrivilegeDefinition.getInstance("validate", PrivilegeDefinition.Action.READ));
-        definitions.put("template",
-                PrivilegeDefinition.getInstance("template", PrivilegeDefinition.Action.READ));
-
+        definitions.put(RestConstants.TEMPLATE,
+                PrivilegeDefinition.getInstance(RestConstants.TEMPLATE, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_ALL_TYPES,
+                PrivilegeDefinition.getInstance(RestConstants.GET_ALL_TYPES, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_CREATABLE_TYPES,
+                PrivilegeDefinition.getInstance(RestConstants.GET_CREATABLE_TYPES, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.NEXT_DESCENDENTS,
+                PrivilegeDefinition.getInstance(RestConstants.NEXT_DESCENDENTS, PrivilegeDefinition.Action.READ));
+        definitions.put(RestConstants.GET_TYPE,
+                PrivilegeDefinition.getInstance(RestConstants.GET_TYPE, PrivilegeDefinition.Action.READ));
         definitions.put("getPropertyNames",
                 PrivilegeDefinition.getInstance("getPropertyNames", PrivilegeDefinition.Action.READ));
         definitions.put("getProperty",
@@ -97,7 +108,23 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 PrivilegeDefinition.getInstance("setProperty", PrivilegeDefinition.Action.MODIFY));
         definitions.put("deleteProperty",
                 PrivilegeDefinition.getInstance("deleteProperty", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("clone",
+                PrivilegeDefinition.getInstance("clone", PrivilegeDefinition.Action.MODIFY));
 
+        return definitions;
+    }
+
+    @Provides
+    @Named("HttpPrivilegeDefinitions")
+    @Singleton
+    public Map<String, PrivilegeDefinition> getHttpPrivilegeDefinitions() {
+        Map<String, PrivilegeDefinition> definitions = new HashMap<>();
+        definitions.put("GET", PrivilegeDefinition.getInstance("GET", PrivilegeDefinition.Action.READ));
+        definitions.put("HEAD", PrivilegeDefinition.getInstance("HEAD", PrivilegeDefinition.Action.READ));
+        definitions.put("POST", PrivilegeDefinition.getInstance("POST", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("PUT", PrivilegeDefinition.getInstance("PUT", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("DELETE", PrivilegeDefinition.getInstance("DELETE", PrivilegeDefinition.Action.MODIFY));
+        definitions.put("PATCH", PrivilegeDefinition.getInstance("PATCH", PrivilegeDefinition.Action.MODIFY));
         return definitions;
     }
 }

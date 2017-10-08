@@ -11,39 +11,87 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
-import static java.util.Collections.emptyMap;
+import static org.forgerock.guava.common.collect.Sets.newHashSet;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.openam.core.rest.sms.SmsRouteTree.*;
+import static org.forgerock.json.resource.Requests.newApiRequest;
+import static org.forgerock.json.resource.Resources.newAnnotatedRequestHandler;
+import static org.forgerock.json.resource.Resources.newCollection;
+import static org.forgerock.json.resource.Resources.newHandler;
+import static org.forgerock.openam.core.rest.sms.SmsRealmProvider.REALMS_PATH;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.branch;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.filter;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.leaf;
+import static org.forgerock.openam.core.rest.sms.tree.SmsRouteTreeBuilder.tree;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.api.models.ApiDescription;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
+import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.ApiProducer;
+import org.forgerock.http.routing.RoutingMode;
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourcePath;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
+import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
+import org.forgerock.openam.rest.RealmRoutingFactory;
+import org.forgerock.openam.rest.authz.CrestPrivilegeAuthzModule;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
+import org.forgerock.services.descriptor.Describable;
+import org.forgerock.services.routing.RouteMatcher;
+import org.forgerock.util.promise.Promise;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.configuration.ConfigurationBase;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -56,40 +104,6 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
-import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Function;
-import org.forgerock.guava.common.collect.Maps;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.ResourcePath;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.RealmNormaliser;
-import org.forgerock.services.context.Context;
-import org.forgerock.services.routing.RouteMatcher;
-import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResponse;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.RealmContextFilter;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.util.promise.Promise;
-
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
  * the SMS configuration services. Uses the {@link ServiceManager} to get a list of all registered
@@ -100,73 +114,13 @@ import org.forgerock.util.promise.Promise;
  * and resource providers are updated accordingly.
  * @since 13.0.0
  */
-public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener {
+public class SmsRequestHandler implements RequestHandler, SMSObjectListener, ServiceListener,
+        Describable<ApiDescription, Request> {
 
-    static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
-    static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
-    static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
-    static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
-
-    private static final Function<String, Boolean> CIRCLES_OF_TRUST_HANDLES_FUNCTION =
-            new SingleServiceFunction(COT_CONFIG_SERVICE);
-    private static final Function<String, Boolean> ENTITYPROVIDER_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        private final List<String> services =
-                Arrays.asList(IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
-
-        public Boolean apply(@Nullable String name) {
-            return services.contains(name);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Nullable
-        @Override
-        public Boolean apply(@Nullable String s) {
-            return ISAuthConstants.AUTH_SERVICE_NAME.equals(s);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_CHAINS_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Nullable
-        @Override
-        public Boolean apply(@Nullable String s) {
-            return ISAuthConstants.AUTHCONFIG_SERVICE_NAME.equals(s);
-        }
-    };
-
-    private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Override
-        public Boolean apply(String serviceName) {
-            return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName);
-        }
-    };
-
-    /**
-     * Services are all the services not handled by other handlers for specific service schema types.
-     */
-    private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
-                AUTHENTICATION_HANDLES_FUNCTION,
-                AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
-                AUTHENTICATION_MODULE_HANDLES_FUNCTION,
-                CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                ENTITYPROVIDER_HANDLES_FUNCTION
-        );
-        @Override
-        public Boolean apply(String serviceName) {
-            for (Function<String, Boolean> handled : ALREADY_HANDLED) {
-                if (handled.apply(serviceName)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    };
-
-    private static final List<Pattern> DEFAULT_IGNORED_ROUTES =
-            Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
+    private static final Pattern DEFAULT_IGNORED_ROUTES =
+            Pattern.compile("services/platform/(\\{sites\\}|sites|servers|secondary-urls)(/.*)?$");
     private static final String DEFAULT_VERSION = "1.0";
-    private static final String USE_PARENT_PATH = "USE-PARENT";
+    static final String USE_PARENT_PATH = "USE-PARENT";
     private static final String EMPTY_PATH = "EMPTY";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
@@ -175,124 +129,183 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
-    private final AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler;
-    private final AuthenticationModuleTypeHandler authenticationModuleTypeHandler;
-    private final RealmContextFilter realmContextFilter;
-    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
-            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
-    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
-            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
-    private final SitesResourceProvider sitesResourceProvider;
+    private final RealmRoutingFactory realmRoutingFactory;
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceSingletons = new HashMap<>();
+    private final Map<SchemaType, Collection<Predicate<String>>> excludedServiceCollections = new HashMap<>();
     private final RealmNormaliser realmNormaliser;
+    private final ServicesRealmSmsHandler servicesRealmSmsHandler;
     private Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
-    private final SmsRouteTree routeTree;
     private final SessionCache sessionCache;
     private final CoreWrapper coreWrapper;
+    private final SmsServiceHandlerFunction smsServiceHandlerFunction;
+    private final SitesResourceProvider sitesResourceProvider;
+    private final ServersResourceProvider serversResourceProvider;
+    private final List<Describable.Listener> apiListeners = new ArrayList<>();
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock read = lock.readLock();
+    private final Lock write = lock.writeLock();
+    // Guarded by lock.
+    private final SmsRouteTree routeTree;
+    private ApiDescription api;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
-            ExcludedServicesFactory excludedServicesFactory,
-            AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
-            AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
-            SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
-            RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
+            ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
+            RealmRoutingFactory realmRoutingFactory, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
-            PrivilegeAuthzModule privilegeAuthzModule)
+            CrestPrivilegeAuthzModule privilegeAuthzModule, SmsServiceHandlerFunction smsServiceHandlerFunction,
+            PrivilegedAction<SSOToken> adminTokenAction, ServicesRealmSmsHandler servicesRealmSmsHandler,
+            SitesResourceProvider sitesResourceProvider, ServersResourceProvider serversResourceProvider)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
-        this.sitesResourceProvider = sitesResourceProvider;
         this.debug = debug;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
         this.realmNormaliser = realmNormaliser;
         this.excludedServices = excludedServicesFactory.get(type);
-        this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
-        this.authenticationModuleTypeHandler = authenticationModuleTypeHandler;
-        this.realmContextFilter = realmContextFilter;
+        this.realmRoutingFactory = realmRoutingFactory;
+        this.servicesRealmSmsHandler = servicesRealmSmsHandler;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         Map<MatchingResourcePath, CrestAuthorizationModule> authzModules = type.equals(SchemaType.GLOBAL)
                 ? globalAuthzModules
                 : Collections.<MatchingResourcePath, CrestAuthorizationModule>emptyMap();
         routeTree = tree(authzModules, privilegeAuthzModule,
-                branch("/authentication", AUTHENTICATION_HANDLES_FUNCTION,
-                        leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION),
-                        filter("/chains", AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
-                branch("/federation", CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                        leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
-                leaf("/services", SERVICES_HANDLES_FUNCTION)
+                branch("/authentication", smsServiceHandlerFunction.AUTHENTICATION_HANDLES_FUNCTION,
+                        leaf("/modules", smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION, true),
+                        filter("/chains", smsServiceHandlerFunction.AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
+                                authenticationChainsFilter)),
+                branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
+                        leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION, false)),
+                leaf("/agents",smsServiceHandlerFunction.AGENTS_MODULE_HANDLES_FUNCTION, true),
+                leaf("/services", smsServiceHandlerFunction, true)
         );
-        addExcludedServiceProviders();
 
+        this.smsServiceHandlerFunction = smsServiceHandlerFunction;
+        this.sitesResourceProvider = sitesResourceProvider;
+        this.serversResourceProvider = serversResourceProvider;
+
+        addExcludedServiceProviders();
         createServices();
         addSpecialCaseRoutes();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
-        registerServiceListener();
+        registerServiceListener(adminTokenAction);
     }
 
-    private void registerServiceListener() throws SSOException, SMSException {
-        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        ServiceConfigManager serviceConfigManager = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME, token);
+    private void registerServiceListener(PrivilegedAction<SSOToken> adminTokenAction) throws SSOException, SMSException {
+        ServiceConfigManager serviceConfigManager = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME,
+                adminTokenAction.run());
         if (serviceConfigManager.addListener(this) == null) {
             debug.error("Could not add listener to ServiceConfigManager instance. Auth Module " +
                     "changes will not be dynamically updated");
         }
     }
 
-    private void addSpecialCaseRoutes() {
-        addAuthenticationModulesQueryHandler();
-        addAuthenticationModuleTypesQueryHandler();
+    private void addSpecialCaseRoutes() throws SMSException, SSOException {
+        addServiceInstancesQueryHandler();
+        addAgentServiceQueryHandler();
+        addAuthenticationHandlers();
         addRealmHandler();
         addCommonTasksHandler();
         addSitesHandler();
+        addServersHandler();
     }
 
+    //hard-coded authentication routes
+    private void addAuthenticationHandlers() {
+        // realm-config/authentication/modules -> realm module collection handler
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            getAuthenticationModuleRouter().addRoute(EQUALS, "",
+                    newAnnotatedRequestHandler(InjectorHolder.getInstance(AuthenticationModuleRealmSmsHandler.class)));
+        }
+    }
+
+    //hard-coded services routes
+    private void addServiceInstancesQueryHandler() throws SSOException, SMSException {
+        // realm-config/services -> service realm collection
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            SmsRouteTree serviceInstanceRouter = getServiceInstanceRouter();
+            servicesRealmSmsHandler.setSmsRouteTree(serviceInstanceRouter);
+            serviceInstanceRouter.addRoute(EQUALS, "", newAnnotatedRequestHandler(servicesRealmSmsHandler));
+        }
+    }
+
+    //hard-coded aggregating agent query routes
+    private void addAgentServiceQueryHandler() throws SSOException, SMSException {
+        // realm-config/agents -> service realm collection
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            ServiceManager sm = getServiceManager();
+            ServiceSchemaManager ssm = sm.getSchemaManager(ISAuthConstants.AGENT_SERVICE_NAME, DEFAULT_VERSION);
+            ServiceSchema agentServiceSchema = ssm.getOrganizationSchema();
+            SmsRouteTree serviceInstanceRouter = routeTree.handles(ISAuthConstants.AGENT_SERVICE_NAME);
+            serviceInstanceRouter.addRoute(EQUALS, "", newAnnotatedRequestHandler(
+                    new SmsAggregatingAgentsQueryHandler(agentServiceSchema, debug)));
+        }
+    }
+
+    //hard-coded realm-config/commontasks route
+    private void addCommonTasksHandler() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            routeTree.addRoute(STARTS_WITH, "/commontasks",
+                    newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
+        }
+    }
+
+    //routes under global-config/realms/{realms} route
+    private void addRealmHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(RoutingMode.STARTS_WITH, REALMS_PATH,
+                    newHandler(new SmsRealmProvider(sessionCache, coreWrapper, realmNormaliser)));
+        }
+    }
+
+    //routes under global-config/sites
     private void addSitesHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
+            routeTree.addRoute(STARTS_WITH, "sites", newCollection(sitesResourceProvider));
         }
+    }
+
+    //routes under global-config/servers
+    private void addServersHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(STARTS_WITH, "servers", newCollection(serversResourceProvider));
+        }
+    }
+
+    /**
+     * Identifies the first node in the SMS tree which isn't explicitly handled by another handler.
+     */
+    private SmsRouteTree getServiceInstanceRouter() throws SMSException, SSOException {
+
+        final Set<String> serviceNames = getServiceManager().getServiceNames();
+
+        for (String serviceName : serviceNames) {
+            if (smsServiceHandlerFunction.apply(serviceName)) {
+                return routeTree.handles(serviceName);
+            }
+        }
+
+        throw new IllegalStateException("Services SmsRouteTree could not be located");
     }
 
     private SmsRouteTree getAuthenticationModuleRouter() {
         return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
     }
 
-    private void addAuthenticationModulesQueryHandler() {
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "", authenticationModuleCollectionHandler);
-        }
-    }
-
-    private void addAuthenticationModuleTypesQueryHandler() {
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            getAuthenticationModuleRouter().addRoute(EQUALS, "types", authenticationModuleTypeHandler);
-        }
-    }
-
-    private void addRealmHandler() {
-        if (SchemaType.GLOBAL.equals(schemaType)) {
-            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(new SmsRealmProvider(
-                    sessionCache, coreWrapper, realmNormaliser), realmContextFilter));
-        }
-    }
-
-    private void addCommonTasksHandler() {
-        if (SchemaType.ORGANIZATION.equals(schemaType)) {
-            routeTree.addRoute(STARTS_WITH, "/commontasks",
-                    Resources.newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
-        }
-    }
-
     private void addExcludedServiceProviders() {
-        excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Function<String, Boolean>>asSet());
-        excludedServiceSingletons.put(SchemaType.ORGANIZATION, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
-        excludedServiceCollections.put(SchemaType.GLOBAL, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
-        excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Function<String, Boolean>>asSet());
+        excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Predicate<String>>asSet());
+        excludedServiceSingletons.put(SchemaType.ORGANIZATION,
+                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.GLOBAL,
+                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Predicate<String>>asSet());
     }
 
     /**
@@ -310,32 +323,43 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         refreshServiceRoute(type, matcher.group(2), matcher.group(1));
     }
 
-    private synchronized void refreshServiceRoute(int type, String svcName, String svcVersion) {
+    /**
+     * Applies the event type to the service routes.
+     *
+     * @param type Type of event as defined in {@link SMSObjectListener}
+     * @param svcName Non null name of the service.
+     * @param svcVersion Non null version of the service.
+     */
+    private void refreshServiceRoute(int type, String svcName, String svcVersion) {
         try {
+            ServiceManager svcMgr = getServiceManager();
             switch (type) {
                 case SMSObjectListener.DELETE:
                     if (serviceRoutes.containsKey(svcName)) {
                         removeService(svcName);
+                        notifyDescriptorChange();
                     }
                     break;
                 case SMSObjectListener.ADD:
                     if (!serviceRoutes.containsKey(svcName)) {
-                        serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
+                        serviceRoutes.put(svcName, addService(svcMgr, svcName, svcVersion));
+                        notifyDescriptorChange();
                     }
                     break;
                 case SMSObjectListener.MODIFY:
-                    removeService(svcName);
-                    serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
-                    if (ISAuthConstants.PLATFORM_SERVICE_NAME.equals(svcName)) {
-                        addServersRoutes(getServiceManager(), serviceRoutes);
+                    try {
+                        write.lock();
+                        removeService(svcName);
+                        serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
+                        notifyDescriptorChange();
+                    } finally {
+                        write.unlock();
                     }
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown modification type: " + type);
             }
-        } catch (SSOException e) {
-            debug.error("Could not update SMS REST services for change to " + svcName, e);
-        } catch (SMSException e) {
+        } catch (SSOException | SMSException e) {
             debug.error("Could not update SMS REST services for change to " + svcName, e);
         }
     }
@@ -387,30 +411,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 serviceRoutes.put(serviceName, routes);
             }
         }
-        if (schemaType == SchemaType.GLOBAL) {
-            addServersRoutes(sm, serviceRoutes);
-        }
+
         this.serviceRoutes = serviceRoutes;
     }
-
-    private void addServersRoutes(ServiceManager sm, Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes)
-            throws SSOException, SMSException {
-        ServiceSchemaManager ssm = sm.getSchemaManager(ISAuthConstants.PLATFORM_SERVICE_NAME, DEFAULT_VERSION);
-        Set<RouteMatcher<Request>> rootRoutes = new HashSet<>();
-        serviceRoutes.get(ISAuthConstants.PLATFORM_SERVICE_NAME).put(routeTree, rootRoutes);
-        addServersRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SERVERS, ConfigurationBase.SUBSCHEMA_SERVER);
-    }
-
-    private void addServersRoutes(ServiceSchemaManager ssm, Set<RouteMatcher<Request>> serviceRoutes, String parentName,
-            String schemaName) throws SSOException, SMSException {
-        ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(parentName);
-        ServiceSchema schema = parentSchema.getSubSchema(schemaName);
-        HashMap<SmsRouteTree, Set<RouteMatcher<Request>>> routes = new HashMap<>();
-        addPaths("", new ArrayList<>(Collections.singletonList(parentSchema)), schema,
-                null, routes, Collections.<Pattern>emptyList(), routeTree);
-        serviceRoutes.addAll(routes.get(routeTree));
-    }
-
 
     /**
      * Remove routes for the service name.
@@ -439,15 +442,15 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addService(ServiceManager sm, String serviceName, String serviceVersion)
+    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addService(ServiceManager sm, String serviceName,
+            String serviceVersion)
             throws SMSException, SSOException {
         if (excludedServices.contains(serviceName)) {
             debug.message("Excluding service from REST SMS: {}", serviceName);
-            return null;
+            return new HashMap<>();
         }
 
         ServiceSchemaManager ssm = sm.getSchemaManager(serviceName, serviceVersion);
-        String resourceName = EMPTY_PATH.equals(ssm.getResourceName()) ? "" : ssm.getResourceName();
         Map<SmsRouteTree, Set<RouteMatcher<Request>>> routes = new HashMap<>();
 
         ServiceSchema organizationSchema = ssm.getOrganizationSchema();
@@ -456,18 +459,22 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (hasGlobalSchema(globalSchema)) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addGlobalPaths("", new ArrayList<ServiceSchema>(), globalSchema, organizationSchema,
+                        dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             } else if (organizationSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addGlobalPaths("", new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema,
+                        dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             }
         } else {
             if (organizationSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addPaths("", new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes,
+                        DEFAULT_IGNORED_ROUTES, null);
             } else if (dynamicSchema != null) {
                 debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addPaths("", new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes,
+                        DEFAULT_IGNORED_ROUTES, null);
             }
         }
         return routes;
@@ -475,8 +482,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private boolean hasGlobalSchema(ServiceSchema globalSchema) throws SMSException {
         return globalSchema != null
-                && !globalSchema.getAttributeSchemaNames().isEmpty()
-                && !globalSchema.getSubSchemaNames().isEmpty();
+                && (!globalSchema.getAttributeSchemaNames().isEmpty()
+                        || !globalSchema.getSubSchemaNames().isEmpty());
     }
 
     /**
@@ -494,19 +501,21 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      */
     private void addGlobalPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema globalSchema,
-            ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
-            List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
+            ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree,
+            Set<RouteMatcher<Request>>> serviceRoutes, Pattern ignoredRoutes, SmsRouteTree routeTree)
+            throws SMSException {
         String schemaName = globalSchema.getResourceName();
-        String path = getPath(parentPath, schemaName, schemaPath, globalSchema);
+        String path = updatePaths(parentPath, schemaName, schemaPath, globalSchema);
 
         SmsGlobalSingletonProvider handler = globalSingletonProviderFactory.create(new SmsJsonConverter(globalSchema),
-                globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
+                globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
                 parentPath, true);
         debug.message("Adding singleton path {}", path);
-        serviceRoutes.putAll(addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree));
+        routeTree = addRoute(globalSchema, EQUALS, path, newAnnotatedRequestHandler(handler), ignoredRoutes, routeTree,
+                serviceRoutes);
 
         if (globalSchema != organizationSchema) {
-            addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
+            addPaths("", schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
         }
     }
 
@@ -518,8 +527,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         return exclude(excludedServiceCollections.get(schemaType), serviceName);
     }
 
-    private boolean exclude(Collection<Function<String, Boolean>> excludeFunctions, String serviceName) {
-        for (Function<String, Boolean> f : excludeFunctions) {
+    private boolean exclude(Collection<Predicate<String>> excludeFunctions, String serviceName) {
+        for (Predicate<String> f : excludeFunctions) {
             if (f.apply(serviceName)) {
                 return true;
             }
@@ -541,62 +550,77 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
      * @throws SMSException From downstream service manager layer.
      */
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes,
-            SmsRouteTree routeTree) throws SMSException {
+            ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes,
+            Pattern ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
         String schemaName = schema.getResourceName();
-        String path = getPath(parentPath, schemaName, schemaPath, schema);
+        String path = updatePaths(parentPath, schemaName, schemaPath, schema);
+        SmsRouteTree subtree = routeTree;
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
             if (schema.supportsMultipleConfigurations() && !excludeCollection(schema.getServiceName())) {
-                RequestHandler handler = Resources.newCollection(collectionProviderFactory.create(
-                        new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
+                RequestHandler handler = newCollection(collectionProviderFactory.create(
+                        new SmsJsonConverter(schema), schema, schemaType, new ArrayList<>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
-                serviceRoutes.putAll(addRoute(schema, STARTS_WITH, path, handler, ignoredRoutes, routeTree));
-                parentPath = path + "/{" + schemaName + "}";
+                subtree = addRoute(schema, STARTS_WITH, path, handler, ignoredRoutes, routeTree, serviceRoutes);
+                parentPath = "/{" + schemaName + "}";
             } else if (!excludeSingleton(schema.getServiceName())) {
-                RequestHandler handler = singletonProviderFactory.create(
-                        new SmsJsonConverter(schema), schema, dynamicSchema, schemaType,
-                        new ArrayList<ServiceSchema>(schemaPath), parentPath, true);
+                RequestHandler handler = newAnnotatedRequestHandler(singletonProviderFactory.create(
+                        new SmsJsonConverter(schema), schema, dynamicSchema, schemaType, new ArrayList<>(schemaPath),
+                        parentPath, true));
                 debug.message("Adding singleton path {}", path);
-                serviceRoutes.putAll(addRoute(schema, EQUALS, path, handler, ignoredRoutes, routeTree));
-                parentPath = path;
+                subtree = addRoute(schema, EQUALS, path, handler, ignoredRoutes, routeTree, serviceRoutes);
+                parentPath = "";
             }
         }
 
-        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes, routeTree);
+        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes, subtree);
     }
 
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
+            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes, Pattern ignoredRoutes,
+            SmsRouteTree routeTree)
             throws SMSException {
-        for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
-            addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema),
-                    null, serviceRoutes, ignoredRoutes, routeTree);
+        for (String subSchema : schema.getSubSchemaNames()) {
+            ServiceSchema subServiceSchema = schema.getSubSchema(subSchema);
+            if (USE_PARENT_PATH.equals(subServiceSchema.getResourceName()) && "".equals(parentPath)) {
+                parentPath = schema.getResourceName();
+            }
+            addPaths(parentPath, new ArrayList<>(schemaPath), subServiceSchema, null, serviceRoutes,
+                    ignoredRoutes, routeTree);
         }
     }
 
-    private String getPath(String parentPath, String schemaName, List<ServiceSchema> schemaPath, ServiceSchema schema) {
+    private String updatePaths(String parentPath, String schemaName, List<ServiceSchema> schemaPath,
+            ServiceSchema schema) {
         String path = parentPath;
         // Top-level schemas don't have a name and we don't want them in our schema path
-        if (schemaName != null && schemaName.length() > 0) {
+        if (schema.getName() != null) {
             schemaPath.add(schema);
-            if (!USE_PARENT_PATH.equals(schemaName)) {
-                path += "/" + schemaName;
-            }
+        }
+        if (EMPTY_PATH.equals(schemaName) || (USE_PARENT_PATH.equals(schemaName) && EMPTY_PATH.equals(parentPath))) {
+            return "";
+        }
+        if (!USE_PARENT_PATH.equals(schemaName)) {
+            path += (path.equals("") ? "" : "/") + schemaName;
         }
         return path;
     }
 
-    private Map<SmsRouteTree, Set<RouteMatcher<Request>>> addRoute(ServiceSchema schema, RoutingMode mode, String path,
-            RequestHandler handler, List<Pattern> ignoredRoutes, SmsRouteTree routeTree) {
-        for (Pattern ignored : ignoredRoutes) {
-            if (ignored.matcher(path).matches()) {
-                return emptyMap();
-            }
+    private SmsRouteTree addRoute(ServiceSchema schema, RoutingMode mode, String path,
+            RequestHandler handler, Pattern ignoredRoutes, SmsRouteTree routeTree,
+            Map<SmsRouteTree, Set<RouteMatcher<Request>>> serviceRoutes) {
+        String parentPath = routeTree == null ? "" : routeTree.getPath() + (path.startsWith("/") ? "" : "/");
+        if (ignoredRoutes.matcher(parentPath + path).matches()) {
+            return routeTree;
         }
         SmsRouteTree tree = routeTree == null ? this.routeTree.handles(schema.getServiceName()) : routeTree;
-        RouteMatcher<Request> route = tree.addRoute(mode, path, handler);
-        return Maps.newHashMap(Collections.singletonMap(tree, asSet(route)));
+        SmsRouteTree.Route route = tree.addRoute(mode, path, handler, schema.isHiddenInConfigUI());
+        if (serviceRoutes.containsKey(tree)) {
+            serviceRoutes.get(tree).add(route.matcher);
+        } else {
+            serviceRoutes.put(tree, newHashSet(route.matcher));
+        }
+        return route.tree;
     }
 
     /**
@@ -613,79 +637,117 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
-        return routeTree.handleAction(context, request);
+        try {
+            read.lock();
+            return routeTree.handleAction(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Synchronized to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
-        return routeTree.handleCreate(context, request);
+        try {
+            read.lock();
+            return routeTree.handleCreate(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
-        return routeTree.handleDelete(context, request);
+        try {
+            read.lock();
+            return routeTree.handleDelete(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
-        return routeTree.handlePatch(context, request);
+        try {
+            read.lock();
+            return routeTree.handlePatch(context, request);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        return routeTree.handleQuery(context, request, handler);
+        try {
+            read.lock();
+            return routeTree.handleQuery(context, request, handler);
+        } finally {
+            read.unlock();
+        }
+
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
-        return routeTree.handleRead(context, request);
+        try {
+            read.lock();
+            return routeTree.handleRead(context, request);
+        } finally {
+            read.unlock();
+        }
     }
 
     /**
      * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
      */
     @Override
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
-        return routeTree.handleUpdate(context, request);
-    }
-
-    private static final class SingleServiceFunction implements Function<String, Boolean> {
-
-        private final String serviceName;
-
-        SingleServiceFunction(String serviceName) {
-            this.serviceName = serviceName;
-        }
-
-        @Nullable
-        @Override
-        public Boolean apply(String name) {
-            return serviceName.equals(name);
+        try {
+            read.lock();
+            return routeTree.handleUpdate(context, request);
+        } finally {
+            read.unlock();
         }
     }
 
@@ -700,4 +762,76 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         // no-op
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param apiProducer {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public ApiDescription api(ApiProducer<ApiDescription> apiProducer) {
+        try {
+            read.lock();
+            return routeTree.api(apiProducer);
+        } finally {
+            read.unlock();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param context {@inheritDoc}
+     * @param request {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public ApiDescription handleApiRequest(Context context, Request request) {
+        try {
+            read.lock();
+            return routeTree.handleApiRequest(context, request);
+        } finally {
+            read.unlock();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param listener {@inheritDoc}
+     */
+    @Override
+    public void addDescriptorListener(Listener listener) {
+        apiListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Thread Safety: Read/Write locking to protect access to {@link #routeTree} during modifications.
+     *
+     * @param listener {@inheritDoc}
+     */
+    @Override
+    public void removeDescriptorListener(Listener listener) {
+        apiListeners.remove(listener);
+    }
+
+    private synchronized void notifyDescriptorChange() {
+        ApiDescription oldApi = this.api;
+        this.api = routeTree.handleApiRequest(
+                new UriRouterContext(new RootContext(), "", "", Collections.<String, String>emptyMap()),
+                newApiRequest(ResourcePath.empty()));
+        if (!oldApi.equals(api)) {
+            for (Listener listener : apiListeners) {
+                listener.notifyDescriptorChange();
+            }
+        }
+    }
 }

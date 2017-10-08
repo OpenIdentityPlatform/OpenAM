@@ -1,0 +1,80 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2016 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+dn: CN=pushDeviceProfiles,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+changetype: add
+adminDisplayName: pushDeviceProfiles
+cn: pushDeviceProfiles
+lDAPDisplayName: pushDeviceProfiles
+adminDescription: Push device profiles
+attributeID: 1.3.6.1.4.1.36733.2.2.1.11
+attributeSyntax: 2.5.5.3
+oMSyntax: 27
+instanceType: 4
+isSingleValued: TRUE
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+objectClass: attributeSchema
+schemaIDGUID:: 4ZFVGwkShke4/IfDuAJ4vg==
+searchFlags: 0
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=pushDeviceProfilesContainer,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+changetype: add
+adminDisplayName: pushDeviceProfilesContainer
+adminDescription: Class containing Push device profiles
+cn: pushDeviceProfilesContainer
+governsID: 1.3.6.1.4.1.36733.2.2.2.11
+instanceType: 4
+lDAPDisplayName: pushDeviceProfilesContainer
+mayContain: pushDeviceProfiles
+objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+objectClass: classSchema
+objectClassCategory: 3
+rDNAttID: cn
+subClassOf: top
+schemaIDGUID:: QiYS+E71q0qWzOCr7q2IMQ==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,@userStoreRootSuffix@
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: pushDeviceProfilesContainer
+-
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: Response.java,v 1.3 2009/02/13 04:05:10 bina Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.saml.protocol;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.xml.XMLUtils; 
@@ -167,7 +166,7 @@ public class Response extends AbstractResponse {
 
 	this.recipient = recipient;
 
-	issueInstant = new Date();
+		issueInstant = newDate();
 
 	if (status == null) {
 	    SAMLUtils.debug.message("Response: missing <Status>.");

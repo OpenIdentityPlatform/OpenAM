@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.tokens;
@@ -72,5 +72,21 @@ public enum TokenType {
     /**
      * STS token type.
      */
-    STS
+    STS,
+    /**
+     * OAuth blacklist token type.
+     */
+    OAUTH_BLACKLIST,
+    /**
+     * Stateless OAuth2 metadata token type.
+     */
+    OAUTH_STATELESS,
+    /**
+     * Push Notification System token type.
+     */
+    PUSH,
+    /**
+     * Token type for cluster-wide notification system.
+     */
+    NOTIFICATION
 }

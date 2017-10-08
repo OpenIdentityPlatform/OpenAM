@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -22,6 +22,7 @@ import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.json.resource.Resources.newInternalConnectionFactory;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import java.util.ArrayList;
@@ -119,20 +120,17 @@ public class Routers {
 
         private final Router router;
         private final org.forgerock.http.routing.Router chfRouter;
-        private final CrestProtocolEnforcementFilter crestProtocolEnforcementFilter;
         private final Filter defaultAuthenticationEnforcer;
         private final AuditFilter auditFilter;
         private final Filter contextFilter;
         private final Filter loggingFilter;
 
-        RootResourceRouterImpl(Router router, org.forgerock.http.routing.Router chfRouter,
-                CrestProtocolEnforcementFilter crestProtocolEnforcementFilter, Set<String> invalidRealms,
+        RootResourceRouterImpl(Router router, org.forgerock.http.routing.Router chfRouter,Set<String> invalidRealms,
                 Filter defaultAuthenticationEnforcer, AuditFilter auditFilter, Filter contextFilter,
                 Filter loggingFilter) {
             super(router, invalidRealms, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
             this.router = router;
             this.chfRouter = chfRouter;
-            this.crestProtocolEnforcementFilter = crestProtocolEnforcementFilter;
             this.defaultAuthenticationEnforcer = defaultAuthenticationEnforcer;
             this.contextFilter = contextFilter;
             this.loggingFilter = loggingFilter;
@@ -141,8 +139,8 @@ public class Routers {
 
         @Override
         ResourceRoute createRoute(String uriTemplate) {
-            return new RootResourceRoute(router, chfRouter, crestProtocolEnforcementFilter,
-                    defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter, uriTemplate);
+            return new RootResourceRoute(router, chfRouter, defaultAuthenticationEnforcer, auditFilter, contextFilter,
+                    loggingFilter, uriTemplate);
         }
     }
 
@@ -199,23 +197,31 @@ public class Routers {
         return InjectorHolder.getInstance(AuthenticationEnforcer.class);
     }
 
+    /**
+     * Creates a new filter which does not require authentication.
+     *
+     * @return A new {@link PassThroughFilter}.
+     */
+    public static PassThroughFilter none() {
+        return InjectorHolder.getInstance(PassThroughFilter.class);
+    }
+
     static class RootResourceRoute extends ResourceRoute {
 
         private final org.forgerock.http.routing.Router chfRouter;
-        private final CrestProtocolEnforcementFilter crestProtocolEnforcementFilter;
 
         RootResourceRoute(Router router, org.forgerock.http.routing.Router chfRouter,
-                CrestProtocolEnforcementFilter crestProtocolEnforcementFilter, Filter defaultAuthenticationEnforcer,
-                AuditFilter auditFilter, Filter contextFilter, Filter loggingFilter, String uriTemplate) {
+                Filter defaultAuthenticationEnforcer, AuditFilter auditFilter, Filter contextFilter,
+                Filter loggingFilter, String uriTemplate) {
             super(router, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter, uriTemplate);
             this.chfRouter = chfRouter;
-            this.crestProtocolEnforcementFilter = crestProtocolEnforcementFilter;
         }
 
         @Override
         void addRoute(RoutingMode mode, String uriTemplate, RequestHandler resource) {
             super.addRoute(mode, uriTemplate, resource);
-            chfRouter.addRoute(requestUriMatcher(mode, uriTemplate), Handlers.chainOf(newHttpHandler(resource), crestProtocolEnforcementFilter));
+            chfRouter.addRoute(requestUriMatcher(mode, uriTemplate),
+                    newHttpHandler(newInternalConnectionFactory(resource)));
         }
     }
 
@@ -324,13 +330,32 @@ public class Routers {
         @SafeVarargs
         public final ResourceRoute authorizeWith(Class<? extends CrestAuthorizationModule>... authorizationModules) {
             Reject.ifNull(authorizationModules);
+            for (Class<? extends CrestAuthorizationModule> authorizationModule : authorizationModules) {
+                authorizeWith(Key.get(authorizationModule));
+            }
+            return this;
+        }
+
+        /**
+         * Specifies the authorization modules to use when authorizing requests
+         * to the endpoint.
+         *
+         * <p>Can only be set <strong>once</strong>, attempt to do so twice
+         * will result in an {@code IllegalStateException}.</p>
+         *
+         * @param authorizationModuleKeys The authorization module keys.
+         * @return This route.
+         * @throws IllegalStateException If attempted to be set twice.
+         */
+        public final ResourceRoute authorizeWith(Key<? extends CrestAuthorizationModule>... authorizationModuleKeys) {
+            Reject.ifNull(authorizationModuleKeys);
             if (this.authorizationModules != null) {
                 throw new IllegalStateException("Authorization Filters have already been set!");
             } else {
                 this.authorizationModules = new ArrayList<>();
             }
-            for (Class<? extends CrestAuthorizationModule> authorizationModuleClass : authorizationModules) {
-                CrestAuthorizationModule module = InjectorHolder.getInstance(authorizationModuleClass);
+            for (Key<? extends CrestAuthorizationModule> authorizationModuleKey : authorizationModuleKeys) {
+                CrestAuthorizationModule module = InjectorHolder.getInstance(authorizationModuleKey);
                 this.authorizationModules.add(new LoggingAuthzModule(module, module.getName()));
             }
             return this;
@@ -416,6 +441,21 @@ public class Routers {
         public void toAnnotatedCollection(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);
             forVersion(1).toAnnotatedCollection(resourceClass);
+        }
+
+        /**
+         * Completes the route registration with the resource that requests
+         * matching the route should be routed to.
+         *
+         * <p>Using this method to complete the route registration will add a
+         * version of {@literal 1} into the route.</p>
+         *
+         * @param resourceClass The annotated resource endpoint class. Should be annotated with
+         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         */
+        public void toAnnotatedSingleton(Class<? extends Object> resourceClass) {
+            Reject.ifNull(resourceClass);
+            forVersion(1).toAnnotatedSingleton(resourceClass);
         }
 
         /**
@@ -557,10 +597,9 @@ public class Routers {
         private final org.forgerock.http.routing.Router router;
         private final HttpAccessAuditFilterFactory httpAuditFactory;
         private final String uriTemplate;
+        private final List<org.forgerock.http.Filter> filters = new ArrayList<>();
 
-        private org.forgerock.http.Filter authenticationEnforcer;
         private org.forgerock.http.Filter auditFilter;
-        private List<org.forgerock.http.Filter> filters;
 
         ServiceRoute(org.forgerock.http.routing.Router router, HttpAccessAuditFilterFactory httpAuditFactory,
                 String uriTemplate) {
@@ -585,6 +624,7 @@ public class Routers {
                 throw new IllegalStateException("Audit component has already been set!");
             }
             this.auditFilter = httpAuditFactory.createFilter(component);
+            this.filters.add(auditFilter);
             return this;
         }
 
@@ -605,6 +645,7 @@ public class Routers {
                 throw new IllegalStateException("Audit component has already been set!");
             }
             this.auditFilter = httpAuditFactory.createFilter(component);
+            this.filters.add(auditFilter);
             return this;
         }
 
@@ -612,24 +653,27 @@ public class Routers {
          * Specifies filters that the request must pass through before reaching
          * the endpoint.
          *
-         * <p>Can only be set <strong>once</strong>, attempt to do so twice
-         * will result in an {@code IllegalStateException}.</p>
-         *
          * @param filters The filters.
          * @return This route.
-         * @throws IllegalStateException If attempted to be set twice.
          */
         @SafeVarargs
         public final ServiceRoute through(Class<? extends org.forgerock.http.Filter>... filters) {
             Reject.ifNull(filters);
-            if (this.filters != null) {
-                throw new IllegalStateException("Filters have already been set!");
-            } else {
-                this.filters = new ArrayList<>();
-            }
             for (Class<? extends org.forgerock.http.Filter> filterClass : filters) {
                 this.filters.add(InjectorHolder.getInstance(filterClass));
             }
+            return this;
+        }
+
+        /**
+         * Add an authorization module to use when authorizing requests to the endpoint.
+         *
+         * @param authorizationModule The authorization module.
+         * @return This route.
+         */
+        public final ServiceRoute authorizeWith(Class<? extends org.forgerock.http.Filter> authorizationModule) {
+            Reject.ifNull(authorizationModule);
+            filters.add(InjectorHolder.getInstance(authorizationModule));
             return this;
         }
 
@@ -676,19 +720,10 @@ public class Routers {
         }
 
         private void addRoute(RoutingMode mode, Handler resource) {
-            if (filters != null) {
+            if (!filters.isEmpty()) {
                 resource = Handlers.chainOf(resource, filters);
             }
-            resource = Handlers.chainOf(resource, getFilters());
             router.addRoute(requestUriMatcher(mode, uriTemplate), resource);
-        }
-
-        private List<org.forgerock.http.Filter> getFilters() {
-            List<org.forgerock.http.Filter> filters = new ArrayList<>();
-            if (auditFilter != null) {
-                filters.add(auditFilter);
-            }
-            return filters;
         }
 
         @Override
@@ -825,6 +860,18 @@ public class Routers {
         public VersionableResourceRoute toAnnotatedCollection(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);
             return addRoute(STARTS_WITH, Resources.newCollection(InjectorHolder.getInstance(resourceClass)));
+        }
+
+        /**
+         * Completes the route registration with the resource that requests
+         * matching the route should be routed to.
+         *
+         * @param resourceClass The annotated resource endpoint class. Should be annotated with
+         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         */
+        public VersionableResourceRoute toAnnotatedSingleton(Class<? extends Object> resourceClass) {
+            Reject.ifNull(resourceClass);
+            return addRoute(EQUALS, Resources.newSingleton(InjectorHolder.getInstance(resourceClass)));
         }
 
         /**

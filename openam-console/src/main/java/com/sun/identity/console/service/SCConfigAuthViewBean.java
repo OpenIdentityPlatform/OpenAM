@@ -28,11 +28,19 @@
 
 package com.sun.identity.console.service;
 
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
+import com.iplanet.jato.model.ModelControlException;
+import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.service.model.SCConfigModel;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPropertySheetModel;
-import com.sun.identity.console.base.model.AMAdminConstants; 
+import com.sun.identity.console.base.model.AMAdminConstants;
+
 import java.util.List;
 
 public class SCConfigAuthViewBean extends SCConfigViewBean {
@@ -42,6 +50,7 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
     public static final String DEFAULT_VIEW_BEAN = 
             "com.sun.identity.console.service.SCConfigAuthViewBean";
 
+    private static final String XUI_AUTHENTICATION_LOCATION = "configure/authentication";
     private static final String SEC_AUTH = SCConfigModel.SEC_AUTH;
     private static final String TBL_AUTH = "tblAuth";
 
@@ -50,6 +59,18 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
     public SCConfigAuthViewBean() {
         super("SCConfigAuth", DEFAULT_DISPLAY_URL);
     }
+
+    @Override
+    protected void beginDisplay(DisplayEvent event, boolean setSelectedTabNode) throws ModelControlException {
+        if (isXuiAdminConsoleEnabled()) {
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.GLOBAL_SERVICES, authenticationRealm);
+        } else {
+            super.beginDisplay(event, setSelectedTabNode);
+        }
+    }
+
+
 
     protected void createPropertyModel() {
         psModel = new CCPropertySheetModel(
@@ -74,5 +95,14 @@ public class SCConfigAuthViewBean extends SCConfigViewBean {
                 AMAdminConstants.SAVE_VB_NAME, DEFAULT_VIEW_BEAN);
         String name = (String)getDisplayFieldValue(TBL_HREF_PREFIX + SEC_AUTH);
         forwardToProfile(name);
+    }
+
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (isXuiAdminConsoleEnabled()) {
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XUI_AUTHENTICATION_LOCATION, authenticationRealm);
+        } else {
+            super.beginDisplay(event);
+        }
     }
 }

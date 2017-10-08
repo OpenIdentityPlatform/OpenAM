@@ -24,7 +24,7 @@
  *
  * $Id: CreateMetaDataTemplate.java,v 1.38 2009/10/29 00:03:50 exu Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.federation.cli;
 
@@ -533,8 +533,8 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                     return true;
                 }
             }
-            if (pdpAlias != null && !pdpAlias.isEmpty()) {
-                if (!metaAliases.add(pdpAlias)) {
+            if (pepAlias != null && !pepAlias.isEmpty()) {
+                if (!metaAliases.add(pepAlias)) {
                     return true;
                 }
             }

@@ -21,12 +21,12 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
@@ -83,7 +83,7 @@ class CrestAuditor {
         this.startTime = context.asContext(RequestAuditContext.class).getRequestReceivedTime();
 
         if (context.containsContext(RealmContext.class)) {
-            this.realm = context.asContext(RealmContext.class).getResolvedRealm();
+            this.realm = context.asContext(RealmContext.class).getRealm().asPath();
         } else {
             this.realm = NO_REALM;
         }
@@ -101,7 +101,7 @@ class CrestAuditor {
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component);
-            addSessionDetailsFromSSOTokenContext(builder, context);
+            addSessionDetailsFromSSOTokenContextIfNotNull(builder, context);
 
             if (ipAddressHeaderPropertyIsSet()) {
                 setClientFromHttpContextHeaderIfExists(builder, context);
@@ -127,7 +127,7 @@ class CrestAuditor {
     void auditAccessSuccess(JsonValue responseDetail) {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpRequest(context, request)
@@ -140,7 +140,7 @@ class CrestAuditor {
             } else {
                 builder.responseWithDetail(SUCCESSFUL, "", elapsedTime, MILLISECONDS, responseDetail);
             }
-            addSessionDetailsFromSSOTokenContext(builder, context);
+            addSessionDetailsFromSSOTokenContextIfNotNull(builder, context);
 
             if (ipAddressHeaderPropertyIsSet()) {
                 setClientFromHttpContextHeaderIfExists(builder, context);
@@ -165,7 +165,7 @@ class CrestAuditor {
     void auditAccessFailure(int resultCode, String message) {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_OUTCOME)) {
 
-            final long endTime = System.currentTimeMillis();
+            final long endTime = currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
@@ -175,7 +175,7 @@ class CrestAuditor {
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
                     .responseWithDetail(FAILED, Integer.toString(resultCode), elapsedTime, MILLISECONDS, detail);
-            addSessionDetailsFromSSOTokenContext(builder, context);
+            addSessionDetailsFromSSOTokenContextIfNotNull(builder, context);
 
             if (ipAddressHeaderPropertyIsSet()) {
                 setClientFromHttpContextHeaderIfExists(builder, context);
@@ -188,10 +188,12 @@ class CrestAuditor {
         }
     }
 
-    private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, Context context) {
+    private void addSessionDetailsFromSSOTokenContextIfNotNull(AMAccessAuditEventBuilder builder, Context context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
-        builder.trackingIdFromSSOToken(callerToken);
-        builder.userId(getUserId(callerToken));
+        if (callerToken != null) {
+            builder.trackingIdFromSSOToken(callerToken);
+            builder.userId(getUserId(callerToken));
+        }
     }
 
     private void setClientFromHttpContextHeaderIfExists(AMAccessAuditEventBuilder builder, Context context) {

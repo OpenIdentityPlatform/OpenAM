@@ -11,47 +11,40 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
 
-import javax.inject.Inject;
-import javax.security.auth.Subject;
-
-import java.security.AccessController;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.xacml.context.ContextFactory;
+import javax.inject.Inject;
+import javax.security.auth.Subject;
 
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationHook;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.openam.entitlement.rest.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.AdminSubjectContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicyService;
-import org.forgerock.services.context.AbstractContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
-import org.forgerock.util.Reject;
+
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Hook implementation for creating a ResourceType for each Resource Set registration.
@@ -62,23 +55,23 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
 
     private final Debug logger = Debug.getInstance("UmaProvider");
     private final ResourceTypeService resourceTypeService;
-    private final ApplicationManagerWrapper applicationManager;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final UmaPolicyService policyService;
     private final SessionCache sessionCache;
 
     /**
      * Creates a new UmaResourceSetRegistrationHook instance.
      * @param resourceTypeService An instance of the {@code ResourceTypeService}.
-     * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
+     * @param applicationServiceFactory An instance of the {@code ApplicationServiceFactory}.
      * @param policyService An instance of the {@code UmaPolicyService}.
      * @param sessionCache An instance of the {@code SessionCache}.
      */
     @Inject
     public UmaResourceSetRegistrationHook(ResourceTypeService resourceTypeService,
-            ApplicationManagerWrapper applicationManager, UmaPolicyService policyService, SessionCache sessionCache)
-            throws EntitlementException{
+            ApplicationServiceFactory applicationServiceFactory, UmaPolicyService policyService,
+            SessionCache sessionCache) throws EntitlementException{
         this.resourceTypeService = resourceTypeService;
-        this.applicationManager = applicationManager;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.policyService = policyService;
         this.sessionCache = sessionCache;
     }
@@ -112,10 +105,10 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
             throw new ServerException(e);
         }
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm,
-                    resourceSet.getClientId().toLowerCase());
+            ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+            Application application = appService.getApplication(resourceSet.getClientId().toLowerCase());
             application.addResourceTypeUuid(resourceType.getUUID());
-            applicationManager.saveApplication(adminSubject, realm, application);
+            appService.saveApplication(application);
         } catch (EntitlementException e) {
             logger.error("Failed to add Resource Type, " + resourceType.getUUID() + " to application, "
                     + resourceSet.getClientId(), e);
@@ -135,21 +128,25 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         String resourceTypeUUID = resourceSet.getId();
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm,
-                    resourceSet.getClientId().toLowerCase());
+            ApplicationService appService = applicationServiceFactory.create(adminSubject, realm);
+            Application application = appService.getApplication(resourceSet.getClientId().toLowerCase());
             application.removeResourceTypeUuid(resourceTypeUUID);
-            applicationManager.saveApplication(adminSubject, realm, application);
+            appService.saveApplication(application);
         } catch (EntitlementException e) {
             logger.error("Failed to remove Resource Type, " + resourceTypeUUID + " from application, "
                     + resourceSet.getClientId(), e);
             throw new ServerException(e);
         }
 
-        policyService.deletePolicy(createAdminContext(realm, resourceSet.getResourceOwnerId()), resourceSet.getId());
-
         try {
+            policyService.deletePolicy(createAdminContext(realm, resourceSet.getResourceOwnerId()), resourceSet.getId());
+
             resourceTypeService.deleteResourceType(adminSubject, realm, resourceTypeUUID);
         } catch (EntitlementException e) {
+            logger.error("Failed to delete Resource Type " + resourceTypeUUID, e);
+            throw new ServerException(e);
+        } catch (RealmLookupException e) {
+            //Should never happen as realm would have been validated already
             logger.error("Failed to delete Resource Type " + resourceTypeUUID, e);
             throw new ServerException(e);
         }
@@ -162,14 +159,12 @@ public class UmaResourceSetRegistrationHook implements ResourceSetRegistrationHo
      * @param resourceOwnerId The owner of the ResourceSet that the policies are for.
      * @return The generated context.
      */
-    private Context createAdminContext(String realm, String resourceOwnerId) {
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.setSubRealm(realm, realm);
+    private Context createAdminContext(String realm, String resourceOwnerId) throws RealmLookupException {
+        RealmContext realmContext = new RealmContext(new RootContext(), Realm.of(realm));
         SubjectContext subjectContext = new AdminSubjectContext(logger, sessionCache,realmContext);
 
         Map<String, String> templateVariables = new HashMap<>();
         templateVariables.put("user", resourceOwnerId);
-        UriRouterContext routerContext = new UriRouterContext(subjectContext, "", "", templateVariables);
-        return routerContext;
+        return new UriRouterContext(subjectContext, "", "", templateVariables);
     }
 }

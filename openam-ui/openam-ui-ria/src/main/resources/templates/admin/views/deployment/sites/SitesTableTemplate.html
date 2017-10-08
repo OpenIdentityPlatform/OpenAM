@@ -1,0 +1,36 @@
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                {{#each headers}}
+                    <th>{{this}}</th>
+                {{/each}}
+                <th class="fr-col-btn-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#each items}}
+            <tr>
+                <td class="wordwrap"><a href="{{routeTo 'editSite' _id}}" title="{{t 'common.form.edit'}}">{{_id}}</a></td>
+                <td class="wordwrap">{{url}}</td>
+                <td>
+                    {{#each secondaryURLs}}
+                        {{this}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+                <td>
+                    {{#each servers}}
+                        {{this.url}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+                <td class="fr-col-btn-2">
+                    <div class="btn-group">
+                        <a href="{{routeTo 'editSite' _id}}" class="btn btn-link" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
+                        <button type="button" data-delete-item="{{_id}}" class="btn btn-link" title="{{t 'common.form.delete'}}"><i class="fa fa-close"></i></button>
+                    </div>
+                </td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</div>

@@ -31,6 +31,7 @@ package com.sun.identity.policy.plugins;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
@@ -522,7 +523,6 @@ public class LDAPUsers implements Subject {
         throws SSOException, PolicyException {
 
         boolean userMatch = false;
-        boolean listenerAdded = false;
         DN userDN = null;
         String userLocalDN = token.getPrincipal().getName();
 
@@ -568,11 +568,15 @@ public class LDAPUsers implements Subject {
                         + " in subject evaluation cache.");
             }
             SubjectEvaluationCache.addEntry(tokenID, ldapServer, valueDN, userMatch);
-            if (!listenerAdded && !PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
-                token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
-                debug.message("LDAPUsers.isMember(): sso listener added");
-                listenerAdded = true;
+            if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                try {
+                    token.addSSOTokenListener(PolicyEvaluator.ssoListener);
+                    PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
+                    debug.message("LDAPUsers.isMember(): sso listener added");
+                } catch (SSOTokenListenersUnsupportedException ex) {
+                    // Catching exception to avoid adding tokenID to ssoListenerRegistry
+                    debug.message("LDAPUsers.isMember(): could not add sso listener: {}", ex.getMessage());
+                }
             }
             if (userMatch) {
                 break;

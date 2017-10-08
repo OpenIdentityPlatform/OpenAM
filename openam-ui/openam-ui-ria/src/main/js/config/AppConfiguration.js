@@ -11,12 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("config/AppConfiguration", [
-    "org/forgerock/openam/ui/common/util/Constants"
-], function (Constants) {
+define([
+], function () {
     var obj = {
         moduleDefinition: [{
             moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
@@ -32,6 +31,7 @@ define("config/AppConfiguration", [
                     { "routes": "config/routes/CommonRoutesConfig" },
                     { "routes": "config/routes/UserRoutesConfig" },
                     { "routes": "config/routes/admin/RealmsRoutes" },
+                    { "routes": "config/routes/admin/GlobalRoutes" },
                     { "routes": "config/routes/user/UMARoutes" }
                 ]
             }
@@ -41,7 +41,7 @@ define("config/AppConfiguration", [
                 selfRegistration: false,
                 enterprise: false,
                 remoteConfig: true,
-                delegate: "org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate"
+                delegate: "org/forgerock/openam/ui/common/services/SiteConfigurationService"
             }
         }, {
             moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
@@ -70,9 +70,15 @@ define("config/AppConfiguration", [
             moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
             configuration: {
                 templateUrls: [
+                    "templates/common/components/table/ReadOnlyRow.html",
+                    "templates/common/components/table/NewRow.html",
+                    "templates/common/components/table/EditRow.html"
                 ],
                 partialUrls: [
                     "partials/form/_JSONSchemaFooter.html",
+                    "partials/form/_AutoCompleteOffFix.html",
+                    "partials/form/_Button.html",
+                    "partials/form/_Select.html",
                     "partials/headers/_Title.html",
                     "partials/headers/_TitleWithSubAndIcon.html",
                     "partials/login/_Choice.html",
@@ -86,7 +92,8 @@ define("config/AppConfiguration", [
                     "partials/login/_SelfService.html",
                     "partials/login/_SocialAuthn.html",
                     "partials/login/_TextInput.html",
-                    "partials/login/_TextOutput.html"
+                    "partials/login/_TextOutput.html",
+                    "partials/login/_PollingWait.html"
                 ]
             }
         }, {
@@ -140,14 +147,14 @@ define("config/AppConfiguration", [
                             "realms": {
                                 "url": "#realms",
                                 "name": "config.AppConfiguration.Navigation.links.realms.title",
-                                "icon": "fa fa-cloud",
+                                "icon": "fa fa-cloud hidden-md",
                                 "dropdown" : true,
                                 "urls": [{
                                     "url": "#realms",
                                     "name": "config.AppConfiguration.Navigation.links.realms.showAll",
                                     "icon": "fa fa-th"
                                 }, {
-                                    "event": Constants.EVENT_ADD_NEW_REALM_DIALOG,
+                                    "url": "#realms/new",
                                     "name": "config.AppConfiguration.Navigation.links.realms.newRealm",
                                     "icon": "fa fa-plus"
                                 }, {
@@ -155,22 +162,40 @@ define("config/AppConfiguration", [
                                 }],
                                 "visibleToRoles": ["ui-realm-admin"]
                             },
-                            "federation": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_FEDERATION,
-                                "name": "config.AppConfiguration.Navigation.links.federation",
-                                "icon": "fa fa-building-o",
+                            "configure": {
+                                "url": "#configure",
+                                "name": "config.AppConfiguration.Navigation.links.configure.title",
+                                "icon": "fa fa-wrench hidden-md",
+                                "dropdown" : true,
+                                "urls": [{
+                                    "url": "#configure/authentication",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.authentication",
+                                    "icon": "fa fa-user"
+                                }, {
+                                    "url": "#configure/global-services",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.global-services",
+                                    "icon": "fa fa-globe"
+                                }, {
+                                    "url": "#configure/server-defaults/general",
+                                    "name": "config.AppConfiguration.Navigation.links.configure.server-defaults",
+                                    "icon": "fa fa-server"
+                                }],
                                 "visibleToRoles": ["ui-global-admin"]
                             },
-                            "configuration": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_CONFIGURATION,
-                                "name": "config.AppConfiguration.Navigation.links.configuration",
-                                "icon": "fa fa-cog",
-                                "visibleToRoles": ["ui-global-admin"]
-                            },
-                            "sessions": {
-                                "event": Constants.EVENT_REDIRECT_TO_JATO_SESSIONS,
-                                "name": "config.AppConfiguration.Navigation.links.sessions",
-                                "icon": "fa fa-users",
+                            "deployment": {
+                                "url": "#deployment",
+                                "name": "config.AppConfiguration.Navigation.links.deployment.title",
+                                "icon": "fa fa-sitemap hidden-md",
+                                "dropdown" : true,
+                                "urls": [{
+                                    "url": "#deployment/servers",
+                                    "name": "config.AppConfiguration.Navigation.links.deployment.servers",
+                                    "icon": "fa fa-server"
+                                }, {
+                                    "url": "#deployment/sites",
+                                    "name": "config.AppConfiguration.Navigation.links.deployment.sites",
+                                    "icon": "fa fa-bookmark-o"
+                                }],
                                 "visibleToRoles": ["ui-global-admin"]
                             }
                         }
@@ -205,7 +230,19 @@ define("config/AppConfiguration", [
                             }
                         }
                     }
-                }
+                },
+                "helpLinks" : [
+                    {
+                        "href" : "#api/explorer",
+                        "icon-class" : "fa-code",
+                        "label" : "config.AppConfiguration.Navigation.helpLinks.apiExplorer"
+                    },
+                    {
+                        "href" : "#api/docs",
+                        "icon-class" : "fa-file-text",
+                        "label" : "config.AppConfiguration.Navigation.helpLinks.apiDocs"
+                    }
+                ]
             }
         }],
         loggerLevel: "debug"

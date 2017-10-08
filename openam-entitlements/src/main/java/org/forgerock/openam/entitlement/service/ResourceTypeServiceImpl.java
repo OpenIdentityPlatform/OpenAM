@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.service;
 
-import static com.sun.identity.entitlement.EntitlementException.NO_SUCH_RESOURCE_TYPE;
-import static com.sun.identity.entitlement.EntitlementException.RESOURCE_TYPE_ALREADY_EXISTS;
+import static com.sun.identity.entitlement.EntitlementException.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -28,7 +28,6 @@ import org.forgerock.util.query.QueryFilter;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 import java.security.Principal;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +51,11 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
     public ResourceType saveResourceType(Subject subject, String realm, ResourceType resourceType)
             throws EntitlementException {
 
+        final String uuid = resourceType.getUUID();
+        if (configuration.containsUUID(subject, realm, uuid)) {
+            throw new EntitlementException(RESOURCE_TYPE_ALREADY_EXISTS, uuid);
+        }
+
         final String name = resourceType.getName();
         if (configuration.containsName(subject, realm, name)) {
             throw new EntitlementException(RESOURCE_TYPE_ALREADY_EXISTS, name);
@@ -71,7 +75,7 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
     private ResourceType setMetaData(Subject subject, String realm, ResourceType resourceType)
             throws EntitlementException {
 
-        final long now = new Date().getTime();
+        final long now = newDate().getTime();
         final String principalName = getPrincipalName(subject);
         final ResourceType oldResourceType = getResourceType(subject, realm, resourceType.getUUID());
         final ResourceType.Builder builder = resourceType.populatedBuilder();

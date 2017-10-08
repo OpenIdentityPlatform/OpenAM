@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "title": "i18n:api-descriptor/SmsRequestHandler#type.title",
+  "description": "i18n:api-descriptor/SmsRequestHandler#type.description",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SmsRequestHandler#type.id.title",
+      "description": "i18n:api-descriptor/SmsRequestHandler#type.id.description"
+    },
+    "name": {
+      "type": "string",
+      "title": "i18n:api-descriptor/SmsRequestHandler#type.name.title",
+      "description": "i18n:api-descriptor/SmsRequestHandler#type.name.description"
+    },
+    "collection": {
+      "type": "boolean",
+      "title": "i18n:api-descriptor/SmsRequestHandler#type.collection.title",
+      "description": "i18n:api-descriptor/SmsRequestHandler#type.collection.description"
+    }
+  }
+}

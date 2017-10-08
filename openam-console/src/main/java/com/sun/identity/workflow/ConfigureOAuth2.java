@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Copyright 2012-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,14 +24,14 @@
 package com.sun.identity.workflow;
 
 import static java.text.MessageFormat.format;
-import static java.util.Collections.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
+import static java.util.Collections.singleton;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+import static org.forgerock.openam.oauth2.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2ProviderService.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import java.security.AccessController;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,9 +55,12 @@ import org.forgerock.openam.entitlement.rest.PolicyStore;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
 import org.forgerock.util.query.QueryFilter;
@@ -66,7 +69,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
@@ -74,7 +76,6 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -87,10 +88,10 @@ public class ConfigureOAuth2 extends Task {
 
     private static final Map<String, String> OIDC_SCOPES = new ImmutableMap.Builder<String, String>()
             .put("openid", "")
-            .put("email", "openidconnect.scopes.email")
-            .put("address", "openidconnect.scopes.address")
-            .put("phone", "openidconnect.scopes.phone")
-            .put("profile", "openidconnect.scopes.profile")
+            .put(OAuth2Constants.Scopes.EMAIL, "openidconnect.scopes.email")
+            .put(OAuth2Constants.Scopes.ADDRESS, "openidconnect.scopes.address")
+            .put(OAuth2Constants.Scopes.PHONE, "openidconnect.scopes.phone")
+            .put(OAuth2Constants.Scopes.PROFILE, "openidconnect.scopes.profile")
             .build();
 
     private static final Map<String, String> OIDC_CLAIMS = new ImmutableMap.Builder<String, String>()
@@ -110,7 +111,8 @@ public class ConfigureOAuth2 extends Task {
     private static final Map<String, Set<String>> COMMON_OIDC_UMA_ATTRIBUTES =
             new ImmutableMap.Builder<String, Set<String>>()
                     .put(SUBJECT_TYPES_SUPPORTED, singleton("public"))
-                    .put(ID_TOKEN_SIGNING_ALGORITHMS, asSet("HS256", "HS384", "HS512", "RS256"))
+                    .put(ID_TOKEN_SIGNING_ALGORITHMS, asSet("HS256", "HS384", "HS512", "RS256", "ES256", "ES384",
+                            "ES512"))
                     .put(RESPONSE_TYPE_LIST, asSet(
                             TOKEN + "|" + TokenResponseTypeHandler.class.getName(),
                             CODE + "|" + AuthorizationCodeResponseTypeHandler.class.getName(),
@@ -294,11 +296,12 @@ public class ConfigureOAuth2 extends Task {
     private String getUrlResourceTypeId(Subject adminSubject, String realm)
             throws EntitlementException, WorkflowException {
 
-        Application application = ApplicationManager.getApplication(adminSubject, realm, POLICY_APPLICATION_NAME);
+        ApplicationService applicationService = getApplicationService(adminSubject, realm);
+        Application application = applicationService.getApplication(POLICY_APPLICATION_NAME);
         if (application == null) {
             ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(adminSubject,
                     ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
-            application = ApplicationManager.newApplication(POLICY_APPLICATION_NAME, applicationType);
+            application = EntitlementUtils.newApplication(POLICY_APPLICATION_NAME, applicationType);
         }
 
         Set<String> resourceTypeIds = application.getResourceTypeUuids();
@@ -326,7 +329,9 @@ public class ConfigureOAuth2 extends Task {
         }
         application.addAllResourceTypeUuids(asSet(resourceType.getUUID()));
         application.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, realm, application);
+        application.setSubjects(EntitlementUtils.getSubjectsShortNames());
+        application.setConditions(EntitlementUtils.getConditionsShortNames());
+        applicationService.saveApplication(application);
         return resourceType.getUUID();
     }
 

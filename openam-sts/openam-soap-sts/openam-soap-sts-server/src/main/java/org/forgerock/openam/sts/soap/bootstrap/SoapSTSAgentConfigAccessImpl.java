@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -85,18 +85,20 @@ public class SoapSTSAgentConfigAccessImpl implements SoapSTSAgentConfigAccess {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return JsonValueBuilder.toJsonValue(connectionResult.getResult());
             } else {
+                if (sessionId != null) {
+                    accessTokenProvider.invalidateAccessToken(sessionId);
+                }
                 throw ResourceException.getException(responseCode,
                         "non 200 response from agent config service at: " + agentProfileUrl +
                                 " : " + connectionResult.getResult());
             }
         } catch (IOException e) {
-            throw new InternalServerErrorException(
-                    "Exception caught obtaining agent config state from: " + agentProfileUrl + "; Exception: " + e);
-        } finally {
             if (sessionId != null) {
                 accessTokenProvider.invalidateAccessToken(sessionId);
             }
-        }
+            throw new InternalServerErrorException(
+                    "Exception caught obtaining agent config state from: " + agentProfileUrl + "; Exception: " + e);
+        } 
     }
 
     private URL buildAgentProfileUrl(UrlConstituentCatenator urlConstituentCatenator,

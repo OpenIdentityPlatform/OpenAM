@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
-    "underscore",
+define([
+    "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/utils/ModelUtils"
@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
         idAttribute: "name",
         urlRoot: URLHelper.substitute("__api__/policies"),
 
-        defaults: function () {
+        defaults () {
             return {
                 name: null,
                 description: "",
@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
             };
         },
 
-        validate: function (attrs) {
+        validate (attrs) {
             if (attrs.name.trim() === "") {
                 return "errorNoName";
             }
@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
             }
         },
 
-        sync: function (method, model, options) {
+        sync (method, model, options) {
             options = options || {};
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/admin/models/authorization/PolicyModel", [
 
             if (model.id === null) {
                 method = "create";
-                options.url = this.urlRoot() + "/?_action=create";
+                options.url = `${this.urlRoot()}/?_action=create`;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

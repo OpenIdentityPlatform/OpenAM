@@ -213,7 +213,7 @@ public class FMSessionProvider implements SessionProvider {
         AuthContext ac = null;
         try {
             if (oldSession != null) {
-                ac = new AuthContext((SSOToken) oldSession, true);
+                ac = new AuthContext((SSOToken) oldSession);
             } else {
                 ac = new AuthContext(realm);
             }
@@ -261,23 +261,19 @@ public class FMSessionProvider implements SessionProvider {
             // is set and passed over
             int failureCode = SessionException.AUTH_ERROR_NOT_DEFINED;
             AuthLoginException ale = ac.getLoginException();
-            String authError = null;
-            if (ale != null) {
-                authError = ale.getErrorCode();
-            }
+            String authError = ac.getErrorCode();
+
             if (authError == null) {
                 failureCode = SessionException.AUTH_ERROR_NOT_DEFINED;
             } else if (authError.equals(AMAuthErrorCode.AUTH_USER_INACTIVE)) {
                 failureCode = SessionException.AUTH_USER_INACTIVE;
-            } else if(authError.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
+            } else if (authError.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
                 failureCode = SessionException.AUTH_USER_LOCKED;
-            } else if(authError.equals(
-                AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED))
-            {
+            } else if (authError.equals(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED)) {
                 failureCode = SessionException.AUTH_ACCOUNT_EXPIRED;
             }
-            
-            SessionException se = null;
+
+            SessionException se;
             if (ale != null) {
                 se = new SessionException(ale);
             } else {
@@ -615,16 +611,16 @@ public class FMSessionProvider implements SessionProvider {
     /**
      * Registers a listener for the session.
      *
+     * If the provided session does not support listeners, calling this method will throw <code>SessionException</code>.
+     *
      * @param session the session object.
      * @param listener listener for the session invalidation event.
      * 
      * @throws SessionException if adding the listener caused an error.
      */
-    public void addListener(Object session, SessionListener listener)
-        throws SessionException {
+    public void addListener(Object session, SessionListener listener) throws SessionException {
         try {
-            ((SSOToken)session).addSSOTokenListener(
-                new SSOTokenListenerImpl(session, listener));
+            ((SSOToken)session).addSSOTokenListener(new SSOTokenListenerImpl(session, listener));
         } catch (SSOException se) {
             throw new SessionException(se);
         }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.validator;
@@ -21,9 +21,13 @@ package org.forgerock.openam.sts.rest.token.validator;
  *  type will correspond to the to-be-validated token.
  *
  *  For custom RestTokenTransformValidator implementations, this generic type will be {@link org.forgerock.json.JsonValue}
+ *
+ *  @supported.all.api
  */
 public interface RestTokenTransformValidatorParameters<T> {
+
     /**
+     * Gets the to-be-validated token.
      *
      * @return the to-be-validated token.
      */

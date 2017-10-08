@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 Cybernetica AS
- * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.log.handlers.syslog;
 
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ import java.util.List;
  */
 public abstract class SyslogPublisher {
 
+    private static final int MAX_ATTEMPT_LIMIT = 3;
     protected final SocketAddress socketAddress;
 
     /**
@@ -47,7 +49,10 @@ public abstract class SyslogPublisher {
      * @param logRecords The logRecords that needs to be published to Syslog.
      */
     public void publishLogRecords(final List<String> logRecords) {
-        for (String logRecord : logRecords) {
+        int failedAttempts = 0;
+        Iterator<String> iterator = logRecords.iterator();
+        while (iterator.hasNext()) {
+            String logRecord = iterator.next();
             byte[] bytes = logRecord.getBytes(Charset.forName("UTF-8"));
 
             try {
@@ -59,6 +64,13 @@ public abstract class SyslogPublisher {
                 try {
                     closeConnection();
                 } catch (IOException ioe2) {
+                }
+                if (++failedAttempts == MAX_ATTEMPT_LIMIT) {
+                    while (iterator.hasNext()) {
+                        // Just give up and log the rest of the audit entries without trying
+                        Debug.error("Unable to publish syslog record due to non-transient network errors"
+                                + "\nAudit record was: " + iterator.next());
+                    }
                 }
             }
         }

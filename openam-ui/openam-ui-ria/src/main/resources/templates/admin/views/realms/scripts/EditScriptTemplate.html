@@ -1,14 +1,10 @@
-{{#if entity.name}}
-    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.scripts.edit.script" icon="code" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
-{{else}}
-    {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.scripts.edit.script" icon="code" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
-{{/if}}
+{{> headers/_TitleWithSubAndIcon title=entity.name type="console.scripts.edit.script" icon="code" }}
 
 <div class="panel panel-default panel-content">
     <div class="panel-body form-horizontal">
         <!-- NAME -->
         <div class="form-group">
-            <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
+            <label class="col-sm-2 control-label" for="name">{{t "console.common.name"}}</label>
 
             <div class="col-sm-9">
                 <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
@@ -18,7 +14,7 @@
 
         <!-- DESCRIPTION -->
         <div class="form-group">
-            <label class="col-sm-2 control-label">{{t "console.common.description"}}</label>
+            <label class="col-sm-2 control-label" for="description">{{t "console.common.description"}}</label>
 
             <div class="col-sm-9">
                 <textarea id="description" class="form-control pull-left script-text" rows="3"
@@ -28,11 +24,11 @@
 
         <!-- CONTEXT -->
         <div class="form-group">
-            <label class="col-sm-2 control-label">{{t "console.scripts.edit.scriptType"}}</label>
+            <label class="col-sm-2 control-label" for="context">{{t "console.scripts.edit.scriptType"}}</label>
 
             <div class="col-sm-9 script-context">
                 <span class="form-control" id="context">{{contextName}}</span>
-                <button type="button" id="changeContext" class="btn fr-btn-secondary pull-right">
+                <button type="button" class="btn fr-btn-secondary pull-right" data-change-context>
                     <i class="fa fa-gear"></i> {{t "common.form.change"}}
                 </button>
             </div>
@@ -69,12 +65,12 @@
                     <textarea id="script">{{entity.script}}</textarea>
                 </div>
 
-                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
+                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}" data-upload-script>
                 <input type="file" name="upload" class="hidden">
 
-                <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
+                <input type="button" class="btn btn-default" value="{{t 'common.form.validate'}}" data-validation-script>
 
-                <button type="button" class="btn btn-default" id="editFullScreen">
+                <button type="button" class="btn btn-default" data-show-fullscreen>
                     <i class="fa fa-expand"></i> {{t "console.common.editFullScreen"}}
                 </button>
 
@@ -85,11 +81,13 @@
 
     <div class="panel-footer clearfix">
         <div class="script-changes-pending pull-left"></div>
-        <button id="saveChanges" class="btn btn-primary pull-right" type="button">{{t 'common.form.save'}}</button>
+        <button data-save class="btn btn-primary pull-right" type="button">
+            {{t 'common.form.saveChanges'}}
+        </button>
     </div>
 
     <div class="full-screen-bar">
-        <button type="button" class="btn btn-link pull-right">
+        <button type="button" class="btn btn-link pull-right" data-exit-fullscreen>
             <i class="fa fa-compress"></i> {{t "console.common.exitFullScreen"}}
         </button>
     </div>

@@ -130,8 +130,9 @@ public class RMRealmViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            String redirectRealm = getRedirectRealm(this);
-            redirectToXui(getRequestContext().getRequest(), redirectRealm, "realms/");
+            String redirectRealm = getAdministeredRealm(this);
+            String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm, "realms/");
             return;
         }
         super.beginDisplay(event);
@@ -201,7 +202,7 @@ public class RMRealmViewBean
                 String name = (String)iter.next();
                 String fqName = null;
                 String displayName = null;
-                
+
                 if (name.equals(startDN)) {
                     tblModel.setSelectionVisible(counter, false);
                     fqName = name;
@@ -220,7 +221,7 @@ public class RMRealmViewBean
                  * may contain a '/' character.
                  */
                 tblModel.setValue(TBL_DATA_ACTION_HREF, stringToHex(fqName));
-                tblModel.setValue(TBL_DATA_NAME, 
+                tblModel.setValue(TBL_DATA_NAME,
                     SMSSchema.unescapeName(displayName));
 
                 // set location column info
@@ -269,7 +270,7 @@ public class RMRealmViewBean
         table.restoreStateData();
         String curRealm = (String)getPageSessionAttribute(
             AMAdminConstants.CURRENT_REALM);
-        
+
         Integer[] selected = tblModel.getSelectedRows();
         SerializedField szCache = (SerializedField)getChild(SZ_CACHE);
         List list = (List)szCache.getSerializedObj();
@@ -277,20 +278,20 @@ public class RMRealmViewBean
 
         for (int i = 0; i < selected.length; i++) {
             String name = (String)list.get(selected[i].intValue());
-            /* 
+            /*
              * make sure the realm name starts with / to give it a
              * fully qualified look. This value will be set in the log file
              */
             if (!name.startsWith("/")) {
                 name = "/" + name;
-            }  
+            }
             names.add(name);
         }
 
         try {
             RMRealmModel model = (RMRealmModel)getModel();
             model.deleteSubRealms(curRealm, names);
-            
+
             if (selected.length == 1) {
                 setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
                     "realm.message.deleted");
@@ -316,12 +317,12 @@ public class RMRealmViewBean
         throws ModelControlException
     {
         // store the current realm name and the current selected tab
-        // in the page session. Need to do this so after returning 
+        // in the page session. Need to do this so after returning
         // from profile object we get placed in the correct location.
         String prevRealm = (String)getPageSessionAttribute(
             AMAdminConstants.CURRENT_REALM);
         setPageSessionAttribute(AMAdminConstants.PREVIOUS_REALM, prevRealm);
-        
+
         String newRealm = hexToString(
             (String)getDisplayFieldValue(TBL_DATA_ACTION_HREF));
         setPageSessionAttribute(AMAdminConstants.CURRENT_REALM, newRealm);

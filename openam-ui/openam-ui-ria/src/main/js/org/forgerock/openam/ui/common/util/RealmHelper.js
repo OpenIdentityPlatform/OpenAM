@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2014-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/common/util/RealmHelper", [
-    "underscore",
+define([
+    "lodash",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/URIUtils"
 ], function (_, Configuration, URIUtils) {
@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
             }
 
             prepend = uri.indexOf("?") === -1 ? "?" : "&";
-            uri = uri + prepend + "realm=" + overrideRealm;
+            uri = `${uri}${prepend}realm=${overrideRealm}`;
             if (fragment) {
                 uri = uri + fragment;
             }
@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
     obj.decorateURIWithSubRealm = function (uri) {
         var persisted = Configuration.globalData,
             persistedSubRealm = (persisted && persisted.auth) ? persisted.auth.subRealm : "",
-            subRealm = persistedSubRealm ? persistedSubRealm + "/" : "";
+            subRealm = persistedSubRealm ? `${persistedSubRealm}/` : "";
 
         if (persisted &&
             persisted.auth &&
@@ -134,6 +134,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
 
         if (page && _.include(subRealmSpecifiablePages, page)) {
             subRealm = subRealmSplit.join("/").split("&")[0];
+            subRealm = subRealm.slice(-1) === "/" ? subRealm.slice(0, -1) : subRealm;
         } else if (Configuration.globalData.auth.subRealm) {
             subRealm = Configuration.globalData.auth.subRealm;
         } else {
@@ -158,7 +159,7 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
             }
         });
 
-        return "/" + encodedPath.join("/");
+        return `/${encodedPath.join("/")}`;
     };
 
     return obj;

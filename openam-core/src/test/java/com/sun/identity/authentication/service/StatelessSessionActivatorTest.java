@@ -16,19 +16,20 @@
 
 package com.sun.identity.authentication.service;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
 import org.forgerock.openam.sso.providers.stateless.StatelessSession;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
 
 public class StatelessSessionActivatorTest {
 
@@ -41,7 +42,7 @@ public class StatelessSessionActivatorTest {
     private LoginState mockLoginState;
 
     @Mock
-    private StatelessSessionFactory mockSessionFactory;
+    private StatelessSessionManager mockSessionFactory;
     
     @BeforeMethod
     public void setup() {
@@ -59,7 +60,7 @@ public class StatelessSessionActivatorTest {
         testActivator.createSession(mockSessionService, mockLoginState);
 
         // When
-        verify(mockSessionService).newInternalSession(orgDn, null, true);
+        verify(mockSessionService).newInternalSession(orgDn, true);
     }
 
     @Test
@@ -73,7 +74,7 @@ public class StatelessSessionActivatorTest {
         testActivator.activateSession(mockSession, mockLoginState);
 
         // Then
-        verify(mockSession).activate(userDn, true);
+        verify(mockSession).activate(userDn);
     }
 
     @Test
@@ -82,7 +83,7 @@ public class StatelessSessionActivatorTest {
         InternalSession mockSession = mock(InternalSession.class);
         String userDn = "fred";
         given(mockLoginState.getUserDN()).willReturn(userDn);
-        given(mockSession.activate(userDn, true)).willReturn(true);
+        given(mockSession.activate(userDn)).willReturn(true);
         StatelessSession mockStatelessSession = mock(StatelessSession.class);
         given(mockSessionFactory.generate(mockSession)).willReturn(mockStatelessSession);
         SessionID statelessSessionId = new SessionID("stateless");
@@ -94,18 +95,6 @@ public class StatelessSessionActivatorTest {
         // Then
         verify(mockSessionFactory).generate(mockSession);
         verify(mockLoginState).setSessionID(statelessSessionId);
-    }
-
-    @Test
-    public void shouldEnsureSessionIsNotScheduled() throws Exception {
-        // Given
-        InternalSession mockSession = mock(InternalSession.class);
-
-        // When
-        testActivator.activateSession(mockSession, mockLoginState);
-
-        // Then
-        verify(mockSession).cancel();
     }
 
 }

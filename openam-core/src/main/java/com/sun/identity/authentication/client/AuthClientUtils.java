@@ -49,7 +49,7 @@ import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.common.FQDNUtils;
+import com.sun.identity.common.FqdnValidator;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
@@ -346,9 +346,9 @@ public class AuthClientUtils {
     	return (decodeHash(request));
     }
 
-    private static Hashtable decodeHash(HttpServletRequest request) {
+    private static Hashtable<String, String> decodeHash(HttpServletRequest request) {
 
-        Hashtable data = new Hashtable();
+        Hashtable<String, String> data = new Hashtable<>();
         String clientEncoding = request.getCharacterEncoding();
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
         if (utilDebug.messageEnabled()) {
@@ -368,14 +368,17 @@ public class AuthClientUtils {
                 }
                 continue;
             }
-            if (name.equalsIgnoreCase("SunQueryParamsString")){
+            if (name.equalsIgnoreCase("SunQueryParamsString")) {
                 // This will normally be the case when browser back button is
-                // used and the form is posted again with the base64 encoded 
-                // parameters            	
-                if (!value.isEmpty()){
+                // used and the form is posted again with the base64 encoded parameters
+                if (!value.isEmpty()) {
                     String decodedValue = Base64.decodeAsUTF8String(value);
-                    if (decodedValue == null && utilDebug.warningEnabled()) {
-                        utilDebug.warning("Parameter ['{}']='{}' should be base64 encoded", name, value);
+                    if (decodedValue == null) {
+                        if (utilDebug.warningEnabled()) {
+                            utilDebug.warning("As parameter 'encoded' is true, parameter ['{}']='{}' should be base64"
+                                    + " encoded", name, value);
+                        }
+                        continue;
                     }
                     value = decodedValue;
                     if (utilDebug.messageEnabled()) {
@@ -384,14 +387,14 @@ public class AuthClientUtils {
                     StringTokenizer st = new StringTokenizer(value, "&");
                     while (st.hasMoreTokens()) {
                         String str = st.nextToken();
-                        if (str.indexOf("=") != -1 ) {
+                        if (str.indexOf("=") != -1) {
                             int index = str.indexOf("=");
-                            String parameter = str.substring(0,index);
+                            String parameter = str.substring(0, index);
                             String parameterValue = str.substring(index + 1);
                             putDecodedValue(data, parameter, parameterValue, encoding);
-                        } 
+                        }
                     }
-            	}
+                }
             } else if (name.equals(RedirectUrlValidator.GOTO) || name.equals(RedirectUrlValidator.GOTO_ON_FAIL)){
                 // Again this will be the case when browser back
                 // button is used and the form is posted with the
@@ -1470,7 +1473,7 @@ public class AuthClientUtils {
      */
     public static String getDomainNameByRequest(
         HttpServletRequest request,
-        Hashtable requestHash) {
+        Map<String, String> requestHash) {
 
         boolean noQueryParam=false;
         String realm = getRealmFromPolicyAdvice(requestHash);
@@ -1514,7 +1517,7 @@ public class AuthClientUtils {
      * @param requestHash Hashtable containing the query parameters
      * @return organization name.
      */
-    public static String getOrgParam(Hashtable<String, String> requestHash) {
+    public static String getOrgParam(Map<String, String> requestHash) {
         String orgParam = null;
         if (requestHash != null && !requestHash.isEmpty()) {
             orgParam = requestHash.get(ISAuthConstants.DOMAIN_PARAM);
@@ -1551,7 +1554,7 @@ public class AuthClientUtils {
             utilDebug.message("hostName is : " + hostName);
         }
 
-        boolean retVal = FQDNUtils.getInstance().isHostnameValid(hostName);
+        boolean retVal = FqdnValidator.getInstance().isHostnameValid(hostName);
         if (utilDebug.messageEnabled()) {
             if (retVal) {
                 utilDebug.message("hostname  and fqdnDefault match returning true");
@@ -1577,7 +1580,7 @@ public class AuthClientUtils {
 
         // get mapping from table
         String validHostName =
-            FQDNUtils.getInstance().getFullyQualifiedHostName(partialHostName);
+            FqdnValidator.getInstance().getFullyQualifiedHostName(partialHostName);
 
         if (validHostName == null) {
             validHostName = partialHostName;
@@ -2274,9 +2277,9 @@ public class AuthClientUtils {
 
     /**
      * @deprecated use {@link #getDomainNameByRequest(
-     * javax.servlet.http.HttpServletRequest, java.util.Hashtable)} instead.
+     * javax.servlet.http.HttpServletRequest, java.util.Map<String, String>)} instead.
      */
-    public static String getDomainNameByRequest(Hashtable requestHash) {
+    public static String getDomainNameByRequest(Map<String, String> requestHash) {
         String realm = getRealmFromPolicyAdvice(requestHash);
         String orgParam = getOrgParam(requestHash);
         if (realm != null) {
@@ -2309,7 +2312,7 @@ public class AuthClientUtils {
      * the advice
      * @see com.sun.identity.authentication.util.AMAuthUtils
      */
-    private static String getRealmFromPolicyAdvice(Hashtable<String, String> requestHash) {
+    private static String getRealmFromPolicyAdvice(Map<String, String> requestHash) {
         String advice = requestHash.get(COMPOSITE_ADVICE);
         if (advice == null) {
             return null;
@@ -2576,7 +2579,11 @@ public class AuthClientUtils {
                     if (queryParams.containsKey(entry.getKey())) {
                         // TODO: do we need to care about params that can be both in GET and POST?
                     } else {
-                        postParams.put(entry.getKey(), new HashSet<String>(asList(entry.getValue())));
+                        Set<String> values = new HashSet<String>();
+                        for (String value : entry.getValue()) {
+                            values.add(getCharDecodedField(value, "UTF-8"));
+                        }
+                        postParams.put(entry.getKey(), values);
                     }
                 }
 
@@ -3014,7 +3021,7 @@ public class AuthClientUtils {
                         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
                 hostUrlCookieValue = hostUrlCookieValue.substring(0, 
                         (hostUrlCookieValue.length() - uri.length()));
-            } catch(ServerEntryNotFoundException e) { 
+            } catch(ServerEntryNotFoundException e) {
                 utilDebug.message("AuthClientUtils.setHostUrlCookie:", e);
             }
 

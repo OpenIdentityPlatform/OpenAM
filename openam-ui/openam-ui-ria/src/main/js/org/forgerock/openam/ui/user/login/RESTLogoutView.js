@@ -15,20 +15,24 @@
  */
 
 
-define("org/forgerock/openam/ui/user/login/RESTLogoutView", [
+define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/user/login/navigateThenRefresh"
+], ($, AbstractView, Configuration, Constants, EventManager, RESTLoginHelper, navigateThenRefresh) => {
 
     var LogoutView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
-        render: function () {
+        events: {
+            "click [data-return-to-login-page]" : navigateThenRefresh
+        },
+        render () {
             /*
             The RESTLoginHelper.filterUrlParams returns a filtered list of the parameters from the value set within the
             Configuration.globalData.auth.fullLoginURL which is populated by the server upon successful login.
@@ -39,7 +43,6 @@ define("org/forgerock/openam/ui/user/login/RESTLogoutView", [
             this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
             delete Configuration.globalData.auth.fullLoginURL;
 
-            Configuration.setProperty("loggedUser", null);
             delete Configuration.gotoURL;
             EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
 

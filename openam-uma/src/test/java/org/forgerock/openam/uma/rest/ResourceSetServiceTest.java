@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -36,6 +36,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.uma.ResourceSetSharedFilter;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.json.JsonPointer;
@@ -46,7 +48,7 @@ import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.services.context.Context;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -61,6 +63,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilterVisitor;
 import org.mockito.Matchers;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -72,6 +75,7 @@ public class ResourceSetServiceTest {
     private UmaPolicyService policyService;
     private CoreWrapper coreWrapper;
     private UmaProviderSettings umaProviderSettings;
+    private RealmTestHelper realmTestHelper;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -84,8 +88,15 @@ public class ResourceSetServiceTest {
 
         service = new ResourceSetService(resourceSetStoreFactory, policyService, coreWrapper, umaProviderSettingsFactory);
 
-        given(resourceSetStoreFactory.create("REALM")).willReturn(resourceSetStore);
-        given(umaProviderSettingsFactory.get("REALM")).willReturn(umaProviderSettings);
+        given(resourceSetStoreFactory.create("/REALM")).willReturn(resourceSetStore);
+        given(umaProviderSettingsFactory.get("/REALM")).willReturn(umaProviderSettings);
+        realmTestHelper = new RealmTestHelper(coreWrapper);
+        realmTestHelper.setupRealmClass();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -93,7 +104,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = mock(Context.class);
-        String realm = "REALM";
+        String realm = "/REALM";
         String resourceSetId = "RESOURCE_SET_ID";
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicy = false;
@@ -117,7 +128,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = mock(Context.class);
-        String realm = "REALM";
+        String realm = "/REALM";
         String resourceSetId = "RESOURCE_SET_ID";
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicy = true;
@@ -141,9 +152,10 @@ public class ResourceSetServiceTest {
         verify(resourceSet).setPolicy(policyJson);
     }
 
-    private Context mockContext(String realm) {
+    private Context mockContext(String realmName) {
+        Realm realm = realmTestHelper.mockRealm(realmName.substring(1));
         RealmContext realmContext = mock(RealmContext.class);
-        given(realmContext.getResolvedRealm()).willReturn(realm);
+        given(realmContext.getRealm()).willReturn(realm);
         return realmContext;
     }
 
@@ -157,7 +169,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnEmptySetWhenNoResourceSetsExist() throws Exception {
 
         //Given
-        String realm = "REALM";
+        String realm = "/REALM";
         Context context = mockContext(realm);
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -189,9 +201,8 @@ public class ResourceSetServiceTest {
     }
 
     private Context createContext() {
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.setDnsAlias("/", "REALM");
-        return realmContext;
+        Realm realm = realmTestHelper.mockRealm("REALM");
+        return new RealmContext(new RootContext(), realm);
     }
 
     @Test
@@ -199,7 +210,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
@@ -239,7 +250,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
@@ -307,7 +318,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         query.setOperator(AggregateQuery.Operator.OR);
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -365,7 +376,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
@@ -424,7 +435,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
@@ -508,7 +519,7 @@ public class ResourceSetServiceTest {
 
         //Given
         Context context = createContext();
-        String realm = "REALM";
+        String realm = "/REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
@@ -576,7 +587,7 @@ public class ResourceSetServiceTest {
     public void shouldRevokeAllResourceSetPolicies() throws Exception {
 
         //Given
-        String realm = "REALM";
+        String realm = "/REALM";
         Context context = mockContext(realm);
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<>();

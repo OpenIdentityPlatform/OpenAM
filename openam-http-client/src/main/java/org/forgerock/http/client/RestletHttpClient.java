@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.http.client;
 
@@ -25,6 +25,7 @@ import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.*;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.util.Series;
 
 import java.io.UnsupportedEncodingException;
@@ -33,16 +34,20 @@ import java.util.*;
 
 /**
  * A basic http client that can be used to send
- * {@link org.forgerock.http.client.request.HttpClientRequest} objects and receive {@link org.forgerock.http.client.response.HttpClientResponse} objects.
+ * {@link org.forgerock.http.client.request.HttpClientRequest} objects and
+ * receive {@link org.forgerock.http.client.response.HttpClientResponse} objects.
  *
  * @since 12.0.0
  * @deprecated Will be replaced in a later release by {@link org.forgerock.http.Client}.
  */
 @Deprecated
 public abstract class RestletHttpClient {
-    final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
+    final HttpClientRequestFactory httpClientRequestFactory =
+            InjectorHolder.getInstance(HttpClientRequestFactory.class);
 
-    protected HttpClientResponse getHttpClientResponse(String uri, String body, Map<String, List<Map<String,String>>> requestData, String method) throws UnsupportedEncodingException {
+    protected HttpClientResponse getHttpClientResponse(
+            String uri, String body, Map<String, List<Map<String, String>>> requestData, String method)
+            throws UnsupportedEncodingException {
         HttpClientRequest httpClientRequest = httpClientRequestFactory.createRequest();
 
         httpClientRequest.setMethod(method);
@@ -50,19 +55,17 @@ public abstract class RestletHttpClient {
         httpClientRequest.setEntity(body);
 
         if (requestData != null) {
-            List<Map<String,String>> cookies = requestData.get("cookies");
+            List<Map<String, String>> cookies = requestData.get("cookies");
             if (cookies != null) {
-                for (Map cookie : cookies) {
-                    httpClientRequest.addCookie((String) cookie.get("domain"),
-                            (String) cookie.get("field"), (String) cookie.get("value"));
+                for (Map<String, String> cookie : cookies) {
+                    httpClientRequest.addCookie(cookie.get("domain"), cookie.get("field"), cookie.get("value"));
                 }
             }
 
-            List<Map<String,String>> headers = requestData.get("headers");
+            List<Map<String, String>> headers = requestData.get("headers");
             if (headers != null) {
-                for (Map header : headers) {
-                    httpClientRequest.addQueryParameter((String) header.get("field"),
-                            (String) header.get("value"));
+                for (Map<String, String> header : headers) {
+                    httpClientRequest.addHeader(header.get("field"), header.get("value"));
                 }
             }
         }
@@ -124,13 +127,14 @@ public abstract class RestletHttpClient {
     }
 
     private void addHeadersToRequest(HttpClientRequest httpClientRequest, Request request) {
-        Map<String, Object> headersMap = new HashMap<String, Object>();
-        Form headersForm = new Form();
-        for (String key : httpClientRequest.getHeaders().keySet()) {
-            headersForm.set(key, httpClientRequest.getHeaders().get(key));
+        Series<Header> headers = (Series<Header>) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        if (headers == null) {
+            headers = new Series<>(Header.class);
+            request.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, headers);
         }
-        headersMap.put("org.restlet.http.headers", headersForm);
-        request.setAttributes(headersMap);
+        for (String key : httpClientRequest.getHeaders().keySet()) {
+            headers.set(key, httpClientRequest.getHeaders().get(key));
+        }
     }
 
     private void addQueryParametersToRequest(HttpClientRequest httpClientRequest, Request request) throws UnsupportedEncodingException {

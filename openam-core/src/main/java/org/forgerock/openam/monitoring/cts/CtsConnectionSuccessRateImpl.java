@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.monitoring.cts;
@@ -56,10 +56,11 @@ public class CtsConnectionSuccessRateImpl extends CtsConnectionSuccessRate {
     }
 
     /**
-     * Getter for the "SuccessAverage" variable.
+     * Getter for the "SuccessAverage" variable. The monitored value is multiplied by 100 to allow SNMP clients to
+     * display it as floating point value with 2 decimal places.
      */
-    public Long getSuccessAverage() throws SnmpStatusException {
-        return Math.round(monitoringStore.getAverageConnectionsPerPeriod(true));
+    public Integer getSuccessAverage() throws SnmpStatusException {
+        return (int) (monitoringStore.getAverageConnectionsPerPeriod(true) * 100);
     }
 
     /**

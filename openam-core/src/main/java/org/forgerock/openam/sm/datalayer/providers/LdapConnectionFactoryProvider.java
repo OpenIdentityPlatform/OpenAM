@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
@@ -44,6 +44,7 @@ import org.forgerock.util.Options;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.time.Duration;
 
+import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -98,6 +99,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
 
         Options options = Options.defaultOptions()
                 .set(REQUEST_TIMEOUT, new Duration((long) timeout, TimeUnit.SECONDS));
+        options.set(LDAPUtils.AFFINITY_ENABLED, config.isAffinityEnabled());
 
         debug("Creating Embedded Factory:\nURL: {0}\nMax Connections: {1}\nHeartbeat: {2}\nOperation Timeout: {3}",
                 config.getLDAPURLs(),
@@ -121,6 +123,21 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
         if (debug.messageEnabled()) {
             debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
         }
+    }
+
+    /**
+     * Wraps a specific {@link org.forgerock.opendj.ldap.ConnectionFactory} factory in a {@link ConnectionFactory}
+     * object, for similarity between {@link org.forgerock.openam.sm.datalayer.impl.ldap.CTSDJLDAPv3PersistentSearch}
+     * and {@link EventService} LDAP uses.
+     *
+     * The intent is to adapt an LDAP connection factory to the more generic data layer connection factory.
+     *
+     * @param ldapConnectionFactory The factory to wrap.
+     * @return The wrapped factory.
+     */
+    public static ConnectionFactory<Connection> wrapExistingConnectionFactory(
+            org.forgerock.opendj.ldap.ConnectionFactory ldapConnectionFactory) {
+        return new LdapConnectionFactory(ldapConnectionFactory);
     }
 
     private static class LdapConnectionFactory implements ConnectionFactory<Connection> {

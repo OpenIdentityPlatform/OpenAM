@@ -1,0 +1,20 @@
+{{#each columns}}
+{{#if this.selectOptions}}
+    <td class="form-group">
+        <select class="form-control" data-row-{{@index}}>
+            {{#each this.selectOptions}}
+            <option value="{{this.value}}" {{#if this.isSelected}}selected{{/if}}>{{this.value}}</option>
+            {{/each}}
+        </select>
+    </td>
+{{else}}
+    <td class="form-group">
+        <input class="form-control" type="text" value="{{this.data}}" data-add-row placeholder="{{t 'common.form.addValue'}}" data-row-{{@index}} data-validator="{{this.required}}">
+    </td>
+{{/if}}
+{{/each}}
+<td class="fr-col-btn-2">
+    <div class="btn-group">
+        <button class="btn btn-link" data-add-row title="{{t 'common.form.add'}}"><i class="fa fa-plus"></i></button>
+    </div>
+</td>

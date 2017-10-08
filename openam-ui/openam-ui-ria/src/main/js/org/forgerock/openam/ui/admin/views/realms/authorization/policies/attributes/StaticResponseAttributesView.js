@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,128 +11,46 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
+define([
+    "lodash",
+    "backbone",
+    "org/forgerock/openam/ui/common/components/table/InlineEditTable"
+], (_, Backbone, InlineEditTable) => {
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/attributes/StaticResponseAttributesView", [
-    "jquery",
-    "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListEditingView"
-], function ($, _, AbstractView, StripedListEditingView) {
-    function StaticResponseAttributesView () {
-    }
+    const StaticResponseAttributesView = Backbone.View.extend({
 
-    StaticResponseAttributesView.prototype = new StripedListEditingView();
+        initialize ({ staticAttributes }) {
+            this.staticAttributes = staticAttributes;
+        },
 
-    StaticResponseAttributesView.prototype.render = function (entity, staticAttributes, el, callback) {
-        this.data = {};
-        this.entity = entity;
-        this.attrType = "Static";
+        render () {
+            const getFlattenedStaticAttributes = () => _.flatten(
+                _.map(this.staticAttributes, (attribute) =>
+                    _.map(attribute.propertyValues, (value) => ({ key: attribute.propertyName, value }))
+                ));
 
-        this.data.items = this.splitAttrs(staticAttributes);
-        this.data.items = _.sortBy(this.data.items, "propertyName");
+            this.inlineEditList = new InlineEditTable({
+                values: getFlattenedStaticAttributes()
+            });
+            this.$el.append(this.inlineEditList.render().$el);
 
-        this.events["change input"] = this.checkedRequired.bind(this);
-        this.events["keyup input"] = this.checkedRequired.bind(this);
+            return this;
+        },
 
-        this.baseRender(this.data,
-            "templates/admin/views/realms/authorization/policies/attributes/StaticAttributesTemplate.html",
-            el, callback);
-    };
-
-    StaticResponseAttributesView.prototype.getPendingItem = function () {
-        var editing = this.$el.find(".editing"),
-            key = editing.find("[data-attr-key]"),
-            val = editing.find("[data-attr-val]"),
-            attr = {};
-
-        attr.propertyName = key.val();
-        attr.propertyValues = val.val();
-
-        return attr;
-    };
-
-    StaticResponseAttributesView.prototype.isValid = function () {
-        var editing = this.$el.find(".editing"),
-            key = editing.find("[data-attr-key]"),
-            val = editing.find("[data-attr-val]");
-
-        return _.every([key, val], function (input) {
-            return input.val() !== "" && input[0].checkValidity();
-        });
-    };
-
-    StaticResponseAttributesView.prototype.isExistingItem = function (itemPending, itemFromCollection) {
-        return itemFromCollection.propertyName === itemPending.propertyName &&
-            itemFromCollection.propertyValues === itemPending.propertyValues;
-    };
-
-    StaticResponseAttributesView.prototype.getCollectionWithout = function (e) {
-        var data = $(e.currentTarget).parent().data(),
-            key = data.attrKey.toString(),
-            val = data.attrVal.toString();
-
-        return _.without(this.data.items, _.find(this.data.items, { propertyName: key, propertyValues: val }));
-    };
-
-    StaticResponseAttributesView.prototype.splitAttrs = function (attrs) {
-        var data = [],
-            prop,
-            i,
-            length;
-
-        for (prop in attrs) {
-            if (attrs.hasOwnProperty(prop)) {
-                for (i = 0, length = attrs[prop].propertyValues.length; i < length; i++) {
-                    data.push({
-                        "type": this.attrType,
-                        "propertyName": attrs[prop].propertyName,
-                        "propertyValues": attrs[prop].propertyValues[i]
-                    });
-                }
-            }
+        getGroupedData () {
+            return _(this.inlineEditList.getData())
+                .groupBy("key")
+                .map((values, key) => ({
+                    type: "Static",
+                    propertyName: key,
+                    propertyValues: _.map(values, "value")
+                }))
+                .value();
         }
-
-        return data;
-    };
-
-    StaticResponseAttributesView.prototype.getCombinedAttrs = function () {
-        var data = [],
-            groupedByName = _.groupBy(this.data.items, function (attribute) {
-                return attribute.propertyName;
-            }),
-            attribute,
-            i,
-            length,
-            self = this;
-
-        _.each(groupedByName, function (value, key) {
-            attribute = { type: self.attrType };
-            attribute.propertyName = key;
-            attribute.propertyValues = [];
-            for (i = 0, length = value.length; i < length; i++) {
-                attribute.propertyValues.push(value[i].propertyValues);
-            }
-            data.push(attribute);
-        });
-
-        return data;
-    };
-
-    StaticResponseAttributesView.prototype.checkedRequired = function (e) {
-        var inputs = $(e.currentTarget).parent().find("input"),
-            required = false;
-
-        _.find(inputs, function (input) {
-            if (input.value !== "") {
-                required = true;
-            }
-        });
-
-        inputs.prop("required", required);
-    };
+    });
 
     return StaticResponseAttributesView;
 });

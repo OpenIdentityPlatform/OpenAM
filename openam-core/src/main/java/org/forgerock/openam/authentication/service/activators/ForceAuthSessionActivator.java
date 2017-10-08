@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.authentication.service.activators;
 
+import javax.security.auth.Subject;
+
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.DefaultSessionActivator;
 import com.sun.identity.authentication.service.LoginState;
-
-import javax.security.auth.Subject;
 
 /**
  * The force auth session activator: creates a new session, sets that as the current session
@@ -41,17 +41,13 @@ public final class ForceAuthSessionActivator extends DefaultSessionActivator {
 
     @Override
     public boolean activateSession(final LoginState loginState, final SessionService sessionService,
-                                   final InternalSession authSession, final Subject subject, final Object loginContext)
-            throws AuthException {
+            final InternalSession authSession, final Subject subject) throws AuthException {
 
         if (!loginState.getForceFlag()) {
             throw new AuthException("Invalid session to activate.");
         }
-
         final InternalSession session = createSession(sessionService, loginState);
-
-        return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject,
-                loginContext);
+        return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject);
     }
 
     public static ForceAuthSessionActivator getInstance() {

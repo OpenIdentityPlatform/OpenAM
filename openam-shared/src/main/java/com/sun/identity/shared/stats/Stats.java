@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,12 @@
  *
  * $Id: Stats.java,v 1.5 2008/08/08 00:40:59 ww203982 Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 package com.sun.identity.shared.stats;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.Constants;
@@ -217,8 +220,8 @@ public class Stats implements ShutdownListener {
                     }
                     
                     SystemTimer.getTimer().schedule(statsListeners, new Date(((
-                        System.currentTimeMillis() +
-                        statsListeners.getRunPeriod()) / 1000) * 1000));
+                            currentTimeMillis() +
+                                    statsListeners.getRunPeriod()) / 1000) * 1000));
 
                     serviceInitialized = true;
                 }
@@ -353,7 +356,7 @@ public class Stats implements ShutdownListener {
         StringWriter swriter = new StringWriter(160);
         PrintWriter buf = new PrintWriter(swriter, true);
         synchronized (dateFormat) {
-            buf.write(dateFormat.format(new Date()));
+            buf.write(dateFormat.format(newDate()));
         }
         if ((serverInstance != null) && (serverInstance != "")) {
             buf.write(": ");

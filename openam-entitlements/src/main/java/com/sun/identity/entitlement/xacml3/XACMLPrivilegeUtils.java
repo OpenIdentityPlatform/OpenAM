@@ -24,10 +24,39 @@
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.entitlement.xacml3;
+
+import static com.sun.identity.entitlement.EntitlementException.INVALID_VALUE;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+
+import org.forgerock.util.annotations.VisibleForTesting;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.xml.sax.InputSource;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
@@ -55,30 +84,9 @@ import com.sun.identity.entitlement.xacml3.core.Rule;
 import com.sun.identity.entitlement.xacml3.core.Target;
 import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
+import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.xml.sax.InputSource;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
 
 /**
  * Class with utility methods to map from
@@ -766,10 +774,9 @@ public class XACMLPrivilegeUtils {
         long lastModifiedAt = dateStringToLong(getVariableById(policy, XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
 
         String entitlementName = getVariableById(policy, XACMLConstants.ENTITLEMENT_NAME);
-        String applicationName = getVariableById(policy, XACMLConstants.APPLICATION_NAME);
+        String applicationName = getApplicationNameFromPolicy(policy);
 
-        List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
-        Set<String> resourceNames = getResourceNamesFromMatches(policyMatches);
+        Set<String> resourceNames = getResourceNamesFromPolicy(policy);
         Map<String, Boolean> actionValues = getActionValuesFromPolicy(policy);
 
         EntitlementSubject es = getEntitlementSubjectFromPolicy(policy);
@@ -802,6 +809,29 @@ public class XACMLPrivilegeUtils {
         privilege.setCondition(ec);
         privilege.setResourceAttributes(ras);
         return privilege;
+    }
+
+    /**
+     * Gets the name of the application to which this policy belongs.
+     *
+     * @param policy read from XACML import stream.
+     *
+     * @return application name.
+     */
+    public static String getApplicationNameFromPolicy(Policy policy) {
+        return getVariableById(policy, XACMLConstants.APPLICATION_NAME);
+    }
+
+    /**
+     * Gets the resource names from the policy.
+     *
+     * @param policy read from XACML import stream.
+     *
+     * @return resource names.
+     */
+    public static Set<String> getResourceNamesFromPolicy(Policy policy) {
+        List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
+        return getResourceNamesFromMatches(policyMatches);
     }
 
     public static String policyIdToPrivilegeName(String policyId) {
@@ -872,13 +902,13 @@ public class XACMLPrivilegeUtils {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String currentTime = sdf.format(System.currentTimeMillis());
+        String currentTime = sdf.format(currentTimeMillis());
         String policySetId  = realm + ":" + currentTime;
 
         policySet.setPolicySetId(policySetId);
 
         Version version = new Version();
-        version.setValue(sdf.format(System.currentTimeMillis()));
+        version.setValue(sdf.format(currentTimeMillis()));
         policySet.setVersion(version);
 
         // FIXME: is there a better choice?
@@ -898,13 +928,13 @@ public class XACMLPrivilegeUtils {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String currentTime = sdf.format(System.currentTimeMillis());
+        String currentTime = sdf.format(currentTimeMillis());
         String policySetId  = realm + ":" + currentTime;
 
         policySet.setPolicySetId(policySetId);
 
         Version version = new Version();
-        version.setValue(sdf.format(System.currentTimeMillis()));
+        version.setValue(sdf.format(currentTimeMillis()));
         policySet.setVersion(version);
 
         // FIXME: is there a better choice?
@@ -1047,7 +1077,14 @@ public class XACMLPrivilegeUtils {
         return ruleList;
     }
 
-    static Map<String, Boolean> getActionValuesFromPolicy(Policy policy) {
+    /**
+     * Gets the action values from the policy.
+     *
+     * @param policy instance read from the XACML input stream.
+     *
+     * @return action values.
+     */
+    public static Map<String, Boolean> getActionValuesFromPolicy(Policy policy) {
         if (policy == null) {
             return null;
         }
@@ -1069,7 +1106,15 @@ public class XACMLPrivilegeUtils {
         return actionValues;
     }
 
-    static EntitlementSubject getEntitlementSubjectFromPolicy(Policy policy) {
+    /**
+     * Constructs EntitlementSubject from policy.
+     *
+     * @param policy
+     *         from which the EntitlementSubject is created.
+     *
+     * @return EntitlementSubject created from the policy instance.
+     */
+    public static EntitlementSubject getEntitlementSubjectFromPolicy(Policy policy) {
         if (policy == null) {
             return null;
         }
@@ -1119,7 +1164,18 @@ public class XACMLPrivilegeUtils {
         return es;
     }
 
-    static EntitlementCondition getEntitlementConditionFromPolicy(Policy policy) throws EntitlementException {
+    /**
+     * Constructs EntitlementCondition from the policy.
+     *
+     * @param policy
+     *         from which EntitlementCondition is constructed.
+     *
+     * @return EntitlementCondition instance created from the policy instance.
+     *
+     * @throws EntitlementException
+     *         when any error occurs during construction.
+     */
+    public static EntitlementCondition getEntitlementConditionFromPolicy(Policy policy) throws EntitlementException {
         if (policy == null) {
             return null;
         }
@@ -1475,4 +1531,53 @@ public class XACMLPrivilegeUtils {
 
         return anyOf;
     }
+
+    /**
+     * Validates the privilege instance.
+     *
+     * @param privilege
+     *         instance to be validated.
+     * @param privilegeValidator
+     *         the validator for privilege.
+     *
+     * @throws EntitlementException
+     *         if the privilege is invalid.
+     */
+    public static void validate(Privilege privilege, PrivilegeValidator privilegeValidator) throws EntitlementException {
+        // OPENAM-5031
+        // For the moment, fail the whole import if any single referral is found to have a name which doesn't
+        // suit LDAP.
+        if (containsUndesiredCharacters(privilege.getName())) {
+            throw new EntitlementException(INVALID_VALUE,
+                    new Object[] { "privilege name " + privilege.getName() });
+        }
+
+        privilegeValidator.validatePrivilege(privilege);
+    }
+
+    /**
+     * OPENAM-5031: We would have used DN.escapeAttributeValue to encode the incoming string and compare with the
+     * original string - if there are differences then the incoming string contains characters which LDAP requires
+     * quoted.  However ssoadm doesn't include the jar that the DN class ends up in.  In order to avoid the
+     * overhead of adding a whole jar just for one function in one class, this is provided here.  Thus, this
+     * function returns true if the incoming string contains any character which LDAP requires to be quoted.
+     *
+     * @param s The specified string.
+     * @return true if the string contains characters which require quotation for LDAP to work, false otherwise
+     */
+    @VisibleForTesting
+    public static boolean containsUndesiredCharacters(String s) {
+        // This is done with strings rather than characters because the initialisation of the set is much easier.
+        // Otherwise we end up with a Set<Character> being initialised from a List<char>
+        final String[] DODGY_LDAP_CHARS = { ",", "+", "\"", "\\", "<", ">", ";" };
+        Set<String> dodgyChars = new HashSet<>(Arrays.asList(DODGY_LDAP_CHARS));
+        for(int i = 0; i < s.length(); i++) {
+            String sub = s.substring(i, i + 1);
+            if (dodgyChars.contains(sub)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

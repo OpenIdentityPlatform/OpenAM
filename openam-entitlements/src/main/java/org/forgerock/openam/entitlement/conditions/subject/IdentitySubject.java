@@ -24,15 +24,19 @@
  *
  * $Id: AMIdentitySubject.java,v 1.3 2008/06/25 05:43:50 qcheng Exp $
  *
- */
-/*
- * Portions Copyright 2011-2014 ForgeRock AS
+ * Portions Copyright 2011-2016 ForgeRock AS
  */
 
 package org.forgerock.openam.entitlement.conditions.subject;
 
+
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonMap;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenListenersUnsupportedException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.SubjectAttributesCollector;
@@ -48,14 +52,13 @@ import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -66,12 +69,12 @@ import java.util.Set;
  */
 public class IdentitySubject implements EntitlementSubject {
 
-    private Set<String> subjectValues = new HashSet<String>();
+    private static Debug debug = Debug.getInstance(PolicyManager.POLICY_DEBUG_NAME);
 
-    private static Debug debug = Debug.getInstance(
-            PolicyManager.POLICY_DEBUG_NAME);
+    private Set<String> subjectValues;
 
     public IdentitySubject() {
+        subjectValues = new HashSet<>();
     }
 
     /**
@@ -79,7 +82,7 @@ public class IdentitySubject implements EntitlementSubject {
      */
     @Override
     public void setState(String state) {
-        Set<String> newState = new HashSet<String>();
+        Set<String> newState = new HashSet<>();
         try {
             JSONArray jo = new JSONArray(state);
             for (int i = 0; i < jo.length(); i++) {
@@ -105,10 +108,12 @@ public class IdentitySubject implements EntitlementSubject {
      */
     @Override
     public Map<String, Set<String>> getSearchIndexAttributes() {
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        map.put(SubjectAttributesCollector.NAMESPACE_IDENTITY,
-                new HashSet<String>(Arrays.asList(SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES)));
-        return map;
+        if (isEmpty(subjectValues)) {
+            return singletonMap(SubjectAttributesCollector.NAMESPACE_IDENTITY,
+                    singleton(SubjectAttributesCollector.ATTR_NAME_ALL_ENTITIES));
+        }
+
+        return singletonMap(SubjectAttributesCollector.NAMESPACE_IDENTITY, subjectValues);
     }
 
     /**
@@ -166,7 +171,6 @@ public class IdentitySubject implements EntitlementSubject {
             }
         }
 
-        boolean listenerAdded = false;
         boolean subjectMatch = false;
 
         if (debug.messageEnabled()) {
@@ -297,20 +301,17 @@ public class IdentitySubject implements EntitlementSubject {
                                 + ", subjectValue = " + subjectValue
                                 + ", subjectMatch = " + subjectMatch);
                     }
-                    SubjectEvaluationCache.addEntry(tokenID,
-                            "IdentitySubject", subjectValue, subjectMatch);
-                    if (!listenerAdded) {
-                        if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                                tokenID)) {
-                            token.addSSOTokenListener(
-                                    PolicyEvaluator.ssoListener);
-                            PolicyEvaluator.ssoListenerRegistry.put(
-                                    tokenID, PolicyEvaluator.ssoListener);
+                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                        try {
+                            token.addSSOTokenListener(PolicyEvaluator.ssoListener);
+                            SubjectEvaluationCache.addEntry(tokenID, "IdentitySubject", subjectValue, subjectMatch);
+                            PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
                             if (debug.messageEnabled()) {
-                                debug.message("IdentitySubject.isMember():"
-                                        + " sso listener added ");
+                                debug.message("IdentitySubject.isMember(): sso listener added ");
                             }
-                            listenerAdded = true;
+                        } catch (SSOTokenListenersUnsupportedException ex) {
+                            // Catching exception to avoid adding tokenID to SubjectEvaluationCache and ssoListenerRegistry
+                            debug.message("IdentitySubject.isMember(): could not add sso listener: {}", ex.getMessage());
                         }
                     }
                     if (subjectMatch) {
@@ -355,4 +356,5 @@ public class IdentitySubject implements EntitlementSubject {
     public void setSubjectValues(Set<String> subjectValues) {
         this.subjectValues = subjectValues;
     }
+
 }

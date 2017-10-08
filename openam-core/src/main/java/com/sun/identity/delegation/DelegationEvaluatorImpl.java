@@ -24,9 +24,20 @@
  *
  * $Id: DelegationEvaluator.java,v 1.16 2009/12/07 19:46:44 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 package com.sun.identity.delegation;
+
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.Subject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -44,14 +55,6 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import org.forgerock.openam.entitlement.PolicyConstants;
-
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The <code>DelegationEvaluator</code> class provides interfaces to evaluate
@@ -114,12 +117,6 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
         Map envParameters,
         boolean subTreeMode
     ) throws SSOException, DelegationException {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, "/");
-        if (!ec.migratedToEntitlementService()) {
-            return false;
-        }
-
         try {
             AMIdentity user = new AMIdentity(token);
             if (((privilegedUser != null) && user.equals(privilegedUser)) ||
@@ -156,8 +153,7 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
         String resource = buff.toString();
         try {
             Subject userSubject = SubjectUtils.createSubject(token);
-            Evaluator eval = new Evaluator(PolicyConstants.SUPER_ADMIN_SUBJECT,
-                DelegationManager.DELEGATION_SERVICE);
+            Evaluator eval = new Evaluator(SUPER_ADMIN_SUBJECT, DelegationManager.DELEGATION_SERVICE);
             List<Entitlement> results = eval.evaluate(
                 DNMapper.orgNameToDN(PolicyManager.DELEGATION_REALM),
                 userSubject, resource, envParameters, true);

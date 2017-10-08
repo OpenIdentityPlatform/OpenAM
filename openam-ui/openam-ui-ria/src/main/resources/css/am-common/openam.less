@@ -28,11 +28,11 @@
  /* ENF should come to toolbar.less from common */
 
  /* Candidate for Commons */
-#wrapper{
+#wrapper {
     padding-bottom: 50px;
 }
 
-.float-right{
+.float-right {
     float:right;
 }
 
@@ -57,7 +57,7 @@
 
 /* END of Candidate for Commons */
 
-.remember-forgot{
+.remember-forgot {
     padding: 0 0 0;
     .pull-right, .pull-left, .checkbox {
         margin-top: 0;
@@ -76,9 +76,14 @@
      .btn-default.active {
         cursor:auto;
     }
+
+    .am-btn-link-no-padding {
+        padding: 0;
+        margin-top:-3px;
+    }
 }
 
-#dialogs .validationRules{
+#dialogs .validationRules {
     margin-left: 0;
 }
 
@@ -93,6 +98,14 @@
     .container {
         width: auto;
     }
+}
+
+/*
+ * Enable point events as they are disabled in Bootstrap 3.3+
+ * @see https://github.com/twbs/bootstrap/pull/14104
+*/
+.enable-pointer .form-control-feedback {
+    pointer-events: auto;
 }
 
 /* XUI Overrides */
@@ -112,10 +125,26 @@ body, .modal-open {
 }
 
 // removes extra space below control
-.selectize-control.multi {
-    font-size: 0;
-    .selectize-dropdown, div {
-        font-size: 14px;
+.selectize-control {
+    &.multi {
+        font-size: 0;
+        .selectize-dropdown, div {
+            font-size: 14px;
+        }
+    }
+
+    .selectize-input.disabled {
+        background-color: #eee;
+        cursor: not-allowed!important; // library's style is thoughtfully written as "cursor: default!important"
+        opacity: inherit;
+
+        &:after {
+            opacity: 0.5;
+        }
+
+        .item {
+            color: #555;
+        }
     }
 }
 
@@ -140,7 +169,7 @@ body, .modal-open {
     }
 
     .panel-footer {
-      border-top: none;
+        border-top: none;
     }
 }
 
@@ -167,6 +196,10 @@ body, .modal-open {
 
 #sidePageContent {
     margin-top:-6px;
+}
+
+.tree-view-container {
+    margin-top: 40px;
 }
 
 .open > .dropdown-toggle.btn-default {
@@ -215,5 +248,43 @@ body, .modal-open {
 
     &:hover, &:focus {
       color: @base-theme-color;
+    }
+}
+
+.am-selectize-search.selectize-control.single, select.am-selectize-search {
+    width: 250px;
+    .selectize-input {
+        border-color: @base-theme-color;
+
+        &:after {
+            display: block;
+            position: absolute;
+            top: 50%;
+            right: 17px;
+            margin: -9px 3px 0 0;
+            width: 0;
+            height: 0;
+            border: none;
+            content: '\f002';
+            font-family: fontawesome;
+            color: @base-theme-color;
+        }
+    }
+}
+
+.api-section {
+    .list-panel-style {
+        height: 860px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+    .iframe-panel-style {
+        height: 860px;
+        overflow: hidden;
+    }
+    .api-explorer-style {
+        height: 860px;
+        width: 100%;
+        border: none;
     }
 }

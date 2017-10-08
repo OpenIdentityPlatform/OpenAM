@@ -15,9 +15,9 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageRulesView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -29,19 +29,19 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
 
     // jquery dependencies
     "sortable"
-], function ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView,
-             OperatorRulesView, LegacyListItemView) {
+], ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView, OperatorRulesView,
+    LegacyListItemView) => {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ManageRulesTemplate.html",
         noBaseTemplate: true,
         events: {
-            "click  #addCondition:not(.disabled)": "addCondition",
-            "keyup  #addCondition:not(.disabled)": "addCondition",
-            "click  #addOperator:not(.disabled)": "addOperator",
-            "keyup  #addOperator:not(.disabled)": "addOperator",
-            "click  .operator > .item-button-panel > .fa-times": "onDelete",
-            "keyup  .operator > .item-button-panel > .fa-times": "onDelete"
+            "click  [data-add-condition]:not(.disabled)": "addCondition",
+            "keyup  [data-add-condition]:not(.disabled)": "addCondition",
+            "click  [data-add-operator]:not(.disabled)": "addOperator",
+            "keyup  [data-add-operator]:not(.disabled)": "addOperator",
+            "click  [data-delete-operator]": "onDelete",
+            "keyup  [data-delete-operator]": "onDelete"
         },
         types: {
             ENVIRONMENT: "environmentType",
@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         property: "",
         properties: "",
 
-        initialize: function () {
+        initialize () {
             AbstractView.prototype.initialize.call(this);
 
             // Needed for correct work of animation
@@ -65,13 +65,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     "ConditionAttrEnum", "ConditionAttrString", "ConditionAttrBoolean", "ConditionAttrArray",
                     "ConditionAttrObject", "ConditionAttrTime", "ConditionAttrDay", "ConditionAttrDate",
                     "OperatorRulesTemplate", "EditSubjectTemplate", "EditEnvironmentTemplate"
-                ], function (filename) {
-                    return "templates/admin/views/realms/authorization/policies/conditions/" + filename + ".html";
+                ], (filename) => {
+                    return `templates/admin/views/realms/authorization/policies/conditions/${filename}.html`;
                 })
             );
         },
 
-        init: function (args, events) {
+        init (args, events) {
             _.extend(this.events, events);
             _.extend(Constants, this.types);
 
@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        buildList: function () {
+        buildList () {
             var self = this,
                 newRule = null,
                 operators = _.pluck(this.data.operators, "title"),
@@ -141,18 +141,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.delegateEvents();
         },
 
-        initSorting: function () {
+        initSorting () {
             var self = this;
 
             this.groupCounter++;
 
             this.$el.find("ol#dropbox").nestingSortable({
-                group: self.element + "rule-creation-group" + self.groupCounter,
+                group: `${self.element}rule-creation-group${self.groupCounter}`,
                 exclude: ".item-button-panel, li.editing",
                 delay: 100,
 
+                onMousedown ($item, _super, event) {
+                    event.stopPropagation();
+                    if (!event.target.nodeName.match(/^(input|select|textarea)$/i)) {
+                        event.preventDefault();
+                        return true;
+                    }
+                },
                 // set item relative to cursor position
-                onDragStart: function (item, container) {
+                onDragStart (item, container) {
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer,
                         editRuleView = null;
@@ -174,14 +181,14 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     }
                 },
 
-                onDrag: function (item, position) {
+                onDrag (item, position) {
                     item.css({
                         left: position.left - self.adjustment.left,
                         top: position.top - self.adjustment.top
                     });
                 },
 
-                onDrop: function (item, container, _super) {
+                onDrop (item, container, _super) {
                     var rule = null, clonedItem, newHeight, animeAttrs;
 
                     clonedItem = $("<li/>").css({
@@ -214,7 +221,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     self.delegateEvents();
                 },
 
-                isValidTarget: function (item, container) {
+                isValidTarget (item, container) {
                     var notValid = (container.items.length > 0 &&
                         container.target.parent().data().itemData &&
                         container.target.parent().data().itemData[self.property]) ||
@@ -223,7 +230,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                     return !notValid;
                 },
 
-                serialize: function ($parent, $children, parentIsContainer) {
+                serialize ($parent, $children, parentIsContainer) {
                     var result = $.extend({}, $parent.data().itemData);
 
                     if (parentIsContainer) {
@@ -245,7 +252,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.sortingInitialised = true;
         },
 
-        editStart: function (item) {
+        editStart (item) {
             $("body").addClass("editing");
 
             var self = this,
@@ -269,7 +276,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             editRuleView.$el.find("select.type-selection:first").focus();
         },
 
-        editStop: function (item) {
+        editStop (item) {
             $("body").removeClass("editing");
 
             var editRuleView = $.extend(false, item, this.getNewRule()),
@@ -286,11 +293,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             disabledConditions.find("> select").prop("disabled", false);
         },
 
-        setInactive: function (button, state) {
+        setInactive (button, state) {
             button.toggleClass("disabled", state);
         },
 
-        addOperator: function (e) {
+        addOperator (e) {
             e.preventDefault();
 
             if (e.type === "keyup" && e.keyCode !== 13) {
@@ -303,7 +310,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.idCount++;
         },
 
-        addCondition: function (e) {
+        addCondition (e) {
             e.preventDefault();
 
             if (e.type === "keyup" && e.keyCode !== 13) {
@@ -322,12 +329,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             this.idCount++;
         },
 
-        onSelect: function (e) {
+        onSelect (e) {
             e.stopPropagation();
             this.save();
         },
 
-        onDelete: function (e) {
+        onDelete (e) {
             e.stopPropagation();
 
             if (e.type === "keyup" && e.keyCode !== 13) {
@@ -357,7 +364,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        toggleEditing: function (e) {
+        toggleEditing (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
@@ -376,29 +383,29 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             }
         },
 
-        setFocus: function (e) {
+        setFocus (e) {
             e.stopPropagation();
             var target = $(e.target).is("select") || $(e.target).is("input") ? e.target : e.currentTarget;
             $(target).focus();
         },
 
-        getNewRule: function () {
+        getNewRule () {
             return this.conditionType === Constants.ENVIRONMENT ? new EditEnvironmentView() : new EditSubjectView();
         },
 
-        getProperties: function () {
+        getProperties () {
             var properties = {};
             properties[this.properties] = this.data[this.properties];
             return properties;
         },
 
-        save: function () {
+        save () {
             if (this.sortingInitialised !== true) {
                 return;
             }
 
             var rules = this.$el.find("ol#dropbox").nestingSortable("serialize").get(),
-                operatorData = this.$el.find("#operator" + this.idPrefix + "0").data().itemData;
+                operatorData = this.$el.find(`#operator${this.idPrefix}0`).data().itemData;
 
             // Removing any obsolete root logicals.
             if (operatorData[this.properties]) {
@@ -422,7 +429,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 console.error("This should never be triggered", this.property, operatorData);
             }
 
-            console.log("\n" + this.property + ":", JSON.stringify(this.data.entity[this.property], null, 2));
+            console.log(`\n${this.property}:`, JSON.stringify(this.data.entity[this.property], null, 2));
 
             this.identifyDroppableLogical();
         },
@@ -431,8 +438,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
          * Searches for the most outer possible dropabble logical container that will be used as a drop target. If such
          * container was not found, disables "Add" buttons and displays corresponding message.
          */
-        identifyDroppableLogical: function () {
-            var rootLogical = this.$el.find("#operator" + this.idPrefix + "0"),
+        identifyDroppableLogical () {
+            var rootLogical = this.$el.find(`#operator${this.idPrefix}0`),
                 nestedItems,
                 nestedLogicals,
                 nestedLogicalsLength,

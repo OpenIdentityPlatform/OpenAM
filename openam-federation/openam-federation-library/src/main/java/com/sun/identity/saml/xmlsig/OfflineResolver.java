@@ -24,15 +24,21 @@
  *
  * $Id: OfflineResolver.java,v 1.2 2008/06/25 05:47:38 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
 
-import java.util.*;
-import java.io.*;
-import org.w3c.dom.*;
-import org.apache.xml.utils.URI;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.w3c.dom.Attr;
+
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
@@ -52,8 +58,7 @@ public class OfflineResolver extends ResourceResolverSpi {
     * @param BaseURI
     * @throws ResourceResolverException
     */
-   public XMLSignatureInput engineResolve(Attr uri, String BaseURI)
-           throws ResourceResolverException {
+   public XMLSignatureInput engineResolve(Attr uri, String BaseURI) throws ResourceResolverException {
 
       try {
          String URI = uri.getNodeValue();
@@ -99,14 +104,11 @@ public class OfflineResolver extends ResourceResolverSpi {
       }
 
       try {
-         URI uriNew = new URI(new URI(BaseURI), uri.getNodeValue());
-
+         URI uriNew = getNewURI(uri.getNodeValue(), BaseURI);
          if (uriNew.getScheme().equals("http")) {
-
             return true;
          }
-
-      } catch (URI.MalformedURIException ex) {}
+      } catch (URISyntaxException ex) {}
 
       return false;
    }
@@ -129,11 +131,28 @@ public class OfflineResolver extends ResourceResolverSpi {
       OfflineResolver._mimeMap.put(URI, MIME);
    }
 
+   private static URI getNewURI(String uri, String baseURI) throws URISyntaxException {
+        URI newUri = null;
+        if (baseURI == null || "".equals(baseURI)) {
+            newUri = new URI(uri);
+        } else {
+            newUri = new URI(baseURI).resolve(uri);
+        }
+
+        // if the URI contains a fragment, ignore it
+        if (newUri.getFragment() != null) {
+            URI uriNewNoFrag =
+                new URI(newUri.getScheme(), newUri.getSchemeSpecificPart(), null);
+            return uriNewNoFrag;
+        }
+        return newUri;
+   }
+
    static {
       org.apache.xml.security.Init.init();
 
-      OfflineResolver._uriMap = new HashMap();
-      OfflineResolver._mimeMap = new HashMap();
+      OfflineResolver._uriMap = new HashMap<String, String>();
+      OfflineResolver._mimeMap = new HashMap<String, String>();
 
       OfflineResolver.register("http://www.w3.org/TR/xml-stylesheet",
                                "data/org/w3c/www/TR/xml-stylesheet.html",

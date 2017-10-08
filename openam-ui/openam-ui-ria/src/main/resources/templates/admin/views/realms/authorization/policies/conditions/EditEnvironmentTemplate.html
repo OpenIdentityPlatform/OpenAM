@@ -14,7 +14,7 @@
                 </a>
             </div>
 
-            <select id="envSelection" class="form-control type-selection">
+            <select id="envSelection" class="form-control type-selection" data-type-selection>
                 <option value="" selected disabled>{{t "common.form.select"}}</option>
                 {{#conditions}}
                 <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>

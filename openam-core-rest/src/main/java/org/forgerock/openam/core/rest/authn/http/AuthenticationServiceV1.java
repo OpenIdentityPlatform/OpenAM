@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.authn.http;
 
 import static org.forgerock.json.JsonValue.*;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
@@ -42,12 +44,15 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmLookupException;
 import org.forgerock.openam.core.rest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Post;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
@@ -58,7 +63,7 @@ import org.restlet.resource.ResourceException;
  */
 public class AuthenticationServiceV1 {
 
-    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+    protected static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final ContentTypeHeader APPLICATION_JSON_CONTENT_TYPE =
             ContentTypeHeader.valueOf("application/json");
@@ -121,6 +126,12 @@ public class AuthenticationServiceV1 {
         final String sessionUpgradeSSOTokenId = urlQueryString.getFirst("sessionUpgradeSSOTokenId");
 
         try {
+
+            // We check the session upgrade token first
+            if (!StringUtils.isEmpty(sessionUpgradeSSOTokenId)) {
+                // Return Bad Request if not a valid upgrade token
+                SSOTokenManager.getInstance().createSSOToken(sessionUpgradeSSOTokenId);
+            }
             JsonValue jsonContent;
             try {
                 jsonContent = getJsonContent(httpRequest);
@@ -151,9 +162,14 @@ public class AuthenticationServiceV1 {
         } catch (RestAuthException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
             return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
+        } catch (SSOException e) {
+            return handleErrorResponse(httpRequest, Status.BAD_REQUEST, e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             return handleErrorResponse(httpRequest, Status.INTERNAL_SERVER_ERROR, e);
+        } catch (RealmLookupException e) {
+            DEBUG.error("AuthenticationService.authenticate() :: RealmLookupException", e);
+            return handleErrorResponse(httpRequest, Status.BAD_REQUEST, e);
         }
     }
 
@@ -177,8 +193,9 @@ public class AuthenticationServiceV1 {
      * the request does not contain the realm as a query parameter.
      *
      * @return The HttpServletRequest
+     * @throws RealmLookupException If the request contains an invalid realm query parameter.
      */
-    private HttpServletRequest getHttpServletRequest(Context context, JsonValue jsonValue) {
+    private HttpServletRequest getHttpServletRequest(Context context, JsonValue jsonValue) throws RealmLookupException {
         AttributesContext requestContext = context.asContext(AttributesContext.class);
         Map<String, Object> requestAttributes = requestContext.getAttributes();
         final HttpServletRequest request = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
@@ -186,12 +203,10 @@ public class AuthenticationServiceV1 {
         // The request contains the realm query param then use that over any realm parsed from the URI
         final String queryParamRealm = request.getParameter(REALM);
         if (queryParamRealm != null && !queryParamRealm.isEmpty()) {
-            RealmContext rc = new RealmContext(context);
-            rc.setOverrideRealm(queryParamRealm);
-            return wrapRequest(request, rc, jsonValue);
+            return wrapRequest(request, Realm.of(queryParamRealm), jsonValue);
         }
 
-        return wrapRequest(request, context.asContext(RealmContext.class), jsonValue);
+        return wrapRequest(request, context.asContext(RealmContext.class).getRealm(), jsonValue);
     }
 
     /**
@@ -201,7 +216,7 @@ public class AuthenticationServiceV1 {
      * @return The wrapped HttpServletRequest.
      */
     private HttpServletRequest wrapRequest(final HttpServletRequest request,
-                                           final RealmContext realmContext,
+                                           final Realm realm,
                                            final JsonValue jsonValue) {
 
         return new HttpServletRequestWrapper(request) {
@@ -209,7 +224,7 @@ public class AuthenticationServiceV1 {
             @Override
             public String getParameter(String name) {
                 if (REALM.equals(name)) {
-                    return realmContext.getResolvedRealm();
+                    return realm.asPath();
                 }
 
                 if (JSONCONTENT.equals(name)) {
@@ -223,7 +238,7 @@ public class AuthenticationServiceV1 {
             public Map getParameterMap() {
                 Map params = super.getParameterMap();
                 Map p = new HashMap(params);
-                p.put(REALM, realmContext.getResolvedRealm());
+                p.put(REALM, realm.asPath());
                 return p;
             }
 
@@ -241,7 +256,7 @@ public class AuthenticationServiceV1 {
             @Override
             public String[] getParameterValues(String name) {
                 if (REALM.equals(name)) {
-                    return new String[]{realmContext.getResolvedRealm()};
+                    return new String[]{realm.asPath()};
                 }
                 return super.getParameterValues(name);
             }
@@ -297,6 +312,7 @@ public class AuthenticationServiceV1 {
      */
     protected Response handleErrorResponse(Request request, Status status, Exception exception) {
         Reject.ifNull(status);
+        DEBUG.warning("Authentication encountered an error: ", exception);
         Response response = new Response(status);
         final Map<String, Object> rep = new HashMap<>();
         if (exception instanceof RestAuthResponseException) {

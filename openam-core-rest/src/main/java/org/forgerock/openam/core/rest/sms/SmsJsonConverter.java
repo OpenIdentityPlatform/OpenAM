@@ -17,8 +17,11 @@
 package org.forgerock.openam.core.rest.sms;
 
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
+import java.util.LinkedHashMap;
 import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
@@ -41,6 +44,7 @@ import java.util.Set;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
@@ -48,7 +52,6 @@ import com.sun.identity.sm.ServiceSchema;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
-import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonPointer;
@@ -71,7 +74,7 @@ public class SmsJsonConverter {
 
     private BiMap<String, String> attributeNameToResourceName;
     private BiMap<String, String> resourceNameToAttributeName;
-    private HashMap<String, String> attributeNameToSection;
+    private Map<String, String> attributeNameToSection;
     private List<String> hiddenAttributeNames;
     private boolean initialised = false;
 
@@ -134,8 +137,8 @@ public class SmsJsonConverter {
      * @param attributeValuePairs The schema attribute values.
      * @return Json representation of attributeValuePairs
      */
-    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs) {
-        return toJson(null, attributeValuePairs);
+    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs, boolean validate) {
+        return toJson(null, attributeValuePairs, validate);
     }
 
     /**
@@ -143,30 +146,58 @@ public class SmsJsonConverter {
      * corresponding JSON representation
      *
      * @param attributeValuePairs The schema attribute values.
-     * @param realm The realm, or null if global.
+     * @param validate Should the attributes be validated.
+     * @param parentJson The {@link JsonValue} to which the attributes should be added.
      * @return Json representation of attributeValuePairs
      */
-    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs) {
+    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs, boolean validate, JsonValue parentJson) {
+        return toJson(null, attributeValuePairs, validate, parentJson);
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
+     * @param realm The realm, or null if global.
+     * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate) {
+        return toJson(realm, attributeValuePairs, validate, json(object()));
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
+     * @param realm The realm, or null if global.
+     * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
+     * @param parentJson The {@link JsonValue} to which the attributes should be added.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate,
+            JsonValue parentJson) {
+
         if (!initialised) {
             init();
         }
-        final boolean validAttributes;
-        try {
-            if (realm == null) {
-                validAttributes = schema.validateAttributes(attributeValuePairs);
-            } else {
-                validAttributes = schema.validateAttributes(attributeValuePairs, realm);
-            }
-        } catch (SMSException e) {
-            debug.error("schema validation threw an exception while validating the attributes: realm="
-                    + realm
-                    + " attributes: "
-                    + attributeValuePairs,
-                    e);
-            throw new JsonException("Unable to validate attributes", e);
-        }
 
-        JsonValue parentJson = json(new HashMap<String, Object>());
+        boolean validAttributes = true;
+        if (validate) {
+            try {
+                if (realm == null) {
+                    validAttributes = schema.validateAttributes(attributeValuePairs);
+                } else {
+                    validAttributes = schema.validateAttributes(attributeValuePairs, realm);
+                }
+            } catch (SMSException e) {
+                debug.error("schema validation threw an exception while validating the attributes: realm=" + realm +
+                        " attributes: " + attributeValuePairs, e);
+                throw new JsonException("Unable to validate attributes", e);
+            }
+        }
 
         if (validAttributes) {
             for (String attributeName : attributeValuePairs.keySet()) {
@@ -207,7 +238,9 @@ public class SmsJsonConverter {
                         Iterator<String> itr = object.iterator();
                         while (itr.hasNext()) {
                             Pair<String, String> entry = nameValueParser.parse(itr.next());
-                            map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            if(entry != null) {
+                                map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            }
                         }
                         jsonAttributeValue = map;
                     } else {
@@ -312,13 +345,14 @@ public class SmsJsonConverter {
                 continue;
             }
 
+            if (shouldBeIgnored(attributeName)) {
+                continue;
+            }
+
             if(shouldNotBeUpdated(attributeName)) {
                 throw new BadRequestException("Invalid attribute, '" + attributeName + "', specified");
             }
 
-            if (shouldBeIgnored(attributeName)) {
-                continue;
-            }
 
             final Object attributeValue = translatedAttributeValuePairs.get(attributeName);
             Set<String> value = new HashSet<>();
@@ -333,10 +367,13 @@ public class SmsJsonConverter {
                 for (Object val : attributeArray) {
                     value.add(convertJsonToString(attributeName, val));
                 }
-            } else {
+            } else if (attributeValue != null) {
                 value.add(convertJsonToString(attributeName, attributeValue));
             }
-            result.put(attributeName, value);
+
+            if (!value.isEmpty() || !isPassword(schema.getAttributeSchema(attributeName).getSyntax())) {
+                result.put(attributeName, value);
+            }
         }
 
         try {
@@ -356,8 +393,8 @@ public class SmsJsonConverter {
 
     private boolean shouldBeIgnored(String attributeName) {
         final AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
-        return attributeSchema == null || StringUtils.isBlank(attributeSchema.getI18NKey()) || hiddenAttributeNames.contains
-                (attributeName);
+        return (attributeSchema != null && StringUtils.isBlank(attributeSchema.getI18NKey())) || attributeName.equals
+                ("_type") || hiddenAttributeNames.contains(attributeName);
     }
 
     private boolean shouldNotBeUpdated(String attributeName) {
@@ -406,10 +443,12 @@ public class SmsJsonConverter {
 
         try {
             InputStream resource = getClass().getClassLoader().getResourceAsStream("amConsoleConfig.xml");
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resource);
-            NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate("//consoleconfig/servicesconfig/consoleservice/@realmEnableHideAttrName", doc, XPathConstants.NODESET);
+            Document doc = XMLUtils.getSafeDocumentBuilder(false).parse(resource);
+            NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().evaluate(
+                    "//consoleconfig/servicesconfig/consoleservice/@realmEnableHideAttrName", doc,
+                    XPathConstants.NODESET);
             String rawList = nodes.item(0).getNodeValue();
-            hiddenAttributeNames = new ArrayList<String>(Arrays.asList(rawList.split(" ")));
+            hiddenAttributeNames = new ArrayList<>(Arrays.asList(rawList.split(",")));
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
@@ -423,10 +462,12 @@ public class SmsJsonConverter {
         return hiddenAttributeNames;
     }
 
-    protected HashMap<String, String> getAttributeNameToSection() {
-        HashMap<String, String> result = new HashMap<String, String>();
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/" + schema.getName() + ".section" +
-                ".properties");
+    protected Map<String, String> getAttributeNameToSection() {
+        Map<String, String> result = new LinkedHashMap();
+        String serviceSectionFilename = schema.getName() != null ? schema.getName() : schema.getServiceName();
+        serviceSectionFilename = serviceSectionFilename + ".section.properties";
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
 
         if (inputStream != null) {
             String line;

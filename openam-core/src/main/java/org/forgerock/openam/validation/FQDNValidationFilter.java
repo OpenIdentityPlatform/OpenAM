@@ -53,8 +53,8 @@ public class FQDNValidationFilter implements Filter {
             if (!AuthUtils.isValidFQDNRequest(hostName)) {
                 try {
                     String newHostName = AuthUtils.getValidFQDNResource(hostName, request);
-
                     response.sendRedirect(newHostName);
+                    return; // must return after sending redirect and not execute the remaining filter chain
                 } catch (IOException e) {
                     // came here continue
                 }

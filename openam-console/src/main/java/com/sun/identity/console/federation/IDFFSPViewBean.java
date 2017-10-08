@@ -253,7 +253,7 @@ public class IDFFSPViewBean
             AMPropertySheet ps =
                     (AMPropertySheet) getChild(PROPERTY_ATTRIBUTES);
 
-            // update standard metadata and extended metadata           
+            // update standard metadata and extended metadata
             Map stdValues = ps.getAttributeValues(
                     model.getEntitySPDescriptor(realm, entityName),
                     false,

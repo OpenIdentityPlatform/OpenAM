@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: XMLSignatureManager.java,v 1.11 2009/08/29 03:06:47 mallas Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Date;
 import com.sun.identity.saml.common.*;
@@ -60,7 +59,7 @@ public class XMLSignatureManager {
                 TaskRunnable refresher = new KeyStoreRefresher(period);   
                 TimerPool timerPool = SystemTimerPool.getTimerPool();
                 timerPool.schedule(refresher, new Date(((
-                    System.currentTimeMillis() + period) / 1000) * 1000));
+                        currentTimeMillis() + period) / 1000) * 1000));
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }

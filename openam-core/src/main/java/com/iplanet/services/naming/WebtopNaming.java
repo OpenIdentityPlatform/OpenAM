@@ -24,11 +24,14 @@
  *
  * $Id: WebtopNaming.java,v 1.31 2009/06/20 06:17:02 bigfatrat Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 package com.iplanet.services.naming;
 
+import static org.forgerock.openam.utils.Time.*;
+
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.client.SendRequestException;
 import com.iplanet.services.comm.share.Request;
@@ -57,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -68,7 +72,7 @@ import java.util.Vector;
  * service name and the host name. The Naming Service shall contain URLs for all
  * services on all servers. For instance, two machines might host session
  * services. The Naming Service profile may look like the following:
- * 
+ *
  * <pre>
  *      host1.session.URL=&quot;http://host1:8080/SessionServlet&quot;
  *      host2.session.URL=&quot;https://host2:9090/SessionServlet&quot;
@@ -76,9 +80,9 @@ import java.util.Vector;
  */
 
 public class WebtopNaming {
-     
+
     /**
-     * The unique identifier for the Naming Service. 
+     * The unique identifier for the Naming Service.
      */
     public static final String NAMING_SERVICE = "com.iplanet.am.naming";
 
@@ -95,7 +99,7 @@ public class WebtopNaming {
 
     /**
      * The debug instance.
-     */    
+     */
     protected static Debug debug;
 
     private static boolean serverMode;
@@ -107,14 +111,14 @@ public class WebtopNaming {
     private static String amServer = null;
 
     private static String amServerPort = null;
-    
+
     private static String amServerURI;
 
     private static SiteMonitor monitorThread = null;
 
     private static String MAP_SITE_TO_SERVER =
         "com.iplanet.am.naming.map.site.to.server";
-    
+
     private static Map mapSiteToServer = new HashMap();
 
     private static final NamingTableConfigurationFactory configFactory = new NamingTableConfigurationFactory();
@@ -132,7 +136,7 @@ public class WebtopNaming {
                         Constants.SERVER_MODE, "false")).booleanValue();
         sitemonitorDisabled = Boolean.valueOf(SystemProperties.get(
                 Constants.SITEMONITOR_DISABLED,"false")).booleanValue();
-        
+
         if (!serverMode) {
             String v = SystemProperties.get(MAP_SITE_TO_SERVER);
             if ((v != null) && (v.length() > 0)) {
@@ -164,14 +168,14 @@ public class WebtopNaming {
         } catch (MalformedURLException e) {
             debug.error("WebtopNaming.addToMapSiteToServer", e);
         }
-    } 
+    }
 
     /**
      * Determines whether WebtopNaming code runs in the core server mode
      * or in the client SDK run-time mode.
      *
      * @return <code>true</code> running in the core server mode,
-     *     <code>false</code> otherwise 
+     *     <code>false</code> otherwise
      */
     public static boolean isServerMode() {
         return serverMode;
@@ -214,9 +218,9 @@ public class WebtopNaming {
      * @param host host of the server instance
      * @param port port of the server instance
      * @param uri uri of the server instance
-     * 
-     * @return <code>true</code> if Site is enabled, 
-     *     <code>false</code> otherwise  
+     *
+     * @return <code>true</code> if Site is enabled,
+     *     <code>false</code> otherwise
      *
      * @throws Exception if server entry is not found or there is any
      *     other run-time error
@@ -224,7 +228,7 @@ public class WebtopNaming {
     public static boolean isSiteEnabled(
         String protocol,
         String host,
-        String port, 
+        String port,
         String uri
     ) throws Exception {
         String serverid = getServerID(protocol, host, port, uri);
@@ -235,7 +239,7 @@ public class WebtopNaming {
      * Determines whether Site is enabled for the given server ID.
      * @param serverid server ID
      *
-     * @return <code>true</code> if Site is enabled, 
+     * @return <code>true</code> if Site is enabled,
      *     <code>false</code> otherwise
      *
      * @throws Exception if the given server ID is null
@@ -246,15 +250,15 @@ public class WebtopNaming {
     }
 
     /**
-     * Returns the server ID.  
+     * Returns the server ID.
      *
-     * @return Server ID 
+     * @return Server ID
      *
      * @throws ServerEntryNotFoundException if the Naming Service
      * can not find that server entry
      */
     public static String getAMServerID() throws ServerEntryNotFoundException {
-        return getServerID(amServerProtocol, amServer, amServerPort, 
+        return getServerID(amServerProtocol, amServer, amServerPort,
             amServerURI);
     }
 
@@ -281,7 +285,7 @@ public class WebtopNaming {
     /**
      * Returns the URL of the specified service on the specified
      * host.
-     * 
+     *
      * @param service  the name of the service.
      * @param protocol the service protocol
      * @param host the service host name
@@ -300,10 +304,10 @@ public class WebtopNaming {
 
     /**
      * Returns the URL of the specified service on the specified host.
-     * 
+     *
      * @param service the name of the service.
      * @param url the deployment URI.
-     * @param validate a boolean value indicate whether or not to 
+     * @param validate a boolean value indicate whether or not to
      *    validate the protocol, host and port of the server
      *
      * @return the URL of the specified service on the specified host.
@@ -320,12 +324,12 @@ public class WebtopNaming {
 
     /**
      * Returns the URL of the specified service on the specified host.
-     * 
+     *
      * @param service the name of the service.
      * @param protocol the service protocol.
      * @param host the service host name.
      * @param port the ervice listening port.
-     * @param validate a boolean value indicate whether or not to 
+     * @param validate a boolean value indicate whether or not to
      *    validate the protocol, host and port of the server
      *
      * @return the URL of the specified service on the specified host.
@@ -334,7 +338,7 @@ public class WebtopNaming {
      *     find a URL for a specified service
      */
     public static URL getServiceURL(
-        String service, 
+        String service,
         String protocol,
         String host,
         String port,
@@ -347,9 +351,9 @@ public class WebtopNaming {
         } catch (MalformedURLException ex) {
             throw new URLNotFoundException(ex.getMessage());
         }
-        
+
     }
-    
+
     public static URL mapSiteToServer(
         String protocol,
         String host,
@@ -366,16 +370,34 @@ public class WebtopNaming {
         }
         return null;
     }
-    
+
+    /**
+     * Return the mapped server URL if there is a site. Otherwise, return the server URL from the session.
+     *
+     * @param sid the session
+     *
+     * @return the site URL
+     *
+     * @throws URLNotFoundException
+     */
+    public static String mapSiteToServer(SessionID sid) throws URLNotFoundException {
+        URL mapSessionServiceUrl = mapSiteToServer(sid.getSessionServerProtocol(), sid.getSessionServer(),
+                sid.getSessionServerPort(), sid.getSessionServerURI());
+        if (mapSessionServiceUrl == null) {
+            return sid.getSessionServerURL();
+        }
+        return mapSessionServiceUrl.toString();
+    }
+
     /**
      * Returns the URL of the specified service on the specified host.
-     * 
+     *
      * @param service name of the service.
      * @param protocol service protocol.
      * @param host service host name.
      * @param port service listening port.
      * @param uri the deployment uri.
-     * @param validate a boolean value indicate whether or not to 
+     * @param validate a boolean value indicate whether or not to
      *    validate the protocol, host and port of the server.
      *
      * @return the URL of the specified service on the specified host.
@@ -384,7 +406,7 @@ public class WebtopNaming {
      *     find a URL for a specified service
      */
     public static URL getServiceURL(
-        String service, 
+        String service,
         String protocol,
         String host,
         String port,
@@ -398,10 +420,9 @@ public class WebtopNaming {
                 (uri == null) || (protocol.length() == 0) ||
                 (host.length() == 0) || (port.length() == 0)
             ) {
-                throw new Exception(NamingBundle.getString("noServiceURL")
-                        + service);
+                throw new Exception(NamingBundle.getString("noServiceURL") + service);
             }
-            
+
             URL mappedURL = mapSiteToServer(protocol, host, port, uri);
             if (mappedURL != null) {
                 protocol = mappedURL.getProtocol();
@@ -418,67 +439,90 @@ public class WebtopNaming {
                 name = FAM_NAMING_PREFIX + service.toLowerCase() + "-url";
                 url = config.getNamingTable().get(name);
             }
-            
+
             if (url != null) {
-                // If replacement is required, the protocol, host, and port
-                // validation is needed against the server list
-                // (iplanet-am-platform-server-list)
-                if (validate && url.indexOf("%") != -1) {
-                    validate(protocol, host, port, uri);
-                }
-                // %protocol processing
-                int idx;
-                if ((idx = url.indexOf("%protocol")) != -1) {
-                    url = url.substring(0, idx)
-                            + protocol
-                            + url.substring(idx + "%protocol".length(), url
-                                    .length());
-                }
-
-                // %host processing
-                if ((idx = url.indexOf("%host")) != -1) {
-                    url = url.substring(0, idx)
-                            + host
-                            + url.substring(idx + "%host".length(), url
-                                    .length());
-                }
-
-                // %port processing
-                if ((idx = url.indexOf("%port")) != -1) {
-                    // plugin the server name
-                    url = url.substring(0, idx)
-                            + port
-                            + url.substring(idx + "%port".length(), url
-                                    .length());
-                }
-                
-                // %uri processing
-                // uri can be null for previous releases.
-                if ((uri != null) && ((idx = url.indexOf("%uri")) != -1)) {
-                    int test = uri.lastIndexOf('/');
-                    while (test > 0) {
-                        uri = uri.substring(0, test);
-                        test = uri.lastIndexOf('/');
-                    }
-
-                    url = url.substring(0, idx) + uri + 
-                        url.substring(idx + "%uri".length(), url.length());
-                }
-
-                return new URL(url);
-            } else {
-                throw new Exception(NamingBundle.getString("noServiceURL")
-                        + service);
+                return new URL(expand(url, protocol, host, port, uri, validate));
             }
+
+            throw new Exception(NamingBundle.getString("noServiceURL") + service);
         } catch (Exception e) {
             throw new URLNotFoundException(e.getMessage());
         }
     }
 
     /**
+     * Expand the specified url (passed in as a string), returning an actual URL
+     * @param url The incoming url, passed in as a string
+     * @param protocol The protocol, http, etc.
+     * @param host The host
+     * @param port The port, as a string
+     * @param uri The uri
+     * @param validate This flag indicates whether to validate or not.
+     * @return a string constructed out of all these different
+     * @throws MalformedURLException if the incoming URL is malformed
+     * @throws URLNotFoundException if the resulting URL cannot be validated
+     */
+    private static String expand(String url,
+                                 String protocol,
+                                 String host,
+                                 String port,
+                                 String uri,
+                                 boolean validate)
+
+            throws MalformedURLException, URLNotFoundException {
+
+        if (url == null) {
+            return null;
+        }
+
+        // If replacement is required, the protocol, host, and port validation is needed against the server list
+        // (iplanet-am-platform-server-list)
+        if (validate && url.indexOf("%") != -1) {
+            validate(protocol, host, port, uri);
+        }
+        // %protocol processing
+        int idx;
+        if ((idx = url.indexOf("%protocol")) != -1) {
+            url = url.substring(0, idx)
+                    + protocol
+                    + url.substring(idx + "%protocol".length(), url.length());
+        }
+
+        // %host processing
+        if ((idx = url.indexOf("%host")) != -1) {
+            url = url.substring(0, idx)
+                    + host
+                    + url.substring(idx + "%host".length(), url.length());
+        }
+
+        // %port processing
+        if ((idx = url.indexOf("%port")) != -1) {
+            // plugin the server name
+            url = url.substring(0, idx)
+                    + port
+                    + url.substring(idx + "%port".length(), url.length());
+        }
+
+        // %uri processing
+        // uri can be null for previous releases.
+        if ((uri != null) && ((idx = url.indexOf("%uri")) != -1)) {
+            int test = uri.lastIndexOf('/');
+            while (test > 0) {
+                uri = uri.substring(0, test);
+                test = uri.lastIndexOf('/');
+            }
+
+            url = url.substring(0, idx) + uri + url.substring(idx + "%uri".length(), url.length());
+        }
+
+        return url;
+    }
+
+
+    /**
      * Returns all the URLs of the specified service based on the
      * servers in platform server list.
-     * 
+     *
      * @param service the name of the service.
      *
      * @return the URL of the specified service on the specified host.
@@ -514,7 +558,7 @@ public class WebtopNaming {
                             URL serverURL = new URL(server);
                             allurls.add(getServiceURL(service,
                                 serverURL.getProtocol(), serverURL.getHost(),
-                                String.valueOf(serverURL.getPort()), 
+                                String.valueOf(serverURL.getPort()),
                                 serverURL.getPath()));
                         }
                     } else {
@@ -530,13 +574,45 @@ public class WebtopNaming {
     }
 
     /**
+     * The idea behind this function is to returns the base URLs of the OpenAM instances, without any of the extras
+     * that getServiceAllURLs provides - i.e. we don't want a specific service, we just want the base URL.
+     *
+     * @return the URLs of the OpenAM instances we can contact.
+     *
+     * @throws URLNotFoundException if the Naming Service cannot find a URL for a specified service
+     */
+    public static List<String> getBaseURLs() throws URLNotFoundException {
+
+        try {
+            getNamingProfile(false);
+
+            List<String> result = new ArrayList<>();
+            if (monitorThread == null) {
+                result.add(expand("%protocol://%host:%port/%uri", amServerProtocol, amServer,
+                            amServerPort, amServerURI, false));
+            } else {
+                Vector<String> serverIDs = SiteMonitor.getAvailableSites();
+                for (String serverID : serverIDs) {
+                    String url = WebtopNaming.getServerFromID(serverID);
+                    result.add(url);
+                }
+            }
+            if (result.isEmpty()) {
+                throw new URLNotFoundException("Cannot find URLs for any OpenAM servers");
+            }
+            return result;
+        } catch (Exception e) {
+            throw new URLNotFoundException(e.getMessage());
+        }
+    }
+
+    /**
      * Returns the platform server list. Note: Calling this method would
      * cause performance impact, as it involves xml request over the wire.
      *
      * @return platform server list
-     *      
-     * @throws Exception if an error occurs when updating the
-     *     nameing table
+     *
+     * @throws Exception if an error occurs when updating the naming table
      */
     public static Set<String> getPlatformServerList() throws Exception {
          return getPlatformServerList(true);
@@ -581,25 +657,25 @@ public class WebtopNaming {
     }
 
     /**
-     * Returns local server name from naming table. 
+     * Returns local server name from naming table.
      *
-     * @return server name opensso is deployed. 
+     * @return server name opensso is deployed.
      */
     public static String getLocalServer() {
         String server = null;
-        
+
         try {
             server = getServerFromID(getAMServerID());
         } catch (ServerEntryNotFoundException e) {
             debug.error("Failed to get local server entry.", e);
         }
-        
+
         return server;
     }
 
     /**
      * Returns the server ID that is there in the platform server
-     * list for a corresponding server. 
+     * list for a corresponding server.
      *
      * @param protocol procotol of the server instance
      * @param host host of the server instance
@@ -609,7 +685,7 @@ public class WebtopNaming {
      * @return Server ID
      *
      * @throws ServerEntryNotFoundException if the Naming Service
-     *     can not find that server entry     
+     *     can not find that server entry
      */
     public static String getServerID(
         String protocol,
@@ -622,7 +698,7 @@ public class WebtopNaming {
 
     /**
      * Returns the server ID that is there in the platform server
-     * list for a corresponding server. 
+     * list for a corresponding server.
      *
      * @param protocol procotol of the server instance
      * @param host host of the server instance
@@ -637,8 +713,8 @@ public class WebtopNaming {
      *     can not find that server entry
      */
     public static String getServerID(
-        String protocol, 
-        String host, 
+        String protocol,
+        String host,
         String port,
         String uri,
         boolean updatetbl
@@ -658,7 +734,7 @@ public class WebtopNaming {
 
             String serverWithoutURI = protocol + ":" + "//" + host + ":" + port;
             String serverWithURI = null;
-            
+
             if ((uri != null) && (uri.length() > 0)) {
                 StringTokenizer tok = new StringTokenizer(uri, "/");
                 uri = "/" + tok.nextToken();
@@ -666,16 +742,16 @@ public class WebtopNaming {
                 serverWithURI = protocol + ":" + "//" + host + ":" + port + amServerURI;
                 debug.message("WebtopNaming.getServerId(): serverWithURI: " + serverWithURI);
             }
-            
+
             String server = (uri != null) ?
-                protocol + ":" + "//" + host + ":" + port + uri : 
+                protocol + ":" + "//" + host + ":" + port + uri :
                 serverWithoutURI;
 
             String serverID = null;
 
             if (config != null) {
                 serverID = getValueFromTable(config.getServerIDTable(), server);
-                
+
                 if (serverID == null) {
                     //try without URI, this is for prior release of OpenSSO
                     //Enterprise 8.0
@@ -739,7 +815,7 @@ public class WebtopNaming {
      *
      * @param serverID Server ID
      *
-     * @return server URL 
+     * @return server URL
      *
      * @throws ServerEntryNotFoundException if the Naming Service
      *     can not find that server entry
@@ -774,7 +850,7 @@ public class WebtopNaming {
      * Returns all server IDs.
      *
      * @return all server IDs.
-     * 
+     *
      * @throws Exception if an error occurs when updating the
      *     nameing table
      */
@@ -786,11 +862,11 @@ public class WebtopNaming {
 
     /**
      * Returns the lbCookieValue corresponding to the server ID.
-     * 
+     *
      * @param serverid the server id
      *
      * @return the LB cookie value corresponding to server ID
-     */     
+     */
     public static String getLBCookieValue(String serverid) {
         String lbCookieValue = null;
 
@@ -828,14 +904,14 @@ public class WebtopNaming {
     }
 
     /**
-     * Returns the unique identifier of the site which the given 
-     * server instance belongs to. 
+     * Returns the unique identifier of the site which the given
+     * server instance belongs to.
      *
      * @param protocol procotol of the server instance
      * @param host host of the server instance
      * @param port port of the server instance
      * @param uri uri of the server instance
-     * 
+     *
      * @return Site ID
      *
      * @throws ServerEntryNotFoundException if the Naming Service
@@ -844,7 +920,7 @@ public class WebtopNaming {
     public static String getSiteID(
         String protocol,
         String host,
-        String port, 
+        String port,
         String uri
     ) throws ServerEntryNotFoundException {
         String serverid = getServerID(protocol, host, port, uri);
@@ -857,66 +933,76 @@ public class WebtopNaming {
      *
      * @param serverid server ID
      *
-     * @return Site ID
+     * @return Site ID or null if the Server ID is not known.
+     *
      */
     public static String getSiteID(String serverid) {
         String primary_site = null;
-        String sitelist = null;
+        String sitelist = getSiteList(serverid);
 
-        if (config.getSiteIDsTable() == null) {
-            return null;
-        }
+        if (sitelist != null ) {
 
-        sitelist = config.getSiteIDsTable().get(serverid);
-        StringTokenizer tok = new StringTokenizer(sitelist, NODE_SEPARATOR);
-        if (tok != null) {
-            primary_site = tok.nextToken();
-        }
+            StringTokenizer tok = new StringTokenizer(sitelist, NODE_SEPARATOR);
+            if (tok != null) {
+                primary_site = tok.nextToken();
+            }
 
-        if (debug.messageEnabled()) {
-            debug.message("WebtopNaming : SiteID for " + serverid + " is "
-                    + primary_site);
+            if (debug.messageEnabled()) {
+                debug.message("WebtopNaming : SiteID for " + serverid + " is "
+                        + primary_site);
+            }
         }
 
         return primary_site;
     }
-    
+
+    private static String getSiteList(String serverId) {
+        String sitelist = null;
+        Map<String, String> siteIds = config.getSiteIDsTable();
+
+        if (siteIds != null && siteIds.get(serverId) != null ) {
+            sitelist = siteIds.get(serverId);
+        }
+
+        return sitelist;
+    }
+
     public static String getSiteIdByName(String siteName) {
         String siteId = null;
-        
+
         if (config.getSiteNameToIdTable() == null) {
             return null;
         }
-        
+
         siteId = config.getSiteNameToIdTable().get(siteName);
-        
+
         if (debug.messageEnabled()) {
             debug.message("WebtopNaming : Site ID for " + siteName + " is "
                     + siteId);
         }
-        
+
         return siteId;
     }
-    
+
     public static String getSiteNameById(String siteId) {
         String siteName = null;
-        
+
         if (config.getSiteNameToIdTable() == null) {
             return null;
         }
-        
+
         for (Map.Entry<String, String> siteNameEntry : config.getSiteNameToIdTable().entrySet()) {
             if (siteNameEntry.getValue().equals(siteId)) {
                 siteName = siteNameEntry.getKey();
                 break;
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("WebtopNaming : Site Name for " + siteName + " is "
                     + siteId);
         }
-        
+
         return siteName;
     }
 
@@ -944,34 +1030,28 @@ public class WebtopNaming {
     }
 
     /**
-     * Returns the String representation of the separator delimited 
+     * Returns the String representation of the separator delimited
      * secondary site list.
      *
      * @param serverid server ID
-     * 
+     *
      * @return the secondary site list
      */
     public static String getSecondarySites(String serverid) {
-        String sitelist = null;
         String secondarysites = null;
+        String sitelist = getSiteList(serverid);
 
-        if (config.getSiteIDsTable() == null) {
-            return null;
-        }
+        if (sitelist != null) {
 
-        sitelist = config.getSiteIDsTable().get(serverid);
-        if (sitelist == null) {
-            return null;
-        }
+            int index = sitelist.indexOf(NODE_SEPARATOR);
+            if (index != -1) {
+                secondarysites = sitelist.substring(index + 1, sitelist.length());
+            }
 
-        int index = sitelist.indexOf(NODE_SEPARATOR);
-        if (index != -1) {
-            secondarysites = sitelist.substring(index + 1, sitelist.length());
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("WebtopNaming : SecondarySites for " + serverid
-                    + " is " + secondarysites);
+            if (debug.messageEnabled()) {
+                debug.message("WebtopNaming : SecondarySites for " + serverid
+                        + " is " + secondarysites);
+            }
         }
 
         return secondarysites;
@@ -979,14 +1059,14 @@ public class WebtopNaming {
 
     /**
      * Returns all the node ID for the site.
-     * 
+     *
      * @param serverid one of server IDs within the site, it can also
-     *     be the loab balancer's ID 
+     *     be the loab balancer's ID
      *
      * @return HashSet has all the node is for the site.
      *
      * @throws Exception if an error occurs when updating the
-     *     nameing table     
+     *     nameing table
      */
     public static Set<String> getSiteNodes(String serverid) throws Exception {
         HashSet<String> nodeset = new HashSet();
@@ -1010,12 +1090,12 @@ public class WebtopNaming {
 
     /**
      * Returns the class of the specified service.
-     * 
+     *
      * @param service the name of the service.
      *
      * @return The class name of the specified service.
      *
-     * @throws ClassNotFoundException if no definition for the class 
+     * @throws ClassNotFoundException if no definition for the class
      *    with the specified name could be found.
      */
     public static String getServiceClass(String service)
@@ -1154,7 +1234,7 @@ public class WebtopNaming {
             // if it doesn't succeed.
             Hashtable namingtbl = null;
             URL tempNamingURL = null;
-            for (int i = 0; ((namingtbl == null) && 
+            for (int i = 0; ((namingtbl == null) &&
                     (i < namingServiceURL.length)); i++) {
                 tempNamingURL = new URL(namingServiceURL[i]);
                 namingtbl = getNamingTable(tempNamingURL);
@@ -1178,8 +1258,8 @@ public class WebtopNaming {
     }
 
     private static void validate(
-        String protocol, 
-        String host, 
+        String protocol,
+        String host,
         String port,
         String uri
     ) throws URLNotFoundException {
@@ -1187,20 +1267,20 @@ public class WebtopNaming {
             protocol + "://" + host + ":" + port + uri :
             protocol + "://" + host + ":" + port;
         server = server.toLowerCase();
-        
+
         try {
             // first check if this is the local server, proto, and port,
             // if it is there is no need to
             // validate that it is in the trusted server platform server list
             if (protocol.equalsIgnoreCase(amServerProtocol) &&
-                host.equalsIgnoreCase(amServer) && 
+                host.equalsIgnoreCase(amServer) &&
                 port.equals(amServerPort) &&
                 ((uri == null) || uri.equalsIgnoreCase(amServerURI))
             ) {
                 return;
             }
             if (debug.messageEnabled()) {
-                debug.message("WebtopNaming.validate: platformServers= " + 
+                debug.message("WebtopNaming.validate: platformServers= " +
                     config.getPlatformServers());
             }
 
@@ -1220,7 +1300,7 @@ public class WebtopNaming {
 
     /**
      * Returns a list of the naming service urls.
-     * 
+     *
      * @return a String array of naming service urls.
      *
      * @throws Exception if there is no configured url or there is an
@@ -1276,14 +1356,14 @@ public class WebtopNaming {
         // Start naming service monitor
         monitorThread = new SiteMonitor(urlList);
         SystemTimer.getTimer().schedule(monitorThread, new Date(
-            System.currentTimeMillis() / 1000 * 1000));
+                currentTimeMillis() / 1000 * 1000));
     }
 
     /**
-     * Removes a server from the available site list. 
+     * Removes a server from the available site list.
      *
-     * @param server the <code>String</code> to parse as a URL of 
-     *     the server to be removed from the site list         
+     * @param server the <code>String</code> to parse as a URL of
+     *     the server to be removed from the site list
      */
     static public void removeFailedSite(String server) {
         if (monitorThread != null) {
@@ -1302,13 +1382,13 @@ public class WebtopNaming {
     /**
      * Removes a server from the available site list.
      *
-     * @param url url of the server to be removed from the site list 
+     * @param url url of the server to be removed from the site list
      */
     static public void removeFailedSite(URL url) {
         if (monitorThread != null) {
             try {
                 String serverid = getServerID(url.getProtocol(),
-                    url.getHost(), String.valueOf(url.getPort()), 
+                    url.getHost(), String.valueOf(url.getPort()),
                     url.getPath());
                 SiteMonitor.removeFailedSite(serverid);
             } catch (ServerEntryNotFoundException e) {
@@ -1321,7 +1401,7 @@ public class WebtopNaming {
 
     /**
      * Returns the uri of the specified URL.
-     * 
+     *
      * @param url the URL that includes uri.
      *
      * @return a uri of the specified <code>URL</code>.
@@ -1333,13 +1413,13 @@ public class WebtopNaming {
             uri = uri.substring(0, idx);
             idx = uri.lastIndexOf('/');
         }
-        
+
         return uri;
     }
 
     /**
      * Provides the Monitoring Agent site and server related information.
-     * 
+     *
      * @return 0 (zero) if all information collected and provided successfully;
      *         -1 if server protocol, hostname, port or URI is null;
      *         -2 if not serverMode, or Monitoring Agent already running
@@ -1353,11 +1433,11 @@ public class WebtopNaming {
          */
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if (isServerMode() && !MonitoringUtil.isRunning() && !sitemonitorDisabled) {
-            Date date1 = new Date();
+            Date date1 = newDate();
             String startDate = sdf.format(date1);
 
             if (debug.warningEnabled()) {
-                Date date = new Date();
+                Date date = newDate();
                 debug.warning(classMethod +
                     "start monitoring config" + "\n" +
                     "    Start time = " + sdf.format(date));
@@ -1399,11 +1479,11 @@ public class WebtopNaming {
                         svrIdTable(config.getServerIDTable()).
                         startDate(startDate).
                         namingTable(config.getNamingTable()).build();
-    
+
                 Agent.siteAndServerInfo(srvrInfo);
 
                 if (debug.messageEnabled()) {
-                    Date date = new Date();
+                    Date date = newDate();
                     debug.message(classMethod +
                         "monitoring agent config returned\n" +
                         "    End time = " + sdf.format(date));
@@ -1446,7 +1526,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
 
     /**
      * A boolean flag indicating whether site monitoring is enabled.
-     */    
+     */
     static public boolean keepMonitoring = false;
 
     static {
@@ -1463,7 +1543,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
             sleepInterval = Long.valueOf(SystemProperties.
                     get(Constants.MONITORING_INTERVAL, "60000")).longValue();
             getNamingProfile(false);
-            currentSiteID = getServerID(amServerProtocol, amServer, 
+            currentSiteID = getServerID(amServerProtocol, amServer,
                 amServerPort, amServerURI);
         } catch (Exception e) {
             debug.message("SiteMonitor initialization failed : ", e);
@@ -1483,19 +1563,19 @@ static public class SiteMonitor extends GeneralTaskRunnable {
     public boolean addElement(Object obj) {
         return false;
     }
-    
+
     public boolean removeElement(Object obj) {
         return false;
     }
-    
+
     public boolean isEmpty() {
         return true;
     }
-    
+
     public long getRunPeriod() {
         return sleepInterval;
     }
-    
+
     public void run() {
         keepMonitoring = true;
         try {
@@ -1510,7 +1590,7 @@ static public class SiteMonitor extends GeneralTaskRunnable {
         updateSiteList(siteList);
         updateCurrentSite(siteList);
     }
-    
+
     /**
      * Checks if the site is up.
      *
@@ -1598,15 +1678,15 @@ static public class SiteMonitor extends GeneralTaskRunnable {
 
         return available;
     }
-    
+
     /**
      * Checks if the url is one of configured sites.
      *
      * @param url a site url
      *
-     * @return <code>true</code> if the url is one of configured sites. 
+     * @return <code>true</code> if the url is one of configured sites.
      *
-     * @throws Exception if failing to get the naming service url.    
+     * @throws Exception if failing to get the naming service url.
      */
     public static boolean isCurrentSite(URL url) throws Exception {
         if ((config == null) || !keepMonitoring) {
@@ -1632,30 +1712,32 @@ static public class SiteMonitor extends GeneralTaskRunnable {
                 isCurrent = serverid.equalsIgnoreCase(serverID);
             }
         }
-
         return isCurrent;
     }
 
-    static Vector getAvailableSites() throws Exception {
-        Vector sites = null;
+    /**
+     * @return a copy of the availableSiteList.
+     * @throws Exception because that's what getNamingServiceURL does.
+     */
+    static Vector<String> getAvailableSites() throws Exception {
+
         if (availableSiteList.isEmpty()) {
             String[] namingURLs = getNamingServiceURL();
             for (int i = 0; i < namingURLs.length; i++) {
                 URL url = new URL(namingURLs[i]);
-                availableSiteList.add(getServerID(
-                    url.getProtocol(), url.getHost(), 
-                    String.valueOf(url.getPort()), url.getPath()));
+                availableSiteList.add(getServerID(url.getProtocol(),
+                        url.getHost(),
+                        String.valueOf(url.getPort()),
+                        url.getPath()));
             }
-
             updateCurrentSite(availableSiteList);
         }
 
-        sites = new Vector(availableSiteList);
+        Vector<String> sites = new Vector<>(availableSiteList);
         if (debug.messageEnabled()) {
             debug.message("In SiteMonitor.getAvailableSites()");
             debug.message("availableSiteList : " + sites.toString());
         }
-
         return sites;
     }
 
@@ -1663,7 +1745,6 @@ static public class SiteMonitor extends GeneralTaskRunnable {
         if ((keepMonitoring == true) && (availableSiteList.contains(site))) {
             availableSiteList.remove(site);
         }
-
         return;
     }
 

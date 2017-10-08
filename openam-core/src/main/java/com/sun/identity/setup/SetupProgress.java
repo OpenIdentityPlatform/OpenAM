@@ -24,10 +24,13 @@
  *
  * $Id: SetupProgress.java,v 1.10 2008/08/31 06:56:18 hengming Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
+
+import static com.sun.identity.shared.debug.DebugConstants.DEBUG_DATE_FORMAT;
+import static org.forgerock.openam.utils.Time.newDate;
 
 import org.forgerock.openam.utils.IOUtils;
 
@@ -36,9 +39,12 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import com.sun.identity.shared.DateUtils;
 
 public class SetupProgress {
     static private Writer writer = null;
@@ -167,8 +173,8 @@ public class SetupProgress {
       * @param str i18n key to be printed
       * @param param Object to be printed.
       */
-    public static void reportStart(String str, Object[] param) { 
-        writeProgressText(str, param, false);
+    public static void reportStart(String str, Object[] param) {
+        writeProgressText(str, param);
     }
 
     /**
@@ -177,14 +183,11 @@ public class SetupProgress {
      * @param param Object to be printed.
      */
     public static void reportEnd(String str, Object[] param) {
-        writeProgressText(str, param, true);
+        writeProgressText(str, param);
     }
 
     private static void writeProgressText(
-        String str,
-        Object[] param,
-        boolean newline
-    ) {
+        String str, Object[] param) {
         String istr = null;
         
         try {
@@ -196,26 +199,24 @@ public class SetupProgress {
             istr = str;
         }
 
-        reportDebug(istr, newline);
+        reportDebug(istr);
     }
 
-    private static void reportDebug(String istr, boolean newline) {
+    private static void reportDebug(String istr) {
+
+        synchronized (DEBUG_DATE_FORMAT) {
+            istr = DEBUG_DATE_FORMAT.format(newDate()) + ": " + istr;
+        }
+
         try {
-            if (newline) {
                 InstallLog.getInstance().write(istr + "\n");
-            } else {
-                InstallLog.getInstance().write(istr);
-            }
+
             if (writer != null) {
                 if (isTextMode) {
-                    if (newline) {
-                        istr += "\n";
-                    }
+                    istr += "\n";
                     writer.write(istr);
                 } else {
-                    if (newline) {
-                        istr += "<br />";
-                    }
+                    istr += "<br />";
                     writer.write(
                         "<script>addProgressText('" + istr + "');</script>");
                 }

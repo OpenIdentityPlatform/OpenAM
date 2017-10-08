@@ -15,17 +15,12 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.assistedinject.Assisted;
 import static org.mockito.Mockito.*;
 
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdRepoBundle;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdRepoListener;
-import com.sun.identity.sm.ldap.ConfigAuditorFactory;
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.security.auth.callback.Callback;
@@ -39,6 +34,7 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditEventPublisherImpl;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.auditors.SMSAuditor;
+import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
@@ -48,12 +44,6 @@ import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
-
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import org.forgerock.util.promise.Promise;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -61,6 +51,16 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.sm.ldap.ConfigAuditorFactory;
 
 @PrepareForTest(value = {IdRepoListener.class, WebtopNaming.class})
 public abstract class IdRepoTestBase extends PowerMockTestCase {
@@ -76,8 +76,9 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
     protected IdRepoListener idRepoListener;
     protected DJLDAPv3Repo idrepo = new DJLDAPv3Repo() {
         @Override
-        protected ConnectionFactory createConnectionFactory(String username, char[] password, int maxPoolSize) {
-            return new FakeConnectionFactory();
+        protected org.forgerock.openam.sm.datalayer.api.ConnectionFactory<Connection>
+        createConnectionFactory(String username, char[] password, int maxPoolSize) {
+            return LdapConnectionFactoryProvider.wrapExistingConnectionFactory(new FakeConnectionFactory());
         }
 
         @Override

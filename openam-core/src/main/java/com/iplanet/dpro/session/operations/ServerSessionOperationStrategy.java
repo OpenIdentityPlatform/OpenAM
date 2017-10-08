@@ -11,28 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.operations;
 
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
+
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.MonitoredOperations;
 import com.iplanet.dpro.session.monitoring.SessionMonitorType;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
-import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Server based SessionOperationStrategy implementation.
@@ -56,48 +52,34 @@ import javax.inject.Named;
  * Between these strategies, the users Session should be available during fail-over of a Site.
  */
 public class ServerSessionOperationStrategy implements SessionOperationStrategy {
-    private final SessionService service;
 
     private final SessionOperations local;
-    private final SessionOperations remote;
-    private final SessionOperations clientSide;
-    private final CTSOperations cts;
-    private final WebtopNamingQuery queryUtils;
+    private final SessionOperations stateless;
     private final Debug debug;
     private final SessionMonitoringStore store;
-    private final StatelessSessionFactory statelessSessionFactory;
+    private final StatelessSessionManager statelessSessionManager;
 
     /**
      * Guice initialised constructor.
      *
-     * @param service Required for local server decisions.
      * @param local Required strategy.
-     * @param remote Required strategy.
-     * @param cts Required strategy.
      * @param store The store for session monitoring information.
-     * @param queryUtils Required for Server availability decisions.
-     * @param statelessSessionFactory Required for JWT checks.
+     * @param statelessSessionManager Required for JWT checks.
      * @param debug Required for logging.
      */
     @Inject
-    public ServerSessionOperationStrategy(SessionService service,
-            SessionMonitoringStore store,
-            LocalOperations local,
-            CTSOperations cts,
-            RemoteOperations remote,
-            StatelessOperations clientSide,
-            WebtopNamingQuery queryUtils,
-            StatelessSessionFactory statelessSessionFactory,
-            @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
 
-        this.service = service;
+    public ServerSessionOperationStrategy(
+            final SessionMonitoringStore store,
+            final LocalOperations local,
+            final StatelessOperations stateless,
+            final StatelessSessionManager statelessSessionManager,
+            final @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
+
         this.store = store;
         this.local = local;
-        this.remote = remote;
-        this.cts = cts;
-        this.clientSide = clientSide;
-        this.queryUtils = queryUtils;
-        this.statelessSessionFactory = statelessSessionFactory;
+        this.stateless = stateless;
+        this.statelessSessionManager = statelessSessionManager;
         this.debug = debug;
     }
 
@@ -109,106 +91,32 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * Remote - The Session is from a remote Site, and the Site is up.
      * CTS - When cross talk is disabled, or if the Session is from a remote Site, which is down.
      *
-     * @param session Non null Session to use.
+     * @param sessionID Non null SessionID to use.
      * @return A non null SessionOperations implementation to use.
      */
     @Override
-    public SessionOperations getOperation(Session session) {
-        if (isClientSide(session)) {
-            return logAndWrap(session, clientSide, SessionMonitorType.STATELESS);
+    public SessionOperations getOperation(SessionID sessionID) {
+        if (isStateless(sessionID)) {
+            return logAndWrap(sessionID, stateless, SessionMonitorType.STATELESS);
         }
 
-        if (isLocalServer(session)) {
-            return logAndWrap(session, local, SessionMonitorType.LOCAL);
-        }
-
-        if (service.isSessionFailoverEnabled()) {
-
-            // If cross talk is reduced... by this point, we know the session is remote.
-            // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
-            // to RemoteOperations.
-            //
-            if (service.isReducedCrossTalkEnabled()) {
-                return logAndWrap(session, cts, SessionMonitorType.CTS);
-            }
-
-            // Remote Site which is known to be down
-            if (!isLocalSite(session) && !isSiteUp(getSiteId(session))) {
-                return logAndWrap(session, cts, SessionMonitorType.CTS);
-            }
-        }
-
-        return logAndWrap(session, remote, SessionMonitorType.REMOTE);
+        return logAndWrap(sessionID, local, SessionMonitorType.LOCAL);
     }
 
-    /**
-     * Fetches the Site for a Session Server ID, based on the results of WebtopNaming.
-     * @param session A non null Session which may or may not be part of a Site.
-     * @return Null if no Site ID was found, otherwise a non null Site ID.
-     */
-    private String getSiteId(Session session) {
-        String serverID = session.getID().getSessionServerID();
-        if (queryUtils.isSite(serverID)) {
-            return serverID;
-        }
-        return queryUtils.getSiteID(serverID);
-    }
-
-    /**
-     * Indicates that the Site associated with the Session is up.
-     *
-     * @param siteId Site ID to test if it is up. May be null, in which case
-     *               false will be returned.
-     * @return False if the Site ID is null, or if the Site was down.
-     * True if the Site was up.
-     */
-    private boolean isSiteUp(String siteId) {
-        if (siteId == null) {
-            return false;
-        }
-
-        return service.isSiteUp(siteId);
-    }
-
-    /**
-     * Tests if the Session should be considered local.
-     *
-     * @param session Non null Session.
-     * @return True if it is based on the current server.
-     */
-    private boolean isLocalServer(Session session) {
-        try {
-            return service.checkSessionLocal(session.getID());
-        } catch (SessionException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private boolean isClientSide(Session session) {
-        return statelessSessionFactory.containsJwt(session.getID());
-    }
-
-    /**
-     * Indicates that the Session belongs to a the local Site. That is, it is
-     * hosted on a Server within the current cluster.
-     *
-     * @param session Non null Session.
-     * @return True if the Session is considered local.
-     */
-    private boolean isLocalSite(Session session) {
-        return service.isLocalSite(session.getID());
+    private boolean isStateless(SessionID sessionID) {
+        return statelessSessionManager.containsJwt(sessionID);
     }
 
     /**
      * Inline logging function.
-     * @param session Non null.
+     * @param sessionID Non null.
      * @param op Non null operation selected.
      * @param type
      * @return {code op}, wrapped in a MonitoredOperations.
      */
-    private SessionOperations logAndWrap(Session session, SessionOperations op, SessionMonitorType type) {
+    private SessionOperations logAndWrap(SessionID sessionID, SessionOperations op, SessionMonitorType type) {
         if (debug.messageEnabled()) {
-            debug.message(session + ": " + op.getClass().getSimpleName() + " selected.");
+            debug.message(sessionID + ": " + op.getClass().getSimpleName() + " selected.");
         }
         return new MonitoredOperations(op, type, store);
     }

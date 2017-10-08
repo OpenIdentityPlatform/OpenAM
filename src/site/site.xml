@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS.
+  !      Copyright 2011-2016 ForgeRock AS.
   !    
 -->
 <project name="${project.name}"
@@ -31,8 +31,18 @@
  <skin>
   <groupId>org.forgerock.commons</groupId>
   <artifactId>forgerock-community-skin</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0-SNAPSHOT</version>
  </skin>
+    <custom>
+        <googleAnalytics>UA-23412190-7</googleAnalytics>
+        <openproject>
+            <href>http://openam.forgerock.org/</href>
+            <src>./images/FR_plogo_org_FC_openAM-300x76.png</src>
+            <alt>OpenAM</alt>
+        </openproject>
+        <siteSearchFQDN>forgerock.org</siteSearchFQDN>
+    </custom>
+
  <publishDate position="right" format="yyyy.MM.dd" />
  <version position="right" />
 
@@ -42,48 +52,68 @@
    <item name="Developer Community" href="http://www.forgerock.org" />
    <item name="OpenAM" href="http://openam.forgerock.org" />
   </breadcrumbs>
- 
-  <menu name="OpenAM">
-   <item name="Welcome" href="index.html" />
-   <item name="News" href="news.html" />
-   <item name="Join" href="https://sso.forgerock.com/openam/UI/Login" />
-   <item name="FAQ" href="faq.html" />
-   <item name="Mailing Lists" href="mail-lists.html" />
-   <item name="Support" href="http://forgerock.com/what-we-offer/subscriptions/" />
-   <item name="Partners" href="http://forgerock.com/partners/" />
-   <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
-   <item name="Builds" href="http://forgerock.org/openam.html" />
-   <item name="Archives" href="http://forgerock.org/openam-archive.html" />
-   <item name="Enterprise Downloads" href="http://www.forgerock.com/download-stack/"/>
+
+    <menu name="OpenAM">
+     <item name="Welcome" href="index.html" />
+     <item name="News" href="news.html" />
+     <item name="FAQ" href="faq.html" />
+     <item name="Mailing Lists" href="mail-lists.html" />
+     <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
+     <item name="Downloads" href="https://forgerock.org/downloads/" />
+     <item name="Archives" href="http://forgerock.org/openam-archive.html" />
+    </menu>
+
+  <menu name="ForgeRock">
+   <item name="Services" href="https://www.forgerock.com/services/" />
+   <item name="Partners" href="https://www.forgerock.com/partner/" />
+   <item name="Register" href="https://forgerock.org/registration/" />
   </menu>
-  
+
   <menu name="Released Documentation">
-   <item name="OpenAM 12.0.0" href="http://docs.forgerock.org/en/openam/12.0.0"/>
-   <item name="OpenAM 11.0.0" href="http://docs.forgerock.org/en/openam/11.0.0"/>
-   <item name="OpenAM 10.1.0" href="http://docs.forgerock.org/en/openam/10.1.0"/>
-   <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/openam/10.0.0"/>
+   <item name="OpenAM 13" href="https://backstage.forgerock.com/#!/docs/openam/13"/>
+   <item name="OpenAM 12" href="https://backstage.forgerock.com/#!/docs/openam/12.0.0"/>
+   <item name="OpenAM 11" href="https://backstage.forgerock.com/#!/docs/openam/11.0.0"/>
+   <item name="OpenAM 10.1 (EOSL)"
+         href="https://backstage.forgerock.com/#!/docs/openam/10.1.0"/>
+   <item name="OpenAM 10" href="https://backstage.forgerock.com/#!/docs/openam/10.0.0"/>
   </menu>
 
   <menu name="OpenAM Docs (in progress)">
-   <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/bootstrap/release-notes/index.html" />
-   <item name="Getting Started" href="./doc/bootstrap/getting-started/index.html" />
-   <item name="Installation Guide" href="./doc/bootstrap/install-guide/index.html" />
+   <!-- Label: Try OpenAM -->
+   <item name="Quick Start Guide" href="./doc/bootstrap/quick-start-guide/index.html" />
+   <!-- Label: Installation and Maintenance -->
+   <item name="Deployment Planning Guide" href="./doc/bootstrap/deployment-planning-guide/index.html" />
+   <item name="Install Guide" href="./doc/bootstrap/install-guide/index.html" />
    <item name="Upgrade Guide" href="./doc/bootstrap/upgrade-guide/index.html" />
-   <item name="Admin Guide" href="./doc/bootstrap/admin-guide/index.html" />
-   <item name="Developer's Guide" href="./doc/bootstrap/dev-guide/index.html" />
-   <item name="Deployment Planning" href="./doc/bootstrap/deployment-planning/index.html" />
+   <item name="Setup and Maintenance Guide" href="./doc/bootstrap/maintenance-guide/index.html" />
+   <item name="UI Customization Guide" href="./doc/bootstrap/ui-customization-guide/index.html" />
+   <item name="Release Notes" href="./doc/bootstrap/release-notes/index.html" />
    <item name="Reference" href="./doc/bootstrap/reference/index.html" />
+   <!-- Label: Access Management -->
+   <item name="Authentication and Single Sign-On Guide" href="./doc/bootstrap/authentication-guide/index.html" />
+   <item name="Authorization Guide" href="./doc/bootstrap/authorization-guide/index.html" />
+   <item name="RADIUS Server Guide" href="./doc/bootstrap/radius-server-guide/index.html" />
+   <!-- Label: User Services -->
+   <item name="User Self-Service Guide" href="./doc/bootstrap/user-self-service-guide/index.html" />
+   <item name="User-Managed Access (UMA) 1.0 Guide" href="./doc/bootstrap/uma-guide/index.html" />
+   <!-- Label: Federation -->
+   <item name="OAuth 2.0 Guide" href="./doc/bootstrap/oauth2-guide/index.html" />
+   <item name="OpenID Connect 1.0 Guide" href="./doc/bootstrap/oidc1-guide/index.html" />
+   <item name="SAML v1.x Guide" href="./doc/bootstrap/saml1-guide/index.html" />
+   <item name="SAML v2.0 Guide" href="./doc/bootstrap/saml2-guide/index.html" />
+   <item name="Security Token Service Guide" href="./doc/bootstrap/sts-guide/index.html" />
+   <!-- Label: Extensibility -->
+   <item name="Development Guide" href="./doc/bootstrap/dev-guide/index.html" />
    <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Java EE Release Notes" href="./doc/bootstrap/jee-release-notes/index.html" />
-   <item name="Java EE User's Guide" href="./doc/bootstrap/jee-users-guide/index.html" />
-   <item name="Java EE Reference" href="./doc/bootstrap/jee-reference/index.html" />
-   <item name="Web Release Notes" href="./doc/bootstrap/web-release-notes/index.html" />
-   <item name="Web User's Guide" href="./doc/bootstrap/web-users-guide/index.html" />
+   <item name="Java EE Policy Agent Guide" href="./doc/bootstrap/javaee-pa-guide/index.html" />
+   <item name="Java EE Policy Agent Release Notes" href="./doc/bootstrap/javaee-pa-rnotes/index.html" />
+   <item name="Web Policy Agent Guide" href="./doc/bootstrap/web-pa-guide/index.html" />
+   <item name="Web Policy Agent Release Notes" href="./doc/bootstrap/web-pa-rnotes/index.html" />
+
   </menu>
 
   <menu name="Project Information">
@@ -93,15 +123,5 @@
    <item name="Source Repository" href="source-repository.html" />
   </menu>  
  </body>
- 
- <custom>
-  <googleAnalytics>UA-23412190-7</googleAnalytics>
-  <openproject>
-   <href>http://openam.forgerock.org/</href>
-   <src>./images/openam-tagline-200x65.png</src>
-   <alt>OpenAM</alt>
-  </openproject>
-  <siteSearchFQDN>forgerock.org</siteSearchFQDN>
- </custom>
 
 </project>

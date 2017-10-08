@@ -16,5 +16,11 @@
         <Attribute name="wantLogoutResponseSigned">
             <Value></Value>
         </Attribute>
+      <Attribute name="requestedSignatureSigningAlgorithm">
+        <Value>http://www.w3.org/2000/09/xmldsig#rsa-sha1</Value>
+      </Attribute>
+      <Attribute name="requestedDigestMethod">
+        <Value>http://www.w3.org/2000/09/xmldsig#sha1</Value>
+      </Attribute>
     </IDPSSOConfig>
 </EntityConfig>

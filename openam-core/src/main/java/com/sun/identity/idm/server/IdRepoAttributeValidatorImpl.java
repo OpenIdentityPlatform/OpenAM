@@ -28,11 +28,22 @@
  */
 package com.sun.identity.idm.server;
 
+import static com.sun.identity.idm.IdRepoBundle.*;
+import static com.sun.identity.idm.IdRepoErrorCode.*;
+import static org.forgerock.guava.common.base.Strings.emptyToNull;
+import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdOperation;
+import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoErrorCode;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.PasswordPolicyException;
 import com.sun.identity.shared.debug.Debug;
 
@@ -42,10 +53,16 @@ import com.sun.identity.shared.debug.Debug;
  *
  */
 public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
-    private static final String PROP_MIN_PASSWORD_LENGTH =
-        "minimumPasswordLength";
+
+    private static final String PROP_MIN_PASSWORD_LENGTH = "minimumPasswordLength";
+    private static final String PROP_USERNAME_INVALID_CHARS = "usernameInvalidChars";
+
     private static final String ATTR_USER_PASSWORD = "userpassword";
+    private static final String ATTR_USERNAME = "username";
+
     private int minPasswordLength = 0;
+    private List<String> usernameInvalidChars = new ArrayList<>();
+
     private static Debug debug = Debug.getInstance("amIdm");
 
     @Override
@@ -66,40 +83,62 @@ public class IdRepoAttributeValidatorImpl implements IdRepoAttributeValidator {
                          }
                     } catch (NumberFormatException nfe) {
                         if (debug.warningEnabled()) {
-                            debug.warning("IdRepoAttributeValidatorImpl." +
-                                "initialize:", nfe);
+                            debug.warning("IdRepoAttributeValidatorImpl.initialize:", nfe);
                         }
                     }
+                }
+            } else if (name.equals(PROP_USERNAME_INVALID_CHARS)) {
+                String invalidCharsValue = emptyToNull(getFirstItem(configParams.get(name)));
+                if (invalidCharsValue != null) {
+                    usernameInvalidChars = Arrays.asList(invalidCharsValue.split("\\|"));
                 }
             }
         }
     }
 
     @Override
-    public void validateAttributes(Map<String, Set<String>> attrMap,
-        IdOperation idOp) throws PasswordPolicyException {
+    public void validateAttributes(Map<String, Set<String>> attrMap, IdOperation idOp) throws IdRepoException {
+        attrMap = new CaseInsensitiveHashMap(attrMap);
 
+        validatePassword(attrMap, idOp);
+        validateUsername(attrMap, idOp);
+    }
+
+    private void validatePassword(Map<String, Set<String>> attrMap, IdOperation idOp) throws PasswordPolicyException {
         if (minPasswordLength == 0) {
             return;
         }
 
-        attrMap = new CaseInsensitiveHashMap(attrMap);
-
         if (!attrMap.containsKey(ATTR_USER_PASSWORD)) {
             if (IdOperation.CREATE.equals(idOp)) {
-                Object[] args = { "" + minPasswordLength };
-                throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
+                Object[] args = {"" + minPasswordLength};
+                throw new PasswordPolicyException(MINIMUM_PASSWORD_LENGTH, args);
             }
         } else {
             Set<String> values = attrMap.get(ATTR_USER_PASSWORD);
             if (values == null || values.isEmpty()) {
-                Object[] args = { "" + minPasswordLength };
-                throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
+                Object[] args = {"" + minPasswordLength};
+                throw new PasswordPolicyException(MINIMUM_PASSWORD_LENGTH, args);
             } else {
                 String password = values.iterator().next();
                 if (password.length() < minPasswordLength) {
-                    Object[] args = { "" + minPasswordLength };
-                    throw new PasswordPolicyException(IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH, args);
+                    Object[] args = {"" + minPasswordLength};
+                    throw new PasswordPolicyException(MINIMUM_PASSWORD_LENGTH, args);
+                }
+            }
+        }
+    }
+
+    private void validateUsername(Map<String, Set<String>> attrMap, IdOperation idOp) throws IdRepoException {
+        if (!usernameInvalidChars.isEmpty() && IdOperation.CREATE.equals(idOp)) {
+            //EDIT operation is based on the username and attrMap contains only attributes which are being modified.
+            String username = getFirstItem(attrMap.get(ATTR_USERNAME));
+            if (username != null) {
+                for (String invalidChar : usernameInvalidChars) {
+                    if (username.indexOf(invalidChar) > -1) {
+                        Object[] args = {ATTR_USERNAME, username, usernameInvalidChars};
+                        throw new IdRepoException(BUNDLE_NAME, IDENTITY_ATTRIBUTE_INVALID, args);
+                    }
                 }
             }
         }

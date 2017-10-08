@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DefaultIDPAttributeMapper.java,v 1.1 2008/07/08 23:03:34 hengming Exp $
+ *
+ * Portions Copyrighted 2016 ForgeRock AS
  */
 
 package com.sun.identity.saml2.plugins;
@@ -45,14 +47,13 @@ public class DefaultIDPAttributeMapper extends DefaultLibraryIDPAttributeMapper
     }
 
     /**
-     * Checks if dynamical profile creation or ignore profile is enabled.
+     * Return true if ignore profile is enabled for this realm.
      *
-     * @param realm realm to check the dynamical profile creation attributes.
-     * @return true if dynamical profile creation or ignore profile is enabled,
-     *     false otherwise.
+     * @param session SSOToken to check the profile creation attributes.
+     * @param realm realm to check the profile creation attributes.
+     * @return true if ignore profile is enabled, false otherwise.
      */
-    protected boolean isDynamicalOrIgnoredProfile(String realm) {
-
-        return SAML2PluginsUtils.isDynamicalOrIgnoredProfile(realm);
+    protected boolean isIgnoredProfile(Object session, String realm) {
+        return SAML2PluginsUtils.isIgnoredProfile(session, realm);
     }
 }

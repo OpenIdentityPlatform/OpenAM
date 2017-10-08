@@ -24,7 +24,7 @@
  *
  * $Id: LogWriter.java,v 1.3 2008/06/25 05:42:09 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -34,6 +34,7 @@ import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.
 import static org.forgerock.http.routing.Version.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.openam.utils.Time.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,9 +46,9 @@ import java.util.logging.Level;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder;
 import org.forgerock.guava.common.collect.ImmutableMap;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.http.header.AcceptApiVersionHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -62,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
@@ -96,6 +98,7 @@ public class LogWriter {
             .put("realm where entity resides", "realm")
             .put("realm where circle of trust resides", "realm")
             .build();
+    private static final Client client = InjectorHolder.getInstance(Client.class);
 
     private LogWriter() {
     }
@@ -174,18 +177,17 @@ public class LogWriter {
         }
 
         JsonValue eventJson = builder.transactionId(CommandManager.TRANSACTION_ID.getValue())
-                .timestamp(System.currentTimeMillis())
+                .timestamp(currentTimeMillis())
                 .userId(ssoToken.getPrincipal().getName())
                 .trackingIdFromSSOToken(ssoToken)
                 .component(AuditConstants.Component.SSOADM)
                 .toEvent().getValue();
 
         String sessionId = adminSSOToken.getTokenID().toString();
-        sendEvent(topic, eventJson, sessionId, new SessionID(sessionId).getSessionServerURL());
+        sendEvent(topic, eventJson, sessionId, WebtopNaming.mapSiteToServer(new SessionID(sessionId)));
     }
 
     private static void sendEvent(String topic, JsonValue eventJson, String sessionId, String baseUrl) throws HttpApplicationException, URISyntaxException {
-        Client client = new Client(new HttpClientHandler());
         Request request = new Request();
         request.setMethod("POST");
         if (eventJson.isDefined(EVENT_REALM)) {
@@ -267,6 +269,7 @@ public class LogWriter {
                         logger.warn("Could not log audit via REST API: Status: {}, Response: {}",
                                 response.getStatus(), responseText);
                     }
+                    response.close();
                     return null;
                 }
             };

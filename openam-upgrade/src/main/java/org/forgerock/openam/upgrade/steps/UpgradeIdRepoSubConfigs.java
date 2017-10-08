@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2015 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -45,8 +45,6 @@ import com.sun.identity.sm.ServiceConfigManager;
  * This upgrade steps if there is any data store configured to use the Netscape LDAPv3Repo implementation, and if there
  * is, it will modify those configurations to use the new DJLDAPv3Repo instead.
  * This upgrade step will also upgrade the psearch filter setting to exclude the CTS suffix as well.
- *
- * @author Peter Major
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
@@ -159,9 +157,9 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
                                     + " to: " + sslMode);
                         }
                         newValues.put(NEW_CONNECTION_MODE, asSet(sslMode));
+                        repoConfig.removeAttribute(OLD_CONNECTION_MODE);
                     }
-                    //There is no need to remove the obsolete attributes here, because once we set an attribute, the SMS
-                    //framework will automagically remove those that do not adhere to the schema.
+
                     repoConfig.setAttributes(newValues);
                     UpgradeProgress.reportEnd("upgrade.success");
                 }

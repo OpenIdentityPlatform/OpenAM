@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,7 +26,10 @@
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
+
 package com.sun.identity.shared.encode;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -436,7 +439,7 @@ public class CookieUtils {
         }
         int age = cookie.getMaxAge();
         if (age > -1) {
-            Date date = new Date(System.currentTimeMillis() + age * 1000l);
+            Date date = new Date(currentTimeMillis() + age * 1000l);
             SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz", Locale.UK);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             sb.append(";max-age=").append(age);

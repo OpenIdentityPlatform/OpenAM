@@ -21,6 +21,8 @@ import static org.testng.Assert.assertEquals;
 
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
@@ -50,6 +52,7 @@ public class UpgradeResourceTypeStepTest {
     private UpgradeResourceTypeStep upgradeResourceTypeStep;
     private ConnectionFactory connectionFactory;
     private ServiceConfigManager configManager;
+    private ApplicationServiceFactory applicationServiceFactory;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -57,8 +60,9 @@ public class UpgradeResourceTypeStepTest {
         resourceTypeService = mock(ResourceTypeService.class);
         connectionFactory = mock(ConnectionFactory.class);
         configManager = mock(ServiceConfigManager.class);
-        upgradeResourceTypeStep =
-                new UpgradeResourceTypeStep(configManager, resourceTypeService, privilegedAction, connectionFactory, Collections.<String>emptySet()) {
+        applicationServiceFactory = mock(ApplicationServiceFactory.class);
+        upgradeResourceTypeStep = new UpgradeResourceTypeStep(configManager, resourceTypeService, privilegedAction,
+                connectionFactory, Collections.<String>emptySet(), applicationServiceFactory) {
                     @Override
                     protected Document getEntitlementXML() throws UpgradeException {
                         return document;

@@ -1,7 +1,7 @@
 <%--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2011-2016 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -23,7 +23,7 @@
 
 --%>
 
-<%@ page import="org.forgerock.oauth2.core.OAuth2Constants" %>
+<%@ page import="org.forgerock.openam.oauth2.OAuth2Constants" %>
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
 <%@ page import="com.iplanet.sso.SSOTokenManager" %>
 <%@ page import="com.iplanet.sso.SSOToken" %>

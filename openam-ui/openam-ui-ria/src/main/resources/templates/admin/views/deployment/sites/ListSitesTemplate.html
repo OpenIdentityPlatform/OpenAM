@@ -1,0 +1,12 @@
+<div class="container">
+    {{> headers/_Title title="console.sites.list.title" }}
+    <p class="page-description">{{t 'console.sites.list.description'}}</p>
+    <div id="toggleCardList">
+        <div class="call-to-action-block panel hidden">
+            <h3>{{t 'console.sites.list.empty'}}</h3>
+            <a href="{{routeTo 'newSite'}}" class="btn btn-primary">
+                <i class="fa fa-plus"></i> {{t 'console.sites.list.new'}}
+            </a>
+        </div>
+    </div>
+</div>

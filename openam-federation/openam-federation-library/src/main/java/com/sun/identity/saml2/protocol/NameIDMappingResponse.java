@@ -24,15 +24,17 @@
  *
  * $Id: NameIDMappingResponse.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.protocol.StatusResponse;
+import com.sun.identity.saml2.protocol.impl.NameIDMappingResponseImpl;
 
 /**
  * This class represents the NameIDMappingResponseType complex type.
@@ -54,7 +56,10 @@ import com.sun.identity.saml2.protocol.StatusResponse;
  *
  * @supported.all.api
  */
-public interface NameIDMappingResponse extends StatusResponse {   
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = NameIDMappingResponseImpl.class)
+public interface NameIDMappingResponse extends StatusResponse {
     /**
      * Returns the value of the <code>encryptedID</code> property.
      *

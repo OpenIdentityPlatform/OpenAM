@@ -24,7 +24,7 @@
  *
  * $Id: SessionRequest.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.dpro.session.share;
 
@@ -89,8 +89,6 @@ public class SessionRequest {
     public static final int Logout = 3;
 
     public static final int AddSessionListener = 4;
-
-    public static final int AddSessionListenerOnAllSessions = 5;
 
     public static final int SetProperty = 6;
 
@@ -247,8 +245,6 @@ public class SessionRequest {
                 return "Logout";
             case AddSessionListener:
                 return "AddSessionListener";
-            case AddSessionListenerOnAllSessions:
-                return "AddSessionListenerOnAllSessions";
             case SetProperty:
                 return "SetProperty";
             case GetSessionCount:
@@ -549,15 +545,6 @@ public class SessionRequest {
             xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
             xml.append("<URL>").append(notificationURL).append("</URL>").append(NL);
             xml.append("</AddSessionListener>").append(NL);
-            break;
-        case AddSessionListenerOnAllSessions:
-            if (notificationURL == null) {
-                return null;
-            }
-            xml.append("<AddSessionListenerOnAllSessions>").append(NL);
-            xml.append("<SessionID>").append(sessionID).append("</SessionID>").append(NL);
-            xml.append("<URL>").append(notificationURL).append("</URL>").append(NL);
-            xml.append("</AddSessionListenerOnAllSessions>").append(NL);
             break;
         case SetProperty:
             if (propertyName == null || propertyValue == null) {

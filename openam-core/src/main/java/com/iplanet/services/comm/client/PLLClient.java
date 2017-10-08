@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.iplanet.services.comm.client;
 
@@ -220,7 +220,7 @@ public class PLLClient {
             ResponseSet resset = ResponseSet.parseXML(in_string);
             return resset.getResponses();
         } catch (Exception e) {
-            debug.warning("PLLClient.send: exception: ", e);
+            debug.warning("PLLClient.send URL=" + url + " : exception: ", e);
             throw new SendRequestException(e.getMessage());
         } finally {
             IOUtils.closeIfNotNull(out);

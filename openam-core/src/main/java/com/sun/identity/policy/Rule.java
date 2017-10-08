@@ -24,7 +24,7 @@
  *
  * $Id: Rule.java,v 1.8 2009/11/13 23:52:20 asyhuang Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -156,6 +156,7 @@ public class Rule extends Object implements Cloneable {
     public Rule(String ruleName, String serviceName,
             String resourceName, Map actions) throws
             NameNotFoundException, InvalidNameException {
+        PolicyManager.initAdminSubject();
         // Rule and resource name can be null
         this.ruleName = (ruleName != null) ? ruleName : ("rule" + ServiceTypeManager.generateRandomName());
         this.resourceNames = new HashSet<String>();
@@ -165,23 +166,7 @@ public class Rule extends Object implements Cloneable {
             resourceNames.add(EMPTY_RESOURCE_NAME);
         } else {
             resourceName = resourceName.trim();
-
-            if (PolicyManager.isMigratedToEntitlementService()) {
-                resourceNames.add(resourceName);
-            } else {
-                // Check the service type name
-                checkAndSetServiceType(serviceName);
-
-                // Verify the action names
-                serviceType.validateActionValues(actions);
-                this.actions = new HashMap(actions);
-
-                try {
-                    resourceNames.add(serviceType.canonicalize(resourceName));
-                } catch (PolicyException pe) {
-                    throw new InvalidNameException(pe, resourceName, 2);
-                }
-            }
+            resourceNames.add(resourceName);
         }
 
         if (actions != null) {
@@ -231,6 +216,7 @@ public class Rule extends Object implements Cloneable {
                     "invalid_xml_rule_node", null, "", PolicyException.RULE));
         }
 
+        PolicyManager.initAdminSubject();
         // Get rule name, can be null
         if ((ruleName = XMLUtils.getNodeAttributeValue(ruleNode,
                 PolicyManager.NAME_ATTRIBUTE)) == null) {
@@ -262,12 +248,10 @@ public class Rule extends Object implements Cloneable {
 
         resourceNames = new HashSet<String>();
         resourceNames.addAll(getResources(ruleNode,
-            PolicyManager.POLICY_RULE_RESOURCE_NODE,
-                PolicyManager.isMigratedToEntitlementService()));
+            PolicyManager.POLICY_RULE_RESOURCE_NODE));
 
         Set<String> excludeResources = getResources(ruleNode,
-            PolicyManager.POLICY_RULE_EXCLUDED_RESOURCE_NODE,
-                PolicyManager.isMigratedToEntitlementService());
+            PolicyManager.POLICY_RULE_EXCLUDED_RESOURCE_NODE);
 
         // Get the actions and action values, cannot be null
         Set actionNodes = XMLUtils.getChildNodes(ruleNode,
@@ -300,9 +284,9 @@ public class Rule extends Object implements Cloneable {
 
     private Set<String> getResources(
         Node ruleNode,
-        String childNodeName,
-        boolean isMigratedToEntitlementService
+        String childNodeName
     ) throws InvalidNameException {
+        PolicyManager.initAdminSubject();
         Set<String> container = null;
         Set children = XMLUtils.getChildNodes(ruleNode, childNodeName);
 
@@ -314,14 +298,6 @@ public class Rule extends Object implements Cloneable {
                     resourceNode, PolicyManager.NAME_ATTRIBUTE);
                 if (resourceName != null) {
                     resourceName = resourceName.trim();
-                    if (!PolicyManager.isMigratedToEntitlementService()) {
-                        try {
-                            resourceName = serviceType.canonicalize(
-                                resourceName);
-                        } catch (PolicyException pe) {
-                            throw new InvalidNameException(pe, resourceName, 2);
-                        }
-                    }
                     container.add(resourceName);
                 }
             }
@@ -338,6 +314,7 @@ public class Rule extends Object implements Cloneable {
     private void checkAndSetServiceType(String serviceTypeName)
             throws NameNotFoundException {
         // Check the service type name
+        PolicyManager.initAdminSubject();
         ServiceTypeManager stm = null;
         try {
             stm = ServiceTypeManager.getServiceTypeManager();
@@ -346,10 +323,6 @@ public class Rule extends Object implements Cloneable {
             PolicyManager.debug.error("Unable to get admin SSO token" + ssoe);
             throw (new NameNotFoundException(ssoe,
                     serviceTypeName, PolicyException.SERVICE));
-        } catch (NameNotFoundException e) {
-            if (!PolicyManager.isMigratedToEntitlementService()) {
-                throw e;
-            }
         }
     }
 

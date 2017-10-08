@@ -11,37 +11,65 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.AUDIT_HISTORY_RESOURCE;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
 
 import java.util.Calendar;
 
+import org.forgerock.api.annotations.Description;
+import org.forgerock.api.annotations.Title;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 
+@Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.title")
+@Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.description")
 @Type(TokenType.UMA_AUDIT_ENTRY)
 public class UmaAuditEntry {
     public static final String ID = "_id";
 
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.id.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.id.description")
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceSetId.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceSetId.description")
     @Field(field = CoreTokenField.STRING_ONE)
     private String resourceSetId;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceSetName.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceSetName.description")
     @Field(field = CoreTokenField.STRING_TWO)
     private String resourceSetName;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.requestingPartyId.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.requestingPartyId.description")
     @Field(field = CoreTokenField.STRING_THREE)
     private String requestingPartyId;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.type.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.type.description")
     @Field(field = CoreTokenField.STRING_FOUR)
     private String type;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceOwnerId.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.resourceOwnerId.description")
     @Field(field = CoreTokenField.STRING_FIVE)
     private String resourceOwnerId;
+
+    @Title(AUDIT_HISTORY_RESOURCE + "umaauditentry.eventTime.title")
+    @Description(AUDIT_HISTORY_RESOURCE + "umaauditentry.eventTime.description")
     @Field(field = CoreTokenField.DATE_ONE)
     private Calendar eventTime;
 
@@ -55,7 +83,7 @@ public class UmaAuditEntry {
         this.resourceOwnerId = resourceOwnerId;
         this.type = type;
         this.requestingPartyId = requestingPartyId;
-        this.eventTime = Calendar.getInstance();
+        this.eventTime = getCalendarInstance();
     }
 
     public String getId() {

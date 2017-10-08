@@ -11,29 +11,36 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
+import static org.forgerock.openam.rest.RestUtils.crestProtocolVersion;
+
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.forgerock.services.context.Context;
+
+import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Default {@link org.forgerock.openam.errors.ExceptionMappingHandler} for entitlements exceptions that translates errors based on the
@@ -43,6 +50,7 @@ import org.forgerock.util.Reject;
  */
 public final class EntitlementsExceptionMappingHandler
         implements ExceptionMappingHandler<EntitlementException, ResourceException> {
+
     public static final String RESOURCE_ERROR_MAPPING = "EntitlementsResourceErrorMapping";
     public static final String REQUEST_TYPE_ERROR_OVERRIDES = "EntitlementsResourceRequestTypeErrorOverrides";
     public static final String DEBUG_TYPE_OVERRIDES = "EntitlementResourceErrorDebug";
@@ -138,6 +146,16 @@ public final class EntitlementsExceptionMappingHandler
         EntitlementException errorToHandle = causeOf(error);
 
         Integer resourceErrorType = errorCodeMapping.get(errorToHandle.getErrorCode());
+
+        //Crest2.0 CONFLICT error code mapping to VERSION_MISMATCH
+        if ((request != null) && (request.getRequestType() != null) && (context != null) &&
+                request.getRequestType().equals(RequestType.CREATE) &&
+                ((CreateRequest)request).getNewResourceId() != null
+                && crestProtocolVersion(context).compareTo(PROTOCOL_VERSION_1) > 0
+                && (resourceErrorType == ResourceException.CONFLICT)) {
+            resourceErrorType = ResourceException.VERSION_MISMATCH;
+        }
+
         if (resourceErrorType == null) {
             resourceErrorType = ResourceException.INTERNAL_ERROR;
         }

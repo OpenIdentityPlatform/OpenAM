@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2011-2016 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,6 +23,8 @@
  *
  */
 package com.sun.identity.config.upgrade;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
@@ -96,7 +98,7 @@ public class Upgrade extends AjaxPage {
     public boolean saveReport() {
         getContext().getResponse().setContentType("application/force-download; charset=\"UTF-8\"");
         getContext().getResponse().setHeader(
-                "Content-Disposition", "attachment; filename=\"upgradereport." + System.currentTimeMillis() + "\"");
+                "Content-Disposition", "attachment; filename=\"upgradereport." + currentTimeMillis() + "\"");
         getContext().getResponse().setHeader("Content-Description", "File Transfer");
         writeToResponse(upgrade.generateDetailedUpgradeReport(adminToken, false));
         setPath(null);

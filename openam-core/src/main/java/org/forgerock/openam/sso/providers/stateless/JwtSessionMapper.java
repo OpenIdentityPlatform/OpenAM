@@ -15,26 +15,32 @@
  */
 package org.forgerock.openam.sso.providers.stateless;
 
-import java.io.IOException;
-import java.security.KeyPair;
+import java.security.Key;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.json.jose.builders.EncryptedJwtBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
+import org.forgerock.json.jose.jwe.CompressionAlgorithm;
+import org.forgerock.json.jose.jwe.EncryptedJwt;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.EncryptedThenSignedJwt;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.SignedEncryptedJwt;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
@@ -45,37 +51,43 @@ import com.iplanet.dpro.session.share.SessionInfo;
 @Immutable
 public final class JwtSessionMapper {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)
+            .configure(SerializationFeature.INDENT_OUTPUT, false);
     private static final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
-    private static final String SERIALIZED_SESSION_CLAIM = "serialized_session";
+    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
+    };
 
-    private final JwsAlgorithm jwsAlgorithm;
-    private final SigningHandler signingHandler;
-    private final SigningHandler verificationHandler;
-    private final KeyPair encryptionKeyPair;
+    @VisibleForTesting
+    final JwsAlgorithm jwsAlgorithm;
+    @VisibleForTesting
+    final SigningHandler signingHandler;
+    @VisibleForTesting
+    final SigningHandler verificationHandler;
+    @VisibleForTesting
+    final JweAlgorithm jweAlgorithm;
+    private final EncryptionMethod encryptionMethod;
+    @VisibleForTesting
+    final Key encryptionKey;
+    @VisibleForTesting
+    final Key decryptionKey;
+    @VisibleForTesting
+    final CompressionAlgorithm compressionAlgorithm;
 
     /**
      * Constructs a fully-configured, immutable instance of JwtSessionMapper.
      *
-     * @param jwsAlgorithm Non-null, JwtAlgorithm to use for signing and verification.
-     * @param signingHandler Non-null, delegate to call for signing.
-     * @param verificationHandler Non-null, delegate to call for signature verification.
-     * @param encryptionKeyPair Nullable, public-private key-pair to use for encryption.
-     *                          If null, no encryption is applied.
+     * @param builder the jwt builder.
      */
-    public JwtSessionMapper(@Nonnull JwsAlgorithm jwsAlgorithm,
-                            @Nonnull SigningHandler signingHandler,
-                            @Nonnull SigningHandler verificationHandler,
-                            @Nullable KeyPair encryptionKeyPair) {
-
-        Reject.ifNull(jwsAlgorithm, "jwsAlgorithm must not be null.");
-        Reject.ifNull(signingHandler, "signingHandler must not be null.");
-        Reject.ifNull(verificationHandler, "verificationHandler must not be null.");
-
-        this.jwsAlgorithm = jwsAlgorithm;
-        this.signingHandler = signingHandler;
-        this.verificationHandler = verificationHandler;
-        this.encryptionKeyPair = encryptionKeyPair;
+    JwtSessionMapper(@Nonnull JwtSessionMapperBuilder builder) {
+        this.jwsAlgorithm = builder.jwsAlgorithm;
+        this.signingHandler = builder.signingHandler;
+        this.verificationHandler = builder.verificationHandler;
+        this.encryptionKey = builder.encryptionKey;
+        this.decryptionKey = builder.decryptionKey;
+        this.jweAlgorithm = builder.jweAlgorithm;
+        this.encryptionMethod = builder.encryptionMethod;
+        this.compressionAlgorithm = builder.compressionAlgorithm;
     }
 
     /**
@@ -87,29 +99,33 @@ public final class JwtSessionMapper {
      *
      * @return String JWT with SessionInfo stored in serialized_session claim.
      */
-    public String asJwt(@Nonnull SessionInfo sessionInfo) {
+    String asJwt(@Nonnull SessionInfo sessionInfo) {
 
-        Reject.ifNull(sessionInfo, "sessionInfo must not ne null.");
+        Reject.ifNull(sessionInfo, "sessionInfo must not be null.");
 
-        String json = asJson(sessionInfo);
-        // TODO: Make serialized_session value actual JSON rather than a String
+        final Map<String, Object> claimMap = MAPPER.convertValue(sessionInfo, MAP_TYPE);
+        final JwtClaimsSet claims = new JwtClaimsSet(claimMap);
 
-        JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claim(SERIALIZED_SESSION_CLAIM, json).build();
+        if (jweAlgorithm != null) {
+            EncryptedJwtBuilder jwtBuilder = jwtBuilderFactory.jwe(encryptionKey)
+                                    .headers()
+                                        .alg(jweAlgorithm)
+                                        .enc(encryptionMethod)
+                                        .zip(compressionAlgorithm)
+                                    .done()
+                                    .claims(claims);
 
-        if (encryptionKeyPair != null) {
-
-            return jwtBuilderFactory.jwe(encryptionKeyPair.getPublic())
-                    .headers().alg(JweAlgorithm.RSAES_PKCS1_V1_5).enc(EncryptionMethod.A128CBC_HS256).done()
-                    .claims(claimsSet)
-                    .sign(signingHandler, jwsAlgorithm)
-                    .build();
-
+            if (jwsAlgorithm != JwsAlgorithm.NONE) {
+                return jwtBuilder.signedWith(signingHandler, jwsAlgorithm).build();
+            } else {
+                return jwtBuilder.build();
+            }
         } else {
 
             return jwtBuilderFactory.jws(signingHandler)
-                    .headers().alg(jwsAlgorithm).done()
-                    .claims(claimsSet)
-                    .build();
+                .headers().alg(jwsAlgorithm).zip(compressionAlgorithm).done()
+                .claims(claims)
+                .build();
 
         }
 
@@ -124,33 +140,47 @@ public final class JwtSessionMapper {
      *
      * @throws JwtRuntimeException If there was a problem reconstructing the JWT
      */
-    public SessionInfo fromJwt(@Nonnull String jwtString) throws JwtRuntimeException {
+    SessionInfo fromJwt(@Nonnull String jwtString) throws JwtRuntimeException {
 
         Reject.ifNull(jwtString, "jwtString must not be null.");
 
         SignedJwt signedJwt;
 
-        if (encryptionKeyPair != null) {
+        if (jweAlgorithm != null) {
+            if (jwsAlgorithm != JwsAlgorithm.NONE) {
+                // could throw JwtRuntimeException
+                EncryptedThenSignedJwt signedEncryptedJwt = jwtBuilderFactory.reconstruct(jwtString,
+                        EncryptedThenSignedJwt.class);
 
-            // could throw JwtRuntimeException
-            SignedEncryptedJwt signedEncryptedJwt = jwtBuilderFactory.reconstruct(jwtString, SignedEncryptedJwt.class);
-            signedEncryptedJwt.decrypt(encryptionKeyPair.getPrivate());
-            signedJwt = signedEncryptedJwt;
+                if (!doesJwtAlgorithmMatch(signedEncryptedJwt) || !signedEncryptedJwt.verify(verificationHandler)) {
+                    throw new JwtRuntimeException("Invalid JWT!");
+                }
+
+                signedEncryptedJwt.decrypt(decryptionKey);
+                signedJwt = signedEncryptedJwt;
+            } else {
+                EncryptedJwt encryptedJwt = jwtBuilderFactory.reconstruct(jwtString, EncryptedJwt.class);
+                encryptedJwt.decrypt(decryptionKey);
+                return fromJson(encryptedJwt.getClaimsSet());
+            }
 
         } else {
 
             // could throw JwtRuntimeException
             signedJwt = jwtBuilderFactory.reconstruct(jwtString, SignedJwt.class);
 
+            if (!doesJwtAlgorithmMatch(signedJwt) || !signedJwt.verify(verificationHandler)) {
+                throw new JwtRuntimeException("Invalid JWT!");
+            }
         }
 
-        if (!doesJwtAlgorithmMatch(signedJwt) || !signedJwt.verify(verificationHandler)) {
-            throw new JwtRuntimeException("Invalid JWT!");
-        }
 
         JwtClaimsSet claimsSet = signedJwt.getClaimsSet();
-        String serializedSession = claimsSet.getClaim(SERIALIZED_SESSION_CLAIM, String.class);
-        return fromJson(serializedSession);
+        return fromJson(claimsSet);
+    }
+
+    private SessionInfo fromJson(JwtClaimsSet claimsSet) {
+        return MAPPER.convertValue(toMap(claimsSet), SessionInfo.class);
     }
 
     private boolean doesJwtAlgorithmMatch(SignedJwt signedJwt) {
@@ -161,32 +191,11 @@ public final class JwtSessionMapper {
         }
     }
 
-    /**
-     * @param inputSessionInfo Non-null, SessionInfo to convert to JSON.
-     *
-     * @return JSON representation of the provided SessionInfo state.
-     */
-    @VisibleForTesting
-    String asJson(@Nonnull SessionInfo inputSessionInfo) {
-        try {
-            return MAPPER.writeValueAsString(inputSessionInfo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private static Map<String, Object> toMap(JwtClaimsSet claims) {
+        final Map<String, Object> map = new TreeMap<>();
+        for (String key : claims.keys()) {
+            map.put(key, claims.get(key).getObject());
         }
+        return map;
     }
-
-    /**
-     * @param jsonString Non-null, JSON representation of SessionInfo state.
-     *
-     * @return SessionInfo deserialized from JSON.
-     */
-    @VisibleForTesting
-    SessionInfo fromJson(@Nonnull String jsonString) {
-        try {
-            return MAPPER.readValue(jsonString, SessionInfo.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

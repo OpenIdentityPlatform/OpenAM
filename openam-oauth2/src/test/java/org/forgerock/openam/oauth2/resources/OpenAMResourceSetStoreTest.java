@@ -26,16 +26,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2Uris;
-import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
+import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
@@ -54,12 +52,11 @@ public class OpenAMResourceSetStoreTest {
     public void setup() throws Exception {
 
         dataStore = mock(TokenDataStore.class);
-        OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
+        OAuth2UrisFactory oAuth2UrisFactory = mock(OAuth2UrisFactory.class);
         OAuth2Uris oAuth2Uris = mock(OAuth2Uris.class);
         TokenIdGenerator idGenerator = mock(TokenIdGenerator.class);
 
-        store = new OpenAMResourceSetStore("REALM", providerSettingsFactory, oAuth2UrisFactory, idGenerator, dataStore);
+        store = new OpenAMResourceSetStore("REALM", oAuth2UrisFactory, idGenerator, dataStore);
 
         given(oAuth2UrisFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(oAuth2Uris);
         given(oAuth2Uris.getResourceSetRegistrationPolicyEndpoint(anyString())).willReturn("POLICY_URI");

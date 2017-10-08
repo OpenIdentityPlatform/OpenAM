@@ -25,7 +25,7 @@
 :
 : $Id: setup.bat,v 1.3 2008/07/07 22:58:30 dillidorai Exp $
 :
-: Portions Copyrighted 2013 ForgeRock, Inc.
+: Portions Copyrighted 2013-2016 ForgeRock AS.
 :
 
-java -cp resources;lib/openam-clientsdk-${project.version}.jar;openam-example-clientsdk-cli-${project.version}.jar com.sun.identity.setup.SetupClientSDKSamples
+java -cp resources;lib/* com.sun.identity.setup.SetupClientSDKSamples

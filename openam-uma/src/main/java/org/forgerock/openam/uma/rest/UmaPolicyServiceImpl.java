@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -55,7 +55,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.core.CoreServicesWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
@@ -877,7 +877,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     private void validateScopes(ResourceSetDescription resourceSet, Set<String> requestedScopes)
             throws BadRequestException {
-        Set<String> availableScopes = resourceSet.getDescription().get("scopes").asSet(String.class);
+        Collection<String> availableScopes = resourceSet.getDescription().get("scopes").asCollection(String.class);
         if (!availableScopes.containsAll(requestedScopes)) {
             throw new BadRequestException("Defined Resource Set scopes, " + availableScopes.toString()
                     + ", do not contain requested scopes, " + requestedScopes.toString());

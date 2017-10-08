@@ -14,7 +14,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  */
 /**
- * Provides extension point for handling session upgrade.
+ * A collection of classes which support the authentication service.
  *
  * @supported.api
  */

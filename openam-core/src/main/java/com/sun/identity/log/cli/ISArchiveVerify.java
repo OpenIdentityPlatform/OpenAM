@@ -249,7 +249,7 @@ public class ISArchiveVerify{
             System.arraycopy(helper.toByteArray(prevSignature), 0, newMAC,
             prevMAC.length, helper.toByteArray(prevSignature).length);
         }
-        // If this is the last record in the file then dont update 
+        // If this is the last record in the file then dont update
         // the prevSignature as the first record in the next file is also 
         // the same signature.
         if(recPos != 0) {

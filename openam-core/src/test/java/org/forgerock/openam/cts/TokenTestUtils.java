@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2013-2016 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.Time.*;
 
 /**
  * Provides CTS based Token testing functionality, specifically for unit testing.
@@ -44,8 +45,8 @@ public class TokenTestUtils {
         for (CoreTokenField field : result.getAttributeNames()) {
 
             if (CoreTokenFieldTypes.isCalendar(field)) {
-                Calendar resultCal = result.getValue(field);
-                Calendar expectedCal = expected.getValue(field);
+                Calendar resultCal = result.getAttribute(field);
+                Calendar expectedCal = expected.getAttribute(field);
 
                 if (resultCal.getTimeInMillis() != expectedCal.getTimeInMillis()) {
                     throw new AssertionError(MessageFormat.format(
@@ -71,8 +72,8 @@ public class TokenTestUtils {
                 }
             } else if (CoreTokenFieldTypes.isByteArray(field)) {
 
-                byte[] resultValue = result.getValue(field);
-                byte[] expectedValue = expected.getValue(field);
+                byte[] resultValue = result.getAttribute(field);
+                byte[] expectedValue = expected.getAttribute(field);
 
                 if (!ArrayUtils.isEquals(resultValue, expectedValue)) {
                     throw new AssertionError(MessageFormat.format(
@@ -85,8 +86,8 @@ public class TokenTestUtils {
                 }
 
             } else {
-                Object resultValue = result.getValue(field);
-                Object expectedValue = expected.getValue(field);
+                Object resultValue = result.getAttribute(field);
+                Object expectedValue = expected.getAttribute(field);
 
                 if (!compareValue(resultValue, expectedValue)) {
                     throw new AssertionError(MessageFormat.format(
@@ -140,7 +141,7 @@ public class TokenTestUtils {
         Token token = new Token(id, TokenType.SESSION);
 
         // Set to expire now.
-        token.setExpiryTimestamp(Calendar.getInstance());
+        token.setExpiryTimestamp(getCalendarInstance());
 
         // Some extra data
         token.setAttribute(CoreTokenField.STRING_ONE, RandomStringUtils.randomAlphabetic(20));

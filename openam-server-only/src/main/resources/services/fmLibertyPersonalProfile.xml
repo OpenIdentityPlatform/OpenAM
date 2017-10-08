@@ -54,7 +54,8 @@
                 <AttributeSchema name="sunIdentityServerPPResourceIDMapper"
                     type="single" 
                     syntax="string" 
-                    i18nKey="p101">
+                    i18nKey="p101"
+                    order="300">
                     <DefaultValues>
                         <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPResourceIDMapper</Value>
                     </DefaultValues>
@@ -62,7 +63,8 @@
                 <AttributeSchema name="sunIdentityServerPPAuthorizer" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="p102">
+                    i18nKey="p102"
+                    order="400">
                     <DefaultValues>
                         <Value>@IDPP_AUTHORIZER@</Value>
                     </DefaultValues>
@@ -70,7 +72,8 @@
                 <AttributeSchema name="sunIdentityServerPPAttributeMapper" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="p103">
+                    i18nKey="p103"
+                    order="500">
                     <DefaultValues>
                         <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPAttributeMapper</Value>
                     </DefaultValues>
@@ -78,7 +81,8 @@
                 <AttributeSchema name="sunIdentityServerPPProviderID"
                     type="single" 
                     syntax="string" 
-                    i18nKey="p104">
+                    i18nKey="p104"
+                    order="600">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/idpp</Value>
                     </DefaultValues>
@@ -86,7 +90,8 @@
                 <AttributeSchema name="sunIdentityServerPPNameScheme"
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="p105">
+                    i18nKey="p105"
+                    order="700">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="FirstLast">urn:liberty:id-sis-pp:nameScheme:firstlast</ChoiceValue>
                         <ChoiceValue i18nKey="FirstMiddleLast">urn:liberty:id-sis-pp:nameScheme:firstmiddlelast</ChoiceValue>
@@ -98,7 +103,8 @@
                 <AttributeSchema name="sunIdentityServerPPNameSpacePrefix"
                     type="single" 
                     syntax="string" 
-                    i18nKey="p106">
+                    i18nKey="p106"
+                    order="800">
                     <DefaultValues>
                         <Value>pp</Value>
                     </DefaultValues>
@@ -107,7 +113,8 @@
                     type="list" 
                     syntax="string" 
                     uitype="name_value_list"
-                    i18nKey="p107">
+                    i18nKey="p107"
+                    order="900">
                     <DefaultValues>
                         <Value>container=CommonName</Value>
                         <Value>container=InformalName</Value>
@@ -125,7 +132,8 @@
                 <AttributeSchema name="sunIdentityServerPPDSAttributeMapList" 
                     type="list" 
                     syntax="string" 
-                    i18nKey="p108">
+                    i18nKey="p108"
+                    order="1000">
                     <DefaultValues>
                         <Value>CN=sunIdentityServerPPCommonNameCN</Value>
                         <Value>FN=sunIdentityServerPPCommonNameFN</Value>
@@ -165,7 +173,8 @@
                 <AttributeSchema name="sunIdentityServerPPisQueryPolicyEvalRequired" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="p109">
+                    i18nKey="p109"
+                    order="1100">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -173,7 +182,8 @@
                 <AttributeSchema name="sunIdentityServerPPisModifyPolicyEvalRequired" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="p110">
+                    i18nKey="p110"
+                    order="1200">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -181,12 +191,14 @@
                 <AttributeSchema name="sunIdentityServerPPExtensionAttributes" 
                     type="list" 
                     syntax="string" 
-                    i18nKey="p111">
+                    i18nKey="p111"
+                    order="1300">
                 </AttributeSchema>
                 <AttributeSchema name="sunIdentityServerPPExtensionPrefix" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="p112">
+                    i18nKey="p112"
+                    order="1400">
                     <DefaultValues>
                         <Value>ispp</Value>
                     </DefaultValues>
@@ -194,7 +206,8 @@
                 <AttributeSchema name="sunIdentityServerPPServiceInstanceUpdateEnabled" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="p113">
+                    i18nKey="p113"
+                    order="1500">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -202,7 +215,8 @@
                 <AttributeSchema name="sunIdentityServerPPServiceInstanceUpdateClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="p114">
+                    i18nKey="p114"
+                    order="1600">
                     <DefaultValues>
                         <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPServiceInstanceUpdate</Value>
                     </DefaultValues>
@@ -210,12 +224,14 @@
                 <AttributeSchema name="sunIdentityServerPPAlternateEndPoint" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="p115">
+                    i18nKey="p115"
+                    order="1700">
                 </AttributeSchema>
                 <AttributeSchema name="sunIdentityServerPPAlternateSecurityMechs" 
                     type="multiple_choice" 
                     syntax="string" 
-                    i18nKey="p116">
+                    i18nKey="p116"
+                    order="1800">
                     <ChoiceValues>
                         <ChoiceValue>urn:liberty:security:2003-08:null:null</ChoiceValue>
                         <ChoiceValue>urn:liberty:security:2003-08:null:X509</ChoiceValue>
@@ -237,7 +253,8 @@
                     type="single_choice"
                     syntax="string"
                     any="display"
-                    i18nKey="QUERY">
+                    i18nKey="QUERY"
+                    order="200">
                     <IsResourceNameAllowed/>
                     <ChoiceValues>
                         <ChoiceValue i18nKey="allow">allow</ChoiceValue>
@@ -253,7 +270,8 @@
                     type="single_choice"
                     syntax="string"
                     any="display"
-                    i18nKey="MODIFY">
+                    i18nKey="MODIFY"
+                    order="100">
                     <IsResourceNameAllowed/>
                     <ChoiceValues>
                         <ChoiceValue i18nKey="allow">allow</ChoiceValue>
@@ -271,52 +289,62 @@
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p120"/>
+                    i18nKey="p120"
+                    order="1900"/>
                 <AttributeSchema name="sunIdentityServerPPCommonNameAltCN"
                     type="list" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p121"/>
+                    i18nKey="p121"
+                    order="2000"/>
                 <AttributeSchema name="sunIdentityServerPPCommonNameFN"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p122"/>
+                    i18nKey="p122"
+                    order="2100"/>
                 <AttributeSchema name="sunIdentityServerPPCommonNameSN"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p123"/>
+                    i18nKey="p123"
+                    order="2200"/>
                 <AttributeSchema name="sunIdentityServerPPCommonNamePT"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p124"/>
+                    i18nKey="p124"
+                    order="2300"/>
                 <AttributeSchema name="sunIdentityServerPPCommonNameMN"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p125"/>
+                    i18nKey="p125"
+                    order="2400"/>
                 <AttributeSchema name="sunIdentityServerPPInformalName"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p126"/>
+                    i18nKey="p126"
+                    order="2500"/>
                 <AttributeSchema name="sunIdentityServerPPLegalIdentityLegalName"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p127"/>
+                    i18nKey="p127"
+                    order="2600"/>
                 <AttributeSchema name="sunIdentityServerPPLegalIdentityDOB"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p128"/>
+                    i18nKey="p128"
+                    order="2700"/>
                 <AttributeSchema name="sunIdentityServerPPLegalIdentityMaritalStatus"
                     type="single_choice" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p129">
+                    i18nKey="p129"
+                    order="2800">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="Single">urn:liberty:id-sis-pp:maritalstatus:single</ChoiceValue>
                         <ChoiceValue i18nKey="Married">urn:liberty:id-sis-pp:maritalstatus:married</ChoiceValue>
@@ -335,7 +363,8 @@
                     type="single_choice" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p130">
+                    i18nKey="p130"
+                    order="2900">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="Male">urn:liberty:id-sis-pp:gender:m</ChoiceValue>
                         <ChoiceValue i18nKey="Female">urn:liberty:id-sis-pp:gender:f</ChoiceValue>
@@ -348,7 +377,8 @@
                     type="single_choice" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p131">
+                    i18nKey="p131"
+                    order="3000">
                     <ChoiceValues>
                         <ChoiceValue>urn:liberty:id-sis-pp:IDType:ukvat</ChoiceValue>
                         <ChoiceValue>urn:liberty:id-sis-pp:IDType:itcif</ChoiceValue>
@@ -364,13 +394,15 @@
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p132"/>
+                    i18nKey="p132"
+                    order="3100"/>
                 <!-- We can have I18n keys if we know what these types are really:-->
                 <AttributeSchema name="sunIdentityServerPPLegalIdentityVATIDType"
                     type="single_choice" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p133">
+                    i18nKey="p133"
+                    order="3200">
                     <ChoiceValues>
                         <ChoiceValue>urn:liberty:id-sis-pp:IDType:ukvat</ChoiceValue>
                         <ChoiceValue>urn:liberty:id-sis-pp:IDType:itcif</ChoiceValue>
@@ -386,97 +418,116 @@
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p134"/>
+                    i18nKey="p134"
+                    order="3300"/>
                 <AttributeSchema name="sunIdentityServerPPEmploymentIdentityJobTitle"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p135"/>
+                    i18nKey="p135"
+                    order="3400"/>
                 <AttributeSchema name="sunIdentityServerPPEmploymentIdentityOrg"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p136"/>
+                    i18nKey="p136"
+                    order="3500"/>
                 <AttributeSchema name="sunIdentityServerPPEmploymentIdentityAltO"
                     type="list" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p137"/>
+                    i18nKey="p137"
+                    order="3600"/>
                 <AttributeSchema name="sunIdentityServerPPAddressCard"
                     type="list" 
                     syntax="string" 
                     uitype="name_value_list"
                     any="display"
-                    i18nKey="p138"/>
+                    i18nKey="p138"
+                    order="3700"/>
                 <AttributeSchema name="sunIdentityServerPPMsgContact"
                     type="list" 
                     syntax="string" 
                     uitype="name_value_list"
                     any="display"
-                    i18nKey="p139"/>
+                    i18nKey="p139"
+                    order="3800"/>
                 <AttributeSchema name="sunIdentityServerPPFacadeMugShot"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p140"/>
+                    i18nKey="p140"
+                    order="3900"/>
                 <AttributeSchema name="sunIdentityServerPPFacadeWebSite"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p141"/>
+                    i18nKey="p141"
+                    order="4000"/>
                 <AttributeSchema name="sunIdentityServerPPFacadeNamePronounced"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p142"/>
+                    i18nKey="p142"
+                    order="4100"/>
                 <AttributeSchema name="sunIdentityServerPPFacadeGreetSound"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p143"/>
+                    i18nKey="p143"
+                    order="4200"/>
                 <AttributeSchema name="sunIdentityServerPPFacadeGreetMeSound"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p144"/>
+                    i18nKey="p144"
+                    order="4300"/>
                 <AttributeSchema name="sunIdentityServerPPDemographicsDisplayLanguage"
                     type="single" 
                     syntax="url" 
                     any="display"
-                    i18nKey="p145"/>
+                    i18nKey="p145"
+                    order="4400"/>
                 <AttributeSchema name="sunIdentityServerPPDemographicsLanguage"
                     type="list" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p146"/>
+                    i18nKey="p146"
+                    order="4500"/>
                 <AttributeSchema name="sunIdentityServerPPDemographicsBirthday"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p147"/>
+                    i18nKey="p147"
+                    order="4600"/>
                 <AttributeSchema name="sunIdentityServerPPDemographicsAge"
                     type="single" 
                     syntax="number" 
                     any="display"
-                    i18nKey="p148"/>
+                    i18nKey="p148"
+                    order="4700"/>
                 <AttributeSchema name="sunIdentityServerPPDemographicsTimeZone"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p149"/>
+                    i18nKey="p149"
+                    order="4800"/>
                 <AttributeSchema name="sunIdentityServerPPSignKey"
                     type="single" 
                     syntax="string" 
-                    i18nKey="p150"/>
+                    i18nKey="p150"
+                    order="4900"/>
                 <AttributeSchema name="sunIdentityServerPPEncryptKey"
                     type="single" 
                     syntax="string" 
-                    i18nKey="p151"/>
+                    i18nKey="p151"
+                    order="5000"/>
                 <AttributeSchema name="sunIdentityServerPPEmergencyContact"
                     type="single" 
                     syntax="string" 
                     any="display"
-                    i18nKey="p152"/>
+                    i18nKey="p152"
+                    order="5100"/>
             </User> 
         </Schema> 
     </Service> 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.security.crypto;
@@ -19,6 +19,8 @@ package org.forgerock.openam.shared.security.crypto;
 import static org.forgerock.util.Reject.checkNotNull;
 
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.util.Reject;
 
 import java.io.File;
@@ -49,6 +51,8 @@ public final class KeyStoreBuilder {
 
     /**
      * Specifies the input stream to load the keystore from. Defaults to {@code null} to create a fresh keystore.
+     * <p>
+     * Note: the input stream will be closed automatically after the keystore is loaded.
      *
      * @param inputStream the input stream to load the keystore from.
      * @return the same builder instance.
@@ -149,6 +153,7 @@ public final class KeyStoreBuilder {
             if (password != null) {
                 Arrays.fill(password, '\0');
             }
+            IOUtils.closeIfNotNull(inputStream);
         }
     }
 }

@@ -36,6 +36,7 @@ public final class ScriptConstants {
     public static final String SCRIPT_NAME = "name";
     public static final String JSON_UUID = "_id";
     public static final String SCRIPT_TEXT = "script";
+    public static final String SCRIPT_IS_DEFAULT = "default";
     public static final String SCRIPT_LANGUAGE = "language";
     public static final String SCRIPT_CONTEXT = "context";
     public static final String SCRIPT_DESCRIPTION = "description";
@@ -69,6 +70,7 @@ public final class ScriptConstants {
     public static final String AUTHENTICATION_SERVER_SIDE_NAME = "AUTHENTICATION_SERVER_SIDE";
     public static final String POLICY_CONDITION_NAME = "POLICY_CONDITION";
     public static final String OIDC_CLAIMS_NAME = "OIDC_CLAIMS";
+    public static final String SCRIPTING_HTTP_CLIENT_NAME = "ScriptingHttpClient";
 
     /**
      * The context in which a script will be used.
@@ -128,6 +130,20 @@ public final class ScriptConstants {
          */
         public ScriptContext getContext() {
             return context;
+        }
+
+        /**
+         * Returns {@code true} if the {@literal id} is a global script id.
+         * @param id The script id.
+         * @return {@code true} if the id matches a global script id.
+         */
+        public static boolean isGlobalScript(String id) {
+            for (GlobalScript script : GlobalScript.values()) {
+                if (script.id.equals(id)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

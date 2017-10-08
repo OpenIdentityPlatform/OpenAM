@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeIndexStore.java,v 1.4 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -282,5 +282,18 @@ public abstract class PrivilegeIndexStore {
      *         should some error occur
      */
     public abstract List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException;
+
+    /**
+     * Finds all policies based on the identity uid, whether user or group uid.
+     *
+     * @param uid
+     *         identity uid
+     *
+     * @return list of matching policies else an empty list
+     *
+     * @throws EntitlementException
+     *         should some query error occur
+     */
+    public abstract List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException;
 
 }

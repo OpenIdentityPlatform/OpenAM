@@ -15,18 +15,17 @@
  */
 package org.forgerock.openam.rest.audit;
 
-import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+import static org.forgerock.openam.audit.AuditConstants.EventName;
+import static org.forgerock.openam.utils.Time.newDate;
 import static org.mockito.Mockito.*;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditServiceBuilder;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.openam.audit.AMAuditService;
@@ -35,12 +34,10 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.AuditServiceProvider;
 import org.forgerock.openam.audit.DefaultAuditServiceProxy;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.mockito.ArgumentCaptor;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.Status;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
@@ -94,7 +91,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
                 RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
         Request request = new Request();
-        request.setDate(new Date());
+        request.setDate(newDate());
         Response response = new Response(request);
         request.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
@@ -117,7 +114,7 @@ public class AbstractRestletAccessAuditFilterTest {
         auditFilter = new RestletAccessAuditFilterTest(restlet, eventPublisher, eventFactory,
                 RestletBodyAuditor.jsonAuditor("fred"), RestletBodyAuditor.jsonAuditor("gary"));
         Request request = new Request();
-        request.setDate(new Date());
+        request.setDate(newDate());
         Response response = new Response(request);
         response.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
         when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);

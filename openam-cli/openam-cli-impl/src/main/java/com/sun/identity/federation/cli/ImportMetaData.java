@@ -24,7 +24,7 @@
  *
  * $Id: ImportMetaData.java,v 1.15 2009/10/29 00:03:50 exu Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock As.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.federation.cli;
 
@@ -63,6 +63,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
+
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 
 /**
@@ -185,11 +188,8 @@ public class ImportMetaData extends AuthenticatedCommand {
                 if (configElt != null && configElt.isHosted()) {
                     List<BaseConfigType> config = configElt.
                        getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
-                    if (!config.isEmpty()) {
-                        BaseConfigType bConfig = (BaseConfigType)
-                            config.iterator().next();
-                        realm = SAML2MetaUtils.getRealmByMetaAlias(
-                            bConfig.getMetaAlias());
+                    if (CollectionUtils.isNotEmpty(config)) {
+                        realm = SAML2MetaUtils.getRealmByMetaAlias(config.get(0).getMetaAlias());
                         newMetaAliases = getMetaAliases(config);
                     }
                 }
@@ -317,16 +317,11 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * the realm value
                  */
                 if (configElt != null && configElt.isHosted()) {
-                    List config = configElt.
-                       getIDPSSOConfigOrSPSSOConfig();
-                    if (!config.isEmpty()) {
-                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType
-                            bConfig =
-                            (com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType)
-                            config.iterator().next();
-                        realm = WSFederationMetaUtils.getRealmByMetaAlias(
-                            bConfig.getMetaAlias());
-                        newMetaAliases = getMetaAliases(config);
+                    List<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType> config =
+                            configElt.getIDPSSOConfigOrSPSSOConfig();
+                    if (CollectionUtils.isNotEmpty(config)) {
+                        realm = WSFederationMetaUtils.getRealmByMetaAlias(config.get(0).getMetaAlias());
+                        newMetaAliases = getMetaAliasesWsFed(config);
                     }
                 }
             }
@@ -696,15 +691,32 @@ public class ImportMetaData extends AuthenticatedCommand {
     }
 
     /**
-     * Gets the metaaliases for this configuration
-     * @param config the{@link BaseConfigType}.
+     * Gets the SAML2 meta aliases for this configuration
+     * @param config the {@link BaseConfigType}.
      * @return the metaAliases or an empty list if none found.
      */
     private List<String> getMetaAliases(List<BaseConfigType> config) {
-        List<String> metaAliases = new ArrayList<String>();
+        List<String> metaAliases = new ArrayList<>(config.size());
         for (BaseConfigType bConfig : config) {
             String cMetaAlias = bConfig.getMetaAlias();
-            if (cMetaAlias != null && !cMetaAlias.isEmpty()) {
+            if (StringUtils.isNotEmpty(cMetaAlias)) {
+                metaAliases.add(cMetaAlias);
+            }
+        }
+        return metaAliases;
+    }
+
+    /**
+     * Gets the WSFed meta aliases for this configuration
+     * @param config the {@link com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType}.
+     * @return the metaAliases or an empty list if none found.
+     */
+    private List<String> getMetaAliasesWsFed(
+            List<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType> config) {
+        List<String> metaAliases = new ArrayList<>(config.size());
+        for (com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType bConfig : config) {
+            String cMetaAlias = bConfig.getMetaAlias();
+            if (StringUtils.isNotEmpty(cMetaAlias)) {
                 metaAliases.add(cMetaAlias);
             }
         }

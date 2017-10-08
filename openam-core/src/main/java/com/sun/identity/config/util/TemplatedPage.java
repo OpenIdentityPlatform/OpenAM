@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,11 @@
  *
  * $Id: TemplatedPage.java,v 1.10 2009/01/05 23:17:10 veiming Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package com.sun.identity.config.util;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +42,7 @@ public abstract class TemplatedPage extends AjaxPage {
     
     public static final String STATUS_MESSAGE_CODES_SESSION_KEY = "statusMessageCodes";
 
-    public int currentYear = Calendar.getInstance().get( Calendar.YEAR );
+    public int currentYear = getCalendarInstance().get( Calendar.YEAR );
 
     public List statusMessages = new ArrayList(); //of Strings
 

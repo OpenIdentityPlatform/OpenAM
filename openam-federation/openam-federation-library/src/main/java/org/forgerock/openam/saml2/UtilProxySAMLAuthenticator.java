@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2015 ForgeRock AS.
+* Copyright 2015-2016 ForgeRock AS.
 */
 package org.forgerock.openam.saml2;
 
@@ -27,6 +27,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -52,8 +53,6 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
-import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -158,8 +157,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             SAML2Utils.debug.error(classMethod, sme);
         }
 
-        if (isFromECP || idpSSODescriptor.isWantAuthnRequestsSigned() ||
-                (spSSODescriptor != null && spSSODescriptor.isAuthnRequestsSigned())) {
+        if (idpSSODescriptor.isWantAuthnRequestsSigned()
+                || (spSSODescriptor != null && spSSODescriptor.isAuthnRequestsSigned())) {
             // need to verify the query string containing authnRequest
             if (StringUtils.isBlank(data.getSpEntityID())) {
                 throw new ClientFaultException(data.getIdpAdapter(), INVALID_SAML_REQUEST);
@@ -192,10 +191,20 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 // In ECP profile, sp doesn't know idp.
                 if (!isFromECP) {
                     // verify Destination
-                    List ssoServiceList = idpSSODescriptor.getSingleSignOnService();
-                    String ssoURL = SPSSOFederate.getSSOURL(ssoServiceList, binding);
-                    if (!SAML2Utils.verifyDestination(data.getAuthnRequest().getDestination(), ssoURL)) {
-                        SAML2Utils.debug.error(classMethod + "authn request destination verification failed.");
+                    List<SingleSignOnServiceElement> ssoServiceList = idpSSODescriptor.getSingleSignOnService();
+                    SingleSignOnServiceElement  endPoint = SPSSOFederate.getSingleSignOnServiceEndpoint(ssoServiceList, binding);
+                    if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                        SAML2Utils.debug
+                                .error("{} authn request unable to get endpoint location for IdpEntity: {}  MetaAlias: {} ",
+                                        classMethod, data.getIdpEntityID(), data.getIdpMetaAlias());
+                        throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
+                    }
+                    if (!SAML2Utils
+                            .verifyDestination(data.getAuthnRequest().getDestination(), endPoint.getLocation())) {
+                        SAML2Utils.debug
+                                .error("{} authn request destination verification failed for IdpEntity: {}  MetaAlias: {} Destination: {}  Location: {}",
+                                        classMethod, data.getIdpEntityID(), data.getIdpMetaAlias(),
+                                        data.getAuthnRequest().getDestination(), endPoint.getLocation());
                         throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
                     }
                 }
@@ -385,9 +394,10 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                         return;
                     } else {
                         try { //and they want to get into the system with passive auth - response no passive
-                            IDPSSOUtil.sendNoPassiveResponse(request, response, out, data.getIdpMetaAlias(),
-                                    data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(), data.getRelayState(),
-                                    data.getSpEntityID());
+                            IDPSSOUtil.sendResponseWithStatus(request, response, out, data.getIdpMetaAlias(),
+                                    data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(),
+                                    data.getRelayState(), data.getSpEntityID(), SAML2Constants.RESPONDER,
+                                    SAML2Constants.NOPASSIVE);
                         } catch (SAML2Exception sme) {
                             SAML2Utils.debug.error(classMethod, sme);
                             redirectException = new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
@@ -428,7 +438,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
      */
     private static boolean isSessionUpgrade(IDPAuthnContextInfo idpAuthnContextInfo, Object session) {
 
-        String classMethod = "IDPSSOFederate.isSessionUpgrade: ";
+        String classMethod = "UtilProxySAMLAuthenticator.isSessionUpgrade: ";
 
         if (session != null) {
             // Get the Authentication Context required
@@ -464,7 +474,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
 
     private void generateAssertionResponse(IDPSSOFederateRequest data) throws ServerFaultException {
 
-        final String classMethod = "IDPSSOFederate.generateAssertionResponse";
+        final String classMethod = "UtilProxySAMLAuthenticator.generateAssertionResponse";
 
         // IDP Adapter invocation, to be sure that we can execute the logic
         // even if there is a new request with the same session
@@ -511,7 +521,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                                 IDPAuthnContextInfo idpAuthnContextInfo, IDPSSOFederateRequest data)
             throws IOException, ServerFaultException {
 
-        String classMethod = "IDPSSOFederate.redirectToAuth";
+        String classMethod = "UtilProxySAMLAuthenticator.redirectToAuth";
         String preferredIDP;
 
         // TODO: need to verify the signature of the AuthnRequest
@@ -580,8 +590,9 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 redirectAuthentication(request, response, idpAuthnContextInfo, data, false);
             } else {
                 try {
-                    IDPSSOUtil.sendNoPassiveResponse(request, response, out, data.getIdpMetaAlias(), data.getIdpEntityID(),
-                            data.getRealm(), data.getAuthnRequest(), data.getRelayState(), data.getSpEntityID());
+                    IDPSSOUtil.sendResponseWithStatus(request, response, out, data.getIdpMetaAlias(),
+                            data.getIdpEntityID(), data.getRealm(), data.getAuthnRequest(), data.getRelayState(),
+                            data.getSpEntityID(), SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE);
                 } catch (SAML2Exception sme) {
                     SAML2Utils.debug.error(classMethod, sme);
                     throw new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
@@ -605,8 +616,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             try {
                 authnReq = ProtocolFactory.getInstance().createAuthnRequest(outputString);
             } catch (SAML2Exception se) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest(): cannot construct a AuthnRequest object from " +
-                        "the SAMLRequest value:", se);
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest(): cannot construct a AuthnRequest "
+                        + "object from the SAMLRequest value:", se);
             }
         }
         return authnReq;
@@ -623,17 +634,17 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 Element elem = SOAPCommunicator.getInstance().getSamlpElement(msg, SAML2Constants.AUTHNREQUEST);
                 return ProtocolFactory.getInstance().createAuthnRequest(elem);
             } catch (Exception ex) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:", ex);
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest:", ex);
             }
             return null;
         } else {
             String samlRequest = request.getParameter(SAML2Constants.SAML_REQUEST);
             if (samlRequest == null) {
-                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: SAMLRequest is null");
+                SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest: SAMLRequest is null");
                 return null;
             }
             if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
-                SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: saml request = {}", samlRequest);
+                SAML2Utils.debug.message("UtilProxySAMLAuthenticator.getAuthnRequest: saml request = {}", samlRequest);
                 return getAuthnRequest(samlRequest);
             } else if (binding.equals(SAML2Constants.HTTP_POST)) {
                 ByteArrayInputStream bis = null;
@@ -644,16 +655,17 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                         bis = new ByteArrayInputStream(raw);
                         Document doc = XMLUtils.toDOMDocument(bis, SAML2Utils.debug);
                         if (doc != null) {
-                            SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: decoded SAML2 Authn Request: {}",
+                            SAML2Utils.debug.message("UtilProxySAMLAuthenticator.getAuthnRequest: decoded SAML2 Authn "
+                                    + "Request: {}",
                                     XMLUtils.print(doc.getDocumentElement()));
                             authnRequest = ProtocolFactory.getInstance().createAuthnRequest(doc.getDocumentElement());
                         } else {
-                            SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: Unable to parse SAMLRequest: " +
-                                    samlRequest);
+                            SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest: Unable to parse "
+                                    + "SAMLRequest: " + samlRequest);
                         }
                     }
                 } catch (Exception ex) {
-                    SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:", ex);
+                    SAML2Utils.debug.error("UtilProxySAMLAuthenticator.getAuthnRequest:", ex);
                     return null;
                 } finally {
                     IOUtils.closeIfNotNull(bis);
@@ -685,7 +697,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                                                boolean isSessionUpgrade)
             throws SAML2Exception, IOException {
 
-        String classMethod = "IDPSSOFederate.redirectAuthentication: ";
+        String classMethod = "UtilProxySAMLAuthenticator.redirectAuthentication: ";
         // get the authentication service url
         String authService = IDPSSOUtil.getAuthenticationServiceURL(data.getRealm(), data.getIdpEntityID(), request);
         StringBuilder appliRootUrl = getAppliRootUrl(request);

@@ -18,6 +18,8 @@ package com.iplanet.dpro.session.share;
 
 import static org.testng.Assert.*;
 
+import java.util.concurrent.TimeUnit;
+
 import org.testng.annotations.Test;
 
 public class SessionInfoTest {
@@ -31,7 +33,7 @@ public class SessionInfoTest {
         info.setTimeLeft(Long.MAX_VALUE);
 
         // Then
-        assertEquals(info.getExpiryTime(), Long.MAX_VALUE);
+        assertEquals(info.getExpiryTime(TimeUnit.MILLISECONDS), Long.MAX_VALUE);
     }
 
     @Test

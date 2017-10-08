@@ -11,10 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest;
+
+import static org.forgerock.openam.utils.StringUtils.isBlank;
+import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -80,6 +83,22 @@ final class PrivilegePolicyStore implements PolicyStore {
 
     @Override
     public List<Privilege> query(QueryRequest request) throws EntitlementException {
+        String queryId = request.getQueryId();
+
+        if (isNotBlank(queryId)) {
+            if (queryId.equals("queryByIdentityUid")) {
+                String uid = request.getAdditionalParameter("uid");
+
+                if (isBlank(uid)) {
+                    throw new EntitlementException(EntitlementException.QUERY_ID_MISSING_UID);
+                }
+
+                return privilegeManager.findAllPoliciesByIdentityUid(uid);
+            }
+
+            throw new EntitlementException(EntitlementException.INVALID_QUERY_ID, queryId);
+        }
+
         QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
         if (queryFilter == null) {
             // Return everything
@@ -145,4 +164,5 @@ final class PrivilegePolicyStore implements PolicyStore {
         }
 
     }
+
 }

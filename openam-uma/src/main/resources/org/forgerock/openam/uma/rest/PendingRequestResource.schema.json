@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/PendingRequestResource#schema.title",
+  "description": "i18n:api-descriptor/PendingRequestResource#schema.description",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/PendingRequestResource#schema._id.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema._id.description"
+    },
+    "user": {
+      "type": "string",
+      "title": "i18n:api-descriptor/PendingRequestResource#schema.user.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema.user.description"
+    },
+    "resource": {
+      "type": "string",
+      "title": "i18n:api-descriptor/PendingRequestResource#schema.resource.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema.resource.description"
+    },
+    "when": {
+      "type": "integer",
+      "title": "i18n:api-descriptor/PendingRequestResource#schema.when.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema.when.description"
+    },
+    "permissions": {
+      "title": "i18n:api-descriptor/PendingRequestResource#schema.permissions.title",
+      "description": "i18n:api-descriptor/PendingRequestResource#schema.permissions.description",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

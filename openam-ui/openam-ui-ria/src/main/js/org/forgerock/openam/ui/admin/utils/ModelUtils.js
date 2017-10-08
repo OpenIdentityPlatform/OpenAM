@@ -11,30 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/admin/utils/ModelUtils", [
+define([
+    "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (Messages, EventManager, Constants) {
+], function ($, _, Messages, EventManager, Constants) {
 
     /**
      * @exports org/forgerock/openam/ui/admin/utils/ModelUtils
      */
     var obj = {};
 
+    function hasError (response) {
+        return _.has(response, "responseJSON.message") && _.isString(response.responseJSON.message);
+    }
+
     obj.errorHandler = function (response) {
-        if (response && response.status === 401) {
-            EventManager.sendEvent(Constants.EVENT_UNAUTHORIZED, {
-                "error": response.error()
-            });
+        if (_.get(response, "status") === 401) {
+            EventManager.sendEvent(Constants.EVENT_UNAUTHORIZED, { error: response.error() });
+        } else if (hasError(response)) {
+            Messages.addMessage({ type: Messages.TYPE_DANGER, escape: true, response });
         } else {
-            Messages.addMessage({
-                "type": Messages.TYPE_DANGER,
-                "response": response
-            });
+            Messages.addMessage({ type: Messages.TYPE_DANGER, message: $.t("config.messages.CommonMessages.unknown") });
         }
     };
 

@@ -24,16 +24,20 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import static java.util.Collections.singleton;
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
@@ -45,6 +49,7 @@ import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SequentialThreadPool;
+import com.sun.identity.entitlement.SubjectAttributesCollector;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.SearchFilter;
@@ -63,6 +68,7 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.util.Reject;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;
@@ -92,8 +98,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     // Initialize the caches
     static {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
+        EntitlementConfiguration ec = getEntitlementConfiguration(adminSubject, "/");
 
         policyCacheSize = getInteger(ec,
             EntitlementConfiguration.POLICY_CACHE_SIZE, DEFAULT_CACHE_SIZE);
@@ -161,8 +166,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         super(adminSubject, realm);
         superAdminSubject = SubjectUtils.createSuperAdminSubject();
         realmDN = DNMapper.orgNameToDN(realm);
-        entitlementConfig = EntitlementConfiguration.getInstance(
-            adminSubject, realm);
+        entitlementConfig = getEntitlementConfiguration(adminSubject, realm);
 
         // Get Index caches based on realm
         if (indexCacheSize > 0) {
@@ -338,16 +342,14 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         }
     }
 
-    private void cache(
-        Privilege p,
-        Set<String> subjectSearchIndexes,
-        String realm
-    ) throws EntitlementException {
-        String dn = DataStore.getPrivilegeDistinguishedName(
-            p.getName(), realm, null);
+    private void cache(Privilege p, Set<String> subjectSearchIndexes, String realm) throws EntitlementException {
+        String dn = DataStore.getPrivilegeDistinguishedName(p.getName(), realm, null);
         String realmName = DNMapper.orgNameToRealmName(realm);
-        indexCache.cache(p.getEntitlement().getResourceSaveIndexes(
-            superAdminSubject, realmName), subjectSearchIndexes, dn);
+        if (subjectSearchIndexes == null) {
+            subjectSearchIndexes = SubjectAttributesManager.getSubjectSearchIndexes(p);
+        }
+        indexCache.cache(p.getEntitlement().getResourceSaveIndexes(superAdminSubject, realmName),
+                subjectSearchIndexes, dn);
         policyCache.cache(dn, p, realmDN);
     }
 
@@ -787,8 +789,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                     Map<String, Set<String>> map =
                         r.getOriginalMapApplNameToResources();
                     for (String a : map.keySet()) {
-                        Application appl = ApplicationManager.getApplication(
-                            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, a);
+                        Application appl = getApplicationService(SUPER_ADMIN_SUBJECT, realmName).getApplication(a);
                         if (appl.getApplicationType().getName().equals(
                             applicationTypeName)) {
                             results.addAll(map.get(a));
@@ -817,6 +818,13 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     @Override
     public List<Privilege> findAllPoliciesByApplication(String application) throws EntitlementException {
         return dataStore.findPoliciesByRealmAndApplication(getRealm(), application);
+    }
+
+    @Override
+    public List<Privilege> findAllPoliciesByIdentityUid(String uid) throws EntitlementException {
+        Reject.ifNull(uid);
+        Set<String> subjectIndexes = singleton(SubjectAttributesCollector.NAMESPACE_IDENTITY + "=" + uid);
+        return dataStore.findAllPoliciesByRealmAndSubjectIndex(getRealm(), subjectIndexes);
     }
 
     private Set<String> getParentRealms(String realm) throws SMSException {
@@ -996,7 +1004,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 // Realm has been deleted, clear the indexCaches &
                 indexCaches.remove(orgName);
                 referralIndexCaches.remove(orgName);
-                ApplicationManager.clearCache(DNMapper.orgNameToDN(orgName));
+                getApplicationService(SUPER_ADMIN_SUBJECT, orgName).clearCache();
             }
         }
     }

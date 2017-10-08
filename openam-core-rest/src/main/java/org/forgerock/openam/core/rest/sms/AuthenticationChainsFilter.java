@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -22,7 +22,6 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMConfigurationException;
@@ -146,7 +145,7 @@ public class AuthenticationChainsFilter implements Filter {
         } else if (options.isMap() && !options.asMap().isEmpty()) {
             StringBuilder optionsBuilder = new StringBuilder();
             for (Map.Entry<String, String> option : options.asMap(String.class).entrySet()) {
-                optionsBuilder.append(option.getKey()).append("=").append(option.getValue()).append(",");
+                optionsBuilder.append(option.getKey()).append("=").append(option.getValue()).append(" ");
             }
             return optionsBuilder.substring(0, optionsBuilder.length() - 1);
         }
@@ -181,7 +180,7 @@ public class AuthenticationChainsFilter implements Filter {
                 JsonValue authChainEntry = json(object());
                 authChainEntry.add("module", entry.getLoginModuleName());
                 authChainEntry.add("criteria", entry.getControlFlag());
-                authChainEntry.add("options", parseOptions(entry.getOptions()).getObject());
+                authChainEntry.add("options", serializeOptions(entry.getOptions()).getObject());
                 authChainConfiguration.add(authChainEntry.getObject());
             }
             resource.getContent().put("authChainConfiguration", authChainConfiguration.getObject());
@@ -189,24 +188,19 @@ public class AuthenticationChainsFilter implements Filter {
         return resource;
     }
 
-    private static final Pattern KEY_VALUE_PAIR_REGEX = Pattern.compile("(\\w+\\s*=\\s*[\\w\\s]+,?)+");
-
-    private JsonValue parseOptions(String options) {
+    private JsonValue serializeOptions(String options) {
         if (options == null || options.isEmpty()) {
             return json(object());
         }
-        if (KEY_VALUE_PAIR_REGEX.matcher(options).matches()) {
-            JsonValue optionsValue = json(object());
-            for (String pair : options.split(",")) {
-                String[] keyValue = pair.trim().split("=");
-                if (keyValue.length != 2) {
-                    return json(options);
-                }
-                optionsValue.add(keyValue[0], keyValue[1]);
+
+        JsonValue optionsValue = json(object());
+        for (String pair : options.split(" ")) {
+            String[] keyValue = pair.trim().split("=");
+            if (keyValue.length != 2) {
+                return json(options);
             }
-            return optionsValue;
-        } else {
-            return json(options);
+            optionsValue.add(keyValue[0], keyValue[1]);
         }
+        return optionsValue;
     }
 }

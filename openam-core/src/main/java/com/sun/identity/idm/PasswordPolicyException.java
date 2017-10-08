@@ -21,6 +21,7 @@ import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * The exception class whose instance is thrown if there is any error related with password issue.
+ * @supported.all.api
  */
 public class PasswordPolicyException extends IdRepoException {
 
@@ -50,6 +51,20 @@ public class PasswordPolicyException extends IdRepoException {
         super(IdRepoBundle.BUNDLE_NAME, e.getErrorCode(), e.getLDAPErrorCode(), e.getMessageArgs());
     }
 
+    /**
+     * Create a password policy exception from an id repo exception.
+     * @param e the id repo exception
+     * @param args the arguments required for this error code.
+     */
+    public PasswordPolicyException(IdRepoException e, Object[] args) {
+        super(IdRepoBundle.BUNDLE_NAME, e.getErrorCode(), e.getLDAPErrorCode(), args);
+    }
+
+    /**
+     * Create a new Password policy exception
+     * @param errorCode the error code
+     * @param args the arguments required for this error code.
+     */
     public PasswordPolicyException(String errorCode, Object[] args) {
         super(IdRepoBundle.BUNDLE_NAME, errorCode, args);
     }

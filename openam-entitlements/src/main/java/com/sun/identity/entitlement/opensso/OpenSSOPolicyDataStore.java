@@ -22,18 +22,34 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  *
  * $Id: OpenSSOPolicyDataStore.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.io.ByteArrayInputStream;
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.security.auth.Subject;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
-import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.PolicyDataStore;
@@ -51,18 +67,6 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.io.ByteArrayInputStream;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import javax.security.auth.Subject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  */
@@ -93,83 +97,12 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             throw new EntitlementException(326);
         }
 
-        String name = "";
-        try {
-            Object policy = PrivilegeUtils.privilegeToPolicyObject(
-                realm, privilege);
-            name = PrivilegeUtils.getPolicyName(policy);
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
+                dsameUserSubject, realm);
+        Set<IPrivilege> privileges = new HashSet<IPrivilege>();
+        privileges.add(privilege);
+        pis.add(privileges);
 
-            if (policy instanceof Policy ||
-                policy instanceof com.sun.identity.entitlement.xacml3.core.Policy
-            ) {
-                String dn = getPolicyDistinguishedName(realm, name);
-
-                if (SMSEntry.checkIfEntryExists(dn, dsameUserToken)) {
-                    throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS);
-                }
-
-                createParentNode(dsameUserToken, realm);
-                SMSEntry s = new SMSEntry(dsameUserToken, dn);
-                Map<String, Set<String>> map = new
-                    HashMap<String, Set<String>>();
-
-                Set<String> setServiceID = new HashSet<String>(2);
-                map.put(SMSEntry.ATTR_SERVICE_ID, setServiceID);
-                setServiceID.add("NamedPolicy");
-
-                Set<String> setObjectClass = new HashSet<String>(4);
-                map.put(SMSEntry.ATTR_OBJECTCLASS, setObjectClass);
-                setObjectClass.add(SMSEntry.OC_TOP);
-                setObjectClass.add(SMSEntry.OC_SERVICE_COMP);
-
-                Set<String> setValue = new HashSet<String>(2);
-                map.put(SMSEntry.ATTR_KEYVAL, setValue);
-                setValue.add(POLICY_XML + "=" +
-                    PrivilegeUtils.policyToXML(policy));
-                s.setAttributes(map);
-
-                String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                    name};
-                OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                    "ATTEMPT_ADD_PRIVILEGE", logParams, subject);
-
-                s.save();
-
-                OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                    "SUCCEEDED_ADD_PRIVILEGE", logParams, subject);
-
-                PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-                    dsameUserSubject, realm);
-                Set<IPrivilege> privileges = new HashSet<IPrivilege>();
-                privileges.add(privilege);
-                pis.add(privileges);
-            } else {
-                PrivilegeManager.debug.error(
-                    "OpenSSOPolicyDataStore.addPolicy: unknown class " +
-                    policy.getClass().getName());
-            }
-        } catch (PolicyException e) {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                name, e.getMessage()};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_ADD_PRIVILEGE", logParams, subject);
-            Object[] params = {name};
-            throw new EntitlementException(202, params, e);
-        } catch (SSOException e) {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                name, e.getMessage()};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_ADD_PRIVILEGE", logParams, subject);
-            Object[] params = {name};
-            throw new EntitlementException(202, params, e);
-        } catch (SMSException e) {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                name, e.getMessage()};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_ADD_PRIVILEGE", logParams, subject);
-            Object[] params = {name};
-            throw new EntitlementException(202, params, e);
-        }
     }
 
     private void createParentNode(
@@ -318,9 +251,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
 
         Document doc = XMLUtils.getXMLDocument(
             new ByteArrayInputStream(xml.getBytes("UTF8")));
-        if (EntitlementConfiguration.getInstance(
-                SubjectUtils.createSubject(adminToken),
-                "/").xacmlPrivilegeEnabled()) {
+        if (getEntitlementConfiguration(SubjectUtils.createSubject(adminToken), "/").xacmlPrivilegeEnabled()) {
             //TODO: create xacml policy from xml document
         } else {
             PolicyManager pm = new PolicyManager(adminToken, realm);
@@ -351,46 +282,18 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             throw new EntitlementException(326);
         }
 
-        try {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
+        String[] logParams = {DNMapper.orgNameToRealmName(realm),
                 name};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
+        OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "ATTEMPT_REMOVE_PRIVILEGE", logParams, subject);
 
-            // Remove from privilege index store first
-            PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-                    dsameUserSubject, realm);
-            pis.delete(name);
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
+                dsameUserSubject, realm);
+        pis.delete(name);
 
-            // Only remove from legacy policy store if the policy still exists. This can happen if an old policy
-            // had multiple rules (= multiple privileges in new store) and one of the new privileges for that policy
-            // has been deleted, which deletes the entire legacy policy.
+        OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
+            "SUCCEEDED_REMOVE_PRIVILEGE", logParams, subject);
 
-            String dn = findLegacyPolicyDn(dsameUserToken, realm, name);
-            if (dn != null) {
-                SMSEntry s = new SMSEntry(dsameUserToken, dn);
-                s.delete();
-            } else {
-                debug("Unable to find legacy policy for privilege %s in realm %s", name, realm);
-            }
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
-                "SUCCEEDED_REMOVE_PRIVILEGE", logParams, subject);
-
-        } catch (SSOException ex) {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                name, ex.getMessage()};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_REMOVE_PRIVILEGE", logParams, subject);
-            Object[] params = {name};
-            throw new EntitlementException(205, params, ex);
-        } catch (SMSException ex) {
-            String[] logParams = {DNMapper.orgNameToRealmName(realm),
-                name, ex.getMessage()};
-            OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
-                "FAILED_REMOVE_PRIVILEGE", logParams, subject);
-            Object[] params = {name};
-            throw new EntitlementException(205, params, ex);
-        }
     }
 
     private static String getPolicyDistinguishedName(String realm, String name)

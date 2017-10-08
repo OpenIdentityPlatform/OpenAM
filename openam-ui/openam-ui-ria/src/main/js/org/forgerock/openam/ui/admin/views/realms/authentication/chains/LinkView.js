@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "handlebars",
@@ -30,64 +30,64 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
         mode: "replace",
         partials : ["templates/admin/views/realms/authentication/chains/_CriteriaFooter.html"],
         events: {
-            "click #editBtn": "editItem",
-            "click #deleteBtn": "deleteItem",
-            "change #selectCriteria": "selectCriteria",
-            "mouseenter .auth-criteria-info": "showPopover",
-            "focusin    .auth-criteria-info": "showPopover",
-            "mouseleave .auth-criteria-info": "hidePopover",
-            "focusout   .auth-criteria-info": "hidePopover"
+            "click [data-edit]"                   : "editItem",
+            "click [data-delete]"                 : "deleteItem",
+            "change [data-select-criteria]"       : "selectCriteria",
+            "mouseenter [data-auth-criteria-info]": "showPopover",
+            "focusin    [data-auth-criteria-info]": "showPopover",
+            "mouseleave [data-auth-criteria-info]": "hidePopover",
+            "focusout   [data-auth-criteria-info]": "hidePopover"
         },
 
-        deleteItem: function () {
+        deleteItem () {
             this.parent.data.form.chainData.authChainConfiguration.splice(this.$el.index(), 1);
             this.parent.validateChain();
             this.remove();
         },
 
-        editItem: function () {
+        editItem () {
             this.parent.editItem(this);
         },
 
-        showPopover: function () {
+        showPopover () {
             var self = this,
-                popover = this.$el.find(".auth-criteria-info").data("bs.popover"),
-                selected = this.$el.find("#selectCriteria option:selected"),
+                popover = this.$el.find("[data-auth-criteria-info]").data("bs.popover"),
+                selected = this.$el.find("[data-select-criteria] option:selected"),
                 index = selected.index(),
                 data = {
                     criteria : selected.val().toLowerCase(),
-                    passText : $.t("console.authentication.editChains.criteria." + index + ".passText"),
-                    failText : $.t("console.authentication.editChains.criteria." + index + ".failText")
+                    passText : $.t(`console.authentication.editChains.criteria.${index}.passText`),
+                    failText : $.t(`console.authentication.editChains.criteria.${index}.failText`)
                 };
 
             UIUtils.fillTemplateWithData(self.popoverTemplate, data, function (data) {
                 popover.options.content = data;
                 popover.options.title = selected.text();
-                self.$el.find(".auth-criteria-info").popover("show");
+                self.$el.find("[data-auth-criteria-info]").popover("show");
             });
 
         },
 
-        hidePopover: function () {
-            this.$el.find(".auth-criteria-info").popover("hide");
+        hidePopover () {
+            this.$el.find("[data-auth-criteria-info]").popover("hide");
         },
 
-        renderArrows: function () {
+        renderArrows () {
             var html = Handlebars.compile(
-                    "{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='" +
-                    this.data.linkConfig.criteria + "'}}"
-                );
+                `{{> templates/admin/views/realms/authentication/chains/_CriteriaFooter type='${
+                    this.data.linkConfig.criteria
+                    }'}}`);
 
             this.$el.find(".criteria-view").html(html);
         },
 
-        selectCriteria: function () {
-            this.data.linkConfig.criteria = this.$el.find("#selectCriteria option:selected").val();
+        selectCriteria () {
+            this.data.linkConfig.criteria = this.$el.find("[data-select-criteria] option:selected").val();
             this.parent.validateChain();
             this.renderArrows();
         },
 
-        render: function () {
+        render () {
             var self = this;
 
             this.data.optionsLength = _.keys(this.data.linkConfig.options).length;
@@ -96,7 +96,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
             this.parentRender(function () {
                 self.renderArrows();
-                self.$el.find(".auth-criteria-info").popover({
+                self.$el.find("[data-auth-criteria-info]").popover({
                     trigger : "manual",
                     container : "body",
                     html : "true",
@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             });
         },
 
-        getModuleDesciption: function () {
+        getModuleDesciption () {
             // The server allows for deletion of modules that are in use within a chain.
             // The chain itself will still have a reference to the deleetd module.
             // Below we are checking if the module is present. If it isn't the typeDescription is left blank;

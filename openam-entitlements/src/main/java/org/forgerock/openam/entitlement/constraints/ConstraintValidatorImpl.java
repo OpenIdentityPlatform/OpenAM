@@ -128,7 +128,7 @@ public final class ConstraintValidatorImpl implements ConstraintValidator {
      *
      * @return whether the resource successfully matched against one of the patterns
      */
-    private boolean validateResourceNames(String resource, Set<String> patterns, ResourceName resourceHandler) {
+    private boolean validateResourceNames(String resource, Set<String> patterns, ResourceName resourceHandler) throws EntitlementException {
         if (resourceHandler instanceof RegExResourceName) {
             return validateResourceNamesUsingRegex(resource, patterns, (RegExResourceName)resourceHandler);
         }
@@ -136,13 +136,14 @@ public final class ConstraintValidatorImpl implements ConstraintValidator {
         for (String pattern : patterns) {
             // This approach of swapping the pattern and the resource during comparison has been inherited.
             // For now this has been preserved until its purpose becomes more clear.
-            ResourceMatch match = resourceHandler.compare(pattern, resource, false);
+            String normalisedPattern = resourceHandler.canonicalize(pattern);
+            ResourceMatch match = resourceHandler.compare(normalisedPattern, resource, false);
 
             if (match == ResourceMatch.EXACT_MATCH || match == ResourceMatch.SUB_RESOURCE_MATCH) {
                 return true;
             }
 
-            match = resourceHandler.compare(resource, pattern, true);
+            match = resourceHandler.compare(resource, normalisedPattern, true);
 
             if (match == ResourceMatch.WILDCARD_MATCH) {
                 return true;

@@ -19,11 +19,13 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
+import org.forgerock.util.Options;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,12 +46,12 @@ public class CTSPersistentStoreImplTest {
     public void shouldUseAdapterForRead() throws CoreTokenException {
         String badger = "badger";
         impl.read(badger);
-        verify(mockAdapter).read(eq(badger));
+        verify(mockAdapter).read(eq(badger), any(Options.class));
     }
 
     @Test
     public void shouldReturnNullForTokenNotFound() throws CoreTokenException {
-        given(mockAdapter.read(anyString())).willReturn(null);
+        given(mockAdapter.read(anyString(), any(Options.class))).willReturn(null);
         assertThat(impl.read("")).isNull();
     }
 }

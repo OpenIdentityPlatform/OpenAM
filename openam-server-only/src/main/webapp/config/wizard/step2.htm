@@ -107,14 +107,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="cookieDomain"><em>*&nbsp;</em>$page.getLocalizedString("step2.cookie.domain")</label></td>
+                    <td><label for="cookieDomain">$page.getLocalizedString("step2.cookie.domain")</label></td>
                     <td>
                         <input id="cookieDomain" name="cookieDomain" type="text" 
                             class="text" style="width:150px" 
                             value="$cookieDomain" 
                             onkeyup="APP.callDelayed(this, validateCookieDomain)"
                             onchange="APP.callDelayed(this, validateCookieDomain)"/>
-                            <span id="cookieDomainStatus"></span>
+                        <span data-tooltip="$page.getLocalizedString("step2.cookie.domain.help")">
+                            <img class="pointer" alt="help" src="$context/com_sun_web_ui/images/alerts/info_small.gif" width="11" height="11" />
+                        </span>
+                        <span id="cookieDomainStatus"></span>
                     </td>
                 </tr>   
                 <tr>                    

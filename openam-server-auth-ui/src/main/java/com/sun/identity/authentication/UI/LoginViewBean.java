@@ -29,6 +29,26 @@
  */
 package com.sun.identity.authentication.UI;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -67,22 +87,6 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.sm.DNMapper;
-import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * This class is a default implementation of <code>LoginViewBean</code> 
@@ -145,16 +149,16 @@ public class LoginViewBean extends AuthViewBeanBase {
             return new StaticTextField(this, name, TextHeaderVal);
         } else if (name.equals(REDIRECT_URL)) { // Redirect URL for wireless
             String redirect = redirect_url;
-            redirect_url = AuthUtils.encodeURL(redirect, ac, response);
+            redirect_url = AuthUtils.encodeURL(redirect, ac);
             return new StaticTextField(this, name, redirect_url);
         } else if (name.equals(DEFAULT_LOGIN_URL)) {
-            String default_login_url = AuthUtils.encodeURL(LOGINURL, ac, response);
+            String default_login_url = AuthUtils.encodeURL(LOGINURL, ac);
             return new StaticTextField(this, name, default_login_url);
         } else if (name.equals(LOGIN_URL)) { // non-cookie support
             if ((loginURL==null)||(loginURL.length() == 0)) {
                 loginURL = LOGINURL;
             }
-            loginURL = AuthUtils.encodeURL(loginURL, ac, response);
+            loginURL = AuthUtils.encodeURL(loginURL, ac);
             return new StaticTextField(this, name, loginURL);
         } else if (name.equals(PAGE_STATE)) {
             return new StaticTextField(this, name, pageState);
@@ -526,6 +530,16 @@ public class LoginViewBean extends AuthViewBeanBase {
             // is the federation post login servlet, use forward instead
             boolean doForward = AuthUtils.isForwardSuccess(ac,request);
 
+            // Override the doForward if the redirect_url is an absolute URL, for example: http://test.example.com
+            // This can occur as a result of a failed login during a Federation login and the Failure Login URL has
+            // been set to an absolute URL
+            try {
+                if (doForward && new URI(redirect_url).isAbsolute()) {
+                    doForward = false;
+                }
+            } catch (URISyntaxException e) {
+                loginDebug.warning("LoginViewBean.forwardTo(): redirect_url {} was not valid", redirect_url, e);
+            }
             if (AuthUtils.isGenericHTMLClient(client_type) || doForward) {
                 try {
                     if (loginDebug.messageEnabled()) {
@@ -593,24 +607,21 @@ public class LoginViewBean extends AuthViewBeanBase {
                         //would not have any knowledge about the freshly created session ID - this can be especially
                         //a problem, when upgrading session: old session ID cookie is still present in the request
                         //but the new isn't.
-                        if(redirect_url.indexOf("?") == -1){
-                            redirect_url = redirect_url + "?" + 
-                            appendCookie.getName() + "=" + 
-                            URLEncDec.encode(appendCookie.getValue());
-                        }else{
-                            redirect_url = redirect_url + "&" + 
-                            appendCookie.getName() + "=" + 
-                            URLEncDec.encode(appendCookie.getValue());
+                        if (redirect_url.contains("?")) {
+                            redirect_url += "&" + appendCookie.getName() + "=";
+                        } else {
+                            redirect_url += "?" + appendCookie.getName() + "=";
+                        }
+                        String cookieValue = appendCookie.getValue();
+                        if (cookieValue != null) {
+                            redirect_url += URLEncDec.encode(cookieValue);
                         }
                         if(loginDebug.messageEnabled()){
-                            loginDebug.message("LoginViewBean.forwardTo():" +
-                            "Final Forward URL is " + redirect_url); 
+                            loginDebug.message("LoginViewBean.forwardTo(): Final Forward URL is " + redirect_url);
                         }
 
-                        RequestDispatcher dispatcher =
-                        request.getRequestDispatcher(redirect_url);
-                        request.setAttribute(Constants.FORWARD_PARAM,
-                            Constants.FORWARD_YES_VALUE);
+                        RequestDispatcher dispatcher = request.getRequestDispatcher(redirect_url);
+                        request.setAttribute(Constants.FORWARD_PARAM, Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {
                         response.sendRedirect(redirect_url);
@@ -728,7 +739,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
         }
         
-        return AuthUtils.encodeURL(jsp_page,ac,response);
+        return AuthUtils.encodeURL(jsp_page,ac);
     }
     
     
@@ -1101,7 +1112,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     // Process 'RedirectCallback' initiated by Authentication module
     private void processRedirectCallback(RedirectCallback rc) throws Exception {                
         String status = request.getParameter(rc.getStatusParameter()); 
-        clearCookie(rc.getRedirectBackUrlCookieName());
         if (status != null && status.length() != 0) {
             loginDebug.message("Found Status parameter."); 
             rc.setStatus(status);
@@ -1171,7 +1181,19 @@ public class LoginViewBean extends AuthViewBeanBase {
             } else {
                 callbacks = AuthUtils.getRecdCallback(ac);
             }
-            
+
+            if (loginDebug.messageEnabled()) {
+                loginDebug.message(" length of callbacks : " + ((callbacks == null) ? 0 : callbacks.length));
+            }
+
+           if (callbacks == null) {
+               errorCode = AMAuthErrorCode.AUTH_TIMEOUT;
+               ErrorMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_MESSAGE);
+               errorTemplate = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_TEMPLATE);
+               clearCookie(ac);
+               return;
+           }
+
             indexType = AuthUtils.getIndexType(ac);
             
             // Assign user specified values

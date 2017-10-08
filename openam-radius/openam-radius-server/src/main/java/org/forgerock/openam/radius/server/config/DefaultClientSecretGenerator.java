@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 package org.forgerock.openam.radius.server.config;
 
@@ -43,7 +45,7 @@ public class DefaultClientSecretGenerator extends DefaultValues {
     }
 
     @Override
-    public Set getDefaultValues() {
+    public Set<String> getDefaultValues() {
         return generateSecretHolder();
     }
 

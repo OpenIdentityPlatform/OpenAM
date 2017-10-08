@@ -54,6 +54,12 @@ public enum CoreTokenField {
 
     //LDAP optional attribute, added by OpenDJ/AD
     /**
+     * Token etag field name.
+     * <p>{@literal "etag"} refers to the ETag attribute present in OpenDJ, and should not be
+     * changed to any other value.</p>
+     */
+    ETAG("etag", String.class),
+    /**
      * Token creation timestamp field.
      */
     CREATE_TIMESTAMP("createTimestamp", Calendar.class),
@@ -182,7 +188,21 @@ public enum CoreTokenField {
     /**
      * Generic token date five field name.
      */
-    DATE_FIVE("coreTokenDate05", Calendar.class);
+    DATE_FIVE("coreTokenDate05", Calendar.class),
+    /**
+     * Generic token multi value String one field name.
+     */
+    MULTI_STRING_ONE("coreTokenMultiString01", String.class),
+
+    /**
+     * Generic token multi value String two field name.
+     */
+    MULTI_STRING_TWO("coreTokenMultiString02", String.class),
+
+    /**
+     * Generic token multi value String three field name.
+     */
+    MULTI_STRING_THREE("coreTokenMultiString03", String.class);
 
     private final String ldapAttribute;
     private final Class<?> attributeType;

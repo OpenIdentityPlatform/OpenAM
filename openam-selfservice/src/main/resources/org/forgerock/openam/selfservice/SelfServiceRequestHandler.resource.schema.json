@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "per-builder-i18n;resource.title",
+  "description": "per-builder-i18n;resource.description",
+  "properties": {
+    "type": {
+      "type": "string",
+      "title": "per-builder-i18n;type.title",
+      "description": "per-builder-i18n;type.description"
+    },
+    "tag": {
+      "type": "string",
+      "title": "per-builder-i18n;tag.title",
+      "description": "per-builder-i18n;tag.description"
+    },
+    "requirements": {
+      "type": "object",
+      "title": "per-builder-i18n;requirements.title",
+      "description": "per-builder-i18n;requirements.description",
+      "patternProperties": {
+        ".*": {
+          "type": "any",
+          "title": "per-builder-i18n;requirements.property.title",
+          "description": "per-builder-i18n;requirements.property.description"
+        }
+      }
+    }
+  }
+}

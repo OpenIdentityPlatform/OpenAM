@@ -24,7 +24,7 @@
  *
  * $Id: AMAdminConstants.java,v 1.11 2009/09/28 19:01:24 babysunil Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
@@ -432,5 +432,10 @@ public interface AMAdminConstants {
      */
     String AGENT_REPOSITORY_LOCATION_ATTR =
             "com.sun.identity.agents.config.repository.location";
+
+    /**
+     * Image displayed in version popup.
+     */
+    final String IMAGES_PRIMARY_PRODUCT_NAME_PNG = "/images/PrimaryProductName.png";
 
 }

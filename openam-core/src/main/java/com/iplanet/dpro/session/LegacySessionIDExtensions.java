@@ -56,7 +56,9 @@ public class LegacySessionIDExtensions implements SessionIDExtensions {
         this();
         extensionsMap.put(PRIMARY_ID, primary);
         extensionsMap.put(SITE_ID, site);
-        extensionsMap.put(STORAGE_KEY, storage);
+        if (storage != null) {
+            extensionsMap.put(STORAGE_KEY, storage);
+        }
     }
 
     public LegacySessionIDExtensions() {

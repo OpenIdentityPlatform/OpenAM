@@ -25,7 +25,7 @@
 #
 # $Id: setup.sh,v 1.3 2008/06/25 05:48:47 qcheng Exp $
 #
-# Portions Copyrighted 2013 ForgeRock, Inc.
+# Portions Copyrighted 2013-2016 ForgeRock AS.
 #
 
-java -cp resources:lib/openam-clientsdk-${project.version}.jar:lib/openam-example-clientsdk-cli-${project.version}.jar com.sun.identity.setup.SetupClientSDKSamples
+java -cp resources:lib/* com.sun.identity.setup.SetupClientSDKSamples

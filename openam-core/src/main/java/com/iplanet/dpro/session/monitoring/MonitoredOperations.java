@@ -11,15 +11,24 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 package com.iplanet.dpro.session.monitoring;
 
+import java.util.Collection;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.forgerock.openam.dpro.session.PartialSession;
+import org.forgerock.openam.utils.CrestQuery;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.share.SessionInfo;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
 
 /**
  * Wraps a provided {@link SessionOperations} instance with timing meta information, and
@@ -74,6 +83,21 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
+    public Session resolveSession(SessionID sessionID) throws SessionException {
+        return sessionOperations.resolveSession(sessionID); // Not monitored at present
+    }
+
+    @Override
+    public SearchResults<SessionInfo> getValidSessions(Session session, String pattern) throws SessionException {
+        return sessionOperations.getValidSessions(session, pattern); // Not monitored at present
+    }
+
+    @Override
+    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
+        return sessionOperations.getMatchingSessions(crestQuery);
+    }
+
+    @Override
     public void destroy(Session requester, Session session) throws SessionException {
         final long start = System.nanoTime();
         sessionOperations.destroy(requester, session);
@@ -90,6 +114,36 @@ public class MonitoredOperations implements SessionOperations {
         sessionOperations.setProperty(session, name, value);
 
         sessionMonitoringStore.storeSetPropertyTime(System.nanoTime() - start, monitorType);
+    }
+
+    @Override
+    public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
+        return sessionOperations.getSessionInfo(sid, reset); // Not monitored at present
+    }
+
+    @Override
+    public void addSessionListener(Session session, String url) throws SessionException {
+        sessionOperations.addSessionListener(session, url); // Not monitored at present
+    }
+
+    @Override
+    public boolean checkSessionExists(SessionID sessionId) throws SessionException {
+        return sessionOperations.checkSessionExists(sessionId); // Not monitored at present
+    }
+
+    @Override
+    public String getRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
+        return sessionOperations.getRestrictedTokenId(masterSid, restriction); // Not monitored at present
+    }
+
+    @Override
+    public String deferenceRestrictedID(Session session, SessionID restrictedID) throws SessionException {
+        return sessionOperations.deferenceRestrictedID(session, restrictedID); // Not monitored at present
+    }
+
+    @Override
+    public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value) throws SessionException {
+        sessionOperations.setExternalProperty(clientToken,sessionId, name, value); // Not monitored at present
     }
 
     @Override

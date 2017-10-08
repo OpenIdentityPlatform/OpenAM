@@ -11,47 +11,50 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 define([
     "jquery",
     "squire",
     "sinon"
-], function ($, Squire, sinon) {
-    var RouteTo, Strategy, validatePromise, Validator;
-    describe("org/forgerock/openam/ui/common/sessions/SessionValidator", function () {
-        beforeEach(function (done) {
-            var injector = new Squire();
+], ($, Squire, sinon) => {
+    let logout;
+    let Strategy;
+    let validatePromise;
+    let Validator;
+    describe("org/forgerock/openam/ui/common/sessions/SessionValidator", () => {
+        beforeEach((done) => {
+            const injector = new Squire();
 
             validatePromise = $.Deferred();
 
             Strategy = sinon.stub().returns(validatePromise);
 
-            RouteTo = {
-                sessionExpired: sinon.stub()
+            logout = {
+                "default": sinon.stub().returns($.Deferred())
             };
 
             injector
-                .mock("org/forgerock/openam/ui/common/RouteTo", RouteTo)
-                .require(["org/forgerock/openam/ui/common/sessions/SessionValidator"], function (subject) {
+                .mock("org/forgerock/openam/ui/user/login/logout", logout)
+                .require(["org/forgerock/openam/ui/common/sessions/SessionValidator"], (subject) => {
                     Validator = subject;
                     done();
                 });
         });
 
-        describe("#start", function () {
-            var clock;
+        describe("#start", () => {
+            let clock;
 
-            beforeEach(function () {
+            beforeEach(() => {
                 clock = sinon.useFakeTimers();
             });
 
-            afterEach(function () {
+            afterEach(() => {
                 clock.restore();
             });
 
-            it("invokes strategy immediately", function () {
+            it("invokes strategy immediately", () => {
                 Validator.start("token", Strategy);
 
                 clock.tick(1000);
@@ -59,34 +62,34 @@ define([
                 expect(Strategy).be.calledOnce.calledWith("token");
             });
 
-            context("when strategy rejects", function () {
-                it("invokes RouteTo#sessionExpired", function () {
+            context("when strategy rejects", () => {
+                it("invokes #logout", () => {
                     validatePromise.reject();
 
                     Validator.start("token", Strategy);
 
                     clock.tick(1000);
 
-                    expect(RouteTo.sessionExpired).to.be.calledOnce;
+                    expect(logout.default).to.be.calledOnce;
                 });
             });
 
-            context("when invoked for the 2nd time", function () {
-                beforeEach(function () {
+            context("when invoked for the 2nd time", () => {
+                beforeEach(() => {
                     Validator.start("token", Strategy);
                 });
 
-                it("throws error", function () {
-                    expect(function () {
+                it("throws error", () => {
+                    expect(() => {
                         Validator.start("token", Strategy);
                     }).to.throw(Error, "Validator has already been started");
                 });
 
-                context("when #stop has been invoked beforehand", function () {
-                    it("doesn not throw error", function () {
+                context("when #stop has been invoked beforehand", () => {
+                    it("doesn not throw error", () => {
                         Validator.stop();
 
-                        expect(function () {
+                        expect(() => {
                             Validator.start("token", Strategy);
                         }).to.not.throw(Error);
                     });
@@ -94,8 +97,8 @@ define([
             });
         });
 
-        describe("#stop", function () {
-            it("invokes #clearTimeout", function () {
+        describe("#stop", () => {
+            it("invokes #clearTimeout", () => {
                 sinon.spy(window, "clearTimeout");
 
                 Validator.stop();

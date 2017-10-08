@@ -3,7 +3,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright 2011-2015 ForgeRock AS.
+* Copyright 2011-2016 ForgeRock AS.
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -38,6 +38,9 @@
         <property name="version.set" value="${openam.version}"/>
         <property name="opendj.repackage.dir" value="${project.build.directory}/repackage-opendj"/>
 
+
+        <filter token="FULL_VERSION_INFO" value="${full.version.information}"/>
+
         <filter token="DATESTAMP" value="${war.time.stamp}"/>
         <filter token="VERSION" value="${version.set}"/>
         <filter token="REVISION" value="${git.short.sha1}"/>
@@ -68,6 +71,12 @@
                 <include name="openam_suffix.ldif.template"/>
             </fileset>
         </copy>
+        <!-- Open JD OEM: copy the OEM Third party readme over the top of the standard readme  -->
+        <copy todir="${opendj.repackage.dir}/opendj/legal-notices" overwrite="true">
+            <fileset dir="../openam-distribution/src/main/opendj/oem">
+                <include name="THIRDPARTYREADME.txt" if="${is.oem}" />
+            </fileset>
+        </copy>
         <!-- OpenDJ 3.0: Perform OpenDJ mangling! -->
         <!-- Remove the block starting with 'dn: cn=SNMP' and terminated by a blank line -->
         <replaceregexp file="${opendj.repackage.dir}/opendj/template/config/config.ldif"
@@ -95,7 +104,7 @@
         <!-- Exclusion List will extract out of the OpenDJ distribution files which do not make sense to include -->
         <zip destfile="${opendj.repackage.dir}/opendj.zip"
              basedir="${opendj.repackage.dir}/opendj"
-            excludesfile="../openam-distribution/src/main/opendj/opendj_exclusion_list"/>
+             excludesfile="../openam-distribution/src/main/opendj/${exclusion.list}"/>
 
         <!-- OpenDJ 3.0: Deliver re-packaged zip to expected location -->
         <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
@@ -112,17 +121,6 @@
         </copy>
 
         <!-- Align in fedlet -->
-        <mkdir dir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
-        <copy todir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
-              filtering="false">
-            <fileset
-                    dir="${project.basedir}/../openam-federation/openam-federation-library/target/classes/com/sun/identity/fedlet/ag">
-                <include name="UserData.class"/>
-                <include name="AssertionGen.class"/>
-                <include name="MetaDataParser.class"/>
-            </fileset>
-        </copy>
-
         <copy todir="${openam.temp.target}/WEB-INF/fedlet" filtering="false">
             <fileset dir="src/main/resources">
                 <include name="FederationConfig.properties"/>

@@ -4,7 +4,7 @@
 --
 
 --
--- Portions Copyrighted 2011-2014 ForgeRock AS
+-- Portions Copyrighted 2011-2016 ForgeRock AS
 --
 
 SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
@@ -105,14 +105,6 @@ ssoServerConfigStoreType OBJECT-TYPE
     DESCRIPTION
         "Type of config store : remote | embedded"
     ::= { ssoServerInstance 6 }
-
-ssoServerSFOStatus OBJECT-TYPE
-    SYNTAX        SnmpAdminString
-    MAX-ACCESS    read-only
-    STATUS        current
-    DESCRIPTION
-        "Session failover status : on | off"
-    ::= { ssoServerInstance 7 }
 
 --
 -- SSO server Topology (Site+Server  config and status)
@@ -515,16 +507,6 @@ sessionAveSessSize OBJECT-TYPE
         "Session size metrics - for approximate memory usage"
     DEFVAL        { 0 }
     ::= { ssoServerSessSvc 6 }
-
-sessionSFOBroker OBJECT-TYPE
-    SYNTAX        SnmpAdminString
-    MAX-ACCESS    read-only
-    STATUS        current
-    DESCRIPTION
-        "Session Failover : comma-separated broker connection string with status : eg : <broker>|on,<broker>|off. (TODO:change to table)?"
-    DEFVAL        { "N/A" }
-    ::= { ssoServerSessSvc 7 }
-
 
 --
 -- SSO server Logging Service
@@ -2587,7 +2569,6 @@ numConnReleased OBJECT-TYPE
 	    ssoServerMemberOfSite,
 	    ssoServerStartDate,
 	    ssoServerConfigStoreType,
-	    ssoServerSFOStatus,
 	    serverProtocol,
 	    serverHostName,
 	    serverPort,
@@ -2612,7 +2593,6 @@ numConnReleased OBJECT-TYPE
 	    sessionNotifCount,
 	    sessionNotifListnrCount,
 	    sessionAveSessSize,
-	    sessionSFOBroker,
 	    loggingType,
 	    loggingLocation,
 	    loggingMaxLogSize,

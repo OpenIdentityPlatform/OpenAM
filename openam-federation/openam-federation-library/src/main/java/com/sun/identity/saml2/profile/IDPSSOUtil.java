@@ -24,11 +24,13 @@
  *
  * $Id: IDPSSOUtil.java,v 1.56 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.NameIDInfo;
@@ -104,6 +106,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -209,7 +212,7 @@ public class IDPSSOUtil {
      * @param nameIDFormat the <code>NameIDFormat</code>
      * @param relayState   the relay state
      * @param newSession   Session used in IDP Proxy Case
-     * @param auditor      the auditor for logging SAML2 Events - may be null
+     * @param auditor      the auditor for logging SAML2 Events
      * @throws SAML2Exception if the operation is not successful
      */
     public static void doSSOFederate(HttpServletRequest request,
@@ -439,29 +442,29 @@ public class IDPSSOUtil {
                 redirectUrl = remoteRequestData.get(SAML2Constants.AM_REDIRECT_URL);
                 outputData = remoteRequestData.get(SAML2Constants.OUTPUT_DATA);
                 responseCode = remoteRequestData.get(SAML2Constants.RESPONSE_CODE);
-            }
 
-            try {
-                if (redirectUrl != null && !redirectUrl.isEmpty()) {
-                    response.sendRedirect(redirectUrl);
-                } else {
-                    if (responseCode != null) {
-                        response.setStatus(Integer.valueOf(responseCode));
+                try {
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        response.sendRedirect(redirectUrl);
+                    } else {
+                        if (responseCode != null) {
+                            response.setStatus(Integer.valueOf(responseCode));
+                        }
+                        // no redirect, perhaps an error page, return the content
+                        if (outputData != null && !outputData.isEmpty()) {
+                            SAML2Utils.debug.message("Printing the forwarded response");
+                            response.setContentType("text/html; charset=UTF-8");
+                            out.println(outputData);
+                            return;
+                        }
                     }
-                    // no redirect, perhaps an error page, return the content
-                    if (outputData != null && !outputData.isEmpty()) {
-                        SAML2Utils.debug.message("Printing the forwarded response");
-                        response.setContentType("text/html; charset=UTF-8");
-                        out.println(outputData);
-                        return;
+                } catch (IOException ioe) {
+                    if (SAML2Utils.debug.messageEnabled()) {
+                        SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS() error in Request Routing", ioe);
                     }
                 }
-            } catch (IOException ioe) {
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS() error in Request Routing", ioe);
-                }
+                return;
             }
-            return;
         }
         //end of request proxy
 
@@ -609,7 +612,8 @@ public class IDPSSOUtil {
     }
 
     /**
-     * A convenience method to construct NoPassive SAML error responses for SAML passive authentication requests.
+     * A convenience method to construct response with First-level and Second-level status code for
+     * SAML authentication requests.
      *
      * @param request The servlet request.
      * @param response The servlet response.
@@ -620,13 +624,17 @@ public class IDPSSOUtil {
      * @param authnReq The SAML AuthnRequest sent by the SP.
      * @param relayState The RelayState value.
      * @param spEntityID The SP's entity ID.
+     * @param firstlevelStatusCodeValue First-level status code value passed.
+     * @param secondlevelStatusCodeValue Second-level status code value passed.
      * @throws SAML2Exception If there was an error while creating or sending the response back to the SP.
      */
-    public static void sendNoPassiveResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-            String idpMetaAlias, String idpEntityID, String realm, AuthnRequest authnReq, String relayState,
-            String spEntityID) throws SAML2Exception {
-        Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
-                idpEntityID);
+    public static void sendResponseWithStatus(HttpServletRequest request, HttpServletResponse response,
+                                                     PrintWriter out, String idpMetaAlias, String idpEntityID,
+                                                     String realm, AuthnRequest authnReq, String relayState,
+                                                     String spEntityID, String firstlevelStatusCodeValue,
+                                                     String secondlevelStatusCodeValue) throws SAML2Exception {
+        Response res = SAML2Utils.getErrorResponse(authnReq, firstlevelStatusCodeValue, secondlevelStatusCodeValue,
+                null, idpEntityID);
         StringBuffer returnedBinding = new StringBuffer();
         String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
         String acsBinding = returnedBinding.toString();
@@ -839,7 +847,7 @@ public class IDPSSOUtil {
             res.setInResponseTo(authnReq.getID());
         }
         res.setVersion(SAML2Constants.VERSION_2_0);
-        res.setIssueInstant(new Date());
+        res.setIssueInstant(newDate());
         res.setID(SAML2Utils.generateID());
 
         // set the idp entity id as the response issuer
@@ -887,7 +895,7 @@ public class IDPSSOUtil {
         String assertionID = SAML2Utils.generateID();
         assertion.setID(assertionID);
         assertion.setVersion(SAML2Constants.VERSION_2_0);
-        assertion.setIssueInstant(new Date());
+        assertion.setIssueInstant(newDate());
         Issuer issuer = AssertionFactory.getInstance().createIssuer();
         issuer.setValue(idpEntityID);
 
@@ -1103,7 +1111,7 @@ public class IDPSSOUtil {
         //  Save to SAML2 Token Repository
         try {
             if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
-                long sessionExpireTime = System.currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
+                long sessionExpireTime = currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
                 SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex, new IDPSessionCopy(idpSession),
                         sessionExpireTime);
             }
@@ -1164,7 +1172,7 @@ public class IDPSSOUtil {
                     SAML2Utils.bundle.getString("errorGettingAuthnStatement"));
         }
         if (authInstant == null) {
-            authInstant = new Date();
+            authInstant = newDate();
         }
         authnStatement.setAuthnInstant(authInstant);
 
@@ -1478,7 +1486,11 @@ public class IDPSSOUtil {
         if (authnReq != null) {
             remoteEntityID = authnReq.getIssuer().getValue();
             NameIDPolicy nameIDPolicy = authnReq.getNameIDPolicy();
-            if (nameIDPolicy != null) {
+            boolean hasNameIDPolicy = nameIDPolicy != null &&
+                    (StringUtils.isNotEmpty(nameIDPolicy.getSPNameQualifier())
+                    || StringUtils.isNotEmpty(nameIDPolicy.getFormat()));
+
+            if (hasNameIDPolicy) {
                 // this will take care of affiliation
                 allowCreate = nameIDPolicy.isAllowCreate();
                 spNameQualifier = nameIDPolicy.getSPNameQualifier();
@@ -1539,19 +1551,17 @@ public class IDPSSOUtil {
 
         nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
 
         NameIDInfo nameIDInfo;
         NameID nameID = null;
         IDPAccountMapper idpAccountMapper = SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
 
         //Use-cases for NameID persistence:
-        //* persistent NameID -> The NameID MUST be stored
         //* transient NameID -> The NameID MUST NOT be stored
         //* ignored user profile mode -> The NameID CANNOT be stored
         //* for any other cases -> The NameID MAY be stored based on customizable logic
-        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && idpAccountMapper.shouldPersistNameIDFormat(realm, idpEntityID, remoteEntityID, nameIDFormat));
+        boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && idpAccountMapper.shouldPersistNameIDFormat(realm, idpEntityID, remoteEntityID, nameIDFormat);
 
         if (!isTransient) {
             String userID;
@@ -1562,7 +1572,7 @@ public class IDPSSOUtil {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("invalidSSOToken"));
             }
 
-            if (isPersistent || shouldPersistNameID) {
+            if (shouldPersistNameID) {
                 nameIDInfo = AccountUtils.getAccountFederation(userID, idpEntityID, remoteEntityID);
 
                 if (nameIDInfo != null) {
@@ -1578,7 +1588,7 @@ public class IDPSSOUtil {
         }
 
         if (nameID == null) {
-            if (!allowCreate && isPersistent) {
+            if (!allowCreate && shouldPersistNameID) {
                 throw new SAML2InvalidNameIDPolicyException(SAML2Utils.bundle.getString("cannotCreateNameID"));
             }
 
@@ -1652,7 +1662,7 @@ public class IDPSSOUtil {
             scd.setInResponseTo(inResponseTo);
         }
 
-        Date date = new Date();
+        Date date = newDate();
         date.setTime(date.getTime() + effectiveTime * 1000);
         scd.setNotOnOrAfter(date);
         sc.setSubjectConfirmationData(scd);
@@ -1676,11 +1686,11 @@ public class IDPSSOUtil {
 
         Conditions conditions = AssertionFactory.getInstance().
                 createConditions();
-        Date date = new Date();
+        Date date = newDate();
         date.setTime(date.getTime() - notBeforeSkewTime * 1000);
         conditions.setNotBefore(date);
 
-        date = new Date();
+        date = newDate();
         date.setTime(date.getTime() + effectiveTime * 1000);
         conditions.setNotOnOrAfter(date);
 
@@ -2845,7 +2855,7 @@ public class IDPSSOUtil {
         List assertions = response.getAssertion();
         if ((assertions == null) || (assertions.size() == 0)) {
             // failed case
-            return (System.currentTimeMillis()
+            return (currentTimeMillis()
                     + getEffectiveTime(realm, idpEntityID)
                     + timeskew * 1000);
         }
@@ -2859,7 +2869,7 @@ public class IDPSSOUtil {
 
         long ret = notOnOrAfter.getTime() + timeskew * 1000;
         if (notOnOrAfter == null ||
-                (ret < System.currentTimeMillis())) {
+                (ret < currentTimeMillis())) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("Time in Assertion "
                         + " is invalid.");

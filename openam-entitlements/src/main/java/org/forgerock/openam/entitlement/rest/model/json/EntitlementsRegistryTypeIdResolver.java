@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.rest.model.json;
@@ -19,6 +19,7 @@ package org.forgerock.openam.entitlement.rest.model.json;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -67,7 +68,7 @@ public abstract class EntitlementsRegistryTypeIdResolver<T> extends TypeIdResolv
     }
 
     @Override
-    public JavaType typeFromId(String id) {
+    public JavaType typeFromId(DatabindContext context, String id) {
         Class<? extends T> subType = getType(registry, id);
         if (subType == null) {
             throw new IllegalArgumentException("No such type: '" + id + "'");

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.service;
@@ -20,13 +20,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertTrue;
 
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
 
 public class NoSessionActivatorTest {
 
@@ -48,15 +49,15 @@ public class NoSessionActivatorTest {
         given(mockSession.getID()).willReturn(sid);
 
         // When
-        NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null, null);
+        NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null);
 
         // Then
-        verify(mockSessionService).destroyInternalSession(sid);
+        verify(mockSessionService).destroyAuthenticationSession(sid);
     }
 
     @Test
     public void shouldAlwaysReturnTrue() throws Exception {
-        assertTrue(NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null, null));
+        assertTrue(NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null));
     }
 
 }

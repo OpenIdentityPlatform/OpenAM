@@ -19,7 +19,11 @@ package org.forgerock.openam.uma;
 import static org.forgerock.json.JsonValue.json;
 
 import javax.inject.Inject;
+
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +37,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.extensions.ExtensionFilterManager;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -56,7 +60,7 @@ import org.restlet.resource.ServerResource;
 public class PermissionRequestEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final OAuth2RequestFactory<?, Request> requestFactory;
+    private final OAuth2RequestFactory requestFactory;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final ExtensionFilterManager extensionFilterManager;
     private final UmaExceptionHandler exceptionHandler;
@@ -72,7 +76,7 @@ public class PermissionRequestEndpoint extends ServerResource {
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<?, Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
+            OAuth2RequestFactory requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory,
             ExtensionFilterManager extensionFilterManager, UmaExceptionHandler exceptionHandler,
             JacksonRepresentationFactory jacksonRepresentationFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
@@ -133,17 +137,18 @@ public class PermissionRequestEndpoint extends ServerResource {
     private Set<String> validateScopes(JsonValue permissionRequest, ResourceSetDescription resourceSetDescription)
             throws UmaException {
 
-        Set<String> permissionScopes = getScopes(permissionRequest);
+        Collection<String> permissionScopes = getScopes(permissionRequest);
 
-        if (!resourceSetDescription.getDescription().get("scopes").asSet(String.class).containsAll(permissionScopes)) {
+        JsonValue scopes = resourceSetDescription.getDescription().get("scopes");
+        if (!scopes.asCollection(String.class).containsAll(permissionScopes)) {
             throw new UmaException(400, "invalid_scope",
                     "Requested scopes are not in allowed scopes for resource set.");
         }
 
-        return permissionScopes;
+        return new HashSet<>(permissionScopes);
     }
 
-    private Set<String> getScopes(JsonValue permissionRequest) throws UmaException {
+    private List<String> getScopes(JsonValue permissionRequest) throws UmaException {
         try {
             permissionRequest.get("scopes").required();
         } catch (JsonValueException e) {
@@ -151,12 +156,11 @@ public class PermissionRequestEndpoint extends ServerResource {
                     "Invalid Permission Request. Missing required attribute, 'scopes'.");
         }
         try {
-            permissionRequest.get("scopes").asSet(String.class);
+            return permissionRequest.get("scopes").asList(String.class);
         } catch (JsonValueException e) {
             throw new UmaException(400, "invalid_scope",
                     "Invalid Permission Request. Required attribute, 'scopes', must be an array of Strings.");
         }
-        return permissionRequest.get("scopes").asSet(String.class);
     }
 
     private ResourceSetDescription getResourceSet(String resourceSetId, String resourceOwnerId, OAuth2ProviderSettings providerSettings) throws UmaException {

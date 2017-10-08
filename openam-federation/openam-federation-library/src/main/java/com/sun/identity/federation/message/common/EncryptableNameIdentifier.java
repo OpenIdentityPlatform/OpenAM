@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EncryptableNameIdentifier.java,v 1.4 2008/06/25 05:46:46 qcheng Exp $
- * Portions Copyrighted 2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.federation.message.common;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import org.w3c.dom.Element;
 import java.util.Date;
@@ -80,8 +83,8 @@ public class EncryptableNameIdentifier {
         if(_format == null) {
            throw new FSException("notValidFormat", null) ;   
         }
-        _nonce = FSUtils.generateID();    
-        _issueInstant = new Date();
+        _nonce = FSUtils.generateID();
+        _issueInstant = newDate();
     }
 
     /**

@@ -24,16 +24,18 @@
  *
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
@@ -518,8 +520,7 @@ public class PrivilegeUtils {
 
         for (String appName : map.keySet()) {
             Set<String> res = map.get(appName);
-            Application application = ApplicationManager.getApplication(PolicyConstants.SUPER_ADMIN_SUBJECT,
-                                            realmName, appName);
+            Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realmName).getApplication(appName);
             if (application == null) {
                 Object[] params = {appName, realm};
                 throw new EntitlementException(105, params);
@@ -551,7 +552,7 @@ public class PrivilegeUtils {
         EntitlementSubject es = privilege.getSubject();
         if ((es != null) && (es != Privilege.NOT_SUBJECT)) {
             Subject sbj = eSubjectToEPSubject(es);
-            policy.addSubject(getSubjectName(es), sbj, false);
+            policy.addSubject(getSubjectName(es), sbj, isExclusive(es));
         }
 
         EntitlementCondition ec = privilege.getCondition();
@@ -595,6 +596,22 @@ public class PrivilegeUtils {
     }
 
     /**
+     * Determine if this subject has exclusive/excluded state.
+     * If the subject is a legacy policy subject then return
+     * it's exclusive state.  Otherwise, return false
+     *
+     * @param subject the subject to check for exclusive/excluded
+     * @return state of the subject exclusive/excluded state
+     */
+    private static boolean isExclusive(EntitlementSubject subject) {
+        if (subject instanceof PolicySubject) {
+           return ((PolicySubject) subject).isExclusive();
+        } else {
+           return false;
+        }
+    }
+
+    /**
      * Determins a name to use for this condition. If the condition is a legacy policy condition then use the name
      * (if any) associated with that. Otherwise, generate a random name.
      *
@@ -621,8 +638,7 @@ public class PrivilegeUtils {
 
         String realmName = LDAPUtils.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
 
-        Application application = ApplicationManager.getApplication(
-            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, appName);
+        Application application = getApplicationService(SUPER_ADMIN_SUBJECT, realmName).getApplication(appName);
         if (application == null) {
             Object[] params = {appName, realm};
             throw new EntitlementException(105, params);

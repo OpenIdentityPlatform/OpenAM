@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#schema.title",
+  "description": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#schema.description",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "title": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#id.title",
+      "description": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#id.description"
+    },
+    "type": {
+      "type": "string",
+      "title": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#type.title",
+      "description": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#type.description"
+    },
+    "typeDescription": {
+      "type": "string",
+      "title": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#typeDescription.title",
+      "description": "i18n:api-descriptor/AuthenticationModuleRealmSmsHandler#typeDescription.description"
+    }
+  }
+}

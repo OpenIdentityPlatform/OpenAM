@@ -11,19 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
  /**
   * @module org/forgerock/openam/ui/common/util/object/flattenValues
   */
-define("org/forgerock/openam/ui/common/util/object/flattenValues", [
+define([
     "lodash"
 ], function (_) {
     var exports = function (object) {
         return _.mapValues(object, function (value) {
             if (_.isArray(value) && value.length === 1) {
-                return value [0];
+                return value[0];
             }
 
             return value;

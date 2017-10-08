@@ -14,11 +14,11 @@
  * Portions copyright 2011-2016 ForgeRock AS.
  */
 
-define("org/forgerock/openam/ui/user/login/RESTLoginView", [
+define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -29,27 +29,40 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/common/util/isRealmChanged",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, _, AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
-            Form2js, Handlebars, i18nManager, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
-            URIUtils) {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/user/login/logout",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/gotoUrl",
+    "store/index"
+], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
+    Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, Router, SessionManager, UIUtils,
+    URIUtils, logout, query, gotoUrl, store) => {
+    isRealmChanged = isRealmChanged.default;
+
+    function hasSsoRedirectOrPost (goto) {
+        let decodedGoto;
+        if (goto) {
+            decodedGoto = decodeURIComponent(goto);
+        }
+        return goto && (_.startsWith(decodedGoto, "/SSORedirect") || _.startsWith(decodedGoto, "/SSOPOST"));
+    }
 
     function populateTemplate () {
         var self = this,
             firstUserNamePassStage = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
 
-
         // self-service links should be shown only on the first stage of the username/password stages
         this.data.showForgotPassword = firstUserNamePassStage && Configuration.globalData.forgotPassword === "true";
         this.data.showForgotUserName = firstUserNamePassStage && Configuration.globalData.forgotUsername === "true";
+        this.data.showForgotten = this.data.showForgotPassword || this.data.showForgotUserName;
         this.data.showSelfRegistration = firstUserNamePassStage && Configuration.globalData.selfRegistration === "true";
         this.data.showRememberLogin = firstUserNamePassStage;
         // socialImplementations links should be shown only on the first stage of the username/password stages
-        // and didn't show at upgrade session page
+        // and should not show on the upgrade session page
         this.data.showSocialLogin = firstUserNamePassStage && !Configuration.loggedUser &&
                                         !_.isEmpty(Configuration.globalData.socialImplementations);
 
@@ -61,13 +74,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 cssClass: "login-dialog",
                 closable: false,
                 message: $("<div></div>"),
-                onshow: function () {
+                onshow () {
                     var dialog = this;
                     // change the target element of the view
                     self.noBaseTemplate = true;
                     self.element = dialog.message;
                 },
-                onshown: function () {
+                onshown () {
                     // return back to the default state
                     delete self.noBaseTemplate;
                     self.element = "#content";
@@ -76,23 +89,39 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         }
     }
 
-    function routeToLoginUnavailable (urlParams) {
-
-        // FIXME: If there has been a previous successful login, the global configuration and login defaults are
-        // populated with the realm and subrealm. These are not being removed when the session ends, and so cause
-        // problems during the next failed login request because the Router.configuration.routes.login.defaults[0] is
-        // already populated with the previous subrealm.
-        // This quick solution just over-rides this property with the subrealm in the current request.
-        Router.configuration.routes.login.defaults[0] = "/" + RealmHelper.getSubRealm();
+    function routeToLoginUnavailable (fragmentParams) {
 
         // We cannot use the Router.getLink() method here and simply apply the subrealm to the route because
         // Router.getLink() does more than its title suggests. It also applies the default properties to the route and
         // these are not always correct if there has been a previous successful login request.
         // FIXME: Remove any session specific properties from the UI upon session end.
         Router.routeTo(Router.configuration.routes.loginFailure, {
-            args: [urlParams],
+            args: [fragmentParams],
             trigger: true
         });
+    }
+
+    /**
+     * Checks if the "PollingWaitCallback" is present on the current stage.
+     * @param {Object} requirements Information about current stage
+     * @returns {Boolean} if the "PollingWaitCallback" is present on the current stage
+     */
+    function hasPollingCallback (requirements) {
+        return _.some(requirements.callbacks, "type", "PollingWaitCallback");
+    }
+
+    /**
+     * Checks if the "ConfirmationCallback" is present on the current stage.
+     * @param {Object} requirements Information about current stage
+     * @returns {Boolean} if the "ConfirmationCallback" is present on the current stage
+     */
+    function hasConfirmationCallback (requirements) {
+        return _.some(requirements.callbacks, "type", "ConfirmationCallback");
+    }
+
+    function getFragmentParamString () {
+        const params = URIUtils.getCurrentFragmentQueryString();
+        return _.isEmpty(params) ? "" : `&${params}`;
     }
 
     var LoginView = AbstractView.extend({
@@ -105,7 +134,42 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             "click input[type=submit]": "formSubmit"
         },
 
-        autoLogin: function () {
+        handleExistingSession (requirements) {
+            // If we have a token, let's see who we are logged in as....
+            SessionManager.getLoggedUser((user) => {
+                if (isRealmChanged()) {
+                    location.href = "#confirmLogin/";
+                } else {
+                    Configuration.setProperty("loggedUser", user);
+                    RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
+
+                        if (gotoUrl.exists()) {
+                            window.location.href = gotoUrl.toHref();
+                            $("body").empty();
+                            return false;
+                        }
+
+                        EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                            anonymousMode: false
+                        });
+
+                        // Copied from EVENT_LOGIN_REQUEST handler
+                        if (Configuration.gotoURL &&
+                            _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
+                            console.log(`Auto redirect to ${Configuration.gotoURL}`);
+                            Router.navigate(Configuration.gotoURL, { trigger: true });
+                            delete Configuration.gotoURL;
+                        } else {
+                            Router.navigate("", { trigger: true });
+                        }
+                    });
+                }
+            }, () => {
+                logout.default();
+            });
+        },
+
+        autoLogin () {
             var index,
                 submitContent = {},
                 auth = Configuration.globalData.auth;
@@ -113,14 +177,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             _.each(_.keys(auth.urlParams), function (key) {
                 if (key.indexOf("IDToken") > -1) {
                     index = parseInt(key.substring(7), 10) - 1;
-                    submitContent["callback_" + index] = auth.urlParams["IDToken" + key.substring(7)];
+                    submitContent[`callback_${index}`] = auth.urlParams[`IDToken${key.substring(7)}`];
                 }
             });
             auth.autoLoginAttempts = 1;
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
 
-        isZeroPageLoginAllowed: function () {
+        isZeroPageLoginAllowed () {
             var referer = document.referrer,
                 whitelist = Configuration.globalData.zeroPageLogin.refererWhitelist;
 
@@ -135,11 +199,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             return !whitelist || !whitelist.length || whitelist.indexOf(referer) > -1;
         },
 
-        formSubmit: function (e) {
+        formSubmit (e) {
             var submitContent,
                 expire;
 
             e.preventDefault();
+            // disabled button before login
+            $(e.currentTarget).prop("disabled", true);
 
             submitContent = new Form2js(this.$el[0]);
             submitContent[$(e.target).attr("name")] = $(e.target).attr("index");
@@ -159,94 +225,58 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             // END CUSTOM STAGE-SPECIFIC LOGIC HERE
 
             EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, {
-                submitContent:submitContent,
-                failureCallback: function () {
+                submitContent,
+                failureCallback () {
+                    // enabled the login button if login failure
+                    $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
-                    var urlParams;
                     if (Configuration.globalData.auth.currentStage > 1) {
-                        urlParams = URIUtils.getCurrentFragmentQueryString();
-                        if (urlParams) {
-                            urlParams = "&" + urlParams;
+                        let fragmentParams = URIUtils.getCurrentFragmentQueryString();
+                        if (fragmentParams) {
+                            fragmentParams = `&${fragmentParams}`;
                         }
-                        // Go to the Login Unavailable view with all the original url params.
-                        routeToLoginUnavailable(urlParams);
+                        // Go to the Login Unavailable view with all the original fragment parameters.
+                        routeToLoginUnavailable(fragmentParams);
                     }
                 }
             });
         },
 
-        render: function (args) {
-            var urlParams = {}, // Deserialized querystring params
-                auth = Configuration.globalData.auth;
+        render (args) {
+            const addtionalArguments = args ? args[1] : undefined;
+            let params = {};
+            const auth = Configuration.globalData.auth;
 
-            if (args && args.length) {
-                auth.additional = args[1]; // May be "undefined"
-                auth.urlParams = urlParams;
+            // TODO: The first undefined argument is the deprecated realm which is defined in the
+            // CommonRoutesConfig login route. This needs to be removed as part of AME-11109.
+            this.data.args = [undefined, getFragmentParamString()];
 
-                if (args[1]) {
-                    urlParams = this.handleUrlParams();
-                }
+
+            if (args) {
+                auth.additional = addtionalArguments;
+                auth.urlParams = {};
+                params = this.handleParams();
 
                 // If there are IDTokens try to login with the provided credentials
-                if (urlParams.IDToken1 && this.isZeroPageLoginAllowed() && !auth.autoLoginAttempts) {
+                if (params.IDToken1 && this.isZeroPageLoginAllowed() && !auth.autoLoginAttempts) {
                     this.autoLogin();
                 }
             }
 
-            AuthNDelegate.getRequirements().then(_.bind(function (reqs) {
-                var auth = Configuration.globalData.auth;
+            AuthNService.getRequirements().then(_.bind(function (reqs) {
 
                 // Clear out existing session if instructed
-                if (reqs.hasOwnProperty("tokenId") && urlParams.arg === "newsession") {
-                    RESTLoginHelper.removeSession();
-                    Configuration.setProperty("loggedUser", null);
+                if (reqs.hasOwnProperty("tokenId") && params.arg === "newsession") {
+                    logout.default();
                 }
 
                 // If simply by asking for the requirements, we end up with a token,
-                // then we must have auto-logged-in somehow
+                // then we must have already had a session
                 if (reqs.hasOwnProperty("tokenId")) {
-                    // Set a variable for the realm passed into the browser so there can be a
-                    // check to make sure it is the same as the current user's realm
-                    auth.passedInRealm = RealmHelper.getRealm();
-                    // If we have a token, let's see who we are logged in as....
-                    SessionManager.getLoggedUser(function (user) {
-
-                        if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
-                            Configuration.setProperty("loggedUser", user);
-                            delete auth.passedInRealm;
-
-                            RESTLoginHelper.setSuccessURL(reqs.tokenId).then(function () {
-
-                                if (auth.urlParams && auth.urlParams.goto) {
-                                    window.location.href = auth.urlParams.goto;
-                                    $("body").empty();
-                                    return false;
-                                }
-                                EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
-                                    anonymousMode: false
-                                });
-
-                                // Copied from EVENT_LOGIN_REQUEST handler
-                                if (Configuration.gotoURL &&
-                                    _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
-                                    console.log("Auto redirect to " + Configuration.gotoURL);
-                                    Router.navigate(Configuration.gotoURL, { trigger: true });
-                                    delete Configuration.gotoURL;
-                                } else {
-                                    Router.navigate("", { trigger: true });
-                                }
-                            });
-                        } else {
-                            location.href = "#confirmLogin/";
-                        }
-                    }, function () {
-                        // There is a tokenId but it is invalid so kill it
-                        RESTLoginHelper.removeSession();
-                        Configuration.setProperty("loggedUser", null);
-                    });
-
+                    this.handleExistingSession(reqs);
                 } else { // We aren't logged in yet, so render a form...
-                    this.renderForm(reqs, urlParams);
+                    this.renderForm(reqs, params);
+
                     if (CookieHelper.getCookie("invalidRealm")) {
                         CookieHelper.deleteCookie("invalidRealm");
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
@@ -268,20 +298,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                  * would normally only be applied when the user has logged in, so they should not contain invalid values
                  */
 
-                routeToLoginUnavailable(
-                    RESTLoginHelper.filterUrlParams (
-                        URIUtils.parseQueryString (
-                            URIUtils.getCurrentCompositeQueryString()
-                        )
-                    )
-                );
+                const paramString = URIUtils.getCurrentFragmentQueryString();
+                routeToLoginUnavailable(RESTLoginHelper.filterUrlParams(query.parseParameters(paramString)));
+
             }, this));
         },
-
-
-        renderForm: function (reqs, urlParams) {
-            var cleaned = _.clone(reqs),
-                implicitConfirmation = true,
+        renderForm (reqs, urlParams) {
+            var requirements = _.clone(reqs),
                 promise = $.Deferred(),
                 usernamePasswordStages = ["DataStore1", "AD1", "JDBC1", "LDAP1", "Membership1", "RADIUS1"],
                 template,
@@ -289,53 +312,55 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
 
-            cleaned.callbacks = [];
-            _.each(reqs.callbacks, function (element) {
+            requirements.callbacks = [];
 
-                var redirectForm,
-                    redirectCallback;
+            _.each(reqs.callbacks, (element) => {
+                let redirectForm;
+                let redirectCallback;
 
                 if (element.type === "RedirectCallback") {
-
-                    redirectCallback = _.object(_.map(element.output, function (o) {
+                    redirectCallback = _.object(_.map(element.output, (o) => {
                         return [o.name, o.value];
                     }));
 
-                    redirectForm = $("<form action='" + redirectCallback.redirectUrl + "' method='POST'></form>");
+                    redirectForm = $(`<form action='${redirectCallback.redirectUrl}' method='POST'></form>`);
 
                     if (redirectCallback.redirectMethod === "POST") {
-
-                        _.each(redirectCallback.redirectData, function (v, k) {
+                        _.each(redirectCallback.redirectData, (v, k) => {
                             redirectForm.append(
-                                "<input type='hidden' name='" + k + "' value='" + v + "' aria-hidden='true' />");
+                                `<input type='hidden' name='${k}' value='${v}' aria-hidden='true' />`);
                         });
-
                         redirectForm.appendTo("body").submit();
                     } else {
                         window.location.replace(redirectCallback.redirectUrl);
                     }
+                } else if (element.type === "PollingWaitCallback") {
+                    const pollingWaitTimeoutMs = _.find(element.output, { name: "waitTime" }).value;
+
+                    _.delay(() => {
+                        this.pollingInProgress = true;
+
+                        if (hasPollingCallback(this.reqs)) {
+                            EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, { suppressSpinner: true });
+                        }
+                    }, pollingWaitTimeoutMs);
                 }
 
-                if (element.type === "ConfirmationCallback") {
-                    implicitConfirmation = false;
-                }
-
-                cleaned.callbacks.push({
+                requirements.callbacks.push({
                     input: {
-                        index: cleaned.callbacks.length,
+                        index: requirements.callbacks.length,
                         name: element.input ? element.input[0].name : null,
                         value: element.input ? element.input[0].value : null
                     },
                     output: element.output,
-                    type: element.type,
-                    isSubmit: element.type === "ConfirmationCallback"
+                    type: element.type
                 });
             });
 
-            if (implicitConfirmation) {
-                cleaned.callbacks.push({
+            if (!hasConfirmationCallback(reqs) && !hasPollingCallback(reqs)) {
+                requirements.callbacks.push({
                     "input": {
-                        index: cleaned.callbacks.length,
+                        index: requirements.callbacks.length,
                         name: "loginButton",
                         value: 0
                     },
@@ -343,21 +368,22 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         name: "options",
                         value: [$.t("common.user.login")]
                     }],
-                    type: "ConfirmationCallback",
-                    isSubmit: true
+                    type: "ConfirmationCallback"
                 });
             }
 
             this.reqs = reqs;
-            this.data.reqs = cleaned;
+            this.data.reqs = requirements;
+
+            const pollingInProgress = this.pollingInProgress && hasPollingCallback(reqs);
 
             // Is there an attempt at autologin happening?
             // if yes then don't render the form until it fails one time
             if (urlParams.IDToken1 && Configuration.globalData.auth.autoLoginAttempts === 1) {
                 Configuration.globalData.auth.autoLoginAttempts++;
-            } else {
+            } else if (!pollingInProgress) {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                template = "templates/openam/authn/" + reqs.stage + ".html";
+                template = `templates/openam/authn/${reqs.stage}.html`;
                 UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
@@ -373,7 +399,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
             return promise;
         },
-        prefillLoginData: function () {
+        prefillLoginData () {
             var login = CookieHelper.getCookie("login");
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
@@ -386,32 +412,34 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         },
 
-        handleUrlParams: function () {
-            var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
-
+        handleParams () {
+            // TODO: Remove support for fragment params and change to URIUtils.getCurrentQueryString()
+            // as currently we are checking both the framgent and query with framgent over-riding.
+            const paramString = URIUtils.getCurrentCompositeQueryString();
+            const params = query.parseParameters(paramString);
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params
             // but if composite_advice set that must be adhered to
-            if (!urlParams.authIndexType || urlParams.authIndexType !== "composite_advice") {
+            if (!params.authIndexType || params.authIndexType !== "composite_advice") {
                 _.each(["authlevel", "module", "service", "user", "resource"], function (param) {
-                    if (urlParams[param]) {
-                        urlParams.authIndexType = ((param === "authlevel") ? "level" : param);
-                        urlParams.authIndexValue = urlParams[param];
+                    if (params[param]) {
+                        params.authIndexType = ((param === "authlevel") ? "level" : param);
+                        params.authIndexValue = params[param];
                         //*** Note special case for authLevel
-                        Configuration.globalData.auth.additional += "&authIndexType=" +
-                        ((param === "authlevel") ? "level" : param) + "&authIndexValue=" + urlParams[param];
+                        Configuration.globalData.auth.additional += `&authIndexType=${
+                            ((param === "authlevel") ? "level" : param)
+                        }&authIndexValue=${params[param]}`;
                     }
                 });
             }
-
-            // Special case for SSORedirect
-            if (urlParams.goto && urlParams.goto.indexOf("/SSORedirect") === 0) {
-                urlParams.goto = "/" + Constants.context + urlParams.goto;
-                Configuration.globalData.auth.additional.replace("&goto=", "&goto=" + "/" + Constants.context);
+            // Special case for SSORedirect and SSOPOST
+            if (hasSsoRedirectOrPost(params.goto)) {
+                params.goto = `/${Constants.context}${params.goto}`;
+                Configuration.globalData.auth.additional.replace("&goto=", `&goto=/${Constants.context}`);
             }
 
-            Configuration.globalData.auth.urlParams = urlParams;
-            return urlParams;
+            Configuration.globalData.auth.urlParams = params;
+            return params;
         }
     });
 
@@ -432,12 +460,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             id: generateId(this.input.name),
             index: this.input.index,
             value: this.input.value,
-            prompt: prompt
+            prompt
         };
 
         function renderPartial (name, context) {
-            return _.find(Handlebars.partials, function (code, templateName) {
-                return templateName.indexOf("login/_" + name) !== -1;
+            return _.find(Handlebars.partials, (code, templateName) => {
+                return templateName.indexOf(`login/_${name}`) !== -1;
             })(_.merge(renderContext, context));
         }
 
@@ -473,9 +501,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     _.each(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
                         result += renderPartial("Confirmation", {
-                            btnClass: btnClass,
-                            key: key,
-                            option: option
+                            btnClass,
+                            key,
+                            option
                         });
                     });
                 }
@@ -488,7 +516,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         values: _.map(options.value, function (option, key) {
                             return {
                                 active: self.input.value === key,
-                                key: key,
+                                key,
                                 value: option
                             };
                         })
@@ -497,24 +525,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 break;
             case "HiddenValueCallback": result += renderPartial("HiddenValue"); break;
             case "RedirectCallback": result += renderPartial("Redirect"); break;
+            case "PollingWaitCallback": result += renderPartial("PollingWait"); break;
             default: result += renderPartial("Default"); break;
         }
 
         return new Handlebars.SafeString(result);
     });
 
-    Handlebars.registerHelper("decorateWithRealm", function (uri) {
-        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
-        if (uri.slice(-1) !== "/") {
-            uri += "/";
-        }
-        return uri + RealmHelper.getSubRealm();
+    Handlebars.registerHelper("intendedRealmParameter", () => {
+        const sessionInfoIntendedRealm = store.default.getState().server.realm;
+        return sessionInfoIntendedRealm ? `&realm=${sessionInfoIntendedRealm}` : "";
     });
 
-    Handlebars.registerHelper("gotoParameter", function () {
-        return _.has(Configuration, "globalData.auth.urlParams.goto")
-            ? "&goto=" + encodeURIComponent(Configuration.globalData.auth.urlParams.goto)
-            : "";
+    Handlebars.registerHelper("gotoParameter", () => {
+        return gotoUrl.exists() ? `&goto=${gotoUrl.get()}` : "";
     });
 
     return new LoginView();

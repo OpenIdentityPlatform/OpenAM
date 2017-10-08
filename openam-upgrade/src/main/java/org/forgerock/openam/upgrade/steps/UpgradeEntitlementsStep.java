@@ -19,6 +19,7 @@ package org.forgerock.openam.upgrade.steps;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -335,12 +336,12 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
                     ENTITLEMENT_INDEX_FILTER, SUN_KEY_VALUE, SUN_XML_KEY_VALUE);
             ConnectionEntryReader reader = conn.search(sr);
             int counter = 0;
-            long lastReport = System.currentTimeMillis();
+            long lastReport = currentTimeMillis();
             while (reader.hasNext()) {
                 if (reader.isEntry()) {
-                    if (System.currentTimeMillis() - lastReport > 3000) {
+                    if (currentTimeMillis() - lastReport > 3000) {
                         UpgradeProgress.reportEnd("upgrade.entitlement.privilege", counter, policyRuleCount);
-                        lastReport = System.currentTimeMillis();
+                        lastReport = currentTimeMillis();
                     }
                     SearchResultEntry entry = reader.readEntry();
                     Set<String> newValues = processEntry(entry);

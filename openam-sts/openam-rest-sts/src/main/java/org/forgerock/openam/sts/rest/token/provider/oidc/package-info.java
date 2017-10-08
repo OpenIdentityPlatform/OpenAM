@@ -16,5 +16,7 @@
 
 /**
  * Classes related to producing OpenIdConnect tokens
+ *
+ * @supported.api
  */
 package org.forgerock.openam.sts.rest.token.provider.oidc;

@@ -15,7 +15,8 @@
  */
 package com.sun.identity.console.scripts;
 
-import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
+import static com.sun.identity.console.XuiRedirectHelper.getAdministeredRealm;
+import static com.sun.identity.console.XuiRedirectHelper.getAuthenticationRealm;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 import com.iplanet.jato.RequestContext;
@@ -61,8 +62,8 @@ public class ScriptsViewBean extends RealmPropertiesBase implements HasEntitiesT
      * @param event The display event.
      */
     public void beginDisplay(DisplayEvent event) {
-        redirectToXui(getRequestContext().getRequest(), getRedirectRealm(this),
-                MessageFormat.format("realms/{0}/scripts/list", getCurrentRealmEncoded()));
+        redirectToXui(getRequestContext().getRequest(), getAdministeredRealm(this), getAuthenticationRealm(this),
+                MessageFormat.format("realms/{0}/scripts", getCurrentRealmEncoded()));
     }
 
     @Override

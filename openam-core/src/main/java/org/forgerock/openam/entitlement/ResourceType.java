@@ -18,6 +18,7 @@ package org.forgerock.openam.entitlement;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,8 +115,8 @@ public final class ResourceType {
          *
          * @return this builder
          */
-        public Builder setPatterns(Set<String> patterns) {
-            this.patterns = new HashSet<String>(patterns);
+        public Builder setPatterns(Collection<String> patterns) {
+            this.patterns = new HashSet<>(patterns);
             return this;
         }
 

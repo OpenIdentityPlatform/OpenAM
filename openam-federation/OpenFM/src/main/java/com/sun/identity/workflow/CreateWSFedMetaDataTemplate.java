@@ -24,8 +24,8 @@
  *
  * $Id: CreateWSFedMetaDataTemplate.java,v 1.9 2009/12/14 23:42:49 mallas Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
-
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTConstants;
@@ -247,26 +247,27 @@ public class CreateWSFedMetaDataTemplate {
         String idpAlias = (String)mapParams.get(MetaTemplateParameters.P_IDP);
         String idpSCertAlias = (String)mapParams.get(
             MetaTemplateParameters.P_IDP_S_CERT);
-        
-        String[][] configDefaults = { 
-            { WSFederationConstants.DISPLAY_NAME, idpAlias },
-            { WSFederationConstants.NAMEID_FORMAT, "" },
-            { WSFederationConstants.NAMEID_ATTRIBUTE, "" },
-            { WSFederationConstants.NAME_INCLUDES_DOMAIN, "" },
-            { WSFederationConstants.DOMAIN_ATTRIBUTE, "" }, 
-            { WSFederationConstants.UPN_DOMAIN, getHostDomain() },
-            { SAML2Constants.SIGNING_CERT_ALIAS, idpSCertAlias },
-            { SAML2Constants.ASSERTION_NOTBEFORE_SKEW_ATTRIBUTE, "600" },
-            { SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE, "600" },
-            { SAML2Constants.IDP_AUTHNCONTEXT_MAPPER_CLASS, 
-                  "com.sun.identity.wsfederation.plugins.DefaultIDPAuthenticationMethodMapper" 
-            },
-            { SAML2Constants.IDP_ACCOUNT_MAPPER, 
-                  "com.sun.identity.wsfederation.plugins.DefaultIDPAccountMapper" },
-            { SAML2Constants.IDP_ATTRIBUTE_MAPPER, 
-                  "com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper" },
-            { SAML2Constants.ATTRIBUTE_MAP, "" },
-            { COTConstants.COT_LIST, null },
+
+        String[][] configDefaults = {
+                {WSFederationConstants.DISPLAY_NAME, idpAlias},
+                {WSFederationConstants.NAMEID_FORMAT, ""},
+                {WSFederationConstants.NAMEID_ATTRIBUTE, ""},
+                {WSFederationConstants.NAME_INCLUDES_DOMAIN, ""},
+                {WSFederationConstants.DOMAIN_ATTRIBUTE, ""},
+                {WSFederationConstants.UPN_DOMAIN, getHostDomain()},
+                {SAML2Constants.SIGNING_CERT_ALIAS, idpSCertAlias},
+                {SAML2Constants.ASSERTION_NOTBEFORE_SKEW_ATTRIBUTE, "600"},
+                {SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE, "600"},
+                {SAML2Constants.IDP_AUTHNCONTEXT_MAPPER_CLASS,
+                        "com.sun.identity.wsfederation.plugins.DefaultIDPAuthenticationMethodMapper"},
+                {SAML2Constants.IDP_ACCOUNT_MAPPER,
+                        "com.sun.identity.wsfederation.plugins.DefaultIDPAccountMapper"},
+                {SAML2Constants.IDP_ATTRIBUTE_MAPPER,
+                        "com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper"},
+                {WSFederationConstants.AUTHENTICATOR_CLASS,
+                        "org.forgerock.openam.saml2.plugins.DefaultWsFedAuthenticator"},
+                {SAML2Constants.ATTRIBUTE_MAP, ""},
+                {COTConstants.COT_LIST, null},
         };
 
         com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement 

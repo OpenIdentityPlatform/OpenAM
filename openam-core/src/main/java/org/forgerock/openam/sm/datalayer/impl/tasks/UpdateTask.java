@@ -15,29 +15,32 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-
-import java.text.MessageFormat;
+import org.forgerock.util.Options;
 
 /**
- * Responsible for updating the LDAP persistence with the provided Token.
+ * Responsible for updating the persistence layer with the provided Token.
  */
 public class UpdateTask extends AbstractTask {
+
     private final Token token;
+    private final Options options;
 
     /**
      * @param token Non null Token to update.
+     * @param options Non null Options for the operation.
      * @param handler Non null handler to notify.
      */
-    public UpdateTask(Token token, ResultHandler<Token, ?> handler) {
+    public UpdateTask(Token token, Options options, ResultHandler<Token, ?> handler) {
         super(handler);
         this.token = token;
+        this.options = options;
     }
 
     /**
@@ -46,19 +49,19 @@ public class UpdateTask extends AbstractTask {
      * If the Token exists, then an update is performed, otherwise a create is
      * performed.
      *
-     * @param connection Non null Connection.
      * @param adapter Non null for connection-coupled operations.
      * @throws DataLayerException If there was an error of any kind.
      */
     @Override
-    public void performTask(Object connection, TokenStorageAdapter adapter) throws DataLayerException {
-        Token previous = adapter.read(connection, token.getTokenId());
+    public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+        Token previous = adapter.read(token.getTokenId(), options);
+        Token updated;
         if (previous == null) {
-            adapter.create(connection, token);
+            updated = adapter.create(token, options);
         } else {
-            adapter.update(connection, previous, token);
+            updated = adapter.update(previous, token, options);
         }
-        handler.processResults(token);
+        handler.processResults(updated);
     }
 
     @Override

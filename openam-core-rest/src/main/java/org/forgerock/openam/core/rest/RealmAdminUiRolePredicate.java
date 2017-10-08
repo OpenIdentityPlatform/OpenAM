@@ -15,6 +15,6 @@ public class RealmAdminUiRolePredicate implements UiRolePredicate {
 
     @Override
     public boolean apply(Context context) {
-        return isAdmin(context);
+        return isAdmin(context, getRole());
     }
 }

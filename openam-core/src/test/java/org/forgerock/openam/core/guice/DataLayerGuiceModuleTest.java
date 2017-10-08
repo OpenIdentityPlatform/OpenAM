@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.guice;
@@ -20,10 +20,13 @@ import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
 
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.impl.LdapOptionFunction;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.openam.sm.ConnectionConfig;
@@ -43,6 +46,7 @@ import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
+import org.forgerock.util.Option;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -65,10 +69,18 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
                 new Object[]{TaskFactory.class, ConnectionType.CTS_ASYNC},
                 new Object[]{QueryFactory.class, ConnectionType.CTS_ASYNC},
                 new Object[]{ConnectionFactory.class, ConnectionType.CTS_ASYNC},
-                new Object[]{TaskExecutor.class, ConnectionType.CTS_REAPER},
-                new Object[]{TaskFactory.class, ConnectionType.CTS_REAPER},
-                new Object[]{QueryFactory.class, ConnectionType.CTS_REAPER},
-                new Object[]{ConnectionFactory.class, ConnectionType.CTS_REAPER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_EXPIRY_DATE_WORKER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_MAX_SESSION_TIMEOUT_WORKER},
+                new Object[]{TaskExecutor.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{TaskFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{QueryFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
+                new Object[]{ConnectionFactory.class, ConnectionType.CTS_SESSION_IDLE_TIMEOUT_WORKER},
                 new Object[]{TaskExecutor.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{TaskFactory.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{QueryFactory.class, ConnectionType.RESOURCE_SETS},
@@ -96,6 +108,8 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
 
         @Override
         protected void configure() {
+            MapBinder.newMapBinder(binder(), new TypeLiteral<Option<?>>() {}, new TypeLiteral<LdapOptionFunction>() {});
+
             SMSConfigurationFactory smsConfigurationFactory = mock(SMSConfigurationFactory.class);
             when(smsConfigurationFactory.getSMSConfiguration()).thenReturn(mock(ServerGroupConfiguration.class));
             bind(SMSConfigurationFactory.class).toInstance(smsConfigurationFactory);

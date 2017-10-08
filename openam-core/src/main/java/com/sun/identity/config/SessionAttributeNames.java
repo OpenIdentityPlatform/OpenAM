@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SessionAttributeNames.java,v 1.2 2009/06/17 21:45:42 goodearth Exp $
+ *
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
  */
 
 package com.sun.identity.config;
@@ -68,5 +70,4 @@ public interface SessionAttributeNames {
 
     static final  String LB_SITE_NAME = "loadBalancerSiteName";
     static final  String LB_PRIMARY_URL = "loadBalancerURL";
-    static final  String LB_SESSION_HA_SFO = "loadBalancerSessionHASFO";
 }

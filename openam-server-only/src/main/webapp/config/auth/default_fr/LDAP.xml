@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
     Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
     (the License). You may not use this file except in
@@ -44,7 +44,7 @@
             <Prompt>Mot de passe :</Prompt>
         </PasswordCallback>
     </Callbacks>
-    <Callbacks length="4" order="2" timeout="120" header="Changer le mot de passe&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+    <Callbacks length="4" order="2" timeout="120" header="#REPLACE#" >
         <PasswordCallback echoPassword="false" >
             <Prompt>Ancien mot de passe</Prompt>
         </PasswordCallback>

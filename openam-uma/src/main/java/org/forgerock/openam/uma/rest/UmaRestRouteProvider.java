@@ -37,30 +37,30 @@ public class UmaRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(OAUTH)
                 .authorizeWith(UmaPolicyResourceAuthzFilter.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(UmaPolicyResource.class);
+                .toAnnotatedCollection(UmaPolicyResource.class);
 
         realmRouter.route("users/{user}/uma/auditHistory")
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(AuditHistory.class);
+                .toAnnotatedCollection(AuditHistory.class);
 
         realmRouter.route("users/{user}/uma/pendingrequests")
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(PendingRequestResource.class);
+                .toAnnotatedCollection(PendingRequestResource.class);
 
         realmRouter.route("users/{user}/oauth2/resources/sets")
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(ResourceSetResource.class);
+                .toAnnotatedCollection(ResourceSetResource.class);
 
         realmRouter.route("users/{user}/oauth2/resources/labels")
                 .auditAs(OAUTH)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .through(UmaEnabledFilter.class)
-                .toCollection(UmaLabelResource.class);
+                .toAnnotatedCollection(UmaLabelResource.class);
     }
 }

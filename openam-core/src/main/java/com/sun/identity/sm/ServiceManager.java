@@ -24,7 +24,7 @@
  *
  * $Id: ServiceManager.java,v 1.27 2009/10/28 04:24:26 hengming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -239,7 +239,7 @@ public class ServiceManager {
      *
      * @supported.api
      */
-    public Set getServiceNames() throws SMSException {
+    public Set<String> getServiceNames() throws SMSException {
         try {
             if (serviceNames == null) {
                 serviceNames = CachedSubEntries.getInstance(token, serviceDN);
@@ -1177,12 +1177,16 @@ public class ServiceManager {
                 SMSUtils.DYNAMIC_SCHEMA, SMSUtils.USER_SCHEMA,
                 SMSUtils.POLICY_SCHEMA, SMSUtils.GROUP_SCHEMA,
                 SMSUtils.DOMAIN_SCHEMA };
-        for (int i = 0; i < schemaNames.length; i++) {
-            Node childNode = XMLUtils.getChildNode(schemaRoot, schemaNames[i]);
+        for (String schemaName : schemaNames) {
+            Node childNode = XMLUtils.getChildNode(schemaRoot, schemaName);
             if (childNode != null) {
                 ServiceSchemaImpl ssi = new ServiceSchemaImpl(null, childNode);
-                Map attrs = ssi.getAttributeDefaults();
-                ssi.validateAttributes(attrs, false);
+                Map<String, Set<String>> attrs = ssi.getAttributeDefaults();
+                if (schemaName.equals(SMSUtils.GLOBAL_SCHEMA)) {
+                    ssi.validateAttributes(attrs, false);
+                } else {
+                    ssi.validateDefaults(attrs);
+                }
             }
         }
         return (true);

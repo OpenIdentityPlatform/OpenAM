@@ -11,23 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBooleanView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrBoolean.html",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
             this.initBasic(data, element, "field-float-pattern data-obj button-field");
 
-            this.events["click .btn"] = _.bind(this.buttonControlClick, this);
-            this.events["keyup .btn"] = _.bind(this.buttonControlClick, this);
+            this.events["click [data-btn]"] = _.bind(this.buttonControlClick, this);
+            this.events["keyup [data-btn]"] = _.bind(this.buttonControlClick, this);
 
             this.parentRender(function () {
                 if (callback) {
@@ -36,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        buttonControlClick: function (e) {
+        buttonControlClick (e) {
             if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }

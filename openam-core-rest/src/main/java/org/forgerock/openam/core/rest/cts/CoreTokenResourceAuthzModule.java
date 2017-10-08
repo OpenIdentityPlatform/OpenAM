@@ -11,22 +11,24 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014-2015 ForgeRock AS.
+* Copyright 2014-2016 ForgeRock AS.
 */
 
 package org.forgerock.openam.core.rest.cts;
 
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.services.context.Context;
+import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
-import javax.inject.Inject;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Authorization module specifically designed for the Core Token Resource endpoint. This prevents access
@@ -39,12 +41,12 @@ import javax.inject.Inject;
 public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
 
     public final static String NAME = "CoreTokenResourceFilter";
-    private final boolean enabled;
+    private final CoreTokenConfig coreTokenConfig;
 
     @Inject
-    public CoreTokenResourceAuthzModule(Config<SessionService> sessionService, Debug debug, boolean enabled) {
+    public CoreTokenResourceAuthzModule(Config<SessionService> sessionService, Debug debug, CoreTokenConfig coreTokenConfig) {
         super(sessionService, debug);
-        this.enabled = enabled;
+        this.coreTokenConfig = coreTokenConfig;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
     @Override
     protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
 
-        if (!enabled) {
+        if (!coreTokenConfig.isCoreTokenResourceEnabled()) {
             if (debug.messageEnabled()) {
                 debug.message("CoreTokenResourceAuthzModule :: Restricted access to CoreTokenResource");
             }

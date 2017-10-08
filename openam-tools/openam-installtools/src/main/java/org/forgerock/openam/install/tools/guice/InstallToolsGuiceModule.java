@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2016 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -34,11 +34,17 @@ import java.io.File;
 @GuiceModule
 public class InstallToolsGuiceModule extends AbstractModule {
 
+    private File getDataDirectory() {
+        String path = ConfigUtil.getDataDirPath();
+        if (path == null) {
+            return new File(".");
+        }
+        return new File(path);
+    }
+
     @Override
     protected void configure() {
-
-        bind(LicenseLog.class).toInstance(new PropertiesFileLicenseLog(new File(ConfigUtil.getDataDirPath())));
+        bind(LicenseLog.class).toInstance(new PropertiesFileLicenseLog(getDataDirectory()));
         bind(DebugLog.class).to(DebugFileLog.class);
-
     }
 }

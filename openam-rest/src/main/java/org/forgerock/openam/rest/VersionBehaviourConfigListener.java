@@ -11,13 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
 
+import static com.sun.identity.shared.Constants.REST_APIS_SERVICE_NAME;
+import static com.sun.identity.shared.Constants.REST_APIS_SERVICE_VERSION;
+
 import java.security.AccessController;
 
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
@@ -25,6 +29,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.http.routing.DefaultVersionBehaviour;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.openam.utils.ServiceConfigUtils;
 
 /**
  * A {@code ServiceListener} to listen for changes to the default version behaviour configuration and update a
@@ -35,8 +40,6 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
     static final String VERSION_BEHAVIOUR_ATTRIBUTE = "openam-rest-apis-default-version";
     static final String WARNING_BEHAVIOUR_ATTRIBUTE = "openam-rest-apis-header-warning";
 
-    private static final String SERVICE_NAME = "RestApisService";
-    private static final String SERVICE_VERSION = "1.0";
     private static Debug debug = Debug.getInstance("frRest");
 
     private volatile boolean warningEnabled = true;
@@ -46,8 +49,9 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
 
     public VersionBehaviourConfigListener() {
         try {
-            ServiceConfigManager mgr = new ServiceConfigManager(
-                    AccessController.doPrivileged(AdminTokenAction.getInstance()), SERVICE_NAME, SERVICE_VERSION);
+            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token,
+                    REST_APIS_SERVICE_NAME, REST_APIS_SERVICE_VERSION);
             register(mgr);
         } catch (Exception e) {
             debug.error("Cannot get ServiceConfigManager - cannot register default version config listener", e);

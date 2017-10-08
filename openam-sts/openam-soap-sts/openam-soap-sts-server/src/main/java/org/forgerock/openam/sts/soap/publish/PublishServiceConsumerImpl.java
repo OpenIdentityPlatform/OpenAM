@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.publish;
@@ -104,17 +104,19 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
                     .setRequestMethod(AMSTSConstants.GET)
                     .makeInvocation();
         } catch (IOException e) {
-            throw new STSPublishException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
-                    "Exception caught invoking obtaining published soap sts instance state from publish service: " + e, e);
-        } finally {
             if (sessionId != null) {
                 soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
             }
-        }
+            throw new STSPublishException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                    "Exception caught invoking obtaining published soap sts instance state from publish service: " + e, e);
+        } 
         final int responseCode = connectionResult.getStatusCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             return parseResponse(connectionResult.getResult());
         } else {
+            if (sessionId != null) {
+                soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
+            }
             throw new STSPublishException(responseCode,
                     "Returning empty list from PublishServiceConsumerImpl#getPublishedInstances - non 200 " +
                             "response from sts-publish service: " + connectionResult.getResult());

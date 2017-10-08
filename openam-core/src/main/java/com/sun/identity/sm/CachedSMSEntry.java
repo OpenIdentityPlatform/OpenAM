@@ -24,59 +24,60 @@
  *
  * $Id: CachedSMSEntry.java,v 1.16 2009/10/08 20:33:54 hengming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import com.iplanet.am.util.SystemProperties;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.forgerock.guava.common.collect.Ordering;
+import org.forgerock.opendj.ldap.DN;
+
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
-import java.util.Collections;
-import java.util.HashMap;
-
-import org.forgerock.opendj.ldap.DN;
 
 /**
  * The class <code>CachedSchemaManagerImpl</code> provides interfaces to
  * manage the SMSEntry. It caches SMSEntries which is used by ServiceSchema and
  * ServiceConfig classes.
  */
-public class CachedSMSEntry {
-
-    // Notification method that will be called for ServiceSchemaManagerImpls
-    protected static final String UPDATE_METHOD = "update";
+public class CachedSMSEntry implements SMSEventListener {
 
     // Cache of CachedSMSEntries (static)
-    protected static Map smsEntries = Collections.synchronizedMap(
+    private static Map smsEntries = Collections.synchronizedMap(
         new HashMap(1000));
 
     // Instance variables
-    
-    // Set of ServiceSchemaManagerImpls and ServiceConfigImpls
-    // that must be updated where entry changes
-    protected Set serviceObjects = Collections.synchronizedSet(
-        new HashSet());
-    protected String notificationID;
+
+    /**
+     * Set of listeners that must be updated when the entry changes. As these may have equals/hashCode
+     * implementations that change as a result of updates, we use the
+     * {@link System#identityHashCode(Object) identity} of the object instances to test for equality.
+     */
+    private final Set<SMSEntryUpdateListener> serviceObjects = new ConcurrentSkipListSet<>(Ordering.arbitrary());
+    private final SMSEventListenerManager.Subscription subscription;
 
     protected Set principals = Collections.synchronizedSet(
         new HashSet(10)); // Principals who have read access
 
     protected SSOToken token; // Valid SSOToken used for read
 
-    protected String dn2Str;
+    private String dn2Str;
 
-    protected String dnRFCStr;
+    private String dnRFCStr;
 
     protected SMSEntry smsEntry;
 
@@ -106,8 +107,7 @@ public class CachedSMSEntry {
         smsEntry.setReadOnly();
         
         // Register for notifications
-        notificationID = SMSEventListenerManager.notifyChangesToNode(
-            token, smsEntry.getDN(), UPDATE_FUNC, this, null);
+        subscription = SMSEventListenerManager.registerForNotifyChangesToNode(smsEntry.getDN(), this);
 
         // Write debug messages
         if (SMSEntry.debug.messageEnabled()) {
@@ -126,7 +126,7 @@ public class CachedSMSEntry {
     // Used by JAXRPCObjectImpl
     public boolean isDirty() {
         if (ttlEnabled && !dirty &&
-            ((System.currentTimeMillis() - lastUpdate) > ttl)) {
+            ((currentTimeMillis() - lastUpdate) > ttl)) {
             synchronized (dirtyLock) {
                 dirty = true;
             }
@@ -167,7 +167,7 @@ public class CachedSMSEntry {
                 SSOToken t = getValidSSOToken();
                 if (t != null) {
                     smsEntry.read(t);
-                    lastUpdate = System.currentTimeMillis();
+                    lastUpdate = currentTimeMillis();
                     updated = true;
                 } else if (SMSEntry.debug.warningEnabled()) {
                     SMSEntry.debug.warning("CachedSMSEntry:update No VALID " +
@@ -189,9 +189,8 @@ public class CachedSMSEntry {
                 // this entry is no long valid, remove from cache
                 clear();
             }
-            // Update service listeners either success or failure
-            // updateServiceListeners(UPDATE_METHOD);
-            updateServiceListeners(UPDATE_METHOD);
+
+            updateServiceListeners();
             dirty = false;
         }
     }
@@ -205,7 +204,7 @@ public class CachedSMSEntry {
     void refresh(SMSEntry e) throws SMSException {
         synchronized (dirtyLock) {
             smsEntry.refresh(e);
-            updateServiceListeners(UPDATE_METHOD);
+            updateServiceListeners();
             dirty = false;
         }
     }
@@ -225,8 +224,7 @@ public class CachedSMSEntry {
      */
     private void clear(boolean removeFromCache) {
         // this entry is no long valid, remove from cache
-        SMSEventListenerManager.removeNotification(notificationID);
-        notificationID = null;
+        subscription.cancel();
         valid = false;
         synchronized(dirtyLock) {
             dirty = true;
@@ -265,35 +263,17 @@ public class CachedSMSEntry {
     }
 
     /**
-     * Sends notifications to ServiceSchemaManagerImpl and ServiceConfigImpl
-     * The method determines the object's method that would be invoked.
-     * It could be either update() -- in which only the local instances are
-     * updated, or updateAndNotify() -- in which case the listeners are also
-     * notified.
-     * @param method either "update" or "updateAndNotify"
+     * Sends notifications to any object that has added itself as a listener.
      */
-    private void updateServiceListeners(String method) {
-        if (SMSEntry.debug.messageEnabled()) {
-            SMSEntry.debug.message("CachedSMSEntry::updateServiceListeners "
-                    + "method called: " + dn2Str);
-        }
-        // Inform the ServiceSchemaManager's of changes to attributes
-        ArrayList tmpServiceObjects = new ArrayList();
-        synchronized (serviceObjects) {
-            for(Iterator objs = serviceObjects.iterator(); objs.hasNext();) {
-                tmpServiceObjects.add(objs.next());
-            }
-        }
+    private void updateServiceListeners() {
+        SMSEntry.debug.message("CachedSMSEntry::updateServiceListeners method called: {}", dn2Str);
 
-        for(Iterator objs = tmpServiceObjects.iterator(); objs.hasNext();){
+        // Inform the ServiceSchemaManager's of changes to attributes
+        for (SMSEntryUpdateListener updateListener : serviceObjects) {
             try {
-                Object obj = objs.next();
-                Method m = obj.getClass().getDeclaredMethod(
-                    method, (Class[]) null);
-                m.invoke(obj, (Object[]) null);
+                updateListener.update();
             } catch (Throwable e) {
-                SMSEntry.debug.error("CachedSMSEntry::unable to " +
-                    "deliver notification(" + dn2Str + ")", e);
+                SMSEntry.debug.error("CachedSMSEntry::unable to update service listener ({})", dn2Str, e);
             }
         }
     }
@@ -301,18 +281,17 @@ public class CachedSMSEntry {
     /**
      * Method to add objects that needs notifications
      */
-    protected void addServiceListener(Object o) {
-        serviceObjects.add(o);
+    protected void addServiceListener(SMSEntryUpdateListener updateListener) {
+        serviceObjects.add(updateListener);
     }
     
     /**
      * Method to remove objects that needs notifications
      */
-    protected void removeServiceListener(Object o) {
-        serviceObjects.remove(o);
+    protected void removeServiceListener(SMSEntryUpdateListener updateListener) {
+        serviceObjects.remove(updateListener);
         if (serviceObjects.isEmpty()) {
-            SMSEventListenerManager.removeNotification(notificationID);
-            notificationID = null;
+            subscription.cancel();
         }
     }
 
@@ -479,19 +458,19 @@ public class CachedSMSEntry {
                     + "successfully wrote the XML schema for dn: " + e.getDN());
         }
     }
-    
-    // Protected static variables
-    private static Class CACHED_SMSENTRY;
-    private static Method UPDATE_FUNC;
-    static {
-        try {
-            CACHED_SMSENTRY = Class.forName(
-                "com.sun.identity.sm.CachedSMSEntry");
-            UPDATE_FUNC = CACHED_SMSENTRY.getDeclaredMethod(
-                UPDATE_METHOD, (Class[]) null);
-            initializeProperties();
-        } catch (Exception e) {
-            // Should not happen, ignore
-        }
+
+    @Override
+    public void notifySMSEvent(DN dn, int event) {
+        update();
+    }
+
+    /**
+     * Defines a listener that needs to be updated when an SMSEntry has changed.
+     */
+    interface SMSEntryUpdateListener {
+        /**
+         * The update operation to perform when a change has occurred.
+         */
+        void update();
     }
 }

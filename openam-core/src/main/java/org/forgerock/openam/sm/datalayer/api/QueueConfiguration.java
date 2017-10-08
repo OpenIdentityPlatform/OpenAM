@@ -11,12 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.sm.datalayer.api;
 
+/**
+ * Interface describing the configuration for asynchronous processing queues.
+ */
 public interface QueueConfiguration {
+
     /**
      * The maximum duration the caller should wait to place their asynchronous
      * task on a work queue, and the maximum duration the caller should wait to
@@ -40,7 +44,6 @@ public interface QueueConfiguration {
      * This value is based on the number of connections available.
      *
      * @see org.forgerock.openam.sm.ConnectionConfigFactory
-     * @see org.forgerock.openam.sm.datalayer.utils.ConnectionCount
      * @see org.forgerock.openam.cts.impl.queue.QueueSelector
      *
      * @throws DataLayerException If there was any issue resolving the configuration of the processors.

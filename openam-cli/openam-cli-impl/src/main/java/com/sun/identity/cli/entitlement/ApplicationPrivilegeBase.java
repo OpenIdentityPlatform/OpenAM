@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.entitlement;
@@ -37,7 +37,6 @@ import com.sun.identity.cli.ExitCodes;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
@@ -47,6 +46,7 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.text.MessageFormat;
@@ -109,9 +109,18 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
     }
 
     private final ResourceTypeService resourceTypeService;
+    private final ApplicationServiceFactory applicationServiceFactory;
 
-    public ApplicationPrivilegeBase(final ResourceTypeService resourceTypeService) {
+    /**
+     * Create an instance of {@link ApplicationPrivilegeBase}.
+     *
+     * @param resourceTypeService Instance of {@link ResourceTypeService}.
+     * @param applicationServiceFactory Instance of {@link ApplicationServiceFactory}.
+     */
+    public ApplicationPrivilegeBase(final ResourceTypeService resourceTypeService,
+            final ApplicationServiceFactory applicationServiceFactory) {
         this.resourceTypeService = resourceTypeService;
+        this.applicationServiceFactory = applicationServiceFactory;
     }
 
     /**
@@ -166,8 +175,7 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
         String appName = getStringOptionValue(PARAM_APPL_NAME);
         Subject subject = SubjectUtils.createSubject(getAdminSSOToken());
 
-        Application application = ApplicationManager.getApplication(
-            subject, realm, appName);
+        Application application = applicationServiceFactory.create(subject, realm).getApplication(appName);
         if (application == null) {
             String[] param = {appName};
             throw new CLIException(MessageFormat.format(getResourceString("privilege-application-application-invalid"),

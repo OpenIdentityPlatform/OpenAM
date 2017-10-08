@@ -24,12 +24,17 @@
  *
  * $Id: LogoutRequest.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
+ * Portions Copyrighted 2016 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.LogoutRequestImpl;
+import com.sun.identity.saml2.protocol.impl.LogoutResponseImpl;
 
 /**
  * This class represents the <code>LogoutRequest</code> element in
@@ -62,6 +67,9 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *
  * @supported.all.api
  */
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = LogoutRequestImpl.class)
 public interface LogoutRequest
 extends com.sun.identity.saml2.protocol.RequestAbstract {
     

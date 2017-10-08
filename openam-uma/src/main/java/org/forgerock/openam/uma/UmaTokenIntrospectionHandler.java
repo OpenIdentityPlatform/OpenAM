@@ -11,18 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.*;
+import static org.forgerock.openam.oauth2.OAuth2Constants.IntrospectionEndpoint.*;
+import static org.forgerock.openam.utils.CollectionUtils.newList;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -84,7 +87,7 @@ public class UmaTokenIntrospectionHandler implements TokenIntrospectionHandler {
         for (Permission p : token.getPermissions()) {
             JsonValue permission = json(object(
                     field(UmaConstants.RESOURCE_SET_ID, p.getResourceSetId()),
-                    field(UmaConstants.SCOPES, p.getScopes())));
+                    field(UmaConstants.SCOPES, newList(p.getScopes()))));
             if (p.getExpiryTime() != null) {
                 permission.add(OAuth2Constants.JWTTokenParams.EXP, p.getExpiryTime());
             }

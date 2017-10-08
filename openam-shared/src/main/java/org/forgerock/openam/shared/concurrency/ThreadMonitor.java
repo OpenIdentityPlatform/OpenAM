@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.concurrency;
@@ -19,6 +19,7 @@ package org.forgerock.openam.shared.concurrency;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.util.Reject;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -49,9 +50,16 @@ import java.util.concurrent.TimeUnit;
  *
  * This function is to be used when the caller requires that their thread never fails
  * under any unexpected circumstance. This usage however should be used carefully.
- * Tight loops of failure followed by restart should be avoided. The thread being
- * invoked is responsible in this case for detecting this and be designed with restart
- * in mind.
+ * ThreadMonitor will monitor failures in the thread it is monitoring and will prevent tight loops by waiting increasing
+ * amounts of time between each retry. This amount of time will be called the recovery delay.
+ *
+ * The recovery delay is computed by multiplying the previous delay by two until it reaches the max recovery delay.
+ *
+ * As the purpose of the thread is still to be running all the time, the max recovery delay will be short:
+ * by printing regular errors, it will remind a problem needs to be address shortly.
+ *
+ * This will avoid the side effects produced by rapidly failing threads (like filling up log files) whilst still
+ * highlighting the critical issue to an administrator.
  *
  * The ThreadMonitor will use its own internal WatchDog class, itself runnable and a
  * thread pool to provide the monitoring.
@@ -70,10 +78,18 @@ import java.util.concurrent.TimeUnit;
  * @see org.forgerock.util.thread.listener.ShutdownManager
  */
 public class ThreadMonitor {
+
+    private static final int DEFAULT_MAX_RECOVERY_DELAY = 2000;
+    private static final int DEFAULT_RECOVERY_DELAY_DELTA = 5;
+
     private static final String DEBUG_HEADER = "ThreadMonitor: ";
     private final ExecutorService workPool;
     private final ShutdownManager shutdownManager;
     private final Debug debug;
+
+    private int maxRecoveryDelayInMS = DEFAULT_MAX_RECOVERY_DELAY;
+    private int recoveryDelayDeltaInMS = DEFAULT_RECOVERY_DELAY_DELTA;
+    private int successiveFailingCounter = 0;
 
     /**
      * Create an instance of the ThreadMonitor with an assigned work pool of threads to use.
@@ -91,9 +107,35 @@ public class ThreadMonitor {
     public ThreadMonitor(ExecutorService workPool,
                          ShutdownManager shutdownManager,
                          @Named(SharedGuiceModule.DEBUG_THREAD_MANAGER) Debug debug) {
+        this(workPool, shutdownManager, debug, DEFAULT_MAX_RECOVERY_DELAY, DEFAULT_RECOVERY_DELAY_DELTA);
+    }
+
+    /**
+     * A constructor reserved for test. We need to trick the time so tests doesn't consume time.
+     *
+     * @see org.forgerock.util.thread.ExecutorServiceFactory
+     *
+     * @param workPool A sized ExecutorService which is larger enough to handle the expected
+     *                 number of jobs it needs to monitor. This ExecutorService should be
+     *                 generated using the {@link org.forgerock.util.thread.ExecutorServiceFactory}
+     *                 to ensure it responds to the global System Shutdown event. Non null.
+     * @param shutdownManager Required to detect shutdown signals.
+     * @param debug Non null, required for signalling thread failure/restart.
+     * @param maxRecoveryDelayInMS Max recovery delay in ms
+     * @param recoveryDelayDeltaInMS Recovery delay delta in ms
+     *
+     */
+    @VisibleForTesting
+    public ThreadMonitor(ExecutorService workPool,
+            ShutdownManager shutdownManager,
+            @Named(SharedGuiceModule.DEBUG_THREAD_MANAGER) Debug debug,
+            int maxRecoveryDelayInMS,
+            int recoveryDelayDeltaInMS) {
         this.workPool = workPool;
         this.shutdownManager = shutdownManager;
         this.debug = debug;
+        this.maxRecoveryDelayInMS = maxRecoveryDelayInMS;
+        this.recoveryDelayDeltaInMS = recoveryDelayDeltaInMS;
     }
 
     /**
@@ -213,6 +255,10 @@ public class ThreadMonitor {
          */
         private synchronized void setComplete(boolean complete) {
             this.complete = complete;
+            if (complete) {
+                // At this point, the task executor should be running properly. We can reset the error counter
+                successiveFailingCounter = 0;
+            }
         }
 
         /**
@@ -225,9 +271,22 @@ public class ThreadMonitor {
 
         public void run() {
             while (!isComplete()) {
+                // Allow a recovery delay when hitting successive errors
+                if (successiveFailingCounter > 0) {
+                    try {
+                        Thread.sleep(Math.min(recoveryDelayDeltaInMS *  (int) Math.pow(2, successiveFailingCounter),
+                                maxRecoveryDelayInMS));
+                    } catch (InterruptedException e) {
+                        debug.message(DEBUG_HEADER + "interrupt detected, shutting down");
+                        setComplete(true);
+                        Thread.currentThread().interrupt();
+                    }
+                }
+
                 debug("Starting", startThread);
                 setFuture(startThread.start());
                 try {
+                    setComplete(false);
                     getFuture().get();
                     setComplete(true);
                     debug("Complete", startThread);
@@ -236,6 +295,7 @@ public class ThreadMonitor {
                     setComplete(true);
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
+                    successiveFailingCounter++;
                     debug.error(DEBUG_HEADER + "Thread WatchDog detected error, restarting", e);
                 } finally {
                     debug("Complete:" + isComplete(), startThread);
@@ -243,6 +303,16 @@ public class ThreadMonitor {
             }
             debug("Exited", startThread);
         }
+    }
+
+    /**
+     * Get Successive failing counter for the test.
+     *
+     * @return Successive failing counter
+     */
+    @VisibleForTesting
+    public int getSuccessiveFailingCounter() {
+        return successiveFailingCounter;
     }
 
     /**

@@ -11,19 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015-2016 ForgeRock AS.
  */
 
-
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrArrayView", [
+define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
 
     // jquery dependencies
     "selectize"
-], function ($, _, ConditionAttrBaseView, PoliciesDelegate) {
+], function ($, _, ConditionAttrBaseView, PoliciesService) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/authorization/policies/conditions/ConditionAttrArray.html",
         MIN_QUERY_LENGTH: 1,
@@ -35,7 +34,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
         IDENTITY_TYPES: ["users", "groups"],
         DEFAULT_TIME_ZONE: "GMT",
 
-        render: function (data, element, callback) {
+        render (data, element, callback) {
 
             // default to multiple selection if this option is not specified
             if (data.multiple === undefined) {
@@ -65,10 +64,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                 placeholder: $.t(view.SCRIPT_PLACEHOLDER),
                                 preload: true,
                                 sortField: "value",
-                                load: function (query, callback) {
+                                load (query, callback) {
                                     view.loadFromDataSource.call(this, item, callback);
                                 },
-                                onChange: function (value) {
+                                onChange (value) {
                                     title = this.$input.parent().find("label").data().title;
                                     text = this.$input.find(":selected").text();
                                     view.data.itemData[title] = value ? value : "";
@@ -81,11 +80,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                 preload: true,
                                 sortField: "value",
                                 render: {
-                                    item: function (item) {
-                                        return "<span class='time-zone-selected'>" + item.text + "</span>";
+                                    item (item) {
+                                        return `<span class='time-zone-selected'>${item.text}</span>`;
                                     }
                                 },
-                                load: function () {
+                                load () {
                                     var selectize = this;
                                     $.ajax({
                                         url: "timezones.json",
@@ -93,11 +92,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                                         cache: true
                                     }).done(function (data) {
                                         _.each(data.timezones, function (value) {
-                                            selectize.addOption({ value: value, text: value });
+                                            selectize.addOption({ value, text: value });
                                         });
                                     });
                                 },
-                                onChange: function (value) {
+                                onChange (value) {
                                     view.data.itemData.enforcementTimeZone = value ? value : view.DEFAULT_TIME_ZONE;
                                 }
                             });
@@ -105,16 +104,16 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                             _.extend(options, {
                                 placeholder: $.t(view.IDENTITY_PLACEHOLDER),
                                 sortField: "value",
-                                load: function (query, callback) {
+                                load (query, callback) {
                                     if (query.length < view.MIN_QUERY_LENGTH) {
                                         return callback();
                                     }
                                     view.queryIdentities.call(this, item, query, callback);
                                 },
-                                onItemAdd: function (item) {
+                                onItemAdd (item) {
                                     view.getUniversalId(item, type);
                                 },
-                                onItemRemove: function (item) {
+                                onItemRemove (item) {
                                     var universalid = _.findKey(view.data.hiddenData[type], function (obj) {
                                         return obj === item;
                                     });
@@ -127,15 +126,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                         }
                     } else {
                         _.extend(options, {
-                            delimiter: ",",
+                            delimiter: false,
                             persist: false,
-                            create: function (input) {
+                            create (input) {
                                 return {
                                     value: input,
                                     text: input
                                 };
                             },
-                            onChange: function (value) {
+                            onChange (value) {
                                 title = this.$input.parent().find("label").data().title;
                                 itemData = view.data.itemData;
                                 itemData[title] = value ? value : [];
@@ -158,12 +157,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
             });
         },
 
-        queryIdentities: function (item, query, callback) {
+        queryIdentities (item, query, callback) {
             var selectize = this;
-            PoliciesDelegate.queryIdentities($(item).data().source, query)
+            PoliciesService.queryIdentities($(item).data().source, query)
                 .done(function (data) {
                     _.each(data.result, function (value) {
-                        selectize.addOption({ value: value, text: value });
+                        selectize.addOption({ value, text: value });
                     });
                     callback(data.result);
                 }).error(function (e) {
@@ -172,17 +171,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/condit
                 });
         },
 
-        getUniversalId: function (item, type) {
+        getUniversalId (item, type) {
             var self = this;
-            PoliciesDelegate.getUniversalId(item, type).done(function (subject) {
+            PoliciesService.getUniversalId(item, type).done(function (subject) {
                 self.data.itemData.subjectValues = _.union(self.data.itemData.subjectValues, subject.universalid);
                 self.data.hiddenData[type][subject.universalid[0]] = item;
             });
         },
 
-        loadFromDataSource: function (item, callback) {
+        loadFromDataSource (item, callback) {
             var selectize = this;
-            PoliciesDelegate.getDataByType($(item).data().source)
+            PoliciesService.getDataByType($(item).data().source)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({ value: value._id, text: value.name });

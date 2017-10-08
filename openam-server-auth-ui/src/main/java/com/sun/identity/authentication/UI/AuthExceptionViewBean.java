@@ -29,6 +29,17 @@
 
 package com.sun.identity.authentication.UI;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -39,19 +50,10 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * This class is a default implementation of <code>ViewBean</code> 
@@ -160,7 +162,7 @@ public class AuthExceptionViewBean extends AuthViewBeanBase {
         } else if (name.equals(TXT_GOTO_LOGIN_AFTER_FAIL)) {
             return new StaticTextField(this, name, "");
         } else if (name.equals(URL_LOGIN)) { // non-cookie support
-            String loginURL = AuthUtils.encodeURL(LOGINURL, ac, response);
+            String loginURL = AuthUtils.encodeURL(LOGINURL, ac);
             return new StaticTextField(this, name, loginURL);
         } else if (name.equals(HTML_TITLE_AUTH_EXCEPTION)) {
             String exceptionTitle = rb.getString("htmlTitle_AuthException");

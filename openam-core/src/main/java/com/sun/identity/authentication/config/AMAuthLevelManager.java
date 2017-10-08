@@ -29,8 +29,19 @@
 
 package com.sun.identity.authentication.config;
 
-import static java.util.Collections.singleton;
-import static java.util.Collections.synchronizedMap;
+import static java.util.Collections.*;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.security.auth.login.Configuration;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthD;
@@ -44,17 +55,6 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import javax.security.auth.login.Configuration;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Manager for module authentication level, this class provides methods to 
@@ -620,11 +620,7 @@ public class AMAuthLevelManager implements ServiceListener {
             }
             // convert name to AMAuthConfigType
             AMAuthConfigType type = new AMAuthConfigType(configName);
-            if (type.getOrganization().equals(orgName) && 
-                (AuthD.revisionNumber >= ISAuthConstants.AUTHSERVICE_REVISION7_0
-                   || (type.getIndexType() == AMAuthConfigType.SERVICE &&
-                       type.getIndexName().equalsIgnoreCase(temp))
-                )) {
+            if (type.getOrganization().equals(orgName)) {
                 // match index type, service name & orgnanization DN
                 if (debug.messageEnabled()) {
                     debug.message(configName + " matches " + temp);

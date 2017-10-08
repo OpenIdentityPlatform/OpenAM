@@ -24,13 +24,15 @@
  *
  * $Id: SSOSessionListener.java,v 1.2 2008/06/25 05:41:43 qcheng Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.iplanet.sso.providers.dpro;
 
+import org.forgerock.util.Reject;
+
 import com.iplanet.dpro.session.SessionEvent;
-import com.iplanet.sso.SSOTokenEvent;
+import com.iplanet.dpro.session.SessionListener;
 import com.iplanet.sso.SSOTokenListener;
 
 /**
@@ -41,39 +43,36 @@ import com.iplanet.sso.SSOTokenListener;
  * triggered, which calls the ssoTokenChanged
  * 
  */
-
-public class SSOSessionListener implements com.iplanet.dpro.session.SessionListener {
+public class SSOSessionListener implements SessionListener {
     
-    private SSOTokenListener ssoListener;
+    private final SSOTokenListener ssoListener;
 
     public SSOSessionListener(SSOTokenListener listener) {
+        Reject.ifNull(listener);
         ssoListener = listener;
     }
 
-    /* implement the session changed method */
-    public void sessionChanged(SessionEvent evt) {
+    @Override
+    public void sessionChanged(SessionEvent sessionEvent) {
+        switch (sessionEvent.getType()) {
+        case IDLE_TIMEOUT:
+        case MAX_TIMEOUT:
+        case LOGOUT:
+        case DESTROY:
+        case PROPERTY_CHANGED:
+            tryToPropagateEventToTokenListeners(sessionEvent);
+            break;
+        default:
+            // ignore all other session event types
+        }
+    }
 
-        SSOTokenEvent ssoEvent = new SSOTokenEventImpl(evt);
-
-        /*
-         * we don't care for session creation and reactivation events. we will
-         * ignore them
-         */
-        int evtType = evt.getType();
-        if (evtType == SessionEvent.SESSION_CREATION
-                || evtType == SessionEvent.REACTIVATION) {
-            return;
-        } else {
-            /*
-             * let us catch any errors in ssoTokenChanged call since they are
-             * implemented by the token listeners.
-             */
-            try {
-                ssoListener.ssoTokenChanged(ssoEvent);
-            } catch (Throwable t) {
-                SSOProviderImpl.debug.error(
-                        "Unknown Error in calling ssoTokenChanged method", t);
-            }
+    private void tryToPropagateEventToTokenListeners(SessionEvent sessionEvent) {
+        try {
+            ssoListener.ssoTokenChanged(new SSOTokenEventImpl(sessionEvent));
+        } catch (Throwable t) {
+            // SSOTokenListener should be responsible for handling its own errors
+            SSOProviderImpl.debug.error("Unknown Error in calling ssoTokenChanged method", t);
         }
     }
 }

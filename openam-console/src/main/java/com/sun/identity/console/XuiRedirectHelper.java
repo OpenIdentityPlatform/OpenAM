@@ -36,7 +36,13 @@ import java.text.MessageFormat;
  */
 public final class XuiRedirectHelper {
 
-    private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI/#{1}";
+    public static final String SERVER_DEFAULT_LOCATION = "configure/server-defaults/general";
+    public static final String DEPLOYMENT_SERVERS = "deployment/servers";
+    public static final String GLOBAL_SERVICES = "configure/global-services";
+    public static final String TOP_LEVEL_REALM_SESSIONS = "realms/%2F/sessions";
+
+    private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI?realm={1}#{2}";
+    private static final String DEFAULT_REALM = "/";
 
     private XuiRedirectHelper() {
     }
@@ -45,13 +51,16 @@ public final class XuiRedirectHelper {
      * Redirects to the XUI to the specified realm and hash.
      *
      * @param request Used to determine the OpenAM deployment URI.
-     * @param redirectRealm The realm.
+     * @param administeredRealm The realm which is being administered.
+     * @param authenticationRealm The realm to which the user is authenticated.
      * @param xuiHash The XUI location hash.
      */
-    public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
-        String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
-                .getRootURL(request);
-        String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
+    public static void redirectToXui(HttpServletRequest request, String administeredRealm, String authenticationRealm,
+                                     String xuiHash) {
+        String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(administeredRealm)
+                .getContextPath();
+
+        String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, authenticationRealm, xuiHash);
         RequestContext rc = RequestManager.getRequestContext();
         try {
             rc.getResponse().sendRedirect(redirect);
@@ -62,17 +71,52 @@ public final class XuiRedirectHelper {
     }
 
     /**
-     * Gets the realm to redirect to from the JATO page session.
+     * Redirects to the XUI to the specified hash.
+     *
+     * @param request Used to determine the OpenAM deployment URI.
+     * @param xuiHash The XUI location hash.
+     * @param authenticationRealm The realm to which the user is authenticated.
+     */
+    public static void redirectToXui(HttpServletRequest request, String xuiHash, String authenticationRealm) {
+        String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(DEFAULT_REALM)
+                .getRootURL(request);
+
+        String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, authenticationRealm, xuiHash);
+        RequestContext rc = RequestManager.getRequestContext();
+        try {
+            rc.getResponse().sendRedirect(redirect);
+            throw new CompleteRequestException();
+        } catch (IOException e) {
+            //never thrown, empty catch
+        }
+    }
+
+    /**
+     * Gets the administered realm to redirect to from the JATO page session.
      *
      * @param viewBean The view bean.
-     * @return The redirect realm.
+     * @return The administered realm.
      */
-    public static String getRedirectRealm(ViewBeanBase viewBean) {
+    public static String getAdministeredRealm(ViewBeanBase viewBean) {
         String redirectRealm = (String) viewBean.getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
         if (redirectRealm == null) {
             redirectRealm = (String) viewBean.getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
         }
         return redirectRealm;
+    }
+
+    /**
+     * Gets the authentication realm to redirect to from the JATO page session.
+     *
+     * @param viewBean The view bean.
+     * @return The authentication realm.
+     */
+    public static String getAuthenticationRealm(ViewBeanBase viewBean) {
+        String authenticationRealm = (String) viewBean.getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
+        if (authenticationRealm == "") {
+            authenticationRealm = DEFAULT_REALM;
+        }
+        return authenticationRealm;
     }
 
     /**

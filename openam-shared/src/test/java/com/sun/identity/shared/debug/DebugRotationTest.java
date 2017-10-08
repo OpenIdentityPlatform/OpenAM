@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -71,7 +72,7 @@ public class DebugRotationTest extends DebugTestTemplate {
     }
 
     public void rotationInNormalDate() throws Exception {
-        Calendar calRandomDate = Calendar.getInstance();
+        Calendar calRandomDate = getCalendarInstance();
         calRandomDate.set(Calendar.YEAR, 1989);
         calRandomDate.set(Calendar.MONTH, Calendar.MAY);
         calRandomDate.set(Calendar.DAY_OF_MONTH, 16);
@@ -89,7 +90,7 @@ public class DebugRotationTest extends DebugTestTemplate {
 
     @Test
     public void rotationInDSTDateMarch() throws Exception {
-        Calendar calDSTMarch = Calendar.getInstance();
+        Calendar calDSTMarch = getCalendarInstance();
         calDSTMarch.set(Calendar.YEAR, 2015);
         calDSTMarch.set(Calendar.MONTH, Calendar.MARCH);
         calDSTMarch.set(Calendar.DAY_OF_MONTH, 29);
@@ -107,7 +108,7 @@ public class DebugRotationTest extends DebugTestTemplate {
 
     @Test
     public void rotationInDSTDateOctober() throws Exception {
-        Calendar calDSTOctober = Calendar.getInstance();
+        Calendar calDSTOctober = getCalendarInstance();
         calDSTOctober.set(Calendar.YEAR, 2015);
         calDSTOctober.set(Calendar.MONTH, Calendar.OCTOBER);
         calDSTOctober.set(Calendar.DAY_OF_MONTH, 26);
@@ -202,7 +203,7 @@ public class DebugRotationTest extends DebugTestTemplate {
 
 
         //Check files creation
-        Calendar fakeDate = Calendar.getInstance();
+        Calendar fakeDate = getCalendarInstance();
         fakeDate.setTimeInMillis(fakeInitTime);
 
         int currentPeriod = -1;

@@ -24,9 +24,12 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.saml2.profile;
+
+import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.soapbinding.Message;
@@ -93,6 +96,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -109,7 +113,6 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
-import org.forgerock.openam.saml2.audit.SAML2Auditor;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -342,7 +345,7 @@ public class SPACSUtils {
             resolve = ProtocolFactory.getInstance().createArtifactResolve();
             resolve.setID(SAML2Utils.generateID());
             resolve.setVersion(SAML2Constants.VERSION_2_0);
-            resolve.setIssueInstant(new Date());
+            resolve.setIssueInstant(newDate());
             resolve.setArtifact(art);
             resolve.setDestination(XMLUtils.escapeSpecialCharacters(location));
             Issuer issuer = AssertionFactory.getInstance().createIssuer();
@@ -673,10 +676,10 @@ public class SPACSUtils {
                         data,
                         null);
             SAMLUtils.sendError(request, response, 
-                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuer",
-                SAML2Utils.bundle.getString("invalidIssuer"));
+                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuerInResponse",
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
             throw new SAML2Exception(
-                SAML2Utils.bundle.getString("invalidIssuer"));
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
         }
 
         // check time?
@@ -1044,11 +1047,12 @@ public class SPACSUtils {
         SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, hostEntityId);
         SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, hostEntityId);
 
-        String assertionEncryptedAttr =
-                SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
+        boolean needAssertionEncrypted =
+                Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                        SAML2Constants.WANT_ASSERTION_ENCRYPTED));
 
-        boolean needAttributeEncrypted = getNeedAttributeEncrypted(assertionEncryptedAttr, spssoconfig);
-        boolean needNameIDEncrypted = getNeedNameIDEncrypted(assertionEncryptedAttr, spssoconfig);
+        boolean needAttributeEncrypted = getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
+        boolean needNameIDEncrypted = getNeedNameIDEncrypted(needAssertionEncrypted, spssoconfig);
 
         Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
         if (needNameIDEncrypted && encId == null) {
@@ -1108,8 +1112,7 @@ public class SPACSUtils {
         }
 
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
-        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(session, realm);
         String existUserName = null;
         SessionProvider sessionProvider = null;
         try {
@@ -1137,8 +1140,8 @@ public class SPACSUtils {
         String remoteHostId = authnAssertion.getIssuer().getValue();
         String userName = null;
         boolean isNewAccountLink = false;
-        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && acctMapper.shouldPersistNameIDFormat(realm, hostEntityId, remoteHostId, nameIDFormat));
+        boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, hostEntityId, remoteHostId, nameIDFormat);
         try {
             if (shouldPersistNameID) {
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -1413,25 +1416,19 @@ public class SPACSUtils {
         return session;
     }
 
-    private static boolean getNeedNameIDEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
-        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
-            String idEncryptedStr = SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
-                    SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (Boolean.parseBoolean(idEncryptedStr)) {
-                return true;
-            }
+    private static boolean getNeedNameIDEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
+        if (!needAssertionEncrypted) {
+            return Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_NAMEID_ENCRYPTED));
         }
 
         return false;
     }
 
-    public static boolean getNeedAttributeEncrypted(String assertionEncryptedAttr, SPSSOConfigElement spssoconfig) {
-        if (Boolean.parseBoolean(assertionEncryptedAttr)) {
-            String attrEncryptedStr =
-                    SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED);
-            if (Boolean.parseBoolean(attrEncryptedStr)) {
-                return true;
-            }
+    public static boolean getNeedAttributeEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
+        if (!needAssertionEncrypted) {
+            return Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig,
+                    SAML2Constants.WANT_ATTRIBUTE_ENCRYPTED));
         }
 
         return false;
@@ -1518,8 +1515,17 @@ public class SPACSUtils {
         }
         String tokenID = sessionProvider.getSessionID(session);
         if (!SPCache.isFedlet) {
-            List fedSessions = (List)
-                SPCache.fedSessionListsByNameIDInfoKey.get(infoKeyString);
+            List fedSessions = (List) SPCache.fedSessionListsByNameIDInfoKey.get(infoKeyString);
+            if (isIDPProxy) {
+                IDPSession idpSess = IDPCache.idpSessionsBySessionID.get(tokenID);
+                if (idpSess == null) {
+                    idpSess = new IDPSession(session);
+                    IDPCache.idpSessionsBySessionID.put(tokenID, idpSess);
+                }
+                SAML2Utils.debug.message("Add Session Partner: {}", info.getRemoteEntityID());
+                idpSess.addSessionPartner(new SAML2SessionPartner(info.getRemoteEntityID(), true));
+            }
+
             if (fedSessions == null) {
                 synchronized (SPCache.fedSessionListsByNameIDInfoKey) {
                     fedSessions = (List)
@@ -1537,25 +1543,6 @@ public class SPACSUtils {
                 if ((agent != null) && agent.isRunning() && (saml2Svc != null)){
                     saml2Svc.setFedSessionCount(
 		        (long)SPCache.fedSessionListsByNameIDInfoKey.size());
-                }
-
-                if (isIDPProxy) {
-                    //IDP Proxy 
-                    IDPSession idpSess = (IDPSession)
-                        IDPCache.idpSessionsBySessionID.get(
-                        tokenID);
-                    if (idpSess == null) {
-                        idpSess = new IDPSession(session);
-                        IDPCache.idpSessionsBySessionID.put(
-                            tokenID, idpSess);
-                    }
-                    if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message("Add Session Partner: " +
-                            info.getRemoteEntityID());
-                    } 
-                    idpSess.addSessionPartner(new SAML2SessionPartner(
-                        info.getRemoteEntityID(), true));
-                    // end of IDP Proxy        
                 }
             } else {
                 synchronized (fedSessions) {
@@ -1759,62 +1746,48 @@ public class SPACSUtils {
     }
 
     /**
-     * Saves response for later retrieval and retrieves local auth url from
-     * <code>SPSSOConfig</code>.
+     * Saves response for later retrieval and retrieves local auth url from <code>SPSSOConfig</code>.
      * If the url does not exist, generate one from request URI.
-     * If still cannot get it, (shouldn't happen), get it from
-     * <code>AMConfig.properties</code>.
+     * If still cannot get it, (shouldn't happen), get it from {@link SystemConfigurationUtil}.
      *
-     * @param orgName realm or organization name the service provider resides in
-     * @param hostEntityId Entity ID of the hosted service provider
-     * @param sm <code>SAML2MetaManager</code> instance to perform meta
-     *                operation.
-     * @param respInfo to be cached <code>ResponseInfo</code>.
-     * @param requestURI http request URI.
-     * @return local login url.
+     * @param realm Realm or organization name the service provider resides in.
+     * @param hostEntityId Entity ID of the hosted service provider.
+     * @param sm <code>SAML2MetaManager</code> instance to perform metadata operations.
+     * @param respInfo The to be cached <code>ResponseInfo</code>.
+     * @param requestURI The HTTP request URI.
+     * @return The local login url.
      */
-    public static String prepareForLocalLogin(
-                                        String orgName,
-                                        String hostEntityId,
-                                        SAML2MetaManager sm,
-                                        ResponseInfo respInfo,
-                                        String requestURI)
-    {
-        String localLoginUrl = getAttributeValueFromSPSSOConfig(
-                orgName, hostEntityId, sm, SAML2Constants.LOCAL_AUTH_URL);
-        if ((localLoginUrl == null) || (localLoginUrl.length() == 0)) {
+    public static String prepareForLocalLogin(String realm, String hostEntityId, SAML2MetaManager sm,
+            ResponseInfo respInfo, String requestURI) {
+        String localLoginUrl = getAttributeValueFromSPSSOConfig(realm, hostEntityId, sm, SAML2Constants.LOCAL_AUTH_URL);
+        if (StringUtils.isEmpty(localLoginUrl)) {
             // get it from request
             try {
                 int index = requestURI.indexOf("Consumer/metaAlias");
                 if (index != -1) {
-                    localLoginUrl = requestURI.substring(0, index)
-                        + "UI/Login?org="
-                        + orgName;
+                    localLoginUrl = requestURI.substring(0, index) + "UI/Login?realm=" + realm;
                 }
             } catch (IndexOutOfBoundsException e) {
                 localLoginUrl = null;
             }
-            if ((localLoginUrl == null) || (localLoginUrl.length() == 0)) {
+            if (StringUtils.isEmpty(localLoginUrl)) {
                 // shouldn't be here, but in case
                 localLoginUrl =
                         SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_PROTOCOL)
                         + "://"
                         + SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_HOST)
                         + SystemConfigurationUtil.getProperty(SAMLConstants.SERVER_PORT)
-                        + "/UI/Login?org="
-                        + orgName;
+                        + "/UI/Login?realm="
+                        + realm;
             }
         }
 
         respInfo.setIsLocalLogin(true);
         synchronized (SPCache.responseHash) {
-           SPCache.responseHash.put(respInfo.getResponse().getID(), 
-               respInfo);
-        }   
-        if (SAML2Utils.debug.messageEnabled()) {
-            SAML2Utils.debug.message("SPACSUtils:prepareForLocalLogin: " +
-                "localLoginUrl = " + localLoginUrl);
+           SPCache.responseHash.put(respInfo.getResponse().getID(), respInfo);
         }
+        SAML2Utils.debug.message("SPACSUtils:prepareForLocalLogin: localLoginUrl = {}", localLoginUrl);
+
         return localLoginUrl;
     }
 
@@ -1941,9 +1914,17 @@ public class SPACSUtils {
     public static Map processResponseForFedlet (HttpServletRequest request,
         HttpServletResponse response, PrintWriter out) throws SAML2Exception, IOException,
         SessionException, ServletException {
-        if ((request == null) || (response == null)) {
-            throw new ServletException(
-                SAML2SDKUtils.bundle.getString("nullInput"));
+        if (request == null) {
+            String message =
+                    MessageFormat.format(SAML2SDKUtils.bundle.getString("nullInputMessage"), new String[]{"request"});
+            SAML2SDKUtils.debug.error("SPACSUtils.processResponseForFedlet: " + message);
+            throw new ServletException(message);
+        }
+        if (response == null) {
+            String message =
+                    MessageFormat.format(SAML2SDKUtils.bundle.getString("nullInputMessage"), new String[]{"response"});
+            SAML2SDKUtils.debug.error("SPACSUtils.processResponseForFedlet: " + message);
+            throw new ServletException(message);
         }
         
         String requestURL = request.getRequestURL().toString();
@@ -2102,12 +2083,10 @@ public class SPACSUtils {
 
         String assertionEncryptedAttr =
                 SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_ASSERTION_ENCRYPTED);
-        if (assertionEncryptedAttr == null || !Boolean.parseBoolean(assertionEncryptedAttr)) {
+        if (!Boolean.parseBoolean(assertionEncryptedAttr)) {
             String idEncryptedStr =
                     SAML2Utils.getAttributeValueFromSPSSOConfig(spssoconfig, SAML2Constants.WANT_NAMEID_ENCRYPTED);
-            if (idEncryptedStr != null && Boolean.parseBoolean(idEncryptedStr)) {
-                needNameIDEncrypted = true;
-            }
+            needNameIDEncrypted = Boolean.parseBoolean(idEncryptedStr);
         }
 
         if (needNameIDEncrypted && encId == null) {
@@ -2140,11 +2119,10 @@ public class SPACSUtils {
         }
 
         final boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
-        final boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
-        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
+        final boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(null, realm);
 
-        final boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
-                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat));
+        final boolean shouldPersistNameID = !isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, spEntityId, idpEntityId, nameIDFormat);
 
         String userName = null;
         boolean isNewAccountLink = false;
@@ -2169,7 +2147,7 @@ public class SPACSUtils {
         }
 
         //if we're new and we're persistent, store the federation data in the user pref
-        if (isNewAccountLink && isPersistent) {
+        if (isNewAccountLink && shouldPersistNameID) {
             try {
                 writeFedData(nameId, spEntityId, realm, metaManager, idpEntityId, userName, storageKey);
             } catch (SAML2Exception se) {

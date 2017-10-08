@@ -15,7 +15,7 @@
  */
 
 
-define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/PoliciesView", [
+define([
     "jquery",
     "lodash",
     "backbone",
@@ -29,11 +29,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/services/realm/PoliciesService",
     "org/forgerock/openam/ui/admin/models/authorization/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/AbstractListView"
 ], function ($, _, Backbone, BackbonePaginator, BackgridFilter, Backgrid, ThemeablePaginator, Configuration,
-             EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesDelegate, PolicyModel,
+             EventManager, Router, Constants, BackgridUtils, URLHelper, PoliciesService, PolicyModel,
              AbstractListView) {
     var PoliciesView = AbstractListView.extend({
         element: "#policiesPanel",
@@ -41,9 +41,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
         // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/authorization/policies/PoliciesToolbarTemplate.html",
         events: {
-            "click #addNewPolicy": "addNewPolicy"
+            "click [data-add-entity]": "addNewPolicy"
         },
-        render: function (data, callback) {
+        render (data, callback) {
             var self = this,
                 Policies,
                 columns,
@@ -59,11 +59,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     filterName: "eq",
-                    _queryFilter: ['applicationName+eq+"' + encodeURIComponent(this.data.policySetModel.id) + '"']
+                    _queryFilter: [`applicationName+eq+"${encodeURIComponent(this.data.policySetModel.id)}"`]
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
-                sync: function (method, model, options) {
+                sync (method, model, options) {
                     options.beforeSend = function (xhr) {
                         xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
                     };
@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
             });
 
             ClickableRow = BackgridUtils.ClickableRow.extend({
-                callback: function (e) {
+                callback (e) {
                     var $target = $(e.target);
 
                     if ($target.parents().hasClass("fr-col-btn-2")) {
@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                     cell: BackgridUtils.TemplateCell.extend({
                         iconClass: "fa-gavel",
                         template: "templates/admin/backgrid/cell/IconAndNameCell.html",
-                        rendered: function () {
+                        rendered () {
                             this.$el.find("i.fa").addClass(this.iconClass);
                         }
                     }),
@@ -117,17 +117,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                         className: "fr-col-btn-2",
                         template: "templates/admin/backgrid/cell/RowActionsCell.html",
                         events: {
-                            "click .edit-row-item": "editItem",
-                            "click .delete-row-item": "deleteItem"
+                            "click [data-edit-item]": "editItem",
+                            "click [data-delete-item]": "deleteItem"
                         },
-                        editItem: function () {
+                        editItem () {
                             Router.routeTo(Router.configuration.routes.realmsPolicyEdit, {
                                 args: _.map([self.data.realmPath, self.data.policySetModel.id, this.model.id],
                                     encodeURIComponent),
                                 trigger: true
                             });
                         },
-                        deleteItem: function (e) {
+                        deleteItem (e) {
                             self.onDeleteClick(e, { type: $.t("console.authorization.common.policy") },
                                 this.model.id,
                                 function () {
@@ -148,7 +148,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
             this.data.items = new Policies();
 
             grid = new Backgrid.Grid({
-                columns: columns,
+                columns,
                 row: ClickableRow,
                 collection: self.data.items,
                 className: "backgrid table table-hover",
@@ -172,13 +172,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policies/Polici
                     }
 
                     if (callback) {
-                        callback(self.data.items.length);
+                        callback();
                     }
                 });
             });
         },
 
-        addNewPolicy: function () {
+        addNewPolicy () {
             Router.routeTo(Router.configuration.routes.realmsPolicyNew, {
                 args: _.map([this.data.realmPath, this.data.policySetModel.id], encodeURIComponent),
                 trigger: true

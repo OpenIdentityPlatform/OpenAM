@@ -24,14 +24,21 @@
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2016 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import static org.forgerock.openam.entitlement.PolicyConstants.SUPER_ADMIN_SUBJECT;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplicationService;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+
+import java.security.AccessController;
+
+import javax.security.auth.Subject;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -42,9 +49,6 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
 
 /**
  * This observer will remove all referral and application privileges
@@ -63,21 +67,16 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         SSOToken adminToken =
             (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            SubjectUtils.createSubject(adminToken), "/");
-        if (ec.migratedToEntitlementService()) {
-            try {
-                ServiceConfigManager scm = new ServiceConfigManager(
-                    IdConstants.REPO_SERVICE, adminToken);
-                scm.addListener(new SubRealmObserver());
-            } catch (SMSException e) {
-                PrivilegeManager.debug.error(
-                    "SubRealmObserver.registerListener", e);
-            } catch (SSOException e) {
-                PrivilegeManager.debug.error(
-                    "SubRealmObserver.registerListener", e);
-            }
+        try {
+            ServiceConfigManager scm = new ServiceConfigManager(
+                IdConstants.REPO_SERVICE, adminToken);
+            scm.addListener(new SubRealmObserver());
+        } catch (SMSException e) {
+            PrivilegeManager.debug.error(
+                "SubRealmObserver.registerListener", e);
+        } catch (SSOException e) {
+            PrivilegeManager.debug.error(
+                "SubRealmObserver.registerListener", e);
         }
     }
     
@@ -101,7 +100,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         // Only clear cache and remove referrals if the realm is being removed
         if (type == ServiceListener.REMOVED &&
                 (serviceComponent == null || serviceComponent.trim().isEmpty() || serviceComponent.equals("/"))) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            getApplicationService(SUPER_ADMIN_SUBJECT, DNMapper.orgNameToRealmName(orgName)).clearCache();
             try {
                 OpenSSOApplicationPrivilegeManager.removeAllPrivileges(orgName);
             } catch (EntitlementException ex) {
@@ -111,7 +110,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
             }
 
         } else if (type == ServiceListener.MODIFIED) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            getApplicationService(SUPER_ADMIN_SUBJECT, DNMapper.orgNameToRealmName(orgName)).clearCache();
         }
     }
 

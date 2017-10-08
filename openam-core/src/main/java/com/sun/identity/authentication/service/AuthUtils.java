@@ -28,13 +28,34 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.session.SessionConstants.*;
+import java.net.URL;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.Reject;
 
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -46,9 +67,7 @@ import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthLevelManager;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.server.AuthXMLRequest;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
-import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.ResourceLookup;
@@ -70,32 +89,11 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.net.URL;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.util.Reject;
 
 public class AuthUtils extends AuthClientUtils {
-    
+
+    private static final Debug utilDebug = Debug.getInstance("amAuthUtils");
+
     public static final String BUNDLE_NAME="amAuth";
     
     /**
@@ -120,12 +118,9 @@ public class AuthUtils extends AuthClientUtils {
      * Name of parameter used to indicate authn process MUST be run.
      */
     public static final String FORCE_AUTH = "ForceAuth";
-    
-    private static ArrayList pureJAASModuleClasses = new ArrayList();
-    private static ArrayList ISModuleClasses = new ArrayList();
+
     private static Hashtable moduleService = new Hashtable();
-    private static ResourceBundle bundle;
-    static Debug utilDebug = Debug.getInstance("amAuthUtils");    
+
     private static String serviceURI = SystemProperties.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
 
@@ -139,11 +134,9 @@ public class AuthUtils extends AuthClientUtils {
     }
     
     /* retrieve session */
-    public static com.iplanet.dpro.session.service.InternalSession
-    getSession(AuthContextLocal authContext) {
+    public static InternalSession getSession(AuthContextLocal authContext) {
         
-        com.iplanet.dpro.session.service.InternalSession sess =
-        getLoginState(authContext).getSession();
+        InternalSession sess = getLoginState(authContext).getSession();
         if (utilDebug.messageEnabled()) {
             utilDebug.message("returning session : " + sess);
         }
@@ -171,81 +164,74 @@ public class AuthUtils extends AuthClientUtils {
      * @param isBackPost <code>true</code> if back posting.
      * @return authentication context.
      */
-    public static AuthContextLocal getAuthContext(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        SessionID sid,
-        boolean isSessionUpgrade,
-        boolean isBackPost) throws AuthException {
-        return getAuthContext(request,response,sid,
-            isSessionUpgrade,isBackPost,false);
+    public static AuthContextLocal getAuthContext(final HttpServletRequest request,
+                                                  final HttpServletResponse response,
+                                                  final SessionID sid,
+                                                  final boolean isSessionUpgrade,
+                                                  final boolean isBackPost) throws AuthException {
+        return getAuthContext(request, response, sid, isSessionUpgrade, isBackPost, false, false);
     }
-    
+
     /**
      * Returns the authentication context for a request.
      *
      * @param request HTTP Servlet Request.
      * @param response HTTP Servlet Response.
-     * @param sid SessionID for this request.
+     * @param sessionId SessionID for this request.
      * @param isSessionUpgrade <code>true</code> if session upgrade.
      * @param isBackPost <code>true</code> if back posting.
      * @param isLogout <code>true</code> for logout.
+     * @param isRestAuth <code>true</code> if the request is coming from JSON REST/XUI.
      * @return authentication context.
      */
-    public static AuthContextLocal getAuthContext(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        SessionID sid,
-        boolean isSessionUpgrade,
-        boolean isBackPost,
-        boolean isLogout) throws AuthException {
+    public static AuthContextLocal getAuthContext(final HttpServletRequest request,
+                                                  final HttpServletResponse response,
+                                                  final SessionID sessionId,
+                                                  final boolean isSessionUpgrade,
+                                                  final boolean isBackPost,
+                                                  final boolean isLogout,
+                                                  final boolean isRestAuth) throws AuthException {
         utilDebug.message("In AuthUtils:getAuthContext");
-        Hashtable dataHash;
+        Hashtable<String, String> decodedRequestData;
         AuthContextLocal authContext = null;
         LoginState loginState = null;
         // initialize auth service.
         AuthD ad = AuthD.getAuth();
         
         try {
-            dataHash = parseRequestParameters(request);
-            authContext = retrieveAuthContext(request, sid);
+            decodedRequestData = parseRequestParameters(request);
+            authContext = retrieveAuthContext(sessionId);
 
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("AuthUtil:getAuthContext:sid is.. .: " 
-                                  + sid);
-                utilDebug.message("AuthUtil:getAuthContext:authContext is..: "
-                + authContext);
+                utilDebug.message("AuthUtil:getAuthContext:sid is.. .: " + sessionId);
+                utilDebug.message("AuthUtil:getAuthContext:authContext is..: " + authContext);
             }
 
-            if(!sid.isNull() && authContext == null && !isSessionUpgrade) {
+            if(!sessionId.isNull() && authContext == null && !isSessionUpgrade) {
                 String authCookieValue = getAuthCookieValue(request);
-                if ((authCookieValue != null) && (!authCookieValue.isEmpty())
-                        && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
+                SessionID sessionIdForURL = null;
+                if (StringUtils.isEmpty(authCookieValue) && isRestAuth) {
+                    sessionIdForURL = sessionId;
+                } else if (StringUtils.isNotEmpty(authCookieValue) && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
+                    sessionIdForURL = new SessionID(authCookieValue);
+                }
+                if (sessionIdForURL != null) {
                     String cookieURL = null;
                     try {
-                        SessionID sessionID = new SessionID(authCookieValue);
-                        URL sessionServerURL = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sessionID);
+                        URL sessionServerURL = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sessionIdForURL);
                         cookieURL = sessionServerURL.getProtocol()
-                            + "://" + sessionServerURL.getHost() + ":"
-                            + Integer.toString(sessionServerURL.getPort()) 
+                            + "://" + sessionServerURL.getHost()
+                            + ":" + Integer.toString(sessionServerURL.getPort())
                             + serviceURI;
                     } catch (SessionException e) {
-                        if (utilDebug.messageEnabled()) {
-                        	utilDebug.message("AuthUtils:getAuthContext():"
-                                + e.toString());
-                        }
+                        utilDebug.message("AuthUtils:getAuthContext(): %s", e.toString());
                     }
-                    if (utilDebug.messageEnabled()) {
-                    	utilDebug.message("AuthUtils:getAuthContext():"
-                            + "cookieURL : " + cookieURL);
-                    }
-                    if ((cookieURL != null) && (!cookieURL.isEmpty()) &&
-                        (isLocalServer(cookieURL,true))) {
-                        utilDebug.error("AuthUtils:getAuthContext(): "
-                            + "Invalid Session Timed out");
+                    utilDebug.message("AuthUtils:getAuthContext(): cookieURL : %s", cookieURL);
+
+                    if (StringUtils.isNotEmpty(cookieURL) && (isLocalServer(cookieURL,true))) {
+                        utilDebug.error("AuthUtils:getAuthContext(): " + "Invalid Session Timed out");
                         clearAllCookies(request, response);
-                        throw new AuthException(
-                            AMAuthErrorCode.AUTH_TIMEOUT, null);
+                        throw new AuthException(AMAuthErrorCode.AUTH_TIMEOUT, null);
                     }            	
                 }
             }
@@ -264,8 +250,8 @@ public class AuthUtils extends AuthClientUtils {
                 try {
                     loginState = new LoginState();
                     InternalSession oldSession = null;
-                    if (sid != null) {
-                        oldSession = AuthD.getSession(sid);
+                    if (sessionId != null) {
+                        oldSession = AuthD.getSession(sessionId);
                         loginState.setOldSession(oldSession);
                     }
                     if (isSessionUpgrade) {
@@ -274,12 +260,11 @@ public class AuthUtils extends AuthClientUtils {
                     } else if (isBackPost) {
                         loginState.setOldSession(oldSession);
                     }
-                    authContext =
-                    loginState.createAuthContext(request,response,sid,dataHash);
+                    authContext = loginState.createAuthContext(request, response, sessionId, decodedRequestData);
                     loginState.setForceAuth(Boolean.parseBoolean(request.getParameter(FORCE_AUTH)));
                     authContext.setLoginState(loginState);
                     String queryOrg =
-                    getQueryOrgName(request,getOrgParam(dataHash));
+                    getQueryOrgName(request, getOrgParam(decodedRequestData));
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("query org is .. : "+ queryOrg);
                     }
@@ -294,8 +279,7 @@ public class AuthUtils extends AuthClientUtils {
             } else {
                 utilDebug.message("getAuthContext: found existing request.");
                 
-                authContext = processAuthContext(authContext,request,
-				response,dataHash,sid);
+                authContext = processAuthContext(authContext, request, response, decodedRequestData, sessionId);
 				loginState = getLoginState(authContext);
 				loginState.setNewRequest(false);
             }
@@ -317,77 +301,55 @@ public class AuthUtils extends AuthClientUtils {
     // if request has arg=newsession then destroy session and create a new
     // AuthContextLocal object.
     
-    static AuthContextLocal processAuthContext(AuthContextLocal authContext,
-    HttpServletRequest request,
-    HttpServletResponse response,
-    Hashtable dataHash,
-    SessionID sid) throws AuthException {
-        // initialize auth service.
-        AuthD ad = AuthD.getAuth();
-        
-        LoginState loginState = getLoginState(authContext);
+    static AuthContextLocal processAuthContext(final AuthContextLocal oldAuthContext,
+                                               final HttpServletRequest request,
+                                               final HttpServletResponse response,
+                                               final Map<String, String> decodedRequestData,
+                                               final SessionID sessionId) throws AuthException {
+
+        Debug authDebugLogger = AuthD.getAuth().debug;
+
+        AuthContextLocal processedAuthContext = oldAuthContext;
+
+        LoginState loginState = getLoginState(processedAuthContext);
         com.iplanet.dpro.session.service.InternalSession sess = null;
         
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("in processAuthContext authcontext : " 
-                + authContext );
+            utilDebug.message("in processAuthContext authcontext : " + processedAuthContext );
             utilDebug.message("in processAuthContext request : " + request);
             utilDebug.message("in processAuthContext response : " + response);
-            utilDebug.message("in processAuthContext sid : " + sid);
+            utilDebug.message("in processAuthContext sid : " + sessionId);
         }
         
-        if (newSessionArgExists(dataHash, sid) &&
-        (loginState.getLoginStatus() == LoginStatus.AUTH_SUCCESS)) {
-            // destroy auth context and create new one.
-            utilDebug.message("newSession arg exists");
-            destroySession(loginState);
-            try{
-                loginState = new LoginState();
-                authContext = loginState.createAuthContext(request,response,
-                sid,dataHash);
-                authContext.setLoginState(loginState);
-                String queryOrg =
-                getQueryOrgName(request,getOrgParam(dataHash));
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("query org is .. : "+ queryOrg);
-                }
-                loginState.setQueryOrg(queryOrg);
-            } catch (AuthException ae) {
-                utilDebug.message("Error creating AuthContextLocal");
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Exception " , ae);
-                }
-                throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
-            }
+        if (newSessionArgExists(decodedRequestData, sessionId)
+                && (loginState.getLoginStatus() == LoginStatus.AUTH_SUCCESS)) {
+            processedAuthContext = rebuildAuthContext(request, response, decodedRequestData, sessionId, loginState);
+
         } else {
-            boolean multipleTabsUsed =
-                Boolean.valueOf(SystemPropertiesManager.get(
-                     Constants.MULTIPLE_TABS_USED, "false")).booleanValue();
-            if (ad.debug.messageEnabled()) {
-                ad.debug.message("AuthUtils .processAuthContext()."
-                    + Constants.MULTIPLE_TABS_USED+"="+multipleTabsUsed);
-            }
-            /**
+            boolean multipleTabsUsed = SystemPropertiesManager.getAsBoolean(Constants.MULTIPLE_TABS_USED, false);
+            authDebugLogger.message("AuthUtils .processAuthContext().%s=%s",
+                    Constants.MULTIPLE_TABS_USED, multipleTabsUsed);
+
+            /*
              * This flag indicates that the same user is running the auth login
-             * process in mutiple tabs of the same browser and if the auth
+             * process in multiple tabs of the same browser and if the auth
              * is zero user intervention custom auth module using Redirect
              * Callback, then there would be a situation that the same 
-             * authContext is being used by mutiple threads running the
-             * auth process, so avoid this mutiple thread interference keep 
+             * authContext is being used by multiple threads running the
+             * auth process, so avoid this multiple thread interference keep
              * the process in this while loop until all the submit requirements
              * have been met. This is a specific customer use case.
              */
             if (multipleTabsUsed) {
-                 while (authContext.submittedRequirements()) {
-                     ad.debug.error("Currently processing submit Requirements");
-                     if (ad.debug.messageEnabled()) {
-                        ad.debug.message("watiting for submittedRequirements() "
-                        +"to complete.");
+                 while (processedAuthContext.submittedRequirements()) {
+                     authDebugLogger.error("Currently processing submit Requirements");
+                     if (authDebugLogger.messageEnabled()) {
+                         authDebugLogger.message("watiting for submittedRequirements() to complete.");
                      }
                  }
             } else {
-                if (authContext.submittedRequirements()) {
-                    ad.debug.error("Currently processing submit Requirements");
+                if (processedAuthContext.submittedRequirements()) {
+                    authDebugLogger.error("Currently processing submit Requirements");
                     throw new AuthException(
                              AMAuthErrorCode.AUTH_TOO_MANY_ATTEMPTS, null);
                 }
@@ -396,8 +358,8 @@ public class AuthUtils extends AuthClientUtils {
             utilDebug.message("new session arg does not exist");
             loginState.setHttpServletRequest(request);
             loginState.setHttpServletResponse(response);
-            loginState.setParamHash(dataHash);
-            sess = ad.getSession(sid);
+            loginState.setParamHash(decodedRequestData);
+            sess = AuthD.getSession(sessionId);
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("AuthUtil :Session is .. : " + sess);
             }
@@ -407,9 +369,33 @@ public class AuthUtils extends AuthClientUtils {
                 loginState.setCookieDetect(false);
             }
         }
-        return authContext;
+        return processedAuthContext;
     }
-    
+
+    // destroy auth context and create new one.
+    private static AuthContextLocal rebuildAuthContext(final HttpServletRequest request,
+                                                       final HttpServletResponse response,
+                                                       final Map<String, String> decodedRequestData,
+                                                       final SessionID sessionId,
+                                                       final LoginState loginState) throws AuthException {
+        AuthContextLocal processedAuthContext;
+        utilDebug.message("newSession arg exists");
+        destroySession(loginState);
+        try {
+            LoginState newLoginState = new LoginState();
+            processedAuthContext = newLoginState.createAuthContext(request, response, sessionId, decodedRequestData);
+            processedAuthContext.setLoginState(newLoginState);
+            String queryOrg = getQueryOrgName(request, getOrgParam(decodedRequestData));
+            utilDebug.message("query org is .. : %s", queryOrg);
+            loginState.setQueryOrg(queryOrg);
+        } catch (AuthException ae) {
+            utilDebug.message("Error creating AuthContextLocal");
+            utilDebug.message("Exception %s", ae);
+            throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
+        }
+        return processedAuthContext;
+    }
+
     public static LoginState getLoginState(AuthContextLocal authContext) {
         
         LoginState loginState = null;
@@ -418,40 +404,19 @@ public class AuthUtils extends AuthClientUtils {
         }
         return loginState;
     }       
-   
-    public static Hashtable getRequestParameters(AuthContextLocal authContext) {
-        LoginState loginState = getLoginState(authContext);
-        if (loginState != null) {
-            return loginState.getRequestParamHash();
-        } else {
-            return new Hashtable();
-        }
-    }
-    
+
     // retrieve the sid from the LoginState object
-    public static String getSidString(AuthContextLocal authContext)
-    throws AuthException {
-        com.iplanet.dpro.session.service.InternalSession sess = null;
-        String sidString = null;
-        try {
-            if (authContext != null) {
-                LoginState loginState = authContext.getLoginState();
-                if (loginState != null) {
-                    SessionID sid = loginState.getSid();
-                    if (sid != null) {
-                        sidString = sid.toString();
-                    }
+    private static String getSessionIDString(AuthContextLocal authContext) {
+        if (authContext != null) {
+            LoginState loginState = authContext.getLoginState();
+            if (loginState != null) {
+                SessionID sessionID = loginState.getSid();
+                if (sessionID != null) {
+                    return sessionID.toString();
                 }
             }
-        } catch (Exception  e) {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error retreiving sid.. :" + e.getMessage());
-            }
-            // no need to have error code since the method where this is called
-            // generates AUTH_ERROR
-            throw new AuthException("noSid", new Object[] {e.getMessage()});
         }
-        return sidString;
+        return null;
     }
     
     /**
@@ -470,7 +435,7 @@ public class AuthUtils extends AuthClientUtils {
         Cookie cookie=null;
         String cookieName = getCookieName();
         try {
-            String sidString= getSidString(ac);
+            String sidString= getSessionIDString(ac);
             LoginState loginState = getLoginState(ac);
             if (loginState != null && loginState.isSessionInvalid()) {
                 cookieName = getAuthCookieName();
@@ -506,36 +471,7 @@ public class AuthUtils extends AuthClientUtils {
         logoutCookie.setMaxAge(0);
         return logoutCookie;
     }
-    
-     /*
-     * Return logout url from LoginState object.
-     * Caller should check for possible null value returned.
-     */
-    public String getLogoutURL(AuthContextLocal authContext) {
 
-        try {
-            LoginState loginState = getLoginState(authContext);
-            if (loginState == null) {
-                // No default URL in case of logout. Taken care by LogoutBean.
-                return null;
-            }
-
-            String logoutURL = loginState.getLogoutURL();
-
-            if (utilDebug.messageEnabled()) {
-                if (logoutURL != null)
-                    utilDebug.message("AuthUtils: getLogoutURL : " + logoutURL);
-                else
-                    utilDebug.message("AuthUtils: getLogoutURL : null");
-            }
-
-            return logoutURL;
-
-        } catch (Exception e) {
-            utilDebug.message("Exception " , e);
-            return null;
-        }
-    }
     // returns true if request is new else false.    
     public static boolean isNewRequest(AuthContextLocal ac) {
         
@@ -612,23 +548,17 @@ public class AuthUtils extends AuthClientUtils {
         return getLoginState(authContext).getInetDomainStatus();
     }
     
-    public static boolean newSessionArgExists(
-        Hashtable dataHash, SessionID sid) {
+    public static boolean newSessionArgExists(final Map<String, String> decodedRequestData, final SessionID sessionId) {
 
-        String arg = (String)dataHash.get("arg");
-        if (arg != null && arg.equals("newsession")) {
-            if (retrieveAuthContext(sid) != null) {
-                return true;
-            } else {
-                return false;
-            }
+        String arg = decodedRequestData.get("arg");
+        if (null == arg) {
+            return false;
         }
-        return false;
+        return arg.equals("newsession") && hasAuthContext(sessionId);
     }
     
     public static String encodeURL(String url,
-    AuthContextLocal authContext,
-    HttpServletResponse response) {
+    AuthContextLocal authContext) {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("AuthUtils:input url is :"+ url);
         }
@@ -638,7 +568,7 @@ public class AuthUtils extends AuthClientUtils {
         if (loginState==null) {
             encodedURL = url;
         } else {
-            encodedURL = loginState.encodeURL(url,response);
+            encodedURL = loginState.encodeURL(url);
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("AuthUtils:encoded url is :"+encodedURL);
@@ -712,14 +642,14 @@ public class AuthUtils extends AuthClientUtils {
     }    
    
     public static Cookie createlbCookie(AuthContextLocal authContext,
-    String cookieDomain, boolean persist) throws AuthException {
+    String cookieDomain) throws AuthException {
         Cookie lbCookie=null;
         try {
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("cookieDomain : " + cookieDomain);
             }
             LoginState loginState = getLoginState(authContext);
-            lbCookie = loginState.setlbCookie(cookieDomain, persist);
+            lbCookie = loginState.setlbCookie(cookieDomain);
             return lbCookie;
         } catch (Exception e) {
             utilDebug.message("Unable to create Load Balance Cookie");
@@ -737,12 +667,12 @@ public class AuthUtils extends AuthClientUtils {
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
-                    Cookie cookie = createlbCookie(authContext, domain, false);
+                    Cookie cookie = createlbCookie(authContext, domain);
                     CookieUtils.addCookieToResponse(response, cookie);
                 }
             } else {
                 CookieUtils.addCookieToResponse(response, 
-                        createlbCookie(authContext, null, false));
+                        createlbCookie(authContext, null));
             }
         }
     }     
@@ -966,17 +896,20 @@ public class AuthUtils extends AuthClientUtils {
      *  @param forceAuth force auth flag
      *  @return AuthContextLocal object
      */
-    public static AuthContextLocal getAuthContext(String orgName,
-        String sessionID, boolean isLogout, HttpServletRequest req,
-        String indexType,  AuthXMLRequest xmlReq, boolean forceAuth)
-        throws AuthException {
+    public static AuthContextLocal getAuthContext(final String providedOrgName,
+                                                  final String sessionID,
+                                                  final boolean isLogout,
+                                                  final HttpServletRequest req,
+                                                  final String indexType,
+                                                  final AuthXMLRequest xmlReq,
+                                                  final boolean forceAuth) throws AuthException {
+        String orgName = providedOrgName;
         AuthContextLocal authContext = null;
         SessionID sid = null;
         com.iplanet.dpro.session.service.InternalSession sess = null;
         LoginState loginState = null;
         boolean sessionUpgrade = false;
         AuthD ad = AuthD.getAuth();
-        int sessionState = -1;
         SSOToken ssot = null;
         String indexName = null;
         if (xmlReq != null) {
@@ -992,7 +925,7 @@ public class AuthUtils extends AuthClientUtils {
         try {
             if ((sessionID != null) && (!sessionID.equals("0"))) {
                 sid = new SessionID(sessionID);
-                authContext = retrieveAuthContext(req, sid);
+                authContext = retrieveAuthContext(sid);
                 
                 // check if this sesson id is active, if yes then it
                 // is a session upgrade case.
@@ -1005,12 +938,12 @@ public class AuthUtils extends AuthClientUtils {
                 if (sess == null) {
                     sessionUpgrade = false;
                 } else {
-                    sessionState = sess.getState();
+                    SessionState sessionState = sess.getState();
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("sid from sess is : " + sess.getID());
                         utilDebug.message("sess is : " + sessionState);
                     }
-                    if (!((sessionState == INVALID)  || (isLogout))) {
+                    if (!((sessionState == SessionState.INVALID)  || (isLogout))) {
                         ssot = AuthUtils.
                             getExistingValidSSOToken(sid);
                         if ((indexType != null) && (indexName != null)) {
@@ -1143,69 +1076,6 @@ public class AuthUtils extends AuthClientUtils {
 	return oldSession;
     }
 
-    
-    /* retreive the authcontext based on the req */
-    public static AuthContextLocal getOrigAuthContext(SessionID sid)
-    throws AuthException {
-        AuthContextLocal authContext = null;
-        // initialize auth service.
-        AuthD ad = AuthD.getAuth();
-        try {
-            authContext = retrieveAuthContext(sid);
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("AuthUtil:getOrigAuthContext:sid is.:"+sid);
-                utilDebug.message("AuthUtil:getOrigAuthContext:authContext is:"
-                + authContext);
-            }
-            com.iplanet.dpro.session.service.InternalSession sess =
-            getLoginState(authContext).getSession();
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("Session is : "+ sess);
-                if (sess != null) {
-                    utilDebug.message("Session State is : "+ sess.getState());
-                }
-                utilDebug.message("Returning Orig AuthContext:"+authContext);
-            }
-            
-            if (sess == null) {
-                return null;
-            } else {
-                int status = sess.getState();
-                if (status == INVALID){
-                    return null;
-                }
-                return authContext;
-            }
-            
-        } catch (Exception e) {
-            return null;
-        }
-    }
-    
-    /* check if the session is active */
-    public static boolean isSessionActive(AuthContextLocal oldAuthContext) {
-        try {
-            com.iplanet.dpro.session.service.InternalSession sess =
-            getSession(oldAuthContext);
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("Sess is : " + sess);
-            }
-            boolean sessionValid = false;
-            if (sess != null) {
-                if (sess.getState() == VALID) {
-                    sessionValid = true;
-                }
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Sess State is : " + sess.getState());
-                    utilDebug.message("Is Session Active : " + sessionValid);
-                }
-            }
-            return sessionValid;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
     /* retreive session property */
     public static String getSessionProperty(String property,
     AuthContextLocal oldAuthContext) {
@@ -1288,15 +1158,7 @@ public class AuthUtils extends AuthClientUtils {
         }
         return loginState.getLoginURL();
     }
-    
-    public static AuthContextLocal getAuthContextFromHash(SessionID sid) {
-        AuthContextLocal authContext = null;
-        if (sid != null) {
-            authContext = retrieveAuthContext(sid);
-        }
-        return authContext;
-    }  
-    
+
     // Gets Callbacks per Page state
     public static Callback[] getCallbacksPerState(AuthContextLocal authContext, 
                                            String pageState) {
@@ -1338,178 +1200,8 @@ public class AuthUtils extends AuthClientUtils {
         else {
             utilDebug.message("in setCallbacksPerState, callbacks is null");
         }
-    }    
-    
-    /**
-     * Returns the SessionID . This is required to added the
-     * session server , port , protocol info to the Logout Cookie.
-     * SessionID is retrieved from Auth service if a handle on
-     * the authcontext object is there otherwise retrieve from
-     * the request object.
-     *
-     * @param authContext  is the AuthContext which is
-     * 	    handle to the auth service
-     * @param request is the HttpServletRequest object
-     * @return returns the SessionID
-     */
-    public static SessionID getSidValue(AuthContextLocal authContext,
-    HttpServletRequest request) {
-        SessionID sessionId = null;
-        if (authContext != null)  {
-            utilDebug.message("AuthContext is not null");
-            try {
-                String sid = getSidString(authContext);
-                if (sid != null) {
-                    sessionId = new SessionID(sid);
-                }
-            } catch (Exception e) {
-                utilDebug.message("Exception getting sid",e);
-            }
-        }
-        
-        if (sessionId == null) {
-            utilDebug.message("Sid from AuthContext is null");
-            sessionId = new SessionID(request);
-        }
-        
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("sid is : " + sessionId);
-        }
-        return sessionId;
     }
-    
-    /**
-     * Returns true if cookie is supported otherwise false.
-     * the value is retrieved from the auth service if a
-     * handle on the auth context object is there otherwise
-     * check the HttpServletRequest object to see if the
-     * OpenAM cookie is in the request header
-     *
-     * @param authContext is the handle to the auth service
-     *	                  for the request
-     * @param request is the HttpServletRequest Object for the
-     *	              request
-     *
-     * @return boolean value indicating whether cookie is supported
-     *	       or not.
-     */
-    public static boolean isCookieSupported(AuthContextLocal authContext,
-    HttpServletRequest request) {
-        boolean cookieSupported;
-        if (authContext != null)  {
-            utilDebug.message("AuthContext is not null");
-            cookieSupported = isCookieSupported(authContext);
-        } else {
-            cookieSupported = checkForCookies(request,null);
-        }
-        
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("Cookie supported" + cookieSupported);
-        }
-        return cookieSupported;
-    }
-    
-    /**
-     * Returns the previous index type after module is selected in authlevel
-     * or composite advices.
-     * @param ac the is the AuthContextLocal instance.
-     * @return AuthContext.IndexType.
-     */
-    public static AuthContext.IndexType getPrevIndexType(AuthContextLocal ac) {
-        LoginState loginState = getLoginState(ac);
-        if (loginState != null) {
-            return loginState.getPreviousIndexType();
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Returns whether the auth module is or the auth chain contains pure JAAS
-     * module(s).
-     * @param configName a string of the configuratoin name.
-     * @return 1 for pure JAAS module; -1 for module(s) provided by IS only.
-     */
-    public static int isPureJAASModulePresent(
-    String configName, AMLoginContext amlc)
-    throws AuthLoginException {
-        
-        if (AuthD.isEnforceJAASThread()) {
-            return 1;
-        }
-        int returnValue = -1;
-        
-        Configuration ISConfiguration = null;
-        try {
-            ISConfiguration = Configuration.getConfiguration();
-        } catch (Exception e) {
-            return 1;
-        }
-        
-        AppConfigurationEntry[] entries =
-        ISConfiguration.getAppConfigurationEntry(configName);
-        if (entries == null) {
-            throw new AuthLoginException("amAuth",
-            AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
-        }
-        // re-use the obtained configuration
-        amlc.setConfigEntries(entries);
-        
-        for (int i = 0; i < entries.length; i++) {
-            String className = entries[i].getLoginModuleName();
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("config entry: " + className);
-            }
-            if (pureJAASModuleClasses.contains(className)) {
-                returnValue = 1;
-                break;
-            } else if (ISModuleClasses.contains(className)) {
-                continue;
-            }
-            
-            try {
-                Object classObject = Class.forName(className,true,
-                    Thread.currentThread().getContextClassLoader()
-                    ).newInstance();
-                if (classObject instanceof AMLoginModule) {
-                    if (utilDebug.messageEnabled()) {
-                        utilDebug.message(className +
-                        " is instance of AMLoginModule");
-                    }
-                    synchronized(ISModuleClasses) {
-                        if (! ISModuleClasses.contains(className)) {
-                            ISModuleClasses.add(className);
-                        }
-                    }
-                } else {
-                    if (utilDebug.messageEnabled()) {
-                        utilDebug.message(className + " is a pure jaas module");
-                    }
-                    synchronized(pureJAASModuleClasses) {
-                        if (! pureJAASModuleClasses.contains(className)) {
-                            pureJAASModuleClasses.add(className);
-                        }
-                    }
-                    returnValue = 1;
-                    break;
-                }
-            } catch (Exception e) {
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("fail to instantiate class for " +
-                    className);
-                }
-                synchronized(pureJAASModuleClasses) {
-                    if (! pureJAASModuleClasses.contains(className)) {
-                        pureJAASModuleClasses.add(className);
-                    }
-                }
-                returnValue = 1;
-                break;
-            }
-        }
-        return returnValue;
-    }
-    
+
     /**
      * Get the module service name in either
      * iplanet-am-auth format<module.toLowerCase()>Service(old) or
@@ -1531,21 +1223,6 @@ public class AuthUtils extends AuthClientUtils {
         }
         return serviceName;
     }
-    
-    public static int getAuthRevisionNumber(){
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-            ServiceSchemaManager scm = new ServiceSchemaManager(
-            ISAuthConstants.AUTH_SERVICE_NAME, token);
-            return scm.getRevisionNumber();
-        } catch (Exception e) {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("getAuthRevisionNumber error", e);
-            }
-        }
-        return 0;
-    }       
    
     /**
      * Returns success URL for this request. If <code>goto</code> parameter is
@@ -1567,8 +1244,7 @@ public class AuthUtils extends AuthClientUtils {
     }              
     
     // Returns the set of Module instances resulting from a 'composite advice'
-    public static Map processCompositeAdviceXML(String xmlCompositeAdvice,
-    String orgDN, String clientType) {
+    public static Map processCompositeAdviceXML(String xmlCompositeAdvice, String orgDN, String clientType) {
         Map returnAuthInstances = null;
         Set returnModuleInstances = null;
         try {
@@ -1713,31 +1389,31 @@ public class AuthUtils extends AuthClientUtils {
             }
         }
         return returnModuleInstances;
-    }                                                                                                        
-      
-    // returns AuthContextLocal object from Session object identified by 'sid'.
-    // if not found then check it in the HttpSession.
-    private static AuthContextLocal retrieveAuthContext(
-    HttpServletRequest req, SessionID sid) {
-        AuthContextLocal acLocal = null;        
-        if (sid != null) {
-            acLocal = retrieveAuthContext(sid);
-        }
-
-        return acLocal;
     }
-    
+
+    private static boolean hasAuthContext(final SessionID sessionId) {
+        if (null == sessionId) {
+            return false;
+        }
+        InternalSession internalSession = AuthD.getSession(sessionId);
+        if (null == internalSession) {
+            return false;
+        }
+        return internalSession.hasAuthenticationContext();
+    }
+
     // retrieve the AuthContextLocal object from the Session object.
-    private static AuthContextLocal retrieveAuthContext(SessionID sid) {
-        com.iplanet.dpro.session.service.InternalSession is =
-            AuthD.getSession(sid);        
+    private static AuthContextLocal retrieveAuthContext(final SessionID sessionId) {
+        if (null == sessionId) {
+            return null;
+        }
+        InternalSession internalSession = AuthD.getSession(sessionId);
         AuthContextLocal localAC = null;
-        if (is != null) {
-            localAC = (AuthContextLocal)
-            is.getObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+        if (internalSession != null) {
+            localAC = internalSession.getAuthContext();
         }
         if (utilDebug.messageEnabled()) {
-            utilDebug.message("retrieveAuthContext - InternalSession = " + is);
+            utilDebug.message("retrieveAuthContext - InternalSession = " + internalSession);
             utilDebug.message("retrieveAuthContext - aclocal = " + localAC);
         }
         return localAC;
@@ -1748,10 +1424,9 @@ public class AuthUtils extends AuthClientUtils {
      * by the SessionID object parameter 'sid'.
      */
     public static void removeAuthContext(SessionID sid) {
-        com.iplanet.dpro.session.service.InternalSession is =
-        AuthD.getSession(sid);
+        com.iplanet.dpro.session.service.InternalSession is = AuthD.getSession(sid);
         if (is != null) {
-            is.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
+            is.clearAuthContext();
         }
     }           
     
@@ -1985,79 +1660,12 @@ public class AuthUtils extends AuthClientUtils {
                                  HttpServletRequest request, 
                                  HttpServletResponse response) 
     throws SSOException {
+
         if (token == null) {
             return false;
         }
-        Object loginContext = null;
-        
-        if (intSession != null) {
-            loginContext = intSession.getObject(ISAuthConstants.LOGIN_CONTEXT);
-        }
-        
-        try {
-            if (loginContext != null) {
-                if (loginContext instanceof 
-                    javax.security.auth.login.LoginContext) {
-                    javax.security.auth.login.LoginContext lc = 
-                        (javax.security.auth.login.LoginContext) 
-                         loginContext;
-                    lc.logout();
-                } else {
-                    com.sun.identity.authentication.jaas.LoginContext 
-                        jlc = (com.sun.identity.authentication.jaas.
-                        LoginContext) loginContext;
-                    jlc.logout();
-                }
-            }
-        } catch (javax.security.auth.login.LoginException loginExp) {
-            utilDebug.error("AuthUtils.logout: Cannot Execute module Logout", loginExp);
-        }
-        
-        Set<AMPostAuthProcessInterface> postAuthSet = null;
-        
-        if (intSession != null) {
-            postAuthSet = (Set<AMPostAuthProcessInterface>) intSession.getObject(ISAuthConstants.
-                POSTPROCESS_INSTANCE_SET);
-        }
-        
-        if ((postAuthSet != null) && !(postAuthSet.isEmpty())) {            
-            for (AMPostAuthProcessInterface postLoginInstance : postAuthSet) {
-                try {
-                    postLoginInstance.onLogout(request, response, token);
-                } catch (Exception exp) {
-                   utilDebug.error("AuthUtils.logout: Failed in post logout.", exp);
-                }
-            }
-        } else {
-            String plis = null;
-            
-            if (intSession != null) {
-                plis = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
-            } else {
-                plis = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
-                }
-            }
-            if (plis != null && plis.length() > 0) {
-                StringTokenizer st = new StringTokenizer(plis, "|");
-                
 
-                while (st.hasMoreTokens()) {
-                    String pli = (String)st.nextToken();
-                        
-                    try {
-                        AMPostAuthProcessInterface postProcess =
-                                    (AMPostAuthProcessInterface) Thread.currentThread().
-                                    getContextClassLoader().loadClass(pli).newInstance();
-                            postProcess.onLogout(request, response, token);
-                    } catch (Exception ex) {
-                            utilDebug.error("AuthUtils.logout:" + pli, ex);
-                    }
-                }
-
-            }
-        }
+        processPostAuthenticationPlugins(intSession, token, request, response);
         
         boolean isTokenValid = false;
         
@@ -2081,6 +1689,37 @@ public class AuthUtils extends AuthClientUtils {
         }
         
         return isTokenValid;
+    }
+
+    private static void processPostAuthenticationPlugins(InternalSession intSession,
+                                                         SSOToken token,
+                                                         HttpServletRequest request,
+                                                         HttpServletResponse response) throws SSOException {
+        String postAuthenticationPluginsClassList = null;
+        if (intSession != null) {
+            postAuthenticationPluginsClassList = intSession.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+        } else {
+            postAuthenticationPluginsClassList = token.getProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE);
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("InternalSession is null, obtaining PAP instance from ssotoken");
+            }
+        }
+        if (postAuthenticationPluginsClassList != null && postAuthenticationPluginsClassList.length() > 0) {
+            StringTokenizer st = new StringTokenizer(postAuthenticationPluginsClassList, "|");
+
+            while (st.hasMoreTokens()) {
+                String postAuthenticationPluginsClass = st.nextToken();
+
+                try {
+                    AMPostAuthProcessInterface postProcess =
+                            (AMPostAuthProcessInterface) Thread.currentThread().
+                                    getContextClassLoader().loadClass(postAuthenticationPluginsClass).newInstance();
+                    postProcess.onLogout(request, response, token);
+                } catch (Exception ex) {
+                    utilDebug.error("AuthUtils.logout:" + postAuthenticationPluginsClass, ex);
+                }
+            }
+        }
     }
 
     private static void auditLogout(SSOToken token) {

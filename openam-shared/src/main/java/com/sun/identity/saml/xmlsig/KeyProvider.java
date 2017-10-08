@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -35,6 +35,8 @@ package com.sun.identity.saml.xmlsig;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+
+import javax.crypto.SecretKey;
 
 /**
  * The class <code>KeyProvider</code> is an interface
@@ -87,6 +89,17 @@ public interface KeyProvider {
     public java.security.PrivateKey getPrivateKey (String certAlias);
 
     /**
+     * Retrieves the secret key for the given certificate alias.
+     *
+     * @param certAlias
+     *         the certificate alieas
+     *
+     * @return the secret key or returns {@literal null} if the key does
+     * not exist or this key provider does not support secret keys
+     */
+    SecretKey getSecretKey(String certAlias);
+
+    /**
      * Return the {@link java.security.PrivateKey} for the specified certAlias and encrypted private key password.
      * @param certAlias Certificate alias name
      * @param encryptedKeyPass The encrypted keypass to use when getting the private certificate
@@ -132,4 +145,15 @@ public interface KeyProvider {
      * @return the keystore instance.
      */
     public KeyStore getKeyStore();
+
+    /**
+     * Whether the key alias exists in the keystore.
+     *
+     * @param alias
+     *         the key alias
+     *
+     * @return whether the key alias exists
+     */
+    boolean containsKey(String alias);
+
 }

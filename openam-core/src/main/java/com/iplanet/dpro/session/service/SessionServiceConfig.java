@@ -25,14 +25,13 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service;
 
-import static com.iplanet.dpro.session.service.SessionBroadcastMode.*;
 import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
-import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -46,22 +45,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
 import com.iplanet.services.naming.ServiceListeners;
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
@@ -76,8 +70,6 @@ public class SessionServiceConfig {
     public static final String AM_SESSION_SERVICE_NAME = "iPlanetAMSessionService";
 
     private final Debug sessionDebug;
-    private final SessionServerConfig sessionServerConfig;
-    private final PrivilegedAction<SSOToken> dsameAdminTokenProvider;
 
     /*
      * Constant Properties
@@ -91,11 +83,7 @@ public class SessionServiceConfig {
      * System Properties
      */
 
-    /**
-     * Property string for max number of sessions
-     */
-    static final int DEFAULT_MAX_SESSIONS = 10000;
-    private final int maxSessions;
+    private static final int DEFAULT_MAX_SESSION_CACHE_SIZE = 5000;
 
     private static final String LOGSTATUS_ACTIVE = "ACTIVE";
     private final boolean logStatus;
@@ -118,18 +106,6 @@ public class SessionServiceConfig {
     private static final boolean DEFAULT_RETURN_APP_SESSION = false;
     private final boolean returnAppSession;
 
-    // Must be True to permit Session Failover HA to be available.
-    private static final boolean DEFAULT_USE_REMOTE_SAVE_METHOD = true;
-    private boolean useRemoteSaveMethod;
-
-    // Must be True to permit Session Failover HA to be available.
-    private static final boolean DEFAULT_USE_INTERNAL_REQUEST_ROUTING = true;
-    private boolean useInternalRequestRouting;
-
-    // Must be True to permit Session Failover HA to be available, but we default this to Disabled or Off for Now.
-    private static final boolean DEFAULT_SESSION_FAILOVER_ENABLED = false;
-    private volatile boolean sessionFailoverEnabled;
-
     private final int sessionFailoverClusterStateCheckTimeout;
     private final long sessionFailoverClusterStateCheckPeriod;
 
@@ -138,26 +114,6 @@ public class SessionServiceConfig {
      */
 
     private volatile HotSwappableSessionServiceConfig hotSwappableSessionServiceConfig;
-
-    /**
-     * Indicates whether to use crosstalk or session persistence to resolve remote sessions.
-     * Always true when session persistence/SFO is disabled.
-     */
-    private static final boolean DEFAULT_REDUCED_CROSSTALK_ENABLED = true;
-    private volatile boolean reducedCrosstalkEnabled = DEFAULT_REDUCED_CROSSTALK_ENABLED;
-
-    /**
-     * The number of minutes to retain {@link com.iplanet.dpro.session.Session} objects in DESTROYED state
-     * while waiting for delete replication to occur if reduced cross-talk is enabled.
-     */
-    private static final long DEFAULT_REDUCED_CROSSTALK_PURGE_DELAY = 5;
-    private volatile long reducedCrosstalkPurgeDelay = DEFAULT_REDUCED_CROSSTALK_PURGE_DELAY;
-
-    /**
-     * Indicates what broadcast to undertake on session logout/destroy
-     */
-    private static final SessionBroadcastMode DEFAULT_LOGOUT_DESTROY_BROADCAST = OFF;
-    private volatile SessionBroadcastMode logoutDestroyBroadcast = DEFAULT_LOGOUT_DESTROY_BROADCAST;
 
     /**
      * Private value object for storing snapshot state of amSession.xml config settings.
@@ -172,7 +128,6 @@ public class SessionServiceConfig {
 
         private final JwtSessionMapperConfig jwtSessionMapperConfig;
         private final Set<String> timeoutHandlers;
-        private final boolean sessionTrimmingEnabled;
         private final boolean sessionConstraintEnabled;
         private final boolean denyLoginIfDBIsDown;
         private final String constraintHandler;
@@ -198,7 +153,6 @@ public class SessionServiceConfig {
             propertyNotificationEnabled = loadPropertyNotificationEnabledSchemaSetting(attrs);
             notificationProperties = loadPropertyNotificationPropertiesSchemaSetting(attrs);
             timeoutHandlers = loadTimeoutHandlersServiceSchemaSetting(attrs);
-            sessionTrimmingEnabled = loadSessionTrimmingServiceSchemaSetting(attrs);
             sessionConstraintEnabled = loadSessionConstraintServiceSchemaSetting(attrs);
             denyLoginIfDBIsDown = loadDenyLoginIfDBIsDownServiceSchemaSetting(attrs);
             constraintHandler = loadConstraintHandlerServiceSchemaSetting(attrs);
@@ -276,15 +230,6 @@ public class SessionServiceConfig {
             return values;
         }
 
-        private boolean loadSessionTrimmingServiceSchemaSetting(Map attrs) {
-            boolean value = "YES".equalsIgnoreCase(
-                    CollectionHelper.getMapAttr(attrs, Constants.ENABLE_TRIM_SESSION));
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("sessionTrimmingEnabled=" + value);
-            }
-            return value;
-        }
-
         private boolean loadSessionConstraintServiceSchemaSetting(Map attrs) {
             boolean value = "ON".equalsIgnoreCase(
                     CollectionHelper.getMapAttr(attrs, AM_SESSION_ENABLE_SESSION_CONSTRAINT));
@@ -325,18 +270,12 @@ public class SessionServiceConfig {
     @Inject
     SessionServiceConfig(
             @Named(SessionConstants.SESSION_DEBUG) final Debug sessionDebug,
-            SessionServerConfig sessionServerConfig,
             PrivilegedAction<SSOToken> adminTokenProvider,
-            final StatelessJWTCache jwtCache,
             final ServiceListeners serviceListeners) {
 
         this.sessionDebug = sessionDebug;
-        this.sessionServerConfig = sessionServerConfig;
-        this.dsameAdminTokenProvider = adminTokenProvider;
 
         // Initialize values set from System properties
-        maxSessions =
-                SystemProperties.getAsInt(AM_SESSION_MAX_SESSIONS, DEFAULT_MAX_SESSIONS);
         logStatus =
                 LOGSTATUS_ACTIVE.equalsIgnoreCase(SystemProperties.get(AM_LOGSTATUS));
         httpSessionTrackingCookieName =
@@ -368,9 +307,8 @@ public class SessionServiceConfig {
                 @Override
                 public void performUpdate() {
                     try {
-                        loadSessionFailover();
                         hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
-                    } catch (SSOException | SMSException e) {
+                    } catch (SMSException e) {
                         throw new IllegalStateException(e);
                     }
                 }
@@ -378,9 +316,6 @@ public class SessionServiceConfig {
             serviceListeners.config(AM_SESSION_SERVICE_NAME)
                     .global(action)
                     .schema(action).listen();
-
-            loadSessionFailover();
-
         } catch (Exception ex) {
             sessionDebug.error("SessionService: Initialization Failed", ex);
             // Rethrow exception rather than hobbling on with invalid configuration state
@@ -388,65 +323,11 @@ public class SessionServiceConfig {
         }
     }
 
-    private synchronized void loadSessionFailover() throws SSOException, SMSException {
-        useRemoteSaveMethod = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD, DEFAULT_USE_REMOTE_SAVE_METHOD);
-        useInternalRequestRouting = SystemProperties.getAsBoolean(AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING, DEFAULT_USE_INTERNAL_REQUEST_ROUTING);
-        sessionFailoverEnabled = SystemProperties.getAsBoolean(IS_SFO_ENABLED, DEFAULT_SESSION_FAILOVER_ENABLED);
-
-        SSOToken adminToken = AccessController.doPrivileged(dsameAdminTokenProvider);
-
-        ServiceConfigManager scm = new ServiceConfigManager(AM_SESSION_SERVICE_NAME, adminToken);
-        ServiceConfig serviceConfig = scm.getGlobalConfig(null);
-
-            /*
-             * In OpenSSO 8.0, we have switched to create sub configuration with
-             * site name. hence we need to lookup the site name based on the URL
-             */
-        String subCfgName = SiteConfiguration.getSiteIdByURL(adminToken, sessionServerConfig.getPrimaryServerURL().toString());
-        ServiceConfig subConfig = subCfgName != null ? serviceConfig.getSubConfig(subCfgName) : null;
-
-        if ((subConfig != null) && subConfig.exists()) {
-
-            Map sessionAttrs = subConfig.getAttributes();
-            boolean sfoEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_SFO_ENABLED, false);
-
-            // Currently, we are not allowing to default to Session Failover HA,
-            // even with a single server to enable session persistence.
-            // But can easily be turned on in the Session SubConfig.
-            if (sfoEnabled) {
-
-                sessionFailoverEnabled = true;
-                useRemoteSaveMethod = true;
-                useInternalRequestRouting = true;
-
-                // Determine whether crosstalk is enabled or disabled.
-                reducedCrosstalkEnabled =
-                        CollectionHelper.getBooleanMapAttr(sessionAttrs, IS_REDUCED_CROSSTALK_ENABLED, true);
-
-                if (reducedCrosstalkEnabled) {
-                    logoutDestroyBroadcast = valueOf(
-                            CollectionHelper.getMapAttr(
-                                    sessionAttrs, LOGOUT_DESTROY_BROADCAST, OFF.name()));
-                }
-
-                reducedCrosstalkPurgeDelay =
-                        CollectionHelper.getLongMapAttr(sessionAttrs,
-                                REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
-
-            }
-        }
-
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Session Failover Enabled = " + sessionFailoverEnabled);
-        }
-    }
-
     private int loadNotificationThreadPoolSizeSystemProperty() {
-        String size = SystemProperties.get(NOTIFICATION_THREADPOOL_SIZE);
         try {
-            return Integer.parseInt(size);
+            return SystemProperties.getAsInt(NOTIFICATION_THREADPOOL_SIZE, DEFAULT_NOTIFICATION_THEAD_POOL_SIZE);
         } catch (NumberFormatException e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + NOTIFICATION_THREADPOOL_SIZE +
                             " defaulting to " + DEFAULT_NOTIFICATION_THEAD_POOL_SIZE);
             return DEFAULT_NOTIFICATION_THEAD_POOL_SIZE;
@@ -454,11 +335,11 @@ public class SessionServiceConfig {
     }
 
     private int loadNotificationThreadPoolThresholdSystemProperty() {
-        String threshold = SystemProperties.get(NOTIFICATION_THREADPOOL_THRESHOLD);
         try {
-            return Integer.parseInt(threshold);
+            return SystemProperties.getAsInt(NOTIFICATION_THREADPOOL_THRESHOLD,
+                    DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD);
         } catch (NumberFormatException e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + NOTIFICATION_THREADPOOL_THRESHOLD +
                             " defaulting to " + DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD);
             return DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD;
@@ -466,11 +347,11 @@ public class SessionServiceConfig {
     }
 
     private int loadSessionFailoverClusterStateCheckTimeout() {
-        String timeout = SystemProperties.get(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT);
         try {
-            return Integer.parseInt(timeout);
+            return SystemProperties.getAsInt(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT,
+                    ClusterStateService.DEFAULT_TIMEOUT);
         } catch (Exception e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT +
                             " defaulting to " + ClusterStateService.DEFAULT_TIMEOUT);
             return ClusterStateService.DEFAULT_TIMEOUT;
@@ -478,34 +359,15 @@ public class SessionServiceConfig {
     }
 
     private long loadSessionFailoverClusterStateCheckPeriod() {
-        String period = SystemProperties.get(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD);
         try {
-            return Long.parseLong(period);
+            return SystemProperties.getAsLong(AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD,
+                    ClusterStateService.DEFAULT_PERIOD);
         } catch (Exception e) {
-            sessionDebug.error(
+            sessionDebug.warning(
                     "Invalid value for " + Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD +
                             " defaulting to " + ClusterStateService.DEFAULT_PERIOD);
             return ClusterStateService.DEFAULT_PERIOD;
         }
-    }
-
-    /**
-     * Returns true if SystemProperty "com.iplanet.am.session.failover.useRemoteSaveMethod" is true or
-     * Session Failover is enabled.
-     *
-     * @see #isSessionFailoverEnabled()
-     */
-    public boolean isUseRemoteSaveMethod() {
-        return useRemoteSaveMethod;
-    }
-
-    /**
-     * Returns amSession.xml property "iplanet-am-session-logout-destroy-broadcast" choice.
-     *
-     * Defaults to {@link SessionBroadcastMode#OFF }.
-     */
-    public SessionBroadcastMode getLogoutDestroyBroadcast() {
-        return logoutDestroyBroadcast;
     }
 
     /**
@@ -541,23 +403,6 @@ public class SessionServiceConfig {
         return hotSwappableSessionServiceConfig.sessionConstraintEnabled;
     }
 
-    /**
-     * Returns true if amSession.xml property "iplanet-am-session-enable-session-trimming" is "YES" (case insensitive).
-     *
-     * Defaults to false.
-     */
-    public boolean isSessionTrimmingEnabled() {
-        return hotSwappableSessionServiceConfig.sessionTrimmingEnabled;
-    }
-
-    /**
-     * The number of minutes to retain {@link com.iplanet.dpro.session.Session} objects in DESTROYED state while waiting
-     * for delete replication to occur if reduced cross-talk is enabled.
-     */
-    public long getReducedCrosstalkPurgeDelay() {
-        return reducedCrosstalkPurgeDelay;
-    }
-
     public String getHttpSessionPropertyName() {
         return HTTP_SESSION_PROPERTY_NAME;
     }
@@ -571,12 +416,12 @@ public class SessionServiceConfig {
     }
 
     /**
-     * Returns SystemProperty "com.iplanet.am.session.maxSessions".
+     * The maximum number of sessions to cache in the internal session cache.
      *
-     * Defaults to 10,000 if not specified.
+     * @return SystemProperty "org.forgerock.openam.session.service.access.persistence.caching.maxsize". Default 5000.
      */
-    public int getMaxSessions() {
-        return maxSessions;
+    public int getMaxSessionCacheSize() {
+        return SystemProperties.getAsInt(AM_SESSION_MAX_CACHE_SIZE, DEFAULT_MAX_SESSION_CACHE_SIZE);
     }
 
     /**
@@ -630,25 +475,6 @@ public class SessionServiceConfig {
      */
     public boolean isReturnAppSessionEnabled() {
         return returnAppSession;
-    }
-
-    /**
-     * Returns true if SystemProperty or amSession.xml property "iplanet-am-session-sfo-enabled" is true.
-     *
-     * Defaults to false.
-     */
-    public boolean isSessionFailoverEnabled() {
-        return sessionFailoverEnabled;
-    }
-
-    /**
-     * Returns true if amSession.xml property "iplanet-am-session-reduced-crosstalk-enabled" is true
-     * (and session failover is enabled).
-     *
-     * @see #isSessionFailoverEnabled()
-     */
-    public boolean isReducedCrossTalkEnabled() {
-        return sessionFailoverEnabled && reducedCrosstalkEnabled;
     }
 
     /**
@@ -710,18 +536,6 @@ public class SessionServiceConfig {
      */
     public JwtSessionMapper getJwtSessionMapper() {
         return hotSwappableSessionServiceConfig.jwtSessionMapperConfig.getJwtSessionMapper();
-    }
-
-    /**
-     * Returns true if SystemProperty "com.iplanet.am.session.failover.useInternalRequestRouting" is enabled or
-     * session failover is enabled.
-     *
-     * Defaults to true.
-     *
-     * @see #isSessionFailoverEnabled()
-     */
-    public boolean isUseInternalRequestRoutingEnabled() {
-        return sessionFailoverEnabled && useInternalRequestRouting;
     }
 
     /**
