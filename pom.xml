@@ -377,10 +377,6 @@
     <!-- OpenAM Child Modules -->
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
-    		<module>forgerock-parent</module>
-    		<module>OpenDJ-SDK</module>
-    		<module>OpenDJ</module>
-    		
         <module>openam-http</module>
 
         <module>openam-ldap-utils</module>
