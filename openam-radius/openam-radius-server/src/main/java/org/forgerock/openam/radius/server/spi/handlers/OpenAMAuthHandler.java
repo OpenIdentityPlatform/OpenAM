@@ -30,8 +30,8 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.forgerock.guava.common.base.Strings;
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessAccept;
 import org.forgerock.openam.radius.common.AccessChallenge;
 import org.forgerock.openam.radius.common.AccessReject;

@@ -25,8 +25,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.forgerock.guava.common.collect.Lists;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.forgerock.guice.core.InjectorHolder;
 
 /**

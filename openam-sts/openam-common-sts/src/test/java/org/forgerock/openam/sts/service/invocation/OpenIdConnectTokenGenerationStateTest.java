@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.service.invocation;
 
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.testng.annotations.Test;
 import java.util.Set;
 

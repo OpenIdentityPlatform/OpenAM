@@ -63,10 +63,14 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-client-sts</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-collect</artifactId>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-collect</artifactId> -->
+<!--         </dependency> -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>

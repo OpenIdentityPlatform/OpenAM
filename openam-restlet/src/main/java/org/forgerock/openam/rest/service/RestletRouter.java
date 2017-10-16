@@ -50,7 +50,7 @@ final class RestletRouter extends AbstractRouter<RestletRouter, Request, Restlet
         }
     }
 
-    @Override
+    //@Override
     protected Pair<RouteMatcher<Request>, Restlet> getSelfApiHandler() {
         return null;
     }

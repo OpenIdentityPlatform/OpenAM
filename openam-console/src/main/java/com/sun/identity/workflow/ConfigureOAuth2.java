@@ -43,8 +43,8 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.guava.common.collect.ImmutableMap;
-import org.forgerock.guava.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler;
 import org.forgerock.oauth2.core.TokenResponseTypeHandler;

@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.sts.rest.operation;
 
-import static org.forgerock.guava.common.collect.Iterables.filter;
-import static org.forgerock.guava.common.collect.Iterables.toArray;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.encode.Base64;

@@ -25,6 +25,24 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>${project.build.directory}/CodeMirror-${codemirror.version}.0</directory>
+            <outputDirectory>/libs/codemirror</outputDirectory>
+            <includes>
+                <include>lib/codemirror.js</include>
+                <include>mode/javascript/javascript.js</include>
+                <include>mode/groovy/groovy.js</include>
+                <include>addon/display/fullscreen.js</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/CodeMirror-${codemirror.version}.0</directory>
+            <outputDirectory>/css/codemirror</outputDirectory>
+            <includes>
+                <include>lib/codemirror.css</include>
+                <include>addon/display/fullscreen.css</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
             <outputDirectory>/libs/codemirror</outputDirectory>
             <includes>
@@ -42,6 +60,7 @@
                 <include>addon/display/fullscreen.css</include>
             </includes>
         </fileSet>
+        
     </fileSets>
     <dependencySets>
         <dependencySet>

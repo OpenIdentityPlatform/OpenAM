@@ -21,8 +21,8 @@ import static org.mockito.Mockito.*;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.HashSet;
-import org.forgerock.guava.common.cache.Cache;
-import org.forgerock.guava.common.cache.CacheBuilder;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.forgerock.json.resource.NotFoundException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;

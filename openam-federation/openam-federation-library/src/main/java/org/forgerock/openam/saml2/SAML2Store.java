@@ -16,8 +16,8 @@
 package org.forgerock.openam.saml2;
 
 import java.util.concurrent.TimeUnit;
-import org.forgerock.guava.common.cache.Cache;
-import org.forgerock.guava.common.cache.CacheBuilder;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * An internal alternative to using the SAML2 Failover as a mechanism for data transfer.

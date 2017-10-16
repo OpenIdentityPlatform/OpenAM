@@ -29,10 +29,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.guava.common.base.Throwables;
-import org.forgerock.guava.common.cache.CacheBuilder;
-import org.forgerock.guava.common.cache.CacheLoader;
-import org.forgerock.guava.common.cache.LoadingCache;
+import com.google.common.base.Throwables;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;

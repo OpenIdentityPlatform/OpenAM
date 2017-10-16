@@ -333,8 +333,8 @@
                         <configuration>
                             <nodeVersion>v4.6.1</nodeVersion>
                             <npmVersion>3.10.7</npmVersion>
-                            <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot>
-                            <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
+<!--                             <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot> -->
+<!--                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot> -->
                         </configuration>
                     </execution>
                     <execution>
@@ -345,9 +345,9 @@
                         <phase>initialize</phase>
                         <configuration>
                             <arguments>install</arguments>
-                            <environmentVariables>
-                                <PHANTOMJS_CDNURL>http://maven.forgerock.org/repo/forgerock-third-party-virtual</PHANTOMJS_CDNURL>
-                            </environmentVariables>
+<!--                             <environmentVariables> -->
+<!--                                 <PHANTOMJS_CDNURL>http://maven.forgerock.org/repo/forgerock-third-party-virtual</PHANTOMJS_CDNURL> -->
+<!--                             </environmentVariables> -->
                         </configuration>
                     </execution>
                     <execution>

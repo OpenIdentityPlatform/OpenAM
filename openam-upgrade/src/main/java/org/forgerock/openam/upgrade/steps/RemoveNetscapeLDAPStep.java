@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
-import org.forgerock.guava.common.base.Joiner;
+import com.google.common.base.Joiner;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;

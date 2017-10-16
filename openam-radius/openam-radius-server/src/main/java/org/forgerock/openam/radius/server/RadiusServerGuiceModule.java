@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.eventbus.EventBus;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.radius.server.audit.RadiusAuditLoggerEventBus;
 import org.forgerock.openam.radius.server.audit.RadiusAuditor;

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap.config.user;
 
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;

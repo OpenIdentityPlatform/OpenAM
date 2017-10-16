@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.forgerock.guava.common.base.Predicate;
+import com.google.common.base.Predicate;
 import org.forgerock.util.Pair;
 
 /**

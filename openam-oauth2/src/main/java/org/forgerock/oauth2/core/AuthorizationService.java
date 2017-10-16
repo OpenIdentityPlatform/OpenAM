@@ -27,8 +27,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.guava.common.base.Predicates;
-import org.forgerock.guava.common.collect.Maps;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Maps;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;

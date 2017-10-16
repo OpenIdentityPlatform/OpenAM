@@ -1,0 +1,9 @@
+[submodule "forgerock-parent"]
+	path = forgerock-parent
+	url = https://github.com/OpenIdentityPlatform/forgerock-parent.git
+[submodule "OpenDJ-SDK"]
+	path = OpenDJ-SDK
+	url = https://github.com/OpenIdentityPlatform/OpenDJ-SDK.git
+[submodule "OpenDJ"]
+	path = OpenDJ
+	url = https://github.com/OpenIdentityPlatform/OpenDJ.git

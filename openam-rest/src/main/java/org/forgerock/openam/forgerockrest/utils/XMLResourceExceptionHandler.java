@@ -36,7 +36,7 @@ import org.forgerock.caf.authentication.api.MessageContext;
 import org.forgerock.caf.authentication.framework.AuditTrail;
 import org.forgerock.caf.authentication.framework.AuthenticationFailedException;
 import org.forgerock.caf.authentication.framework.ResponseWriter;
-import org.forgerock.guava.common.net.MediaType;
+import com.google.common.net.MediaType;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;

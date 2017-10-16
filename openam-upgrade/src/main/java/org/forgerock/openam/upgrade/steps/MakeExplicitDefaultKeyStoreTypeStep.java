@@ -16,7 +16,7 @@
 package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.common.configuration.ServerConfiguration.*;
-import static org.forgerock.guava.common.collect.Maps.fromProperties;
+import static com.google.common.collect.Maps.fromProperties;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 

@@ -49,7 +49,7 @@ import java.util.TreeSet;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
 import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;

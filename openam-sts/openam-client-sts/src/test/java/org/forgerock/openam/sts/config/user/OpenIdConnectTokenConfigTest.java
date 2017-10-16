@@ -18,7 +18,7 @@ package org.forgerock.openam.sts.config.user;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertEquals;
 
-import org.forgerock.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.testng.annotations.Test;

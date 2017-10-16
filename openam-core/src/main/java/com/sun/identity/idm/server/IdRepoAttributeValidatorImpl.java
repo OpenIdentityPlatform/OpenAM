@@ -30,7 +30,7 @@ package com.sun.identity.idm.server;
 
 import static com.sun.identity.idm.IdRepoBundle.*;
 import static com.sun.identity.idm.IdRepoErrorCode.*;
-import static org.forgerock.guava.common.base.Strings.emptyToNull;
+import static com.google.common.base.Strings.emptyToNull;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import java.util.ArrayList;

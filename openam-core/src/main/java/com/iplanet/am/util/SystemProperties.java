@@ -47,9 +47,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
 
-import org.forgerock.guava.common.base.Predicate;
-import org.forgerock.guava.common.collect.ImmutableMap;
-import org.forgerock.guava.common.collect.Maps;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.sso.SSOToken;

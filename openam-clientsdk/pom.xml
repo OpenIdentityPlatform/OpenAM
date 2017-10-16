@@ -132,6 +132,7 @@
                             <include>org.forgerock.commons:i18n-slf4j</include>
                             <include>org.forgerock.commons.guava:forgerock-guava-base</include>
                             <include>org.forgerock.commons.guava:forgerock-guava-collect</include>
+                            <include>com.google:guava</include>
                             <include>org.forgerock.http:chf-http-core</include>
                             <include>com.fasterxml.jackson.core:jackson-databind</include>
                             <include>com.fasterxml.jackson.core:jackson-core</include>
@@ -707,14 +708,18 @@
             <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-grizzly</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-collect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-base</artifactId>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-collect</artifactId> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-base</artifactId> -->
+<!--         </dependency> -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

@@ -73,7 +73,8 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
+<!--             <groupId>external</groupId> -->
+			<groupId>com.sun.xml.rpc</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
         <dependency>

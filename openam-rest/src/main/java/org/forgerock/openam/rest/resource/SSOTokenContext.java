@@ -16,12 +16,12 @@
 
 package org.forgerock.openam.rest.resource;
 
-import static org.forgerock.guava.common.base.Suppliers.*;
+import static com.google.common.base.Suppliers.*;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 
-import org.forgerock.guava.common.base.Supplier;
+import com.google.common.base.Supplier;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionConstants;

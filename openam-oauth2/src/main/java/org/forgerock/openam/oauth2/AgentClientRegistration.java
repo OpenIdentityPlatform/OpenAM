@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.exceptions.ServerException;

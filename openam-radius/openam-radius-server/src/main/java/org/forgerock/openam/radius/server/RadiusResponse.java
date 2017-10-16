@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.radius.server;
 
-import org.forgerock.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import org.forgerock.openam.radius.common.Packet;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 

@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.resource;
 
 import java.security.AccessController;
 
-import org.forgerock.guava.common.base.Supplier;
+import com.google.common.base.Supplier;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.services.context.Context;
 

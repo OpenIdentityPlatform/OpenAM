@@ -20,7 +20,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

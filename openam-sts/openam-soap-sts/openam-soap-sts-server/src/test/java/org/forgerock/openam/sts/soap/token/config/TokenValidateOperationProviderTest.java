@@ -24,7 +24,7 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;

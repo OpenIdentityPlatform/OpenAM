@@ -158,7 +158,7 @@ public class OAuthProblemException extends ResourceException {
     private String scope;
 
     private Map<String, String> parameters = new HashMap<String, String>();
-    private OAuth2Utils oAuth2Utils = InjectorHolder.getInstance(OAuth2Utils.class);
+    private OAuth2Utils oAuth2Utils;// = InjectorHolder.getInstance(OAuth2Utils.class);
 
     // Constructors
     private OAuthProblemException(OAuthError error, Request request) {
@@ -167,6 +167,7 @@ public class OAuthProblemException extends ResourceException {
         this.errorUri = null;
         this.request = request;
         if (null != this.request) {
+        		oAuth2Utils = InjectorHolder.getInstance(OAuth2Utils.class);
             String redirect =
                     oAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.REDIRECT_URI,
                             String.class);

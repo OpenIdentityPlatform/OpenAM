@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.soap.token.delegation;
 
 import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
-import org.forgerock.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.slf4j.Logger;

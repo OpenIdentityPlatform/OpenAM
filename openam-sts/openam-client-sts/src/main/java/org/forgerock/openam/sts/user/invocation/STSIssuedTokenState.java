@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.user.invocation;
 
-import org.forgerock.guava.common.base.Objects;
+import com.google.common.base.Objects;
 import org.forgerock.json.JsonValue;
 
 import static org.forgerock.json.JsonValue.field;

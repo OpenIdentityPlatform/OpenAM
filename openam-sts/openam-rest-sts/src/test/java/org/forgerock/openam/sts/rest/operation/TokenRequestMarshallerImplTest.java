@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Set;
 import javax.inject.Named;
 
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;

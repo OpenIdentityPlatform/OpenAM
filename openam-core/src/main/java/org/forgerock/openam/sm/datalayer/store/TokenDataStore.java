@@ -23,7 +23,7 @@ import java.util.Set;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;

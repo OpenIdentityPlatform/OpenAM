@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.dpro.session.SessionException;

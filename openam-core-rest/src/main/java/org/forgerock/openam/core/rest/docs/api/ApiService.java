@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.api.transform.LocalizableOperation;
-import org.forgerock.guava.common.collect.Lists;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.forgerock.http.handler.DescribableHandler;
 import org.forgerock.http.header.AcceptLanguageHeader;
 import org.forgerock.http.header.MalformedHeaderException;

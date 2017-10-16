@@ -17,7 +17,7 @@ package org.forgerock.openam.radius.server.monitoring;
 
 import static org.assertj.core.api.Assertions.*;
 
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.eventbus.EventBus;
 import org.testng.annotations.Test;
 
 /**

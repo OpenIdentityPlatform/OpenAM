@@ -61,7 +61,7 @@ import org.forgerock.api.models.Resource;
 import org.forgerock.api.models.Schema;
 import org.forgerock.api.models.VersionedPath;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Predicate;
+import com.google.common.base.Predicate;
 import org.forgerock.http.ApiProducer;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.UriRouterContext;

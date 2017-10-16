@@ -65,8 +65,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.guava.common.base.Joiner;
-import org.forgerock.guava.common.collect.ImmutableList;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;

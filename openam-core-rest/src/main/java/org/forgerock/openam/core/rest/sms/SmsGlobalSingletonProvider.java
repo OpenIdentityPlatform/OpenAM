@@ -40,7 +40,7 @@ import org.forgerock.api.models.ApiDescription;
 import org.forgerock.api.models.Paths;
 import org.forgerock.api.models.Resource;
 import org.forgerock.api.models.VersionedPath;
-import org.forgerock.guava.common.base.Optional;
+import com.google.common.base.Optional;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;

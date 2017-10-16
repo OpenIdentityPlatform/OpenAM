@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.caf.authentication.framework.AuthenticationFramework;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

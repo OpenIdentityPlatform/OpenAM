@@ -22,7 +22,7 @@ import static org.forgerock.json.resource.ResourcePath.resourcePath;
 import java.util.Collections;
 
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Predicate;
+import com.google.common.base.Predicate;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.testng.annotations.BeforeClass;

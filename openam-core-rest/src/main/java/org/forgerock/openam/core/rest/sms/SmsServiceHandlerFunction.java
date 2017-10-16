@@ -23,8 +23,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
-import org.forgerock.guava.common.base.Function;
-import org.forgerock.guava.common.base.Predicate;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.util.ISAuthConstants;

@@ -25,7 +25,7 @@ import com.google.inject.Scopes;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.assertj.core.api.Assertions;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;

@@ -19,7 +19,7 @@
 package org.forgerock.openam.radius.server;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessReject;
 import org.forgerock.openam.radius.common.AccessRequest;
 import org.forgerock.openam.radius.common.Packet;

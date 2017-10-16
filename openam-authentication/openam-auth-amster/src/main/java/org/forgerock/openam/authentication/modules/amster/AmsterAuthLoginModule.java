@@ -23,7 +23,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.openam.authentication.modules.common.AuthLoginModule;
 import org.forgerock.openam.core.CoreWrapper;
 

@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.guava.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.CTSPersistentStore;

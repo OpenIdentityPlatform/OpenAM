@@ -26,7 +26,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.ArrayUtils;
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.openam.shared.security.crypto.KeyStoreBuilder;
 import org.forgerock.openam.shared.security.crypto.KeyStoreType;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;

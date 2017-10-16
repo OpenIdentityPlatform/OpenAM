@@ -260,7 +260,8 @@ public final class LDAPUtils {
 
     private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories, Options options) {
         if (options.get(AFFINITY_ENABLED)) {
-            return Connections.newShardedRequestLoadBalancer(factories, options);
+            //return Connections.newShardedRequestLoadBalancer(factories, options);
+            return Connections.newAffinityRequestLoadBalancer(factories, options);
         } else {
             return Connections.newFailoverLoadBalancer(factories, options);
         }

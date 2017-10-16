@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.eventbus.EventBus;
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.config.RadiusServiceConfig;

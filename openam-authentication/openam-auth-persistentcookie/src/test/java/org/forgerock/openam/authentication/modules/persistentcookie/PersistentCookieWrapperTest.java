@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
 import org.forgerock.jaspi.modules.session.jwt.ServletJwtSessionModule;
 import org.forgerock.openam.utils.AMKeyProvider;

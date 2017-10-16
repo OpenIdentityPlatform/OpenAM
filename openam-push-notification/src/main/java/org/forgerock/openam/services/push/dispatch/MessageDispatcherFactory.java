@@ -18,8 +18,8 @@ package org.forgerock.openam.services.push.dispatch;
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Singleton;
-import org.forgerock.guava.common.cache.Cache;
-import org.forgerock.guava.common.cache.CacheBuilder;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Generates message dispatchers.

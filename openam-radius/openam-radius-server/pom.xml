@@ -41,10 +41,14 @@
             <artifactId>javax.servlet-api</artifactId>
            <scope>provided</scope>
        </dependency>
-        <dependency>
-	        <groupId>org.forgerock.commons.guava</groupId>
-	        <artifactId>forgerock-guava-eventbus</artifactId>        
-        </dependency>      
+<!--         <dependency> -->
+<!-- 	        <groupId>org.forgerock.commons.guava</groupId> -->
+<!-- 	        <artifactId>forgerock-guava-eventbus</artifactId>         -->
+<!--         </dependency>       -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
   </dependencies>
 
     <!-- Build -->

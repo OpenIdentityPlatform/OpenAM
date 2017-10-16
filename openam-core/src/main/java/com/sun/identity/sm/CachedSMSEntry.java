@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.forgerock.guava.common.collect.Ordering;
+import com.google.common.collect.Ordering;
 import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.util.SystemProperties;

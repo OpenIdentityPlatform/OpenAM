@@ -180,12 +180,13 @@
         </dependency>
         
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+             <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>external</groupId>
+<!--             <groupId>external</groupId> -->
+			<groupId>com.sun.xml.rpc</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
         
@@ -210,11 +211,14 @@
             <artifactId>openam-certs</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-cache</artifactId>
-        </dependency>
-
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-cache</artifactId> -->
+<!--         </dependency> -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>openam-audit-core</artifactId>

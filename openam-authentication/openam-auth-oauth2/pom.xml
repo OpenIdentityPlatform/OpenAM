@@ -49,8 +49,8 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+             <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
         </dependency>
     </dependencies>
 </project>

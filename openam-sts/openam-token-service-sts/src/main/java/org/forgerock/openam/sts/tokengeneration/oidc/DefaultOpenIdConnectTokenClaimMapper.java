@@ -21,7 +21,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
-import org.forgerock.guava.common.base.Joiner;
+import com.google.common.base.Joiner;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.utils.StringUtils;

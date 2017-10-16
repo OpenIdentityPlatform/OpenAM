@@ -27,9 +27,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
-import org.forgerock.guava.common.base.Strings;
-import org.forgerock.guava.common.eventbus.EventBus;
-import org.forgerock.guava.common.eventbus.Subscribe;
+import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditConstants;

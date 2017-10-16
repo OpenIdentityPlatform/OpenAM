@@ -40,10 +40,14 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-collect</artifactId>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-collect</artifactId> -->
+<!--         </dependency> -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>

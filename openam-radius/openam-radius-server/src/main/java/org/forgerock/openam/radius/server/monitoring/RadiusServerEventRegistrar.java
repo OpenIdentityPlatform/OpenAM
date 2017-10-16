@@ -26,8 +26,8 @@ import javax.inject.Named;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.forgerock.guava.common.eventbus.EventBus;
-import org.forgerock.guava.common.eventbus.Subscribe;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.forgerock.openam.radius.server.config.RadiusServerConstants;
 import org.forgerock.openam.radius.server.events.AuthRequestAcceptedEvent;
 import org.forgerock.openam.radius.server.events.AuthRequestReceivedEvent;

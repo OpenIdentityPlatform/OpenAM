@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.forgerock.guava.common.base.Strings;
+import com.google.common.base.Strings;
 import org.forgerock.openam.radius.common.Attribute;
 import org.forgerock.openam.radius.common.AttributeSet;
 import org.forgerock.openam.radius.common.Packet;

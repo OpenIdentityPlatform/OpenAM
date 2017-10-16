@@ -33,9 +33,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.forgerock.guava.common.collect.HashMultimap;
-import org.forgerock.guava.common.collect.Multimaps;
-import org.forgerock.guava.common.collect.SetMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.SearchScope;

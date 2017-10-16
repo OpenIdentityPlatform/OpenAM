@@ -5,3 +5,7 @@ openam-ui/openam-ui-ria/npm-debug.log.*
 # Editor generated files
 *.iml
 .idea/
+.classpath
+.settings
+.project
+test-output

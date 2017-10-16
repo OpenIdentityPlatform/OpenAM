@@ -20,7 +20,7 @@ import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
 import org.apache.commons.collections.MapUtils;
-import org.forgerock.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jwk.KeyUse;

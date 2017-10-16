@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder;
-import org.forgerock.guava.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;

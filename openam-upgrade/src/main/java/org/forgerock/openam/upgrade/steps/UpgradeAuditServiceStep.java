@@ -26,7 +26,7 @@ import java.util.Iterator;
 
 import javax.inject.Inject;
 
-import org.forgerock.guava.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;

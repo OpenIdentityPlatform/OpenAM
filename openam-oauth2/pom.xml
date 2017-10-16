@@ -78,10 +78,14 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-web-token</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-collect</artifactId>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <artifactId>forgerock-guava-collect</artifactId> -->
+<!--         </dependency> -->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
@@ -99,8 +103,8 @@
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+             <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
         </dependency>
 
         <dependency>
@@ -148,6 +152,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
+        
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-slf4j</artifactId>
@@ -195,5 +200,20 @@
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
         </dependency>
+        <dependency>
+        		<groupId>org.forgerock.opendj</groupId>
+	        <artifactId>opendj-server-legacy</artifactId>
+	        <scope>test</scope>
+	        <exclusions>
+	          <exclusion>
+	            <artifactId>slf4j-jdk14</artifactId>
+	            <groupId>org.slf4j</groupId>
+	          </exclusion>
+	          <exclusion>
+	            <artifactId>javax.servlet-api</artifactId>
+	            <groupId>javax.servlet</groupId>
+	          </exclusion>
+	        </exclusions>
+	    </dependency>
     </dependencies>
 </project>

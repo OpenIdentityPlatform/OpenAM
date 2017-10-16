@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
-import org.forgerock.guava.common.collect.ClassToInstanceMap;
-import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.restlet.Request;

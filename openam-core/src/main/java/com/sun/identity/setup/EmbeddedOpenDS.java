@@ -66,7 +66,7 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletContext;
 
-import org.forgerock.guava.common.io.ByteStreams;
+import com.google.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;

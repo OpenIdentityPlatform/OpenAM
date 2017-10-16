@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
-import org.forgerock.guava.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;

@@ -26,7 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guava.common.io.ByteStreams;
+import com.google.common.io.ByteStreams;
 
 /**
  * Utilities for creating zip files from directories.

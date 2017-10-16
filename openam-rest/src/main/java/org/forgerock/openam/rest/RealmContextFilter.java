@@ -28,7 +28,7 @@ import java.util.List;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Form;

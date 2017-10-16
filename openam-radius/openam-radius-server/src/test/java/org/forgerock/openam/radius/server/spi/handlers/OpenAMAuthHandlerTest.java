@@ -26,7 +26,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.forgerock.guava.common.eventbus.EventBus;
+import com.google.common.eventbus.EventBus;
 import org.forgerock.openam.radius.common.AccessRequest;
 import org.forgerock.openam.radius.common.AttributeSet;
 import org.forgerock.openam.radius.common.Authenticator;

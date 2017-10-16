@@ -31,7 +31,7 @@ import java.util.Map;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.guice.core.InjectorHolder;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.errors.EncodingException;

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import org.forgerock.guava.common.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.json.jose.jwe.CompressionAlgorithm;
 import org.forgerock.json.jose.jwe.JweAlgorithmType;
 import org.forgerock.json.jose.jws.JwsAlgorithm;

@@ -50,6 +50,7 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
 /**
  * A local implementation of a SSOToken Session module, that is designed to be deployed in an OpenAM deployment
@@ -122,11 +123,11 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
      * @param options {@inheritDoc}
      */
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
-            Map<String, Object> options) throws AuthenticationException {
-        this.handler = handler;
+    public Promise<Void, AuthenticationException> initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+            CallbackHandler callbackHandler, Map config) {
+    		this.handler = handler;
+        return Promises.newResultPromise(null);
     }
-
     /**
      * {@inheritDoc}
      */

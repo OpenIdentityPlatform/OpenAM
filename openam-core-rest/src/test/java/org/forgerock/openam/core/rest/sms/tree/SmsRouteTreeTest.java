@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
-import org.forgerock.guava.common.base.Predicate;
+import com.google.common.base.Predicate;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.resource.ActionRequest;

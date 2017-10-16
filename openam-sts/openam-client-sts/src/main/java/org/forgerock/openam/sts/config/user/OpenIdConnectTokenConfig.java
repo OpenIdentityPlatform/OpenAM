@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.sts.config.user;
 
-import org.forgerock.guava.common.base.Objects;
-import org.forgerock.guava.common.collect.Sets;
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;

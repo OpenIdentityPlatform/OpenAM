@@ -31,12 +31,12 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.guava.common.base.Throwables;
-import org.forgerock.guava.common.cache.Cache;
-import org.forgerock.guava.common.cache.CacheBuilder;
-import org.forgerock.guava.common.cache.CacheStats;
-import org.forgerock.guava.common.cache.Weigher;
-import org.forgerock.guava.common.collect.ImmutableMap;
+import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.Weigher;
+import com.google.common.collect.ImmutableMap;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreStep;
