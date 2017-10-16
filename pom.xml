@@ -377,7 +377,7 @@
     <!-- OpenAM Child Modules -->
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
-        <module>openam-http</module>
+        <module>openam-http</module> 
 
         <module>openam-ldap-utils</module>
         <module>openam-datastore</module>
