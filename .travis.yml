@@ -17,9 +17,6 @@ branches:
 notifications:
  email:
   - support@openam.org.ru
-cache:
-  directories:
-  - $HOME/.m2
 before_install:
   -  mvn -q -DskipTests install -f forgerock-parent
   -  mvn -q -DskipTests install -f OpenDJ-SDK 
