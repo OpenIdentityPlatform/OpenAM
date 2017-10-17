@@ -5,9 +5,9 @@
 
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
+mvn clean install -f forgerock-parent
 mvn clean install -f OpenDJ-SDK
 mvn clean install -f OpenDJ
-mvn clean install -f forgerock-parent
 mvn clean install -f OpenAM
 ```
 

@@ -21,8 +21,8 @@ cache:
   directories:
   - $HOME/.m2
 before_install:
-  -  mvn -q install -f OpenDJ-SDK 
-  -  mvn -q install -f OpenDJ
-  -  mvn -q install -f forgerock-parent
+  -  mvn -q -DskipTests install -f forgerock-parent
+  -  mvn -q -DskipTests install -f OpenDJ-SDK 
+  -  mvn -q -DskipTests install -f OpenDJ
 script:
   -  mvn -q install
