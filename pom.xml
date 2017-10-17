@@ -2041,7 +2041,7 @@
                     </stagingDirectory>
 					<createChecksum>true</createChecksum>
 					<skipChecksumVerification>false</skipChecksumVerification>
-					<force>false</force>
+					<force>true</force>
 					<artifactItems>
 						<artifactItem>
 							<groupId>org.forgerock</groupId>

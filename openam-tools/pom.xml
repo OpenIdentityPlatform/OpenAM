@@ -43,5 +43,58 @@
         <module>openam-installer-utils</module>
         <module>openam-license-servlet</module>
     </modules>
+    <build>
+    		<plugins>
+    			<plugin>
+				<groupId>com.savage7.maven.plugins</groupId>
+				<artifactId>maven-external-dependency-plugin</artifactId>
+				<version>0.6-SNAPSHOT</version>
+				<inherited>false</inherited>
+				<configuration>
+					<stagingDirectory>
+						${project.build.directory}/dependencies/
+                    </stagingDirectory>
+					<createChecksum>true</createChecksum>
+					<skipChecksumVerification>false</skipChecksumVerification>
+					<force>true</force>
+					<artifactItems>
+						<artifactItem>
+							<groupId>org.forgerock</groupId>
+			                <artifactId>cddl-license</artifactId>
+			                <version>1.0.0</version>
+			                <packaging>txt</packaging>
+							<downloadUrl>
+								https://repository.jboss.org/licenses/cddl.txt
+                        		</downloadUrl>
+                        	</artifactItem>
+ 					</artifactItems>
+				</configuration>
+				<executions>
+					<execution>
+						<id>clean-external-dependencies</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean-external</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>resolve-install-external-dependencies</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>resolve-external</goal>
+							<goal>install-external</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>deploy-external-dependencies</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy-external</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+    		</plugins>
+    </build>
 </project>
 
