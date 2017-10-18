@@ -18,8 +18,8 @@ notifications:
  email:
   - support@openam.org.ru
 before_install:
-  -  mvn -q -B -DskipTests install -f forgerock-parent
-  -  mvn -q -B -DskipTests install -f OpenDJ-SDK 
-  -  mvn -q -B -DskipTests install -f OpenDJ
+  -  mvn -q -B -DskipTests clean install -f forgerock-parent
+  -  mvn -q -B -DskipTests clean install -f OpenDJ-SDK 
+  -  mvn -q -B -DskipTests clean install -f OpenDJ
 script:
-  -  mvn -q -B install
+  -  mvn -q -B clean install
