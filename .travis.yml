@@ -22,4 +22,4 @@ before_install:
   -  mvn -q -DskipTests install -f OpenDJ-SDK 
   -  mvn -q -DskipTests install -f OpenDJ
 script:
-  -  mvn -q install
+  -  mvn -q clean install
