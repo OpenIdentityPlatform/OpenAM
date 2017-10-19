@@ -7,6 +7,7 @@ matrix:
           jdk: openjdk8
         - os: osx
           osx_image: xcode9.1
+          env: ALLOW_FAILURE=true
 before_install:
  - date -u
  - uname -a
@@ -21,3 +22,5 @@ before_install:
   -  mvn -q -B -DskipTests clean install -f forgerock-parent
   -  mvn -q -B -DskipTests clean install -f OpenDJ-SDK 
   -  mvn -q -B -DskipTests clean install -f OpenDJ
+script
+  -  mvn -q -B clean install
