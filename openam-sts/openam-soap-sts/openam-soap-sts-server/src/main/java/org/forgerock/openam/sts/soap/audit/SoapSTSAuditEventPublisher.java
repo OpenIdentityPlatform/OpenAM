@@ -76,7 +76,7 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
     public void tryPublish(String topic, AuditEvent auditEvent) {
         String sessionId = null;
         try {
-            sessionId = soapSTSAccessTokenProvider.getAccessToken();
+            sessionId = soapSTSAccessTokenProvider.getAccessTokenWithRetry();
             Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, openamAuditServiceVersion);

@@ -11,7 +11,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2015 ForgeRock AS.
+  ~ Copyright 2015-2016 ForgeRock AS.
 --%>
 
 <%@ page info="CreateSoapSTSDeployment" language="java" %>
@@ -108,6 +108,9 @@
       var openAMUrl = frm.elements['CreateSoapSTSDeployment.tfOpenAMUrl'].value;
       var soapAgentName = frm.elements['CreateSoapSTSDeployment.tfSoapAgentName'].value;
       var soapAgentPassword = frm.elements['CreateSoapSTSDeployment.tfSoapAgentPassword'].value;
+      var soapAgentRetryNumber = frm.elements['CreateSoapSTSDeployment.tfSoapAgentRetryNumber'].value;
+      var soapAgentRetryInitialInterval = frm.elements['CreateSoapSTSDeployment.tfSoapAgentRetryInitialInterval'].value;
+      var soapAgentRetryMultiplier = frm.elements['CreateSoapSTSDeployment.tfSoapAgentRetryMultiplier'].value;
 
       var keystoreFileNamesSize = frm.elements['CreateSoapSTSDeployment.elKeystoreFileNames.listbox'].length;
       var i=0;
@@ -128,6 +131,9 @@
               + "&openAMUrl=" + escapeEx(openAMUrl)
               + "&soapAgentName=" + escapeEx(soapAgentName)
               + "&soapAgentPassword=" + escapeEx(soapAgentPassword)
+              + "&soapAgentRetryNumber=" + escapeEx(soapAgentRetryNumber)
+              + "&soapAgentRetryInitialInterval=" + escapeEx(soapAgentRetryInitialInterval)
+              + "&soapAgentRetryMultiplier=" + escapeEx(soapAgentRetryMultiplier)
               + "&keystoreFileNames=" + escapeEx(keystoreFileNames)
               + "&wsdlFileNames=" + escapeEx(wsdlFileNames);
 

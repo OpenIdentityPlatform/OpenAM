@@ -68,14 +68,14 @@ public class AuditEventPublisherTest {
         // Given
         AuditEvent auditEvent = mockAuditEvent("event-as-json");
         HttpURLConnectionWrapper httpURLConnectionWrapper = mockHttpURLConnectionWrapper(headersCaptor, methodCaptor, payloadCaptor);
-        given(soapSTSAccessTokenProvider.getAccessToken()).willReturn("ssoTokenId");
+        given(soapSTSAccessTokenProvider.getAccessTokenWithRetry()).willReturn("ssoTokenId");
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(urlCaptor.capture())).willReturn(httpURLConnectionWrapper);
 
         // When
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
 
         // Then
-        verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();
+        verify(soapSTSAccessTokenProvider, times(1)).getAccessTokenWithRetry();
         assertThat(urlCaptor.getValue()).isEqualTo(new URL("http://openam.example.com:8080/openam/json/audit/access/?_action=create"));
         assertThat(headersCaptor.getValue().get(AMSTSConstants.CONTENT_TYPE)).isEqualTo(AMSTSConstants.APPLICATION_JSON);
         assertThat(headersCaptor.getValue().get(AMSTSConstants.CREST_VERSION_HEADER_KEY)).isEqualTo("protocol=1.0, resource=1.0");
@@ -88,14 +88,14 @@ public class AuditEventPublisherTest {
     @Test
     public void ensuresCreatedSoapSTSAgentSessionIsLoggedOut() throws Exception {
         // Given
-        given(soapSTSAccessTokenProvider.getAccessToken()).willReturn("ssoTokenId");
+        given(soapSTSAccessTokenProvider.getAccessTokenWithRetry()).willReturn("ssoTokenId");
         given(httpURLConnectionWrapperFactory.httpURLConnectionWrapper(any(URL.class))).willThrow(new RuntimeException());
 
         // When
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, mock(AuditEvent.class));
 
         // Then
-        verify(soapSTSAccessTokenProvider, times(1)).getAccessToken();
+        verify(soapSTSAccessTokenProvider, times(1)).getAccessTokenWithRetry();
         verify(soapSTSAccessTokenProvider, times(1)).invalidateAccessToken("ssoTokenId");
 
     }

@@ -52,6 +52,7 @@ import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.session.service.SessionAccessManager;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.sdk.AMStoreConnection;
@@ -557,7 +558,7 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(SessionID sessionId) {
-        if (null == sessionId) {
+        if (null == sessionId || InjectorHolder.getInstance(StatelessSessionManager.class).containsJwt(sessionId)) {
             return null;
         }
         InternalSession internalSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).getSession(sessionId);

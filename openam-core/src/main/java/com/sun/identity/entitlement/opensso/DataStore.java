@@ -450,11 +450,6 @@ public class DataStore {
             s.setAttributes(map);
             s.save();
 
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(NotificationServlet.ATTR_NAME, privilegeName);
-            params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-            Notifier.submit(NotificationServlet.PRIVILEGE_ADDED,
-                params);
             updateIndexCount(realm, 1, false);
         } catch (JSONException e) {
             throw new EntitlementException(210, e);
@@ -574,11 +569,6 @@ public class DataStore {
             s.setAttributes(map);
             s.save();
 
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(NotificationServlet.ATTR_NAME, privilegeName);
-            params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-            Notifier.submit(NotificationServlet.REFERRAL_ADDED,
-                params);
             updateIndexCount(realm, 1, true);
         } catch (SSOException e) {
             throw new EntitlementException(270, e);
@@ -618,12 +608,6 @@ public class DataStore {
                 SMSEntry s = new SMSEntry(token, dn);
                 s.delete();
                 updateIndexCount(realm, -1, false);
-
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(NotificationServlet.ATTR_NAME, name);
-                params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-                Notifier.submit(NotificationServlet.PRIVILEGE_DELETED,
-                    params);
             }
         } catch (SMSException e) {
             Object[] arg = {dn};
@@ -663,13 +647,6 @@ public class DataStore {
                 SMSEntry s = new SMSEntry(token, dn);
                 s.delete();
                 updateIndexCount(realm, -1, true);
-
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(NotificationServlet.ATTR_NAME, name);
-                params.put(NotificationServlet.ATTR_REALM_NAME, realm);
-
-                Notifier.submit(NotificationServlet.REFERRAL_DELETED,
-                    params);
             }
         } catch (SMSException e) {
             Object[] arg = {dn};

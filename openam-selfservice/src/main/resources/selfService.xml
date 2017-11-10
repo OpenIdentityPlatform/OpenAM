@@ -520,7 +520,7 @@
                                  order="330">
                     <IsOptional/>
                     <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#register/</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/?realm=${realm}#register/</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -532,7 +532,7 @@
                                  order="340">
                     <IsOptional/>
                     <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/#passwordReset/</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/?realm=${realm}#passwordReset/</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

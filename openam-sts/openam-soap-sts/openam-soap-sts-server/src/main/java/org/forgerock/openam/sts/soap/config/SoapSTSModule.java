@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Agile Digital Engineering
  */
 
@@ -96,6 +96,9 @@ public class SoapSTSModule extends PrivateModule {
     public static final String AM_SESSION_COOKIE_NAME_PROPERTY_KEY = AMSTSConstants.AM_SESSION_COOKIE_NAME;
     public static final String SOAP_STS_AGENT_USERNAME_PROPERTY_KEY = "soap_sts_agent_username";
     public static final String SOAP_STS_AGENT_PASSWORD_PROPERTY_KEY = "soap_sts_agent_password";
+    public static final String SOAP_STS_AGENT_RETRY_NUMBER_PROPERTY_KEY = "soap_sts_agent_retry_number";
+    public static final String SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_PROPERTY_KEY = "soap_sts_agent_retry_initial_interval";
+    public static final String SOAP_STS_AGENT_RETRY_MULTIPLIER_PROPERTY_KEY = "soap_sts_agent_retry_multiplier";
     public static final String AGENT_REALM = AMSTSConstants.REALM;
 
     @Override

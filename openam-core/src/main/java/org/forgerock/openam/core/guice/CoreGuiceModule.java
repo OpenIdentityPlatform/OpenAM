@@ -36,10 +36,8 @@ import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.blacklist.Blacklist;
-import org.forgerock.openam.blacklist.BloomFilterBlacklist;
 import org.forgerock.openam.blacklist.CTSBlacklist;
-import org.forgerock.openam.blacklist.CachingBlacklist;
-import org.forgerock.openam.blacklist.NoOpBlacklist;
+import org.forgerock.openam.blacklist.ConfigurableSessionBlacklist;
 import org.forgerock.openam.core.DNWrapper;
 import org.forgerock.openam.core.realms.RealmGuiceModule;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -337,24 +335,7 @@ public class CoreGuiceModule extends AbstractModule {
     public static Blacklist<Session> getSessionBlacklist(final CTSBlacklist<Session> ctsBlacklist,
             final SessionServiceConfig serviceConfig) {
 
-        if (!serviceConfig.isSessionBlacklistingEnabled()) {
-            return new NoOpBlacklist<>();
-        }
-
-        final long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
-        final int cacheSize = serviceConfig.getSessionBlacklistCacheSize();
-        final long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
-
-        Blacklist<Session> blacklist = ctsBlacklist;
-        if (cacheSize > 0) {
-            blacklist = new CachingBlacklist<>(blacklist, cacheSize, purgeDelayMs);
-        }
-
-        if (pollIntervalMs > 0) {
-            blacklist = new BloomFilterBlacklist<>(blacklist, purgeDelayMs);
-        }
-
-        return blacklist;
+        return ConfigurableSessionBlacklist.createConfigurableSessionBlacklist(ctsBlacklist, serviceConfig);
     }
 
     @Provides @Singleton @Inject

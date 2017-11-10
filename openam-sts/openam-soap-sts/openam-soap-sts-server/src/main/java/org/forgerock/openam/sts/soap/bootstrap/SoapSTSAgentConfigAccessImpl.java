@@ -69,7 +69,7 @@ public class SoapSTSAgentConfigAccessImpl implements SoapSTSAgentConfigAccess {
     public JsonValue getConfigurationState() throws ResourceException {
         String sessionId = null;
         try {
-            sessionId = accessTokenProvider.getAccessToken();
+            sessionId = accessTokenProvider.getAccessTokenWithRetry();
             Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, agentsProfileServiceVersion);

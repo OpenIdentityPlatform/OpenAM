@@ -75,7 +75,7 @@ abstract class TokenCancellerBase implements TokenCanceller {
 
     private String getTokenServiceConsumptionToken() throws TokenCancellationException {
         try {
-            return soapSTSAccessTokenProvider.getAccessToken();
+            return soapSTSAccessTokenProvider.getAccessTokenWithRetry();
         } catch (ResourceException e) {
             throw new TokenCancellationException(e.getCode(), e.getMessage(), e);
         }
