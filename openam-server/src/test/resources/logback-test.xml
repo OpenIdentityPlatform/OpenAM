@@ -1,0 +1,24 @@
+<configuration debug="true" scan="true" scanPeriod="5 seconds"> 
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender"> 
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</Pattern>
+    </layout>
+  </appender>
+
+  <root level="TRACE">
+    <appender-ref ref="STDOUT" />
+  </root>
+   
+	<logger name="org.mortbay.log" level="info" />
+	<logger name="org.apache.http.headers" level="info" />
+	<logger name="com.gargoylesoftware.htmlunit.javascript.background" level="info" />
+	<logger name="org.apache.commons.jcs" level="ERROR"></logger>
+	<logger name="org.apache.jasper" level="info" />
+	<logger name="org.openqa" level="info" />
+	<logger name="org.apache.axis" level="info" />
+	<logger name="org.apache.catalina" level="INFO"></logger>
+	<logger name="org.apache.tomcat" level="INFO"></logger>
+	<logger name="org.apache.jasper" level="INFO"></logger>
+    <logger name="org.apache.coyote.http11" level="INFO"></logger>
+</configuration>

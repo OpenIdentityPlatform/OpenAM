@@ -24,7 +24,12 @@
     <artifactId>openam-soap-sts</artifactId>
     <packaging>pom</packaging>
     <name>OpenAM SOAP STS</name>
-
+	<repositories>
+	     <repository>
+       		<id>mvnrepository.com</id>
+       		<url>https://repo.boundlessgeo.com/main</url>
+       </repository>
+	</repositories>
     <modules>
         <module>openam-soap-sts-server</module>
         <module>openam-soap-sts-client</module>

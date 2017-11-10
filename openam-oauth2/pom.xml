@@ -28,6 +28,12 @@
     <name>OpenAM OAuth2</name>
     <description>OpenAM OAuth2 integration</description>
 
+	<repositories>
+		<repository>
+       		<id>mvnrepository.com</id>
+       		<url>https://repo.boundlessgeo.com/main</url>
+       </repository>
+	</repositories>
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

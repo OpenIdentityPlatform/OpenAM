@@ -65,6 +65,40 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<port>8080</port>
+					<path>/openam</path>
+<!-- 					<serverXml>${basedir}/config/tomcat/server.xml</serverXml> -->
+<!-- 					<tomcatUsers>${basedir}/config/tomcat/tomcat-users.xml</tomcatUsers> -->
+					<useTestClasspath>true</useTestClasspath>
+					<ignorePackaging>true</ignorePackaging>
+					<tomcatLoggingFile>${basedir}/src/test/resources/logging.properties</tomcatLoggingFile>
+<!-- 					<warDirectory>/Users/vharseko/Downloads/openam/openam</warDirectory> -->
+					<systemProperties>
+<!-- 						<java.endorsed.dirs>${project.build.directory}/endorsed</java.endorsed.dirs> -->
+						<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
+<!-- 						<com.iplanet.services.configpath>${basedir}/config/test</com.iplanet.services.configpath> -->
+<!-- 						<com.sun.identity.configuration.directory>${basedir}/config/test</com.sun.identity.configuration.directory> -->
+						<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
+						<ssoadm.disabled>false</ssoadm.disabled>
+						<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
+						<com.iplanet.services.debug.directory></com.iplanet.services.debug.directory>
+						<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
+						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage>
+					</systemProperties>
+				</configuration>
+<!-- 				<dependencies> -->
+<!-- 					<dependency> -->
+<!-- 						<groupId>ch.qos.logback</groupId> -->
+<!-- 						<artifactId>logback-classic</artifactId> -->
+<!-- 						<version>RELEASE</version> -->
+<!-- 					</dependency> -->
+<!-- 				</dependencies> -->
+			</plugin>
         </plugins>
     </build>
     <dependencies>

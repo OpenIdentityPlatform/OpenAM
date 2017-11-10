@@ -50,7 +50,7 @@
       <tag>release/13.0.0</tag>
   </scm>
 
-<!--     <repositories> -->
+    <repositories>
 <!--         <repository> -->
 <!--             <id>forgerock-staging-repository</id> -->
 <!--             <name>ForgeRock Release Repository</name> -->
@@ -67,7 +67,11 @@
 <!--                 <enabled>false</enabled> -->
 <!--             </releases> -->
 <!--         </repository> -->
-<!--     </repositories> -->
+		     <repository>
+	        		<id>mvnrepository.com</id>
+	        		<url>https://repo.boundlessgeo.com/main</url>
+	        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>

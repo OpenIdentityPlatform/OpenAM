@@ -27,7 +27,13 @@
 
     <name>OpenAM OAuth2 SAML2 Grant Flow</name>
     <description>OpenAM OAuth2 SAML2 integration</description>
-
+	
+	<repositories>
+	     <repository>
+       		<id>mvnrepository.com</id>
+       		<url>https://repo.boundlessgeo.com/main</url>
+       </repository>
+	</repositories>
     <dependencies>
 
         <dependency>

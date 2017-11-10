@@ -29,6 +29,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdEventListener;
 import com.sun.identity.idm.IdRepoCreationListener;
+import com.sun.identity.log.spi.Debug;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.guice.core.InjectorHolder;
 
@@ -46,11 +47,16 @@ public class AMIdentityRepositoryListenerInitializer implements ServletContextLi
      */
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        Set<IdRepoCreationListener> listeners = InjectorHolder.getInstance(
-                Key.get(new TypeLiteral<Set<IdRepoCreationListener>>() {}));
-        for (IdRepoCreationListener listener : listeners) {
-            AMIdentityRepository.addCreationListener(listener);
-        }
+    		try {
+	        Set<IdRepoCreationListener> listeners = InjectorHolder.getInstance(
+	                Key.get(new TypeLiteral<Set<IdRepoCreationListener>>() {}));
+	        for (IdRepoCreationListener listener : listeners) {
+	            AMIdentityRepository.addCreationListener(listener);
+	        }
+    		}catch (Throwable e) {
+    			Debug.error("AMIdentityRepositoryListenerInitializer contextInitialized", e);
+    			throw e;
+    		}
     }
 
     /**
@@ -60,10 +66,15 @@ public class AMIdentityRepositoryListenerInitializer implements ServletContextLi
      */
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        Set<IdRepoCreationListener> listeners = InjectorHolder.getInstance(
-                Key.get(new TypeLiteral<Set<IdRepoCreationListener>>() {}));
-        for (IdRepoCreationListener listener : listeners) {
-            AMIdentityRepository.removeCreationListener(listener);
-        }
+    		try {
+	        Set<IdRepoCreationListener> listeners = InjectorHolder.getInstance(
+	                Key.get(new TypeLiteral<Set<IdRepoCreationListener>>() {}));
+	        for (IdRepoCreationListener listener : listeners) {
+	            AMIdentityRepository.removeCreationListener(listener);
+	        }
+    		}catch (Throwable e) {
+    			Debug.error("AMIdentityRepositoryListenerInitializer contextDestroyed", e);
+    			throw e;
+    		}
     }
 }

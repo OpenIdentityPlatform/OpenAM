@@ -546,19 +546,6 @@
 <!--                 <enabled>false</enabled> -->
 <!--             </snapshots> -->
 <!--         </repository> -->
-
-        <repository>
-            <id>oracle-repository</id>
-            <name>Oracle Repository</name>
-            <url>http://download.oracle.com/maven</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-        		<id>mvnrepository.com</id>
-        		<url>https://repo.boundlessgeo.com/main</url>
-        </repository>
     </repositories>
 
     <!-- For Deployment to ForgeRock Maven Repository -->

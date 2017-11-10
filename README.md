@@ -11,8 +11,13 @@ mvn clean install -f OpenAM/OpenDJ
 mvn clean install -f OpenAM
 ```
 
-About
-==========
+## How-to run after build
+
+```bash
+mvn tomcat7:run-war -f OpenAM/openam-server
+```
+
+## About
 
 OpenAM is an "all-in-one" access management solution that provides the following features in a single unified project:
 
