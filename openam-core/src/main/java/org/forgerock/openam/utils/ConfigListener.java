@@ -14,15 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts;
+package org.forgerock.openam.utils;
+
+import org.forgerock.openam.cts.CoreTokenConfig;
 
 /**
- * Listener interface allowing changes to {@link CoreTokenConfig} to be observed.
+ * Listener interface allowing changes to hot swappable configuration (e.g. {@link CoreTokenConfig},
+ * {@link com.iplanet.dpro.session.service.SessionServiceConfig}) to be observed.
  */
-public interface CoreTokenConfigListener {
-
+public interface ConfigListener {
     /**
-     * Indicates that the {@link CoreTokenConfig} has changed.
+     * Indicates that the configuration has changed.
      */
     void configChanged();
 }

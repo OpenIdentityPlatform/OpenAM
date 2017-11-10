@@ -331,10 +331,17 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
+<<<<<<< HEAD
                             <nodeVersion>v4.6.1</nodeVersion>
                             <npmVersion>3.10.7</npmVersion>
 <!--                             <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot> -->
 <!--                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot> -->
+=======
+                            <nodeVersion>v4.6.2</nodeVersion>
+                            <npmVersion>3.10.9</npmVersion>
+                            <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot>
+                            <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot>
+>>>>>>> f03abd00954cbcc1e955519945b70fd2b8e32436
                         </configuration>
                     </execution>
                     <execution>

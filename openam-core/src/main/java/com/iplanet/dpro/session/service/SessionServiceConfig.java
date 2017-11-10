@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -47,6 +48,7 @@ import javax.inject.Singleton;
 
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
+import org.forgerock.openam.utils.ConfigListener;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.cluster.ClusterStateService;
@@ -114,6 +116,7 @@ public class SessionServiceConfig {
      */
 
     private volatile HotSwappableSessionServiceConfig hotSwappableSessionServiceConfig;
+    private final CopyOnWriteArraySet<ConfigListener> listeners = new CopyOnWriteArraySet<>();
 
     /**
      * Private value object for storing snapshot state of amSession.xml config settings.
@@ -308,6 +311,7 @@ public class SessionServiceConfig {
                 public void performUpdate() {
                     try {
                         hotSwappableSessionServiceConfig = new HotSwappableSessionServiceConfig(serviceSchemaManager);
+                        notifyListeners();
                     } catch (SMSException e) {
                         throw new IllegalStateException(e);
                     }
@@ -591,5 +595,20 @@ public class SessionServiceConfig {
      */
     public long getSessionBlacklistPurgeDelay(TimeUnit unit) {
         return unit.convert(hotSwappableSessionServiceConfig.sessionBlacklistPurgeDelayMinutes, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Register a listener to be notified when {@link SessionServiceConfig} changes.
+     *
+     * @param listener the event listener to call when {@link SessionServiceConfig} changes.
+     */
+    public void addListener(ConfigListener listener) {
+        this.listeners.add(listener);
+    }
+
+    private void notifyListeners() {
+        for (final ConfigListener listener : listeners) {
+            listener.configChanged();
+        }
     }
 }

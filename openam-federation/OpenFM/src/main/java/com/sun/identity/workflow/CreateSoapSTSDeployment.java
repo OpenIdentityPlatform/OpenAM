@@ -100,6 +100,9 @@ public class CreateSoapSTSDeployment extends Task {
     private static final String OPENAM_URL_PARAM = "openAMUrl";
     private static final String SOAP_AGENT_NAME_PARAM = "soapAgentName";
     private static final String SOAP_AGENT_PASSWORD_PARAM = "soapAgentPassword";
+    private static final String SOAP_AGENT_RETRY_NUMBER_PARAM = "soapAgentRetryNumber";
+    private static final String SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM = "soapAgentRetryInitialInterval";
+    private static final String SOAP_AGENT_RETRY_MULTIPLIER_PARAM = "soapAgentRetryMultiplier";
     private static final String KEYSTORE_FILE_NAMES_PARAM = "keystoreFileNames";
     private static final String WSDL_FILE_NAMES_PARAM = "wsdlFileNames";
 
@@ -134,6 +137,9 @@ public class CreateSoapSTSDeployment extends Task {
     private static final String SOAP_PROPERTY_FILE_AM_SESSION_COOKIE_NAME_KEY = "am_session_cookie_name";
     private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_USERNAME_KEY = "soap_sts_agent_username";
     private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_PASSWORD_KEY = "soap_sts_agent_password";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_NUMBER_KEY = "soap_sts_agent_retry_number";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_KEY = "soap_sts_agent_retry_initial_interval";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_MULTIPLIER_KEY = "soap_sts_agent_retry_multiplier";
     private static final String SOAP_PROPERTY_FILE_REALM_KEY = "am_realm";
 
     private static final String COMMA = ",";
@@ -305,6 +311,12 @@ public class CreateSoapSTSDeployment extends Task {
         properties.setProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_USERNAME_KEY, getStringParam(mapParams, SOAP_AGENT_NAME_PARAM));
         properties.setProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_PASSWORD_KEY, encryptedAgentPassword);
         properties.setProperty(SOAP_PROPERTY_FILE_AM_SESSION_COOKIE_NAME_KEY, getAMSessionIdCookieNameForDeployment());
+        properties.setProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_NUMBER_KEY, 
+                getStringParam(mapParams, SOAP_AGENT_RETRY_NUMBER_PARAM));
+        properties.setProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_KEY, 
+                getStringParam(mapParams, SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM));
+        properties.setProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_MULTIPLIER_KEY, 
+                getStringParam(mapParams, SOAP_AGENT_RETRY_MULTIPLIER_PARAM));
         modifiedSoapSTSServerWar.putNextEntry(new JarEntry(SOAP_PROPERTY_FILE_JAR_ENTRY_NAME));
         final String nullComments = null;
         properties.store(modifiedSoapSTSServerWar, nullComments);

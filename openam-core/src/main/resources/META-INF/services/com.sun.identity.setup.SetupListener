@@ -18,3 +18,4 @@ org.forgerock.openam.services.push.PushNotificationServiceSetupListener
 org.forgerock.openam.entitlement.service.DefaultUrlResourceTypeGenerator
 com.iplanet.dpro.session.service.SessionMaxStatsSetupListener
 org.forgerock.openam.session.service.access.persistence.watchers.SessionModificationWatcher
+org.forgerock.openam.entitlement.SetupInternalNotificationSubscriptions

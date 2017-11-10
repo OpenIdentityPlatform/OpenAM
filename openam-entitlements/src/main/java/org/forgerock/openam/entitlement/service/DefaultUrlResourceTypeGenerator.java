@@ -17,9 +17,9 @@
 package org.forgerock.openam.entitlement.service;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.StringUtils.isEmpty;
 
 import java.security.AccessController;
-import java.util.UUID;
 
 import javax.security.auth.Subject;
 
@@ -34,14 +34,13 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.SetupListener;
-import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 
 /**
- * This class is responsible for creating the default Resouce Type (URL resource type) for the realm.
+ * This class is responsible for creating the default Resource Type (URL resource type) for the realm.
  * It is added to the ServiceConfigManager as a listener so gets called automatically if the organization config is
  * changed.
  */
@@ -70,7 +69,7 @@ public final class DefaultUrlResourceTypeGenerator implements ServiceListener, S
     @Override
     public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
                                           String serviceComponent, int type) {
-        if (ServiceListener.ADDED == type && ServiceManager.REALM_SERVICE.equals(serviceName)) {
+        if (ServiceListener.ADDED == type && ServiceManager.REALM_SERVICE.equals(serviceName) && isEmpty(groupName)) {
             loadDefaultResourceType(orgName);
         }
     }
@@ -82,7 +81,7 @@ public final class DefaultUrlResourceTypeGenerator implements ServiceListener, S
             resourceTypeService.saveResourceType(adminSubject, orgName, DEFAULT_RESOURCE_TYPE);
         } catch (EntitlementException ssoe) {
             PolicyConstants.DEBUG.error(
-                    "DefaultUrlResourceTypeGenerator.loadDefaultServices. Exception in loading default services ", ssoe);
+                   "DefaultUrlResourceTypeGenerator.loadDefaultServices. Exception in loading default services ", ssoe);
         }
     }
 
@@ -92,7 +91,7 @@ public final class DefaultUrlResourceTypeGenerator implements ServiceListener, S
     }
 
     private static void registerListener() {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         try {
             ServiceConfigManager scm = new ServiceConfigManager(ServiceManager.REALM_SERVICE, adminToken);
             scm.addListener(new DefaultUrlResourceTypeGenerator());

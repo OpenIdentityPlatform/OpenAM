@@ -61,7 +61,7 @@ public final class UserRegistrationConfigProvider
         }
 
         if (config.isEmailEnabled()) {
-            String serverUrl = config.getEmailVerificationUrl() + "&realm=" + realm;
+            String serverUrl = config.getEmailVerificationUrl(realm);
             stages.add(new VerifyEmailAccountConfig()
                     .setEmailServiceUrl("/email")
                     .setIdentityEmailField(config.getEmailAttributeName())

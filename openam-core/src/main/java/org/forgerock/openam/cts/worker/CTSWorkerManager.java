@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.CoreTokenConfigListener;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.openam.utils.ConfigListener;
 import org.forgerock.util.Reject;
 import org.forgerock.util.annotations.VisibleForTesting;
 
@@ -67,7 +67,7 @@ public class CTSWorkerManager {
             @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         final CTSWorkerManager manager = new CTSWorkerManager(taskProvider, monitor, config, executorServiceFactory, debug);
         manager.config.addListener(
-                new CoreTokenConfigListener() {
+                new ConfigListener() {
                     @Override
                     public void configChanged() {
                         manager.configChanged();

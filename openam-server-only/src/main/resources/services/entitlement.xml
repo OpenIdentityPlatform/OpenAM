@@ -97,38 +97,6 @@
                         <Value>100000</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
-                <!-- entitlement notification, Connection timeout in millisec,
-                     max 5 mins -->
-                <AttributeSchema name="entitlement-notifier-conn-timeout"
-                    type="single"
-                    syntax="number_range"
-                    rangeStart="0" rangeEnd="300000"
-                    i18nKey="">
-                    <DefaultValues>
-                        <Value>1000</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="entitlement-notifier-retries"
-                    type="single"
-                    syntax="number_range"
-                    rangeStart="0" rangeEnd="50"
-                    i18nKey="">
-                    <DefaultValues>
-                        <Value>3</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <!-- duration between retries in millisec, max 5 mins -->
-                <AttributeSchema name="entitlement-notifier-duration-between-retries"
-                    type="single"
-                    syntax="number_range"
-                    rangeStart="0" rangeEnd="300000"
-                    i18nKey="">
-                    <DefaultValues>
-                        <Value>1000</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <!-- Privilege change notification
                      Connection timeout in millisec, max 5 mins -->
                 <AttributeSchema name="privilege-notifier-conn-timeout"

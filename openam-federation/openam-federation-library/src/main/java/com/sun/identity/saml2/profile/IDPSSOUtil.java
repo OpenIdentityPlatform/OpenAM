@@ -106,6 +106,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -910,7 +911,7 @@ public class IDPSSOUtil {
         String sessionID = sessionProvider.getSessionID(session);
         synchronized (sessionID) {
             authnStatement = getAuthnStatement(request, session, isNewSessionIndex, authnReq, idpEntityID, realm,
-                matchingAuthnContext);
+                matchingAuthnContext, idpMetaAlias);
             if (authnStatement == null) {
                 return null;
             }
@@ -1139,6 +1140,7 @@ public class IDPSSOUtil {
      * @param idpEntityID The entity ID of the identity provider.
      * @param realm The realm name.
      * @param matchingAuthnContext The <code>AuthnContext</code> used to find authentication type and scheme.
+     * @param metaAlias The meta alias.
      * @return The <code>SAML AuthnStatement</code> object.
      * @throws SAML2Exception If the operation is not successful.
      */
@@ -1149,7 +1151,8 @@ public class IDPSSOUtil {
             AuthnRequest authnReq,
             String idpEntityID,
             String realm,
-            AuthnContext matchingAuthnContext)
+            AuthnContext matchingAuthnContext,
+            String metaAlias)
             throws SAML2Exception {
         String classMethod = "IDPSSOUtil.getAuthnStatement: ";
 
@@ -1208,13 +1211,33 @@ public class IDPSSOUtil {
             // a new SAML response for the SP.
             Set<String> authenticatingAuthorities = new LinkedHashSet<String>();
             final List<Assertion> assertions = idpResponse.getAssertion();
-            for (Assertion assertion : assertions) {
-                authenticatingAuthorities.addAll(extractAuthenticatingAuthorities(assertion));
+            if (CollectionUtils.isNotEmpty(assertions)) {
+                for (Assertion assertion : assertions) {
+                    authenticatingAuthorities.addAll(extractAuthenticatingAuthorities(assertion));
+                }
+                // According to SAML profile 4.1.4.2 each assertion within the SAML Response MUST have the same issuer, so
+                // this should suffice. We should have at least one assertion or encrypted assertion available since the 
+                // IdP proxy's SP already accepted it.
+                authenticatingAuthorities.add(assertions.iterator().next().getIssuer().getValue());
+                authnContext.setAuthenticatingAuthority(new ArrayList<String>(authenticatingAuthorities));
+            } else {
+                // Check for Encrypted Assertions
+                final List<EncryptedAssertion> encryptedAssertions = idpResponse.getEncryptedAssertion();
+                if (CollectionUtils.isNotEmpty(encryptedAssertions)) {
+                    boolean firstAssertion = true;
+                    String hostEntityId = metaManager.getEntityByMetaAlias(metaAlias);
+                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(metaManager.getSPSSOConfig(realm, hostEntityId));
+                    for (EncryptedAssertion encryptedAssertion : encryptedAssertions) {
+                        Assertion assertion = encryptedAssertion.decrypt(decryptionKeys);
+                        authenticatingAuthorities.addAll(extractAuthenticatingAuthorities(assertion));
+                        if (firstAssertion) {
+                            authenticatingAuthorities.add(assertion.getIssuer().getValue());
+                            firstAssertion = false;
+                        }
+                    }
+                    authnContext.setAuthenticatingAuthority(new ArrayList<String>(authenticatingAuthorities));
+                }
             }
-            // According to SAML profile 4.1.4.2 each assertion within the SAML Response MUST have the same issuer, so
-            // this should suffice. We should have at least one assertion, since the IdP proxy's SP already accepted it.
-            authenticatingAuthorities.add(assertions.iterator().next().getIssuer().getValue());
-            authnContext.setAuthenticatingAuthority(new ArrayList<String>(authenticatingAuthorities));
         }
         authnStatement.setAuthnContext(authnContext);
 

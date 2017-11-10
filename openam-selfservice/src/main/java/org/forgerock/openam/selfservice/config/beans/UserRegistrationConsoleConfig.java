@@ -130,10 +130,12 @@ public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {
     /**
      * Gets the verification Url to be sent with the email body.
      *
+     * @param realm
+     *          the absolute realm
      * @return email verification Url
      */
-    public String getEmailVerificationUrl() {
-        return emailVerificationUrl;
+    public String getEmailVerificationUrl(String realm) {
+        return emailVerificationUrl.replace("${realm}", realm);
     }
 
     /**
