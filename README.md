@@ -20,6 +20,17 @@ The getting started guide is [here][Getting Started Guide]
 
 Issues are handled via the [GitHub issues page for the project][GitHub Issues].
 
+## Security Policy
+
+ForgeRock will create GitHub issues for any known security issues that are thought to affect the community edition. They will have a SECURITY label. Community members are responsible for fixing and testing any security issues.
+ 
+### What should I do if I find a new security issue?
+If you find a new security issue in the community edition please send an email describing the issue and how it may be reproduced to security@forgerock.com. 
+Once we receive the email we will;
+
+- Confirm whether or not the vulnerability affects any currently supported versions and if so we will follow our standard security response process which will involve us publishing the GitHub issue as part of the security advisory process
+- If the issue does not affect any supported versions we will notify the reporter and request that they create a github issue directly
+
 ## How to Collaborate
 
 Collaborate by:
