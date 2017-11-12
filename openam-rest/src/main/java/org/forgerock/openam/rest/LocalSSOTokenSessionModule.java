@@ -125,7 +125,7 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
     @Override
     public Promise<Void, AuthenticationException> initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
             CallbackHandler callbackHandler, Map config) {
-    		this.handler = handler;
+    		this.handler = callbackHandler;
         return Promises.newResultPromise(null);
     }
     /**
