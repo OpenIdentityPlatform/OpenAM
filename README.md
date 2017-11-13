@@ -1,7 +1,6 @@
 # OpenAM
 [![Build Status](https://travis-ci.org/OpenIdentityPlatform/OpenAM.svg)](https://travis-ci.org/OpenIdentityPlatform/OpenAM)
 
-## About
 Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements and Web Services Security.
 
 ## License
@@ -24,7 +23,10 @@ mvn tomcat7:run-war -f OpenAM/openam-server
 ## Support and Mailing List Information
 * Community Mailing List: open-identity-platform-openam@googlegroups.com
 * Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
-* Commercial support request: support@openam.org.ru
+* Commercial support RFP: support@openam.org.ru (English, Russian)
+
+## Contributing
+Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)
 
 ## Thanks
 * Sun Access Manager
