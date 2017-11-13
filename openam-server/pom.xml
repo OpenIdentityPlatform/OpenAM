@@ -77,7 +77,7 @@
 					<useTestClasspath>true</useTestClasspath>
 					<ignorePackaging>true</ignorePackaging>
 					<tomcatLoggingFile>${basedir}/src/test/resources/logging.properties</tomcatLoggingFile>
-<!-- 					<warDirectory>/Users/vharseko/Downloads/openam/openam</warDirectory> -->
+<!-- 					<warDirectory>/tmp/openam</warDirectory> -->
 					<systemProperties>
 <!-- 						<java.endorsed.dirs>${project.build.directory}/endorsed</java.endorsed.dirs> -->
 						<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
@@ -88,7 +88,7 @@
 						<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
 						<com.iplanet.services.debug.directory></com.iplanet.services.debug.directory>
 						<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
-						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage>
+<!-- 						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
 					</systemProperties>
 				</configuration>
 <!-- 				<dependencies> -->

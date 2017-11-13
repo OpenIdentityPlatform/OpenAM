@@ -1116,4 +1116,41 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private void fireSessionEvent(SessionEventType sessionEventType) {
         sessionEventBroker.onEvent(new InternalSessionEvent(this, sessionEventType, Time.currentTimeMillis()));
     }
+    
+    @JsonIgnore private final ConcurrentMap<String, Object> internalObjects = new ConcurrentHashMap<>();
+    /**
+     * Returns the value of the specified key from the internal object map.
+     * 
+     * @param key
+     *            the key whose associated value is to be returned
+     * @return internal object
+     */
+    public Object getObject(String key) {
+        return getInternalObjectMap().get(key);
+    }
+
+    /**
+     * Removes the mapping for this key from the internal object map if present.
+     * 
+     * @param key
+     *            key whose mapping is to be removed from the map
+     */
+    public void removeObject(String key) {
+        getInternalObjectMap().remove(key);
+    }
+
+    /**
+     * Sets the key-value pair in the internal object map.
+     * 
+     * @param key with which the specified value is to be associated
+     * @param value to be associated with the specified key
+     */
+    public void setObject(String key, Object value) {
+        getInternalObjectMap().put(key, value);
+    }
+
+    private Map getInternalObjectMap() {
+        return internalObjects;
+    }
+
 }

@@ -946,4 +946,8 @@ public class Session implements Blacklistable, AMSession{
     private boolean usingCachedBasedPolling() {
         return SystemProperties.getAsBoolean(CACHED_BASE_POLLING_PROPERTY, false);
     }
+    
+    public static Session getSession(SessionID sid) throws SessionException {
+    		return org.forgerock.openam.session.SessionCache.getInstance().getSession(sid);
+     }
 }

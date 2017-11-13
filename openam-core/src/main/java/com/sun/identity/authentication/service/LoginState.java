@@ -498,7 +498,7 @@ public class LoginState {
      *
      * @param callback
      */
-    void setReceivedCallback_NoThread(Callback[] callback) {
+    public void setReceivedCallback_NoThread(Callback[] callback) {
         submittedCallbackInfo = null;
         receivedCallbackInfo = callback;
         prevCallback = callback;
@@ -547,7 +547,7 @@ public class LoginState {
      *
      * @return callbacks submitted by client.
      */
-     Callback[] getSubmittedInfo() {
+    public Callback[] getSubmittedInfo() {
         return submittedCallbackInfo;
     }
 
@@ -897,6 +897,9 @@ public class LoginState {
         return idleTime;
     }
 
+    public int getMaxSession() {
+        return maxSession;
+    }
     /**
      * Returns session cache time.
      *
@@ -2387,7 +2390,7 @@ public class LoginState {
      *
      * @throws AMException if it fails to populate default user attributes
      */
-    private void populateDefaultUserAttributes() throws AMException {
+    public void populateDefaultUserAttributes() throws AMException {
         int[] sessionAttrs = getDefaultSessionAttributes(getOrgDN());
         maxSession = sessionAttrs[0];
         idleTime = sessionAttrs[1];
@@ -3145,7 +3148,7 @@ public class LoginState {
      *
      * @return success login URL.
      */
-    String getSuccessLoginURL() {
+    public String getSuccessLoginURL() {
         String postProcessGoto = AuthUtils.getPostProcessURL(servletRequest,
                 AMPostAuthProcessInterface.POST_PROCESS_LOGIN_SUCCESS_URL);
         //check from postAuthModule URL is set
@@ -3680,7 +3683,7 @@ public class LoginState {
      *
      * @return failure login URL.
      */
-    String getFailureLoginURL() {
+    public String getFailureLoginURL() {
         String postProcessURL = AuthUtils.getPostProcessURL(servletRequest,
                 AMPostAuthProcessInterface.POST_PROCESS_LOGIN_FAILURE_URL);
         if (postProcessURL != null) {
@@ -4518,7 +4521,7 @@ public class LoginState {
      *
      * @param sessionUpgrade <code>true</code> if session upgrade.
      */
-    void setSessionUpgrade(boolean sessionUpgrade) {
+    public void setSessionUpgrade(boolean sessionUpgrade) {
         this.sessionUpgrade = sessionUpgrade;
     }
 
@@ -5174,7 +5177,7 @@ public class LoginState {
      *
      * @return ignoreUserProfile
      */
-    boolean ignoreProfile() {
+    public boolean ignoreProfile() {
         return ignoreUserProfile;
     }
 
