@@ -310,7 +310,7 @@ public class UpgradeCTSMaxConnectionsConfigurationStep extends AbstractUpgradeSt
      * @see ConnectionType
      */
     static class ConnectionCount {
-        static final int MINIMUM_CONNECTIONS = 6;
+        static final int MINIMUM_CONNECTIONS = 2;
         private final Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration;
 
         /**
