@@ -1,8 +1,13 @@
 # OpenAM
 [![Build Status](https://travis-ci.org/OpenIdentityPlatform/OpenAM.svg)](https://travis-ci.org/OpenIdentityPlatform/OpenAM)
 
-## How-to build
+## About
+Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements and Web Services Security.
 
+## License
+This project is licensed under the Common Development and Distribution License (CDDL). 
+
+## How-to build
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
 mvn clean install -f OpenAM/forgerock-parent
@@ -12,28 +17,17 @@ mvn clean install -f OpenAM
 ```
 
 ## How-to run after build
-
 ```bash
 mvn tomcat7:run-war -f OpenAM/openam-server
 ```
 
-## About
+## Support and Mailing List Information
+* Community Mailing List: open-identity-platform-openam@googlegroups.com
+* Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
+* Commercial support request: support@openam.org.ru
 
-OpenAM is an "all-in-one" access management solution that provides the following features in a single unified project:
-
-+ Authentication
-    - Adaptive 
-    - Strong  
-+ Single sign-on (SSO)
-+ Authorization
-+ Entitlements
-+ Federation 
-+ Web Services Security
-
-OpenAM provides mobile support out of the box, with full OAuth 2.0 and OpenID Connect support - modern protocols that 
-provide the most efficient method for developing secure native or HTML5 mobile applications optimized for bandwidth and 
-CPU.
-
-## License
-
-This project is licensed under the Common Development and Distribution License (CDDL). 
+## Thanks
+* Sun Access Manager
+* Sun OpenSSO
+* Oracle OpenSSO
+* Forgrock OpenAM
