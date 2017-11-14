@@ -618,7 +618,7 @@ public class BootstrapData {
     private static final String BOOTSTRAP_SERVER_END_TAG =
         "</iPlanetDataAccessLayer>";
     private static final String BOOTSTRAP_SERVER_CONFIG_USER =
-        "<ServerGroup name=\"default\" minConnPool=\"1\" maxConnPool=\"1\">" +
+        "<ServerGroup name=\"default\" minConnPool=\"1\" maxConnPool=\"10\">" +
         "<Server name=\"Server1\" host=\"@" + DS_HOST + "@\" " +
         "port=\"@" + DS_PORT + "@\" type=\"@" + DS_PROTO_TYPE + "@\" />" +
         "<User name=\"User1\" type=\"admin\">" +
