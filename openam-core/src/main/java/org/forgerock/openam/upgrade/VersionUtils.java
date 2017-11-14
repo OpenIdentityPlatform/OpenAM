@@ -40,6 +40,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Utility class that deals with determining and comparing versions of OpenAM.
  *
@@ -80,33 +82,34 @@ public class VersionUtils {
         }
         if (SystemProperties.get("org.forgerock.donotupgrade") != null) return false;
 
-        SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT, Locale.UK);
-        Date currentVersionDate = null;
-        Date warVersionDate = null;
-
-        try {
-            currentVersionDate = versionDateFormat.parse(current[1]);
-            warVersionDate = versionDateFormat.parse(war[1]);
-        } catch (ParseException pe) {
-            DEBUG.error("Unable to parse date strings; current:" + currentVersion +
-                    " war version: " + warVersion, pe);
-        }
-
-        if (currentVersionDate == null || warVersionDate == null) {
-            // stop upgrade if we cannot check
-            return false;
-        }
-
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Current version: " + currentVersionDate);
-            DEBUG.message("War version: " + warVersionDate);
-        }
-        boolean isBefore = currentVersionDate.before(warVersionDate);
-        if (isBefore) {
-            return Integer.valueOf(current[0]) <= Integer.valueOf(war[0]);
-        } else {
-            return Integer.valueOf(current[0]) < Integer.valueOf(war[0]);
-        }
+//        SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT, Locale.UK);
+//        Date currentVersionDate = null;
+//        Date warVersionDate = null;
+//
+//        try {
+//            currentVersionDate = versionDateFormat.parse(current[1]);
+//            warVersionDate = versionDateFormat.parse(war[1]);
+//        } catch (ParseException pe) {
+//            DEBUG.error("Unable to parse date strings; current:" + currentVersion +
+//                    " war version: " + warVersion, pe);
+//        }
+//
+//        if (currentVersionDate == null || warVersionDate == null) {
+//            // stop upgrade if we cannot check
+//            return false;
+//        }
+//
+//        if (DEBUG.messageEnabled()) {
+//            DEBUG.message("Current version: " + currentVersionDate);
+//            DEBUG.message("War version: " + warVersionDate);
+//        }
+//        boolean isBefore = currentVersionDate.before(warVersionDate);
+//        if (isBefore) {
+//            return Integer.valueOf(current[0]) <= Integer.valueOf(war[0]);
+//        } else {
+//            return Integer.valueOf(current[0]) < Integer.valueOf(war[0]);
+//        }
+        return !StringUtils.equalsIgnoreCase(current[0], war[0]);
     }
 
     public static String getCurrentVersion() {
