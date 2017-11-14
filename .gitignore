@@ -8,4 +8,6 @@ openam-ui/openam-ui-ria/npm-debug.log.*
 .classpath
 .settings
 .project
+.DS_Store
 test-output
+

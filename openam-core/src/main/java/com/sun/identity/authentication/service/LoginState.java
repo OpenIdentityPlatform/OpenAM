@@ -5091,7 +5091,7 @@ public class LoginState {
      *
      * @param pageTimeOut Page timeout.
      */
-    synchronized void setPageTimeOut(long pageTimeOut) {
+    public synchronized void setPageTimeOut(long pageTimeOut) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Setting page timeout :" + pageTimeOut);
         }
@@ -5280,7 +5280,7 @@ public class LoginState {
     /**
      * Sets Callbacks per Page state.
      */
-    void setCallbacksPerState(String pageState, Callback[] callbacks) {
+    public void setCallbacksPerState(String pageState, Callback[] callbacks) {
         this.callbacksPerState.put(pageState, callbacks);
     }
 

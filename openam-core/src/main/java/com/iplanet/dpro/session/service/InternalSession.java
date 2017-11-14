@@ -131,7 +131,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private SessionState sessionState = SessionState.INVALID;
     private String clientID;
     private String clientDomain;
-    private Properties sessionProperties; // e.g. LoginURL, Timeout, Host, etc
+    public Properties sessionProperties; // e.g. LoginURL, Timeout, Host, etc
     private boolean willExpireFlag;
     private boolean isSessionUpgrade = false;
     private Boolean cookieMode = null;
