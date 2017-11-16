@@ -89,7 +89,7 @@ public class DNUtils {
     public static String DNtoName(String dn,  boolean noTypes) {
         // String dn is guaranteed type of DN
         String id = dn;
-        if (StringUtils.isNotEmpty(dn) && LDAPUtils.isDN(dn, 1)) {
+        if (StringUtils.isNotEmpty(dn) && LDAPUtils.isDN(dn)) {
             try {
                 DN name = DN.valueOf(dn);
                 id = LDAPUtils.unescapeValue(noTypes ? rdnValueFromDn(name) : name.rdn().toString());
