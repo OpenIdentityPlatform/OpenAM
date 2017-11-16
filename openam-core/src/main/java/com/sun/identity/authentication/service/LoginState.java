@@ -4975,7 +4975,8 @@ public class LoginState {
                 }
             }
             InternalSession session = getReferencedSession();
-            session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
+            if(session != null)
+            	session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
         }
         return postLoginInstanceSet;
     }
