@@ -842,7 +842,7 @@ public class AMLoginContext {
 
             authContext.getLoginState().logLogout();
             auditor.auditLogout(getSSOToken());
-            authContext.getLoginState().postProcess(indexType, indexName, LoginState.PostProcessEvent.LOGOUT);
+            authContext.getLoginState().postProcess(this, indexType, indexName, LoginState.PostProcessEvent.LOGOUT);
             destroySession();
             loginStatus.setStatus(LoginStatus.AUTH_COMPLETED);
         } catch (AuthLoginException le) {
@@ -1877,7 +1877,7 @@ public class AMLoginContext {
                 debug.message("postProcessOnFail ");
             }
             //setErrorMsgAndTemplate();
-            authContext.getLoginState().postProcess(indexType, indexName, LoginState.PostProcessEvent.FAILURE);
+            authContext.getLoginState().postProcess(this, indexType, indexName, LoginState.PostProcessEvent.FAILURE);
             authContext.getLoginState().setFailureLoginURL(indexType, indexName);
             processDone = true;
         }
@@ -1893,7 +1893,7 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("postProcessOnSuccess ");
             }
-            authContext.getLoginState().postProcess(indexType, indexName, LoginState.PostProcessEvent.SUCCESS);
+            authContext.getLoginState().postProcess(this, indexType, indexName, LoginState.PostProcessEvent.SUCCESS);
             processDone = true;
         }
     }

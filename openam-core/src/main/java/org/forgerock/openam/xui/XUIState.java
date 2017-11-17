@@ -20,6 +20,7 @@ import java.security.AccessController;
 import java.util.Map;
 
 import com.google.inject.Singleton;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -60,7 +61,7 @@ public class XUIState {
             try {
                 ServiceSchema schema = schemaManager.getGlobalSchema();
                 Map defaults = schema.getAttributeDefaults();
-                enabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
+                enabled = SystemProperties.get("XUI.enable") != null &&  Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
                 if (listenerId == null) {
                     listenerId = schemaManager.addListener(this);
                 }

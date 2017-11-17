@@ -105,6 +105,7 @@ import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AMLoginModule;
+import com.sun.identity.authentication.spi.AMPostAuthProcess;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.AMAuthUtils;
@@ -4816,12 +4817,15 @@ public class LoginState {
      * @param indexName Index name for post process
      * @param type indicates success, failure or logout
      */
-    void postProcess(AuthContext.IndexType indexType, String indexName, PostProcessEvent type) {
+    void postProcess(AMLoginContext amlc, AuthContext.IndexType indexType, String indexName, PostProcessEvent type) {
         Set<AMPostAuthProcessInterface> postLoginInstanceSet = getPostLoginInstances(getPostLoginClassSet(indexType, indexName));
         if ((postLoginInstanceSet != null) &&
                 (!postLoginInstanceSet.isEmpty())) {
-            for (AMPostAuthProcessInterface postLoginInstance : postLoginInstanceSet) {
-                executePostProcessSPI(postLoginInstance, type);
+        	for (AMPostAuthProcessInterface postLoginInstance : postLoginInstanceSet) {
+        		if(postLoginInstance instanceof AMPostAuthProcess) {
+        			((AMPostAuthProcess)postLoginInstance).amlc = amlc;
+        		}
+            	executePostProcessSPI(postLoginInstance, type);
             }
         }
     }
@@ -4971,7 +4975,8 @@ public class LoginState {
                 }
             }
             InternalSession session = getReferencedSession();
-            session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
+            if(session != null)
+            	session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
         }
         return postLoginInstanceSet;
     }
@@ -5091,7 +5096,7 @@ public class LoginState {
      *
      * @param pageTimeOut Page timeout.
      */
-    synchronized void setPageTimeOut(long pageTimeOut) {
+    public synchronized void setPageTimeOut(long pageTimeOut) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Setting page timeout :" + pageTimeOut);
         }
@@ -5280,7 +5285,7 @@ public class LoginState {
     /**
      * Sets Callbacks per Page state.
      */
-    void setCallbacksPerState(String pageState, Callback[] callbacks) {
+    public void setCallbacksPerState(String pageState, Callback[] callbacks) {
         this.callbacksPerState.put(pageState, callbacks);
     }
 
