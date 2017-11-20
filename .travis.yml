@@ -20,7 +20,6 @@ before_install:
  - uname -a
  - env | sort
  - mvn -q -B -DskipTests clean install -f forgerock-parent
- - mvn -q -B -DskipTests clean install -f OpenDJ-SDK 
  - mvn -q -B -DskipTests clean install -f OpenDJ
 script:
  - mvn -q -B clean install
