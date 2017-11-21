@@ -88,11 +88,11 @@ public class AuthenticationSessionStore {
      */
     public void promoteSession(SessionID sessionID) {
         InternalSession session = removeSession(sessionID);
-        if (session == null) {
-            throw new IllegalStateException("Attempted to promote non existent session");
-        }
-
-        sessionAccessManager.persistInternalSession(session);
+//        if (session == null) {
+//            throw new IllegalStateException("Attempted to promote non existent session");
+//        }
+        if(session != null)
+        	sessionAccessManager.persistInternalSession(session);
     }
 
     private void cullExpiredSessions() {
