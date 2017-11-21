@@ -158,12 +158,12 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(2, 1)
                 .toService(EQUALS, AuthenticationServiceV2.class);
 
-        realmRouter.route("docs/api")
-                .auditAs(DOCUMENTATION)
-                .through(HttpContextFilter.class)
-                .authorizeWith(HttpPrivilegeAuthzModule.class)
-                .forVersion(1, 0)
-                .toService(EQUALS, ApiDocsService.class);
+//        realmRouter.route("docs/api")
+//                .auditAs(DOCUMENTATION)
+//                .through(HttpContextFilter.class)
+//                .authorizeWith(HttpPrivilegeAuthzModule.class)
+//                .forVersion(1, 0)
+//                .toService(EQUALS, ApiDocsService.class);
 
         realmRouter.route("api")
                 .auditAs(DOCUMENTATION)
