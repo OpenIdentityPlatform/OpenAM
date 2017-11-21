@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.shared.security.whitelist;
 
@@ -62,7 +62,8 @@ public class RedirectUrlValidator<T> {
 
         try {
             final URI uri = new URI(url);
-            if (!uri.isAbsolute()) {
+            //Both Absolute and scheme relative URLs should be validated.
+            if (!uri.isAbsolute() && !url.startsWith("//")) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message(url + " is a relative URI, the goto URL is considered valid");
                 }
