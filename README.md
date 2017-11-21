@@ -1,4 +1,4 @@
-# OpenAM
+## <img alt="OpenAM Logo" src="https://github.com/OpenIdentityPlatform/OpenAM/raw/master/logo.png" width="300"/>
 [![Build Status](https://travis-ci.org/OpenIdentityPlatform/OpenAM.svg)](https://travis-ci.org/OpenIdentityPlatform/OpenAM)
 
 Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements and Web Services Security.
@@ -10,7 +10,6 @@ This project is licensed under the Common Development and Distribution License (
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
 mvn clean install -f OpenAM/forgerock-parent
-mvn clean install -f OpenAM/OpenDJ-SDK
 mvn clean install -f OpenAM/OpenDJ
 mvn clean install -f OpenAM
 ```
