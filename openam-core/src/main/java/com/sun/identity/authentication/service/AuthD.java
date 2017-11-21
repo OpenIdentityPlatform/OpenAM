@@ -558,13 +558,17 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(SessionID sessionId) {
-        if (null == sessionId || InjectorHolder.getInstance(StatelessSessionManager.class).containsJwt(sessionId)) {
-            return null;
-        }
-        InternalSession internalSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).getSession(sessionId);
-        if (internalSession != null) {
-            return internalSession;
-        }
+    		try {
+	        if (null == sessionId || InjectorHolder.getInstance(StatelessSessionManager.class).containsJwt(sessionId)) {
+	            return null;
+	        }
+	        InternalSession internalSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).getSession(sessionId);
+	        if (internalSession != null) {
+	            return internalSession;
+	        }
+    		}catch (IllegalArgumentException e) {
+			return null;
+		}
 
         return InjectorHolder.getInstance(SessionAccessManager.class).getInternalSession(sessionId);
     }
