@@ -384,14 +384,6 @@
         <servlet-class>com.sun.identity.federation.login.FSPostLoginHandler</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>FederationServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSFederationHandler</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>consentHandler</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSConsentHandler</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ProcessLogout</servlet-name>
         <servlet-class>com.sun.identity.federation.services.logout.FSProcessLogoutServlet</servlet-class>
     </servlet>
@@ -913,14 +905,6 @@
     <servlet-mapping>
         <servlet-name>postLoginHandler</servlet-name>
         <url-pattern>/postLogin/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>FederationServlet</servlet-name>
-        <url-pattern>/federation</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>consentHandler</servlet-name>
-        <url-pattern>/consentHandler</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ProcessLogout</servlet-name>
