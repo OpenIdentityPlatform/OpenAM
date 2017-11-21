@@ -196,6 +196,31 @@ public  class AuthPropertiesViewBean
             String authenticationRealm = getAuthenticationRealm(this);
             redirectToXui(getRequestContext().getRequest(), redirectRealm, authenticationRealm,
                 MessageFormat.format("realms/{0}/authentication-settings", Uris.urlEncodePathElement(redirectRealm)));
+        } else {
+	        super.beginDisplay(event);
+	        resetButtonState(DELETE_CONFIG_BUTTON);
+	        resetButtonState(DELETE_INSTANCE_BUTTON);
+	
+	        AuthPropertiesModel model = (AuthPropertiesModel)getModel();
+	        if (model != null) {
+	            AMPropertySheet ps = 
+	                (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+	            try {
+	                ps.setAttributeValues(model.getValues(), model);
+	                populateConfigTable();
+	                populateInstanceTable();
+	                populateConfigMenu();
+	            } catch (AMConsoleException a) {
+	                setInlineAlertMessage(CCAlert.TYPE_WARNING, 
+	                    "message.warning", "noproperties.message");
+	            }
+	            setPageTitle(getModel(), "page.title.realms.authentication");
+	        }
+	        String msg = (String)removePageSessionAttribute(INSTANCE_MSG);
+	        if (msg != null) {
+	            setInlineAlertMessage(
+	                CCAlert.TYPE_WARNING, "message.warning", msg);
+	        }
         }
     }
 
