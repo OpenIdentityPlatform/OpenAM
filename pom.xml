@@ -56,11 +56,11 @@
     <description>OpenAM</description>
     <inceptionYear>2010</inceptionYear>
 
-<!--     <organization> -->
-<!--         <name>ForgeRock</name> -->
-<!--         <url>http://www.forgerock.org</url> -->
-<!--     </organization> -->
-<!--     <url>http://www.forgerock.org</url> -->
+    <organization>
+        <name>Open Identity Platform Community</name>
+        <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
+    </organization>
+    <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
 
     <issueManagement>
         <system>github.com</system>
@@ -100,7 +100,7 @@
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
         <!-- Shade plugin setting for ClientSDK build -->
-        <generate.clientsdk.sources>false</generate.clientsdk.sources>
+        <generate.clientsdk.sources>true</generate.clientsdk.sources>
 
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -226,34 +226,34 @@
             </dependencyManagement>
         </profile>
 
-        <!-- When building an Enterprise binary download, include the correct binary license terms. -->
-        <profile>
-            <!-- Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
-            <id>binary-licensing</id>
-            <repositories>
-                <repository>
-                    <id>forgerock-internal</id>
-                    <name>Forgerock Internal Repository</name>
-                    <url>http://maven.forgerock.org/repo/internal</url>
-                </repository>
-            </repositories>
-            <properties>
-                <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
-                <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
-                <forgerock.license.version>1.0.0</forgerock.license.version>
-            </properties>
-        </profile>
+<!--         When building an Enterprise binary download, include the correct binary license terms. -->
+<!--         <profile> -->
+<!--             Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
+<!--             <id>binary-licensing</id> -->
+<!--             <repositories> -->
+<!--                 <repository> -->
+<!--                     <id>forgerock-internal</id> -->
+<!--                     <name>Forgerock Internal Repository</name> -->
+<!--                     <url>http://maven.forgerock.org/repo/internal</url> -->
+<!--                 </repository> -->
+<!--             </repositories> -->
+<!--             <properties> -->
+<!--                 <forgerock.license.groupId>com.forgerock</forgerock.license.groupId> -->
+<!--                 <forgerock.license.artifactId>binary-license</forgerock.license.artifactId> -->
+<!--                 <forgerock.license.version>1.0.0</forgerock.license.version> -->
+<!--             </properties> -->
+<!--         </profile> -->
 
-        <profile>
-            <id>development</id>
-            <repositories>
-                <repository>
-                    <id>forgerock-internal</id>
-                    <name>Forgerock Internal Repository</name>
-                    <url>http://maven.forgerock.org/repo/internal</url>
-                </repository>
-            </repositories>
-        </profile>
+<!--         <profile> -->
+<!--             <id>development</id> -->
+<!--             <repositories> -->
+<!--                 <repository> -->
+<!--                     <id>forgerock-internal</id> -->
+<!--                     <name>Forgerock Internal Repository</name> -->
+<!--                     <url>http://maven.forgerock.org/repo/internal</url> -->
+<!--                 </repository> -->
+<!--             </repositories> -->
+<!--         </profile> -->
 
         <!-- The clover profile should be activated to generate coverage reports using Atlassian Clover -->
         <profile>
@@ -477,24 +477,24 @@
     <mailingLists>
         <mailingList>
             <name>OpenAM Users List</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
-            <post>openam@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+            <subscribe>https://groups.google.com/d/forum/open-identity-platform-openam</subscribe>
+            <unsubscribe>https://groups.google.com/d/forum/open-identity-platform-openam</unsubscribe>
+            <post>open-identity-platform-openam@googlegroups.com</post>
+            <archive>https://groups.google.com/d/forum/open-identity-platform-openam</archive>
         </mailingList>
         <mailingList>
             <name>OpenAM Developers List</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
-            <post>openam-dev@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+            <subscribe>https://groups.google.com/d/forum/open-identity-platform-openam</subscribe>
+            <unsubscribe>https://groups.google.com/d/forum/open-identity-platform-openam</unsubscribe>
+            <post>open-identity-platform-openam@googlegroups.com</post>
+            <archive>https://groups.google.com/d/forum/open-identity-platform-openam</archive>
         </mailingList>
         <mailingList>
             <name>OpenAM Commit Notifications</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
-            <post>commitopenam@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+            <subscribe>https://groups.google.com/d/forum/open-identity-platform-openam</subscribe>
+            <unsubscribe>https://groups.google.com/d/forum/open-identity-platform-openam</unsubscribe>
+            <post>open-identity-platform-openam@googlegroups.com</post>
+            <archive>https://groups.google.com/d/forum/open-identity-platform-openam</archive>
         </mailingList>
     </mailingLists>
 
@@ -550,30 +550,30 @@
 
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
-        <repository>
-            <id>maven.forgerock.org</id>
-            <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.forgerock.org</id>
-            <name>maven.forgerock.org-snapshots</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-        </snapshotRepository>
-        <site>
-            <id>forgerock.org</id>
-            <name>OpenAM Project</name>
-            <url>${siteDistributionURL}</url>
-        </site>
+<!--         <repository> -->
+<!--             <id>maven.forgerock.org</id> -->
+<!--             <name>maven.forgerock.org-releases</name> -->
+<!--             <url>http://maven.forgerock.org/repo/releases</url> -->
+<!--         </repository> -->
+<!--         <snapshotRepository> -->
+<!--             <id>maven.forgerock.org</id> -->
+<!--             <name>maven.forgerock.org-snapshots</name> -->
+<!--             <url>http://maven.forgerock.org/repo/snapshots</url> -->
+<!--         </snapshotRepository> -->
+<!--         <site> -->
+<!--             <id>forgerock.org</id> -->
+<!--             <name>OpenAM Project</name> -->
+<!--             <url>${siteDistributionURL}</url> -->
+<!--         </site> -->
     </distributionManagement>
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
-        <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
-        <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
-      <tag>release/13.0.0</tag>
-  </scm>
+        <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:OpenIdentityPlatform/OpenAM.git</developerConnection>
+        <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
+      	<tag>HEAD</tag>
+  	</scm>
 
     <!-- Dependency Management -->
     <dependencyManagement>
@@ -2212,10 +2212,10 @@
                         <manifestEntries>
                             <Specification-Title>${project.name}</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Specification-Vendor>Open Identity Platform Community</Specification-Vendor>
                             <Implementation-Title>${project.name}</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Implementation-Vendor>Open Identity Platform Community</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
                             <Build-Jdk>${java.version}</Build-Jdk>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
@@ -2263,6 +2263,19 @@
                     <individualFiles>true</individualFiles>
                     <quiet>true</quiet>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+		          <execution>
+		            <id>attach-sources</id>
+		            <phase>verify</phase>
+		            <goals>
+		              <goal>jar-no-fork</goal>
+		            </goals>
+		          </execution>
+		        </executions>
             </plugin>
         </plugins>
 

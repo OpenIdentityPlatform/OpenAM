@@ -9,7 +9,7 @@ This project is licensed under the Common Development and Distribution License (
 ## How-to build
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
-mvn clean install -f OpenAM/forgerock-parent
+mvn clean install -f OpenAM/OpenDJ/forgerock-parent
 mvn clean install -f OpenAM/OpenDJ
 mvn clean install -f OpenAM
 ```
