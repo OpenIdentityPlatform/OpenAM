@@ -327,6 +327,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             if (ssoToken != null) {
                 if (AuthUtils.newSessionArgExists(reqDataHash)) {
                     SSOTokenManager.getInstance().destroyToken(ssoToken);
+                    ssoToken = null;
                 } else {
                     loginDebug.message("Old Session is Active.");
                     newOrgExist = false;//checkNewOrg(ssoToken);
