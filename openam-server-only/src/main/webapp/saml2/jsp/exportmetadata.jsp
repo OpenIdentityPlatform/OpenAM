@@ -24,7 +24,7 @@
 
    $Id: exportmetadata.jsp,v 1.8 2009/12/23 23:13:23 exu Exp $
 
-   Portions Copyrighted 2014 ForgeRock AS
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 
    NOTE : remove this JSP from the OpenAM WAR if you don't want to
      publically expose your hosted metadata, but some of the SAML2 metadata
@@ -33,7 +33,8 @@
         page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %><%@
         page import="java.util.List" %><%@
         page import="org.owasp.esapi.ESAPI" %><%@
-        page import="com.sun.identity.saml.common.SAMLUtils" %><%
+        page import="com.sun.identity.saml.common.SAMLUtils" %><%@
+        page import="com.sun.identity.shared.debug.Debug" %><%
     // This JSP is used to export standard entity metadata, 
     // there are three supported query parameters:
     //    * role     -- role of the entity: sp, idp or any
@@ -100,11 +101,11 @@
             }
         }
     } catch (Exception e) {
-        e.printStackTrace();
+        Debug.getInstance("libSAML2").error("An error occurred while retrieving metadata", e);
         errorMsg = e.getMessage();
     }
     if (errorMsg != null) {
-        out.print("ERROR : " + errorMsg);
+        out.print("ERROR : " + ESAPI.encoder().encodeForHTML(errorMsg));
     } else {
         response.setContentType("text/xml");
         response.setHeader("Pragma", "no-cache");
