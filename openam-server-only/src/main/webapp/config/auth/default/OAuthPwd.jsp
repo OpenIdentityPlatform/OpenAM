@@ -269,8 +269,7 @@ resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,s
     </div>
     <div class="footer alt-color">
         <div class="grid_3">
-            <p>Copyright &copy; 208-2013, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
-                terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
+            <p>This project is licensed under the Common Development and Distribution License (CDDL).</p>
         </div>
     </div>
 </div>
