@@ -684,15 +684,15 @@ public class AMLoginContext {
             logFailedMessage = bundle.getString("invalidPasswd");
             logFailedError = "INVALIDPASSWORD";
             if (accountLocked) {
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED);
                 if (failedUserId != null) {
                     loginState.logFailed(failedUserId, "LOCKEDOUT");
                 } else {
                     loginState.logFailed("LOCKEDOUT");
                 }
-            } else {
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_INVALID_PASSWORD);
             }
+
+            loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED);
+
             isFailed = true;
             authContext.setLoginException(ipe);
         } catch (MessageLoginException me) {
