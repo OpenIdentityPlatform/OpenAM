@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SAMLPOSTProfileServlet.java,v 1.4 2009/06/12 22:21:39 mallas Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2016 ForgeRock AS
  */
 
 package com.sun.identity.saml.servlet;
@@ -68,6 +65,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.owasp.esapi.ESAPI;
 
 /**
  * This servlet is used to support SAML 1.x Web Browser/POST Profile.
@@ -237,18 +236,19 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
                 LogUtils.REDIRECT_TO_URL, data, token);
         }
         response.setContentType("text/html; charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.println("<HTML>");
-        out.println("<BODY Onload=\"document.forms[0].submit()\">");
-        out.println("<FORM METHOD=\"POST\" ACTION=\"" + destSiteUrl + "\">");
-        out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-        SAMLConstants.POST_SAML_RESPONSE_PARAM + "\" ");
-        out.println("VALUE=\"" + encodedResponse + "\">");
-        out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-        SAMLConstants.POST_TARGET_PARAM + "\" VALUE=\"" + target
-        + "\"> </FORM>");
-        out.println("</BODY></HTML>");
-        out.close();
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<HTML>");
+            out.println("<BODY Onload=\"document.forms[0].submit()\">");
+            out.println("<FORM METHOD=\"POST\" ACTION=\""
+                    + ESAPI.encoder().encodeForHTMLAttribute(destSiteUrl) + "\">");
+            out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
+                    SAMLConstants.POST_SAML_RESPONSE_PARAM + "\" ");
+            out.println("VALUE=\"" + ESAPI.encoder().encodeForHTMLAttribute(encodedResponse) + "\">");
+            out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
+                    SAMLConstants.POST_TARGET_PARAM + "\" VALUE=\"" + ESAPI.encoder().encodeForHTMLAttribute(target)
+                    + "\"> </FORM>");
+            out.println("</BODY></HTML>");
+        }
     }
     
     private SAMLServiceManager.SiteEntry getDestSite(String target) {
