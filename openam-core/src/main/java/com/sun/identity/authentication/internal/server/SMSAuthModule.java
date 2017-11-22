@@ -24,10 +24,7 @@
  *
  * $Id: SMSAuthModule.java,v 1.9 2009/12/11 06:51:37 hengming Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.authentication.internal.server;
 
@@ -37,7 +34,6 @@ import com.sun.identity.authentication.internal.AuthSubject;
 import com.sun.identity.authentication.internal.LoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.security.AdminDNAction;
 import com.sun.identity.security.AdminPasswordAction;
@@ -56,6 +52,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
@@ -70,17 +67,17 @@ import com.sun.identity.shared.ldap.util.DN;
 public class SMSAuthModule implements LoginModule {
 
     // Static variables
-    private static boolean initialized;
+    private static volatile boolean initialized = false;
 
-    private static boolean loadedInternalUsers;
+    private static volatile boolean loadedInternalUsers = false;
 
-    private static boolean registeredCallbackHandler;
+    private static volatile boolean registeredCallbackHandler = false;
 
-    private static Map users;
+    private static final Map<String, String> users = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
 
-    private static Map userNameToDN;
+    private static final Map<String, String> userNameToDN = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
 
-    private static Debug debug = Debug.getInstance("amAuthInternalSMModule");
+    private static final Debug debug = Debug.getInstance("amAuthInternalSMModule");
 
     // Instance variables
     AuthSubject subject;
@@ -150,8 +147,8 @@ public class SMSAuthModule implements LoginModule {
         loadedInternalUsers = false;
         
         // initialize caches.
-        users = new CaseInsensitiveHashMap();
-        userNameToDN = new CaseInsensitiveHashMap();
+        users.clear();
+        userNameToDN.clear();
 
         // Get internal user names and passwords from serverconfig.xml
         // %%% Might have to get them directory from DSConfigMgr %%%
@@ -412,6 +409,7 @@ public class SMSAuthModule implements LoginModule {
             if (serviceName.equalsIgnoreCase(IDREPO_SERVICE)) {
                 // Force the loading of internal users
                 loadedInternalUsers = false;
+                users.clear();
             }
         }
 
