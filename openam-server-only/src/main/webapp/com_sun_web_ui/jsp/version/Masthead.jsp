@@ -24,6 +24,8 @@
 
    $Id: Masthead.jsp,v 1.1 2009/08/05 20:15:51 veiming Exp $
 
+   Portions Copyrighted 2016 ForgeRock AS.
+
 --%>
 
 <%@ page language="java" %>
@@ -36,8 +38,6 @@
     // obtain the versionFile and productSrc attrs from the request params 
     String versionFile = request.getParameter("versionFile") != null
 	? request.getParameter("versionFile") : "";
-    String productNameSrc = request.getParameter("productNameSrc") != null
-        ? request.getParameter("productNameSrc") : "";
     String productNameHeight =
 	request.getParameter("productNameHeight") != null
         ? request.getParameter("productNameHeight") : "";
@@ -46,8 +46,6 @@
 
     versionFile = VersionViewBean.validateVersionFile(
         request, versionFile);
-    productNameSrc = VersionViewBean.validateProductImage(
-        request, productNameSrc);
 %>
 
 <jato:useViewBean className="com.sun.identity.console.version.MastheadViewBean">
@@ -59,7 +57,7 @@
  baseName="com.sun.web.ui.resources.Resources"
  bundleID="testBundle">             
        
-<cc:versionbanner versionFile="<%=versionFile%>" productNameSrc="<%=productNameSrc%>" 
+<cc:versionbanner versionFile="<%=versionFile%>" productNameSrc="<%=viewBean.getMastheadLogo()%>"
  productNameHeight="<%=productNameHeight%>" productNameWidth="<%=productNameWidth%>" />
 
 </cc:header>

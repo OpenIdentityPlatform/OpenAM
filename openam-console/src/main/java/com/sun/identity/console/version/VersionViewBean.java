@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: VersionViewBean.java,v 1.1 2009/08/05 20:15:51 veiming Exp $
+ *
+ * Portions copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.console.version;
@@ -50,19 +52,6 @@ public class VersionViewBean extends
         }
         return versionFile;
     }
-
-    public static String validateProductImage(
-        HttpServletRequest request,
-        String productImage) {
-        if (productImage.length() == 0) {
-            return productImage;
-        }
-        if (!productImage.startsWith("../")) {
-            return "";
-        }
-        return productImage;
-    }
-
 
     public static String getCurrentURL(HttpServletRequest httpRequest) {
         return httpRequest.getScheme() + "://" +
