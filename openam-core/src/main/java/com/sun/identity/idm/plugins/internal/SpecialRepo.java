@@ -24,10 +24,7 @@
  *
  * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.plugins.internal;
 
@@ -975,6 +972,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         opSet.add(IdOperation.READ);
         opSet.add(IdOperation.SERVICE);
         supportedOps.put(IdType.USER, Collections.unmodifiableSet(opSet));
+        supportedOps.put(IdType.AGENT, Collections.unmodifiableSet(opSet));
         if (debug.messageEnabled()) {
             debug.message("SpecialRepo: loadSupportedOps called " +
                 "supportedOps Map = " + supportedOps);

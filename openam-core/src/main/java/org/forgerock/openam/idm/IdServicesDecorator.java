@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2016 ForgeRock AS.
  */
 
 package org.forgerock.openam.idm;
@@ -62,6 +64,11 @@ public class IdServicesDecorator implements IdServices {
     @Override
     public boolean authenticate(String orgName, Callback[] credentials) throws IdRepoException, AuthLoginException {
         return delegate.authenticate(orgName, credentials);
+    }
+
+    @Override
+    public boolean authenticate(String orgName, Callback[] credentials, IdType idType) throws IdRepoException, AuthLoginException {
+        return delegate.authenticate(orgName, credentials, idType);
     }
 
     /**

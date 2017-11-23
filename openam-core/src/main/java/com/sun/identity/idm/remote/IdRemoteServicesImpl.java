@@ -24,9 +24,7 @@
  *
  * $Id: IdRemoteServicesImpl.java,v 1.23 2010/01/06 01:58:26 veiming Exp $
  *
- */
-/**
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2016 ForgeRock AS.
  */
 package com.sun.identity.idm.remote;
 
@@ -176,12 +174,12 @@ public class IdRemoteServicesImpl implements IdServices {
      *         else <code>false</code>
      */
     public boolean authenticate(String orgName, Callback[] credentials) {
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("IdRemoteServicesImpl.authenticate(): "
-                    + " Not supported for remote clients");
-        }
+        return authenticate(orgName, credentials, null);
+    }
 
-        // Not supported for remote
+    @Override
+    public boolean authenticate(String orgName, Callback[] credentials, IdType idType) {
+        DEBUG.message("IdRemoteServicesImpl.authenticate(): Not supported for remote clients");
         return false;
     }
 
