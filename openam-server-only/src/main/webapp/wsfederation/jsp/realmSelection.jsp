@@ -288,7 +288,7 @@
       <td>&nbsp;</td>
       <td>
         <div class="logCpy"><span class="logTxtCpy">
-          Copyright &copy; 2008-2016, ForgeRock AS. All Rights Reserved. Use of this software is subject to the terms and conditions of the ForgeRock&#8482; License and Subscription Agreement.
+          This project is licensed under the Common Development and Distribution License (CDDL).
         </div>
       </td>
       <td>&nbsp;</td>
