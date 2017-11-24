@@ -1533,6 +1533,7 @@ public class LoginState {
                     }
                 }
             }
+
         } catch (Exception e) {
             DEBUG.error("Exception in setSession ", e);
             throw new AuthException(e);
@@ -1793,17 +1794,14 @@ public class LoginState {
      * @throws SSOException
      */
     public SSOToken getSSOToken() throws SSOException {
-    		if (forceAuth)
-    			setSession(getOldSession());
-    	
         if (null == sessionReference || isNoSession()) {
             return null;
         }
-        
         InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
         if (!stateless && session == null) {
             return null;
         }
+
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
             SSOToken ssoToken = ssoManager.createSSOToken(finalSessionId.toString());
@@ -4857,7 +4855,7 @@ public class LoginState {
         try {
             switch (type) {
                 case SUCCESS:
-                    final SSOToken ssoToken = getSSOToken(); 
+                    final SSOToken ssoToken = getSSOToken();
                     postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, ssoToken);
                     // Regenerate the session ID based on the sso token in case this is a stateless session that
                     // has been updated.
