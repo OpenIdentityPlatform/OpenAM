@@ -29,6 +29,16 @@ import java.util.Collection;
  */
 public class RedirectUrlValidator<T> {
 
+    /**
+     * Go to url query parameter name.
+     */
+    public final static String GOTO = "goto";
+
+    /**
+     * Go to on fail query parameter name.
+     */
+    public final static String GOTO_ON_FAIL = "gotoOnFail";
+
     private static final Debug DEBUG = Debug.getInstance("patternMatching");
     private final ValidDomainExtractor<T> domainExtractor;
 
