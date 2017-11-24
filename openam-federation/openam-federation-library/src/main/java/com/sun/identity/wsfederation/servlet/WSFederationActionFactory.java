@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationActionFactory.java,v 1.3 2008/08/27 19:00:07 superpat7 Exp $
  *
+ * Portions copyright 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -31,6 +32,8 @@ package com.sun.identity.wsfederation.servlet;
 import com.sun.identity.saml2.common.SAML2Constants;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.owasp.esapi.ESAPI;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
@@ -91,6 +94,15 @@ public class WSFederationActionFactory {
         {
             wreply = request.getParameter(WSFederationConstants.WREPLY);
         }
+
+        if (!ESAPI.validator().isValidInput("HTTP URL: " + wreply, wreply, "URL", 2000, false)) {
+            wreply = null;
+        }
+
+        if (!WSFederationUtils.isWReplyURLValid(request, wreply)) {
+            wreply = null;
+        }
+
         if (wreply!=null && debug.messageEnabled()) {
             debug.message(classMethod + WSFederationConstants.WREPLY + "=" + 
                 wreply);

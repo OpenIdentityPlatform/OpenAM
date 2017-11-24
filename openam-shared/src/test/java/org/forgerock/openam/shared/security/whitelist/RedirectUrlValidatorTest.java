@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2016 ForgeRock AS.
  */
 package org.forgerock.openam.shared.security.whitelist;
 
@@ -131,8 +131,26 @@ public class RedirectUrlValidatorTest {
         assertThat(validator.isRedirectUrlValid(url, null)).isEqualTo(result);
     }
 
+    @DataProvider(name = "schemeRelative")
+    public Object[][] getSchemeRelativeCases() {
+        //FIXME the scheme relative URLs are currently incorrectly validated, see OPENAM-8022
+        return new Object[][]{
+                {"//example.com", false},
+                {"//example.com/index.html", false},
+                {"//example.com/foo/index.html", false},
+                {"//example.com/foo/bar/index.html", false},
+                {"//example.com/foo/bar/index.html/c", false},
+        };
+    }
+
+    @Test(dataProvider = "schemeRelative")
+    public void testSchemeRelativeUrls(String url, boolean result) {
+        RedirectUrlValidator<String> validator = getValidator(asSet("http://example.com/*"));
+        assertThat(validator.isRedirectUrlValid(url, null)).isEqualTo(result);
+
+    }
     private RedirectUrlValidator<String> getValidator(final Set<String> domains) {
-        return new RedirectUrlValidator<String>(new ValidDomainExtractor<String>() {
+        return new RedirectUrlValidator<>(new ValidDomainExtractor<String>() {
 
             public Collection<String> extractValidDomains(String configInfo) {
                 return domains;

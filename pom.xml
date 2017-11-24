@@ -102,10 +102,10 @@
         <!-- **************************************************************** -->
 
         <!-- Java Properties -->
-        <java.source.version>1.5</java.source.version>
-        <java.target.version>1.5</java.target.version>
-        <federation.java.source.version>1.6</federation.java.source.version>
-        <federation.java.target.version>1.6</federation.java.target.version>
+        <java.source.version>1.7</java.source.version>
+        <java.target.version>1.7</java.target.version>
+        <federation.java.source.version>1.7</federation.java.source.version>
+        <federation.java.target.version>1.7</federation.java.target.version>
 
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms256m -Xmx256m -XX:MaxPermSize=96m</java.surefire.options>

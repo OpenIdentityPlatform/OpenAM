@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationConstants.java,v 1.13 2009/12/14 23:42:48 mallas Exp $
  *
+ * Portions copyright 2016 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.common;
@@ -331,4 +332,10 @@ public final class WSFederationConstants {
      */
     public static final String WS_POLICY_URI =
                      "http://schemas.xmlsoap.org/ws/2004/09/policy";
+
+    /**
+     * List of valid wreply Urls
+     */
+    public static String WREPLY_URL_LIST = "wreplyList";
+
 }

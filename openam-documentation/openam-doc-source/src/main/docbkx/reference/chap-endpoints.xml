@@ -226,15 +226,6 @@
 
 
 <varlistentry>
-    <term><literal>nowritewarning.jsp</literal></term>
-    <listitem>
-        <para>Displays a permission error message, used by the GUI-based installation wizard.</para>
-    </listitem>
-</varlistentry>
-
-
-
-<varlistentry>
     <term><literal>proxyidpfinder.jsp</literal></term>
     <listitem>
         <para>Supports access to a remote identity provider, through the federation broker.</para>

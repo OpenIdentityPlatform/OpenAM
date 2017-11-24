@@ -24,10 +24,7 @@
  *
  * $Id: AMPrimaryMastHeadViewBean.java,v 1.11 2009/08/18 22:38:10 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
  */
 package com.sun.identity.console.base;
 
@@ -240,7 +237,7 @@ public abstract class AMPrimaryMastHeadViewBean
          * the console jsp directory attribute.
          */
         String logo = 
-            "../" + consoleDirectory + "/images/PrimaryProductName.png";
+            "../" + consoleDirectory + AMAdminConstants.IMAGES_PRIMARY_PRODUCT_NAME_PNG;
 
         mm.setSrc(logo);
         mm.setWidth("");

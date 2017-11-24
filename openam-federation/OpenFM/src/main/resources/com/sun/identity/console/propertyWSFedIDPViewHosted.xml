@@ -24,6 +24,7 @@
 
    $Id: propertyWSFedIDPViewHosted.xml,v 1.7 2008/08/30 01:22:25 babysunil Exp $
 
+   Portions copyright 2016 ForgeRock AS.
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -187,5 +188,24 @@
                 </cc>
                 <fieldhelp name="helpIDPAssertionEffectiveTime" defaultValue="wsfed.provider.section.title.help.idpassertionEffectiveTime" />
             </property>
+    </section>
+    <section name="WReplyList" defaultValue="wsfedidp.provider.section.title.wreply">
+        <subsection name="elistWReplyList" defaultValue="" >
+            <property>
+                <label name="lblWReplyList"
+                       defaultValue="wsfedidp.attribute.label.wreply.wreplyList"
+                       labelFor="wreplyList" />
+                <ccgroup>
+                    <property>
+                        <cc name="wreplyList"
+                            tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel" value="label.current.value" />
+                            <attribute name="textboxLabel" value="label.new.value" />
+                        </cc>
+                    </property>
+                </ccgroup>
+            </property>
+        </subsection>
     </section>
 </propertysheet>

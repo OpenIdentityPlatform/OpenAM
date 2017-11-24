@@ -691,8 +691,10 @@ public class AMLoginContext {
                     loginState.logFailed("LOCKEDOUT");
                 }
             } else {
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_INVALID_PASSWORD);
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED);
+
             }
+
             isFailed = true;
             authContext.setLoginException(ipe);
         } catch (MessageLoginException me) {
