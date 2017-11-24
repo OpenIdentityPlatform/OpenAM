@@ -38,6 +38,11 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
+<%@ page import="com.iplanet.sso.SSOTokenManager" %>
+<%@ page import="com.iplanet.sso.SSOException" %>
+<%@ page import="com.iplanet.sso.SSOToken" %>
+<%@ page import="com.sun.identity.authentication.service.AuthD" %>
+<%@ page import="com.sun.identity.idm.AMIdentity" %>
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
@@ -76,20 +81,22 @@
    String gotoURLencAttr = "";
    String OAuth2IdP = "";
    
-   String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
-   if (gotoURL == null || gotoURL.isEmpty() ) {
-      gotoURL = ServiceURI + "/UI/Logout"; 
-   } else {
-       boolean isValidURL = ESAPI.validator().
-               isValidInput("URLContext", gotoURL, "URL", 255, false); 
-       boolean isValidURI = ESAPI.validator().
-               isValidInput("HTTP URI: " + gotoURL, gotoURL, "HTTPURI", 2000, false);      
-       if (!isValidURL && !isValidURI) {
-           OAuthUtil.debugError("OAuthLogout: wrong goto URL attempted to be used "
-                   + "in the Logout page: " + gotoURL);
-           gotoURL = "wronggotoURL";
-       } 
+   String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+   SSOTokenManager manager = SSOTokenManager.getInstance();
+   try {
+       SSOToken ssoToken = manager.createSSOToken(request);
+       String realm = ssoToken.getProperty("Organization");
+       boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm)
+               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false);
+       if (!isValidGotoUrl) {
+           OAuthUtil.debugError("OAuthLogout: invalid or empty goto URL ignored on Logout page: " + gotoURL);
+           gotoURL = ServiceURI + "/UI/Logout";
+       }
+   } catch (SSOException e) {
+       OAuthUtil.debugMessage("OAuthLogout: using default goto URL because we failed to get a session");
+       gotoURL = ServiceURI + "/UI/Logout";
    }
+   gotoURL = ESAPI.encoder().encodeForJavaScript(gotoURL);
    
    String logoutURL = request.getParameter(PARAM_LOGOUT_URL);
    if (logoutURL == null) {
@@ -107,6 +114,7 @@
            doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
        }
    }
+   logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);
    String copyrightNotice = null;
    try{
        copyrightNotice = ResourceBundle.getBundle("amAuthUI", locale).getString("copyright.notice");
