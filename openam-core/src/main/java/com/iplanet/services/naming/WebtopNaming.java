@@ -34,6 +34,7 @@ package com.iplanet.services.naming;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -811,7 +812,7 @@ public class WebtopNaming {
      * @throws Exception if an error occurs when updating the
      *     nameing table
      */
-    public static Vector getAllServerIDs() throws Exception  {
+    public static Collection<String> getAllServerIDs() throws Exception  {
         if (namingTable == null) {
             getNamingProfile(false);
         }
