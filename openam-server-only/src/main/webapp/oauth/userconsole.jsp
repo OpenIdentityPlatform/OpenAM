@@ -85,12 +85,6 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
                 redir += "&id=" + id.toString();
                 window.location = redir;
             }
-            
-            function revoke(oauthtk) {
-                var redir = "./deletetoken.jsp?oauth_token=";
-                redir += oauthtk.toString();
-                window.location = redir;
-            }
         </script>
     </head>
     <body>

@@ -47,14 +47,5 @@
             Register this Service Consumer <input type="submit" value="Register" name="cons_reg" /><br>
         </form>
         <hr><br>
-        <h2>
-            Delete a service consumer<br>
-        </h2>
-        <form name="consumer_del" action="deleteconsumer.jsp" method="POST">
-            Service Consumer Key: <input type="text" name="conskey" value="" size="100" /><br><br>
-
-            Delete this Service Consumer <input type="submit" value="Delete" name="cons_del" /><br>
-        </form>
-        <hr><br>
     </body>
 </html>
