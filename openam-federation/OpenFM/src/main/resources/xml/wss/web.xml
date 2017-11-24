@@ -1,0 +1,70 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: web.xml,v 1.6 2008/11/17 23:59:09 mallas Exp $
+
+-->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+
+<display-name>sts</display-name>
+<description>sts</description>
+     
+<listener>
+    <listener-class>com.sun.identity.wss.sts.STSContextListener</listener-class>
+</listener>
+
+<servlet>
+    <description>JAX-WS endpoint - sts</description>
+    <display-name>sts</display-name>
+    <servlet-name>sts</servlet-name>
+    <servlet-class>com.sun.identity.wss.sts.SecurityTokenService</servlet-class>
+    <load-on-startup>1</load-on-startup>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>sts</servlet-name>
+    <url-pattern>/sts</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+      <servlet-name>sts</servlet-name>
+      <url-pattern>/sts/mex</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>sts</servlet-name>
+    <url-pattern>/sts/soap11</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+      <servlet-name>sts</servlet-name>
+      <url-pattern>/sts/mexsoap11</url-pattern>
+</servlet-mapping>
+
+<session-config>
+    <session-timeout>60</session-timeout>
+</session-config>
+

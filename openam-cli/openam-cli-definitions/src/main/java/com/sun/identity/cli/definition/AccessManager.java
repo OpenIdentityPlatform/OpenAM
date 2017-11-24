@@ -1875,7 +1875,7 @@ public class AccessManager {
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
                   "agentname|b|s|Name of agent.",
-                  "agenttype|t|s|Type of agent. Possible values: J2EEAgent, WebAgent, 2.2_Agent, SharedAgent, OAuth2Client"
+                  "agenttype|t|s|Type of agent. Possible values: J2EEAgent, WebAgent, WSCAgent, WSPAgent, STSAgent, DiscoveryAgent, 2.2_Agent, SharedAgent, OAuth2Client"
           },
           optionAliases={},
           macro="authentication",
