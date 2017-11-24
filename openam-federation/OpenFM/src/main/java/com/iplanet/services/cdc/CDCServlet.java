@@ -30,9 +30,9 @@
 package com.iplanet.services.cdc;
 
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.TokenRestriction;
-
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -63,15 +63,16 @@ import com.sun.identity.saml.protocol.Status;
 import com.sun.identity.saml.protocol.StatusCode;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.DateUtils;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.SMSEntry;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.ParseException;
@@ -80,9 +81,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -94,6 +95,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.owasp.esapi.ESAPI;
+
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * The <code>CDCServlet</code> is the heart of the Cross Domain Single
@@ -641,7 +644,25 @@ public class CDCServlet extends HttpServlet {
                     dispatcher.forward(request, response);
                 }
             } else {
-                // Redirect the user to the authenticated URL
+                // Redirect the user to the OpenAM host that they originally authenticated against. The authURL is
+                // set by AuthClientUtils#setHostUrlCookie when in restricted cookie mode. It's not entirely clear
+                // exactly what this use-case is for, but we should validate the cookie against the known server list
+                // to prevent an unvalidated redirect.
+                boolean valid = false;
+                for (String serverId : WebtopNaming.getAllServerIDs()) {
+                    String serverUrl = WebtopNaming.getServerFromID(serverId);
+                    serverUrl = serverUrl.substring(0, serverUrl.length() - deployDescriptor.length());
+                    if (StringUtils.compareCaseInsensitiveString(serverUrl, authURL)) {
+                        valid = true;
+                        break;
+                    }
+                }
+
+                if (!valid) {
+                    response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Invalid cookie");
+                    return;
+                }
+
                 redirectURL.append(authURL).append(deployDescriptor)
                     .append(CDCURI).append(QUESTION_MARK)
                     .append(request.getQueryString());
@@ -650,10 +671,8 @@ public class CDCServlet extends HttpServlet {
                  * Reset the cookie value to null, to avoid continous loop
                  * when a load balancer is used.
                  */
-                if (authCookie != null) {
-                    authCookie.setValue("");
-                    response.addCookie(authCookie);
-                }
+                authCookie.setValue("");
+                response.addCookie(authCookie);
                 response.sendRedirect(redirectURL.toString());
             }
             
@@ -661,13 +680,7 @@ public class CDCServlet extends HttpServlet {
                 debug.message("Forwarding for authentication to: " +
                     redirectURL);
             }
-        } catch (IOException e) {
-            debug.error("CDCServlet.redirectForAuthentication", e);
-            showError(response);
-        } catch (ServletException e) {
-            debug.error("CDCServlet.redirectForAuthentication", e);
-            showError(response);
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             debug.error("CDCServlet.redirectForAuthentication", e);
             showError(response);
         }
