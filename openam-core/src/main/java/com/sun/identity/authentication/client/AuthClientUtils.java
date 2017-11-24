@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -67,6 +68,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.sun.identity.session.util.SessionUtils;
+
+import static java.util.Arrays.asList;
 
 import com.iplanet.am.util.AMClientDetector;
 import com.iplanet.am.util.SystemProperties;
@@ -112,7 +115,9 @@ import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
 import com.sun.identity.shared.encode.Base64;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 public class AuthClientUtils {
 
@@ -142,6 +147,8 @@ public class AuthClientUtils {
     .append(Constants.FILE_SEPARATOR)
     .append(ISAuthConstants.AUTH_DIR).toString();
     private static final String rootSuffix = SMSEntry.getRootSuffix();
+    protected static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
 
     // dsame version
     private static String dsameVersion =
@@ -352,7 +359,7 @@ public class AuthClientUtils {
     private static List<String> getHeaderNameListForProperty(String property) {
         String value = SystemProperties.get(property);
         if (value != null) {
-            return Arrays.asList(value.toLowerCase().split(","));
+            return asList(value.toLowerCase().split(","));
         }
         return Collections.EMPTY_LIST;
     }
@@ -401,7 +408,7 @@ public class AuthClientUtils {
                         } 
                     }          
             	}            	
-            }else if(name.equals("goto")){
+            } else if (name.equals(RedirectUrlValidator.GOTO) || name.equals(RedirectUrlValidator.GOTO_ON_FAIL)){
                 // Again this will be the case when browser back
                 // button is used and the form is posted with the
                 // base64 encoded parameters including goto
@@ -1763,7 +1770,8 @@ public class AuthClientUtils {
                 } else {
                     String value = request.getParameter(parameter);
                     if(( value != null) && value.length()>0) {
-                       if(parameter.equals("goto")) {
+                       if(RedirectUrlValidator.GOTO.equals(parameter) ||
+                               RedirectUrlValidator.GOTO_ON_FAIL.equals(parameter)) {
                     	   // Again this will be the case when browser back
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
@@ -2589,8 +2597,9 @@ public class AuthClientUtils {
             // If we don't do this the server might going to deny the request because of invalid domain access.
             conn.setRequestProperty("Host", request.getHeader("host"));
 
+            List<Cookie> cookies = removeLocalLoadBalancingCookie(asList(request.getCookies()));
             // replay cookies
-            strCookies = getCookiesString(request);
+            strCookies = getCookiesString(cookies);
             if (strCookies != null) {
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("Sending cookies : " + strCookies);
@@ -2633,7 +2642,7 @@ public class AuthClientUtils {
                     if (queryParams.containsKey(entry.getKey())) {
                         // TODO: do we need to care about params that can be both in GET and POST?
                     } else {
-                        postParams.put(entry.getKey(), new HashSet<String>(Arrays.asList(entry.getValue())));
+                        postParams.put(entry.getKey(), new HashSet<String>(asList(entry.getValue())));
                     }
                 }
 
@@ -2739,6 +2748,22 @@ public class AuthClientUtils {
         return (origRequestData);
     }
 
+    /**
+     * Filter the load balancing cookie if it points to this server to avoid potential infinite redirect loop.
+     */
+    private static List<Cookie> removeLocalLoadBalancingCookie(final List<Cookie> cookies) {
+        final String lblCookieName = getlbCookieName();
+        final String lblCookieValue = getlbCookieValue();
+        final List<Cookie> filteredCookies = new ArrayList<>();
+        for (final Cookie cookie : cookies) {
+            if (!Objects.equals(cookie.getName(), lblCookieName)
+                    && !Objects.equals(cookie.getValue(), lblCookieValue)) {
+                filteredCookies.add(cookie);
+            }
+        }
+        return filteredCookies;
+    }
+
     private static boolean isSameServer(URL url1, URL url2) {
         int port1 = url1.getPort() != -1 ? url1.getPort() : url1.getDefaultPort();
         int port2 = url2.getPort() != -1 ? url2.getPort() : url2.getDefaultPort();
@@ -2798,27 +2823,21 @@ public class AuthClientUtils {
     }
 
     // Get cookies string from HTTP request object
-    private static String getCookiesString(HttpServletRequest request) {
-        Cookie cookies[] = request.getCookies();
+    private static String getCookiesString(List<Cookie> cookies) {
         StringBuffer cookieStr = null;
         String strCookies = null;
         // Process Cookies
         if (cookies != null) {
-            for (int nCookie = 0; nCookie < cookies.length; nCookie++) {
+            for (final Cookie cookie : cookies) {
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Cookie name = " + 
-                                      cookies[nCookie].getName());
-                    utilDebug.message("Cookie value = " + 
-                                      cookies[nCookie].getValue());
+                    utilDebug.message("Cookie name=" + cookie.getName() + ", value=" + cookie.getValue());
                 }
                 if (cookieStr == null) {
                     cookieStr = new StringBuffer();
                 } else {
                     cookieStr.append(";");
                 }
-                cookieStr.append(cookies[nCookie].getName())
-                .append("=")
-                .append(cookies[nCookie].getValue());
+                cookieStr.append(cookie.getName()).append("=").append(cookie.getValue());
             }
         }
         if (cookieStr != null) {
