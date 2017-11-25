@@ -62,11 +62,19 @@ public class DefaultSessionActivator implements SessionActivator {
                                    final InternalSession authSession, final Subject subject)
             throws AuthException {
 
-        //create our new session - the loginState needs this session as it's the one we'll be passing back to the user
-        final InternalSession session = createSession(sessionService, loginState);
-        loginState.setSession(session);
-
-        return updateSessions(session, loginState, session, authSession, sessionService, subject);
+    		authSession.clearAuthContext();
+    		loginState.setSessionProperties(authSession);
+    		loginState.setSubject(addSSOTokenPrincipal(subject, authSession.getID()));
+		try {
+			return activateSession(authSession, loginState);
+	    } catch (SessionException e) {
+	    		throw new AuthException(e);
+	    }
+//		create our new session - the loginState needs this session as it's the one we'll be passing back to the user
+//        final InternalSession session = createSession(sessionService, loginState);
+//        loginState.setSession(session);
+//
+//        return updateSessions(session, loginState, session, authSession, sessionService, subject);
     }
 
     /**
