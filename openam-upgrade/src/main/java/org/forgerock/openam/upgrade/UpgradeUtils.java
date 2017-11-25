@@ -423,7 +423,7 @@ public class UpgradeUtils {
 
 
     }
-
+    
     public static void removeSubSchema(
             String serviceName,
             String subSchemaName,
@@ -444,6 +444,7 @@ public class UpgradeUtils {
             throw new UpgradeException("error removing subschema " + subSchemaName);
         }
     }
+
 
     protected static void addAttributesToSchema(String serviceName,
                                                 String schemaType,
