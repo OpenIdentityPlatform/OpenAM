@@ -405,7 +405,7 @@ public class CookieUtils {
      * @param cookie 
      */
     public static void addCookieToResponse(HttpServletResponse response, Cookie cookie) {
-        if (cookie == null) {
+        if (response==null || cookie == null) {
             return;
         }
         if (!isCookieHttpOnly()) {
