@@ -2313,17 +2313,19 @@ public class AuthClientUtils {
      * @see com.sun.identity.authentication.util.AMAuthUtils
      */
     private static String getRealmFromPolicyAdvice(Map<String, String> requestHash) {
-        String advice = requestHash.get(COMPOSITE_ADVICE);
-        if (advice == null) {
-            return null;
-        }
-
-        try {
-            String decodedXml = URLDecoder.decode(advice, "UTF-8");
-            return getRealmFromPolicyAdvice(decodedXml);
-        } catch (UnsupportedEncodingException uee) {
-            utilDebug.error("Unable to URLdecode condition advice using UTF-8");
-        }
+    		if (requestHash!=null) {
+	        String advice = requestHash.get(COMPOSITE_ADVICE);
+	        if (advice == null) {
+	            return null;
+	        }
+	
+	        try {
+	            String decodedXml = URLDecoder.decode(advice, "UTF-8");
+	            return getRealmFromPolicyAdvice(decodedXml);
+	        } catch (UnsupportedEncodingException uee) {
+	            utilDebug.error("Unable to URLdecode condition advice using UTF-8");
+	        }
+    		}
         return null;
     }
 
