@@ -82,7 +82,12 @@ import com.sun.identity.shared.debug.Debug;
  *
  */
 public class InternalSession implements Serializable, AMSession, SessionPersistenceObservable {
-    /**
+    @Override
+	public String toString() {
+		return String.format("%s %s" , super.toString(),sessionID,this.getID());
+	}
+
+	/**
      * Expiry time which is long enough to make sessions functionally non expiring.
      */
     public static final long NON_EXPIRING_SESSION_LENGTH_MINUTES = 42 * TimeUnit.DAYS.toMinutes(365);
