@@ -1099,8 +1099,16 @@ public class LoginState {
             }
 
             InternalSession internalSession = getReferencedSession();
-            final boolean isSessionActivated = getSessionActivator().activateSession(this, AuthD.getSessionService(),
-                    internalSession, subject);
+            
+            final SessionActivator sa=getSessionActivator();
+            DEBUG.message("activate before isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}" , 
+            		isSessionUpgrade(),forceAuth,sa.getClass().getSimpleName(),oldSessionReference,getOldSession(),sessionReference,getSession(),finalSessionId);
+            
+            final boolean isSessionActivated = sa.activateSession(this, AuthD.getSessionService(),internalSession, subject);
+            
+            DEBUG.message("activate after isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}" , 
+            		isSessionUpgrade(),forceAuth,sa.getClass().getSimpleName(),oldSessionReference,getOldSession(),sessionReference,getSession(),finalSessionId);
+            
             if (isSessionActivated) {
                 this.activatedSessionTrackingId = internalSession.getProperty(Constants.AM_CTX_ID);
             }
@@ -1797,14 +1805,14 @@ public class LoginState {
         if (null == sessionReference || isNoSession()) {
             return null;
         }
-        InternalSession session = sessionAccessManager.getInternalSession(sessionReference);
+        InternalSession session = sessionAccessManager.getInternalSession((forceAuth)?oldSessionReference:sessionReference);
         if (!stateless && session == null) {
             return null;
         }
 
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = ssoManager.createSSOToken(finalSessionId.toString());
+            SSOToken ssoToken = ssoManager.createSSOToken((forceAuth)?oldSessionReference.toString() :finalSessionId.toString());
             return ssoToken;
         } catch (SSOException ex) {
             DEBUG.message("Error retrieving SSOToken :", ex);
@@ -5259,7 +5267,7 @@ public class LoginState {
         if ((stateless && !restriction.isRestricted(getUserDN()) || isNoSession())) {
             return;
         }
-        authenticationSessionStore.promoteSession(sessionReference);
+        authenticationSessionStore.promoteSession((forceAuth)?oldSessionReference:sessionReference);
     }
 
     /**

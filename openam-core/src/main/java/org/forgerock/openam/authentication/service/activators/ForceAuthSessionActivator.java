@@ -46,8 +46,9 @@ public final class ForceAuthSessionActivator extends DefaultSessionActivator {
         if (!loginState.getForceFlag()) {
             throw new AuthException("Invalid session to activate.");
         }
-        final InternalSession session = createSession(sessionService, loginState);
-        return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject);
+        return super.activateSession(loginState, sessionService,loginState.getOldSession(), subject);
+        //final InternalSession session = createSession(sessionService, loginState);
+        //return updateSessions(session, loginState, loginState.getOldSession(), authSession, sessionService, subject);
     }
 
     public static ForceAuthSessionActivator getInstance() {

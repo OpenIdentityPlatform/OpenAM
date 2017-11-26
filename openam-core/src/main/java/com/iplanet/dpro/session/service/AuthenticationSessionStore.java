@@ -92,7 +92,7 @@ public class AuthenticationSessionStore {
 //            throw new IllegalStateException("Attempted to promote non existent session");
 //        }
         if(session != null)
-        	sessionAccessManager.persistInternalSession(session);
+        		sessionAccessManager.persistInternalSession(session);
     }
 
     private void cullExpiredSessions() {

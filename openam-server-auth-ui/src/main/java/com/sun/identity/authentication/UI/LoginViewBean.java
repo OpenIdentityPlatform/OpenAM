@@ -578,7 +578,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                                 loginDebug.message("Forced Auth Succeed."
                                     + "Restoring updated session");
                             }
-                            clearCookieAndDestroySession(ac);
+                            //clearCookieAndDestroySession(ac);
+                            AuthD.getAuth().destroySession(ac.getLoginState().getSession().getID());
                             ac.getLoginState().setSession(oldSession);
                         } else {
                             if (AuthUtils.isCookieSupported(ac)) {

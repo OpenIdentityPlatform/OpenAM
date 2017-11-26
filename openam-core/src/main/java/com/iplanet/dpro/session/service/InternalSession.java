@@ -84,7 +84,7 @@ import com.sun.identity.shared.debug.Debug;
 public class InternalSession implements Serializable, AMSession, SessionPersistenceObservable {
     @Override
 	public String toString() {
-		return String.format("%s %s" , super.toString(),sessionID,this.getID());
+		return String.format("%s sid=%s" , super.toString(),sessionID,this.getID());
 	}
 
 	/**
