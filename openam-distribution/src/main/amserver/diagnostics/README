@@ -55,7 +55,7 @@ run-time. The tool does not address the dynamic issues.
 
 2. Supported versions of Java Runtime
 -------------------------------------
-Java SE 1.5 or higher.
+Java SE 7 or higher.
 
 Note: Embedded quotes in JAVA_HOME environment variable are not supported.
 

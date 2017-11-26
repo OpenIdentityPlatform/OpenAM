@@ -57,7 +57,7 @@ Best built on linux or OS X. Builds are possible on Windows, but more of a chall
 Software          | Version
 ------------------|--------
 Apache Maven      | 3.0.5  
-JDK version       | Oracle JDK 1.6 or 1.7
+JDK version       | Oracle JDK 7
 Git               | 1.7.6 or above
 
 
