@@ -20,10 +20,12 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.identity.sm.SMSException;
@@ -55,6 +57,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.forgerock.json.fluent.JsonValue;
+import static org.forgerock.json.fluent.JsonValue.*;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.*;
 
@@ -103,6 +106,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
     final static String CURRENT_PASSWORD = "currentpassword";
+    private static final String USER_PASSWORD = "userpassword";
 
     private RestSecurity restSecurity = null;
     /**
@@ -644,21 +648,19 @@ public final class IdentityResource implements CollectionResourceProvider {
         String tokenID;
         String confirmationId;
         String username;
-        String nwpassword;
+        String newPassword;
         final JsonValue jVal = request.getContent();
 
         try{
             tokenID = jVal.get(TOKEN_ID).asString();
-            jVal.remove(TOKEN_ID);
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
-            jVal.remove(CONFIRMATION_ID);
             username = jVal.get(USERNAME).asString();
-            nwpassword =  jVal.get("userpassword").asString();
+            newPassword =  jVal.get(USER_PASSWORD).asString();
 
             if(username == null || username.isEmpty()){
                 throw new BadRequestException("username not provided");
             }
-            if(nwpassword == null || username.isEmpty()) {
+            if (newPassword == null || newPassword.isEmpty()) {
                 throw new BadRequestException("new password not provided");
             }
 
@@ -670,7 +672,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             admin.setId(tok.getTokenID().toString());
 
             // Update instance with new password value
-            if (updateInstance(admin, jVal, handler)) {
+            if (updateInstance(admin, json(object(field(USERNAME, username), field(USER_PASSWORD, newPassword))), handler)) {
                 // Only remove the token if the update was successful, errors will be set in the handler.
                 try {
                     // Even though the generated token will eventually timeout, delete it after a successful read
