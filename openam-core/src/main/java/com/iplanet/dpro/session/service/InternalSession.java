@@ -1112,7 +1112,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
         persistenceManager = manager;
     }
 
-    private void notifyPersistenceManager() {
+    public void notifyPersistenceManager() {
         if (persistenceManager != null) {
             persistenceManager.notifyUpdate(this);
         }
