@@ -107,7 +107,7 @@ public abstract class DataLayerConnectionModule extends PrivateModule {
      */
     protected void configureTaskExecutor(PrivateBinder binder) {
         if (executorType != null) {
-            binder.bind(TokenStorageAdapter.class).to(LdapAdapter.class);
+            binder.bind(TokenStorageAdapter.class).to(adapterType);
             binder.bind(TaskExecutor.class).to(executorType);
             binder.bind(TaskFactory.class).in(Singleton.class);
         }
