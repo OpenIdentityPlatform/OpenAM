@@ -35,4 +35,4 @@ Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls
 * Sun Access Manager
 * Sun OpenSSO
 * Oracle OpenSSO
-* Forgrock OpenAM
+* Forgerock OpenAM
