@@ -50,4 +50,17 @@ public final class StringUtils {
     public static String insertContent(String original, int position, String content) {
         return original.substring(0, position) + content + original.substring(position);
     }
+
+    /**
+     * Compares two strings in a case insensitive manner, that also allows for
+     * either of the strings to be null, without issue.
+     *
+     * @param s1 the first string to be compared.
+     * @param s2 the second string to tbe compared.
+     * @return true if the parameter values are the same, false if different.
+     */
+    public static boolean compareCaseInsensitiveString(String s1, String s2) {
+        return s1 == null ? s2 == null : s1.equalsIgnoreCase(s2);
+    }
+
 }
