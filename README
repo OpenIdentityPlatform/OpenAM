@@ -47,10 +47,10 @@ business practices.
 The OpenAM workspace is based on a standard Maven build and uses Maven as the
 build framework.
 
-The sources in this workspace should be compiled using JDK 6.0. In order to allow
-this, you must ensure that JDK 6.0 is present in your system path and the
+The sources in this workspace should be compiled using JDK 7. In order to allow
+this, you must ensure that JDK 7 is present in your system path and the
 JAVA_HOME environment variable is setup correctly pointing to its location. The
-target JDK is set to 1.5, but the recommended compiler is 1.6 or higher.
+target JDK is set to 7, and the recommended compiler is 7 or higher.
 
 Please see this URL for the latest instructions on how to compile OpenAM:
 https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source.

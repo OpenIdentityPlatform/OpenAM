@@ -45,7 +45,7 @@ Table of contents:
 
 1. Supported versions of Java Runtime
 -------------------------
-Java SE 1.5 or higher.
+Java SE 7 or higher.
 
 2. Installing openam-distribution-ssoconfiguratortools-${project.version}.zip
 --------------------------------------
