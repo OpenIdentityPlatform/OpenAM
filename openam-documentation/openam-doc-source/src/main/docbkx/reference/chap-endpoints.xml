@@ -3212,25 +3212,10 @@ to a runtime exception with messages that I think suggest that it needed to be c
         <variablelist>
 
             <varlistentry>
-                <term><literal>deleteconsumer.jsp</literal></term>
-                <listitem>
-                    <para>This endpoint is used to delete consumer systems, which get resources from service providers
-                        (SPs) based on OAuth 1.0 tokens.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
-                <term><literal>deletetoken.jsp</literal></term>
-                <listitem>
-                    <para>This endpoint is used to delete an existing OAuth 1.0 token.</para>
-                </listitem>
-            </varlistentry>
-
-            <varlistentry>
                 <term><literal>index.jsp</literal></term>
                 <listitem>
-                    <para>Specifies an endpoint used to register and delete service consumers, which get resources
-                    from SPs. Provides access to registerconsumer.jsp and deleteconsumer.jsp. Associated with OAuth 1.0.
+                    <para>Specifies an endpoint used to register service consumers, which get resources from SPs.
+                    Provides access to registerconsumer.jsp. Associated with OAuth 1.0.
                     </para>
                 </listitem>
             </varlistentry>

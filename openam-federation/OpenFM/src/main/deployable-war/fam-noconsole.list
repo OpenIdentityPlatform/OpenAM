@@ -2124,8 +2124,6 @@
 ./login_images/master-style.css
 ./login_images/spacer.gif
 ./login_images/warning_32_sunplex.gif
-./oauth/deleteconsumer.jsp
-./oauth/deletetoken.jsp
 ./oauth/index.jsp
 ./oauth/registerconsumer.jsp
 ./oauth/userconsole.jsp
