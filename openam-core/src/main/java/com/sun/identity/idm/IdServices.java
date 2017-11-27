@@ -24,6 +24,7 @@
  *
  * $Id: IdServices.java,v 1.10 2010/01/06 01:58:26 veiming Exp $
  *
+ * Portions Copyrighted 2015-2016 ForgeRock AS.
  */
 
 package com.sun.identity.idm;
@@ -40,9 +41,44 @@ import com.sun.identity.sm.SchemaType;
 
 public interface IdServices {
     
+    /**
+     * Returns <code>true</code> if the data store has successfully
+     * authenticated the identity with the specific type and provided credentials. In case the
+     * data store requires additional credentials, the list would be returned
+     * via the <code>IdRepoException</code> exception.
+     *
+     * @param orgName
+     *            realm name to which the identity would be authenticated
+     * @param credentials
+     *            Array of callback objects containing information such as
+     *            username and password.
+     *
+     * @return <code>true</code> if data store authenticates the identity;
+     *         else <code>false</code>
+     */
     public boolean authenticate(String orgName, Callback[] credentials)
         throws IdRepoException, AuthLoginException;
     
+    /**
+     * Returns <code>true</code> if the data store has successfully
+     * authenticated the identity with the specific type and provided credentials. In case the
+     * data store requires additional credentials, the list would be returned
+     * via the <code>IdRepoException</code> exception.
+     *
+     * @param orgName
+     *            realm name to which the identity would be authenticated
+     * @param credentials
+     *            Array of callback objects containing information such as
+     *            username and password.
+     * @param idType
+     *            The type of identity, or null for any.
+     *
+     * @return <code>true</code> if data store authenticates the identity;
+     *         else <code>false</code>
+     */
+    boolean authenticate(String orgName, Callback[] credentials, IdType idType)
+           throws IdRepoException, AuthLoginException;
+
     public AMIdentity create(SSOToken token, IdType type, String name,
             Map attrMap, String amOrgName) throws IdRepoException, SSOException;
 

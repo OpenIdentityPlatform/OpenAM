@@ -222,22 +222,14 @@ public class IdServicesImpl implements IdServices {
        return (answer);
    }
 
-   /**
-    * Returns <code>true</code> if the data store has successfully
-    * authenticated the identity with the provided credentials. In case the
-    * data store requires additional credentials, the list would be returned
-    * via the <code>IdRepoException</code> exception.
-    * 
-    * @param orgName
-    *            realm name to which the identity would be authenticated
-    * @param credentials
-    *            Array of callback objects containing information such as
-    *            username and password.
-    * 
-    * @return <code>true</code> if data store authenticates the identity;
-    *         else <code>false</code>
-    */
-   public boolean authenticate(String orgName, Callback[] credentials)
+    @Override
+    public boolean authenticate(String orgName, Callback[] credentials)
+            throws IdRepoException, AuthLoginException {
+        return authenticate(orgName, credentials, null);
+    }
+
+    @Override
+   public boolean authenticate(String orgName, Callback[] credentials, IdType idType)
            throws IdRepoException, AuthLoginException {
        if (DEBUG.messageEnabled()) {
            DEBUG.message(
@@ -248,32 +240,24 @@ public class IdServicesImpl implements IdServices {
        AuthLoginException authException = null;
 
        // Get the list of plugins and check if they support authN
-       Set cPlugins = null;
+       Set<IdRepo> cPlugins;
        try {
-           cPlugins = idrepoCache.getIdRepoPlugins(orgName);
-       } catch (SSOException ex) {
-           // Debug the message and return false
-           if (DEBUG.messageEnabled()) {
-               DEBUG.message(
-                   "IdServicesImpl.authenticate: " + "Error obtaining " +
-                   "IdRepo plugins for the org: " + orgName);
+           if (idType == null) {
+               cPlugins = idrepoCache.getIdRepoPlugins(orgName);
+           } else {
+               cPlugins = idrepoCache.getIdRepoPlugins(orgName, IdOperation.READ, idType);
            }
-           return (false);
-       } catch (IdRepoException ex) {
+       } catch (SSOException | IdRepoException ex) {
            // Debug the message and return false
-           if (DEBUG.messageEnabled()) {
-               DEBUG.message(
-                   "IdServicesImpl.authenticate: " + "Error obtaining " +
-                   "IdRepo plugins for the org: " + orgName);
-           }
-           return (false);
+           DEBUG.message("IdServicesImpl.authenticate: Error obtaining IdRepo plugins for the org: " + orgName);
+           return false;
        }
        
        // Check for internal user. If internal user, use SpecialRepo only
        String name = null;
-       for (int i = 0; i < credentials.length; i++) {
-           if (credentials[i] instanceof NameCallback) {
-               name = ((NameCallback) credentials[i]).getName();
+       for (Callback credential : credentials) {
+           if (credential instanceof NameCallback) {
+               name = ((NameCallback) credential).getName();
                if (DN.isDN(name)) {
                    // Obtain the firsr RDN
                    name = LDAPDN.explodeDN(name, true)[0];
@@ -281,30 +265,21 @@ public class IdServicesImpl implements IdServices {
                break;
            }
        }
-       SSOToken token = (SSOToken) AccessController.doPrivileged(
-           AdminTokenAction.getInstance());
+       SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
        try {
-           if ((name != null) &&
-               isSpecialIdentity(token, name, IdType.USER, orgName)) {
-               for (Iterator tis = cPlugins.iterator(); tis.hasNext();) {
-                   IdRepo idRepo = (IdRepo) tis.next();
-                   if (idRepo.getClass().getName().equals(
-                       IdConstants.SPECIAL_PLUGIN)) {
+           if ((name != null) && isSpecialIdentity(token, name, IdType.USER, orgName)) {
+               for (IdRepo idRepo : cPlugins) {
+                   if (idRepo.getClass().getName().equals(IdConstants.SPECIAL_PLUGIN)) {
                        if (idRepo.authenticate(credentials)) {
                            if (DEBUG.messageEnabled()) {
-                               DEBUG.message("IdServicesImpl.authenticate: " +
-                                   "AuthN success using special repo " +
-                                   idRepo.getClass().getName() +
-                                   " user: " + name);
+                               DEBUG.message(
+                                       "IdServicesImpl.authenticate: AuthN success using special repo " + idRepo.getClass().getName() + " user: " + name);
                            }
-                           return (true);
+                           return true;
                        } else {
                            // Invalid password used for internal user
-                           DEBUG.error("IdServicesImpl.authenticate: " +
-                               "AuthN failed using special repo " +
-                               idRepo.getClass().getName() +
-                               " user: " + name);
-                           return (false);
+                           DEBUG.error("IdServicesImpl.authenticate: AuthN failed using special repo " + idRepo.getClass().getName() + " user: " + name);
+                           return false;
                        }
 
                    }
@@ -312,8 +287,7 @@ public class IdServicesImpl implements IdServices {
            }
        } catch (SSOException ssoe) {
            // Ignore the exception
-           DEBUG.error("IdServicesImpl.authenticate: AuthN failed " +
-               "checking for special users", ssoe);
+           DEBUG.error("IdServicesImpl.authenticate: AuthN failed checking for special users", ssoe);
            return (false);
        }
        
@@ -321,20 +295,15 @@ public class IdServicesImpl implements IdServices {
            IdRepo idRepo = (IdRepo) items.next();
            if (idRepo.supportsAuthentication()) {
                if (DEBUG.messageEnabled()) {
-                   DEBUG.message(
-                       "IdServicesImpl.authenticate: " + "AuthN to " +
-                       idRepo.getClass().getName() + " in org: " + orgName);
+                   DEBUG.message("IdServicesImpl.authenticate: AuthN to " + idRepo.getClass().getName() + " in org: " + orgName);
                }
                try {
                    if (idRepo.authenticate(credentials)) {
                        // Successfully authenticated
                        if (DEBUG.messageEnabled()) {
-                           DEBUG.message(
-                               "IdServicesImpl.authenticate: " +
-                               "AuthN success for " +
-                               idRepo.getClass().getName());
+                           DEBUG.message("IdServicesImpl.authenticate: AuthN success for " + idRepo.getClass().getName());
                        }
-                       return (true);
+                       return true;
                    }
                } catch (IdRepoException ide) {
                    // Save the exception to be thrown later if
@@ -348,18 +317,16 @@ public class IdServicesImpl implements IdServices {
                    }
                }
            } else if (DEBUG.messageEnabled()) {
-               DEBUG.message(
-                   "IdServicesImpl.authenticate: AuthN " +
-                   "not supported by " + idRepo.getClass().getName());
+               DEBUG.message("IdServicesImpl.authenticate: AuthN not supported by " + idRepo.getClass().getName());
            }
        }
        if (authException != null) {
-           throw (authException);
+           throw authException;
        }
        if (firstException != null) {
-           throw (firstException);
+           throw firstException;
        }
-       return (false);
+       return false;
    }
 
    private AMIdentity getRealmIdentity(SSOToken token, String orgDN)
