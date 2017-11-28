@@ -46,6 +46,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
