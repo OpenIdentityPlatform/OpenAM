@@ -99,6 +99,21 @@
     </build>
 
     <dependencies>
+
+		<dependency>
+		    <groupId>org.glassfish.metro</groupId>
+		    <artifactId>wsit-impl</artifactId>
+		    <version>2.4.0</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.glassfish.gmbal</groupId>
+		    		<artifactId>gmbal</artifactId>
+		    	</exclusion>
+		    	
+		    </exclusions>
+		</dependency>
+		
+    
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
@@ -119,11 +134,6 @@
             <artifactId>openam-federation-library</artifactId>
         </dependency>
         
-		<dependency>
-			<groupId>org.glassfish.metro</groupId>
-			<artifactId>wsit-impl</artifactId>
-			<version>2.4.0</version>
-		</dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
