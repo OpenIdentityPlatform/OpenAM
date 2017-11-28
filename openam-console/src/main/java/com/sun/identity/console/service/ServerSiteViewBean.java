@@ -39,6 +39,7 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMViewBeanBase;
@@ -527,8 +528,12 @@ public class ServerSiteViewBean
     }
     
     public void handleBtnDefaultSettingsRequest(RequestInvocationEvent event) {
-        String authenticationRealm = getAuthenticationRealm(this);
-        redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION, authenticationRealm);
+    	if (isXuiAdminConsoleEnabled()) {
+    		String authenticationRealm = getAuthenticationRealm(this);
+            redirectToXui(getRequestContext().getRequest(), XuiRedirectHelper.SERVER_DEFAULT_LOCATION, authenticationRealm);
+    	} else {
+    		forwardToServerProfilePage(ServerConfiguration.DEFAULT_SERVER_CONFIG);
+    	}
     }
 
     protected String getBreadCrumbDisplayName() {
