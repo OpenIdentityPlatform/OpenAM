@@ -108,7 +108,7 @@
                     <attribute name="Implementation-Version"
                         value="${clientsdk.stamp}"/>
                     <attribute name="Implementation-Vendor"
-                        value="ForgeRock AS"/>
+                        value="Open Identity Platform Community"/>
                 </section>
             </manifest>
             <zipfileset src="${sharedlib.dist.dir}/opensso-sharedlib.jar" includes="**/*.class"/>
