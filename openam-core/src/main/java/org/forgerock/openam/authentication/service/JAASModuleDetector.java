@@ -89,7 +89,7 @@ public class JAASModuleDetector {
                 addClassnameToModule(className, true);
             }
         } catch (Exception e) {
-            debug.message("fail to instantiate class for %s", className);
+            debug.message("fail to instantiate class for {}", className);
             addClassnameToModule(className, true);
         }
     }

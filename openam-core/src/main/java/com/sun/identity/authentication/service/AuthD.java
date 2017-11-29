@@ -537,7 +537,7 @@ public class AuthD implements ConfigurationListener {
      * @return the <code>InternalSession</code> associated with a session ID.
      */
     public static InternalSession getSession(String sessId) {
-        debug.message("getSession for %s", sessId);
+        debug.message("getSession for {}", sessId);
 
         if (null == sessId) {
             debug.message("getSession returned null");
