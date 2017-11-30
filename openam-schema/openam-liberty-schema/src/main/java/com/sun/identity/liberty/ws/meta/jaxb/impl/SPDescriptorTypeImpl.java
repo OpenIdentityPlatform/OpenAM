@@ -282,7 +282,7 @@ public class SPDescriptorTypeImpl
 
         public boolean isIsDefault() {
             if (!has_IsDefault) {
-                return javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.DatatypeConverterImpl.installHook("false"));
+                return javax.xml.bind.DatatypeConverter.parseBoolean("false");
             } else {
                 return _IsDefault;
             }

@@ -77,9 +77,13 @@
 			<groupId>com.sun.xml.rpc</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
+       	<dependency>
+			<groupId>org.glassfish.metro</groupId>
+			<artifactId>wsit-impl</artifactId>
+		</dependency>
+<!--         <dependency> -->
+<!--             <groupId>com.sun.xml.bind</groupId> -->
+<!--             <artifactId>jaxb-impl</artifactId> -->
+<!--         </dependency> -->
     </dependencies>
 </project>

@@ -36,7 +36,7 @@ public class SelectTypeImpl
 
     public boolean isMultiple() {
         if (!has_Multiple) {
-            return javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.DatatypeConverterImpl.installHook("false"));
+            return javax.xml.bind.DatatypeConverter.parseBoolean(("false"));
         } else {
             return _Multiple;
         }

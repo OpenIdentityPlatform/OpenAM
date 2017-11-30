@@ -337,7 +337,7 @@ public class ModifyTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.Mod
 
         public boolean isOverrideAllowed() {
             if (!has_OverrideAllowed) {
-                return javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.DatatypeConverterImpl.installHook("false"));
+                return javax.xml.bind.DatatypeConverter.parseBoolean(("false"));
             } else {
                 return _OverrideAllowed;
             }

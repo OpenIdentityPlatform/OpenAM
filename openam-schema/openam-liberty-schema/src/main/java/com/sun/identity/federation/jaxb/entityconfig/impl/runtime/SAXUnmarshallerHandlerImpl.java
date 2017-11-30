@@ -112,7 +112,7 @@ public class SAXUnmarshallerHandlerImpl
                 // the SAXParserFactory.setNamespaceAware(true). When this happens, you see
                 // the namespace URI is reported as empty whereas you expect something else.
                 throw new SAXParseException(
-                    Messages.format( Messages.UNEXPECTED_ROOT_ELEMENT2,
+                    Messages.format( "Messages.UNEXPECTED_ROOT_ELEMENT2",
                         uri, local, computeExpectedRootElements() ),
                     getLocator() );
             }
