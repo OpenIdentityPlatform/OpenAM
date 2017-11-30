@@ -41,10 +41,10 @@
                         <manifestEntries>
                             <Specification-Title>OpenAM IdP Discovery WAR</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Specification-Vendor>Open Identity Platform Community</Specification-Vendor>
                             <Implementation-Title>OpenAM IdP Discovery WAR</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Implementation-Vendor>Open Identity Platform Community</Implementation-Vendor>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                     </archive>
