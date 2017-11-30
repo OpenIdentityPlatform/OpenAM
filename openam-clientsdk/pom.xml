@@ -134,7 +134,7 @@
                             <include>org.forgerock.commons:i18n-slf4j</include>
                             <include>org.forgerock.commons.guava:forgerock-guava-base</include>
                             <include>org.forgerock.commons.guava:forgerock-guava-collect</include>
-                            <include>com.google:guava</include>
+<!--                             <include>com.google:guava</include> -->
                             <include>org.forgerock.http:chf-http-core</include>
                             <include>com.fasterxml.jackson.core:jackson-databind</include>
                             <include>com.fasterxml.jackson.core:jackson-core</include>
@@ -668,6 +668,7 @@
                             <excludes>
                                 <exclude>com.sun.identity.**.*</exclude>
                                 <exclude>com.iplanet.**.*</exclude>
+                                <exclude>com.google.**.*</exclude>
                             </excludes>
                         </relocation>
                         <relocation>

@@ -81,6 +81,7 @@
                                     <excludes>
                                         <exclude>com.sun.identity.**.*</exclude>
                                         <exclude>com.iplanet.**.*</exclude>
+                                        <exclude>com.google.**.*</exclude>
                                     </excludes>
                                 </relocation>
                                 <relocation>
