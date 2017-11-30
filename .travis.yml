@@ -14,7 +14,7 @@ branches:
    - master
 notifications:
  email:
-  - support@openam.org.ru
+  - open-identity-platform-openam@googlegroups.com
 before_install:
  - date -u
  - uname -a
