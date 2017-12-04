@@ -1818,7 +1818,7 @@ public class AuthClientUtils {
             }
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error in getExistingValidSSOToken", e);
+                utilDebug.message("Error in getExistingValidSSOToken {} {}",sessID ,e.toString());
             }
             return ssoToken;
         }
