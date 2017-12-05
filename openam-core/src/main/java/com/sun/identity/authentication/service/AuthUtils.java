@@ -1042,7 +1042,7 @@ public class AuthUtils extends AuthClientUtils {
             
         } catch (Exception ee) {
             if (utilDebug.messageEnabled()) {
-                utilDebug.message("Creating AuthContextLocal 2: ", ee);
+                utilDebug.message("Creating AuthContextLocal 2: {}", ee.toString());
             }
             
             throw new AuthException(ee);

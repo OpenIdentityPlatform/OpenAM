@@ -35,6 +35,7 @@ import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getApplica
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
@@ -281,7 +282,7 @@ public class PolicyRequestHandler implements RequestHandler {
 
         String appSSOTokenIDStr = req.getAppSSOToken();
         SSOToken appToken = null;
-        Map<String, Set<String>> appAttributes;
+        Map<String, Set<String>> appAttributes=Collections.EMPTY_MAP;
 
         try {
             appToken = getSSOToken(appSSOTokenIDStr, null);
@@ -291,17 +292,19 @@ public class PolicyRequestHandler implements RequestHandler {
                 debug.warning("PolicyRequestHandler: Invalid app sso token, " +
                     appSSOTokenIDStr);
             }
-            throw new PolicyEvaluationException(
-                    PolicyResponse.APP_SSO_TOKEN_INVALID, requestId);
+            if (!SystemProperties.getAsBoolean("org.openidentityplatform.openam.ignoreFailAppToken", false))
+            		throw new PolicyEvaluationException(PolicyResponse.APP_SSO_TOKEN_INVALID, requestId);
         }
 
         // set the app token into the ThreadLocal
-        AppTokenHandler.set(appToken);
+        if (appToken!=null) {
+        		AppTokenHandler.set(appToken);
 
-        auditor.setMethod(req.getMethodName());
-        auditor.setSsoToken(appToken);
-        auditor.setRealm(getFirstItem(appAttributes.get(EVALUATION_REALM), NO_REALM));
-        auditor.auditAccessAttempt();
+	        auditor.setMethod(req.getMethodName());
+	        auditor.setSsoToken(appToken);
+	        auditor.setRealm(getFirstItem(appAttributes.get(EVALUATION_REALM), NO_REALM));
+	        auditor.auditAccessAttempt();
+        }
 
         if (req.getMethodID() == 
                 PolicyRequest.POLICY_REQUEST_ADD_POLICY_LISTENER) {
@@ -386,6 +389,10 @@ public class PolicyRequestHandler implements RequestHandler {
             ) {
                 try {
                     userToken = getSSOToken(userSSOTokenIDStr, appToken);
+                    if (appToken==null) {
+                    		appToken=userToken;
+                			AppTokenHandler.set(userToken);
+                    }
                 } catch (PolicyException pe) {
                     if (debug.warningEnabled()) {
                         debug.warning(
