@@ -266,7 +266,7 @@ public class ISAccountLockout {
         acInfo.setLastFailTime(now);
         acInfo.setFailCount(fail_count);
         acInfo.setLockoutAt(lockedAt);
-        if (lockedAt > 0) {
+        if (lockedAt > 0 && (acInfo.getActualLockoutDuration() + lockedAt) > System.currentTimeMillis()) {
             acInfo.setLockout(true);
         }
         acInfo.setUserToken(userName);
@@ -348,11 +348,13 @@ public class ISAccountLockout {
                 }
             }
             
+            
+            
             acInfo.setLastFailTime(last_failed);
             acInfo.setFailCount(invalid_attempts);
             acInfo.setLockoutAt(locked_out_at);
             acInfo.setActualLockoutDuration(actual_lockout_duration);
-            if (locked_out_at > 0) {
+            if (locked_out_at > 0 && (actual_lockout_duration + locked_out_at) > System.currentTimeMillis()) {
                 acInfo.setLockout(true);
             }
             
