@@ -188,55 +188,59 @@ public class AuthXMLHandler implements RequestHandler {
             }
         }
 
-        if ((cookieURL != null) && (cookieURL.trim().length() != 0) && 
-            !(AuthUtils.isLocalServer(cookieURL,serviceURI))) {
-            // Routing to the correct server, the looks like a mis-routed 
-            // requested.
-            HashMap cookieTable = new HashMap();
-            Map headers = new HashMap();
-            Enumeration headerNames = servletReq.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = (String)headerNames.nextElement();
-                List headerValues = new ArrayList();
-                Enumeration enum1 = servletReq.getHeaders(headerName);
-                while (enum1.hasMoreElements()) {
-                    headerValues.add(enum1.nextElement());
-                }
-                headers.put(headerName,headerValues);
-            }
-            if (debug.messageEnabled()) {
-                debug.message("Headers: " + headers);
-            }
-            PLLClient.parseCookies(headers,cookieTable);
-            if (debug.messageEnabled()) {
-                debug.message("Cookies: " + cookieTable);
-            }
-            RequestSet set = new RequestSet(AuthXMLTags.AUTH_SERVICE);
-            set.addRequest(req);
-            try {
-                Vector responses = PLLClient.send(new URL(cookieURL), set,
-                    cookieTable);
-                if (!responses.isEmpty()) {
-                    auditor.auditAccessAttempt();
-                    auditor.auditAccessSuccess(); // Just record result as success here to avoid parsing response
-                    debug.message("=====================Returning redirected");
-                    return ((Response) responses.elementAt(0));
-                }
-            } catch (Exception e) {
-                debug.error("Error in misrouted ", e);
-                // Attempt to contact server failed
-                authResponse = new AuthXMLResponse(AuthXMLRequest.
-                    NewAuthContext);
-                setErrorCode(authResponse, e);
-                auditor.auditAccessAttempt();
-                auditor.auditAccessFailure(authResponse.errorCode, authResponse.authErrorMessage);
-                return new Response(authResponse.toXMLString());
-            }
-        }
-
         // Either local request or new request, handle it locally
         try {
             AuthXMLRequest sreq = AuthXMLRequest.parseXML(content, servletReq);
+            
+            if (sreq.getRequestType()!=AuthXMLRequest.Logout
+            		&& sreq.getRequestType()!=AuthXMLRequest.NewAuthContext
+            		&& (cookieURL != null) 
+            		&& (cookieURL.trim().length() != 0) 
+            		&&  !(AuthUtils.isLocalServer(cookieURL,serviceURI))) {
+                // Routing to the correct server, the looks like a mis-routed 
+                // requested.
+                HashMap cookieTable = new HashMap();
+                Map headers = new HashMap();
+                Enumeration headerNames = servletReq.getHeaderNames();
+                while (headerNames.hasMoreElements()) {
+                    String headerName = (String)headerNames.nextElement();
+                    List headerValues = new ArrayList();
+                    Enumeration enum1 = servletReq.getHeaders(headerName);
+                    while (enum1.hasMoreElements()) {
+                        headerValues.add(enum1.nextElement());
+                    }
+                    headers.put(headerName,headerValues);
+                }
+                if (debug.messageEnabled()) {
+                    debug.message("Headers: " + headers);
+                }
+                PLLClient.parseCookies(headers,cookieTable);
+                if (debug.messageEnabled()) {
+                    debug.message("Cookies: " + cookieTable);
+                }
+                RequestSet set = new RequestSet(AuthXMLTags.AUTH_SERVICE);
+                set.addRequest(req);
+                try {
+                    Vector responses = PLLClient.send(new URL(cookieURL), set,
+                        cookieTable);
+                    if (!responses.isEmpty()) {
+                        auditor.auditAccessAttempt();
+                        auditor.auditAccessSuccess(); // Just record result as success here to avoid parsing response
+                        debug.message("=====================Returning redirected");
+                        return ((Response) responses.elementAt(0));
+                    }
+                } catch (Exception e) {//try local processing
+                    debug.error("Error in misrouted {} {}\n{}", cookieURL,e.toString(),content);
+                    // Attempt to contact server failed
+//                    authResponse = new AuthXMLResponse(AuthXMLRequest.
+//                        NewAuthContext);
+//                    setErrorCode(authResponse, e);
+//                    auditor.auditAccessAttempt();
+//                    auditor.auditAccessFailure(authResponse.errorCode, authResponse.authErrorMessage);
+//                    return new Response(authResponse.toXMLString());
+                }
+            }
+        
             sreq.setHttpServletRequest(servletReq);
             authResponse = processAuthXMLRequest(content, auditor, sreq, servletReq, servletRes);
         } catch (AuthException e) {
