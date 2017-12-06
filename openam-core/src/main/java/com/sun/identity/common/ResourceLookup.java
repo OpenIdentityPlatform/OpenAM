@@ -28,6 +28,8 @@
  */
 package com.sun.identity.common;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -36,8 +38,11 @@ import com.sun.identity.shared.search.FileLookupException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.ServletContext;
 
 /**
@@ -46,20 +51,9 @@ import javax.servlet.ServletContext;
  * increasing web container independence.
  */
 public class ResourceLookup {
+	private static final Debug DEBUG = Debug.getInstance("amResourceLookup");
 
-    private static final ConcurrentMap<String, String> RESOURCE_NAME_CACHE;
-    private static final boolean CACHE_ENABLED;
-    private static final Debug DEBUG = Debug.getInstance("amResourceLookup");
-
-    static {
-        CACHE_ENABLED = SystemProperties.getAsBoolean(Constants.RESOURCE_LOOKUP_CACHE_ENABLED, true);
-        if (CACHE_ENABLED) {
-            RESOURCE_NAME_CACHE = new ConcurrentHashMap<String, String>();
-        } else {
-            RESOURCE_NAME_CACHE = null;
-        }
-    }
-
+	final private static Map<String,String> resourceNameCache = new ConcurrentHashMap<String,String>();
     /**
      * Returns the first existing resource in the ordered search paths.
      * 
@@ -83,13 +77,13 @@ public class ResourceLookup {
                 .append(":").append(filename).append(":").append(resourceDir)
                 .toString();
 
-        if (CACHE_ENABLED) {
-            resourceName = RESOURCE_NAME_CACHE.get(cacheKey);
-            if (resourceName != null) {
-                return resourceName;
-            }
-        }
+        resourceName = (String) resourceNameCache.get(cacheKey);
+        if (resourceName != null) 
+            return resourceName;
 
+        if (resourceURLCacheNotExists.getIfPresent(cacheKey)!=null)
+        		return null;
+        
         URL resourceUrl = null;
 
         // calls FileLookup to get the file paths to locate file
@@ -112,20 +106,29 @@ public class ResourceLookup {
             DEBUG.message("amResourceLookup: resourceURL: " + resourceUrl);
             DEBUG.message("amResourceLookup: resourceName: " + resourceName);
         }
-        if (resourceUrl != null) {
-            if (CACHE_ENABLED) {
-                RESOURCE_NAME_CACHE.put(cacheKey, resourceName);
-            }
-        } else {
-            resourceName = null;
-        }
 
+        if (resourceUrl != null) 
+            resourceNameCache.put(cacheKey, resourceName);
+        else{
+	        	resourceURLCacheNotExists.put(cacheKey, true);
+	        	resourceName = null;
+        }
         return resourceName;
     }
 
+    final static Map<String, URL> resourceURLCache=new ConcurrentHashMap<String, URL>();
+    final static Cache<String,Boolean> resourceURLCacheNotExists=
+    		CacheBuilder.newBuilder()
+    		.maximumSize(32000)
+    		.expireAfterAccess(1, TimeUnit.HOURS)
+    		.build();
     /* returns the resourceURL for the resource name for the request */
     private static URL getResourceURL(ServletContext context, String resourceName) {
-        URL resourceURL = null;
+        URL resourceURL = resourceURLCache.get(resourceName);
+        if (resourceURL!=null)
+        		return resourceURL;
+        if (resourceURLCacheNotExists.getIfPresent(resourceName)!=null)
+        		return null;
         try {
             if (context != null) {
                 resourceURL = context.getResource(resourceName);
@@ -138,6 +141,10 @@ public class ResourceLookup {
         } catch (MalformedURLException murle) {
             DEBUG.message("Error getting resource: " + resourceURL + " cause: " + murle.getMessage());
         }
+        if (resourceURL!=null)
+	        	resourceURLCache.put(resourceName,resourceURL);
+	    	else
+	    		resourceURLCacheNotExists.put(resourceName,true);
         return resourceURL;
     }
 }
