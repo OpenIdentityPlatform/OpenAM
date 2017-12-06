@@ -44,20 +44,8 @@ import java.util.Set;
  * a persistent data store.
  */
 public abstract class PrivilegeIndexStore {
-    private static Class clazz;
     private Subject adminSubject;
     private String realm;
-    
-
-    static {
-        try {
-            //RFE: configurable
-            clazz = Class.forName(
-                "com.sun.identity.entitlement.opensso.OpenSSOIndexStore");
-        } catch (ClassNotFoundException e) {
-            PolicyConstants.DEBUG.error("PrivilegeIndexStore.static<init>", e);
-        }
-    }
 
     protected PrivilegeIndexStore(
         Subject adminSubject,
@@ -85,34 +73,7 @@ public abstract class PrivilegeIndexStore {
     public static PrivilegeIndexStore getInstance(
         Subject adminSubject,
         String realm) {
-        if (clazz == null) {
-            return null;
-        }
-        Class[] parameterTypes = {Subject.class, String.class};
-            try {
-                Constructor constructor = clazz.getConstructor(parameterTypes);
-                Object[] args = {adminSubject, realm};
-                return ((PrivilegeIndexStore) constructor.newInstance(args));
-            } catch (InstantiationException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            } catch (IllegalAccessException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            } catch (IllegalArgumentException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            } catch (InvocationTargetException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            } catch (NoSuchMethodException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            } catch (SecurityException ex) {
-                PolicyConstants.DEBUG.error("PrivilegeIndexStore.getInstance",
-                    ex);
-            }
-        return null;
+        return  ((PrivilegeIndexStore) new com.sun.identity.entitlement.opensso.OpenSSOIndexStore(adminSubject, realm));
     }
 
     /**
