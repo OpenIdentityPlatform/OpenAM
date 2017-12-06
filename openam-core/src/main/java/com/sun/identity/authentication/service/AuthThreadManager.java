@@ -60,6 +60,7 @@ public class AuthThreadManager extends Thread   {
      */
     public AuthThreadManager () {
         debug = Debug.getInstance("amThreadManager");
+        setPriority(MIN_PRIORITY);
         defaultSleepTime = AuthD.getAuth().getDefaultSleepTime();
         if (debug.messageEnabled()) {
             debug.message("Default sleep time : " + defaultSleepTime);
