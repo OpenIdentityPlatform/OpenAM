@@ -4357,7 +4357,7 @@ public class LoginState {
             } else if (callbacksPerState != null && !callbacksPerState.values().isEmpty()) {
                 for (Callback[] cb : callbacksPerState.values()) {
                     for (Callback aCb : cb) {
-                        if (aCb instanceof NameCallback) {
+                        if (aCb instanceof NameCallback && userDN==null && ((NameCallback) aCb).getName()!=null) {
                             userDN = ((NameCallback) aCb).getName();
                             if (DEBUG.messageEnabled()) {
                                 DEBUG.message("userDN is null, setting to " + userDN);
