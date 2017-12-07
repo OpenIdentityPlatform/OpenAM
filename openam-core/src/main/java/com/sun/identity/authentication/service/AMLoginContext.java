@@ -767,6 +767,9 @@ public class AMLoginContext {
         } catch (DSAMECallbackHandlerError error) {
             debug.message("Caught error returned from DSAMEHandler");
             return;
+        } catch (Throwable e) {
+        		debug.error("Error during login.. ",e);
+        		throw e;
         }
         debug.message("Came to before if Failed loop");
 
