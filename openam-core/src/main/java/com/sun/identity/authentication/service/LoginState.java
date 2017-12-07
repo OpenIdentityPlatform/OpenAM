@@ -1112,7 +1112,7 @@ public class LoginState {
             if (isSessionActivated) {
                 this.activatedSessionTrackingId = internalSession.getProperty(Constants.AM_CTX_ID);
             }
-            if (sessionUpgrade && !getForceFlag() && isSessionActivated && oldStatelessSession == null) {
+            if (sessionUpgrade && !forceAuth && isSessionActivated && oldStatelessSession == null) {
                 invokeSessionUpgradeHandlers();
             }
 
@@ -1140,7 +1140,7 @@ public class LoginState {
             return StatelessSessionActivator.INSTANCE;
         }
 
-        if (getForceFlag()) {
+        if (forceAuth) {
             return ForceAuthSessionActivator.getInstance();
         }
 
@@ -1268,7 +1268,7 @@ public class LoginState {
             }
         }
 
-        if (getForceFlag() && sessionUpgrade) {
+        if (forceAuth && sessionUpgrade) {
             session = oldSession;
         }
 
@@ -1618,7 +1618,7 @@ public class LoginState {
     }
 
     public boolean getForceFlag() {
-        return forceAuth && getOldSession()!=null;
+        return forceAuth;
     }
 
     public void setForceAuth(boolean force) {
@@ -1805,14 +1805,14 @@ public class LoginState {
         if (null == sessionReference || isNoSession()) {
             return null;
         }
-        InternalSession session = sessionAccessManager.getInternalSession((getForceFlag())?oldSessionReference:sessionReference);
+        InternalSession session = sessionAccessManager.getInternalSession((forceAuth)?oldSessionReference:sessionReference);
         if (!stateless && session == null) {
             return null;
         }
 
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = ssoManager.createSSOToken((getForceFlag())?oldSessionReference.toString() :finalSessionId.toString());
+            SSOToken ssoToken = ssoManager.createSSOToken((forceAuth)?oldSessionReference.toString() :finalSessionId.toString());
             return ssoToken;
         } catch (SSOException ex) {
             DEBUG.message("Error retrieving SSOToken :", ex);
@@ -4678,7 +4678,7 @@ public class LoginState {
         }
         InternalSession session = null;
 
-        if (!getForceFlag()) {
+        if (!forceAuth) {
             session = getReferencedSession();
         } else {
             session = getReferencedOldSession();
@@ -4753,7 +4753,7 @@ public class LoginState {
             DEBUG.message("LoginState::upgradeAllProperties() : Calling SessionPropertyUpgrader");
         }
         InternalSession session = getReferencedSession();
-        LazyConfig.SESSION_PROPERTY_UPGRADER.populateProperties(oldSession, session, getForceFlag());
+        LazyConfig.SESSION_PROPERTY_UPGRADER.populateProperties(oldSession, session, forceAuth);
     }
 
     // Upgrade all Properties from the existing (old) session to new session
@@ -5267,7 +5267,7 @@ public class LoginState {
         if ((stateless && !restriction.isRestricted(getUserDN()) || isNoSession())) {
             return;
         }
-        authenticationSessionStore.promoteSession((getForceFlag())?oldSessionReference:sessionReference);
+        authenticationSessionStore.promoteSession((forceAuth)?oldSessionReference:sessionReference);
     }
 
     /**
