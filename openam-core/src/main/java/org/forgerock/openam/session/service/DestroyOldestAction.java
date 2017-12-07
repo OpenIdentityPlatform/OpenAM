@@ -85,6 +85,7 @@ public class DestroyOldestAction implements QuotaExhaustionAction {
             SessionID sessID = new SessionID(oldestSessionID);
             try {
                 Session s = sessionCache.getSession(sessID);
+                debug.warning("destroy {}", sessID);
                 s.destroySession(s);
             } catch (SessionException e) {
                 if (debug.messageEnabled()) {

@@ -70,6 +70,7 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
             SessionID sessID = new SessionID(nextExpiringSessionID);
             try {
                 Session s = sessionCache.getSession(sessID);
+                debug.warning("destroy {}", sessID);
                 s.destroySession(s);
             } catch (SessionException e) {
                 if (debug.messageEnabled()) {
