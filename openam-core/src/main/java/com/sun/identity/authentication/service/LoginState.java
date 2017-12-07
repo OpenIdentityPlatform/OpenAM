@@ -1140,7 +1140,7 @@ public class LoginState {
             return StatelessSessionActivator.INSTANCE;
         }
 
-        if (forceAuth) {
+        if (forceAuth && getOldSession()!=null) {
             return ForceAuthSessionActivator.getInstance();
         }
 
@@ -1805,14 +1805,14 @@ public class LoginState {
         if (null == sessionReference || isNoSession()) {
             return null;
         }
-        InternalSession session = sessionAccessManager.getInternalSession((forceAuth)?oldSessionReference:sessionReference);
+        InternalSession session = sessionAccessManager.getInternalSession((forceAuth && oldSessionReference!=null)?oldSessionReference:sessionReference);
         if (!stateless && session == null) {
             return null;
         }
 
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = ssoManager.createSSOToken((forceAuth)?oldSessionReference.toString() :finalSessionId.toString());
+            SSOToken ssoToken = ssoManager.createSSOToken((forceAuth & oldSessionReference!=null)?oldSessionReference.toString() :finalSessionId.toString());
             return ssoToken;
         } catch (SSOException ex) {
             DEBUG.message("Error retrieving SSOToken :", ex);
@@ -5267,7 +5267,7 @@ public class LoginState {
         if ((stateless && !restriction.isRestricted(getUserDN()) || isNoSession())) {
             return;
         }
-        authenticationSessionStore.promoteSession((forceAuth)?oldSessionReference:sessionReference);
+        authenticationSessionStore.promoteSession((forceAuth&&oldSessionReference!=null)?oldSessionReference:sessionReference);
     }
 
     /**
