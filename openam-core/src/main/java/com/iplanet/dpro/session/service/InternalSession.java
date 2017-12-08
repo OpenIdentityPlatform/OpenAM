@@ -741,7 +741,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     private boolean shouldIgnoreSessionQuotaChecking() {
         boolean ignore = false;
-        if (sessionService.isSuperUser(getUUID()) || (isAppSession())) {
+        if (getState().equals(SessionState.VALID) || sessionService.isSuperUser(getUUID()) || (isAppSession())) {
             ignore = true;
         }
         return ignore;
