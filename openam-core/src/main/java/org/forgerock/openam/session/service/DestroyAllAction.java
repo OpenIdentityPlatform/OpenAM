@@ -36,6 +36,8 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
 
@@ -63,28 +65,24 @@ public class DestroyAllAction implements QuotaExhaustionAction {
 
     @Override
     public boolean action(InternalSession is, Map sessions) {
-        Set<String> sids = sessions.keySet();
+        final Set<String> sids = sessions.keySet();
         debug.message("there are " + sids.size() + " sessions");
-        synchronized (sessions) {
-            for (String sid : sids) {
-                SessionID sessID = new SessionID(sid);
-
-                try {
-                    Session s = sessionCache.getSession(sessID);
-                    s.destroySession(s);
-                    debug.message("Destroy sid " + sessID);
-                } catch (SessionException se) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Failed to destroy the next "
-                                + "expiring session.", se);
-                    }
-
-                    // deny the session activation request
-                    // in this case
-                    return true;
-                }
-            }
-        }
+        for (String sid : sids) 
+        		if (!StringUtils.equals(is.getSessionID().toString(), sid))
+	        {
+	            final SessionID sessID = new SessionID(sid);
+	            try {
+	            		sessions.remove(sid);
+	                Session s = sessionCache.getSession(sessID);
+	                debug.warning("{} {} {} {}", this.getClass().getSimpleName(), sessID,s.getClientID(),s.getIdleTime());
+	                s.destroySession(s);
+	            } catch (SessionException se) {
+	                if (debug.messageEnabled()) {
+	                    debug.message("Failed to destroy the next "
+	                            + "expiring session.", se);
+	                }
+	            }
+	        }
         return false;
     }
 }

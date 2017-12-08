@@ -34,6 +34,8 @@ import com.iplanet.dpro.session.service.QuotaExhaustionAction;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
 
@@ -56,30 +58,28 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
     public boolean action(InternalSession is, Map<String, Long> sessions) {
 
         String nextExpiringSessionID = null;
-        long smallestExpTime = Long.MAX_VALUE;
-        for (Map.Entry<String, Long> entry : sessions.entrySet()) {
-            String sid = entry.getKey();
-            long expirationTime = entry.getValue();
-            if (expirationTime < smallestExpTime) {
-                smallestExpTime = expirationTime;
-                nextExpiringSessionID = sid;
-            }
-
-        }
+        long largestExpTime = -1;
+        for (Map.Entry<String, Long> entry : sessions.entrySet()) 
+        		if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
+	            String sid = entry.getKey();
+	            long expirationTime = entry.getValue();
+	            if (expirationTime > largestExpTime) {
+	            		largestExpTime = expirationTime;
+	            		nextExpiringSessionID = sid;
+	            }
+	
+	        }
         if (nextExpiringSessionID != null) {
             SessionID sessID = new SessionID(nextExpiringSessionID);
             try {
+            		sessions.remove(nextExpiringSessionID);
                 Session s = sessionCache.getSession(sessID);
-                debug.warning("destroy {}", sessID);
+                debug.warning("{} {} {} from {} idle {}", this.getClass().getSimpleName(), sessID,s.getClientID(),sessions.size()+1,s.getIdleTime());
                 s.destroySession(s);
             } catch (SessionException e) {
                 if (debug.messageEnabled()) {
-                    debug.message("Failed to destroy the next "
-                            + "expiring session.", e);
+                    debug.message("Failed to destroy the next expiring session.", e);
                 }
-                // deny the session activation request
-                // in this case
-                return true;
             }
         }
         return false;

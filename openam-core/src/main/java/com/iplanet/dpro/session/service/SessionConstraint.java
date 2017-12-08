@@ -154,12 +154,8 @@ public class SessionConstraint {
             }
         }
 
-        if (sessions != null) {
-            sessionCount = sessions.size();
-        }
-
         // Step 3: checking the constraints
-        if (sessionCount >= quota) {
+        while (sessions != null && sessionCount >= sessions.size()) {
             // If the session quota internalSession exhausted, invoke the
             // pluggin to determine the desired behavior.
             reject = getQuotaExhaustionAction().action(internalSession, sessions);

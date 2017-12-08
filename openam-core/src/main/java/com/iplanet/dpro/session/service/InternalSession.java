@@ -740,11 +740,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * (2) the token is an application token (e.g. Agent)
      */
     private boolean shouldIgnoreSessionQuotaChecking() {
-        boolean ignore = false;
-        if (getState().equals(SessionState.VALID) || sessionService.isSuperUser(getUUID()) || (isAppSession())) {
-            ignore = true;
-        }
-        return ignore;
+        return (getState().equals(SessionState.VALID) || sessionService.isSuperUser(getUUID()) || (isAppSession()));
     }
 
     /**

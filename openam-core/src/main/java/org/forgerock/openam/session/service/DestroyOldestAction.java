@@ -32,6 +32,8 @@ import com.iplanet.dpro.session.service.QuotaExhaustionAction;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
 
@@ -62,38 +64,35 @@ public class DestroyOldestAction implements QuotaExhaustionAction {
     public boolean action(InternalSession is, Map<String, Long> sessions) {
         long smallestExpTime = Long.MAX_VALUE;
         String oldestSessionID = null;
-        for (Map.Entry<String, Long> entry : sessions.entrySet()) {
-            try {
-                Session session = sessionCache.getSession(new SessionID(entry.getKey()));
-                session.refresh(false);
-                long expTime = session.getTimeLeft();
-                if (expTime < smallestExpTime) {
-                    smallestExpTime = expTime;
-                    oldestSessionID = entry.getKey();
-                }
-            } catch (SessionException ssoe) {
-                if (debug.warningEnabled()) {
-                    debug.warning("Failed to create SSOToken", ssoe);
-                }
-                // deny the session activation request
-                // in this case
-                return true;
-            }
-        }
+        for (Map.Entry<String, Long> entry : sessions.entrySet()) 
+	        	if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
+	        {
+	            try {
+	                Session session = sessionCache.getSession(new SessionID(entry.getKey()));
+	                session.refresh(false);
+	                long expTime = session.getTimeLeft();
+	                if (expTime <= smallestExpTime) {
+	                    smallestExpTime = expTime;
+	                    oldestSessionID = entry.getKey();
+	                }
+	            } catch (SessionException ssoe) {
+	                if (debug.warningEnabled()) {
+	                    debug.warning("Failed to create SSOToken", ssoe);
+	                }
+	            }
+	        }
 
         if (oldestSessionID != null) {
             SessionID sessID = new SessionID(oldestSessionID);
             try {
+            		sessions.remove(oldestSessionID);
                 Session s = sessionCache.getSession(sessID);
-                debug.warning("destroy {}", sessID);
+                debug.warning("{} {} {} from {} idle {}", this.getClass().getSimpleName(), sessID,s.getClientID(),sessions.size()+1,s.getIdleTime());
                 s.destroySession(s);
             } catch (SessionException e) {
                 if (debug.messageEnabled()) {
                     debug.message("Failed to destroy the next expiring session.", e);
                 }
-                // deny the session activation request
-                // in this case
-                return true;
             }
         }
         return false;
