@@ -573,7 +573,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                             "Login failure, current session destroyed!");
                     } else if (ac.getStatus()==AuthContext.Status.SUCCESS) {
                         response.setHeader("X-AuthErrorCode", "0");
-                        if (ac.getLoginState().getForceFlag() && oldSession!=null) {
+                        if (ac.getLoginState().getForceFlag()) {
                             if (loginDebug.messageEnabled()) {
                                 loginDebug.message("Forced Auth Succeed."
                                     + "Restoring updated session");
