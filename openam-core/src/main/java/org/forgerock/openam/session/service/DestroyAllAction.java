@@ -74,7 +74,7 @@ public class DestroyAllAction implements QuotaExhaustionAction {
 	            try {
 	            		sessions.remove(sid);
 	                Session s = sessionCache.getSession(sessID);
-	                debug.warning("{} {} {} {}", this.getClass().getSimpleName(), sessID,s.getClientID(),s.getIdleTime());
+	                debug.error("{} {} {} {}", this.getClass().getSimpleName(), sessID,s.getClientID(),s.getIdleTime());
 	                s.destroySession(s);
 	            } catch (SessionException se) {
 	                if (debug.messageEnabled()) {

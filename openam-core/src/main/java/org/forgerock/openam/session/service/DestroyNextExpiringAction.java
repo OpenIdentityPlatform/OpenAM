@@ -32,6 +32,8 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionAction;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Date;
 import java.util.Map;
 import javax.inject.Inject;
 
@@ -69,19 +71,17 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
 	            }
 	
 	        }
-        if (nextExpiringSessionID != null) {
-            SessionID sessID = new SessionID(nextExpiringSessionID);
+        if (nextExpiringSessionID != null) 
             try {
-            		sessions.remove(nextExpiringSessionID);
-                Session s = sessionCache.getSession(sessID);
-                debug.warning("{} {} {} from {} idle {}", this.getClass().getSimpleName(), sessID,s.getClientID(),sessions.size()+1,s.getIdleTime());
+                Session s = new Session(new SessionID(nextExpiringSessionID));
+                	s.refresh(false);
+                debug.error("{} {} {} from {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,s.getClientID(),sessions.size()+1,largestExpTime);
                 s.destroySession(s);
             } catch (SessionException e) {
-                if (debug.messageEnabled()) {
-                    debug.message("Failed to destroy the next expiring session.", e);
-                }
-            }
-        }
+            		debug.error("{} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,sessions.size()+1,largestExpTime,e.toString());
+            }finally {
+            		sessions.remove(nextExpiringSessionID);
+			}
         return false;
     }
 }

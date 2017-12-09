@@ -1618,7 +1618,7 @@ public class LoginState {
     }
 
     public boolean getForceFlag() {
-        return forceAuth && getOldSession()!=null;
+        return forceAuth && oldSessionReference!=null;
     }
 
     public void setForceAuth(boolean force) {

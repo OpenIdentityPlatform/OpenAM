@@ -30,6 +30,8 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionAction;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Date;
 import java.util.Map;
 import javax.inject.Inject;
 
@@ -66,9 +68,8 @@ public class DestroyOldestAction implements QuotaExhaustionAction {
         String oldestSessionID = null;
         for (Map.Entry<String, Long> entry : sessions.entrySet()) 
 	        	if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
-	        {
 	            try {
-	                Session session = sessionCache.getSession(new SessionID(entry.getKey()));
+	                Session session = new Session(new SessionID(entry.getKey()));
 	                session.refresh(false);
 	                long expTime = session.getTimeLeft();
 	                if (expTime <= smallestExpTime) {
@@ -82,19 +83,17 @@ public class DestroyOldestAction implements QuotaExhaustionAction {
 	            }
 	        }
 
-        if (oldestSessionID != null) {
-            SessionID sessID = new SessionID(oldestSessionID);
+        if (oldestSessionID != null) 
             try {
-            		sessions.remove(oldestSessionID);
-                Session s = sessionCache.getSession(sessID);
-                debug.warning("{} {} {} from {} idle {}", this.getClass().getSimpleName(), sessID,s.getClientID(),sessions.size()+1,s.getIdleTime());
+            		Session s = new Session(new SessionID(oldestSessionID));
+            		s.refresh(false);
+                debug.error("{} {} {} from {} getTimeLeft={}", this.getClass().getSimpleName(), oldestSessionID,s.getClientID(),sessions.size()+1, (smallestExpTime));
                 s.destroySession(s);
             } catch (SessionException e) {
-                if (debug.messageEnabled()) {
-                    debug.message("Failed to destroy the next expiring session.", e);
-                }
-            }
-        }
+            		debug.error("{} {} {} expire={} {}", this.getClass().getSimpleName(), oldestSessionID,sessions.size()+1, (smallestExpTime),e.toString());
+            }finally {
+            		sessions.remove(oldestSessionID);
+			}
         return false;
     }
 }

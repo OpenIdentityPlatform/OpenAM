@@ -88,23 +88,19 @@ public class SessionConstraint {
 
     private static QuotaExhaustionAction quotaExhaustionAction = null;
 
-    private QuotaExhaustionAction getQuotaExhaustionAction() {
+    static QuotaExhaustionAction getQuotaExhaustionAction() {
+    		if (quotaExhaustionAction != null) 
+            return quotaExhaustionAction;
         String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
-        if (quotaExhaustionAction != null
-                && quotaExhaustionAction.getClass().getName().equals(clazzName)) {
-            return quotaExhaustionAction;
-        } else {
-            try {
-                quotaExhaustionAction = Class.forName(clazzName).asSubclass(
-                        QuotaExhaustionAction.class).newInstance();
-            } catch (Exception ex) {
-                debug.error("Unable to load the Session Quota Exhaustion Action "
-                        + "class: " + clazzName
-                        + "\nFalling back to DESTROY_OLDEST_SESSION mode", ex);
-                quotaExhaustionAction = new DestroyOldestAction();
-            }
-            return quotaExhaustionAction;
+        try {
+            quotaExhaustionAction = Class.forName(clazzName).asSubclass(QuotaExhaustionAction.class).newInstance();
+        } catch (Exception ex) {
+            debug.error("Unable to load the Session Quota Exhaustion Action "
+                    + "class: " + clazzName
+                    + "\nFalling back to DESTROY_OLDEST_SESSION mode", ex);
+            quotaExhaustionAction = new DestroyOldestAction();
         }
+        return quotaExhaustionAction;
     }
 
     /**
@@ -116,7 +112,6 @@ public class SessionConstraint {
      */
     protected boolean checkQuotaAndPerformAction(InternalSession internalSession) {
         boolean reject = false;
-        int sessionCount = -1;
 
         // Check if it internalSession upgrade scenario
         if (internalSession.getIsSessionUpgrade()) {
@@ -155,15 +150,10 @@ public class SessionConstraint {
         }
 
         // Step 3: checking the constraints
-        while (sessions != null && sessionCount >= sessions.size()) {
+        while (sessions != null && (sessions.size()-(sessions.containsKey(internalSession.getSessionID().toString())?1:0)) >= quota) {
             // If the session quota internalSession exhausted, invoke the
             // pluggin to determine the desired behavior.
             reject = getQuotaExhaustionAction().action(internalSession, sessions);
-            if (debug.messageEnabled()) {
-                debug.message("SessionConstraint." +
-                        "checkQuotaAndPerformAction: " +
-                        "Session quota exhausted.");
-            }
         }
         return reject;
     }
