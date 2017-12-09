@@ -229,7 +229,7 @@ public class AuthUtils extends AuthClientUtils {
                     utilDebug.message("AuthUtils:getAuthContext(): cookieURL : %s", cookieURL);
 
                     if (StringUtils.isNotEmpty(cookieURL) && (isLocalServer(cookieURL,true))) {
-                        utilDebug.error("AuthUtils:getAuthContext(): " + "Invalid Session Timed out");
+                        utilDebug.message("AuthUtils:getAuthContext(): " + "Invalid Session Timed out");
                         clearAllCookies(request, response);
                         throw new AuthException(AMAuthErrorCode.AUTH_TIMEOUT, null);
                     }            	
@@ -976,7 +976,7 @@ public class AuthUtils extends AuthClientUtils {
             }
             
             if ((orgName == null) && (sess == null)) {
-                utilDebug.error("Cannot create authcontext with null org " );
+                utilDebug.message("Cannot create authcontext with null org " );
                 throw new AuthException(AMAuthErrorCode.AUTH_TIMEOUT, null);
             } else if (orgName == null) {
                 orgName = sess.getClientDomain();
