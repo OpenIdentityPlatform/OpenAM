@@ -57,6 +57,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -118,7 +119,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     }
 
     private void initializeCache() {
-        idRepoCache = CacheBuilder.newBuilder().maximumSize(maxSize).build();
+        idRepoCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
     }
 
     private void resetCache(int maxCacheSize) {
