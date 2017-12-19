@@ -513,16 +513,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String dn = IdUtils.getUniversalId(id).toLowerCase();
 
         // Update the cache
-        if (type.equals(IdType.USER)) {
-            // Update cache locally for modified delted user attributes
-            if (isString) {
-                updateCache(token, dn, attributes, null);
-            } else {
-                updateCache(token, dn, null, attributes);
-            }
-        } else {
+//        if (type.equals(IdType.USER)) {
+//            // Update cache locally for modified delted user attributes
+//            if (isString) {
+//                updateCache(token, dn, attributes, null);
+//            } else {
+//                updateCache(token, dn, null, attributes);
+//            }
+//        } else {
             dirtyCache(dn);
-        }
+//        }
     }
 
     public void delete(SSOToken token, IdType type, String name,
@@ -534,7 +534,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         // Clear the cache, get identity DN
         AMIdentity id = new AMIdentity(token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
-        idRepoCache.invalidate(dn);
+        //idRepoCache.invalidate(dn);
+        dirtyCache(dn);
     }
 
     public void removeAttributes(SSOToken token, IdType type, String name,
@@ -546,11 +547,12 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         // Update the cache
         AMIdentity id = new AMIdentity(token, name, type, orgName, amsdkDN);
         String dn = id.getUniversalId().toLowerCase();
-        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
-        if ((cb != null) && !cb.hasExpiredAndUpdated() && cb.isExists()) {
-            // Remove the attributes
-            cb.removeAttributes(attrNames);
-        }
+//        IdCacheBlock cb = idRepoCache.getIfPresent(dn);
+//        if ((cb != null) && !cb.hasExpiredAndUpdated() && cb.isExists()) {
+//            // Remove the attributes
+//            cb.removeAttributes(attrNames);
+//        }
+        dirtyCache(dn);
     }
 
     @Override
