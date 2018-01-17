@@ -4833,7 +4833,8 @@ public class LoginState {
         		if(postLoginInstance instanceof AMPostAuthProcess) {
         			((AMPostAuthProcess)postLoginInstance).amlc = amlc;
         		}
-            	executePostProcessSPI(postLoginInstance, type);
+	        		if (!isNoSession())
+	        			executePostProcessSPI(postLoginInstance, type);
             }
         }
     }
