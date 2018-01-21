@@ -619,7 +619,10 @@ public class SecureSOAPMessage {
              SOAPHeader header = soapMessage.getSOAPHeader();
              java.util.Iterator childElements = header.getChildElements();
              while(childElements.hasNext()) {
-                Element childElement = (Element)childElements.next();
+            	 	Object nextElement=childElements.next();
+            	 	if (!(nextElement instanceof Element))
+            	 		continue;
+                Element childElement = (Element)nextElement;
                 String localName = childElement.getLocalName();
                 String nameSpace = childElement.getNamespaceURI();
                 if(WSSConstants.wsaNS.equals(nameSpace)
