@@ -591,7 +591,7 @@ public class SAML2Token implements SecurityToken {
              List elementValues = new ArrayList();
                  for (Iterator iter1=values.iterator(); iter1.hasNext();) {
                      String value = (String)iter1.next();
-                     String attrValue = "<saml:AttributeValue>" + value +
+                     String attrValue = "<saml:AttributeValue xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + value +
                               "</saml:AttributeValue>";
                      elementValues.add(attrValue);
                  }
