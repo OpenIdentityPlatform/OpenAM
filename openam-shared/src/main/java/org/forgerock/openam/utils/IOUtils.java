@@ -302,7 +302,7 @@ public final class IOUtils {
                     "java.util.HashMap","java.util.LinkedHashMap","java.util.Collections$UnmodifiableMap","java.util.TreeSet","java.lang.String$CaseInsensitiveComparator","java.util.TreeMap",
                     "java.util.HashSet",
                     "org.forgerock.openam.dpro.session.NoOpTokenRestriction",
-                    "org.apache.catalina.util.ParameterMap");
+                    "org.apache.catalina.util.ParameterMap","java.io.ObjectStreamClass");
 
         public WhitelistObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
             super(in);
