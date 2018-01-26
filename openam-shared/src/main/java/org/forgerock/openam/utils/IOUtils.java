@@ -302,7 +302,19 @@ public final class IOUtils {
                     "java.util.HashMap","java.util.LinkedHashMap","java.util.Collections$UnmodifiableMap","java.util.TreeSet","java.lang.String$CaseInsensitiveComparator","java.util.TreeMap",
                     "java.util.HashSet",
                     "org.forgerock.openam.dpro.session.NoOpTokenRestriction",
-                    "org.apache.catalina.util.ParameterMap","java.io.ObjectStreamClass");
+                    "org.apache.catalina.util.ParameterMap","javax.servlet.DispatcherType","java.lang.Enum",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteServletRequest",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteServletResponse",
+                    "java.util.Locale",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteCookie",
+                    "com.sun.identity.common.CaseInsensitiveHashSet",
+                    "com.sun.identity.common.CaseInsensitiveKey",
+                    "com.sun.identity.common.CaseInsensitiveHashMap",
+                    "org.forgerock.openam.authentication.service.protocol.RemoteSession",
+                    "java.lang.StringBuffer"
+                    );
 
         public WhitelistObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
             super(in);
