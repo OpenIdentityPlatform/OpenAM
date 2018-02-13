@@ -1143,6 +1143,10 @@ public class IdServicesImpl implements IdServices {
            try {
                if (idRepo.getClass().getName().equals(
                    IdConstants.AMSDK_PLUGIN) && (amsdkDN != null)) {
+	       	   		if (!idRepo.isExists(token, type, amsdkDN)) {
+               			noOfSuccess--;
+	                    continue;
+	       	   		}
                    active = idRepo.isActive(token, type, amsdkDN);
                } else if (idRepo.getClass().getName().equals(
                    IdConstants.SPECIAL_PLUGIN)) {
@@ -1150,6 +1154,10 @@ public class IdServicesImpl implements IdServices {
                    noOfSuccess--;
                    continue;
                } else {
+            	   		if (!idRepo.isExists(token, type, name)) {
+                   		noOfSuccess--;
+    	                    	continue;
+    	       	   		}
                    active = idRepo.isActive(token, type, name);
                }
                if (!active) {
@@ -1219,8 +1227,16 @@ public class IdServicesImpl implements IdServices {
            try {
                if (idRepo.getClass().getName().equals(
                    IdConstants.AMSDK_PLUGIN) && amsdkDN != null) {
+	            	   if (!idRepo.isExists(token, type, amsdkDN)) { 
+	            		   noOfSuccess--;
+	            		   continue;
+	            	   }
                    idRepo.setActiveStatus(token, type, amsdkDN, active);
                } else {
+	            	   if (!idRepo.isExists(token, type, name)) {
+	            		   noOfSuccess--;
+	            		   continue;
+	            	   }
                    idRepo.setActiveStatus(token, type, name, active);
                }
            } catch (IdRepoUnsupportedOpException ide) {
