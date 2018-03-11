@@ -1,4 +1,6 @@
 language: java
+git:
+  depth: 9999
 matrix:
   include:
   - os: linux
@@ -65,10 +67,10 @@ before_install:
   - uname -a
   - # if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install rpm wine; else sudo apt-get install -y rpm wine; fi 
   - git fetch -t
-  - export git_version_last="$(git describe --abbrev=0 --tags)"
+  - export git_version_last="$(git describe --abbrev=0 --tags --always)"
   - export git_version="$(echo $git_version_last | awk -F . '{ printf "%d.%d.%d", $1,$2,$3 + 1}')"
   - env | sort
-  - git log `git describe --tags --abbrev=0 HEAD^`..HEAD --oneline
+  - git log `git describe --tags --abbrev=0 HEAD^ --always`..HEAD --oneline 
 install:
   - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/forgerock-parent
   - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P '!man-pages,!distribution'
