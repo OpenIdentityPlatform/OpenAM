@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>14.0.1</version>
     </parent>
 
     <!-- Component Definition -->
@@ -86,7 +86,7 @@
 						<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
 						<ssoadm.disabled>false</ssoadm.disabled>
 						<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
-						<com.iplanet.services.debug.directory></com.iplanet.services.debug.directory>
+						<com.iplanet.services.debug.directory />
 						<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
 <!-- 						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
 					</systemProperties>
