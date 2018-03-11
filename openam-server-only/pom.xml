@@ -312,9 +312,9 @@
                         </webResource>
                         <webResource>
                             <!-- More third party licenses... -->
-                            <directory>${project.parent.basedir}/license</directory>
+                            <directory>${project.parent.basedir}/</directory>
                             <includes>
-                                <include>**/**</include>
+                                <include>**/LICENSE.md</include>
                             </includes>
                             <targetPath>legal-notices</targetPath>
                         </webResource>
@@ -962,7 +962,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-upgrade</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
