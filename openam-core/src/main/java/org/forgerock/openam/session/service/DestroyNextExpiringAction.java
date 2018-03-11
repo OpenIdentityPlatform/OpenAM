@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.TimeUtils;
 
 public class DestroyNextExpiringAction implements QuotaExhaustionAction {
 
@@ -73,12 +74,11 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
 	        }
         if (nextExpiringSessionID != null) 
             try {
-                Session s = new Session(new SessionID(nextExpiringSessionID));
-                	s.refresh(false);
-                debug.error("{} {} {} from {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,s.getClientID(),sessions.size()+1,largestExpTime);
+            		Session s=sessionCache.getSession(new SessionID(nextExpiringSessionID), true, false);
                 s.destroySession(s);
+                debug.error("{} {} {} {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(largestExpTime).getTimeInMillis()));
             } catch (SessionException e) {
-            		debug.error("{} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,sessions.size()+1,largestExpTime,e.toString());
+            		debug.error("{} {} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(largestExpTime).getTimeInMillis()),e.toString());
             }finally {
             		sessions.remove(nextExpiringSessionID);
 			}
