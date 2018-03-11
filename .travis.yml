@@ -1,25 +1,76 @@
 language: java
 matrix:
-    include:
-        - os: linux
-          jdk: oraclejdk8
-        - os: linux
-          jdk: openjdk8
-        - os: osx
-          osx_image: xcode9.1
-    allow_failures:
-        - os: osx
+  include:
+  - os: linux
+    jdk: openjdk8
+    sudo: required
+    services:
+      - docker
+    before_deploy: 
+      - git config --local user.name "Open Identity Platform Community" && git config --local user.email "open-identity-platform-openam@googlegroups.com"
+      - git checkout -f $TRAVIS_BRANCH
+      - git tag -f $git_version && git tag -d $git_version
+      - mvn -q -B -DreleaseVersion="$git_version" -DignoreSnapshots=true  -DpushChanges=false -DscmCommentPrefix="[ci skip] $git_version_last->$git_version " -DskipTests -Darguments=-DskipTests -Dresume=false release:prepare 
+      - git push --quiet --force https://$GITHUBKEY@github.com/$TRAVIS_REPO_SLUG.git >/dev/null 2>&1
+      - git push --quiet --force https://$GITHUBKEY@github.com/$TRAVIS_REPO_SLUG.git $git_version >/dev/null 2>&1
+    deploy:
+      provider: releases
+      draft: false
+      prerelease: false
+      target_commitish: $(git rev-list -n 1 $git_version)
+      tag_name: $git_version
+      name: $git_version
+      body: "compare: $(git rev-list -n 1 $git_version_last)...$(git rev-list -n 1 $git_version)"
+      api_key:
+        secure: bprK7kiogA+nA4TuYU7BHHIPasg2Ve7dG/eZRQ+mJpH2y6GXFBqoEpN2AQECrJ5IgVQZ9WyBc+/PXhjh/VYrg3bvU9lE2zTnkQa5kiPFGnC5cOmqO2dSdUjiBcm3yBO9J3pL//Qsr8g7fv9g5580yMW/NYMs0R70S5ystqjJFSFQHXLkWJBzXQnIyMqjPNsndmqR9lnqX690u298z9H56pNrZqK851NVjTX9WKIoWlVezCSp3nwvAD5tW+p1A0Sy/6kPheYyudEHvHO5zUe33vh3lxB/qqXzIszlEPvIzzcig/ElxTCQ+4eWL34MlGLUzeJ8DdR7JshIPkTrAQ9i5nbOIP0NLu5wfNh642Sl4diGqa+7ioAmhIQuQmBJcOb0l9pP01fLVmgJoPVLGctWpklB9FdNCu96EtHmqj6FmsQzSTpmkfhCjRrgPHQYTZNcl25xdN6GSYZpiP2fYSmp06Wz2mi2OO2gvwjU2iX2b8j/koJ8kWQHrCYamTKbu4X08Vd+lE3EupTBfBzmiPiu8pC5PRi+nmilKdg40lsga++HB3IRRoPYhULo29Yfh6kMmWrP4Pn7RFOyI0Jm5NhLlZW2A5Q+FpEr8qyiLV1eC5RxMlAdaqassz2aWgwxrJC2taF0gUnZbg6w0xa5O0UAl0VAAGAJb2cXl9yJDCkYL18=
+      skip_cleanup: true
+      overwrite: true
+      file_glob: true
+      file: 
+        - "openam-distribution/openam-distribution-kit/target/*.zip"
+        - "openam-distribution/openam-distribution-ssoconfiguratortools/target/*.zip"
+        - "openam-distribution/openam-distribution-fedlet-unconfigured/target/*.zip"
+        - "openam-distribution/openam-distribution-ssoadmintools/target/*.zip"
+        - "openam-console/target/*.war"
+        - "openam-server/target/*.war"
+        - "openam-server-only/target/*.war"
+        - "openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war"
+      on:
+        repo: OpenIdentityPlatform/OpenAM
+        tags: false
+        branch: 
+          - master
+          - travis
+    after_deploy:
+      - echo 'after_deploy'
+      - echo 'build and push Docker'
+      -   docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      -   #docker build ./opendj-packages/opendj-docker/target -t $DOCKER_USERNAME/openam -t $DOCKER_USERNAME/openam:$git_version
+      -   #docker push $DOCKER_USERNAME/openam:$git_version
+      -   #docker push $DOCKER_USERNAME/openam
+  - os: linux
+    jdk: oraclejdk8
+  - os: osx
+    osx_image: xcode9.1
+  allow_failures:
+  - os: osx
 branches:
- only:
-   - master
+  except:
+    - /[0-9]+\.[0-9]+\.[0-9]+$/
 notifications:
- email:
+  email:
   - open-identity-platform-openam@googlegroups.com
 before_install:
- - date -u
- - uname -a
- - env | sort
- - mvn -q -B -DskipTests clean install -f OpenDJ/forgerock-parent
- - mvn -q -B -DskipTests clean install -f OpenDJ
+  - date -u
+  - uname -a
+  - # if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install rpm wine; else sudo apt-get install -y rpm wine; fi 
+  - git fetch -t
+  - export git_version_last="$(git describe --abbrev=0 --tags)"
+  - export git_version="$(echo $git_version_last | awk -F . '{ printf "%d.%d.%d", $1,$2,$3 + 1}')"
+  - env | sort
+  - git log `git describe --tags --abbrev=0 HEAD^`..HEAD --oneline
+install:
+  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/forgerock-parent
+  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P '!man-pages,!distribution'
 script:
- - mvn -q -B clean install
+  - mvn -q -B install 
