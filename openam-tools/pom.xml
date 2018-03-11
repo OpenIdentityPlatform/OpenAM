@@ -54,8 +54,8 @@
 					<stagingDirectory>
 						${project.build.directory}/dependencies/
                     </stagingDirectory>
-					<createChecksum>true</createChecksum>
-					<skipChecksumVerification>false</skipChecksumVerification>
+					<createChecksum>false</createChecksum>
+					<skipChecksumVerification>true</skipChecksumVerification>
 					<force>true</force>
 					<artifactItems>
 						<artifactItem>
