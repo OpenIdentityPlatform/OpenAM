@@ -106,9 +106,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>4.0.0-SNAPSHOT</opendj.server.version>
-        <opendj.sdk.version>4.0.0-SNAPSHOT</opendj.sdk.version>
-        <opendj.server.legacy>4.0.0-SNAPSHOT</opendj.server.legacy>
+        <opendj.server.version>4.1.5-SNAPSHOT</opendj.server.version>
+        <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
+        <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
@@ -146,7 +146,7 @@
 		<jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
         <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
         <jdom.version>2.0.1</jdom.version>
-        <je.version>5.0.104</je.version>
+        <je.version>7.5.11</je.version>
         <jersey-bundle.version>1.1.1-ea</jersey-bundle.version>
         <jato.version>2005-05-04</jato.version>
         <cc-ui.version>2008-08-08</cc-ui.version>
