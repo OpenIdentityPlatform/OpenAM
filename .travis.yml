@@ -37,7 +37,7 @@ matrix:
         - "openam-server/target/*.war"
         - "openam-server-only/target/*.war"
         - "openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war"
-        - "openam-distribution/openam-distribution-docker/Dockerfile"
+        - "openam-distribution/openam-distribution-docker/target/Dockerfile"
       on:
         repo: OpenIdentityPlatform/OpenAM
         tags: false

@@ -1,6 +1,6 @@
 FROM tomcat:7.0-jre8
 
-MAINTAINER Open Identity Platform <open-identity-platform@googlegroups.com>
+MAINTAINER Open Identity Platform Community <open-identity-platform-openam@googlegroups.com>
 
 ENV CATALINA_HOME /usr/local/tomcat
 
