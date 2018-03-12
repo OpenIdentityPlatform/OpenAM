@@ -36,6 +36,7 @@
         <module>openam-distribution-ssoadmintools</module>
         <module>openam-distribution-ssoconfiguratortools</module>
         <module>openam-distribution-kit</module>
+        <module>openam-distribution-docker</module>
     </modules>
 </project>
 
