@@ -10,6 +10,8 @@
 
 Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements and Web Services Security.
 
+Cross Domain Single Sign On (CDSSO), SAML 2.0, OAuth 2.0 & OpenID Connect ensure that OpenAM integrates easily with legacy, custom and cloud applications without requiring any modifications. It's a developer-friendly, open-source control solution that allows you to own and protect your users digital identities.
+
 ## License
 This project is licensed under the [Common Development and Distribution License (CDDL)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md). 
 
@@ -23,15 +25,16 @@ Java 1.8+ required
 ## How-to build
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
-mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/forgerock-parent
-mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P '!man-pages,!distribution'
-mvn install 
+mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ/forgerock-parent
+mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ -P '!man-pages,!distribution'
+mvn install -f OpenAM
 ```
 
 ## How-to run after build
 ```bash
 mvn tomcat7:run-war -f OpenAM/openam-server
 ```
+The next step is then to go to [http://localhost:8080](http://localhost:8080) where you'll see the OpenAM welcome page
 
 ## Support and Mailing List Information
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
