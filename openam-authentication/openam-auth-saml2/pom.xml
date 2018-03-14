@@ -18,7 +18,7 @@
     <parent>
         <artifactId>openam-authentication</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>14.0.4-SNAPSHOT</version>
+        <version>14.0.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
