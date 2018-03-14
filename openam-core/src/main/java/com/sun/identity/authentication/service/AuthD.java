@@ -1159,8 +1159,7 @@ public class AuthD implements ConfigurationListener {
             amIdentity = IdUtils.getIdentity(
                 getSSOAuthSession(), idName, orgName);
             if ((amIdentity != null) && (amIdentity.isExists()) && 
-                (amIdentity.getType().equals(idType)) && 
-                (amIdentity.getAttributes() != null)) {
+                (amIdentity.getType().equals(idType)) ) {
                 if (debug.messageEnabled()) {
                     debug.message("AuthD.getIdentity obtained identity" +
                         "using IdUtil.getIdentity: " + amIdentity);
