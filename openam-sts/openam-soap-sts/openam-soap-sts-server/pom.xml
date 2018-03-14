@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-soap-sts</artifactId>
-        <version>14.0.3</version>
+        <version>14.0.4-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM SOAP STS Server</name>
