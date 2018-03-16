@@ -2253,8 +2253,7 @@ public class LoginState {
                     }
                     AMIdentity amIdentity = IdUtils.getIdentity(
                             LazyConfig.AUTHD.getSSOAuthSession(), user, getOrgDN());
-                    if (amIdentity != null &&
-                            amIdentity.getAttributes() != null) {
+                    if (amIdentity != null && amIdentity.isExists()) {
                         amIdentitySet = new HashSet<>();
                         amIdentitySet.add(amIdentity);
                         idt = amIdentity.getType();
