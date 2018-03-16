@@ -94,6 +94,8 @@ public class SearchResultIterator implements Iterator<SMSDataEntry> {
             debug.error("SearchResultIterator.hasNext: reference should be already handled", e);
             return hasNext();
         }
+        if (results!=null)
+        		results.close();
         conn.close();
         return false;
     }

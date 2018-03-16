@@ -20,15 +20,21 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ * 
+ * Portions Copyrighted 2018 3A Systems,LLC
  *
  */
 
 package org.forgerock.openam.entitlement;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.entitlement.ConditionDecision;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Holds the context of the policy evaluation making it available to policy
@@ -46,7 +52,11 @@ public class PrivilegeEvaluatorContext implements Serializable {
      * An entitlement condition decision cache, where the condition decisions are cached based on the condition's JSON
      * representation.
      */
-    private Map<String, ConditionDecision> conditionDecisionCache = new HashMap<String, ConditionDecision>();
+    static private Cache<String, ConditionDecision> conditionDecisionCache = 
+    		CacheBuilder.newBuilder()
+    		.maximumSize(16000)
+    		.expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.condition.cache.ttl", 3*60), TimeUnit.SECONDS).build();
+    
     private static ThreadLocal <PrivilegeEvaluatorContext> currentCtx = new ThreadLocal();
 
     /**
@@ -132,7 +142,7 @@ public class PrivilegeEvaluatorContext implements Serializable {
      *
      * @return the condition decision cache.
      */
-    public Map<String, ConditionDecision> getConditionDecisionCache() {
+    public Cache<String, ConditionDecision> getConditionDecisionCache() {
         return conditionDecisionCache;
     }
 }
