@@ -12,6 +12,7 @@
  *  information: "Portions copyright [year] [name of copyright owner]".
  *
  *  Copyright 2016 ForgeRock AS.
+ *  Portions Copyrighted 2018 3A Systems,LLC
  */
 
 package org.forgerock.openam.entitlement;
@@ -58,7 +59,7 @@ public final class SetupInternalNotificationSubscriptions implements SetupListen
     }
 
     private static final class PolicySetNotificationConsumer implements Consumer {
-        @Override
+
         public void accept(JsonValue notification) {
             JsonValue eventType = notification.get(MESSAGE_ATTR_EVENT_TYPE);
             JsonValue realm = notification.get(MESSAGE_ATTR_REALM);
