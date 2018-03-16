@@ -25,7 +25,8 @@
  * $Id: SMSLdapObject.java,v 1.27 2009/11/20 23:52:56 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- */
+ * Portions Copyrighted 2018 3A Systems,LLC
+  */
 
 package com.sun.identity.sm.ldap;
 
@@ -57,6 +58,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -85,6 +88,8 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 /**
  * This object represents an LDAP entry in the directory server. The UMS have an
  * equivalent class called PersistentObject. The SMS could not integrate with
@@ -118,13 +123,21 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
     static Set<ResultCode> retryErrorCodes = new HashSet<>();
 
-    static int entriesPresentCacheSize = 1000;
+    //static int entriesPresentCacheSize = 1000;
 
     static boolean initializedNotification;
 
-    static Set<String> entriesPresent = Collections.synchronizedSet(new LinkedHashSet<String>());
+    Cache<String,Boolean> entriesPresent = CacheBuilder
+	    .newBuilder()
+	    .maximumSize(16000)
+	    .expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.ldap.cache.ttl", 5*60), TimeUnit.SECONDS)
+	    .build();
 
-    static Set<String> entriesNotPresent = Collections.synchronizedSet(new LinkedHashSet<String>());
+    Cache<String,Boolean> entriesNotPresent = CacheBuilder
+    	    .newBuilder()
+    	    .maximumSize(16000)
+    	    .expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.ldap.cache.ttl", 5*60), TimeUnit.SECONDS)
+    	    .build();
 
     // Other parameters
     static ResourceBundle bundle;
@@ -260,7 +273,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         }
 
         // Check if entry does not exist
-        if (SMSNotificationManager.isCacheEnabled() && entriesNotPresent.contains(dn)) {
+        if (SMSNotificationManager.isCacheEnabled() && entriesNotPresent.getIfPresent(dn)!=null) {
             debug.message("SMSLdapObject:read Entry not present: {} (checked in cache)", dn);
             return null;
         }
@@ -482,36 +495,36 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         int retry = 0;
 
         Set<String> answer = new LinkedHashSet<>();
-        ConnectionEntryReader results;
+
         while (retry <= connNumRetry) {
             debug.message("SMSLdapObject.subEntries() retry: {}", retry);
 
             try (Connection conn = getConnection(token.getPrincipal())) {
                 // Get the sub entries
-                ConnectionEntryReader iterResults = conn.search(request);
-                iterResults.hasNext();
-                results = iterResults;
-                // Construct the results and return
-                try {
-                    while (results != null && results.hasNext()) {
-                        try {
-                            if (results.isReference()) {
-                                debug.warning("Skipping reference result: {}", results.readReference());
-                                continue;
-                            }
-                            SearchResultEntry entry = results.readEntry();
-                            // Check if the attribute starts with "ou="
-                            // Workaround for 3823, where (objectClass=*) is used
-                            if (entry.getName().toString().toLowerCase().startsWith("ou=")) {
-                                answer.add(entry.getName().rdn().getFirstAVA().getAttributeValue().toString());
-                            }
-                        } catch (SearchResultReferenceIOException e) {
-                            debug.error("SMSLdapObject.subEntries: Reference should be handled already for dn {}", dn, e);
-                        }
-                    }
-                } catch (LdapException e) {
-                    debug.warning("SMSLdapObject.subEntries: Error in obtaining sub-entries: {}", dn, e);
-                    throw new SMSException(e, "sms-entry-cannot-obtain");
+                try(ConnectionEntryReader results = conn.search(request)){
+	                results.hasNext();
+	                // Construct the results and return
+	                try {
+	                    while (results != null && results.hasNext()) {
+	                        try {
+	                            if (results.isReference()) {
+	                                debug.warning("Skipping reference result: {}", results.readReference());
+	                                continue;
+	                            }
+	                            SearchResultEntry entry = results.readEntry();
+	                            // Check if the attribute starts with "ou="
+	                            // Workaround for 3823, where (objectClass=*) is used
+	                            if (entry.getName().toString().toLowerCase().startsWith("ou=")) {
+	                                answer.add(entry.getName().rdn().getFirstAVA().getAttributeValue().toString());
+	                            }
+	                        } catch (SearchResultReferenceIOException e) {
+	                            debug.error("SMSLdapObject.subEntries: Reference should be handled already for dn {}", dn, e);
+	                        }
+	                    }
+	                } catch (LdapException e) {
+	                    debug.warning("SMSLdapObject.subEntries: Error in obtaining sub-entries: {}", dn, e);
+	                    throw new SMSException(e, "sms-entry-cannot-obtain");
+	                }
                 }
                 break;
             } catch (LdapException e) {
@@ -589,8 +602,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             boolean ascendingOrder, Set<String> excludes)
             throws SSOException, SMSException {
         try (Connection conn = getConnection(adminPrincipal)){
-            ConnectionEntryReader results = searchObjectsEx(token, startDN, filter,
-                numOfEntries, timeLimit, sortResults, ascendingOrder, conn);
+            ConnectionEntryReader results = searchObjectsEx(token, startDN, filter,numOfEntries, timeLimit, sortResults, ascendingOrder, conn);
             return new SearchResultIterator(results, excludes, conn);
         }
     }
@@ -649,19 +661,18 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         Set<String> answer = new LinkedHashSet<>();
         // Convert LDAP results to DNs
         try (Connection conn = getConnection(token.getPrincipal())) {
-            ConnectionEntryReader results = searchObjects(token, startDN, filter,
-                    numOfEntries, timeLimit, sortResults, ascendingOrder, conn);
-
-            while (results != null && results.hasNext()) {
-                try {
-                    if (results.isEntry()) {
-                        answer.add(results.readEntry().getName().toString());
-                    } else {
-                        debug.warning("SMSLdapObject.search(): ignoring reference", results.readReference());
-                    }
-                } catch (SearchResultReferenceIOException e) {
-                    debug.error("SMSLdapObject.search: reference should already be handled", e);
-                }
+            try(ConnectionEntryReader results = searchObjects(token, startDN, filter,numOfEntries, timeLimit, sortResults, ascendingOrder, conn)){
+	            while (results != null && results.hasNext()) {
+	                try {
+	                    if (results.isEntry()) {
+	                        answer.add(results.readEntry().getName().toString());
+	                    } else {
+	                        debug.warning("SMSLdapObject.search(): ignoring reference", results.readReference());
+	                    }
+	                } catch (SearchResultReferenceIOException e) {
+	                    debug.error("SMSLdapObject.search: reference should already be handled", e);
+	                }
+	            }
             }
         } catch (LdapException e) {
             ResultCode errorCode = e.getResult().getResultCode();
@@ -706,6 +717,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             } catch (LdapException e) {
                 ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry >= connNumRetry) {
+                    if (results!=null)
+            				results.close();
                     debug.warning("SMSLdapObject.search(): LDAP exception in search for filter match: {}", filter, e);
                     throw new SMSException(e, "sms-error-in-searching");
                 }
@@ -735,12 +748,12 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         dn = DN.valueOf(dn).toString().toLowerCase();
         // Check the caches
         if (SMSNotificationManager.isCacheEnabled()) {
-            if (entriesPresent.contains(dn)) {
+            if (entriesPresent.getIfPresent(dn)!=null) {
                 if (debug.messageEnabled()) {
                     debug.message("SMSLdapObject: entry present in cache: " + dn);
                 }
                 return true;
-            } else if (entriesNotPresent.contains(dn)) {
+            } else if (entriesNotPresent.getIfPresent(dn)!=null) {
                 if (debug.messageEnabled()) {
                     debug.message("SMSLdapObject: entry present in not-present-cache: " + dn);
                 }
@@ -755,15 +768,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             // Update the cache
             if (SMSNotificationManager.isCacheEnabled()) {
                 initializeNotification();
-                Set<String> cacheToUpdate = entryExists ? entriesPresent : entriesNotPresent;
-                cacheToUpdate.add(dn);
-                if (cacheToUpdate.size() > entriesPresentCacheSize) {
-                    synchronized (cacheToUpdate) {
-                        if (!cacheToUpdate.isEmpty()) {
-                            cacheToUpdate.remove(cacheToUpdate.iterator().next());
-                        }
-                    }
-                }
+                Cache<String,Boolean> cacheToUpdate = entryExists ? entriesPresent : entriesNotPresent;
+                cacheToUpdate.put(dn,true);
             }
 
             return entryExists;
@@ -842,10 +848,10 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         dn = DN.valueOf(dn).toString().toLowerCase();
         if (type == DELETE) {
             // Remove from entriesPresent Set
-            entriesPresent.remove(dn);
+            entriesPresent.invalidate(dn);
         } else if (type == ADD) {
             // Remove from entriesNotPresent set
-            entriesNotPresent.remove(dn);
+            entriesNotPresent.invalidate(dn);
 
         }
     }
@@ -857,8 +863,8 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             SMSEntry.debug.warning(
                     "SMSLDAPObject: got notifications, all objects changed");
         }
-        entriesPresent.clear();
-        entriesNotPresent.clear();
+        entriesPresent.invalidateAll();;
+        entriesNotPresent.invalidateAll();
     }
 
     /**
@@ -908,12 +914,12 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
                         "SMSLdapObject.searchSubOrganizationNames() retry: " +
                                 retry);
             }
-
             try (Connection conn = getConnection(token.getPrincipal())) {
                 // Get the suborganization names
-                ConnectionEntryReader iterResults = conn.search(request);
-                iterResults.hasNext();
-                return toDNStrings(iterResults, dn, SUBORG_CANNOT_OBTAIN);
+            		try(ConnectionEntryReader iterResults = conn.search(request)){
+	                iterResults.hasNext();
+	                return toDNStrings(iterResults, dn, SUBORG_CANNOT_OBTAIN);
+            		}
             } catch (LdapException e) {
                 ResultCode errorCode = e.getResult().getResultCode();
                 if (!retryErrorCodes.contains(errorCode) || retry >= connNumRetry) {
@@ -1037,44 +1043,37 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         // Should be initialized by AMSDK
     }
 
-    private Set<String> getOrgNames(SSOToken token, String dn, String filter,
-            int numOfEntries, boolean sortResults, boolean ascendingOrder)
-            throws SMSException, SSOException {
-        ConnectionEntryReader results = null;
-        int retry = 0;
-        SearchRequest request = getSearchRequest(dn, filter, SearchScope.WHOLE_SUBTREE, numOfEntries, 0, sortResults,
-                ascendingOrder, getOrgNamingAttribute(), O_ATTR);
-        while (retry <= connNumRetry) {
-            if (debug.messageEnabled()) {
-                debug.message("SMSLdapObject.getOrgNames() retry: "+ retry);
-            }
-
-            try (Connection conn = getConnection(token.getPrincipal())) {
-                // Get the organization names
-                results = conn.search(request);
-                results.hasNext();
-                return toDNStrings(results, dn, ORG_CANNOT_OBTAIN);
-            } catch (LdapException e) {
-                ResultCode errorCode = e.getResult().getResultCode();
-                if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
-                    if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
-                        debug.message("SMSLdapObject.getOrgNames(): org not present: {}", dn);
-                        break;
-                    } else {
-                        debug.warning("SMSLdapObject.getOrgNames: Unable to search for organization names: {}", dn, e);
-                        throw new SMSException(e, "sms-org-cannot-search");
-                    }
-                }
-                retry++;
-                try {
-                    Thread.sleep(connRetryInterval);
-                } catch (InterruptedException ex) {
-                    // ignored
-                }
-            }
-        }
-        return Collections.emptySet();
-    }
+	private Set<String> getOrgNames(SSOToken token, String dn, String filter, int numOfEntries, boolean sortResults, boolean ascendingOrder) throws SMSException, SSOException {
+		int retry = 0;
+		SearchRequest request = getSearchRequest(dn, filter, SearchScope.WHOLE_SUBTREE, numOfEntries, 0, sortResults, ascendingOrder, getOrgNamingAttribute(), O_ATTR);
+		while (retry <= connNumRetry) {
+			if (debug.messageEnabled()) {
+				debug.message("SMSLdapObject.getOrgNames() retry: " + retry);
+			}
+			try (Connection conn = getConnection(token.getPrincipal())) {
+				try (ConnectionEntryReader results = conn.search(request)) {
+					results.hasNext();
+					return toDNStrings(results, dn, ORG_CANNOT_OBTAIN);
+				}
+			} catch (LdapException e) {
+				ResultCode errorCode = e.getResult().getResultCode();
+				if (!retryErrorCodes.contains(errorCode) || retry == connNumRetry) {
+					if (errorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
+						debug.message("SMSLdapObject.getOrgNames(): org not present: {}", dn);
+						break;
+					} else {
+						debug.warning("SMSLdapObject.getOrgNames: Unable to search for organization names: {}", dn, e);
+						throw new SMSException(e, "sms-org-cannot-search");
+					}
+				}
+				retry++;
+				try {
+					Thread.sleep(connRetryInterval);
+				} catch (InterruptedException ex) {}
+			} 
+		}
+		return Collections.emptySet();
+	}
 
     private CharSequence getBundleString(String key, Object... appendables) {
         StringBuilder message = new StringBuilder(bundle.getString(key));

@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *  
+ *  Portions Copyrighted 2018 3A Systems,LLC
  */
 package org.forgerock.openam.entitlement;
 
@@ -106,9 +108,8 @@ public class CachingEntitlementCondition implements EntitlementCondition {
         //different contexts as well.
         final String cacheKey = backingCondition.getClass().getName() + getState();
 
-        synchronized (context) {
-            ConditionDecision cachedResult = context.getConditionDecisionCache()
-                    .get(cacheKey);
+        //synchronized (context) {
+            ConditionDecision cachedResult = context.getConditionDecisionCache().getIfPresent(cacheKey);
 
             if (cachedResult != null) {
                 if (DEBUG.messageEnabled()) {
@@ -123,7 +124,7 @@ public class CachingEntitlementCondition implements EntitlementCondition {
             }
             context.getConditionDecisionCache().put(cacheKey, result);
             return result;
-        }
+        //}
     }
 
     @Override
