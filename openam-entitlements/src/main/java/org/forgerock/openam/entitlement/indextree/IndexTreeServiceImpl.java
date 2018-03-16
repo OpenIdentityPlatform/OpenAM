@@ -12,9 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 3A Systems,LLC
  */
 package org.forgerock.openam.entitlement.indextree;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
@@ -39,8 +43,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides a search implementation that takes on a lazy approach to policy rule retrieval. Policy rules for a given
@@ -58,8 +61,11 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
     private static final String REALM_DN_TEMPLATE =
             "ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,%s";
 
-    private final ConcurrentMap<String, IndexRuleTree> indexTreeCache;
-
+    final Cache<String, IndexRuleTree> indexTreeCache=CacheBuilder.newBuilder()
+    		.maximumSize(16000)
+    		.expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.policy.indextree.cache.ttl", 3*60), TimeUnit.SECONDS)
+    		.build();
+    
     private final IndexChangeManager manager;
     private final PrivilegedAction<SSOToken> adminAction;
     private final ServiceManagementDAO smDAO;
@@ -75,9 +81,7 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         this.smDAO = smDAO;
         this.dnMapper = dnMapper;
 
-        indexTreeCache = new ConcurrentHashMap<String, IndexRuleTree>();
-
-        // Register to the shutdown to clean up appropriate resources.
+       // Register to the shutdown to clean up appropriate resources.
         shutdownManager.addShutdownListener(this);
         // Register interest with the change manager so that this service is notified of changes.
         manager.registerObserver(this);
@@ -117,13 +121,13 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         // It is important to note here that get() is used on the cache as opposed to contains() followed by a get().
         // This is done to make the retrieval of the tree atomic, whereas contains() follow by get() is not atomic
         // and therefore the result of contains() instantly becomes unreliable when get() is reached.
-        indexTree = indexTreeCache.get(realm);
+        indexTree = indexTreeCache.getIfPresent(realm);
 
         if (indexTree == null) {
 
             synchronized (indexTreeCache) {
                 // Double checking mechanism used here to help performance within a synchronised block.
-                indexTree = indexTreeCache.get(realm);
+                indexTree = indexTreeCache.getIfPresent(realm);
 
                 if (indexTree == null) {
                     // Create a new tree instance for the realm.
@@ -197,7 +201,7 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
             ModificationEvent modification = (ModificationEvent)event;
 
             String realm = modification.getRealm();
-            IndexRuleTree tree = indexTreeCache.get(realm);
+            IndexRuleTree tree = indexTreeCache.getIfPresent(realm);
 
             if (tree != null) {
                 String pathIndex = modification.getPathIndex();
@@ -219,7 +223,7 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         } else if (type == ErrorEventType.DATA_LOSS) {
             // Error event received, destroy the cache as policy updates may well have been lost, resulting in cached
             // trees becoming inconsistent. This will force all trees to be reloaded with clean data.
-            indexTreeCache.clear();
+            indexTreeCache.invalidateAll();
 
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Potential policy path index loss, cached index trees cleared.");
