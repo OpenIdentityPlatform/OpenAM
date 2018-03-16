@@ -230,8 +230,8 @@ class AMAccountLockout {
      */
     public boolean isLockedOut() {
         // has this user been locked out.
-        String userDN = loginState.getUserToken();
-        return isLockedOut(userDN);
+        final String userDN = loginState.getUserDN();
+        return isLockedOut((userDN==null)?loginState.getUserToken():userDN);
     }
 
     /**
