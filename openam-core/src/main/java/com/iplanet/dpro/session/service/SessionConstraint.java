@@ -39,6 +39,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.DestroyOldestAction;
 import org.forgerock.openam.session.service.access.SessionQueryManager;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -87,7 +88,9 @@ public class SessionConstraint {
     private static final Debug debug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     private static QuotaExhaustionAction quotaExhaustionAction = null;
-
+    
+    static SessionQueryManager sqm=null;
+   
     static QuotaExhaustionAction getQuotaExhaustionAction() {
     		if (quotaExhaustionAction != null) 
             return quotaExhaustionAction;
@@ -103,6 +106,11 @@ public class SessionConstraint {
         return quotaExhaustionAction;
     }
 
+    static SessionQueryManager getSessionQueryManager(){
+    		if (sqm==null)
+    			sqm=InjectorHolder.getInstance(SessionQueryManager.class);
+    		return sqm;
+    }
     /**
      * Check if the session quota for a given user has been exhausted and
      * perform necessary actions in such as case.
@@ -120,13 +128,22 @@ public class SessionConstraint {
 
         // Step 1: get constraints for the given user via IDRepo
         int quota = getSessionQuota(internalSession);
+        internalSession.putProperty("am.protected.sfo.quota", ""+quota);
 
+        if (quota<1)
+        		return false;
+        
         // Step 2: get the information (session id and expiration
         // time) of all sessions for the given user from all
         // AM servers and/or session repository
-        Map sessions = null;
         try {
-            sessions = InjectorHolder.getInstance(SessionQueryManager.class).getAllSessionsByUUID(internalSession.getUUID());
+            final Map sessions = getSessionQueryManager().getAllSessionsByUUID(internalSession.getUUID());
+         // Step 3: checking the constraints
+            if (sessions != null && SystemProperties.getAsBoolean("org.openidentityplatform.openam.cts.quota.enabled", true)) {
+            		sessions.remove(internalSession.getSessionID().toString());
+	    	        while (sessions.size() >= quota) 
+	    	            reject = getQuotaExhaustionAction().action(internalSession, sessions);
+            }
         } catch (Exception e) {
             if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
                 if (debug.messageEnabled()) {
@@ -149,12 +166,7 @@ public class SessionConstraint {
             }
         }
 
-        // Step 3: checking the constraints
-        while (sessions != null && (sessions.size()-(sessions.containsKey(internalSession.getSessionID().toString())?1:0)) >= quota) {
-            // If the session quota internalSession exhausted, invoke the
-            // pluggin to determine the desired behavior.
-            reject = getQuotaExhaustionAction().action(internalSession, sessions);
-        }
+        
         return reject;
     }
 
