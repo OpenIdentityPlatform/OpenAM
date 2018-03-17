@@ -279,6 +279,7 @@
                                 <include>com/sun/identity/monitoring/SsoServerPolicySvc*</include>
                                 <include>com/sun/identity/monitoring/SsoServerPolicySvcImpl*</include>
 
+							    <include>com/sun/identity/policy/ActionDecision*</include>
                                 <include>com/sun/identity/policy/ChainedException*</include>
                                 <include>com/sun/identity/policy/Conditions*</include>
                                 <include>com/sun/identity/policy/InvalidFormatException*</include>
@@ -316,19 +317,23 @@
                                 <include>com/sun/identity/policy/ActionSchema*</include>
                                 <include>com/sun/identity/policy/ObjectInUseException*</include>
                                 <include>com/sun/identity/policy/plugins/AMIdentitySubject*</include>
+                                <include>com/sun/identity/policy/plugins/HttpURLResourceName*</include>
                                 <include>com/sun/identity/policy/plugins/OrgReferral*</include>
                                 <include>com/sun/identity/policy/plugins/LDAPRoles*</include>
                                 <include>com/sun/identity/policy/plugins/LDAPConnectionPools*</include>
                                 <include>com/sun/identity/policy/plugins/PrefixResourceName*</include>
                                 <include>com/sun/identity/policy/plugins/PrivilegeSubject*</include>
                                 <include>com/sun/identity/policy/plugins/URLResourceName*</include>
+                                <include>com/sun/identity/policy/plugins/IPCondition*</include>
+                                <include>com/sun/identity/policy/plugins/AuthenticatedUsers*</include>
                                 <include>com/sun/identity/policy/remote/PolicyEvaluationException*</include>
                                 <include>com/sun/identity/policy/remote/PolicyRequestHandler*</include>
                                 <include>com/sun/identity/policy/SharedSubject*</include>
                                 <include>com/sun/identity/policy/SubjectEvaluationCache*</include>
                                 <include>com/sun/identity/policy/ValidationErrorHandler*</include>
                                 <include>com/sun/identity/policy/util/PolicyDecisionUtils*</include>
-
+								<include>com/sun/identity/policy/client/*</include>
+								
                                 <include>com/sun/identity/protocol/**</include>
                                 <include>com/sun/identity/security/AMSecurityPropertiesException*</include>
                                 <include>com/sun/identity/security/AdminTokenAction*</include>
