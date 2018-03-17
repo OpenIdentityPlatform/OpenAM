@@ -1,5 +1,5 @@
 ## <img alt="OpenAM Logo" src="https://github.com/OpenIdentityPlatform/OpenAM/raw/master/logo.png" width="300"/>
-[![Latest release](https://img.shields.io/github/release/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/releases/latest)
+[![Latest release](https://img.shields.io/github/release/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/releases)
 [![Build Status](https://travis-ci.org/OpenIdentityPlatform/OpenAM.svg)](https://travis-ci.org/OpenIdentityPlatform/OpenAM)
 [![Issues](https://img.shields.io/github/issues/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/issues)
 [![Last commit](https://img.shields.io/github/last-commit/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/commits/master)
@@ -16,8 +16,8 @@ Cross Domain Single Sign On (CDSSO), SAML 2.0, OAuth 2.0 & OpenID Connect ensure
 This project is licensed under the [Common Development and Distribution License (CDDL)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md). 
 
 ## Downloads 
-* [OpenAM ZIP](https://github.com/OpenIdentityPlatform/OpenAM/releases/latest) (All OS)
-* [OpenAM WAR](https://github.com/OpenIdentityPlatform/OpenAM/releases/latest) (All OS)
+* [OpenAM ZIP](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
+* [OpenAM WAR](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
 * [OpenAM Docker](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
 
 Java 1.8+ required
