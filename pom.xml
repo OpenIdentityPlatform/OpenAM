@@ -50,7 +50,7 @@
     <name>OpenAM Project</name>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>14.0.5-SNAPSHOT</version>
+    <version>14.0.5</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -572,7 +572,7 @@
         <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:OpenIdentityPlatform/OpenAM.git</developerConnection>
         <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
-      	<tag>HEAD</tag>
+      	<tag>14.0.5</tag>
   	</scm>
 
     <!-- Dependency Management -->
