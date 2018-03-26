@@ -211,10 +211,6 @@
             <artifactId>openam-certs</artifactId>
         </dependency>
 
-<!--         <dependency> -->
-<!--             <groupId>org.forgerock.commons.guava</groupId> -->
-<!--             <artifactId>forgerock-guava-cache</artifactId> -->
-<!--         </dependency> -->
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>

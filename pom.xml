@@ -106,7 +106,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>4.1.5</opendj.server.version>
+        <opendj.server.version>4.1.6-SNAPSHOT</opendj.server.version>
         <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
         <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
 
