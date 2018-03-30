@@ -314,7 +314,7 @@
                             <!-- More third party licenses... -->
                             <directory>${project.parent.basedir}/</directory>
                             <includes>
-                                <include>**/LICENSE.md</include>
+                                <include>LICENSE.md</include>
                             </includes>
                             <targetPath>legal-notices</targetPath>
                         </webResource>
