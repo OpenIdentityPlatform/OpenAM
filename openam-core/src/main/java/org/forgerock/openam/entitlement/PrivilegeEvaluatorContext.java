@@ -52,9 +52,9 @@ public class PrivilegeEvaluatorContext implements Serializable {
      * An entitlement condition decision cache, where the condition decisions are cached based on the condition's JSON
      * representation.
      */
-    static private Cache<String, ConditionDecision> conditionDecisionCache = 
+    private Cache<String, ConditionDecision> conditionDecisionCache = 
     		CacheBuilder.newBuilder()
-    		.maximumSize(16000)
+    		.maximumSize(16)
     		.expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.condition.cache.ttl", 3*60), TimeUnit.SECONDS).build();
     
     private static ThreadLocal <PrivilegeEvaluatorContext> currentCtx = new ThreadLocal();
