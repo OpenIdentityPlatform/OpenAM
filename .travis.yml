@@ -74,6 +74,6 @@ before_install:
   - git log `git describe --tags --abbrev=0 HEAD^ --always`..HEAD --oneline 
 install:
   - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/forgerock-parent
-  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P '!man-pages,!distribution'
+  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P\!distribution
 script:
   - mvn -B install 

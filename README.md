@@ -29,7 +29,7 @@ Java 1.8+ required
 ```bash
 git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
 mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ/forgerock-parent
-mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ -P '!man-pages,!distribution'
+mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ -P\!distribution
 mvn install -f OpenAM
 ```
 
