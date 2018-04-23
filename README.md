@@ -37,7 +37,7 @@ mvn install -f OpenAM
 ```bash
 mvn tomcat7:run-war -f OpenAM/openam-server
 ```
-The next step is then to go to [http://localhost:8080](http://localhost:8080) where you'll see the OpenAM welcome page
+The next step is then to go to [http://localhost:8080/openam](http://localhost:8080/openam) where you'll see the OpenAM welcome page
 
 ## Support and Mailing List Information
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
