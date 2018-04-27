@@ -90,8 +90,8 @@ public class ReCaptcha extends AMLoginModule {
 			debug.error("AMIdentity_isSharedStateField",e);
 		}
 		
-		secret = CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ReCaptcha.secret", "").trim();
-		key = CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ReCaptcha.key", "").trim();
+		secret = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret", "").trim();
+		key = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key", "").trim();
 		
 	}
 	
