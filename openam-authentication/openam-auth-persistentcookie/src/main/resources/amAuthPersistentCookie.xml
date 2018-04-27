@@ -20,7 +20,7 @@
     <Service name="iPlanetAMAuthPersistentCookieService" version="1.0">
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthPersistentCookieService"
-            i18nFileName="amAuthPersistentCookie" revisionNumber="10"
+            i18nFileName="amAuthPersistentCookie" revisionNumber="11"
             i18nKey="persistent-cookie-service-description"
             resourceName="persistentcookie">
 
@@ -86,6 +86,36 @@
                         <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-persistent-cookie-name" type="single" 
+                       i18nKey="openam-auth-persistent-cookie-name"
+                       order="599" resourceName="openam-auth-persistent-cookie-name">
+                       <DefaultValues>
+                           <Value>session-jwt</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="openam-auth-persistent-cookie-input" type="single" 
+                       i18nKey="openam-auth-persistent-cookie-input"
+                       order="601" resourceName="openam-auth-persistent-cookie-input">
+                       <DefaultValues>
+                           <Value></Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="openam-auth-persistent-cookie-field" type="single" 
+                       i18nKey="openam-auth-persistent-cookie-field"
+                       order="602" resourceName="openam-auth-persistent-cookie-field">
+                       <DefaultValues>
+                           <Value></Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema
+                       name="openam-auth-persistent-cookie-field-max"
+                       type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                       i18nKey="openam-auth-persistent-cookie-field-max"
+                       order="603" resourceName="openam-auth-persistent-cookie-field-max">
+	                    <DefaultValues>
+	                        <Value>5</Value>
+	                    </DefaultValues>
+	             </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
@@ -148,6 +178,36 @@
                             <Value>@256_BIT_RANDOM_SECURE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                     <AttributeSchema name="openam-auth-persistent-cookie-name" type="single" 
+                        i18nKey="openam-auth-persistent-cookie-name"
+                        order="599" resourceName="openam-auth-persistent-cookie-name">
+                        <DefaultValues>
+                            <Value>session-jwt</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-persistent-cookie-input" type="single" 
+                        i18nKey="openam-auth-persistent-cookie-input"
+                        order="601" resourceName="openam-auth-persistent-cookie-input">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-persistent-cookie-field" type="single" 
+                        i18nKey="openam-auth-persistent-cookie-field"
+                        order="602" resourceName="openam-auth-persistent-cookie-field">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="openam-auth-persistent-cookie-field-max"
+                        type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="openam-auth-persistent-cookie-field-max"
+                        order="603" resourceName="openam-auth-persistent-cookie-field-max">
+		                    <DefaultValues>
+		                        <Value>5</Value>
+		                    </DefaultValues>
+		             </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

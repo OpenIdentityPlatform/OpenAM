@@ -22,13 +22,16 @@ import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthLoginModulePostAuthenticationPlugin;
 import org.forgerock.openam.utils.ClientUtils;
@@ -37,6 +40,10 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.SMSException;
@@ -73,27 +80,28 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
     @Override
     protected Map<String, Object> generateConfig(HttpServletRequest request, HttpServletResponse response,
                                                  SSOToken ssoToken) throws AuthenticationException {
+    		if (request==null || ssoToken==null)
+    			return Collections.EMPTY_MAP;
 
         try {
-            final String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY);
-            final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY);
-            final boolean enforceClientIP = Boolean.parseBoolean(ssoToken.getProperty(ENFORCE_CLIENT_IP_SETTING_KEY));
-            final String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY);
-            boolean secureCookie = Boolean.parseBoolean(ssoToken.getProperty(SECURE_COOKIE_KEY));
-            boolean httpOnlyCookie = Boolean.parseBoolean(ssoToken.getProperty(HTTP_ONLY_COOKIE_KEY));
-            String cookieName = ssoToken.getProperty(COOKIE_NAME_KEY);
-            String cookieDomainsString = ssoToken.getProperty(COOKIE_DOMAINS_KEY);
+            final String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY,true);
+            final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY,true);
+            final boolean enforceClientIP = Boolean.parseBoolean(ssoToken.getProperty(ENFORCE_CLIENT_IP_SETTING_KEY,true));
+            final String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY,true);
+            boolean secureCookie = Boolean.parseBoolean(ssoToken.getProperty(SECURE_COOKIE_KEY,true));
+            boolean httpOnlyCookie = Boolean.parseBoolean(ssoToken.getProperty(HTTP_ONLY_COOKIE_KEY,true));
+            String cookieName = ssoToken.getProperty(COOKIE_NAME_KEY,true);
+            String cookieDomainsString = ssoToken.getProperty(COOKIE_DOMAINS_KEY,true);
             Collection<String> cookieDomains;
-            if (cookieDomainsString.isEmpty()) {
+            if (StringUtils.isBlank(cookieDomainsString)) {
                 cookieDomains = Collections.singleton(null);
             } else {
                 cookieDomains = Arrays.asList(cookieDomainsString.split(","));
             }
-            final String hmacKey = AccessController.doPrivileged(new DecodeAction(ssoToken.getProperty(HMAC_KEY)));
+            final String hmacKey = AccessController.doPrivileged(new DecodeAction(ssoToken.getProperty(HMAC_KEY,true)));
             ssoToken.setProperty(HMAC_KEY, "");
 
-            return persistentCookieModuleWrapper.generateConfig(tokenIdleTime, maxTokenLife, enforceClientIP, realm, secureCookie,
-                    httpOnlyCookie, cookieName, cookieDomains, hmacKey);
+            return persistentCookieModuleWrapper.generateConfig(tokenIdleTime, maxTokenLife, enforceClientIP, realm, secureCookie,httpOnlyCookie, cookieName, cookieDomains, hmacKey);
 
         } catch (SSOException | SMSException e) {
             DEBUG.error("Could not initialise the Auth Module", e);
@@ -114,19 +122,41 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
     @Override
     public void onLoginSuccess(MessageInfo messageInfo, Map requestParamsMap, HttpServletRequest request,
                                HttpServletResponse response, SSOToken ssoToken) throws AuthenticationException {
-
+		if (request==null || ssoToken==null)
+			return;
         try {
-            Map<String, Object> contextMap = persistentCookieModuleWrapper.getContextMap(messageInfo);
-
-            contextMap.put(OPENAM_USER_CLAIM_KEY, ssoToken.getPrincipal().getName());
-            contextMap.put(OPENAM_AUTH_TYPE_CLAIM_KEY, ssoToken.getAuthType());
-            contextMap.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
-            contextMap.put(OPENAM_REALM_CLAIM_KEY, ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY));
-            contextMap.put(OPENAM_CLIENT_IP_CLAIM_KEY, ClientUtils.getClientIPAddress(request));
-
-            String jwtString = ssoToken.getProperty(JwtSessionModule.JWT_VALIDATED_KEY);
-            if (jwtString != null) {
-                messageInfo.getMap().put(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.parseBoolean(jwtString));
+            if (StringUtils.equals(ssoToken.getProperty("remember.ignore",true), "1")) 
+        			messageInfo.getMap().put("skipSession",true);
+            else
+            {
+            		final Map<String, Object> contextMap = persistentCookieModuleWrapper.getContextMap(messageInfo);
+            		final String uid=ssoToken.getProperty("Principal",true);
+            		final String realm=ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY,true);
+	            contextMap.put(OPENAM_USER_CLAIM_KEY, uid);
+	            contextMap.put(OPENAM_AUTH_TYPE_CLAIM_KEY, ssoToken.getProperty("AuthType",true));
+	            contextMap.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
+	            contextMap.put(OPENAM_REALM_CLAIM_KEY, realm);
+	            contextMap.put(OPENAM_CLIENT_IP_CLAIM_KEY, ClientUtils.getClientIPAddress(request));
+            
+		        String jwtString = ssoToken.getProperty(JwtSessionModule.JWT_VALIDATED_KEY,true);
+		        if (jwtString != null) {
+		            messageInfo.getMap().put(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.parseBoolean(jwtString));
+		        }
+		        //save last token for next usage
+		        final String repoField=ssoToken.getProperty("openam.repo",true);
+		        if (StringUtils.isNotBlank(repoField)) 
+			        	try{
+			        		final SSOToken admintoken=AccessController.doPrivileged(AdminTokenAction.getInstance());
+				        	final AMIdentity idm=IdUtils.getIdentity(admintoken,uid, realm);
+		            		final Map<String,Set<String>> attrMap=new HashMap<String,Set<String>>(1);
+		            		final Set<String> values=idm.getAttribute(repoField);
+		            		values.add(ssoToken.getTokenID().toString());
+		            		attrMap.put(repoField, values);
+		            		idm.setAttributes(attrMap);
+		            		idm.store();
+			        }catch (IdRepoException e) {
+			        		DEBUG.error("Could not save token", e);
+					}
             }
 
         } catch (SSOException e) {
@@ -157,6 +187,8 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
      */
     @Override
     public void onLogout(HttpServletRequest request, HttpServletResponse response, SSOToken ssoToken) {
+		if (request==null)
+			return;
         try {
             Map<String, Object> config = generateConfig(request, response, ssoToken);
             // The HMAC signing key will be null on logout, but this is rejected by the commons auth module, so
