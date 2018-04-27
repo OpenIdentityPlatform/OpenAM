@@ -1,0 +1,10 @@
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="ReCaptcha" version="1.0" >
+    <Callbacks length="1" order="1" timeout="600" header="Are you human ?" template="ReCaptcha.jsp"  >
+        <PasswordCallback echoPassword="true" >
+            <Prompt> </Prompt>
+        </PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
