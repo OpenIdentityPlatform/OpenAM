@@ -119,13 +119,20 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
      * @param ssoToken {@inheritDoc}
      * @throws AuthenticationException {@inheritDoc}
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void onLoginSuccess(MessageInfo messageInfo, Map requestParamsMap, HttpServletRequest request,
                                HttpServletResponse response, SSOToken ssoToken) throws AuthenticationException {
 		if (request==null || ssoToken==null)
 			return;
         try {
-            if (StringUtils.equals(ssoToken.getProperty("remember.ignore",true), "1")) 
+	        //check remember UI checkbox      
+        		final String FieldUI=ssoToken.getProperty("openam.field.ui",true);
+            if (StringUtils.isNotBlank(FieldUI)
+            		&& !(StringUtils.isNotBlank(ssoToken.getProperty("remember.check",true)) 
+            				|| StringUtils.equalsIgnoreCase("POST",request.getMethod()) && request.getParameter(FieldUI)!=null
+            			)
+            		) 
         			messageInfo.getMap().put("skipSession",true);
             else
             {
@@ -143,7 +150,7 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
 		            messageInfo.getMap().put(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.parseBoolean(jwtString));
 		        }
 		        //save last token for next usage
-		        final String repoField=ssoToken.getProperty("openam.repo",true);
+		        final String repoField=ssoToken.getProperty("openam.field.repo",true);
 		        if (StringUtils.isNotBlank(repoField)) 
 			        	try{
 			        		final SSOToken admintoken=AccessController.doPrivileged(AdminTokenAction.getInstance());

@@ -204,8 +204,9 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
 	            }
 	            setUserSessionProperty(COOKIE_DOMAINS_KEY, cookieDomainsString);
 	            setUserSessionProperty(HMAC_KEY, encryptedHmacKey);
+	            //repo field for tokens
 	            if (StringUtils.isNotBlank(RepoField)) 
-	            		setUserSessionProperty("openam.repo", RepoField);
+	            		setUserSessionProperty("openam.field.repo", RepoField);
 	            
 	            final Subject clientSubject = new Subject();
 	            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),getHttpServletResponse());
@@ -240,9 +241,12 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
         final Jwt jwt = persistentCookieModuleWrapper.validateJwtSessionCookie(messageInfo);
 
         if (jwt == null) {
-            //BAD
-            //disable remember ?
-            setUserSessionProperty("remember.ignore", (StringUtils.isNotBlank(UIField)&&getHttpServletRequest().getParameter(UIField)==null)?"1":"0");
+            //remember check ?
+            if (StringUtils.isNotBlank(UIField)) { 
+            		setUserSessionProperty("openam.field.ui", UIField);
+            		if (StringUtils.equalsIgnoreCase("POST",getHttpServletRequest().getMethod()) && getHttpServletRequest().getParameter(UIField)!=null)
+            			setUserSessionProperty("remember.check", "1");
+            }
             throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
         } else {
             //GOOD
