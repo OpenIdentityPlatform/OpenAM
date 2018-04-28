@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+    <Service name="sunAMAuthReCaptchaService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthReCaptchaService"
+            i18nFileName="amAuthReCaptcha"
+            revisionNumber="10"
+            i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.description">
+
+            <Organization>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key">
+					<DefaultValues>
+						<Value></Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl">
+					<DefaultValues>
+						<Value>https://www.google.com/recaptcha/api.js</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
+					<DefaultValues>
+						<Value>https://www.google.com/recaptcha/api/siteverify</Value>
+					</DefaultValues>
+				</AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret">
+						<DefaultValues>
+							<Value></Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key">
+						<DefaultValues>
+							<Value></Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl">
+						<DefaultValues>
+							<Value>https://www.google.com/recaptcha/api.js</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
+						<DefaultValues>
+							<Value>https://www.google.com/recaptcha/api/siteverify</Value>
+						</DefaultValues>
+					</AttributeSchema>
+                  </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

@@ -58,6 +58,7 @@
         <module>openam-auth-device-id</module>
         <module>openam-auth-saml2</module>
         <module>openam-auth-amster</module>
+        <module>openam-auth-recaptcha</module>
     </modules>
 
     <profiles>
