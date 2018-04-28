@@ -6160,6 +6160,13 @@ public class LoginState {
     }
 
     /**
+     * get orgPostLoginClassSet
+     */
+    public Set<String> getPostLoginClassSet(){
+    			return orgPostLoginClassSet;
+    }
+    
+    /**
      * Indicates the type of post-processing that should be performed.
      */
     enum PostProcessEvent {

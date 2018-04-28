@@ -74,9 +74,9 @@ public class PersistentCookiePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY)).willReturn("TOKEN_IDLE_TIME");
-        given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY)).willReturn("TOKEN_MAX_LIFE");
-        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
+        given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY,true)).willReturn("TOKEN_IDLE_TIME");
+        given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY,true)).willReturn("TOKEN_MAX_LIFE");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains",true)).willReturn("");
 
         //When
         Map<String, Object> config = persistentCookieAuthPAP.generateConfig(request, response, ssoToken);
@@ -94,8 +94,8 @@ public class PersistentCookiePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(ssoToken.getProperty("openam-auth-persistent-cookie-enforce-ip")).willReturn("true");
-        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-enforce-ip",true)).willReturn("true");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains",true)).willReturn("");
 
         //When
         Map<String, Object> config = persistentCookieAuthPAP.generateConfig(request, response, ssoToken);
@@ -120,14 +120,16 @@ public class PersistentCookiePAPTest {
 
         Principal principal = mock(Principal.class);
         given(principal.getName()).willReturn("PRINCIPAL_NAME");
+        given(ssoToken.getProperty("Principal",true)).willReturn("PRINCIPAL_NAME");
 
         SSOTokenID ssoTokenId = mock(SSOTokenID.class);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
 
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(ssoToken.getAuthType()).willReturn("AUTH_TYPE");
+        given(ssoToken.getProperty("AuthType",true)).willReturn("AUTH_TYPE");
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
-        given(ssoToken.getProperty("Organization")).willReturn("ORGANISATION");
+        given(ssoToken.getProperty("Organization",true)).willReturn("ORGANISATION");
 
         //When
         persistentCookieAuthPAP.onLoginSuccess(messageInfo, requestParamsMap, request, response, ssoToken);
@@ -163,10 +165,11 @@ public class PersistentCookiePAPTest {
 
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(ssoToken.getAuthType()).willReturn("AUTH_TYPE");
+        given(ssoToken.getProperty("AuthType",true)).willReturn("AUTH_TYPE");
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
-        given(ssoToken.getProperty("Organization")).willReturn("ORGANISATION");
-        given(ssoToken.getProperty("jwtValidated")).willReturn("true");
-
+        given(ssoToken.getProperty("Organization",true)).willReturn("ORGANISATION");
+        given(ssoToken.getProperty("jwtValidated",true)).willReturn("true");
+        given(ssoToken.getProperty("Principal",true)).willReturn("PRINCIPAL_NAME");
         //When
         persistentCookieAuthPAP.onLoginSuccess(messageInfo, requestParamsMap, request, response, ssoToken);
 
