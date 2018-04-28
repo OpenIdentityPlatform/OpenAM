@@ -18,13 +18,18 @@ package org.forgerock.openam.authentication.modules.persistentcookie;
 
 import static org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookieModuleWrapper.*;
 
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.message.MessageInfo;
 
@@ -37,8 +42,14 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.ClientUtils;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.LoginState;
+import com.sun.identity.authentication.service.LoginStateCallback;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -67,6 +78,10 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
     private Collection<String> cookieDomains;
     private String encryptedHmacKey;
 
+    private String UIField;
+    private String RepoField;
+    private Integer MaxTokens;
+    
     private Principal principal;
 
     private final PersistentCookieModuleWrapper persistentCookieModuleWrapper;
@@ -121,15 +136,38 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
         httpOnlyCookie = CollectionHelper.getBooleanMapAttr(options, HTTP_ONLY_COOKIE_KEY, true);
         cookieName = CollectionHelper.getMapAttr(options, COOKIE_NAME_KEY);
         cookieDomains = coreWrapper.getCookieDomainsForRequest(getHttpServletRequest());
+//      openam-auth-persistent-cookie-input=The name of the check box, which means that the function is enabled by the user
+//      openam-auth-persistent-cookie-field=The name of the field in the repository in which the issued tokens are stored
+//      openam-auth-persistent-cookie-field-max=Maximum number of tokens (devices) per user
+        UIField=	CollectionHelper.getMapAttr(options, "openam-auth-persistent-cookie-input");
+        RepoField=CollectionHelper.getMapAttr(options, "openam-auth-persistent-cookie-field");
+        String MaxTokensString = CollectionHelper.getMapAttr(options, "openam-auth-persistent-cookie-field-max");
+        if (StringUtils.isEmpty(MaxTokensString)) {
+            DEBUG.warning("MaxTokens not set. Defaulting to 5");
+            MaxTokensString = "5";
+        }
+        MaxTokens = Integer.parseInt(MaxTokensString);
+        
         String hmacKey = CollectionHelper.getMapAttr(options, HMAC_KEY);
-
         // As this key will need to be passed via session properties to the post-authentication plugin, we encrypt it
         // here to avoid it being accidentally exposed.
         encryptedHmacKey = AccessController.doPrivileged(new EncodeAction(hmacKey));
 
         try {
-            return persistentCookieModuleWrapper.generateConfig(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP,
-                    getRequestOrg(), secureCookie, httpOnlyCookie, cookieName, cookieDomains, hmacKey);
+        		//add post processing
+        		try {
+	        		Callback[] callbacks = new Callback[1];
+	        		callbacks[0] = new LoginStateCallback();
+	        		CallbackHandler handler=getCallbackHandler();
+			    if (handler!= null) {
+			        handler.handle(callbacks);
+			        LoginState ls=((LoginStateCallback) callbacks[0]).getLoginState();
+			        ls.getPostLoginClassSet().add("org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookieAuthModulePostAuthenticationPlugin");
+			    }
+        		}catch (UnsupportedCallbackException|IOException e) {
+        			DEBUG.error("Error get LoginState", e);
+			}
+        		return persistentCookieModuleWrapper.generateConfig(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP,getRequestOrg(), secureCookie, httpOnlyCookie, cookieName, cookieDomains, hmacKey);
         } catch (SMSException e) {
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
@@ -150,37 +188,39 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
      */
     @Override
     public int process(Callback[] callbacks, int state) throws LoginException {
-
         switch (state) {
-        case ISAuthConstants.LOGIN_START: {
-            setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, tokenIdleTime.toString());
-            setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, maxTokenLife.toString());
-            setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
-            setUserSessionProperty(SECURE_COOKIE_KEY, Boolean.toString(secureCookie));
-            setUserSessionProperty(HTTP_ONLY_COOKIE_KEY, Boolean.toString(httpOnlyCookie));
-            if (cookieName != null) {
-                setUserSessionProperty(COOKIE_NAME_KEY, cookieName);
-            }
-            String cookieDomainsString = "";
-            for (String cookieDomain : cookieDomains) {
-                cookieDomainsString += cookieDomain + ",";
-            }
-            setUserSessionProperty(COOKIE_DOMAINS_KEY, cookieDomainsString);
-            setUserSessionProperty(HMAC_KEY, encryptedHmacKey);
-            final Subject clientSubject = new Subject();
-            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),
-                    getHttpServletResponse());
-            if (process(messageInfo, clientSubject, callbacks)) {
-                if (principal != null) {
-                    setAuthenticatingUserName(principal.getName());
-                }
-                return ISAuthConstants.LOGIN_SUCCEED;
-            }
-            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
-        }
-        default: {
-            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "incorrectState", null);
-        }
+	        case ISAuthConstants.LOGIN_START: {
+	            setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, tokenIdleTime.toString());
+	            setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, maxTokenLife.toString());
+	            setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
+	            setUserSessionProperty(SECURE_COOKIE_KEY, Boolean.toString(secureCookie));
+	            setUserSessionProperty(HTTP_ONLY_COOKIE_KEY, Boolean.toString(httpOnlyCookie));
+	            if (cookieName != null) {
+	                setUserSessionProperty(COOKIE_NAME_KEY, cookieName);
+	            }
+	            String cookieDomainsString = "";
+	            for (String cookieDomain : cookieDomains) {
+	                cookieDomainsString += cookieDomain + ",";
+	            }
+	            setUserSessionProperty(COOKIE_DOMAINS_KEY, cookieDomainsString);
+	            setUserSessionProperty(HMAC_KEY, encryptedHmacKey);
+	            //repo field for tokens
+	            if (StringUtils.isNotBlank(RepoField)) 
+	            		setUserSessionProperty("openam.field.repo", RepoField);
+	            
+	            final Subject clientSubject = new Subject();
+	            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),getHttpServletResponse());
+	            if (process(messageInfo, clientSubject, callbacks)) {
+	                if (principal != null) {
+	                    setAuthenticatingUserName(principal.getName());
+	                }
+	                return ISAuthConstants.LOGIN_SUCCEED;
+	            }
+	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
+	        }
+	        default: {
+	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "incorrectState", null);
+	        }
         }
     }
 
@@ -201,7 +241,12 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
         final Jwt jwt = persistentCookieModuleWrapper.validateJwtSessionCookie(messageInfo);
 
         if (jwt == null) {
-            //BAD
+            //remember check ?
+            if (StringUtils.isNotBlank(UIField)) { 
+            		setUserSessionProperty("openam.field.ui", UIField);
+            		if (StringUtils.equalsIgnoreCase("POST",getHttpServletRequest().getMethod()) && getHttpServletRequest().getParameter(UIField)!=null)
+            			setUserSessionProperty("remember.check", "1");
+            }
             throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
         } else {
             //GOOD
@@ -231,7 +276,30 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
                 }
             };
 
-            setUserSessionProperty(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.TRUE.toString());
+            //test and remove before session
+            if (StringUtils.isNotBlank(RepoField)) 
+	            	try{
+	            		final SSOToken admintoken=AccessController.doPrivileged(AdminTokenAction.getInstance());
+	            		final AMIdentity idm=IdUtils.getIdentity(admintoken,username, getRequestOrg());
+	            		final Map<String,Set<String>> attrMap=new HashMap<String,Set<String>>(1);
+	            		final Set<String> values=idm.getAttribute(RepoField);
+	            		attrMap.put(RepoField, values);
+	            		try {
+		            		//test current
+		            		if (!values.remove(claimsSetContext.get("openam.sid"))) //unknown token
+		            			throw new AuthLoginException("Token expired");
+	            		}finally {
+		            		//limit old
+		            		while (values.size()>=MaxTokens)
+		            			values.remove(values.iterator().next());
+						idm.setAttributes(attrMap);
+            				idm.store();
+	            		}
+	            }catch (Exception e) {
+	            		throw new AuthLoginException("Token expired");
+				}
+            else
+            		setUserSessionProperty(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.TRUE.toString());
 
             return true;
         }

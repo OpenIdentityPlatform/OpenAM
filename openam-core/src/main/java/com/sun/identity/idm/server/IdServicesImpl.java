@@ -83,6 +83,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -2490,8 +2491,7 @@ public class IdServicesImpl implements IdServices {
                             * create a new Set so that we do not alter the set
                             * that is referenced in setOfMaps
                             */
-                           resultSet = new HashSet((Set)
-                                   currMap.get(thisAttr));
+                           resultSet = new LinkedHashSet<String>((Set)currMap.get(thisAttr));
                            resultMap.put(thisAttr, resultSet);
                        }
                    } else { // binary attributes
