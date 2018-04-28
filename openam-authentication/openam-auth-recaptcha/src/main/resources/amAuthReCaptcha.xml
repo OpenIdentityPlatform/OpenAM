@@ -31,7 +31,18 @@
 						<Value></Value>
 					</DefaultValues>
 				</AttributeSchema>
-				
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl">
+					<DefaultValues>
+						<Value>https://www.google.com/recaptcha/api.js</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
+					<DefaultValues>
+						<Value>https://www.google.com/recaptcha/api/siteverify</Value>
+					</DefaultValues>
+				</AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
                         type="single"
@@ -51,6 +62,18 @@
 						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key">
 						<DefaultValues>
 							<Value></Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl">
+						<DefaultValues>
+							<Value>https://www.google.com/recaptcha/api.js</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
+						<DefaultValues>
+							<Value>https://www.google.com/recaptcha/api/siteverify</Value>
 						</DefaultValues>
 					</AttributeSchema>
                   </SubSchema>

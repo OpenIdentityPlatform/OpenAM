@@ -53,7 +53,7 @@
             <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
             <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
             <script language="JavaScript" src="<%= ServiceURI%>/js/auth.js" type="text/javascript"></script>
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <script src="${requestScope['g-recaptcha-js-url']}" async defer></script>
             <jato:content name="validContent">
                 <script language="JavaScript" type="text/javascript">
                     <!--

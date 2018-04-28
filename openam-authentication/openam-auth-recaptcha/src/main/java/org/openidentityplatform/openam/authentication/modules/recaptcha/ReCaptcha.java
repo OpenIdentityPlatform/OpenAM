@@ -54,7 +54,7 @@ public class ReCaptcha extends AMLoginModule {
 		cm.setMaxTotal(500);
 	}
 	
-	final static Integer connectTimeout = Integer.parseInt(SystemProperties.get(ReCaptcha.class.getName()+".timeout","300"));
+	final static Integer connectTimeout = Integer.parseInt(SystemProperties.get(ReCaptcha.class.getName()+".timeout","500"));
 	
 	final static RequestConfig requestConfig = RequestConfig.custom()
 		    .setSocketTimeout(connectTimeout)
@@ -77,6 +77,11 @@ public class ReCaptcha extends AMLoginModule {
 	
 	private String key = "";
 	
+	private String jsUrl = "";
+	
+	private String verifyUrl = "";
+
+	
 	@Override
 	@SuppressWarnings("rawtypes") 
 	public void init(Subject subject, Map sharedState, Map options) {
@@ -91,7 +96,13 @@ public class ReCaptcha extends AMLoginModule {
 		}
 		
 		secret = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret", "").trim();
+		
 		key = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key", "").trim();
+		
+		jsUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl", "").trim();
+		
+		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "").trim();
+	
 		
 	}
 	
@@ -106,6 +117,7 @@ public class ReCaptcha extends AMLoginModule {
 		if (getHttpServletRequest()==null)
 			return ISAuthConstants.LOGIN_IGNORE;
 		getHttpServletRequest().setAttribute("g-recaptcha-sitekey", key);
+		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
 		
 		if (in_callbacks.length!=0){
 			Integer CT=0;
@@ -141,12 +153,10 @@ public class ReCaptcha extends AMLoginModule {
 		return state;
 	}
 	
-	final static String VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
-	
 	boolean validateRecaptcha(String token) throws AuthLoginException {
 		boolean result = true;
 		try {
-			HttpPost httpost = new HttpPost(VERIFY_URL);
+			HttpPost httpost = new HttpPost(verifyUrl);
 			
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("secret", secret));
