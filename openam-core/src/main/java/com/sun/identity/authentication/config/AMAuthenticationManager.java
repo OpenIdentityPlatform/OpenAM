@@ -717,9 +717,12 @@ public class AMAuthenticationManager {
             //In case of server mode AMAuthLevelManager will update AMAuthenticationManager about the change, and
             //there is no need to reinitialize the configuration twice. In client mode it is less likely that
             //AMAuthLevelManager listeners are in place, so let's reinitialize to be on the safe side.
-            if (!SystemProperties.isServerMode()) {
-                buildModuleInstanceForService(realm, serviceName);
-            }
+	        
+            //TODO need to find out why AMAuthLevelManager does not update AMAuthenticationManager
+	
+	        //if (!SystemProperties.isServerMode()) {
+	        	buildModuleInstanceForService(realm, serviceName);
+	        //}
             return new AMAuthenticationInstance(name, type, subConfig, schema);
         } catch (Exception e) {
             throw new AMConfigurationException(e);
