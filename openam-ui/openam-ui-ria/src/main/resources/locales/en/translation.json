@@ -328,7 +328,7 @@
             "deactivate": "Deactivate",
             "active": "Active",
             "inactive": "Inactive",
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Join <a href='https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md'>OpenAM</a> Community",
             "build": "Build",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",

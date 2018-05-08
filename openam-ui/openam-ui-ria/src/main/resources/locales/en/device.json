@@ -1,7 +1,7 @@
 {
     "common": {
         "form": {
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Join <a href='https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md'>OpenAM</a> Community",
             "thankYou": "Done!",
             "build": "Build"
         }
