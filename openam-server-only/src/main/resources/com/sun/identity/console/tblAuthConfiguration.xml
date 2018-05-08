@@ -39,7 +39,7 @@
         </cc>
     </actions>
     <column name="configNameColumnLabel" 
-        sortname="tblDataName" rowheader="true">
+        sortname="configNameColumnData" rowheader="true">
 
         <cc name="configActionColumnHREF" 
 	    tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
