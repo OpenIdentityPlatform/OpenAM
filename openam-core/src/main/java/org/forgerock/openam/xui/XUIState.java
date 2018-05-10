@@ -61,7 +61,7 @@ public class XUIState {
             try {
                 ServiceSchema schema = schemaManager.getGlobalSchema();
                 Map defaults = schema.getAttributeDefaults();
-                enabled = SystemProperties.get("XUI.enable") != null &&  Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
+                enabled = Boolean.parseBoolean(SystemProperties.get("XUI.enable", CollectionHelper.getMapAttr(defaults, attribute, "")));
                 if (listenerId == null) {
                     listenerId = schemaManager.addListener(this);
                 }

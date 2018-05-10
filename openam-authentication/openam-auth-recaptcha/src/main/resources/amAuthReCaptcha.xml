@@ -7,8 +7,9 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthReCaptchaService"
             i18nFileName="amAuthReCaptcha"
-            revisionNumber="10"
-            i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.description">
+            revisionNumber="11"
+            i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.description"
+            resourceName="recaptcha">
 
             <Organization>
                 <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
@@ -43,7 +44,7 @@
 						<Value>https://www.google.com/recaptcha/api/siteverify</Value>
 					</DefaultValues>
 				</AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"

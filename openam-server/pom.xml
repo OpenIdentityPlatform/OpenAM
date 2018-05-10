@@ -88,6 +88,7 @@
 						<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
 						<com.iplanet.services.debug.directory />
 						<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
+						<XUI.enable>false</XUI.enable>
 <!-- 						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
 					</systemProperties>
 				</configuration>
