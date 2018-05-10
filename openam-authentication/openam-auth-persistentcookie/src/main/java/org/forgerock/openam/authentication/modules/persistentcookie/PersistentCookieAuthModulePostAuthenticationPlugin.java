@@ -153,10 +153,17 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
 		        final String repoField=ssoToken.getProperty("openam.field.repo",true);
 		        if (StringUtils.isNotBlank(repoField)) 
 			        	try{
+			        		Integer maxTokens=1;
+			        		try {
+			        			maxTokens=Integer.parseInt(ssoToken.getProperty("openam.field.repo.max",true));
+			        		}catch (NumberFormatException e) {}
 			        		final SSOToken admintoken=AccessController.doPrivileged(AdminTokenAction.getInstance());
 				        	final AMIdentity idm=IdUtils.getIdentity(admintoken,uid, realm);
 		            		final Map<String,Set<String>> attrMap=new HashMap<String,Set<String>>(1);
 		            		final Set<String> values=idm.getAttribute(repoField);
+		            		//limit old
+		            		while (values.size()>=maxTokens)
+		            			values.remove(values.iterator().next());
 		            		values.add(ssoToken.getTokenID().toString());
 		            		attrMap.put(repoField, values);
 		            		idm.setAttributes(attrMap);

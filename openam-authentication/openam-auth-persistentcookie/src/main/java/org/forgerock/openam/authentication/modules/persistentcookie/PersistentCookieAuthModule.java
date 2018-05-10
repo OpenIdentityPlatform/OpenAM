@@ -205,8 +205,10 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
 	            setUserSessionProperty(COOKIE_DOMAINS_KEY, cookieDomainsString);
 	            setUserSessionProperty(HMAC_KEY, encryptedHmacKey);
 	            //repo field for tokens
-	            if (StringUtils.isNotBlank(RepoField)) 
+	            if (StringUtils.isNotBlank(RepoField)) { 
 	            		setUserSessionProperty("openam.field.repo", RepoField);
+	            		setUserSessionProperty("openam.field.repo.max", MaxTokens==null?"1":MaxTokens.toString());
+	            }
 	            
 	            final Subject clientSubject = new Subject();
 	            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),getHttpServletResponse());
@@ -284,17 +286,11 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
 	            		final Map<String,Set<String>> attrMap=new HashMap<String,Set<String>>(1);
 	            		final Set<String> values=idm.getAttribute(RepoField);
 	            		attrMap.put(RepoField, values);
-	            		try {
-		            		//test current
-		            		if (!values.remove(claimsSetContext.get("openam.sid"))) //unknown token
-		            			throw new AuthLoginException("Token expired");
-	            		}finally {
-		            		//limit old
-		            		while (values.size()>=MaxTokens)
-		            			values.remove(values.iterator().next());
-						idm.setAttributes(attrMap);
-            				idm.store();
-	            		}
+	            		//test current
+	            		if (!values.remove(claimsSetContext.get("openam.sid"))) //unknown token
+	            			throw new AuthLoginException("Token expired");
+	            		idm.setAttributes(attrMap);
+        				idm.store();
 	            }catch (Exception e) {
 	            		throw new AuthLoginException("Token expired");
 				}
