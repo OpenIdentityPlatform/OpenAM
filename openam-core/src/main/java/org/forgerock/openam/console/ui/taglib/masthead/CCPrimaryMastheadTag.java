@@ -45,7 +45,7 @@ public class CCPrimaryMastheadTag extends com.sun.web.ui.taglib.masthead.CCPrima
     @Override
     protected void appendGeneralLinks(NonSyncStringBuffer buffer) throws JspException {
     	//TODO migrate to CCHrefTag
-    	String switchToXUI = "<a href=\""+CONTEXT_ROOT.concat("/XUI/")+"\" class=\"MstLnkLft\" title=\"Switch to XUI\"  target=\"_top\">Switch to XUI</a>";
+    	String switchToXUI = "<a href=\""+CONTEXT_ROOT.concat("/XUI/?relam=/")+"\" class=\"MstLnkLft\" title=\"Switch to XUI\"  target=\"_top\">Switch to XUI</a>";
     	buffer.append(switchToXUI);
     	super.appendGeneralLinks(buffer);
     }
