@@ -197,6 +197,12 @@ define([
                                     "icon": "fa fa-bookmark-o"
                                 }],
                                 "visibleToRoles": ["ui-global-admin"]
+                            },
+                            "switchLegacyUI": {
+                                "url": "../task/Home",
+                                "name": "config.AppConfiguration.Navigation.links.switchLegacyUI",
+                                "icon": "fa fa-terminal hidden-md",
+                                "visibleToRoles": ["ui-global-admin"]
                             }
                         }
                     },
