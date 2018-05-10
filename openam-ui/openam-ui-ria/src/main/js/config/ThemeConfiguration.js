@@ -53,7 +53,7 @@ define({
                 // The footer is displayed on every page.
                 footer: {
                     // A contact email address.
-                    mailto: "open-identity-platform-openig@googlegroups.com",
+                    mailto: "open-identity-platform-openam@googlegroups.com",
                     // A contact phone number. If empty, it will not be displayed.
                     phone: ""
                 }
