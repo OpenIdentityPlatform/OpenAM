@@ -31,7 +31,7 @@
                         i18nKey="a001"
                         order="100" resourceName="idleTimeout">
                     <DefaultValues>
-                        <Value>5</Value>
+                        <Value>1440</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema
@@ -40,7 +40,7 @@
                         i18nKey="a002"
                         order="200" resourceName="maxLife">
                     <DefaultValues>
-                        <Value>5</Value>
+                        <Value>8760</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema
@@ -113,7 +113,7 @@
                        i18nKey="openam-auth-persistent-cookie-field-max"
                        order="603" resourceName="openam-auth-persistent-cookie-field-max">
 	                    <DefaultValues>
-	                        <Value>5</Value>
+	                        <Value>1</Value>
 	                    </DefaultValues>
 	             </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
@@ -123,7 +123,7 @@
                             i18nKey="a001"
                             order="100" resourceName="idleTimeout">
                         <DefaultValues>
-                            <Value>5</Value>
+                            <Value>1440</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
@@ -132,7 +132,7 @@
                             i18nKey="a002"
                             order="200" resourceName="maxLife">
                         <DefaultValues>
-                            <Value>5</Value>
+                            <Value>8760</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
@@ -205,7 +205,7 @@
                         i18nKey="openam-auth-persistent-cookie-field-max"
                         order="603" resourceName="openam-auth-persistent-cookie-field-max">
 		                    <DefaultValues>
-		                        <Value>5</Value>
+		                        <Value>1</Value>
 		                    </DefaultValues>
 		             </AttributeSchema>
                 </SubSchema>
