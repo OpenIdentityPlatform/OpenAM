@@ -25,6 +25,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
@@ -61,7 +62,7 @@ public class XUIState {
             try {
                 ServiceSchema schema = schemaManager.getGlobalSchema();
                 Map defaults = schema.getAttributeDefaults();
-                enabled = SystemProperties.get("XUI.enable") != null &&  Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
+                enabled = !CookieUtils.isCookieHttpOnly() && Boolean.parseBoolean(SystemProperties.get("XUI.enable", CollectionHelper.getMapAttr(defaults, attribute, "")));
                 if (listenerId == null) {
                     listenerId = schemaManager.addListener(this);
                 }

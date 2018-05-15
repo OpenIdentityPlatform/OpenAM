@@ -345,6 +345,11 @@ public class CreateServiceConfig {
         entry.save(token);
         cEntry.refresh(entry);
         updateSubEntriesNode(token, entry.getDN());
+        
+        //notify parent org that object has changed
+        ServiceConfigManagerImpl scmImpl = ServiceConfigManagerImpl.
+                getInstance(token, ss.serviceName, ss.ssm.getVersion());
+        scmImpl.objectChanged(entry.getDN(), SMSObjectListener.ADD);
     }
 
     static void checkBaseNodesForOrg(

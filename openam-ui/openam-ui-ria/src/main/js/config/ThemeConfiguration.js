@@ -29,31 +29,31 @@ define({
                 // This logo is displayed on user profile pages.
                 logo: {
                     // The URL of the image.
-                    src: "images/logo-horizontal.png",
+                    src: "images/login-logo.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The width of the logo as a CSS length.
-                    width: "202px"
+                    width: "225px"
                 },
                 // This logo is displayed on login pages.
                 loginLogo: {
                     // The URL of the image.
                     src: "images/login-logo.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The height of the logo as a CSS length.
-                    height: "104px",
+                    height: "57px",
                     // The width of the logo as a CSS length.
-                    width: "210px"
+                    width: "225px"
                 },
                 // The footer is displayed on every page.
                 footer: {
                     // A contact email address.
-                    mailto: "info@forgerock.com",
+                    mailto: "open-identity-platform-openam@googlegroups.com",
                     // A contact phone number. If empty, it will not be displayed.
                     phone: ""
                 }
