@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>14.1.3-SNAPSHOT</version>
+        <version>14.1.3</version>
     </parent>
 
     <!-- Component Definition -->
