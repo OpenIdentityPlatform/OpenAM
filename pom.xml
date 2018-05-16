@@ -1503,6 +1503,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.forgerock.opendj</groupId>
+        <artifactId>opendj-server-legacy</artifactId>
+        <version>${opendj.server.legacy}</version>
+        <type>zip</type>
+      </dependency>
       <!-- Legacy External Libraries for OpenAM -->
       <!-- We need to eventually ween off of these -->
       <!-- Dependencies for the Build Helper Maven Plugin -->
