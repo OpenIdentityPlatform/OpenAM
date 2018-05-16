@@ -21,6 +21,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 
+import com.sun.identity.authentication.spi.AuthLoginException;
+
 public class OdnoklassnikiProvider implements ProfileProvider {
 
 	private static final ProfileProvider INSTANCE = new OdnoklassnikiProvider();
@@ -44,8 +46,8 @@ public class OdnoklassnikiProvider implements ProfileProvider {
 		System.err.println(profileServiceUrl);
 		try {
 			signRequest(token, parameters, privateKey);
-		} catch(Exception e) { //TODO process signing exception
-			e.printStackTrace();
+		} catch(Exception e) { 
+			throw new AuthLoginException(e);
 		}
 		parameters.put("access_token", token);
 		return HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl(), null,
