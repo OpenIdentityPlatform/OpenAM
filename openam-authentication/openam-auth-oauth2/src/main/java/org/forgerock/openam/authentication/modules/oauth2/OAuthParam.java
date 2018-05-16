@@ -62,8 +62,10 @@ public class OAuthParam {
     static final String KEY_SMTP_PASSWORD = "org-forgerock-auth-oauth-smtp-password";
     static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled";
     static final String KEY_EMAIL_FROM = "org-forgerock-auth-oauth-smtp-email-from";
-
+    static final String KEY_CUSTOM_PROPERTIES = "openam-auth-oauth2-custom-properties";
+    
     public final static String CODE_CHALLENGE_METHOD = "org-forgerock-auth-oauth-code-challenge-method-algorithm";
+        
 
     // openam parameters
     public final static String PARAM_GOTO = "goto";
@@ -115,5 +117,6 @@ public class OAuthParam {
     public final static String ID_TOKEN = "id_token";
     public final static String OIDC_SCOPE = "openid";
     public final static String SCOPE_SEPARATOR = " ";
+    
 }
 
