@@ -277,9 +277,6 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                             validator="MapValueValidator"
                             i18nKey="openam.auth.oauth2.custom.properties"
                             order="3300">
-               		<DefaultValues>
-                    	<Value>[]=</Value>
-                    </DefaultValues>
                 </AttributeSchema>
                 
 
