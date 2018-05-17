@@ -38,7 +38,7 @@
 						<Value>https://www.google.com/recaptcha/api.js</Value>
 					</DefaultValues>
 				</AttributeSchema>
-				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl"
 					type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
 					<DefaultValues>
 						<Value>https://www.google.com/recaptcha/api/siteverify</Value>
@@ -71,7 +71,7 @@
 							<Value>https://www.google.com/recaptcha/api.js</Value>
 						</DefaultValues>
 					</AttributeSchema>
-					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verify.Url"
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl"
 						type="single" syntax="string" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl">
 						<DefaultValues>
 							<Value>https://www.google.com/recaptcha/api/siteverify</Value>
