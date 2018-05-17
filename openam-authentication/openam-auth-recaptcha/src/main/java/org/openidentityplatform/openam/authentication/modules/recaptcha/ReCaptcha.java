@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -18,6 +19,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -89,6 +91,7 @@ public class ReCaptcha extends AMLoginModule {
 	
 	private boolean invisible = false;
 
+	boolean isIPIgnore=false;
 	
 	@Override
 	@SuppressWarnings("rawtypes") 
@@ -112,6 +115,22 @@ public class ReCaptcha extends AMLoginModule {
 		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "https://www.google.com/recaptcha/api/siteverify").trim();
 	
 		invisible = Boolean.parseBoolean(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible", "false"));
+		
+		if(!isIPIgnore && options.get("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore") != null)
+	        for (String ipMask : (Set<String>)options.get("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"))
+	        	try{
+	        		SubnetUtils su=new SubnetUtils(ipMask);
+	        		su.setInclusiveHostCount(true);
+		        	if (su.getInfo().isInRange(getHttpServletRequest().getRemoteAddr())){
+		        		isIPIgnore=true;
+		        		try{
+	        				setUserSessionProperty("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ignore.range", ipMask);
+	        			}catch(AuthLoginException e){}
+		        		break;
+		        	}
+	        	}catch (Throwable e) {
+	        		debug.error("invalid {}: {}",ipMask,e.getMessage());
+				}
 	}
 	
 	boolean userProcessed=false;
@@ -124,6 +143,10 @@ public class ReCaptcha extends AMLoginModule {
 	public int process(Callback[] in_callbacks, int state) throws LoginException {
 		if (getHttpServletRequest()==null)
 			return ISAuthConstants.LOGIN_IGNORE;
+		
+		if(isIPIgnore)
+			return ISAuthConstants.LOGIN_IGNORE;
+		
 		getHttpServletRequest().setAttribute("g-recaptcha-sitekey", key);
 		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
 		getHttpServletRequest().setAttribute("g-recaptcha-invisible", invisible);
