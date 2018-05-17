@@ -18,10 +18,10 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -59,12 +59,13 @@ public class ReCaptcha extends AMLoginModule {
 		cm.setMaxTotal(500);
 	}
 	
-	final static Integer connectTimeout = Integer.parseInt(SystemProperties.get(ReCaptcha.class.getName()+".timeout","500"));
+	final static Integer connectTimeout = Integer.parseInt(SystemProperties.get(ReCaptcha.class.getName()+".connect.timeout","1500"));
+	final static Integer readTimeout = Integer.parseInt(SystemProperties.get(ReCaptcha.class.getName()+".read.timeout","2500"));
 	
 	final static RequestConfig requestConfig = RequestConfig.custom()
 		    .setSocketTimeout(connectTimeout)
 		    .setConnectTimeout(connectTimeout)
-		    .setConnectionRequestTimeout(connectTimeout)
+		    .setConnectionRequestTimeout(readTimeout)
 		    .build();
 	
 	static CloseableHttpClient httpClient = HttpClients.custom()
@@ -104,9 +105,9 @@ public class ReCaptcha extends AMLoginModule {
 		
 		key = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key", "").trim();
 		
-		jsUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl", "").trim();
+		jsUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl", "https://www.google.com/recaptcha/api.js").trim();
 		
-		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "").trim();
+		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "https://www.google.com/recaptcha/api/siteverify").trim();
 	
 		
 	}
@@ -161,26 +162,32 @@ public class ReCaptcha extends AMLoginModule {
 	boolean validateRecaptcha(String token) throws AuthLoginException {
 		boolean result = true;
 		try {
-			HttpPost httpost = new HttpPost(verifyUrl);
+			final HttpPost httpost = new HttpPost(verifyUrl);
 			
-			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+			final List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("secret", secret));
 			nvps.add(new BasicNameValuePair("response", token));
 			nvps.add(new BasicNameValuePair("remoteip", getHttpServletRequest().getRemoteAddr()));
 			
 			httpost.setEntity(new UrlEncodedFormEntity(nvps));
-			HttpResponse response = httpClient.execute(httpost); 
-			String responseBody=EntityUtils.toString(response.getEntity(),"UTF-8");
-			JSONObject jsonResponse = new JSONObject(responseBody);
+			
+			final String responseBody;
+			try (CloseableHttpResponse response = httpClient.execute(httpost)){
+				responseBody=EntityUtils.toString(response.getEntity(),"UTF-8");
+			}
+			final JSONObject jsonResponse = new JSONObject(responseBody);
 			result = jsonResponse.getBoolean("success");
 			if(result) {
 				AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".passed") ,true);
 				setUserSessionProperty(ReCaptcha.class.getName().concat(".passed"),"1");
+			}else {
+				setUserSessionProperty(ReCaptcha.class.getName().concat(".error"),jsonResponse.toString());
+				debug.warning("failed validation: {} request=({})", responseBody, Dump.toString(getHttpServletRequest()));
 			}
 		} catch (Exception e) {
 			AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".ignored.connection-error") ,true);
-			setUserSessionProperty(ReCaptcha.class.getName().concat(".ignored.connection-error"),"1");
-			debug.error("Exception ocurred while validating reCaptcha: error: {0} request=({1})", e.getMessage(), Dump.toString(getHttpServletRequest()));
+			setUserSessionProperty(ReCaptcha.class.getName().concat(".ignored.connection-error"),e.getMessage()==null?e.toString():e.getMessage());
+			debug.error("ignore validation: {} request=({})", e.getMessage()==null?e.toString():e.getMessage(), Dump.toString(getHttpServletRequest()));
 			return true;
 		}
 		return result;
