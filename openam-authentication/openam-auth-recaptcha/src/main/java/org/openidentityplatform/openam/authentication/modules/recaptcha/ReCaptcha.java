@@ -8,6 +8,9 @@ import java.util.Map;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+
+import ru.org.openam.httpdump.Dump;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -28,6 +31,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionID;
+import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -168,8 +173,14 @@ public class ReCaptcha extends AMLoginModule {
 			String responseBody=EntityUtils.toString(response.getEntity(),"UTF-8");
 			JSONObject jsonResponse = new JSONObject(responseBody);
 			result = jsonResponse.getBoolean("success");
+			if(result) {
+				AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".passed") ,true);
+				setUserSessionProperty(ReCaptcha.class.getName().concat(".passed"),"1");
+			}
 		} catch (Exception e) {
-			debug.error("Exception ocurred while validating reCaptcha", e);
+			AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".ignored.connection-error") ,true);
+			setUserSessionProperty(ReCaptcha.class.getName().concat(".ignored.connection-error"),"1");
+			debug.error("Exception ocurred while validating reCaptcha: error: {0} request=({1})", e.getMessage(), Dump.toString(getHttpServletRequest()));
 			return true;
 		}
 		return result;

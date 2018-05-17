@@ -77,3 +77,7 @@ install:
   - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P\!distribution
 script:
   - mvn -B install 
+after_failure:
+  - echo 'remove build commits'
+  - git reset --hard $TRAVIS_COMMIT
+  - git push --quiet --force https://$GITHUBKEY@github.com/$TRAVIS_REPO_SLUG.git >/dev/null 2>&1
