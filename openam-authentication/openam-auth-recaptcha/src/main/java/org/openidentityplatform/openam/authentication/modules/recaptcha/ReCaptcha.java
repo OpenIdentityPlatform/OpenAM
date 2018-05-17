@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -18,6 +19,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -87,6 +89,7 @@ public class ReCaptcha extends AMLoginModule {
 	
 	private String verifyUrl = "";
 
+	boolean isIPIgnore=false;
 	
 	@Override
 	@SuppressWarnings("rawtypes") 
@@ -108,8 +111,22 @@ public class ReCaptcha extends AMLoginModule {
 		jsUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl", "https://www.google.com/recaptcha/api.js").trim();
 		
 		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "https://www.google.com/recaptcha/api/siteverify").trim();
-	
-		
+
+		if(!isIPIgnore && options.get("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore") != null)
+	        for (String ipMask : (Set<String>)options.get("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"))
+	        	try{
+	        		SubnetUtils su=new SubnetUtils(ipMask);
+	        		su.setInclusiveHostCount(true);
+		        	if (su.getInfo().isInRange(getHttpServletRequest().getRemoteAddr())){
+		        		isIPIgnore=true;
+		        		try{
+	        				setUserSessionProperty("org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ignore.range", ipMask);
+	        			}catch(AuthLoginException e){}
+		        		break;
+		        	}
+        	}catch (Throwable e) {
+	        		debug.error("invalid {}: {}",ipMask,e.getMessage());
+		}
 	}
 	
 	boolean userProcessed=false;
@@ -122,6 +139,10 @@ public class ReCaptcha extends AMLoginModule {
 	public int process(Callback[] in_callbacks, int state) throws LoginException {
 		if (getHttpServletRequest()==null)
 			return ISAuthConstants.LOGIN_IGNORE;
+		
+		if(isIPIgnore)
+			return ISAuthConstants.LOGIN_IGNORE;
+		
 		getHttpServletRequest().setAttribute("g-recaptcha-sitekey", key);
 		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
 		
@@ -182,12 +203,12 @@ public class ReCaptcha extends AMLoginModule {
 				setUserSessionProperty(ReCaptcha.class.getName().concat(".passed"),"1");
 			}else {
 				setUserSessionProperty(ReCaptcha.class.getName().concat(".error"),jsonResponse.toString());
-				debug.warning("failed validation: {} request=({})", responseBody, Dump.toString(getHttpServletRequest()));
+				debug.error("failed validation {}: {} request=({})", sharedState.get(getUserKey()),jsonResponse.toString(), Dump.toString(getHttpServletRequest()));
 			}
 		} catch (Exception e) {
 			AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".ignored.connection-error") ,true);
 			setUserSessionProperty(ReCaptcha.class.getName().concat(".ignored.connection-error"),e.getMessage()==null?e.toString():e.getMessage());
-			debug.error("ignore validation: {} request=({})", e.getMessage()==null?e.toString():e.getMessage(), Dump.toString(getHttpServletRequest()));
+			debug.error("ignore validation {}: {} request=({})", sharedState.get(getUserKey()),e.getMessage()==null?e.toString():e.getMessage(), Dump.toString(getHttpServletRequest()));
 			return true;
 		}
 		return result;
