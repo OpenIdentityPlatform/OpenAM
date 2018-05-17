@@ -85,6 +85,8 @@ public class ReCaptcha extends AMLoginModule {
 	private String jsUrl = "";
 	
 	private String verifyUrl = "";
+	
+	private boolean invisible = false;
 
 	
 	@Override
@@ -108,7 +110,7 @@ public class ReCaptcha extends AMLoginModule {
 		
 		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "").trim();
 	
-		
+		invisible = Boolean.parseBoolean(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible", "false"));
 	}
 	
 	boolean userProcessed=false;
@@ -123,6 +125,7 @@ public class ReCaptcha extends AMLoginModule {
 			return ISAuthConstants.LOGIN_IGNORE;
 		getHttpServletRequest().setAttribute("g-recaptcha-sitekey", key);
 		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
+		getHttpServletRequest().setAttribute("g-recaptcha-invisible", invisible);
 		
 		if (in_callbacks.length!=0){
 			Integer CT=0;
