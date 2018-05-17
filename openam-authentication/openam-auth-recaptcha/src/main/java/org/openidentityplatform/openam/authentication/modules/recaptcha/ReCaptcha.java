@@ -182,12 +182,12 @@ public class ReCaptcha extends AMLoginModule {
 				setUserSessionProperty(ReCaptcha.class.getName().concat(".passed"),"1");
 			}else {
 				setUserSessionProperty(ReCaptcha.class.getName().concat(".error"),jsonResponse.toString());
-				debug.warning("failed validation: {} request=({})", responseBody, Dump.toString(getHttpServletRequest()));
+				debug.error("failed validation {}: {} request=({})", sharedState.get(getUserKey()),jsonResponse.toString(), Dump.toString(getHttpServletRequest()));
 			}
 		} catch (Exception e) {
 			AuthD.getSession(new SessionID(getSessionId())).setObject(ReCaptcha.class.getName().concat(".ignored.connection-error") ,true);
 			setUserSessionProperty(ReCaptcha.class.getName().concat(".ignored.connection-error"),e.getMessage()==null?e.toString():e.getMessage());
-			debug.error("ignore validation: {} request=({})", e.getMessage()==null?e.toString():e.getMessage(), Dump.toString(getHttpServletRequest()));
+			debug.error("ignore validation {}: {} request=({})", sharedState.get(getUserKey()),e.getMessage()==null?e.toString():e.getMessage(), Dump.toString(getHttpServletRequest()));
 			return true;
 		}
 		return result;
