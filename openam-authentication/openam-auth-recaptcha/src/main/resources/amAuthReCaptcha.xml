@@ -44,6 +44,16 @@
 						<Value>https://www.google.com/recaptcha/api/siteverify</Value>
 					</DefaultValues>
 				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
+					type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"
+						type="list" syntax="string"
+						i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore">
+				</AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
                         type="single"
@@ -76,6 +86,16 @@
 						<DefaultValues>
 							<Value>https://www.google.com/recaptcha/api/siteverify</Value>
 						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
+						type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"
+						type="list" syntax="string"
+						i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore">
 					</AttributeSchema>
                   </SubSchema>
             </Organization>

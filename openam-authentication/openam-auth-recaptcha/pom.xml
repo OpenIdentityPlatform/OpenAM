@@ -58,6 +58,11 @@
             <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>httpdump</artifactId>
         </dependency>
+       	<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>RELEASE</version>
+		</dependency>
     </dependencies>
 
 </project>
