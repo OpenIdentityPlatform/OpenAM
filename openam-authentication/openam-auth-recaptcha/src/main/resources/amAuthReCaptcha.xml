@@ -7,7 +7,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthReCaptchaService"
             i18nFileName="amAuthReCaptcha"
-            revisionNumber="11"
+            revisionNumber="12"
             i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.description"
             resourceName="recaptcha">
 
@@ -47,13 +47,14 @@
 				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
 					type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
 					<DefaultValues>
-						<Value>false</Value>
+						<Value>true</Value>
 					</DefaultValues>
 				</AttributeSchema>
 				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"
 						type="list" syntax="string"
 						i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore">
 				</AttributeSchema>
+
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.authlevel"
                         type="single"
@@ -90,7 +91,7 @@
 					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
 						type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
 						<DefaultValues>
-							<Value>false</Value>
+							<Value>true</Value>
 						</DefaultValues>
 					</AttributeSchema>
 					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore"
