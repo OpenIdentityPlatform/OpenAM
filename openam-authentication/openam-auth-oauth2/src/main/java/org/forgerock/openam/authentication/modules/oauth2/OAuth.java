@@ -145,7 +145,7 @@ public class OAuth extends AMLoginModule {
 
         // We are being redirected back from an OAuth 2 Identity Provider
         String code = request.getParameter(PARAM_CODE);
-        if (code != null) {
+        if (code != null && state < SET_PASSWORD_STATE) {
             OAuthUtil.debugMessage("OAuth.process(): GOT CODE: " + code);
             state = GET_OAUTH_TOKEN_STATE;
         }
