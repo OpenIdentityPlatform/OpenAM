@@ -110,7 +110,7 @@ public class ReCaptcha extends AMLoginModule {
 		
 		verifyUrl = CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl", "").trim();
 	
-		invisible = Boolean.parseBoolean(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible", "false"));
+		invisible = Boolean.parseBoolean(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible", "true"));
 	}
 	
 	boolean userProcessed=false;

@@ -47,7 +47,7 @@
 				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
 					type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
 					<DefaultValues>
-						<Value>false</Value>
+						<Value>true</Value>
 					</DefaultValues>
 				</AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
@@ -86,7 +86,7 @@
 					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible"
 						type="single" syntax="boolean" i18nKey="org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.invisible">
 						<DefaultValues>
-							<Value>false</Value>
+							<Value>true</Value>
 						</DefaultValues>
 					</AttributeSchema>
                   </SubSchema>
