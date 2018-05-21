@@ -182,6 +182,10 @@ public class ReCaptcha extends AMLoginModule {
 			}
 			pwdCT--;
 			
+			if(System.getProperty("test.ReCaptcha") !=null	
+					&& StringUtils.equalsIgnoreCase(System.getProperty("test.ReCaptcha"), in_code)) //for test
+				return ISAuthConstants.LOGIN_IGNORE;
+			
 			if(validateRecaptcha(in_code)) 
 				return ISAuthConstants.LOGIN_IGNORE;
 			
