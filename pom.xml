@@ -47,7 +47,7 @@
   <name>OpenAM Project</name>
   <groupId>org.forgerock.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.1.4-SNAPSHOT</version>
+  <version>14.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
