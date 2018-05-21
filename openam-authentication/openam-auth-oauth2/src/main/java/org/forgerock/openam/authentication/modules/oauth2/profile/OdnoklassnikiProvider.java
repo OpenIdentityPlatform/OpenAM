@@ -37,7 +37,7 @@ public class OdnoklassnikiProvider implements ProfileProvider {
 	public String getProfile(OAuthConf config, String token) throws LoginException {
 		
 		//profile servce url
-		String profileServiceUrl = "https://api.ok.ru/api/users/getCurrentUser";
+		String profileServiceUrl = config.getProfileServiceUrl();
 		String publicKey = config.getCustomProperties().get(PUBLIC_KEY);
 		String privateKey = config.getClientSecret();
 		Map<String, String> parameters = new HashMap<>();
