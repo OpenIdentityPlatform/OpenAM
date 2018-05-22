@@ -149,9 +149,6 @@ public class ReCaptcha extends AMLoginModule {
 		if (getHttpServletRequest()==null)
 			return ISAuthConstants.LOGIN_IGNORE;
 		
-		if(isIPIgnore)
-			return ISAuthConstants.LOGIN_IGNORE;
-		
 		getHttpServletRequest().setAttribute("g-recaptcha-sitekey", key);
 		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
 		getHttpServletRequest().setAttribute("g-recaptcha-invisible", invisible);
@@ -184,6 +181,9 @@ public class ReCaptcha extends AMLoginModule {
 			
 			if(System.getProperty("test.ReCaptcha") !=null	
 					&& StringUtils.equalsIgnoreCase(System.getProperty("test.ReCaptcha"), in_code)) //for test
+				return ISAuthConstants.LOGIN_IGNORE;
+			
+			if(isIPIgnore) //org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.ip.ignore
 				return ISAuthConstants.LOGIN_IGNORE;
 			
 			if(validateRecaptcha(in_code)) 
