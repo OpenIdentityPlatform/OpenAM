@@ -66,7 +66,7 @@ public class OpenAMClientRegistrationStoreTest {
     private AMIdentityRepositoryFactory identityRepositoryFactory;
 
     @BeforeMethod
-    public void setUpTest() throws org.forgerock.json.resource.NotFoundException {
+    public void setUpTest() throws org.forgerock.json.resource.NotFoundException, SSOException, InvalidClientException, IdRepoException {
         initMocks(this);
         ssoToken = mock(SSOToken.class);
         RealmNormaliser realmNormaliser = mock(RealmNormaliser.class);
@@ -86,7 +86,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getWithOauth2RequestReturnsAgentRegistrationIfJ2eeAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_J2EE, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_J2EE, true, AGENT_NAME);
         OAuth2Request request = createRequest();
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, request);
@@ -97,7 +97,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getWithOauth2RequestReturnsAgentRegistrationIfWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true, AGENT_NAME);
         OAuth2Request request = createRequest();
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, request);
@@ -108,7 +108,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getWithOauth2RequestReturnsAgentRegistrationIfNotJ2eeOrWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true, AGENT_NAME);
         OAuth2Request request = createRequest();
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, request);
@@ -119,7 +119,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getReturnsAgentRegistrationIfJ2eeAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_J2EE, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_J2EE, true, AGENT_NAME);
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, REALM, null);
 
@@ -129,7 +129,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getReturnsAgentRegistrationIfWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_WEB, true, AGENT_NAME);
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, REALM, null);
 
@@ -139,7 +139,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test
     public void getReturnsAgentRegistrationIfNotJ2eeOrWebAgent()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, true, AGENT_NAME);
 
         OpenIdConnectClientRegistration registration = store.get(AGENT_NAME, REALM, null);
 
@@ -149,7 +149,7 @@ public class OpenAMClientRegistrationStoreTest {
     @Test(expectedExceptions = InvalidClientException.class)
     public void getWithOauth2RequestThrowsExceptionIfIdentityIsNotActive()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, false);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, false, AGENT_NAME);
         OAuth2Request request = createRequest();
 
         store.get(AGENT_NAME, request);
@@ -158,17 +158,27 @@ public class OpenAMClientRegistrationStoreTest {
     @Test(expectedExceptions = InvalidClientException.class)
     public void getThrowsExceptionIfIdentityIsNotActive()
             throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
-        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, false);
+        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, false, AGENT_NAME);
+
+        store.get(AGENT_NAME, REALM, null);
+    }
+    
+    @Test(expectedExceptions = InvalidClientException.class)
+    public void getThrowsExceptionIfIdentityNameNotMatch()
+            throws NotFoundException, InvalidClientException, IdRepoException, SSOException {
+        setUpAgent(AgentConfiguration.AGENT_TYPE_OAUTH2, false, AGENT_NAME.toUpperCase());
 
         store.get(AGENT_NAME, REALM, null);
     }
 
-    private void setUpAgent(String agentType, boolean isActive) throws IdRepoException, SSOException {
+    private void setUpAgent(String agentType, boolean isActive, String agentName) throws IdRepoException, SSOException {
         AMIdentity j2eeAgent = mock(AMIdentity.class);
         given(j2eeAgent.getAttribute(IdConstants.AGENT_TYPE))
                 .willReturn(new HashSet<>(Collections.singletonList(agentType)));
         given(j2eeAgent.isActive())
                 .willReturn(isActive);
+        given(j2eeAgent.getName())
+        	.willReturn(agentName);
         IdSearchResults searchResults = mock(IdSearchResults.class);
         given(searchResults.getSearchResults())
                 .willReturn(new HashSet<>(Collections.singletonList(j2eeAgent)));

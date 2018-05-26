@@ -141,7 +141,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
         final SSOToken token = AccessController.doPrivileged(adminTokenAction);
         try {
             final AMIdentity identity = searchIdentity(name, realm, token, request);
-            if (identity.isActive()) {
+            if (identity.isActive() && name.equals(identity.getName())) { //check case sensitivity due to https://tools.ietf.org/html/rfc6749#section-1.9
                 return identity;
             }
             throw failureFactory.getException(request, AUTHENTICATION_FAILURE_MESSAGE);
