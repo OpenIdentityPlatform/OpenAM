@@ -38,7 +38,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthOAuthService"
             i18nFileName="amAuthOAuth"
-            revisionNumber="1"
+            revisionNumber="2"
             i18nKey="description"
             resourceName="oauth2">
 
@@ -268,6 +268,20 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single" syntax="string" i18nKey="oidc.crypto_context_value" order="3100"
                                  resourceName="openidConnectContextValue">
                 </AttributeSchema>
+                
+				<AttributeSchema
+                            name="openam-auth-oauth2-custom-properties"
+                            type="list"
+                            syntax="string"
+                            uitype="maplist"
+                            validator="MapValueValidator"
+                            i18nKey="openam.auth.oauth2.custom.properties"
+                            order="3300">
+               		<DefaultValues>
+                    	<Value>[]=</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                
 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-oauth-client-id"
@@ -494,6 +508,17 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                      type="single" syntax="string" i18nKey="oidc.crypto_context_value" order="3100"
                                      resourceName="openidConnectContextValue">
                     </AttributeSchema>
+                    
+                    <AttributeSchema
+                            name="openam-auth-oauth2-custom-properties"
+                            type="list"
+                            syntax="string"
+                            uitype="maplist"
+                            validator="MapValueValidator"
+                            i18nKey="openam.auth.oauth2.custom.properties"
+                            order="3300">
+	                </AttributeSchema>
+                
                 </SubSchema>
             </Organization>
         </Schema>

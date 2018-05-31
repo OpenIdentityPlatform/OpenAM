@@ -29,16 +29,19 @@ package org.forgerock.openam.authentication.modules.oauth2;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.openam.utils.MappingUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.owasp.esapi.util.CollectionsUtil;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
@@ -85,11 +88,13 @@ public class OAuthConf {
     private String smtpSSLEnabled = "false";
     private String emailFrom = null;
     private String authLevel = "0";
+	private Map<String, String> customProperties = null;
 
     OAuthConf() {
     }
 
-    OAuthConf(Map config) {
+    @SuppressWarnings("unchecked")
+	OAuthConf(Map config) {
         clientId = CollectionHelper.getMapAttr(config, KEY_CLIENT_ID);
         clientSecret = CollectionHelper.getMapAttr(config, KEY_CLIENT_SECRET);
         scope = CollectionHelper.getMapAttr(config, KEY_SCOPE);
@@ -128,6 +133,9 @@ public class OAuthConf {
         smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);
         emailFrom = CollectionHelper.getMapAttr(config, KEY_EMAIL_FROM);
         authLevel = CollectionHelper.getMapAttr(config, KEY_AUTH_LEVEL);
+        
+        customProperties  = CollectionUtils.isNotEmpty((Set<String>)config.get(KEY_CUSTOM_PROPERTIES))  
+        		? MappingUtils.parseMappings((Set<String>) config.get(KEY_CUSTOM_PROPERTIES)) : Collections.EMPTY_MAP;
     }
 
     public int getAuthnLevel() {
@@ -344,9 +352,18 @@ public class OAuthConf {
     public String getClientId() {
         return clientId;
     }
+    
+    public String getClientSecret() {
+    	return clientSecret;
+    }
 
     public boolean isOpenIDConnect() {
         return openIDConnect;
+    }
+    
+    
+    public Map<String, String> getCustomProperties() {
+        return customProperties;
     }
 
 }
