@@ -156,7 +156,7 @@ public class OAuth extends AMLoginModule {
 
         // The Proxy is used to return with a POST to the module
         proxyURL = config.getProxyURL();
-
+        request.setAttribute("SafeURL.ignore",true);
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
                 config.validateConfiguration();
