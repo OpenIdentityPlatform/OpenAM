@@ -152,7 +152,7 @@ public class SessionCuller extends GeneralTaskRunnable {
                     } else {
                         expectedTime = (session.getLatestRefreshTime() + (SessionMeta.getAppSSOTokenRefreshTime() * 60)) * 1000;
                     }
-                    if (expectedTime > System.currentTimeMillis()) {
+                    if (expectedTime > scheduledExecutionTime()) {
                         // Get an instance as required otherwise it causes issues on container restart.
                         SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                         return;
@@ -186,7 +186,7 @@ public class SessionCuller extends GeneralTaskRunnable {
             if (willExpire(session.getMaxSessionTime())) {
                 expectedTime = (session.getLatestRefreshTime() + (session.getMaxSessionTime() * 60)) * 1000;
             }
-            if (expectedTime > System.currentTimeMillis()) {
+            if (expectedTime > scheduledExecutionTime()) {
                 SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                 return;
             }
