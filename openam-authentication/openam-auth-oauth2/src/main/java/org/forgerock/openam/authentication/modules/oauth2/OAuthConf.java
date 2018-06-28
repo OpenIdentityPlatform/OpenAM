@@ -30,6 +30,9 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.forgerock.openam.authentication.modules.oauth2.service.DefaultServiceUrlProvider;
+import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrlProvider;
+import org.forgerock.openam.authentication.modules.oauth2.service.ServiceUrlProvider;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
 import java.io.UnsupportedEncodingException;
@@ -57,6 +60,8 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 public class OAuthConf {
 
     static final String CLIENT = "genericHTML";
+    static final String ESIA_PREFIX = "esia";
+    
     private boolean openIDConnect;
     private String accountProvider;
     // private static Debug debug = Debug.getInstance("amAuth");
@@ -247,23 +252,22 @@ public class OAuthConf {
     public String getScope() {
         return scope;
     }
+    
+    public String getAuthServiceUrl() {
+    	return authServiceUrl;
+    }
 
     public String getAuthServiceUrl(String originalUrl, String state) throws
             AuthLoginException {
+    	
+    	ServiceUrlProvider provider = null;
+    	if(this.authServiceUrl.contains(ESIA_PREFIX))
+    		provider = new ESIAServiceUrlProvider();
+    	else
+    		provider = new DefaultServiceUrlProvider();
+    	
+    	return provider.getServiceUri(this, originalUrl, state);
 
-        try {
-            StringBuilder sb = new StringBuilder(authServiceUrl);
-            addParam(sb, PARAM_CLIENT_ID, clientId);
-            addParam(sb, PARAM_SCOPE, OAuthUtil.oAuthEncode(scope));
-            addParam(sb, PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl));
-            addParam(sb, "response_type", "code");
-            addParam(sb, "state", state);
-            return sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
-                    + "the scope", ex);
-            throw new AuthLoginException("Problem to build the Auth Service URL", ex);
-        }
     }
 
     private void addParam(StringBuilder url, String key, String value) {
@@ -274,30 +278,29 @@ public class OAuthConf {
     public String getTokenServiceUrl(){
         return tokenServiceUrl;
     }
+    
+    public Map<String, String> getTokenServiceGETParameters(String code, String authServiceURL)
+            throws AuthLoginException {
+
+    	ServiceUrlProvider provider = null;
+    	if(this.authServiceUrl.contains(ESIA_PREFIX))
+    		provider = new ESIAServiceUrlProvider();
+    	else
+    		provider = new DefaultServiceUrlProvider();
+    	
+    	return provider.getTokenServiceGETparameters(this, code, authServiceURL);
+    }
 
     public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
             throws AuthLoginException {
 
-        Map<String, String> postParameters = new HashMap<String, String>();
-        if (code == null) {
-            OAuthUtil.debugError("process: code == null");
-            throw new AuthLoginException(BUNDLE_NAME, "authCode == null", null);
-        }
-        OAuthUtil.debugMessage("authentication code: " + code);
-
-        try {
-            postParameters.put(PARAM_CLIENT_ID, clientId);
-            postParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
-            postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
-            postParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
-            postParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-
-        } catch (UnsupportedEncodingException ex) {
-            OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
-                    + "and building the Token Service URL", ex);
-            throw new AuthLoginException("Problem to build the Token Service URL", ex);
-        }
-        return postParameters;
+    	ServiceUrlProvider provider = null;
+    	if(this.authServiceUrl.contains(ESIA_PREFIX))
+    		provider = new ESIAServiceUrlProvider();
+    	else
+    		provider = new DefaultServiceUrlProvider();
+    	
+    	return provider.getTokenServicePOSTparameters(this, code, authServiceURL);
     }
 
     public String getProfileServiceUrl() {

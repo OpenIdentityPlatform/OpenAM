@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -291,7 +292,8 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
-                    String tokenSvcResponse = HttpRequestContent.getInstance().getContentUsingPOST(config.getTokenServiceUrl(), null, null,
+                    String tokenSvcResponse = HttpRequestContent.getInstance().getContentUsingPOST(config.getTokenServiceUrl(), null, 
+                    		config.getTokenServiceGETParameters(code, proxyURL),
                             config.getTokenServicePOSTparameters(code, proxyURL));
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
@@ -493,7 +495,7 @@ public class OAuth extends AMLoginModule {
     }
 
     private String createAuthorizationState() {
-        return new BigInteger(160, new SecureRandom()).toString(Character.MAX_RADIX);
+        return UUID.randomUUID().toString(); //new BigInteger(160, new SecureRandom()).toString(Character.MAX_RADIX);
     }
 
     // Search for the user in the realm, using the instantiated account mapper

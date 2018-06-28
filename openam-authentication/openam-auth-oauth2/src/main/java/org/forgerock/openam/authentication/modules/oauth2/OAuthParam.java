@@ -28,7 +28,7 @@ package org.forgerock.openam.authentication.modules.oauth2;
 public class OAuthParam {
     
     static final String MODULE_NAME = "OAuth";
-    static final String BUNDLE_NAME = "amAuthOAuth";
+    public static final String BUNDLE_NAME = "amAuthOAuth";
 
     static final String KEY_CLIENT_ID = "iplanet-am-auth-oauth-client-id";
     static final String KEY_CLIENT_SECRET = "iplanet-am-auth-oauth-client-secret";

@@ -12,14 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -202,6 +202,21 @@ public class HttpRequestContent {
             }
             return buf.toString();
         }
+    }
+    
+    public Map<String, List<String>> getHeadersUsingHEAD(String serviceUrl) {
+    	Map<String, List<String>> headers = new HashMap<>();
+    	try {
+	    	URL url = new URL(serviceUrl);
+	    	final HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
+	        connection.setDoOutput(true);
+	        connection.setRequestMethod("HEAD");
+	        connection.getResponseCode();
+	        headers = connection.getHeaderFields();
+    	} catch (Exception e) {
+    		DEBUG.warning("OAuth.getHeadersUsingHEAD URL={} caught IOException", serviceUrl, e);
+    	}
+		return headers;
     }
     
     private String getDataString(Map<String, String> params) throws UnsupportedEncodingException {
