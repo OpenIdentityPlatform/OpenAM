@@ -13,7 +13,7 @@ public class ESIATest {
 		ESIAServiceUrlProvider.getSyncOffset();
 	}
 	
-	@Test
+	//@Test
 	public void testSigner() {
 		URL certUrl = ESIATest.class.getClassLoader().getResource("test.crt");
 		URL keyUrl = ESIATest.class.getClassLoader().getResource("test.key");
