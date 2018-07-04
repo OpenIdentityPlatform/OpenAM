@@ -9,6 +9,8 @@ public class ProfileProviderFactory {
 			return OdnoklassnikiProvider.getInstance();
 		if(StringUtils.defaultString(config.getProfileServiceUrl()).contains("vk.com"))
 			return VkontakteProvider.getInstance();
+		if(StringUtils.defaultString(config.getProfileServiceUrl()).contains("esia"))
+			return ESIAProfileProvider.getInstance();
 		return DefaultProfileProvider.getInstance();
 	}
 }
