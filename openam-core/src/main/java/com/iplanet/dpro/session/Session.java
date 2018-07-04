@@ -588,11 +588,11 @@ public class Session implements Blacklistable, AMSession{
         try {
             SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
             operation.logout(this);
-            sessionCache.removeSID(sessionID);
-
         } catch (Exception e) {
             throw new SessionException(e);
-        }
+        } finally {
+        	sessionCache.removeSID(sessionID);
+		}
     }
 
     /**
