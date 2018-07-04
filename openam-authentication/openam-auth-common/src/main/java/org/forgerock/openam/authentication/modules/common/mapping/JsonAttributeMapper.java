@@ -98,6 +98,7 @@ public class JsonAttributeMapper implements AttributeMapper<String> {
                 //put full json response to attribute
                 if("remote-json".equals(responseName)) {
                 	attr.put(localName, CollectionUtils.asSet(jsonText));
+                	continue;
                 }
 
                 if (debug.messageEnabled()) {
