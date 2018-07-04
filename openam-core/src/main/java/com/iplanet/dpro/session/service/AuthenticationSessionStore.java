@@ -17,6 +17,10 @@
 package com.iplanet.dpro.session.service;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,13 +44,21 @@ public class AuthenticationSessionStore {
 
     private final SessionAccessManager sessionAccessManager;
 
+    final ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+    
     @Inject
     public AuthenticationSessionStore(SessionAccessManager sessionAccessManager) {
         this.sessionAccessManager = sessionAccessManager;
+        
+        timer.scheduleAtFixedRate(new Runnable() {
+            public void run() { 
+            	cullExpiredSessions(); 
+            }
+        }, 1,1, TimeUnit.MINUTES);
     }
 
     public void addSession(InternalSession session) {
-        cullExpiredSessions();
+        //cullExpiredSessions(); CPU consuming method
 
         if (session.isStored()) {
             throw new IllegalStateException("Session was added to temporary store when it is already persisted.");
