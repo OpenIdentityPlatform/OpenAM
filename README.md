@@ -19,11 +19,11 @@ This project is licensed under the [Common Development and Distribution License 
 * [OpenAM ZIP](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
 * [OpenAM WAR](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
 * [OpenAM Docker](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
-### Download OpenAM Java Policy Agents:
+### Download OpenAM Policy Agents:
 * [OpenAM Java Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
 * [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#Установка-файлов-бинарной-поставки) (Windows/Linux)
-
-Java 1.8+ required
+* [OpenAM Web Policy Agents Apache 2.2](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
+* [OpenAM Web Policy Agents Apache 2.4](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
 
 ## How-to build
 For windows use:
