@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +36,21 @@ public class ESIAProfileProvider implements ProfileProvider {
 		String profileStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("?embed=(contacts.elements)"), "Bearer " + token,
                 config.getProfileServiceGetParameters());
 		
-		return convertProfileToPLain(profileStr);
+		String docsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/docs?embed=(elements)"), "Bearer " + token,
+                config.getProfileServiceGetParameters());
+		
+		String addrStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/addrs?embed=(elements)"), "Bearer " + token,
+                config.getProfileServiceGetParameters());
+		
+		String orgsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/orgs"), "Bearer " + token,
+                config.getProfileServiceGetParameters());
+		
+
+				
+		return buildProfile(oid, profileStr, docsStr, addrStr, orgsStr);
 	}
 	
-	public String convertProfileToPLain(String profileStr)  {
+	public String buildProfile(String oid, String profileStr, String docsStr, String addrStr, String orgsStr)  {
 		
 		String email = "";
 		String phone = "";
@@ -65,10 +77,39 @@ public class ESIAProfileProvider implements ProfileProvider {
 					homePhone = contact.getString("value").replaceAll("[^\\d]", "");
 				}
 			}
+			profile.put("oid", oid);
 			profile.put("phone", phone);
 			profile.put("email", email);
 			profile.put("workEmail", workEmail);
 			profile.put("homePhone", homePhone);
+			
+			try {
+				JSONObject docs = new JSONObject(docsStr);
+				profile.put("docs", docs);
+			} catch (JSONException e) {
+				logger.warn("error embed docs profile: {}", docsStr, e.toString());
+			}
+			
+			try {
+				JSONObject orgs = new JSONObject(orgsStr);
+				profile.put("orgs", orgs);
+			} catch (JSONException e) {
+				logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
+			}
+			
+			try {
+				JSONObject addrs = new JSONObject(addrStr);
+				profile.put("addrs", addrs);
+			} catch (JSONException e) {
+				logger.warn("error embed addrs profile: {}", addrStr, e.toString());
+			}
+			
+			try {
+				JSONObject orgs = new JSONObject(orgsStr);
+				profile.put("orgs", orgs);
+			} catch (JSONException e) {
+				logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
+			}
 			
 			return profile.toString();
 			
