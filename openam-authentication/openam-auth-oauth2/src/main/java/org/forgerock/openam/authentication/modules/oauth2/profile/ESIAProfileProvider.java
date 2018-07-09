@@ -26,6 +26,8 @@ public class ESIAProfileProvider implements ProfileProvider {
 	
 	public static final String ESIA_ORG_SCOPE = "[esia-org-scope]";
 	
+	static final Pattern ORG_ID_PATTERN = Pattern.compile("(\\d{1,})$");
+	
 	public static ProfileProvider getInstance() {
 		return INSTANCE;
 	}
@@ -56,7 +58,7 @@ public class ESIAProfileProvider implements ProfileProvider {
 		if(config.getCustomProperties().containsKey(ESIA_ORG_SCOPE) 
 				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))) {
 			
-			Pattern p = Pattern.compile("(\\d{1,})$");
+			
 	        
 			ESIAServiceUrlProvider provider = new ESIAServiceUrlProvider();
 			
@@ -65,7 +67,7 @@ public class ESIAProfileProvider implements ProfileProvider {
 				JSONArray orgsArray = orgsJson.getJSONArray("elements");
 				for(int i = 0; i < orgsArray.length(); i++) {
 					String orgUrl = orgsArray.getString(i); 
-					Matcher m = p.matcher(orgUrl);
+					final Matcher m = ORG_ID_PATTERN.matcher(orgUrl);
 					String orgId = "";
 					if(!m.find()) {
 						continue;

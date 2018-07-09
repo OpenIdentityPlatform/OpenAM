@@ -6,18 +6,14 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.CipherInputStream;
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 
