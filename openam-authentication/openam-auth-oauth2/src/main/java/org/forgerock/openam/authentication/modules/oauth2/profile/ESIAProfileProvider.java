@@ -1,11 +1,17 @@
 package org.forgerock.openam.authentication.modules.oauth2.profile;
 
+import java.text.MessageFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
+import org.forgerock.openam.authentication.modules.oauth2.OAuthUtil;
+import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrlProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +23,8 @@ public class ESIAProfileProvider implements ProfileProvider {
 	final static Logger logger = LoggerFactory.getLogger(ESIAProfileProvider.class);
 	
 	private static final ProfileProvider INSTANCE = new ESIAProfileProvider();
+	
+	public static final String ESIA_ORG_SCOPE = "[esia-org-scope]";
 	
 	public static ProfileProvider getInstance() {
 		return INSTANCE;
@@ -45,8 +53,53 @@ public class ESIAProfileProvider implements ProfileProvider {
 		String orgsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/orgs"), "Bearer " + token,
                 config.getProfileServiceGetParameters());
 		
+		if(config.getCustomProperties().containsKey(ESIA_ORG_SCOPE) 
+				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))) {
+			
+			Pattern p = Pattern.compile("(\\d{1,})$");
+	        
+			ESIAServiceUrlProvider provider = new ESIAServiceUrlProvider();
+			
+			try {
+				JSONObject orgsJson = new JSONObject(orgsStr);
+				JSONArray orgsArray = orgsJson.getJSONArray("elements");
+				for(int i = 0; i < orgsArray.length(); i++) {
+					String orgUrl = orgsArray.getString(i); 
+					Matcher m = p.matcher(orgUrl);
+					String orgId = "";
+					if(!m.find()) {
+						continue;
+			        }
+					orgId = m.group();
+					String[] scopes = StringUtils.split(config.getCustomProperties().get(ESIA_ORG_SCOPE), " ");
+					for(int j = 0; j< scopes.length; j ++) {
+						scopes[j] = MessageFormat.format("http://esia.gosuslugi.ru/{0}?org_oid={1}", scopes[j], orgId);
+					}
+					String scope = StringUtils.join(scopes, " ");
+									
+					String tokenSvcResponse = HttpRequestContent.getInstance().getContentUsingPOST(config.getTokenServiceUrl(), 
+							null, 
+	                 		null,
+	                 		provider.getTokenServiceClientPOSTparameters(config, scope));
+	                 OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
+	                 JSONObject orgJsonToken = new JSONObject(tokenSvcResponse);
+	                 String orgToken = orgJsonToken.getString("access_token");
+                 
 
+	         		String orgStr = HttpRequestContent.getInstance().getContentUsingGET("https://esia-portal1.test.gosuslugi.ru/rs/orgs/".concat(orgId), "Bearer " + orgToken,
+	                        config.getProfileServiceGetParameters());
+	         		 
+	         		JSONObject orgJson = new JSONObject(orgStr);
+	         		orgsArray.put(i, orgJson);
+				}
 				
+				orgsStr = orgsJson.toString();
+				
+			} catch (JSONException e) {
+				logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
+			}
+		}
+						
 		return buildProfile(oid, profileStr, docsStr, addrStr, orgsStr);
 	}
 	

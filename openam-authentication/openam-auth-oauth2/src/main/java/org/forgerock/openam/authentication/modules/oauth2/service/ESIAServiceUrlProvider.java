@@ -7,13 +7,11 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARA
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_REDIRECT_URI;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_SCOPE;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,10 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	
 	@Override
 	public String getServiceUri(OAuthConf config, String originalUrl, String state) throws AuthLoginException {
+		return getServiceUri(config, originalUrl, state, config.getScope());
+	}
+
+	public String getServiceUri(OAuthConf config, String originalUrl, String state, String scope) throws AuthLoginException {
 		String uriTemplate = config.getAuthServiceUrl().concat("?client_id={0}&client_secret={1}&redirect_uri={2}&scope={3}&response_type=code&state={4}&timestamp={5}&access_type=offline");
 		String timestamp = getTimeStamp();
 		
@@ -46,9 +48,9 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 			
 			authUrl = MessageFormat.format(uriTemplate, 
 				URLEncoder.encode(config.getClientId(), UTF_8), 
-				URLEncoder.encode(Signer.signString(config.getScope() +timestamp+config.getClientId()+state), UTF_8),
+				URLEncoder.encode(Signer.signString(scope +timestamp+config.getClientId()+state), UTF_8),
 				URLEncoder.encode(originalUrl, UTF_8),
-				URLEncoder.encode(config.getScope(), UTF_8),
+				URLEncoder.encode(scope, UTF_8),
 				URLEncoder.encode(state, UTF_8), 
 				URLEncoder.encode(timestamp, UTF_8));
 		
@@ -60,8 +62,14 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 		
 	}
 	
+	@Override
+	public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, String code, String authServiceURL)
+			throws AuthLoginException {
+		return getTokenServicePOSTparameters(config, code, authServiceURL, config.getScope());
+	}
+	
     public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, 
-    		String code, String authServiceURL)
+    		String code, String authServiceURL, String scope)
             throws AuthLoginException {
 		Map<String, String> parameters = new LinkedHashMap<String, String>();
         if (code == null) {
@@ -75,12 +83,39 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	        parameters.put(PARAM_CLIENT_ID, config.getClientId());
 	        parameters.put(PARAM_CODE, URLEncoder.encode(code, UTF_8));
 	        parameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(config.getScope()+timestamp+config.getClientId()+state), UTF_8));
+	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(scope+timestamp+config.getClientId()+state), UTF_8));
 	        parameters.put(PARAM_REDIRECT_URI, URLEncoder.encode(authServiceURL, UTF_8));
-	        parameters.put(PARAM_SCOPE, URLEncoder.encode(config.getScope(), UTF_8));
+	        parameters.put(PARAM_SCOPE, URLEncoder.encode(scope, UTF_8));
 	        parameters.put("state", URLEncoder.encode(state, UTF_8));
 	        parameters.put("timestamp", URLEncoder.encode(timestamp, UTF_8));
 	        parameters.put("token_type", "Bearer");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+        return parameters;
+    }
+    
+    
+    public Map<String, String> getTokenServiceClientPOSTparameters(OAuthConf config, 
+    		String scope)
+            throws AuthLoginException {
+    	
+    	
+		Map<String, String> parameters = new LinkedHashMap<String, String>();
+        String timestamp = getTimeStamp();
+        String state = UUID.randomUUID().toString();
+        try {
+	        parameters.put(PARAM_CLIENT_ID, config.getClientId());
+	        parameters.put("response_type", "token");
+	        parameters.put(PARAM_SCOPE, URLEncoder.encode(scope, UTF_8));
+	        parameters.put(PARAM_GRANT_TYPE, "client_credentials");
+	        parameters.put("state", URLEncoder.encode(state, UTF_8));
+	        parameters.put("timestamp", URLEncoder.encode(timestamp, UTF_8));
+	        parameters.put("token_type", "Bearer");
+	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(scope+timestamp+config.getClientId()+state), UTF_8));
+	        
+	        
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -121,6 +156,8 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 		cal.setTimeInMillis(timeMills);
 		return format.format(cal.getTime());
 	}
+
+
 
 
 }
