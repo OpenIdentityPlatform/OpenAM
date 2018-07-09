@@ -61,12 +61,6 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	@Override
 	public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, String code, String authServiceURL)
 			throws AuthLoginException {
-		return getTokenServicePOSTparameters(config, code, authServiceURL, config.getScope());
-	}
-	
-    public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, 
-    		String code, String authServiceURL, String scope)
-            throws AuthLoginException {
 		Map<String, String> parameters = new LinkedHashMap<String, String>();
         if (code == null) {
             OAuthUtil.debugError("process: code == null");
@@ -79,9 +73,9 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	        parameters.put(PARAM_CLIENT_ID, config.getClientId());
 	        parameters.put(PARAM_CODE, URLEncoder.encode(code, UTF_8));
 	        parameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(scope+timestamp+config.getClientId()+state), UTF_8));
+	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(config.getScope()+timestamp+config.getClientId()+state), UTF_8));
 	        parameters.put(PARAM_REDIRECT_URI, URLEncoder.encode(authServiceURL, UTF_8));
-	        parameters.put(PARAM_SCOPE, URLEncoder.encode(scope, UTF_8));
+	        parameters.put(PARAM_SCOPE, URLEncoder.encode(config.getScope(), UTF_8));
 	        parameters.put("state", URLEncoder.encode(state, UTF_8));
 	        parameters.put("timestamp", URLEncoder.encode(timestamp, UTF_8));
 	        parameters.put("token_type", "Bearer");
@@ -90,9 +84,9 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 		}
 
         return parameters;
-    }
-    
-    
+	}
+	
+       
     public Map<String, String> getTokenServiceClientPOSTparameters(OAuthConf config, 
     		String scope)
             throws AuthLoginException {
