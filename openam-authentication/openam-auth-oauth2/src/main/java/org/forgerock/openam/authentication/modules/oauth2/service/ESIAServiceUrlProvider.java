@@ -36,10 +36,6 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	
 	@Override
 	public String getServiceUri(OAuthConf config, String originalUrl, String state) throws AuthLoginException {
-		return getServiceUri(config, originalUrl, state, config.getScope());
-	}
-
-	public String getServiceUri(OAuthConf config, String originalUrl, String state, String scope) throws AuthLoginException {
 		String uriTemplate = config.getAuthServiceUrl().concat("?client_id={0}&client_secret={1}&redirect_uri={2}&scope={3}&response_type=code&state={4}&timestamp={5}&access_type=offline");
 		String timestamp = getTimeStamp();
 		
@@ -48,9 +44,9 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 			
 			authUrl = MessageFormat.format(uriTemplate, 
 				URLEncoder.encode(config.getClientId(), UTF_8), 
-				URLEncoder.encode(Signer.signString(scope +timestamp+config.getClientId()+state), UTF_8),
+				URLEncoder.encode(Signer.signString(config.getScope() +timestamp+config.getClientId()+state), UTF_8),
 				URLEncoder.encode(originalUrl, UTF_8),
-				URLEncoder.encode(scope, UTF_8),
+				URLEncoder.encode(config.getScope(), UTF_8),
 				URLEncoder.encode(state, UTF_8), 
 				URLEncoder.encode(timestamp, UTF_8));
 		
@@ -59,8 +55,8 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 		}
 		
 		return authUrl;
-		
 	}
+
 	
 	@Override
 	public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, String code, String authServiceURL)
