@@ -26,6 +26,8 @@ public class ESIAProfileProvider implements ProfileProvider {
 	
 	public static final String ESIA_ORG_SCOPE = "[esia-org-scope]";
 	
+	public static final String ESIA_ORG_INFO_URL = "[esia-org-info-url]";
+	
 	static final Pattern ORG_ID_PATTERN = Pattern.compile("(\\d{1,})$");
 	
 	public static ProfileProvider getInstance() {
@@ -56,10 +58,10 @@ public class ESIAProfileProvider implements ProfileProvider {
                 config.getProfileServiceGetParameters());
 		
 		if(config.getCustomProperties().containsKey(ESIA_ORG_SCOPE) 
-				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))) {
+				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))
+				&& config.getCustomProperties().containsKey(ESIA_ORG_INFO_URL) 
+				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_INFO_URL))) {
 			
-			
-	        
 			ESIAServiceUrlProvider provider = new ESIAServiceUrlProvider();
 			
 			try {
@@ -88,7 +90,7 @@ public class ESIAProfileProvider implements ProfileProvider {
 	                 String orgToken = orgJsonToken.getString("access_token");
                  
 
-	         		String orgStr = HttpRequestContent.getInstance().getContentUsingGET("https://esia-portal1.test.gosuslugi.ru/rs/orgs/".concat(orgId), "Bearer " + orgToken,
+	         		String orgStr = HttpRequestContent.getInstance().getContentUsingGET(config.getCustomProperties().get(ESIA_ORG_INFO_URL).concat(orgId), "Bearer " + orgToken,
 	                        config.getProfileServiceGetParameters());
 	         		 
 	         		JSONObject orgJson = new JSONObject(orgStr);

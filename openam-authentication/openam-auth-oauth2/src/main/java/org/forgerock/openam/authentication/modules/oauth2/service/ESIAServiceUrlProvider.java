@@ -146,8 +146,4 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 		cal.setTimeInMillis(timeMills);
 		return format.format(cal.getTime());
 	}
-
-
-
-
 }
