@@ -218,7 +218,8 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
 	                }
 	                return ISAuthConstants.LOGIN_SUCCEED;
 	            }
-	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
+	            //throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
+	            return ISAuthConstants.LOGIN_IGNORE;
 	        }
 	        default: {
 	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "incorrectState", null);
@@ -249,7 +250,8 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
             		if (StringUtils.equalsIgnoreCase("POST",getHttpServletRequest().getMethod()) && getHttpServletRequest().getParameter(UIField)!=null)
             			setUserSessionProperty("remember.check", "1");
             }
-            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
+            //throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
+            return false;
         } else {
             //GOOD
 
