@@ -503,8 +503,8 @@ public class AMSetupServlet extends HttpServlet {
             isConfiguredFlag = configure(request, map, userRepo);
             if (isConfiguredFlag) {
                 FqdnValidator.getInstance().initialize();
-                //postInitialize was called at the end of configure????
-                postInitialize(getAdminSSOToken());
+                //postInitialize was called at the end of configure???? 
+                //postInitialize(getAdminSSOToken()); //don't think this is necessary
             }
             LoginLogoutMapping.setProductInitialized(isConfiguredFlag);
             registerListeners();
