@@ -45,19 +45,36 @@ public class ESIAProfileProvider implements ProfileProvider {
 		} catch(Exception e) {	
 		}
 		
-		String profileStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("?embed=(contacts.elements)"), "Bearer " + token,
+		String profileStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid), "Bearer " + token,
                 config.getProfileServiceGetParameters());
 		
-		String docsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/docs?embed=(elements)"), "Bearer " + token,
-                config.getProfileServiceGetParameters());
+		String cttsStr = null;
 		
-		String addrStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/addrs?embed=(elements)"), "Bearer " + token,
+		try {
+			cttsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/ctts?embed=(elements)"), "Bearer " + token,
                 config.getProfileServiceGetParameters());
+		} catch (Exception e) {}
 		
-		String orgsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/orgs"), "Bearer " + token,
+		String docsStr = null;
+		try {
+			docsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/docs?embed=(elements)"), "Bearer " + token,
                 config.getProfileServiceGetParameters());
+		} catch (Exception e) {}
 		
-		if(config.getCustomProperties().containsKey(ESIA_ORG_SCOPE) 
+		String addrStr = null;
+		try {
+			addrStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/addrs?embed=(elements)"), "Bearer " + token,
+                config.getProfileServiceGetParameters());
+		} catch (Exception e) {}
+		
+		String orgsStr = null;
+		try { 
+			orgsStr = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl().concat("/").concat(oid).concat("/orgs"), "Bearer " + token,
+                config.getProfileServiceGetParameters());
+		} catch (Exception e) {}
+		
+		
+		if(orgsStr != null && config.getCustomProperties().containsKey(ESIA_ORG_SCOPE) 
 				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))
 				&& config.getCustomProperties().containsKey(ESIA_ORG_INFO_URL) 
 				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_INFO_URL))) {
@@ -104,10 +121,10 @@ public class ESIAProfileProvider implements ProfileProvider {
 			}
 		}
 						
-		return buildProfile(oid, profileStr, docsStr, addrStr, orgsStr);
+		return buildProfile(oid, profileStr, cttsStr, docsStr, addrStr, orgsStr);
 	}
 	
-	public String buildProfile(String oid, String profileStr, String docsStr, String addrStr, String orgsStr)  {
+	public String buildProfile(String oid, String profileStr, String cttsStr, String docsStr, String addrStr, String orgsStr)  {
 		
 		String email = "";
 		String phone = "";
@@ -115,58 +132,72 @@ public class ESIAProfileProvider implements ProfileProvider {
 		String homePhone = "";
 		try {
 			JSONObject profile = new JSONObject(profileStr);
-			JSONArray contacts =  profile.getJSONObject("contacts").getJSONArray("elements");
-			for(int i = 0; i < contacts.length(); i++) {
-				JSONObject contact = contacts.getJSONObject(i);
-				if(!contact.has("type") || !contact.has("value"))
-					continue;
+			
+			
+			if(cttsStr != null) {
+				JSONObject contactsJsonObj = new JSONObject(cttsStr);
+				JSONArray contacts =  contactsJsonObj.getJSONArray("elements");
 				
-				if("EML".equals(contact.getString("type")) && StringUtils.isBlank(email)) {
-					email = contact.getString("value");
+				for(int i = 0; i < contacts.length(); i++) {
+					JSONObject contact = contacts.getJSONObject(i);
+					if(!contact.has("type") || !contact.has("value"))
+						continue;
+					
+					if("EML".equals(contact.getString("type")) && StringUtils.isBlank(email)) {
+						email = contact.getString("value");
+					}
+					if("MBT".equals(contact.getString("type"))&& StringUtils.isBlank(phone)) {
+						phone = contact.getString("value").replaceAll("[^\\d]", "");
+					}
+					if("CEM".equals(contact.getString("type"))&& StringUtils.isBlank(workEmail)) {
+						workEmail = contact.getString("value");
+					}
+					if("PHN".equals(contact.getString("type"))&& StringUtils.isBlank(homePhone)) {
+						homePhone = contact.getString("value").replaceAll("[^\\d]", "");
+					}
 				}
-				if("MBT".equals(contact.getString("type"))&& StringUtils.isBlank(phone)) {
-					phone = contact.getString("value").replaceAll("[^\\d]", "");
+				
+				//put for attribute mapping
+				profile.put("oid", oid);
+				profile.put("phone", phone);
+				profile.put("email", email);
+				profile.put("workEmail", workEmail);
+				profile.put("homePhone", homePhone);
+				
+				//add full contacts info
+				profile.put("ctts", contactsJsonObj);
+			}
+			if(docsStr != null)
+				try {
+					JSONObject docs = new JSONObject(docsStr);
+					profile.put("docs", docs);
+				} catch (JSONException e) {
+					logger.warn("error embed docs profile: {}", docsStr, e.toString());
 				}
-				if("CEM".equals(contact.getString("type"))&& StringUtils.isBlank(workEmail)) {
-					workEmail = contact.getString("value");
+			
+			if(orgsStr != null)
+				try {
+					JSONObject orgs = new JSONObject(orgsStr);
+					profile.put("orgs", orgs);
+				} catch (JSONException e) {
+					logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
 				}
-				if("PHN".equals(contact.getString("type"))&& StringUtils.isBlank(homePhone)) {
-					homePhone = contact.getString("value").replaceAll("[^\\d]", "");
+			
+			if(addrStr != null)
+				try {
+					JSONObject addrs = new JSONObject(addrStr);
+					profile.put("addrs", addrs);
+				} catch (JSONException e) {
+					logger.warn("error embed addrs profile: {}", addrStr, e.toString());
 				}
-			}
-			profile.put("oid", oid);
-			profile.put("phone", phone);
-			profile.put("email", email);
-			profile.put("workEmail", workEmail);
-			profile.put("homePhone", homePhone);
 			
-			try {
-				JSONObject docs = new JSONObject(docsStr);
-				profile.put("docs", docs);
-			} catch (JSONException e) {
-				logger.warn("error embed docs profile: {}", docsStr, e.toString());
-			}
-			
-			try {
-				JSONObject orgs = new JSONObject(orgsStr);
-				profile.put("orgs", orgs);
-			} catch (JSONException e) {
-				logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
-			}
-			
-			try {
-				JSONObject addrs = new JSONObject(addrStr);
-				profile.put("addrs", addrs);
-			} catch (JSONException e) {
-				logger.warn("error embed addrs profile: {}", addrStr, e.toString());
-			}
-			
-			try {
-				JSONObject orgs = new JSONObject(orgsStr);
-				profile.put("orgs", orgs);
-			} catch (JSONException e) {
-				logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
-			}
+			if(orgsStr != null)
+				try {
+					JSONObject orgs = new JSONObject(orgsStr);
+					profile.put("orgs", orgs);
+				} catch (JSONException e) {
+					logger.warn("error embed orgs profile: {}", orgsStr, e.toString());
+				}
 			
 			return profile.toString();
 			
