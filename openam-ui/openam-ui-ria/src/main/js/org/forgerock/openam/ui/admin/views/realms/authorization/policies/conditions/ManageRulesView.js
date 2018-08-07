@@ -28,6 +28,7 @@ define([
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/LegacyListItemView",
 
     // jquery dependencies
+    "jquery-ui",
     "sortable"
 ], ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView, OperatorRulesView,
     LegacyListItemView) => {
@@ -146,7 +147,7 @@ define([
 
             this.groupCounter++;
 
-            this.$el.find("ol#dropbox").nestingSortable({
+            this.$el.find("ol#dropbox").nestedSortable({
                 group: `${self.element}rule-creation-group${self.groupCounter}`,
                 exclude: ".item-button-panel, li.editing",
                 delay: 100,
@@ -244,7 +245,7 @@ define([
                     }
 
                     delete result.subContainers;
-                    delete result.nestingSortable;
+                    delete result.nestedSortable;
                     return result;
                 }
             });
@@ -323,7 +324,7 @@ define([
             editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null,
                 function onRuleRender () {
                     self.editStart(editRuleView.$el);
-                    self.$el.find("ol#dropbox").nestingSortable("refresh");
+                    self.$el.find("ol#dropbox").nestedSortable("refresh");
                 });
 
             this.idCount++;
@@ -404,7 +405,7 @@ define([
                 return;
             }
 
-            var rules = this.$el.find("ol#dropbox").nestingSortable("serialize").get(),
+            var rules = this.$el.find("ol#dropbox").nestedSortable("serialize").get(),
                 operatorData = this.$el.find(`#operator${this.idPrefix}0`).data().itemData;
 
             // Removing any obsolete root logicals.

@@ -56,6 +56,7 @@ require.config({
         "handlebars"       : "libs/handlebars-4.0.5",
         "i18next"          : "libs/i18next-1.7.3-min",
         "jquery"           : "libs/jquery-2.1.1-min",
+        "jquery-ui"        : "libs/jquery-ui-1.12.0-min",
         "js2form"          : "libs/js2form-2.0-769718a",
         "jsonEditor"       : "libs/jsoneditor-0.7.23-custom",
         "lodash"           : "libs/lodash-3.10.1-min",
@@ -189,6 +190,7 @@ require([
 
     // other modules that are necessary to include to startup the app
     "jquery",
+    "jquery-ui",
     "lodash",
     "backbone",
     "handlebars",
