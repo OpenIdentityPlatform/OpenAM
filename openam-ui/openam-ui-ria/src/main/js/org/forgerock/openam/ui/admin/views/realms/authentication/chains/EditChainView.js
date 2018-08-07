@@ -65,7 +65,7 @@ define([
 
         initSortable = function (self) {
 
-            self.$el.find("ol#sortableAuthChain").nestingSortable({
+            self.$el.find("ol#sortableAuthChain").sortable({
                 exclude: "li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
