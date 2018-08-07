@@ -56,7 +56,6 @@ require.config({
         "handlebars"       : "libs/handlebars-4.0.5",
         "i18next"          : "libs/i18next-1.7.3-min",
         "jquery"           : "libs/jquery-2.1.1-min",
-        "jquery-ui"        : "libs/jquery-ui-1.12.0-min",
         "js2form"          : "libs/js2form-2.0-769718a",
         "jsonEditor"       : "libs/jsoneditor-0.7.23-custom",
         "lodash"           : "libs/lodash-3.10.1-min",
@@ -72,7 +71,7 @@ require.config({
         "redux"            : "libs/redux-3.5.2-min",
         "selectize"        : "libs/selectize-non-standalone-0.12.1-min",
         "sifter"           : "libs/sifter-0.4.1-min",
-        "sortable"         : "libs/jquery-nestingSortable-0.9.12",
+        "sortable"         : "libs/jquery-sortable-0.9.13",
         "spin"             : "libs/spin-2.0.1-min",
         "text"             : "libs/text-2.0.15",
         "xdate"            : "libs/xdate-0.8-min"
@@ -190,7 +189,6 @@ require([
 
     // other modules that are necessary to include to startup the app
     "jquery",
-    "jquery-ui",
     "lodash",
     "backbone",
     "handlebars",

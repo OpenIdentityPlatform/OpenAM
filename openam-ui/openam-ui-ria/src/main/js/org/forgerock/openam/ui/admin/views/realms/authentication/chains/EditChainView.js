@@ -29,7 +29,6 @@ define([
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/services/realm/AuthenticationService",
     // jquery dependencies
-    "jquery-ui",
     "sortable"
 ], function ($, _, AbstractView, Constants, EventManager, EditLinkView, FormHelper, Handlebars, LinkView, Messages,
              PostProcessView, Router, AuthenticationService) {
@@ -66,7 +65,7 @@ define([
 
         initSortable = function (self) {
 
-            self.$el.find("ol#sortableAuthChain").nestedSortable({
+            self.$el.find("ol#sortableAuthChain").sortable({
                 exclude: "li:not(.chain-link)",
                 delay: 100,
                 vertical: true,
