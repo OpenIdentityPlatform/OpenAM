@@ -20,3 +20,4 @@ org.forgerock.openam.core.guice.CoreGuiceModule
 org.forgerock.openam.core.guice.DataLayerGuiceModule
 org.forgerock.openam.audit.AuditCoreGuiceModule
 org.forgerock.openam.audit.configuration.AuditConfigurationGuiceModule
+com.sun.identity.cli.WebCliGuiceModule
