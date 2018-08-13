@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.http.Client;
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -29,6 +30,7 @@ import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 
@@ -50,6 +52,7 @@ public class SharedGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
         bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
         bind(KeyPairProviderFactory.class).to(KeyPairProviderFactoryImpl.class);
+        bind(Client.class).toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
     }
 
     @Provides @Inject

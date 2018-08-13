@@ -16,7 +16,6 @@
 
 package com.sun.identity.cli;
 
-import org.forgerock.http.Client;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfigurationImpl;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
@@ -30,7 +29,6 @@ import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 import org.forgerock.openam.entitlement.utils.NullNotificationBroker;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -61,7 +59,5 @@ public class CliGuiceModule extends AbstractModule {
                 .build(EntitlementConfigurationFactory.class));
 
         bind(SessionCache.class).toInstance(SessionCache.getInstance());
-
-        bind(Client.class).toProvider(CloseableHttpClientProvider.class);
     }
 }
