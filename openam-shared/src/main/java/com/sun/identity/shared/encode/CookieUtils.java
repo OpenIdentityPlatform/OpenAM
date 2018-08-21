@@ -53,6 +53,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Implements utility methods for handling Cookie.
  */
@@ -474,10 +476,17 @@ public class CookieUtils {
         Set<String> domains = new HashSet<>();
 
         for (String domain : cookieDomains) {
-            if (domain == null || host.contains(domain)) {
+            if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
                 domains.add(domain);
             }
         }
+        //IE fix: allow add .app.domain.com after .domain.com without SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true) 
+        for (String domain :  new HashSet<>(domains)) { //.domain.com
+			for (String cookieDomain : cookieDomains) { //.app.domain.com 
+				if (StringUtils.endsWithIgnoreCase(cookieDomain,domain)) //.app.domain.com ends with .domain.com ?
+					domains.add(cookieDomain); //add .app.domain.com after .domain.com
+			}
+		}
         return domains;
     }
 }
