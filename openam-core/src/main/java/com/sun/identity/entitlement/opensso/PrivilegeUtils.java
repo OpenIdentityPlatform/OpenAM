@@ -91,7 +91,7 @@ public class PrivilegeUtils {
     private static Random random = new Random();
     private static ServiceTypeManager svcTypeManager;
     
-    private final static String DEFAULT_RESOURCE_TYPE_UUID = "76656a38-5f8e-401b-83aa-4ccb74ce88d2";
+    private final static String DEFAULT_RESOURCE_TYPE_UUID = "76656a38-5f8e-401b-83aa-4ccb74ce88d2"; //default value for URL resource type from entitlement.xml
 
     static {
         try {
