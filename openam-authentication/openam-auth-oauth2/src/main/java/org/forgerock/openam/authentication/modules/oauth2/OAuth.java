@@ -299,7 +299,7 @@ public class OAuth extends AMLoginModule {
 
                     JwtClaimsSet jwtClaims = null;
                     String idToken = null;
-                    if (config.isOpenIDConnect()) {
+                    if (config.isOpenIDConnect() && StringUtils.isNotEmpty(jwtHandlerConfig.getConfiguredIssuer())) { //obtained jwt and jwt validator configured
                         idToken = extractToken(ID_TOKEN, tokenSvcResponse);
                         JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
                         try {

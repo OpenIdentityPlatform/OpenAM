@@ -98,6 +98,7 @@ public class HttpRequestContent {
             if (authorizationHeader != null) {
                 connection.setRequestProperty("Authorization", authorizationHeader);
             }
+            connection.setRequestProperty("Accept", "application/json"); //deal with MS https://graph.microsoft.com/v1.0/me issue, this header required
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
