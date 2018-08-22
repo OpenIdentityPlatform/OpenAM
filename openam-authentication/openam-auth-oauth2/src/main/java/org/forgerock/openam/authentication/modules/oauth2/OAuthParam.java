@@ -90,6 +90,7 @@ public class OAuthParam {
     // Session parameters set by the module
     public final static String SESSION_OAUTH_TOKEN = "OAuthToken";
     public final static String SESSION_LOGOUT_BEHAVIOUR = "OAuth2logoutBehaviour";
+    public final static String SESSION_OAUTH_SCOPE = "OAuthScope";
     
     // Cookies used by the module
     public final static String COOKIE_ORIG_URL = "ORIG_URL";

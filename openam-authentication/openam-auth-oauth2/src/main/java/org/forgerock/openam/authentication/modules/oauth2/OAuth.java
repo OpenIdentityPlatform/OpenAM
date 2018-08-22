@@ -26,22 +26,7 @@
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.BUNDLE_NAME;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.COOKIE_LOGOUT_URL;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.COOKIE_ORIG_URL;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.COOKIE_PROXY_URL;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.CREATE_USER_STATE;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.GET_OAUTH_TOKEN_STATE;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.ID_TOKEN;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.NONCE_TOKEN_ID;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_ACCESS_TOKEN;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_ACTIVATION;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_CODE;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_TOKEN1;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.PARAM_TOKEN2;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.SESSION_LOGOUT_BEHAVIOUR;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.SESSION_OAUTH_TOKEN;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.SET_PASSWORD_STATE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.lang.reflect.InvocationTargetException;
@@ -245,7 +230,7 @@ public class OAuth extends AMLoginModule {
 
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
-
+                
                 String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
@@ -317,6 +302,8 @@ public class OAuth extends AMLoginModule {
                     String token = extractToken(PARAM_ACCESS_TOKEN, tokenSvcResponse);
 
                     setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
+                    
+                    setUserSessionProperty(SESSION_OAUTH_SCOPE, config.getScope());
 
                     String profileSvcResponse = null;
                     if (StringUtils.isNotEmpty(config.getProfileServiceUrl())) {
