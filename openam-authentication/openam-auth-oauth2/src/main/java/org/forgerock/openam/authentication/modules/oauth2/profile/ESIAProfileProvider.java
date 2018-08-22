@@ -170,6 +170,23 @@ public class ESIAProfileProvider implements ProfileProvider {
 			if(docsStr != null)
 				try {
 					JSONObject docs = new JSONObject(docsStr);
+
+					//make docs flat
+					JSONArray docsArray =  docs.getJSONArray("elements");
+					
+					for(int i = 0; i < docsArray.length(); i++) {
+						JSONObject doc = docsArray.getJSONObject(i);
+						String docNum = String.valueOf(i);
+						profile.put("doc_id_".concat(docNum), doc.get("id"));
+						profile.put("doc_type_".concat(docNum), doc.get("type"));
+						profile.put("doc_vrfStu_".concat(docNum), doc.get("vrfStu"));
+						profile.put("doc_series_".concat(docNum), doc.get("series"));
+						profile.put("doc_number_".concat(docNum), doc.get("number"));
+						profile.put("doc_issueDate_".concat(docNum), doc.get("issueDate"));
+						profile.put("doc_issueId_".concat(docNum), doc.get("issueId"));
+						profile.put("doc_issuedBy_".concat(docNum), doc.get("issuedBy"));
+					}
+					
 					profile.put("docs", docs);
 				} catch (JSONException e) {
 					logger.warn("error embed docs profile: {}", docsStr, e.toString());

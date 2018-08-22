@@ -79,6 +79,7 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_SECRET = "client_secret";
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
+    public final static String PARAM_REFRESH_TOKEN = "refresh_token";
     public final static String PARAM_GRANT_TYPE = "grant_type";
 
     // oauthproxy parameters
@@ -90,6 +91,7 @@ public class OAuthParam {
     // Session parameters set by the module
     public final static String SESSION_OAUTH_TOKEN = "OAuthToken";
     public final static String SESSION_LOGOUT_BEHAVIOUR = "OAuth2logoutBehaviour";
+    public final static String SESSION_OAUTH_SCOPE = "OAuthScope";
     
     // Cookies used by the module
     public final static String COOKIE_ORIG_URL = "ORIG_URL";
