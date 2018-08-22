@@ -30,11 +30,11 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -90,6 +90,7 @@ public class OAuth extends AMLoginModule {
 
     public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
     public static final String OPENID_TOKEN = "OPENID_TOKEN";
+    public static final String REFRESH_TOKEN_ATTRIBUTE_CUSTOM_PROPERTY = "[refresh_token_attribute]";
     private static Debug DEBUG = Debug.getInstance("amAuthOAuth2");
     private String authenticatedUser = null;
     private Map sharedState;
@@ -102,6 +103,7 @@ public class OAuth extends AMLoginModule {
     String userPassword = "";
     String proxyURL = "";
     private final CTSPersistentStore ctsStore;
+    private String refreshToken = null;
 
     /* default idle time for invalid sessions */
     private static final long maxDefaultIdleTime =
@@ -300,6 +302,8 @@ public class OAuth extends AMLoginModule {
                     }
 
                     String token = extractToken(PARAM_ACCESS_TOKEN, tokenSvcResponse);
+                    
+                    refreshToken = extractToken(PARAM_REFRESH_TOKEN, tokenSvcResponse);
 
                     setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
                     
@@ -554,6 +558,11 @@ public class OAuth extends AMLoginModule {
                 OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the Attribute Mapper", ex);
             }
         }
+        
+        if(config.getCustomProperties().containsKey(REFRESH_TOKEN_ATTRIBUTE_CUSTOM_PROPERTY) && StringUtils.isNotBlank(refreshToken)) {
+        	attributes.put(config.getCustomProperties().get(REFRESH_TOKEN_ATTRIBUTE_CUSTOM_PROPERTY), Collections.singleton(refreshToken));
+        }
+        
         OAuthUtil.debugMessage("OAuth.getUser: creating new user; attributes = " + attributes);
         return attributes;
     }

@@ -79,6 +79,7 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_SECRET = "client_secret";
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
+    public final static String PARAM_REFRESH_TOKEN = "refresh_token";
     public final static String PARAM_GRANT_TYPE = "grant_type";
 
     // oauthproxy parameters
