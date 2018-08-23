@@ -70,11 +70,15 @@ import org.forgerock.openam.xui.XUIState;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.service.LoginState;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.RedirectCallback;
@@ -85,6 +89,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+
 
 public class OAuth extends AMLoginModule {
 
@@ -121,9 +126,27 @@ public class OAuth extends AMLoginModule {
         bundle = amCache.getResBundle(BUNDLE_NAME, getLoginLocale());
         setAuthLevel(this.config.getAuthnLevel());    
     }
-
     
+    //FIX: allow ForceAuth over change org
+    public static Logger logger=LoggerFactory.getLogger(OAuth.class);
     public int process(Callback[] callbacks, int state) throws LoginException {
+    	int res=process2(callbacks,state);
+    	if (res==ISAuthConstants.LOGIN_SUCCEED) {
+    		//allow user change
+            LoginState ls=getLoginState(this.getClass().getName());
+            InternalSession oldSession=ls.getOldSession();
+            if (oldSession!=null&&!authenticatedUser.equalsIgnoreCase(oldSession.getProperty(ISAuthConstants.PRINCIPAL))){
+            	ls.setForceAuth(false);
+            	ls.setSessionUpgrade(false);
+            	logger.info("upgrade user from {} to {}",new Object[]{oldSession.getProperty(ISAuthConstants.PRINCIPAL),authenticatedUser});
+            	setUserSessionProperty("am.protected.old.".concat(ISAuthConstants.PRINCIPAL), oldSession.getProperty(ISAuthConstants.PRINCIPAL));
+            	oldSession.putProperty(ISAuthConstants.PRINCIPAL, authenticatedUser);
+            }
+    	}
+    	return res;
+    }
+    
+    public int process2(Callback[] callbacks, int state) throws LoginException {
 
         OAuthUtil.debugMessage("process: state = " + state);
         HttpServletRequest request = getHttpServletRequest();
