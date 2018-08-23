@@ -1226,8 +1226,8 @@ public class LoginState {
                     AMAuthenticationInstance authInstance =
                             authManager.getAuthenticationInstance(
                                     oldAuthenticationModuleInstanceName);
-                    oldAuthenticationModuleClassName =
-                            authInstance.getType();
+                    if (authInstance!=null)
+                    	oldAuthenticationModuleClassName = authInstance.getType();
                 } catch (AMConfigurationException ace) {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message("LoginState.setSessionProperties()"
