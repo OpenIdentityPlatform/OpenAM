@@ -177,14 +177,14 @@ public class ESIAProfileProvider implements ProfileProvider {
 					for(int i = 0; i < docsArray.length(); i++) {
 						JSONObject doc = docsArray.getJSONObject(i);
 						String docNum = String.valueOf(i);
-						profile.put("doc_id_".concat(docNum), doc.get("id"));
-						profile.put("doc_type_".concat(docNum), doc.get("type"));
-						profile.put("doc_vrfStu_".concat(docNum), doc.get("vrfStu"));
-						profile.put("doc_series_".concat(docNum), doc.get("series"));
-						profile.put("doc_number_".concat(docNum), doc.get("number"));
-						profile.put("doc_issueDate_".concat(docNum), doc.get("issueDate"));
-						profile.put("doc_issueId_".concat(docNum), doc.get("issueId"));
-						profile.put("doc_issuedBy_".concat(docNum), doc.get("issuedBy"));
+						profile.put("doc_id_".concat(docNum), getDefault(doc, "id", ""));
+						profile.put("doc_type_".concat(docNum), getDefault(doc, "type", ""));
+						profile.put("doc_vrfStu_".concat(docNum), getDefault(doc, "vrfStu", ""));
+						profile.put("doc_series_".concat(docNum), getDefault(doc, "series", ""));
+						profile.put("doc_number_".concat(docNum), getDefault(doc, "number", ""));
+						profile.put("doc_issueDate_".concat(docNum), getDefault(doc, "issueDate", ""));
+						profile.put("doc_issueId_".concat(docNum), getDefault(doc, "issueId", ""));
+						profile.put("doc_issuedBy_".concat(docNum), getDefault(doc, "issuedBy", ""));
 					}
 					
 					profile.put("docs", docs);
@@ -223,6 +223,15 @@ public class ESIAProfileProvider implements ProfileProvider {
 		}
 		
 		return profileStr;
+	}
+	
+	private static Object getDefault(JSONObject obj, String field, Object defaultVal) {
+		if(obj.has(field))
+			try {
+				return obj.get(field);
+			} catch(JSONException e) {}
+		return defaultVal;
+			
 	}
 
 }
