@@ -2,13 +2,13 @@ package org.forgerock.openam.authentication.modules.oauth2.service.esia;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -38,12 +38,12 @@ public class Signer {
 	}
 
 	private static PrivateKey getPrivateKey() {
-		return Signer.kp.getPrivate();
+		return Signer.privateKey;
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static String signString(String data)  {
-		if(kp == null || certHolder == null)
+		if(privateKey == null || certHolder == null)
 			initKeys();
 		String encoded = null;
 		Security.addProvider(new BouncyCastleProvider());
@@ -78,8 +78,8 @@ public class Signer {
 
 	}
 
-	static KeyPair kp;
 	static X509CertificateHolder certHolder;
+	static PrivateKey privateKey;
 	
 	//TODO get cert paths from config
 	static final String keyPath = SystemProperties.get(Signer.class.getName().concat(".keyPath"), "/etc/nginx/ssl/example.key");
@@ -108,8 +108,10 @@ public class Signer {
 				certPemReader.close();
 			}
 
-			PEMKeyPair pemKeyPair = (PEMKeyPair) obj;
-			kp = new JcaPEMKeyConverter().getKeyPair(pemKeyPair);
+			if(obj instanceof PEMKeyPair)
+				privateKey = new JcaPEMKeyConverter().getKeyPair((PEMKeyPair) obj).getPrivate();
+			else 
+				privateKey = new JcaPEMKeyConverter().getPrivateKey((PrivateKeyInfo) obj );
 
 			certHolder = ((X509CertificateHolder) certObj);
 
