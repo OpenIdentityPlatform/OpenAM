@@ -250,23 +250,23 @@ define([
         if (data === undefined) { data = {}; }
 
         var params = [],
-            additionalFilters = data._queryFilter || [],
-            getFilter = (function () {
-                return data && data.filterName && data.filterName === "eq"
-                    ? function (filterName, filterQuery) {
-                        // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
-                        return `${filterName}+eq+${encodeURIComponent(`"*${filterQuery}*"`)}`;
-                    }
-                    : function (filterName, filterQuery) {
-                        return `${filterName}+co+${encodeURIComponent(`"${filterQuery}"`)}`;
-                    };
-            }());
+            additionalFilters = data._queryFilter || [];
+//            getFilter = (function () {
+//                return data && data.filterName && data.filterName === "eq"
+//                    ? function (filterName, filterQuery) {
+//                        // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
+//                        return `${filterName}+eq+${encodeURIComponent(`"*${filterQuery}*"`)}`;
+//                    }
+//                    : function (filterName, filterQuery) {
+//                        return `${filterName}+co+${encodeURIComponent(`"${filterQuery}"`)}`;
+//                    };
+//            }());
 
-        _.each(this.state.filters, function (filter) {
-            if (filter.query() !== "") {
-                params.push(getFilter(filter.name, filter.query()));
-            }
-        });
+//        _.each(this.state.filters, function (filter) {
+//            if (filter.query() !== "") {
+//                params.push(getFilter(filter.name, filter.query()));
+//            }
+//        });
         params = params.concat(additionalFilters);
 
         return params.length === 0 ? true : params.join("+AND+");
