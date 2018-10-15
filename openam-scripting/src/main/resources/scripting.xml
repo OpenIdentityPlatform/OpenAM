@@ -129,6 +129,7 @@
                                 <Value>java.util.HashMap</Value>
                                 <Value>java.util.HashMap$KeyIterator</Value>
                                 <Value>java.util.LinkedHashMap</Value>
+                                <Value>java.util.LinkedHashMap$LinkedKeyIterator</Value>
                                 <Value>java.util.LinkedHashSet</Value>
                                 <Value>java.util.LinkedList</Value>
                                 <Value>java.util.TreeMap</Value>
@@ -280,6 +281,7 @@
                             <Value>java.util.HashMap</Value>
                             <Value>java.util.HashMap$KeyIterator</Value>
                             <Value>java.util.LinkedHashMap</Value>
+                            <Value>java.util.LinkedHashMap$LinkedKeyIterator</Value>
                             <Value>java.util.LinkedHashSet</Value>
                             <Value>java.util.LinkedList</Value>
                             <Value>java.util.TreeMap</Value>
@@ -343,6 +345,7 @@
                             <Value>java.util.HashMap$Entry</Value>
                             <Value>java.util.HashMap$KeyIterator</Value>
                             <Value>java.util.LinkedHashMap</Value>
+                            <Value>java.util.LinkedHashMap$LinkedKeyIterator</Value>
                             <Value>java.util.LinkedHashSet</Value>
                             <Value>java.util.LinkedList</Value>
                             <Value>java.util.TreeMap</Value>

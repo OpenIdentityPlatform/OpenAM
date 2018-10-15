@@ -87,7 +87,7 @@ define([
                 name: "name",
                 label: $.t("console.scripts.list.grid.0"),
                 cell: "string",
-                headerCell: BackgridUtils.FilterHeaderCell,
+//                headerCell: BackgridUtils.FilterHeaderCell,
                 sortType: "toggle",
                 editable: false
             }, {
@@ -97,7 +97,7 @@ define([
                     map: "contextMap",
                     render: renderTranslatedCell
                 }),
-                headerCell: BackgridUtils.FilterHeaderCell,
+//                headerCell: BackgridUtils.FilterHeaderCell,
                 sortType: "toggle",
                 editable: false
             }, {
@@ -107,7 +107,7 @@ define([
                     map: "langMap",
                     render: renderTranslatedCell
                 }),
-                headerCell: BackgridUtils.FilterHeaderCell,
+//                headerCell: BackgridUtils.FilterHeaderCell,
                 sortType: "toggle",
                 editable: false
             }, {
