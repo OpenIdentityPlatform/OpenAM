@@ -47,6 +47,7 @@ mvn tomcat7:run-war -f OpenAM/openam-server
 The next step is then to go to [http://localhost:8080/openam](http://localhost:8080/openam) where you'll see the OpenAM welcome page
 
 ## Support and Mailing List Information
+* OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
 * OpenAM Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
 * OpenAM Community on Gitter: https://gitter.im/OpenIdentityPlatform/OpenAM
