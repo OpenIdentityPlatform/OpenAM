@@ -47,7 +47,7 @@
   <name>OpenAM Project</name>
   <groupId>org.forgerock.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.1.11-SNAPSHOT</version>
+  <version>14.1.13-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -128,7 +128,7 @@
     <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
     <jdom.version>2.0.1</jdom.version>
     <je.version>7.5.11</je.version>
-    <jersey-bundle.version>1.1.1-ea</jersey-bundle.version>
+    <jersey-bundle.version>1.19.4</jersey-bundle.version>
     <jato.version>2005-05-04</jato.version>
     <cc-ui.version>2008-08-08</cc-ui.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
