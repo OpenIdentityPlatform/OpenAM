@@ -805,7 +805,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             newURL.append('&').append(SystemPropertiesManager.get(Constants.AM_AUTH_COOKIE_NAME, "AMAuthCookie"));
             newURL.append('=');
 
-            SAML2Utils.debug.message("{} Forward to ", classMethod, newURL.toString());
+            SAML2Utils.debug.message("{} Forward to {}", classMethod, newURL.toString());
             try {
                 request.setAttribute(Constants.FORWARD_PARAM, Constants.FORWARD_YES_VALUE);
                 request.getRequestDispatcher(newURL.toString()).forward(request, response);
