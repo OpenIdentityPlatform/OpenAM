@@ -774,7 +774,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
         // of redirection, forward needs a relative URI.
         StringBuffer gotoURL;
         if (forward) {
-            gotoURL = new StringBuffer(getRelativePath(request.getRequestURI(), request.getContextPath()));
+            //gotoURL = new StringBuffer(getRelativePath(request.getRequestURI(), request.getContextPath()));
+        	gotoURL = new StringBuffer(request.getRequestURI());
         } else {
             String rpUrl = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(data.getRealm(),
                     data.getIdpEntityID(), SAML2Constants.RP_URL);
