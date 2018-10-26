@@ -21,10 +21,11 @@ This project is licensed under the [Common Development and Distribution License 
 * [OpenAM WAR](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
 * [OpenAM Docker](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
 ### Download OpenAM Policy Agents:
-* [OpenAM Java Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
+* [OpenAM Java Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
 * [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#Установка-файлов-бинарной-поставки) (Windows/Linux)
-* [OpenAM Web Policy Agents Apache 2.2](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
-* [OpenAM Web Policy Agents Apache 2.4](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
+* [OpenAM Web Policy Agent Apache 2.2](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
+* [OpenAM Web Policy Agent Apache 2.4](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
+* [OpenAM Web Policy Agent (IIS  Windows x32/x64 ZIP)](https://ci.appveyor.com/api/buildjobs/cnebrw2f43my9vxr/artifacts/IIS_WINNT_4.1.0.zip)
 
 ## How-to build
 For windows use:
@@ -46,6 +47,7 @@ mvn tomcat7:run-war -f OpenAM/openam-server
 The next step is then to go to [http://localhost:8080/openam](http://localhost:8080/openam) where you'll see the OpenAM welcome page
 
 ## Support and Mailing List Information
+* OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
 * OpenAM Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
 * OpenAM Community on Gitter: https://gitter.im/OpenIdentityPlatform/OpenAM
