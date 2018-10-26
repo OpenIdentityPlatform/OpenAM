@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
@@ -49,13 +50,12 @@ import com.sun.identity.shared.debug.Debug;
 
 public class CachedSubEntries implements SMSEventListener{
     // Cache of CachedSubEntries based on lowercased DN to obtain sub entries
-    protected static Map smsEntries = Collections.synchronizedMap(
-        new HashMap(100));
+    protected static Map<String,CachedSubEntries> smsEntries = new ConcurrentHashMap<String, CachedSubEntries>(100);
 
     // Instance variables
     // Cache of SubEntries for the given SSOToken
     // Limited cache so that it does not grow in size
-    protected Map ssoTokenToSubEntries = new Cache(100);
+    protected Map<String,Set> ssoTokenToSubEntries = new Cache(100);
     private long lastUpdated;
 
     protected CachedSMSEntry cachedEntry;
@@ -268,14 +268,12 @@ public class CachedSubEntries implements SMSEventListener{
             return (answer);
         }
         // Not in cache, synchronize and add to cache
-        synchronized (smsEntries) {
             answer = (CachedSubEntries) smsEntries.get(entry);
             if (answer == null) {
                 // Create and add to cache
                 answer = new CachedSubEntries(token, dn);
                 smsEntries.put(entry, answer);
             }
-        }
         return (answer);
     }
     public static CachedSubEntries getInstance(SSOToken token, String dn)
@@ -284,14 +282,10 @@ public class CachedSubEntries implements SMSEventListener{
     }
 
     static void clearCache() {
-        synchronized (smsEntries) {
-            // Clear the individual cached entries
-            for (Iterator items = smsEntries.values().iterator();
-                items.hasNext();) {
-                CachedSubEntries entry = (CachedSubEntries) items.next();
-                entry.update();
-            }
-        }
+    	for (CachedSubEntries entry : smsEntries.values()) {
+    		 entry.update();
+		}
+    	smsEntries.clear();
     }
 
     @Override
