@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.sso.SSOException;
@@ -621,11 +622,9 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         
         // User has permissions,
         // Construct ServiceConfigManagerImpl and add to cache
-        synchronized (configMgrImpls) {
             answer = new ServiceConfigManagerImpl(
                     token, serviceName, version);
             configMgrImpls.put(cName, answer);
-        }
         // Debug messages
         if (debug.messageEnabled()) {
             debug.message("ServiceConfigMgrImpl::getInstance: success: " +
@@ -678,7 +677,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         }
         
         // User has permissions, add principal to cache
-        synchronized (userPrincipals) {
+       
             Set sudoPrincipals = (Set) userPrincipals.get(cacheName);
             if (sudoPrincipals == null) {
                 sudoPrincipals = new LinkedHashSet(20);
@@ -693,29 +692,21 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
                     items.remove();
                 }
             }
-        }
         // In the case failed permissions, exception would be thrown
         return (true);
     }
 
     static void clearCache() {
         // Clear the internal caches
-        synchronized (configMgrImpls) {
-            for (Iterator items = configMgrImpls.values().iterator();
-                items.hasNext();) {
-                ServiceConfigManagerImpl sc = (ServiceConfigManagerImpl)
-                    items.next();
-                sc.clear();
-            }
-        }
+        for (ServiceConfigManagerImpl sc : configMgrImpls.values()) {
+        	sc.clear();
+		}
         userPrincipals.clear();
     }
 
-    private static Map configMgrImpls = Collections.synchronizedMap(
-        new HashMap());
+    private static Map<String,ServiceConfigManagerImpl> configMgrImpls = new ConcurrentHashMap<String, ServiceConfigManagerImpl>();
 
-    private static Map userPrincipals = Collections.synchronizedMap(
-        new HashMap());
+    private static Map<String,Set> userPrincipals = new ConcurrentHashMap<String, Set>();
     
     private static int PRINCIPALS_CACHE_SIZE = 20;
 

@@ -111,7 +111,7 @@ public class ApplicationPrivilegeMetaTest {
         ApplicationPrivilege ap = new ApplicationPrivilege(
             DELEGATE_PRIVILEGE_NAME);
         OpenSSOUserSubject sbj = new OpenSSOUserSubject();
-        sbj.setID("id=dummy,dc=openam,dc=forgerock,dc=org");
+        sbj.setID("id=dummy,dc=openam,dc=openidentityplatform,dc=org");
         Set<SubjectImplementation> subjects = new HashSet<SubjectImplementation>();
         subjects.add(sbj);
         ap.setSubject(subjects);

@@ -184,7 +184,7 @@
                         <AttributeSchema name="script" type="single" syntax="script"/>
                         <AttributeSchema name="createdBy" type="single" syntax="string">
                             <DefaultValues>
-                                <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                                <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="creationDate" type="single" syntax="string">
@@ -194,7 +194,7 @@
                         </AttributeSchema>
                         <AttributeSchema name="lastModifiedBy" type="single" syntax="string">
                             <DefaultValues>
-                                <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                                <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                             </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="lastModifiedDate" type="single" syntax="string">

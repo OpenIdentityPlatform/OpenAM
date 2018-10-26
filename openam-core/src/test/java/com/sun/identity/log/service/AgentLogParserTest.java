@@ -58,14 +58,14 @@ public class AgentLogParserTest {
     public void parsesJavaAgentSuccessMessages() {
         // Given
         String message = "Access to http://raspi.forrest.org:8080/examples/index.html allowed for user " +
-                "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org";
+                "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org";
 
         // When
         AgentLogParser.LogExtracts logExtracts = logParser.tryParse(message);
 
         // Then
         assertThat(logExtracts.getResourceUrl()).isEqualTo("http://raspi.forrest.org:8080/examples/index.html");
-        assertThat(logExtracts.getSubjectId()).isEqualTo("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
+        assertThat(logExtracts.getSubjectId()).isEqualTo("id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         assertThat(logExtracts.getStatusCode()).isEqualTo("allowed");
         assertThat(logExtracts.getStatus()).isEqualTo(ResponseStatus.SUCCESSFUL);
     }
@@ -86,14 +86,14 @@ public class AgentLogParserTest {
     public void parsesJavaAgentFailureMessages() {
         // Given
         String message = "Access tohttp://raspi.forrest.org:8080/examples/index.html  denied for user    " +
-                "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org";
+                "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org";
 
         // When
         AgentLogParser.LogExtracts logExtracts = logParser.tryParse(message);
 
         // Then
         assertThat(logExtracts.getResourceUrl()).isEqualTo("http://raspi.forrest.org:8080/examples/index.html");
-        assertThat(logExtracts.getSubjectId()).isEqualTo("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
+        assertThat(logExtracts.getSubjectId()).isEqualTo("id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         assertThat(logExtracts.getStatusCode()).isEqualTo("denied");
         assertThat(logExtracts.getStatus()).isEqualTo(ResponseStatus.FAILED);
     }

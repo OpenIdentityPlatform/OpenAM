@@ -65,7 +65,7 @@ public class BootstrapConfigTest {
     public void testJsonInit() throws IOException {
         String json = "{\n" +
                 "  \"instance\" : \"${env.HOME}\",\n" +
-                "  \"dsameUser\" : \"cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org\",\n" +
+                "  \"dsameUser\" : \"cn=dsameuser,ou=DSAME Users,dc=openam,dc=openidentityplatform,dc=org\",\n" +
                 "  \"keystores\" : {\n" +
                 "    \"default\" : {\n" +
                 "      \"keyStorePasswordFile\" : \"${env.OPENAM_SECRETS}/.storepass\",\n" +
@@ -75,7 +75,7 @@ public class BootstrapConfigTest {
                 "    }\n" +
                 "  },\n" +
                 "  \"configStoreList\" : [ {\n" +
-                "    \"baseDN\" : \"dc=openam,dc=forgerock,dc=org\",\n" +
+                "    \"baseDN\" : \"dc=openam,dc=openidentityplatform,dc=org\",\n" +
                 "    \"dirManagerDN\" : \"cn=Directory Manager\",\n" +
                 "    \"ldapHost\" : \"${env.OPENAM_CONFIG_STORE_LDAP_HOST}\",\n" +
                 "    \"ldapPort\" : 389,\n" +

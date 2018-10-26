@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -474,19 +475,13 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
     }
     
     static void clearCache() {
-        synchronized (configMgrImpls) {
-            for (Iterator items = configMgrImpls.values().iterator();
-                items.hasNext();) {
-                OrganizationConfigManagerImpl ocm =
-                    (OrganizationConfigManagerImpl) items.next();
-                ocm.clear();
-            }
-            configMgrImpls.clear();
-        }
+        for (OrganizationConfigManagerImpl ocm : configMgrImpls.values()) {
+        	ocm.clear();
+		}
+        configMgrImpls.clear();
     }
 
-    private static Map configMgrImpls = Collections.synchronizedMap(
-        new HashMap());
+    private static Map<String,OrganizationConfigManagerImpl> configMgrImpls = new ConcurrentHashMap<String, OrganizationConfigManagerImpl>();
 
     private static Map userPrincipals = Collections.synchronizedMap(
         new HashMap());

@@ -44,7 +44,7 @@ public class DNOrIPAddressListTokenRestrictionTest {
 
     private DNOrIPAddressListTokenRestriction createTokenRestriction()
             throws SMSException, SSOException, UnknownHostException {
-        final String DN = "dc=openam,dc=forgerock,dc=org";
+        final String DN = "dc=openam,dc=openidentityplatform,dc=org";
         final String HOST_NAME = "google.com";
 
         return new DNOrIPAddressListTokenRestriction(DN, CollectionUtils.asSet(HOST_NAME),

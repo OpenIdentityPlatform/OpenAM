@@ -35,7 +35,7 @@ import com.sun.identity.shared.debug.Debug;
 
 public class PartialSessionFactoryTest {
 
-    private static final String UNIVERSAL_ID = "id=demo,ou=user,dc=openam,dc=forgerock,dc=org";
+    private static final String UNIVERSAL_ID = "id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org";
     private static final String USERNAME = "demo";
     private static final String REALM = "/";
     private static final String SESSION_HANDLE = "shandle:foobar";

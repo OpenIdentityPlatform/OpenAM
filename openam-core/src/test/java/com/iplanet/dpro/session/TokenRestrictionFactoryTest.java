@@ -33,7 +33,7 @@ public class TokenRestrictionFactoryTest {
 
     @BeforeMethod
     public void setUpTest() throws UnknownHostException {
-        final String DN = "dc=openam,dc=forgerock,dc=org";
+        final String DN = "dc=openam,dc=openidentityplatform,dc=org";
         final String HOST_NAME = "google.com";
 
         tokenRestriction = new DNOrIPAddressListTokenRestriction(DN, CollectionUtils.asSet(HOST_NAME),

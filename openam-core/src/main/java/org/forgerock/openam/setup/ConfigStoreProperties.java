@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @since 14.0
  */
 public class ConfigStoreProperties {
-    private String baseDN = "dc=openam,dc=forgerock,dc=org";
+    private String baseDN = "dc=openam,dc=openidentityplatform,dc=org";
     private String dirManagerDN = "dc= Directory Manager";
     private String ldapHost = "localhost";
     private int ldapPort = 50389;

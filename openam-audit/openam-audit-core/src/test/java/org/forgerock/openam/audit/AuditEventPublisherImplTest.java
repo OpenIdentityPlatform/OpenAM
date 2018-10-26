@@ -131,7 +131,7 @@ public class AuditEventPublisherImplTest {
         return new AMAccessAuditEventBuilder()
                 .eventName(EventName.AM_ACCESS_OUTCOME)
                 .transactionId(UUID.randomUUID().toString())
-                .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .request("CREST", "READ")

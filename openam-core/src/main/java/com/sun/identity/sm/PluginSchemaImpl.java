@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -336,7 +337,6 @@ class PluginSchemaImpl extends ServiceSchemaImpl implements CachedSMSEntry.SMSEn
             return (answer);
         }
 
-        synchronized (pluginSchemas) {
             // Try the cache again, in case another thread added it
             if ((answer = (PluginSchemaImpl)
                 pluginSchemas.get(cName)) == null) {
@@ -344,22 +344,16 @@ class PluginSchemaImpl extends ServiceSchemaImpl implements CachedSMSEntry.SMSEn
                         pluginName, iName, oName);
                 pluginSchemas.put(cName, answer);
             }
-        }
         return (answer);
     }
 
     // Clears the cache
     static void clearCache() {
-        synchronized (pluginSchemas) {
-            Iterator items = pluginSchemas.values().iterator();
-            while (items.hasNext()) {
-                PluginSchemaImpl psi = (PluginSchemaImpl) items.next();
-                psi.clear();
-            }
-            pluginSchemas.clear();
-        }
+        for (PluginSchemaImpl psi : pluginSchemas.values()) {
+        	psi.clear();
+		}
+        pluginSchemas.clear();
     }
 
-    private static Map pluginSchemas = Collections.synchronizedMap(
-        new HashMap());
+    private static Map<String,PluginSchemaImpl> pluginSchemas = new ConcurrentHashMap<String, PluginSchemaImpl>();
 }

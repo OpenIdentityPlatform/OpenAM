@@ -206,7 +206,7 @@ public class GenericRepoTest extends IdRepoTestBase {
     public void createIgnoresUndefinedAttributes() throws Exception {
         Map<String, Set<String>> attrs = MapHelper.readMap("/config/users/testuser1.properties");
         String dn = idrepo.create(null, IdType.USER, TEST_USER1, attrs);
-        assertThat(dn).isEqualTo("uid=testuser1,ou=people,dc=openam,dc=forgerock,dc=org");
+        assertThat(dn).isEqualTo("uid=testuser1,ou=people,dc=openam,dc=openidentityplatform,dc=org");
         Map<String, Set<String>> createdAttrs =
                 new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.USER, TEST_USER1));
         assertThat(createdAttrs.keySet().containsAll(asSet("objectclass", "uid", "sn", "cn", "postaladdress")));
@@ -408,7 +408,7 @@ public class GenericRepoTest extends IdRepoTestBase {
         idrepo.create(null, IdType.GROUP, TEST1_GROUP, attributes);
         Map<String, Set<String>> returnedAttrs =
                 new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.GROUP, TEST1_GROUP));
-        assertThat(returnedAttrs.get("uniqueMember")).containsOnly("uid=demo,ou=people,dc=openam,dc=forgerock,dc=org");
+        assertThat(returnedAttrs.get("uniqueMember")).containsOnly("uid=demo,ou=people,dc=openam,dc=openidentityplatform,dc=org");
         assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).containsOnly(DEMO_DN);
         assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).contains(TEST1_GROUP_DN);
     }
