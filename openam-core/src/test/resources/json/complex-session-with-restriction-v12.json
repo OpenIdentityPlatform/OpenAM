@@ -1,6 +1,6 @@
 {
-    "clientDomain": "dc=openam,dc=forgerock,dc=org",
-    "clientID": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org",
+    "clientDomain": "dc=openam,dc=openidentityplatform,dc=org",
+    "clientID": "id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org",
     "cookieMode": null,
     "cookieStr": null,
     "creationTime": 1396296561,
@@ -13,7 +13,7 @@
             "@class": "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction",
             "addressList": [],
             "asString": "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=",
-            "dn": "id=myagent,ou=agent,dc=openam,dc=forgerock,dc=org"
+            "dn": "id=myagent,ou=agent,dc=openam,dc=openidentityplatform,dc=org"
         }
     },
     "sessionEventURLs": {
@@ -78,7 +78,7 @@
             "SK": "7982303934275618544"
         },
         "isParsed": true,
-        "sessionDomain": "dc=openam,dc=forgerock,dc=org",
+        "sessionDomain": "dc=openam,dc=openidentityplatform,dc=org",
         "sessionServer": "lb.example.com",
         "sessionServerID": "02",
         "sessionServerPort": "8080",
@@ -99,8 +99,8 @@
         "Principals": "demo",
         "Service": "ldapService",
         "amlbcookie": "01",
-        "sun.am.UniversalIdentifier": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org",
-        "Organization": "dc=openam,dc=forgerock,dc=org",
+        "sun.am.UniversalIdentifier": "id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org",
+        "Organization": "dc=openam,dc=openidentityplatform,dc=org",
         "Locale": "en",
         "HostName": "127.0.0.1",
         "AuthType": "DataStore",
@@ -109,7 +109,7 @@
         "AMCtxId": "982c2a6ccd3cc5fd01",
         "clientType": "genericHTML",
         "authInstant": "2014-03-31T20:09:21Z",
-        "Principal": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+        "Principal": "id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org"
     },
     "sessionState": 1,
     "sessionType": 0,

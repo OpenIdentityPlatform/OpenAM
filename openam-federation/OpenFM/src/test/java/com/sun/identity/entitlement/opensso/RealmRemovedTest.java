@@ -100,7 +100,7 @@ public class RealmRemovedTest {
         ApplicationPrivilege ap = new ApplicationPrivilege(
             APP_PRIVILEGE_NAME);
         OpenSSOUserSubject sbj = new OpenSSOUserSubject();
-        sbj.setID("ou=dummy,ou=user,dc=openam,dc=forgerock,dc=org");
+        sbj.setID("ou=dummy,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         Set<SubjectImplementation> subjects = new
             HashSet<SubjectImplementation>();
         subjects.add(sbj);

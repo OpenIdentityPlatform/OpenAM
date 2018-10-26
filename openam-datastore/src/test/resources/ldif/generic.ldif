@@ -1,20 +1,20 @@
-dn: dc=openam,dc=forgerock,dc=org
+dn: dc=openam,dc=openidentityplatform,dc=org
 dc: openam
 objectClass: domain
 objectClass: top
 
-dn: ou=people,dc=openam,dc=forgerock,dc=org
+dn: ou=people,dc=openam,dc=openidentityplatform,dc=org
 ou: People
 objectClass: organizationalUnit
 objectClass: top
 
-dn: ou=groups,dc=openam,dc=forgerock,dc=org
+dn: ou=groups,dc=openam,dc=openidentityplatform,dc=org
 ou: Groups
 objectClass: organizationalUnit
 objectClass: top
 numSubordinates: 0
 
-dn: uid=demo,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=demo,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: demo
 sn: demo
 givenName: demo
@@ -26,7 +26,7 @@ objectclass: top
 objectclass: person
 l: DemoLand
 
-dn: uid=searchTester1,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=searchTester1,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: searchTester1
 sn: hello
 userpassword: demo
@@ -36,7 +36,7 @@ objectclass: inetuser
 objectclass: top
 objectclass: person
 
-dn: uid=searchTester2,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=searchTester2,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: searchTester2
 sn: HellOworld
 userpassword: demo
@@ -46,7 +46,7 @@ objectclass: inetuser
 objectclass: top
 objectclass: person
 
-dn: uid=searchTester3,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=searchTester3,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: searchTester3
 sn: hellNo
 userpassword: demo
@@ -56,7 +56,7 @@ objectclass: inetuser
 objectclass: top
 objectclass: person
 
-dn: uid=searchTester4,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=searchTester4,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: searchTester4
 sn: HellYeah
 userpassword: demo

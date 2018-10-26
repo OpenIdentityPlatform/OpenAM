@@ -384,7 +384,7 @@ public class EmbeddedOpenDS {
     /**
      * Runs the OpenDJ setup command like this:
      * $ ./setup --cli --adminConnectorPort 4444
-     * --baseDN dc=openam,dc=forgerock,dc=org --rootUserDN "cn=directory manager"
+     * --baseDN dc=openam,dc=openidentityplatform,dc=org --rootUserDN "cn=directory manager"
      * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
      * --jmxPort 1689 --no-prompt
      *
@@ -1059,7 +1059,7 @@ public class EmbeddedOpenDS {
             ------------------------------:---------------------------------------------
             cn=admin data                 : dj1.example.com:58989, dj2.example.com:50889
             cn=schema                     : dj1.example.com:58989, dj2.example.com:50889
-            dc=openam,dc=forgerock,dc=org : dj1.example.com:58989, dj2.example.com:50889
+            dc=openam,dc=openidentityplatform,dc=org : dj1.example.com:58989, dj2.example.com:50889
          */
 
         BufferedReader brd = new BufferedReader(new StringReader(str));

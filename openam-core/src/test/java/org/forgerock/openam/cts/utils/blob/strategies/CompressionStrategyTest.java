@@ -40,8 +40,8 @@ public class CompressionStrategyTest {
     private CompressionStrategy compression;
     private byte[] data;
 
-    private static final String JSON_SAMPLE = "{\"clientDomain\":\"dc=openam,dc=forgerock,dc=org\",\"" +
-            "clientID\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"cookieMode\":null,\"" +
+    private static final String JSON_SAMPLE = "{\"clientDomain\":\"dc=openam,dc=openidentityplatform,dc=org\",\"" +
+            "clientID\":\"id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org\",\"cookieMode\":null,\"" +
             "cookieStr\":null,\"creationTime\":1375353841,\"isISStored\":true,\"latestAccessTime\":" +
             "1375353841,\"maxCachingTime\":3,\"maxIdleTime\":30,\"maxSessionTime\":120,\"" +
             "reschedulePossible\":false,\"restrictedTokensByRestriction\":{},\"restrictedTokensBySid\":" +
@@ -56,7 +56,7 @@ public class CompressionStrategyTest {
             "ryptedString\":\"AQIC5wM2LY4SfcxjU9TuISV5pcZVBhh8fA2kRtHPX065uzE.*AAJTSQACMDIAAlNLABM4NjE3Nj" +
             "M5MTc2NTIyMzc3Mzg1AAJTMQACMDE.*\",\"extensionPart\":\"AAJTSQACMDIAAlNLABM4NjE3NjM5MTc2NTIyMz" +
             "c3Mzg1AAJTMQACMDE=\",\"extensions\":{\"SI\":\"02\",\"S1\":\"01\",\"SK\":\"86176391765223773" +
-            "85\"},\"isParsed\":true,\"sessionDomain\":\"dc=openam,dc=forgerock,dc=org\",\"sessionServer" +
+            "85\"},\"isParsed\":true,\"sessionDomain\":\"dc=openam,dc=openidentityplatform,dc=org\",\"sessionServer" +
             "\":\"rwapshott.forgerock.com\",\"sessionServerID\":\"02\",\"sessionServerPort\":\"8080\",\"s" +
             "essionServerProtocol\":\"http\",\"sessionServerURI\":\"/openam\",\"tail\":\"\"},\"sessionPro" +
             "perties\":{\"CharSet\":\"UTF-8\",\"UserId\":\"amadmin\",\"FullLoginURL\":\"/openam/UI/Logi" +
@@ -64,12 +64,12 @@ public class CompressionStrategyTest {
             "onHandle\":\"shandle:AQIC5wM2LY4Sfcyn6TUnRk0cPYbywbMa5eHp3KodJFMuh08.*AAJTSQACMDIAAlMxAAIwMQA" +
             "CU0sAFC0yOTc3NjI0NjQ4NDYyODA4NDk0*\",\"UserToken\":\"amadmin\",\"loginURL\":\"/openam/UI/Logi" +
             "n\",\"Principals\":\"amadmin\",\"Service\":\"ldapService\",\"sun.am.UniversalIdentifier\":\"i" +
-            "d=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"amlbcookie\":\"01\",\"Organization\":\"dc" +
-            "=openam,dc=forgerock,dc=org\",\"Locale\":\"en_US\",\"HostName\":\"172.16.100.130\",\"AuthType" +
+            "d=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org\",\"amlbcookie\":\"01\",\"Organization\":\"dc" +
+            "=openam,dc=openidentityplatform,dc=org\",\"Locale\":\"en_US\",\"HostName\":\"172.16.100.130\",\"AuthType" +
             "\":\"DataStore\",\"Host\":\"172.16.100.130\",\"UserProfile\":\"Required\",\"clientType\":\"ge" +
             "nericHTML\",\"AMCtxId\":\"70cb377418240f5601\",\"authInstant\":\"2013-08-01T10:44:01Z\",\"Pri" +
-            "ncipal\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\"},\"sessionState\":1,\"sessionTyp" +
-            "e\":0,\"timedOutAt\":0,\"uuid\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"version" +
+            "ncipal\":\"id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org\"},\"sessionState\":1,\"sessionTyp" +
+            "e\":0,\"timedOutAt\":0,\"uuid\":\"id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org\",\"version" +
             "\":0,\"willExpireFlag\":true}";
 
     @BeforeMethod

@@ -30,10 +30,10 @@ public class SMSAuditorTest {
     @DataProvider(name = "DNprovider")
     public Object[][] createData1() {
         return new Object[][] {
-                { "ou=default,ou=GlobalConfig,ou=1.0,ou=AuditService,ou=services,dc=openam,dc=forgerock,dc=org", null },
-                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,dc=openam,dc=forgerock,dc=org", "/"},
-                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,o=subrealm,ou=services,dc=openam,dc=forgerock,dc=org", "/subrealm"},
-                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,o=subsubrealm,o=subrealm,ou=services,dc=openam,dc=forgerock,dc=org", "/subrealm/subsubrealm"},
+                { "ou=default,ou=GlobalConfig,ou=1.0,ou=AuditService,ou=services,dc=openam,dc=openidentityplatform,dc=org", null },
+                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,dc=openam,dc=openidentityplatform,dc=org", "/"},
+                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,o=subrealm,ou=services,dc=openam,dc=openidentityplatform,dc=org", "/subrealm"},
+                { "ou=default,ou=OrganizationConfig,ou=1.0,ou=AuditService,ou=services,o=subsubrealm,o=subrealm,ou=services,dc=openam,dc=openidentityplatform,dc=org", "/subrealm/subsubrealm"},
 
         };
     }
