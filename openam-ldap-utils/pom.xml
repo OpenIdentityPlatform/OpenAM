@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.1.13-SNAPSHOT</version>
+        <version>14.1.14-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ldap-utils</artifactId>

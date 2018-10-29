@@ -190,8 +190,8 @@ public class JwtSessionMapperTest {
         SessionInfo sessionInfo = new SessionInfo();
         sessionInfo.setSessionID(null);
         sessionInfo.setSessionType("user");
-        sessionInfo.setClientID("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
-        sessionInfo.setClientDomain("dc=openam,dc=forgerock,dc=org");
+        sessionInfo.setClientID("id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org");
+        sessionInfo.setClientDomain("dc=openam,dc=openidentityplatform,dc=org");
         sessionInfo.setMaxTime(120);
         sessionInfo.setMaxIdle(30);
         sessionInfo.setMaxCaching(3);
@@ -209,9 +209,9 @@ public class JwtSessionMapperTest {
         sessionInfo.getProperties().put("loginURL", "/openam/UI/Login");
         sessionInfo.getProperties().put("Principals", "amadmin");
         sessionInfo.getProperties().put("Service", "ldapService");
-        sessionInfo.getProperties().put("sun.am.UniversalIdentifier", "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
+        sessionInfo.getProperties().put("sun.am.UniversalIdentifier", "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         sessionInfo.getProperties().put("amlbcookie", "01");
-        sessionInfo.getProperties().put("Organization", "dc=openam,dc=forgerock,dc=org");
+        sessionInfo.getProperties().put("Organization", "dc=openam,dc=openidentityplatform,dc=org");
         sessionInfo.getProperties().put("Locale", "en_GB");
         sessionInfo.getProperties().put("HostName", "127.0.0.1");
         sessionInfo.getProperties().put("AuthType", "DataStore");
@@ -220,7 +220,7 @@ public class JwtSessionMapperTest {
         sessionInfo.getProperties().put("AMCtxId", "13452a66dc3c54bc01");
         sessionInfo.getProperties().put("clientType", "genericHTML");
         sessionInfo.getProperties().put("authInstant", "2015-01-14T12:00:44Z");
-        sessionInfo.getProperties().put("Principal", "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org");
+        sessionInfo.getProperties().put("Principal", "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         return sessionInfo;
     }
 

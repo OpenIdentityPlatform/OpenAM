@@ -331,7 +331,7 @@ public class UmaPolicyServiceImplDelegationTest {
 
     private AMIdentity setupIdentityForUser(String username, String realm) {
         AMIdentity loggedInUser = mock(AMIdentity.class);
-        given(loggedInUser.getUniversalId()).willReturn("id=" + username + ",ou=" + realm + ",dc=forgerock,dc=org");
+        given(loggedInUser.getUniversalId()).willReturn("id=" + username + ",ou=" + realm + ",dc=openidentityplatform,dc=org");
         given(coreServicesWrapper.getIdentity(username, realm)).willReturn(loggedInUser);
         return loggedInUser;
     }
@@ -340,7 +340,7 @@ public class UmaPolicyServiceImplDelegationTest {
         userInUri = username;
         given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(userInUri);
         given(contextHelper.getUserUid(Matchers.<Context>anyObject())).willReturn("uid=" + userInUri + ",ou="
-                + loggedInRealm + ",dc=forgerock,dc=org");
+                + loggedInRealm + ",dc=openidentityplatform,dc=org");
     }
 
     private String registerResourceSet(String resourceOwner) throws Exception {
@@ -461,7 +461,7 @@ public class UmaPolicyServiceImplDelegationTest {
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
-        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org");
+        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + loggedInUserId + ",ou=REALM,dc=openidentityplatform,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(loggedInUserId);
         return ClientContext.newInternalClientContext(new RealmContext(subjectContext, Realm.root()));
@@ -489,11 +489,11 @@ public class UmaPolicyServiceImplDelegationTest {
 
     private void verifyAuditLogCreatedForLoggedInUser(String resourceSetId, AMIdentity loggedInUser) {
         ArgumentCaptor<AMIdentity> loggedInUserCaptor = ArgumentCaptor.forClass(AMIdentity.class);
-        verify(auditLogger).log(eq(resourceSetId), anyString(), loggedInUserCaptor.capture(), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org"));
+        verify(auditLogger).log(eq(resourceSetId), anyString(), loggedInUserCaptor.capture(), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=openidentityplatform,dc=org"));
         Assertions.assertThat(loggedInUserCaptor.getValue().getUniversalId()).isEqualTo(loggedInUser.getUniversalId());
     }
 
     private void verifyAuditLogNotCreatedForLoggedInUser(String resourceSetId) {
-        verify(auditLogger, never()).log(eq(resourceSetId), anyString(), eq(loggedInUser), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=forgerock,dc=org"));
+        verify(auditLogger, never()).log(eq(resourceSetId), anyString(), eq(loggedInUser), eq(UmaAuditType.POLICY_CREATED), eq("id=" + loggedInUserId + ",ou=REALM,dc=openidentityplatform,dc=org"));
     }
 }

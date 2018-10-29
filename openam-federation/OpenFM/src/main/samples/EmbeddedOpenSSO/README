@@ -93,7 +93,7 @@ Deployed
      DIRECTORY_SSL=SIMPLE
      DIRECTORY_SERVER=localhost
      DIRECTORY_PORT=50389
-     ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
+     ROOT_SUFFIX=dc=openam,dc=openidentityplatform,dc=org
      DS_DIRMGRDN=cn=Directory Manager
      DS_DIRMGRPASSWD=11111111
 

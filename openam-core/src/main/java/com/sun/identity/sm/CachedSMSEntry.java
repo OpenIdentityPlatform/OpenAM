@@ -38,7 +38,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.google.common.collect.Ordering;
@@ -57,8 +59,7 @@ import com.sun.identity.shared.Constants;
 public class CachedSMSEntry implements SMSEventListener {
 
     // Cache of CachedSMSEntries (static)
-    private static Map smsEntries = Collections.synchronizedMap(
-        new HashMap(1000));
+    private static Map<String,CachedSMSEntry> smsEntries = new ConcurrentHashMap<String,CachedSMSEntry>(1000);
 
     // Instance variables
 
@@ -360,14 +361,14 @@ public class CachedSMSEntry implements SMSEventListener {
             // block since SMSEntry call delegation which in turn calls
             // policy, idrepo, special repo and SMS again
             CachedSMSEntry tmp = new CachedSMSEntry(new SMSEntry(t, dn));
-            synchronized (smsEntries) {
+//            synchronized (smsEntries) {
                 if (((answer = (CachedSMSEntry) smsEntries.get(cacheEntry))
                     == null) || !answer.isValid()) {
                     // Add it to cache
                     answer = tmp;
                     smsEntries.put(cacheEntry, answer);
                 }
-            }
+//            }
         }
         
         // Check if user has permissions
@@ -410,16 +411,9 @@ public class CachedSMSEntry implements SMSEventListener {
 
     // Clears the cache
     static void clearCache() {
-        synchronized (smsEntries) {
-            for (Iterator items = smsEntries.values().iterator();
-                items.hasNext();) {
-                CachedSMSEntry cEntry = (CachedSMSEntry) items.next();
-                // this entry is no long valid
-                cEntry.clear(false);
-            }
-            // Remove all entries from cache
-            smsEntries.clear();
-        }
+        for (CachedSMSEntry entry: smsEntries.values()) {
+        	entry.clear(true);
+		}
     }
 
     // ----------------------------------------------

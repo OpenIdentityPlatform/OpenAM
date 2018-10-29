@@ -39,7 +39,7 @@ import org.testng.annotations.Test;
  */
 public class IndexTreeServiceImplTest {
 
-    private static final String ROOT_SUFFIX = "dc=openam,dc=forgerock,dc=org";
+    private static final String ROOT_SUFFIX = "dc=openam,dc=openidentityplatform,dc=org";
 
     private static final String REALM = "/test-realm";
     private static final String REALM_DN = "ou=test-realm," + ROOT_SUFFIX;

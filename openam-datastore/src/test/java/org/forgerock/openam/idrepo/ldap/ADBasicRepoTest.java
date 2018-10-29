@@ -57,7 +57,7 @@ public class ADBasicRepoTest extends IdRepoTestBase {
     @Test
     public void referenceShouldNotCauseExceptionDuringLookup() throws Exception {
         String fqn = idrepo.getFullyQualifiedName(null, IdType.USER, DEMO);
-        assertThat(fqn).isNotNull().isEqualTo("[localhost:389]/cn=Demo,cn=users,dc=openam,dc=forgerock,dc=org");
+        assertThat(fqn).isNotNull().isEqualTo("[localhost:389]/cn=Demo,cn=users,dc=openam,dc=openidentityplatform,dc=org");
     }
 
     @Test

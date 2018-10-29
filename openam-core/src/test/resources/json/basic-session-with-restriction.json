@@ -13,7 +13,7 @@
             "@class": "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction",
             "addressList": [],
             "asString": "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=",
-            "dn": "id=myagent,ou=agent,dc=openam,dc=forgerock,dc=org"
+            "dn": "id=myagent,ou=agent,dc=openam,dc=openidentityplatform,dc=org"
         }
     },
     "sessionEventURLs": {},

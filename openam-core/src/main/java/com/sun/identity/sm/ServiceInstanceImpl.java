@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -165,7 +166,6 @@ class ServiceInstanceImpl implements CachedSMSEntry.SMSEntryUpdateListener {
         }
 
         // Construct the service instance
-        synchronized (serviceInstances) {
             // Check cache again, in case it was added by another thread
             if ((answer = getFromCache(cName, serviceName, version, iName,
                     oName, token)) == null) {
@@ -175,7 +175,6 @@ class ServiceInstanceImpl implements CachedSMSEntry.SMSEntryUpdateListener {
                 answer = new ServiceInstanceImpl(iName, entry);
                 serviceInstances.put(cName, answer);
             }
-        }
         if (debug.messageEnabled()) {
             debug.message("ServiceInstanceImpl::getInstance: success: " +
                 serviceName + "(" + version + ")" + " Instance: " + iName);
@@ -185,14 +184,10 @@ class ServiceInstanceImpl implements CachedSMSEntry.SMSEntryUpdateListener {
 
     // Clears the cache
     static void clearCache() {
-        synchronized (serviceInstances) {
-            for (Iterator items = serviceInstances.values().iterator();
-                items.hasNext();) {
-                ServiceInstanceImpl impl = (ServiceInstanceImpl) items.next();
-                impl.clear();
-            }
-            serviceInstances.clear();
-        }
+        for (ServiceInstanceImpl impl : serviceInstances.values()) {
+        	impl.clear();
+		}
+		serviceInstances.clear();
     }
 
     static String getCacheName(String sName, String version, String ins, String oName) {
@@ -264,8 +259,7 @@ class ServiceInstanceImpl implements CachedSMSEntry.SMSEntryUpdateListener {
         return sb.toString();
     }
     
-    private static Map serviceInstances = Collections.synchronizedMap(
-        new HashMap());
+    private static Map<String,ServiceInstanceImpl> serviceInstances = new ConcurrentHashMap<String, ServiceInstanceImpl>();
 
     private static Map userPrincipals = Collections.synchronizedMap(
         new HashMap());

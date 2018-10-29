@@ -66,12 +66,12 @@ import com.sun.identity.sm.ldap.ConfigAuditorFactory;
 public abstract class IdRepoTestBase extends PowerMockTestCase {
 
     protected static final String TEST1_GROUP = "test1";
-    protected static final String TEST1_GROUP_DN = "cn=test1,ou=groups,dc=openam,dc=forgerock,dc=org";
+    protected static final String TEST1_GROUP_DN = "cn=test1,ou=groups,dc=openam,dc=openidentityplatform,dc=org";
     protected static final String TEST_USER1 = "testuser1";
     protected static final String DEMO = "demo";
     protected static final String USER0 = "user.0";
-    protected static final String USER0_DN = "uid=user.0,ou=people,dc=openam,dc=forgerock,dc=org";
-    protected static final String DEMO_DN = "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org";
+    protected static final String USER0_DN = "uid=user.0,ou=people,dc=openam,dc=openidentityplatform,dc=org";
+    protected static final String DEMO_DN = "uid=demo,ou=people,dc=openam,dc=openidentityplatform,dc=org";
     protected RequestHandler<RequestContext> memoryBackend;
     protected IdRepoListener idRepoListener;
     protected DJLDAPv3Repo idrepo = new DJLDAPv3Repo() {
