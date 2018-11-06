@@ -160,7 +160,7 @@ public class UmaPolicyServiceImplTest {
         given(lazyAuditLogger.get()).willReturn(auditLogger);
 
         AMIdentity identity = mock(AMIdentity.class);
-        given(identity.getUniversalId()).willReturn("uid=RESOURCE_OWNER_ID,ou=REALM,dc=forgerock,dc=org");
+        given(identity.getUniversalId()).willReturn("uid=RESOURCE_OWNER_ID,ou=REALM,dc=openidentityplatform,dc=org");
         given(coreServicesWrapper.getIdentity(RESOURCE_OWNER_ID, "REALM")).willReturn(identity);
 
         realmTestHelper = new RealmTestHelper();
@@ -181,7 +181,7 @@ public class UmaPolicyServiceImplTest {
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
-        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + userShortName + ",ou=REALM,dc=forgerock,dc=org");
+        given(ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("id=" + userShortName + ",ou=REALM,dc=openidentityplatform,dc=org");
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(userShortName);
         return ClientContext.newInternalClientContext(new RealmContext(subjectContext, Realm.root()));

@@ -4,7 +4,7 @@
   "component": "AUTHENTICATION",
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
   "authentication": {
-    "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+    "id": "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org",
     "operation": "LOGIN",
     "status": "SUCCEEDED",
     "method": {

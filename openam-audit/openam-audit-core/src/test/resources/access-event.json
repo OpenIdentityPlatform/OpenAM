@@ -3,7 +3,7 @@
   "eventName": "AM-ACCESS-ATTEMPT",
   "component": "Audit",
   "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
-  "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "userId": "id=amadmin,ou=user,dc=openam,dc=openidentityplatform,dc=org",
   "client": {
     "ip": "172.16.101.7",
     "port": 62375

@@ -36,9 +36,9 @@ public class DSEERepoTest extends IdRepoTestBase {
     private static final String DSEE_SETTINGS = "/config/dseesettings.properties";
     private static final String DSEE_LDIF = "/ldif/dsee.ldif";
     private static final String ACCOUNTANT = "Accountant";
-    private static final String ACCOUNTANT_DN = "cn=Accountant,dc=openam,dc=forgerock,dc=org";
+    private static final String ACCOUNTANT_DN = "cn=Accountant,dc=openam,dc=openidentityplatform,dc=org";
     private static final String MANAGER = "Manager";
-    private static final String MANAGER_DN = "cn=Manager,dc=openam,dc=forgerock,dc=org";
+    private static final String MANAGER_DN = "cn=Manager,dc=openam,dc=openidentityplatform,dc=org";
 
     @BeforeClass
     public void setUp() throws Exception {

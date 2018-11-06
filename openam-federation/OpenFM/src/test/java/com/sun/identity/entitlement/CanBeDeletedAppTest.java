@@ -125,7 +125,7 @@ public class CanBeDeletedAppTest {
         ApplicationPrivilege ap = new ApplicationPrivilege(
             DELEGATE_PRIVILEGE_NAME);
         OpenSSOUserSubject sbj = new OpenSSOUserSubject();
-        sbj.setID("uid=demo,ou=user,dc=openam,dc=forgerock,dc=org");
+        sbj.setID("uid=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org");
         Set<SubjectImplementation> subjects = new
             HashSet<SubjectImplementation>();
         subjects.add(sbj);

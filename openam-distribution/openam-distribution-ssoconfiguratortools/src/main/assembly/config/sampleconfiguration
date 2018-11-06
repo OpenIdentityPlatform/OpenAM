@@ -92,7 +92,7 @@ DIRECTORY_SERVER=server1.example.com
 DIRECTORY_PORT=50389
 DIRECTORY_ADMIN_PORT=4444
 DIRECTORY_JMX_PORT=1689
-ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
+ROOT_SUFFIX=dc=openam,dc=openidentityplatform,dc=org
 DS_DIRMGRDN=cn=Directory Manager
 DS_DIRMGRPASSWD=11111111
 
@@ -190,7 +190,7 @@ DS_DIRMGRPASSWD=11111111
 #USERSTORE_DOMAINNAME=addc.example.com 
 #USERSTORE_HOST=server1.example.com
 #USERSTORE_PORT=389
-#USERSTORE_SUFFIX=dc=openam,dc=forgerock,dc=org
+#USERSTORE_SUFFIX=dc=openam,dc=openidentityplatform,dc=org
 #USERSTORE_MGRDN=cn=Directory Manager
 #USERSTORE_PASSWD=11111111
 

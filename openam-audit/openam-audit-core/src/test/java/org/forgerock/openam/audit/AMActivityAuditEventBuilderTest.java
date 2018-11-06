@@ -34,9 +34,9 @@ public class AMActivityAuditEventBuilderTest {
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
-                .userId("id=demo,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org")
                 .trackingId("12345")
-                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org")
+                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=openidentityplatform,dc=org")
                 .objectId("/sessions/uniqueSessionAlias")
                 .operation("CREATE")
                 .toEvent();
@@ -51,9 +51,9 @@ public class AMActivityAuditEventBuilderTest {
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
-                .userId("id=demo,ou=user,dc=openam,dc=forgerock,dc=org")
+                .userId("id=demo,ou=user,dc=openam,dc=openidentityplatform,dc=org")
                 .trackingId("12345")
-                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org")
+                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=openidentityplatform,dc=org")
                 .objectId("/sessions/uniqueSessionAlias")
                 .operation("CREATE")
                 .toEvent();

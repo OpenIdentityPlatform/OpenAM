@@ -36,7 +36,7 @@ import com.sun.identity.idm.IdType;
 
 public class SessionQueryFilterVisitorTest {
 
-    private static final String MOCK_UUID = "id=demo,ou=people,dc=openam,dc=forgerock,dc=org";
+    private static final String MOCK_UUID = "id=demo,ou=people,dc=openam,dc=openidentityplatform,dc=org";
     @Mock
     private IdentityUtils identityUtils;
     private SessionQueryFilterVisitor visitor;

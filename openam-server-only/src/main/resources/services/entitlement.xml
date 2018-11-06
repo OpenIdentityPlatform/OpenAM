@@ -482,7 +482,7 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="createdBy" />
-                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="creationDate" />
@@ -490,7 +490,7 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="lastModifiedBy" />
-                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="lastModifiedDate" />
@@ -519,7 +519,7 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="createdBy" />
-                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="creationDate" />
@@ -527,7 +527,7 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="lastModifiedBy" />
-                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=openidentityplatform,dc=org</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="lastModifiedDate" />

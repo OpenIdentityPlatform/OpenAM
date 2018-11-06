@@ -1207,7 +1207,7 @@ public interface Constants {
     /**
      * Default Root Context
      */
-    static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=forgerock,dc=org";
+    static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=openidentityplatform,dc=org";
 
     /**
      * Default Token Root Context, this will be used to create a Secondary Suffix during installation.

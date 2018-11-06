@@ -26,20 +26,20 @@ public class DelegationUtilsTest {
     @Test
     public void testSwapRealmTagWithREALMInName() throws Exception {
 
-        String realm = "o=aREALM,ou=services,dc=openam,dc=forgerock,dc=org";
+        String realm = "o=aREALM,ou=services,dc=openam,dc=openidentityplatform,dc=org";
 
         String result = DelegationUtils.swapRealmTag(realm, VALUE);
 
-        Assert.assertEquals(result, "*o=aREALM,ou=services,dc=openam,dc=forgerock,dc=org/*");
+        Assert.assertEquals(result, "*o=aREALM,ou=services,dc=openam,dc=openidentityplatform,dc=org/*");
     }
 
     @Test
     public void testSwapRealmTagWithREALMInSubRealmName() throws Exception {
 
-        String realm = "o=aSUBREALM,o=aREALM,ou=services,dc=openam,dc=forgerock,dc=org";
+        String realm = "o=aSUBREALM,o=aREALM,ou=services,dc=openam,dc=openidentityplatform,dc=org";
 
         String result = DelegationUtils.swapRealmTag(realm, VALUE);
 
-        Assert.assertEquals(result, "*o=aSUBREALM,o=aREALM,ou=services,dc=openam,dc=forgerock,dc=org/*");
+        Assert.assertEquals(result, "*o=aSUBREALM,o=aREALM,ou=services,dc=openam,dc=openidentityplatform,dc=org/*");
     }
 }

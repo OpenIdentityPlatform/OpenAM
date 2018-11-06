@@ -1,20 +1,20 @@
-dn: dc=openam,dc=forgerock,dc=org
+dn: dc=openam,dc=openidentityplatform,dc=org
 dc: openam
 objectClass: domain
 objectClass: top
 
-dn: ou=people,dc=openam,dc=forgerock,dc=org
+dn: ou=people,dc=openam,dc=openidentityplatform,dc=org
 ou: People
 objectClass: organizationalUnit
 objectClass: top
 
-dn: ou=groups,dc=openam,dc=forgerock,dc=org
+dn: ou=groups,dc=openam,dc=openidentityplatform,dc=org
 ou: Groups
 objectClass: organizationalUnit
 objectClass: top
 numSubordinates: 0
 
-dn: cn=Accountant,dc=openam,dc=forgerock,dc=org
+dn: cn=Accountant,dc=openam,dc=openidentityplatform,dc=org
 objectClass: nsroledefinition
 objectClass: ldapsubentry
 objectClass: nssimpleroledefinition
@@ -22,7 +22,7 @@ objectClass: top
 objectClass: nsmanagedroledefinition
 cn: Accountant
 
-dn: uid=demo,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=demo,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: demo
 sn: demo
 givenName: demo
@@ -34,7 +34,7 @@ objectclass: top
 objectclass: person
 l: DemoLand
 
-dn: cn=Manager,dc=openam,dc=forgerock,dc=org
+dn: cn=Manager,dc=openam,dc=openidentityplatform,dc=org
 objectClass: nscomplexroledefinition
 objectClass: ldapsubentry
 objectClass: nsfilteredroledefinition
@@ -43,7 +43,7 @@ objectClass: nsroledefinition
 cn: Manager
 nsRoleFilter: (uid=user.*)
 
-dn: uid=user.0,ou=people,dc=openam,dc=forgerock,dc=org
+dn: uid=user.0,ou=people,dc=openam,dc=openidentityplatform,dc=org
 uid: user.0
 sn: Aaccf
 userpassword: password
@@ -52,4 +52,4 @@ objectclass: organizationalPerson
 objectclass: inetuser
 objectclass: top
 objectclass: person
-nsrole: cn=Manager,dc=openam,dc=forgerock,dc=org
+nsrole: cn=Manager,dc=openam,dc=openidentityplatform,dc=org
