@@ -234,10 +234,8 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
                 if (share[0] != VERSION) {
                     Debug debug = Debug.getInstance("amSDK");
                     if (debug != null) {
-                        debug.error("JCEEncryption:: Unsupported version: "
-                                + share[0]);
+                        debug.message("JCEEncryption:: Unsupported version: "+ share[0]);
                     }
-
                     return null;
                 }
 
