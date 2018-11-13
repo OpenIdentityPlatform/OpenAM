@@ -403,6 +403,10 @@ public class OAuth extends AMLoginModule {
                                     profileSvcResponse, jwtClaims);
                             saveAttributes(attributes);
                         }
+
+                        updateAccount(accountProvider, realm, profileSvcResponse, user, jwtClaims);
+                        //update user attributes
+                        
                         storeUsernamePasswd(authenticatedUser, null);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
@@ -676,7 +680,28 @@ public class OAuth extends AMLoginModule {
                 return null;      
             }     
     }
+    
+    protected void updateAccount(AccountProvider accountProvider, String realm, String profileSvcResponse,
+            String userPassword, JwtClaimsSet jwtClaims)
+            throws AuthLoginException {
 
+            Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse, jwtClaims);
+            attributes.put("userPassword", CollectionUtils.asSet(userPassword));
+            attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
+            AMIdentity userIdentity =
+                    accountProvider.searchUser(getAMIdentityRepository(realm),
+                    attributes);
+            if(userIdentity != null) {
+            	try {
+            		userIdentity.setAttributes(attributes);
+            		userIdentity.store();
+            	} catch(Exception e) {
+            		logger.warn("error update attributes for identity {0}", userIdentity, e);
+            	}
+            	
+            }
+                 
+    }
     // Extract the Token from the OAuth 2.0 response
     // Todo: Maybe this should be pluggable
     public String extractToken(String tokenName, String response) {
