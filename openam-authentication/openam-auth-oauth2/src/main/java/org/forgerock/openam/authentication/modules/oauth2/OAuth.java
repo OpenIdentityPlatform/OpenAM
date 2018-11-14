@@ -405,7 +405,6 @@ public class OAuth extends AMLoginModule {
                         }
 
                         updateAccount(accountProvider, realm, userNames, profileSvcResponse, user, jwtClaims);
-                        //update user attributes
                         
                         storeUsernamePasswd(authenticatedUser, null);
                         return ISAuthConstants.LOGIN_SUCCEED;
@@ -680,11 +679,13 @@ public class OAuth extends AMLoginModule {
                 return null;      
             }     
     }
-
-    protected void updateAccount(AccountProvider accountProvider, String realm, Map<String, Set<String>> userNames, String profileSvcResponse,
-
+    
+    protected void updateAccount(AccountProvider accountProvider, 
+    		String realm, Map<String, Set<String>> userNames, 
+    		String profileSvcResponse,
             String userPassword, JwtClaimsSet jwtClaims)
             throws AuthLoginException {
+
 
             Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse, jwtClaims);
             attributes.put("userPassword", CollectionUtils.asSet(userPassword));
@@ -692,6 +693,7 @@ public class OAuth extends AMLoginModule {
             AMIdentity userIdentity =
                     accountProvider.searchUser(getAMIdentityRepository(realm),
                     userNames);
+
             if(userIdentity != null) {
             	try {
             		userIdentity.setAttributes(attributes);
