@@ -680,8 +680,9 @@ public class OAuth extends AMLoginModule {
                 return null;      
             }     
     }
-    
+
     protected void updateAccount(AccountProvider accountProvider, String realm, Map<String, Set<String>> userNames, String profileSvcResponse,
+
             String userPassword, JwtClaimsSet jwtClaims)
             throws AuthLoginException {
 
