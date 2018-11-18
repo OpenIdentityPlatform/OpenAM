@@ -90,7 +90,7 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-    <opendj.server.version>4.2.5</opendj.server.version>
+    <opendj.server.version>4.2.6-SNAPSHOT</opendj.server.version>
     <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
     <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
