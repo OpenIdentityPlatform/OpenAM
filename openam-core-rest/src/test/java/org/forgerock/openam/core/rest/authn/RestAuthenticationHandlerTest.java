@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SignatureException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,6 +188,7 @@ public class RestAuthenticationHandlerTest {
         given(pagePropertiesCallback.getModuleName()).willReturn("MODULE_NAME");
         given(pagePropertiesCallback.getPageState()).willReturn("PAGE_STATE");
         given(pagePropertiesCallback.getHeader()).willReturn("HEADER");
+        given(pagePropertiesCallback.getInfoText()).willReturn(Collections.singletonList("MESSAGE"));
 
         AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
 
@@ -210,12 +212,13 @@ public class RestAuthenticationHandlerTest {
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.size(), 5);
+        assertEquals(response.size(), 6);
         assertEquals(response.get("authId").asString(), "AUTH_ID");
         assertEquals(response.get("template").asString(), "TEMPLATE_NAME");
         assertEquals(response.get("stage").asString(), "MODULE_NAMEPAGE_STATE");
         assertEquals(response.get("header").asString(), "HEADER");
         assertEquals(response.get("callbacks").get("KEY").asString(), "VALUE");
+        assertEquals(response.get("infoText").asList().size(), 1);
     }
 
     @Test
