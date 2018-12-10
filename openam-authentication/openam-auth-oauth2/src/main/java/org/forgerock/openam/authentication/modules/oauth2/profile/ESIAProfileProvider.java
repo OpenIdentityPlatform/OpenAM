@@ -133,6 +133,9 @@ public class ESIAProfileProvider implements ProfileProvider {
 		try {
 			JSONObject profile = new JSONObject(profileStr);
 			
+			if(profile.isNull("oid") && StringUtils.isNotBlank(oid)) {
+				profile.put("oid", oid);
+			}
 			
 			if(cttsStr != null) {
 				JSONObject contactsJsonObj = new JSONObject(cttsStr);

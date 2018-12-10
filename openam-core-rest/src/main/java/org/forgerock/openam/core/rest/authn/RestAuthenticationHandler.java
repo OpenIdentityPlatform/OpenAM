@@ -347,6 +347,7 @@ public class RestAuthenticationHandler {
             String state = pagePropertiesCallback.getPageState();
             jsonResponseObject.put("stage", moduleName + state);
             jsonResponseObject.put("header", pagePropertiesCallback.getHeader());
+            jsonResponseObject.put("infoText", pagePropertiesCallback.getInfoText());
         }
         jsonResponseObject.put("callbacks", jsonCallbacks.getObject());
 
