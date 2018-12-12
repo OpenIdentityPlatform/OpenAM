@@ -63,9 +63,7 @@
 			                <artifactId>cddl-license</artifactId>
 			                <version>1.0.0</version>
 			                <packaging>txt</packaging>
-							<downloadUrl>
-								https://repository.jboss.org/licenses/cddl.txt
-                        		</downloadUrl>
+							<downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
                         	</artifactItem>
  					</artifactItems>
 				</configuration>

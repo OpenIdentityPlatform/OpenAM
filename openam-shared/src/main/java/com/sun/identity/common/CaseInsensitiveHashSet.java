@@ -126,7 +126,7 @@ public class CaseInsensitiveHashSet<T> extends HashSet<T> {
     }
 
     public Object[] toArray() {
-        return toArray(null);
+        return toArray((Object[])null);
     }
     
     /**
