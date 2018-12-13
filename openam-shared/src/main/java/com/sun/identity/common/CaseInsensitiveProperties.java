@@ -28,6 +28,9 @@
 
 package com.sun.identity.common;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
@@ -40,7 +43,7 @@ import java.util.Set;
  */
 public class CaseInsensitiveProperties extends Properties {
 
-    static class CaseInsensitiveEnumeration implements Enumeration {
+	static class CaseInsensitiveEnumeration implements Enumeration {
         Enumeration mEnum = null;
 
         public CaseInsensitiveEnumeration(Enumeration en) {
@@ -138,14 +141,12 @@ public class CaseInsensitiveProperties extends Properties {
     }
 
     public Object put(Object key, Object value) {
-        Object retval;
         if (key instanceof String) {
             CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.put(ciKey, value);
+            return super.put(ciKey, value);
         } else {
-            retval = super.put(key, value);
+        	return super.put(key, value);
         }
-        return retval;
     }
 
     public Object remove(Object key) {

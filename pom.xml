@@ -90,7 +90,7 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-    <opendj.server.version>4.2.6-SNAPSHOT</opendj.server.version>
+    <opendj.server.version>4.3.2-SNAPSHOT</opendj.server.version>
     <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
     <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
@@ -102,7 +102,7 @@
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
     <restlet.version>2.3.4</restlet.version>
-    <powermock.version>1.6.6</powermock.version>
+    <powermock.version>2.0.0-RC.4</powermock.version>
     <slf4j.version>1.7.25</slf4j.version>
     <santuario.xmlsec.version>2.1.0</santuario.xmlsec.version>
     <click.version>2.3.0</click.version>
@@ -546,6 +546,12 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+	  <dependency>
+		  <groupId>org.mockito</groupId>
+		  <artifactId>mockito-all</artifactId>
+		  <version>1.10.19</version>
+		  <scope>test</scope>
+		</dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.forgerock.openam</groupId>
@@ -1775,6 +1781,12 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+		  <groupId>org.powermock</groupId>
+		  <artifactId>powermock-api-mockito2</artifactId>
+		  <version>${powermock.version}</version>
+		  <scope>test</scope>
+	  </dependency>
+      <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-module-junit4</artifactId>
         <version>${powermock.version}</version>
@@ -1883,14 +1895,6 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
     </dependency>
@@ -1916,9 +1920,7 @@
               <artifactId>cddl-license</artifactId>
               <version>1.0.0</version>
               <packaging>txt</packaging>
-              <downloadUrl>
-								https://repository.jboss.org/licenses/cddl.txt
-                        		</downloadUrl>
+              <downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
             </artifactItem>
           </artifactItems>
         </configuration>

@@ -42,6 +42,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-context</artifactId>
         </dependency>
+        <dependency>
+		  <groupId>org.mockito</groupId>
+		  <artifactId>mockito-core</artifactId>
+		  <scope>test</scope>
+		</dependency>
     </dependencies>
 
 </project>

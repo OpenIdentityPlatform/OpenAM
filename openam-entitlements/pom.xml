@@ -84,16 +84,43 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
         </dependency>
-
+		<dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-module-testng</artifactId>
+	      <version>1.7.4</version>
+	      <scope>test</scope>
+	   </dependency>
+	   <dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-core</artifactId>
+	      <version>1.7.4</version>
+	      <scope>test</scope>
+	   </dependency>
+	   <dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-module-junit4</artifactId>
+	      <version>1.7.4</version>
+	      <scope>test</scope>
+	   </dependency>
+	   <dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-api-mockito</artifactId>
+	      <version>1.7.4</version>
+	      <scope>test</scope>
+	   </dependency> 
+	   
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -107,18 +134,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-testng-common</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
