@@ -125,9 +125,11 @@ public class BootstrapCreator {
             final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
 
             // write the required boot passwords to the keystore
-            amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
-            amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
-            amKeyProvider.store();
+            if (!new File(ksc.getKeyStoreFile()).exists()) {
+	            amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
+	            amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
+	            amKeyProvider.store();
+            }
 
             bootConfig.writeConfig(baseDir + "/boot.json");
             // We delay deletion of legacy bootstrap until the very end.
