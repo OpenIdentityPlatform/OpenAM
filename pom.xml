@@ -134,6 +134,7 @@
     <jsr311-api.version>1.1.1</jsr311-api.version>
     <jstl.version>1.1.2</jstl.version>
     <mail.version>1.5.1</mail.version>
+    <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
     <rhino.version>1.7R4</rhino.version>
@@ -1802,6 +1803,12 @@
         <groupId>httpunit</groupId>
         <artifactId>httpunit</artifactId>
         <version>1.7</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
