@@ -18,6 +18,7 @@ package org.forgerock.openam.core.rest.authn;
 
 import com.google.inject.Singleton;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.callbacks.NameValueOutputCallback;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
@@ -31,6 +32,7 @@ import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthHiddenValue
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthHttpCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthLanguageCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthNameCallbackHandler;
+import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthNameValueOutputCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthPollingWaitCallbackHandler;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthRedirectCallbackHandler;
@@ -114,6 +116,8 @@ public class RestAuthCallbackHandlerFactory {
             return new RestAuthX509CallbackHandler();
         } else if (PollingWaitCallback.class.isAssignableFrom(callbackClass)) {
             return new RestAuthPollingWaitCallbackHandler();
+        } else if (NameValueOutputCallback.class.isAssignableFrom(callbackClass)) {
+            return new RestAuthNameValueOutputCallbackHandler();
         }
 
         DEBUG.error(MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
