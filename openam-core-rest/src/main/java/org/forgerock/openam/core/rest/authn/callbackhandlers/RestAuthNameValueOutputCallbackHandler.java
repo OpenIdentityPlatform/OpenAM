@@ -28,7 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+<<<<<<< HEAD
  * Defines methods to convert a NameValueOutputCallback to a JSON representation.
+=======
+ * Defines methods to convert a TextOutputCallback to a JSON representation.
+>>>>>>> upstream/master
  */
 public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCallbackHandler<NameValueOutputCallback>  {
 
@@ -44,6 +48,21 @@ public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCall
     /**
      * {@inheritDoc}
      */
+<<<<<<< HEAD
+=======
+    public TextOutputCallback convertFromJson(TextOutputCallback callback, JsonValue jsonCallback) throws RestAuthException {
+
+        validateCallbackType(CALLBACK_NAME, jsonCallback);
+
+        // Nothing to do here as TextOutputCallback is purely used to send information to the client.
+
+        return callback;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+>>>>>>> upstream/master
 	@Override
 	public NameValueOutputCallback handle(HttpServletRequest request, HttpServletResponse response, JsonValue postBody,
 			NameValueOutputCallback originalCallback) {
