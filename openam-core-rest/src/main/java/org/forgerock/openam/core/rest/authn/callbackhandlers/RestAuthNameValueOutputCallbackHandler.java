@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2018 Open Identity Community.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Defines methods to convert a TextOutputCallback to a JSON representation.
+ * Defines methods to convert a NameValueOutputCallback to a JSON representation.
  */
 public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCallbackHandler<NameValueOutputCallback>  {
 
@@ -39,18 +39,6 @@ public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCall
      */
     public String getCallbackClassName() {
         return CALLBACK_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TextOutputCallback convertFromJson(TextOutputCallback callback, JsonValue jsonCallback) throws RestAuthException {
-
-        validateCallbackType(CALLBACK_NAME, jsonCallback);
-
-        // Nothing to do here as TextOutputCallback is purely used to send information to the client.
-
-        return callback;
     }
 
     /**

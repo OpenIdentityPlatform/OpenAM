@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2016 ForgeRock AS.
+ * Copyright 2018 Open Identity Community.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
