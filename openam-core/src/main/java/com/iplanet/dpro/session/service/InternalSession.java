@@ -335,6 +335,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     public void setMaxSessionTime(long maxSessionTimeInMinutes) {
         if (this.maxSessionTimeInMinutes != maxSessionTimeInMinutes) {
+        	if (willExpireFlag == false &&maxSessionTimeInMinutes<NON_EXPIRING_SESSION_LENGTH_MINUTES)
+        		willExpireFlag = true;
             this.maxSessionTimeInMinutes = maxSessionTimeInMinutes;
             notifyPersistenceManager();
         }
@@ -354,8 +356,13 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @param maxIdleTimeInMinutes
      */
     public void setMaxIdleTime(long maxIdleTimeInMinutes) {
-        this.maxIdleTimeInMinutes = maxIdleTimeInMinutes;
-        notifyPersistenceManager();
+    	if (this.maxIdleTimeInMinutes != maxIdleTimeInMinutes) {
+	    	if (willExpireFlag == false && maxIdleTimeInMinutes<NON_EXPIRING_SESSION_LENGTH_MINUTES)
+	    		willExpireFlag = true;
+	            
+	    	this.maxIdleTimeInMinutes = maxIdleTimeInMinutes;
+	        notifyPersistenceManager();
+    	}
     }
 
     /**
@@ -374,8 +381,12 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      *        Maximum Caching Time
      */
     public void setMaxCachingTime(long t) {
-        maxCachingTimeInMinutes = t;
-        notifyPersistenceManager();
+    	if (this.maxCachingTimeInMinutes != t) {
+	    	if (willExpireFlag == false && t<serviceConfig.getApplicationMaxCachingTime())
+	    		willExpireFlag = true;
+	        maxCachingTimeInMinutes = t;
+	        notifyPersistenceManager();
+    	}
     }
 
     /**
@@ -768,7 +779,10 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * @param timeoutTime The timeout time (in millis).
      */
     public void setTimedOutTime(long timeoutTime) {
-        Reject.rejectStateIfTrue(!willExpire(), "Cannot timeout non-expiring session.");
+   		if (!willExpire()) {
+   			debug.error("!willExpire {}",toString());
+   			throw new IllegalStateException("Cannot timeout non-expiring session.");
+   		}
         Reject.rejectStateIfTrue(isTimedOut(), "Session already timed out.");
         timedOutTimeInSeconds = MILLISECONDS.toSeconds(timeoutTime);
         putProperty(SESSION_TIMED_OUT, String.valueOf(timedOutTimeInSeconds));
