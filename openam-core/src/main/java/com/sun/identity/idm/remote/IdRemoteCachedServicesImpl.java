@@ -638,9 +638,9 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                         isCached = true;
                     } catch (IdRepoException ide) {
                         // Check if the exception is name not found
-                        if (!ide.getErrorCode().equals(IdRepoErrorCode.UNABLE_FIND_ENTRY)) {
+                        if (!ide.getErrorCode().equals(IdRepoErrorCode.UNABLE_FIND_ENTRY) && !ide.getErrorCode().equals(IdRepoErrorCode.TYPE_NOT_FOUND)) {
                             // Throw the exception
-                            throw (ide);
+                           throw (ide);
                         }
                     }
                 }
