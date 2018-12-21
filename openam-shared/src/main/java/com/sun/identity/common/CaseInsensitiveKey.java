@@ -36,13 +36,16 @@ import java.io.Serializable;
  * String wrapper that returns a case insensitive hash code useful for case
  * insensitive hashing in HashSet and HashMap.
  */
-public class CaseInsensitiveKey implements Serializable {
-    String mKey;
+public class CaseInsensitiveKey implements Serializable  {
+
+private static final long serialVersionUID = 1L;
+	String mKey;
 
     public CaseInsensitiveKey(String key) {
         mKey = key;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof CaseInsensitiveKey) {
             return mKey.equalsIgnoreCase(((CaseInsensitiveKey) o).toString());
@@ -51,10 +54,12 @@ public class CaseInsensitiveKey implements Serializable {
         }
     }
 
+    @Override
     public int hashCode() {
         return mKey.toLowerCase().hashCode();
     }
 
+    @Override
     public String toString() {
         return mKey;
     }

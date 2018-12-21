@@ -96,7 +96,7 @@ public class OpenAMAuthHandlerTest {
 
         final ContextHolderCache ctxHolderCache = mock(ContextHolderCache.class);
         when(ctxHolderCache.createCachedContextHolder()).thenReturn(holder);
-        when(ctxHolderCache.get(isA(String.class))).thenReturn(holder);
+        when(ctxHolderCache.get(org.mockito.Matchers.isA(String.class))).thenReturn(holder);
 
         EventBus eventBus = new EventBus();
 
@@ -130,7 +130,7 @@ public class OpenAMAuthHandlerTest {
         UserNameAttribute userName = mock(UserNameAttribute.class);
         when(userName.getName()).thenReturn("Fred");
         UserPasswordAttribute userPassword = mock(UserPasswordAttribute.class);
-        when(userPassword.extractPassword(isA(Authenticator.class), isA(String.class))).thenReturn("password");
+        when(userPassword.extractPassword(org.mockito.Matchers.isA(Authenticator.class), org.mockito.Matchers.isA(String.class))).thenReturn("password");
         when(request.getAttribute(UserPasswordAttribute.class)).thenReturn(userPassword);
         when(request.getAttribute(UserNameAttribute.class)).thenReturn(userName);
 
