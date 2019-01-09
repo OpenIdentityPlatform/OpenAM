@@ -1083,21 +1083,24 @@ public class IdServicesImpl implements IdServices {
        }
 
        // Iterate through other plugins
-       Iterator it = configuredPluginClasses.iterator();
+       Exception lastException=null;
+       final Iterator it = configuredPluginClasses.iterator();
        boolean exists = false;
        try {
            while (it.hasNext()) {
-               IdRepo idRepo = (IdRepo) it.next();
+               final IdRepo idRepo = (IdRepo) it.next();
                exists = idRepo.isExists(token, type, name);
-               if (exists) {
-                   break;
-               }
+               if (exists) 
+            	   return exists;
+               lastException=null; //has good repo
            }
        } catch (Exception idm) {
-           // Ignore the exception if not found in one plugin.
-           // Iterate through all configured plugins and look for the
-           // identity and if found break the loop, if not finally return
-           // false.
+    	   lastException=idm;
+       }
+       if (lastException!=null) {
+    	   if  (lastException instanceof IdRepoException)
+    		   throw (IdRepoException)lastException;
+    	   throw (SSOException)lastException;
        }
        return exists;
    }
