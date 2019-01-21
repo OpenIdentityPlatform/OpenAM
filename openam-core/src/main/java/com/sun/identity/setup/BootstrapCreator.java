@@ -122,10 +122,9 @@ public class BootstrapCreator {
             if (doMigrate) { // start migration of legacy bootstrap
                 migrateBootstrap(ksc);
             }
-            final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
-
             // write the required boot passwords to the keystore
             if (!new File(ksc.getKeyStoreFile()).exists()) {
+            	final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
 	            amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
 	            amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
 	            amKeyProvider.store();
