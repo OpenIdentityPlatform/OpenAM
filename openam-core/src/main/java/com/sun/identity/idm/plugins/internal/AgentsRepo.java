@@ -771,10 +771,14 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             throw (initializationException);
         }
         boolean exist = false;
-        Map answer = getAttributes(token, type, name);
-        if (answer != null && !answer.isEmpty()) {
-            exist = true;
-        }
+        try {
+	        Map answer = getAttributes(token, type, name);
+	        if (answer != null && !answer.isEmpty()) {
+	            exist = true;
+	        }
+        }catch (Exception e) { //AMSetupServlet.processRequest: errorMessage:Plug-in com.sun.identity.idm.plugins.internal.AgentsRepo: Unable to read attributes.
+			return false;
+		}
         return (exist);
     }
 
