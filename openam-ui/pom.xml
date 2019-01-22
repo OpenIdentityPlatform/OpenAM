@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.1.16-SNAPSHOT</version>
+        <version>14.1.17-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ui</artifactId>
@@ -206,8 +206,8 @@
 			                <packaging>js</packaging>
 			                <classifier>min</classifier>
 							<downloadUrl>
-								https://raw.githubusercontent.com/JedWatson/react-input-autosize/v1.1.0/src/AutosizeInput.js
-                        		</downloadUrl>
+								https://raw.githubusercontent.com/JedWatson/react-input-autosize/v1.1.0/dist/react-input-autosize.min.js
+                        	</downloadUrl>
                         	</artifactItem>
                         	<artifactItem>
 							<groupId>org.forgerock.commons.ui.libs</groupId>

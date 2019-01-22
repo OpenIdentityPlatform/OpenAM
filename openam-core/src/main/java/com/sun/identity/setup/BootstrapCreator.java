@@ -123,12 +123,23 @@ public class BootstrapCreator {
                 migrateBootstrap(ksc);
             }
             // write the required boot passwords to the keystore
-            if (!new File(ksc.getKeyStoreFile()).exists()) {
-            	final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
-	            amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
-	            amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
-	            amKeyProvider.store();
-            }
+        	final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
+        	if (amKeyProvider.getSecretKey(BootstrapData.DSAME_PWD_KEY)==null) {
+        		amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
+        		 try {
+                 	amKeyProvider.store();
+                 }catch (Exception e) {
+     				DEBUG.warning("save {} {}",BootstrapData.DSAME_PWD_KEY, e.toString());
+     			}
+        	}
+        	if (amKeyProvider.getSecretKey(BootstrapData.CONFIG_PWD_KEY)==null) {
+        		amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
+        		 try {
+                  	amKeyProvider.store();
+                  }catch (Exception e) {
+      				DEBUG.warning("save {} {}",BootstrapData.CONFIG_PWD_KEY, e.toString());
+      			}
+         	}
 
             bootConfig.writeConfig(baseDir + "/boot.json");
             // We delay deletion of legacy bootstrap until the very end.
@@ -138,7 +149,7 @@ public class BootstrapCreator {
                 bootstrap.delete();
             }
 
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+        } catch (IOException | KeyStoreException  e) {
             throw new ConfigurationException(e.getMessage());
         }
     }
