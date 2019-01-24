@@ -144,7 +144,7 @@
     <xsdlib.version>20060615</xsdlib.version>
     <authapi.version>2005-08-12</authapi.version>
     <FastInfoset.version>2006-26-09</FastInfoset.version>
-    <jdmk.version>2007-01-10</jdmk.version>
+    <opendmk.version>1.0-b02-SNAPSHOT</opendmk.version>
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.19</freemarker.version>
@@ -189,6 +189,13 @@
           <id>forgerock-internal</id>
           <name>Forgerock Internal Repository</name>
           <url>http://maven.forgerock.org/repo/internal</url>
+        </repository>
+        <repository>
+          <id>xtreemfs-opendmk</id>
+          <url>https://xtreemfs.github.io/opendmk</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
       <dependencyManagement>
@@ -1548,15 +1555,14 @@
         <version>${FastInfoset.version}</version>
       </dependency>
       <dependency>
-        <groupId>external</groupId>
+        <groupId>org.xtreemfs.opendmk</groupId>
         <artifactId>jdmkrt</artifactId>
-        <version>${jdmk.version}</version>
+        <version>${opendmk.version}</version>
       </dependency>
       <dependency>
-        <groupId>external</groupId>
+        <groupId>org.xtreemfs.opendmk</groupId>
         <artifactId>jdmktk</artifactId>
-        <version>${jdmk.version}</version>
-        <scope>compile</scope>
+        <version>${opendmk.version}</version>
       </dependency>
       <dependency>
         <groupId>external</groupId>
@@ -2312,36 +2318,6 @@
           <artifactId>maven-install-plugin</artifactId>
           <inherited>false</inherited>
           <executions>
-            <execution>
-              <id>install-jar-lib-jdmkrt</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>external</groupId>
-                <artifactId>jdmkrt</artifactId>
-                <version>2007-01-10</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/jdmkrt-2007-01-10.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-jdmktk</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>external</groupId>
-                <artifactId>jdmktk</artifactId>
-                <version>2007-01-10</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/jdmktk-2007-01-10.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
             <execution>
               <id>install-jar-lib-jato</id>
               <goals>

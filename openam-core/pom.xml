@@ -344,7 +344,7 @@
 
         <!-- Legacy External Libraries for OpenAM -->
         <dependency>
-            <groupId>external</groupId>
+            <groupId>org.xtreemfs.opendmk</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
         <dependency>
