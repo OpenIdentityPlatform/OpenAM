@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -1493,7 +1494,7 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("resProperty is.. :" + resProperty);
             }
-            String errorMsg = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_MESSAGE);
+            String errorMsg = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_MESSAGE, bundle);
             String templateName = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_TEMPLATE);
 
             if (debug.messageEnabled()) {

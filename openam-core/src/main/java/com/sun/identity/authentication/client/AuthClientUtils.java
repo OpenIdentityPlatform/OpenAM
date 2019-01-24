@@ -25,6 +25,7 @@
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.client;
 
@@ -1855,9 +1856,20 @@ public class AuthClientUtils {
             bundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
         }
 
+        return getErrorVal(errorCode, type, bundle);
+    }
+    
+    public static String getErrorVal(String errorCode,String type,
+            ResourceBundle bundle) {
+
+        ResourceBundle errMsgBundle = bundle;
+        if (errMsgBundle == null) {
+            errMsgBundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
+        }
+
         String errorMsg=null;
         String templateName=null;
-        String resProperty = bundle.getString(errorCode);
+        String resProperty = errMsgBundle.getString(errorCode);
         if (utilDebug.messageEnabled()) {
             utilDebug.message("errorCod='{}', resProperty='{}'", errorCode, resProperty);
         }
