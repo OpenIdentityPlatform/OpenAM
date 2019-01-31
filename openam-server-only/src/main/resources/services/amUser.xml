@@ -214,6 +214,13 @@
                         <Value>Active</Value>
 		    </DefaultValues>
 	        </AttributeSchema>
+	        <AttributeSchema name="sunAMAuthInvalidAttemptsData"
+	        	type="single"
+	        	syntax="xml" 
+	        	any="adminDisplay" 
+	        	i18nKey="u1111"
+	        	order="1510">
+	        </AttributeSchema>
                 <AttributeSchema name="iplanet-am-user-account-life"
                     type="single"
                     syntax="date"
