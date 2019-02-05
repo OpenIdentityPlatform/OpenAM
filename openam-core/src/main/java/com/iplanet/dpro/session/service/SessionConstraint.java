@@ -139,7 +139,7 @@ public class SessionConstraint {
         try {
             final Map sessions = getSessionQueryManager().getAllSessionsByUUID(internalSession.getUUID());
          // Step 3: checking the constraints
-            if (sessions != null && SystemProperties.getAsBoolean("org.openidentityplatform.openam.cts.quota.enabled", true)) {
+            if (sessions != null && SystemProperties.getAsBoolean("org.openidentityplatform.openam.cts.quota.exhaustion.enabled", true)) {
             		sessions.remove(internalSession.getSessionID().toString());
 	    	        while (sessions.size() >= quota) 
 	    	            reject = getQuotaExhaustionAction().action(internalSession, sessions);
