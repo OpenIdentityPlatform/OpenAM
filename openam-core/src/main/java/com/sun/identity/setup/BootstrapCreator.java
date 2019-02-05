@@ -37,6 +37,7 @@ import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.keystore.KeyStoreConfig;
 import org.forgerock.openam.setup.BootstrapConfig;
 import org.forgerock.openam.setup.ConfigStoreProperties;
@@ -124,22 +125,19 @@ public class BootstrapCreator {
             }
             // write the required boot passwords to the keystore
         	final AMKeyProvider amKeyProvider = new AMKeyProvider(ksc);
-        	if (amKeyProvider.getSecretKey(BootstrapData.DSAME_PWD_KEY)==null) {
-        		amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
-        		 try {
-                 	amKeyProvider.store();
-                 }catch (Exception e) {
-     				DEBUG.warning("save {} {}",BootstrapData.DSAME_PWD_KEY, e.toString());
-     			}
-        	}
-        	if (amKeyProvider.getSecretKey(BootstrapData.CONFIG_PWD_KEY)==null) {
-        		amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
-        		 try {
+        	try {
+	        	if (!StringUtils.equals(dspw,amKeyProvider.getSecret(BootstrapData.DSAME_PWD_KEY)) || !StringUtils.equals(configStorepw,amKeyProvider.getSecret(BootstrapData.CONFIG_PWD_KEY))) {
+	        		throw new KeyStoreException("need rewrite keys");
+	        	}
+        	}catch (KeyStoreException ke) {
+        		try {
+        			amKeyProvider.setSecretKeyEntry(BootstrapData.DSAME_PWD_KEY, dspw);
+        			amKeyProvider.setSecretKeyEntry(BootstrapData.CONFIG_PWD_KEY, configStorepw);
                   	amKeyProvider.store();
                   }catch (Exception e) {
       				DEBUG.warning("save {} {}",BootstrapData.CONFIG_PWD_KEY, e.toString());
       			}
-         	}
+			}
 
             bootConfig.writeConfig(baseDir + "/boot.json");
             // We delay deletion of legacy bootstrap until the very end.
