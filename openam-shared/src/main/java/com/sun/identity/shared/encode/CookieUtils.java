@@ -467,26 +467,19 @@ public class CookieUtils {
      * @param cookieDomains The configured cookie domains to match against.
      * @return The set of matching cookie domains. May contain null.
      */
-    public static Set<String> getMatchingCookieDomains(HttpServletRequest request, Collection<String> cookieDomains) {
+    public static Set<String> getMatchingCookieDomains(HttpServletRequest request, Collection<String> cookieDomain) {
         if (SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true)) {
-            return new HashSet<>(cookieDomains);
+            return new HashSet<>(cookieDomain);
         }
 
         String host = request.getServerName();
         Set<String> domains = new HashSet<>();
 
-        for (String domain : cookieDomains) {
+        for (String domain : cookieDomain) {
             if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
                 domains.add(domain);
             }
         }
-        //IE fix: allow add .app.domain.com after .domain.com without SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true) 
-        for (String domain :  new HashSet<>(domains)) { //.domain.com
-			for (String cookieDomain : cookieDomains) { //.app.domain.com 
-				if (StringUtils.endsWithIgnoreCase(cookieDomain,domain)) //.app.domain.com ends with .domain.com ?
-					domains.add(cookieDomain); //add .app.domain.com after .domain.com
-			}
-		}
         return domains;
     }
 }
