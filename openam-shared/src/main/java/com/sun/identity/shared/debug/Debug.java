@@ -261,33 +261,15 @@ public class Debug {
         if (!serviceInitialized) {
             String providerName = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_PROVIDER);
             IDebugProvider provider = null;
-            boolean providerLoadFailed = false;
-            Exception exceptionCatched = null;
             if (providerName != null && providerName.trim().length() > 0) {
                 try {
                     provider = (IDebugProvider) Class.forName(providerName).newInstance();
-                } catch (ClassNotFoundException cnex) {
-                    providerLoadFailed = true;
-                    exceptionCatched = cnex;
-                } catch (InstantiationException iex) {
-                    providerLoadFailed = true;
-                    exceptionCatched = iex;
-                } catch (IllegalAccessException iaex) {
-                    providerLoadFailed = true;
-                    exceptionCatched = iaex;
-                } catch (ClassCastException ccex) {
-                    providerLoadFailed = true;
-                    exceptionCatched = ccex;
-                }
+                } catch (Throwable e) {
+                	System.err.println("error init " + providerName);
+					e.printStackTrace();
+				}
             }
             if (provider == null) {
-                if (providerLoadFailed) {
-                    ResourceBundle bundle = com.sun.identity.shared.locale.Locale.getInstallResourceBundle
-                            ("amUtilMsgs");
-                    StdDebugFile.printError(Debug.class.getSimpleName(), bundle.getString("com.iplanet" + ".services" +
-                            ".debug.invalidprovider"), exceptionCatched);
-
-                }
                 provider = new DebugProviderImpl();
             }
             setDebugProvider(provider);
