@@ -184,7 +184,7 @@
             <artifactId>javassist</artifactId>
         </dependency>
         <dependency>
-        		<groupId>org.forgerock.opendj</groupId>
+        <groupId>org.forgerock.opendj</groupId>
 	        <artifactId>opendj-server-legacy</artifactId>
 	        <scope>test</scope>
 	        <exclusions>
@@ -198,5 +198,10 @@
 	          </exclusion>
 	        </exclusions>
 	    </dependency>
+	    <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
