@@ -467,16 +467,21 @@ public class CookieUtils {
      * @param cookieDomains The configured cookie domains to match against.
      * @return The set of matching cookie domains. May contain null.
      */
-    public static Set<String> getMatchingCookieDomains(HttpServletRequest request, Collection<String> cookieDomain) {
-        if (SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true)) {
-            return new HashSet<>(cookieDomain);
+    public static Set<String> getMatchingCookieDomains(HttpServletRequest request, Collection<String> cookieDomains) {
+        Set<String> processedCookieDomains = new HashSet<>();
+    	for (String cookieDomain : cookieDomains) {
+    		processedCookieDomains.add(cookieDomain.replaceFirst("^\\.", ""));
+		}
+    	
+    	if (SystemPropertiesManager.getAsBoolean(Constants.SET_COOKIE_TO_ALL_DOMAINS, true)) {
+            return new HashSet<>(processedCookieDomains);
         }
 
         String host = request.getServerName();
         Set<String> domains = new HashSet<>();
 
-        for (String domain : cookieDomain) {
-            if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
+        for (String domain : processedCookieDomains) {
+        	if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
                 domains.add(domain);
             }
         }

@@ -45,9 +45,9 @@ public class CookieUtilsTest {
 	    			".domain.ru"
 	    	})), 
 	    	(Set<String>)new HashSet<String>(Arrays.asList(new String[] {
-	    		".domain.ru",
-	    		".dev.domain.ru",
-	    		".openshift.dev.domain.ru"
+	    		"domain.ru",
+	    		"dev.domain.ru",
+	    		"openshift.dev.domain.ru"
 	    	}))
 	    );
     }
