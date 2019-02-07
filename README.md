@@ -42,7 +42,7 @@ mvn install -f OpenAM
 
 ## How-to run after build
 ```bash
-mvn tomcat7:run-war -f OpenAM/openam-server
+mvn cargo:run -f OpenAM/openam-server
 ```
 The next step is then to go to [http://localhost:8080/openam](http://localhost:8080/openam) where you'll see the OpenAM welcome page
 
