@@ -502,6 +502,10 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
         } catch (Exception e) {
+        	
+        	if (loginDebug.messageEnabled()) {
+                loginDebug.error("Error ocurred: ", e);
+        	}
             ISLocaleContext localeContext = new ISLocaleContext();
             localeContext.setLocale(request);
             fallbackLocale = localeContext.getLocale();
