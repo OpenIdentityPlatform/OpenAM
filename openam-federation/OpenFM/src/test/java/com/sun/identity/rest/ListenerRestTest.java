@@ -47,10 +47,11 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.unittest.UnittestLog;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,6 +63,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONObject;
@@ -87,7 +90,7 @@ public class ListenerRestTest {
     private static final String PRIVILEGE_NAME = "ListenerRestTestPrivilege";
     private Subject adminSubject = SubjectUtils.createSuperAdminSubject();
     private static final String RESOURCE_NAME = "http://www.listenerresttest.com";
-    private WebResource listenerClient;
+    private WebTarget listenerClient;
     private String hashedTokenId;
     private String tokenIdHeader;
     private Cookie cookie;
@@ -127,7 +130,7 @@ public class ListenerRestTest {
             privilege.setSubject(sbj);
             pm.add(privilege);
 
-            listenerClient = Client.create().resource(
+            listenerClient = ClientBuilder.newClient().target(
                 SystemProperties.getServerInstanceName() +
                 "/ws/1/entitlement/listener");
 
@@ -155,15 +158,15 @@ public class ListenerRestTest {
     }
 
     private void noURLInPost() throws Exception {
-        Form form = new Form();
+    	MultivaluedMap form = new MultivaluedHashMap();
         form.add("resources", RESOURCE_NAME + "/*");
         form.add("subject", hashedTokenId);
         try {
-            listenerClient
+            listenerClient.request()
                 .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
                 .cookie(cookie)
-                .post(String.class, form);
-        } catch (UniformInterfaceException e) {
+                .post(Entity.form(form)).readEntity(String.class);
+        } catch (WebApplicationException e) {
             validateUniformInterfaceException(e, 426, "noURLInPost");
         }
     }
@@ -171,7 +174,7 @@ public class ListenerRestTest {
     private void noURLInGet() throws Exception {
         try {
             getListener("");
-        } catch (UniformInterfaceException e) {
+        } catch (WebApplicationException e) {
             int errorCode = e.getResponse().getStatus();
             if (errorCode != 405) {
                 throw new Exception(
@@ -183,10 +186,10 @@ public class ListenerRestTest {
     private void noURLInDelete() throws Exception {
         try {
            listenerClient.path("")
-               .queryParam("subject", hashedTokenId)
+               .queryParam("subject", hashedTokenId).request()
                .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
                .cookie(cookie).delete(String.class);
-        } catch (UniformInterfaceException e) {
+        } catch (WebApplicationException e) {
             int errorCode = e.getResponse().getStatus();
             if (errorCode != 405) {
                 throw new Exception(
@@ -196,7 +199,7 @@ public class ListenerRestTest {
     }
 
     private void validateUniformInterfaceException(
-        UniformInterfaceException e,
+    		WebApplicationException e,
         int expectedStatusCode,
         String methodName
     ) throws Exception {
@@ -205,7 +208,7 @@ public class ListenerRestTest {
             throw new Exception(
                 "ListenerRestTest." + methodName + ": incorrect error code");
         }
-        String json = e.getResponse().getEntity(String.class);
+        String json = e.getResponse().readEntity(String.class);
         JSONObject jo = new JSONObject(json);
         if (jo.optInt("statusCode") != expectedStatusCode) {
             throw new Exception(
@@ -217,14 +220,14 @@ public class ListenerRestTest {
 
     @Test(dependsOnMethods={"negativeTest"})
     public void test() throws Exception {
-        Form form = new Form();
+        MultivaluedMap form = new MultivaluedHashMap();
         form.add("resources", RESOURCE_NAME + "/*");
         form.add("subject", hashedTokenId);
         form.add("url", NOTIFICATION_URL);
-        String result = listenerClient
+        String result = listenerClient.request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .post(String.class, form);
+            .post(Entity.form(form)).readEntity(String.class);
         JSONObject jo = new JSONObject(result);
         if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception("ListenerRESTTest.test failed to add");
@@ -262,14 +265,14 @@ public class ListenerRestTest {
 
     @Test(dependsOnMethods = {"test"})
     public void testAddMoreResources() throws Exception {
-        Form form = new Form();
+    	MultivaluedMap form = new MultivaluedHashMap();
         form.add("resources", RESOURCE_NAME + "/a/*");
         form.add("subject", hashedTokenId);
         form.add("url", NOTIFICATION_URL);
-        String result = listenerClient
+        String result = listenerClient.request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .post(String.class, form);
+            .post(Entity.form(form)).readEntity(String.class);
         JSONObject jo = new JSONObject(result);
         if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception(
@@ -311,14 +314,14 @@ public class ListenerRestTest {
 
     @Test(dependsOnMethods = {"testAddMoreResources"})
     public void testAddDifferentApp() throws Exception {
-        Form form = new Form();
+    	MultivaluedMap form = new MultivaluedHashMap();
         form.add("application", "sunBank");
         form.add("subject", hashedTokenId);
         form.add("url", NOTIFICATION_URL);
-        String result = listenerClient
+        String result = listenerClient.request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .post(String.class, form);
+            .post(Entity.form(form)).readEntity(String.class);
         JSONObject jo = new JSONObject(result);
         if (!jo.getString("statusCode").equals(IdRepoErrorCode.ILLEGAL_ARGUMENTS)) {
             throw new Exception(
@@ -387,7 +390,7 @@ public class ListenerRestTest {
             cookieValue);
         String encodedURL = ESAPI.encoder().encodeForURL(url);
         String result = listenerClient.path(encodedURL)
-            .queryParam("subject", adminHashedTokenId)
+            .queryParam("subject", adminHashedTokenId).request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, adminTokenIdHeader)
             .cookie(cookie)
             .get(String.class);
@@ -399,7 +402,7 @@ public class ListenerRestTest {
     public void testRemove() throws Exception {
         String result = listenerClient
             .path(ENC_NOTIFICATION_URL)
-            .queryParam("subject", hashedTokenId)
+            .queryParam("subject", hashedTokenId).request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .delete(String.class);

@@ -43,9 +43,8 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
@@ -56,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONObject;
@@ -78,8 +76,8 @@ public class MultipleResourceRestTest {
     private static final String RESOURCE_NAME =
         "http://www.MultipleResourceRestTest.com";
     private AMIdentity user;
-    private WebResource decisionsClient;
-    private WebResource entitlementsClient;
+    private WebTarget decisionsClient;
+    private WebTarget entitlementsClient;
     private String hashedTokenId;
     private String tokenIdHeader;
     private Cookie cookie;
@@ -130,10 +128,10 @@ public class MultipleResourceRestTest {
 
         user = IdRepoUtils.createUser(REALM, "MultipleResourceRestTestUser");
 
-        decisionsClient = Client.create().resource(
+        decisionsClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/decisions");
-        entitlementsClient = Client.create().resource(
+        entitlementsClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/entitlements");
     }
@@ -149,15 +147,13 @@ public class MultipleResourceRestTest {
 
     @Test
     public void testDecisions() throws Exception {
-        MultivaluedMap params = new MultivaluedMapImpl();
-        params.add("resources", RESOURCE_NAME + "/index.html");
-        params.add("resources", RESOURCE_NAME + "/a");
-        params.add("action", "GET");
-        params.add("realm", REALM);
-        params.add("subject", hashedTokenId);
-
         String json = decisionsClient
-            .queryParams(params)
+            .queryParam("resources", RESOURCE_NAME + "/index.html")
+            .queryParam("resources", RESOURCE_NAME + "/a")
+            .queryParam("action", "GET")
+            .queryParam("realm", REALM)
+            .queryParam("subject", hashedTokenId)
+            .request()
             .accept("application/json")
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
@@ -186,13 +182,11 @@ public class MultipleResourceRestTest {
 
     @Test
     public void testEntitlements() throws Exception {
-        MultivaluedMap params = new MultivaluedMapImpl();
-        params.add("resource", RESOURCE_NAME);
-        params.add("realm", REALM);
-        params.add("subject", hashedTokenId);
-
         String json = entitlementsClient
-            .queryParams(params)
+            .queryParam("resource", RESOURCE_NAME)
+            .queryParam("realm", REALM)
+            .queryParam("subject", hashedTokenId)
+            .request()
             .accept("application/json")
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)

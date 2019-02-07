@@ -128,7 +128,6 @@
     <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
     <jdom.version>2.0.1</jdom.version>
     <je.version>7.5.11</je.version>
-    <jersey-bundle.version>1.19.4</jersey-bundle.version>
     <jato.version>2005-05-04</jato.version>
     <cc-ui.version>2008-08-08</cc-ui.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
@@ -1328,11 +1327,11 @@
         <version>${je.version}</version>
         <scope>runtime</scope>
       </dependency>
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-bundle</artifactId>
-        <version>${jersey-bundle.version}</version>
-      </dependency>
+		<dependency>
+		    <groupId>org.glassfish.jersey.bundles</groupId>
+		    <artifactId>jaxrs-ri</artifactId>
+		    <version>2.28</version>
+		</dependency>
       <dependency>
         <groupId>com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
@@ -2300,7 +2299,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.4.3</version>
+          <version>1.7.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

@@ -27,9 +27,10 @@
  */
 package com.sun.identity.wsfederation.client;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.saml.common.SAMLConstants;
@@ -42,7 +43,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 public class WSFederationClient {
 
-    private static final Client client = Client.create();
+    private static final Client client = ClientBuilder.newClient();
 
     /**
      * Returns the user SAML Assertion for a given session established by
@@ -98,9 +99,13 @@ public class WSFederationClient {
         if(entityRole != null) {
            url = url + "&entityRole=" + entityRole;
         }
-        WebResource resource = client.resource(endpoint);
-        ClientResponse clr = resource.get(ClientResponse.class);
-        return clr.getEntity(String.class);
+        WebTarget resource = client.target(endpoint);
+        Response clr = resource.request().get(Response.class);
+        try {
+        	return clr.readEntity(String.class);
+        }finally {
+			clr.close();
+		}
 
     }
 

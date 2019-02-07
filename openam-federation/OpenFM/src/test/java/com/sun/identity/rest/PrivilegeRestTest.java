@@ -40,16 +40,19 @@ import com.sun.identity.entitlement.rest.PrivilegeResource;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import java.net.URLEncoder;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONArray;
@@ -70,7 +73,7 @@ public class PrivilegeRestTest {
 
     private static final String RESOURCE_NAME =
         "http://www.PrivilegeRestTest.com";
-    private WebResource webClient;
+    private WebTarget webClient;
     private String tokenIdHeader;
     private String hashedTokenId;
     private Cookie cookie;
@@ -104,7 +107,7 @@ public class PrivilegeRestTest {
 
         cookie = new Cookie(SystemProperties.get(Constants.AM_COOKIE_NAME),
             cookieValue);
-        webClient = Client.create().resource(
+        webClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/privilege");
     }
@@ -123,34 +126,34 @@ public class PrivilegeRestTest {
     }
 
     private void noJSONStringInPost() throws Exception {
-        Form form = new Form();
+    	MultivaluedMap form = new MultivaluedHashMap();
         form.add("subject", hashedTokenId);
         try {
-            webClient.header(
+            webClient.request().header(
                 RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
                 .cookie(cookie)
-                .post(String.class, form);
-        } catch (UniformInterfaceException e) {
+                .post(Entity.form(form));
+        } catch (WebApplicationException e) {
             validateUniformInterfaceException(e, 9, "noJSONStringInPost");
         }
     }
     
     private void noJSONStringInPut() throws Exception {
         try {
-            Form form = new Form();
+    		MultivaluedMap form = new MultivaluedHashMap();
             webClient
                 .path(PRIVILEGE_NAME)
                 .queryParam("subject", hashedTokenId)
-                .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+                .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
                 .cookie(cookie)
-                .put(String.class, form);
-        } catch (UniformInterfaceException e) {
+                .put(Entity.form(form));
+        } catch (WebApplicationException e) {
             validateUniformInterfaceException(e, 9, "noJSONStringInPut");
         }
     }
 
     private void validateUniformInterfaceException(
-        UniformInterfaceException e,
+    	WebApplicationException e,
         int expectedStatusCode,
         String methodName
     ) throws Exception {
@@ -159,7 +162,7 @@ public class PrivilegeRestTest {
             throw new Exception(
                 "PrivilegeRestTest." + methodName + ": incorrect error code");
         }
-        String json = e.getResponse().getEntity(String.class);
+        String json = e.getResponse().readEntity(String.class);
         JSONObject jo = new JSONObject(json);
         if (jo.optInt("statusCode") != expectedStatusCode) {
             throw new Exception(
@@ -175,7 +178,7 @@ public class PrivilegeRestTest {
             .queryParam("filter",
                 Privilege.NAME_ATTRIBUTE + "=" + PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .get(String.class);
         
@@ -198,7 +201,7 @@ public class PrivilegeRestTest {
         String result = webClient
             .path(PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .get(String.class);
         JSONObject jbody = parseResult(result);
@@ -208,14 +211,14 @@ public class PrivilegeRestTest {
             new JSONObject(jsonStr));
         privilege.setDescription("desciption1");
 
-        Form form = new Form();
+        MultivaluedMap form = new MultivaluedHashMap();
         form.add("privilege.json", privilege.toMinimalJSONObject());
         result = webClient
             .path(PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .put(String.class, form);
+            .put(Entity.form(form)).readEntity(String.class);
         validateResult(result, 200, "OK"); //OK
     }
 
@@ -225,7 +228,7 @@ public class PrivilegeRestTest {
         String result = webClient
             .path(PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .get(String.class);
         JSONObject jbody = parseResult(result);
@@ -233,18 +236,18 @@ public class PrivilegeRestTest {
 
         result = webClient.path(PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .delete(String.class);
         validateResult(result, 200, "OK"); //OK
 
-        Form form = new Form();
+        MultivaluedMap form = new MultivaluedHashMap();
         form.add("privilege.json", jsonStr);
         form.add("subject", hashedTokenId);
         result = webClient
-            .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
+            .request().header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .post(String.class, form);
+            .post(Entity.form(form)).readEntity(String.class);
         validateResult(result, 201, "Created");
     }
 

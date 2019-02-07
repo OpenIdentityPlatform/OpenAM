@@ -32,8 +32,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import java.net.URLEncoder;
 import java.security.AccessController;
 import javax.ws.rs.core.Cookie;
@@ -47,7 +48,7 @@ import org.testng.annotations.Test;
 public class RestNoSubjectHeaderTest {
     private static final SSOToken adminToken = (SSOToken)
         AccessController.doPrivileged(AdminTokenAction.getInstance());
-    private WebResource webClient;
+    private WebTarget webClient;
     private String hashedTokenId;
     private Cookie cookie;
 
@@ -63,7 +64,7 @@ public class RestNoSubjectHeaderTest {
         }
         cookie = new Cookie(SystemProperties.get(Constants.AM_COOKIE_NAME),
             cookieValue);
-        webClient = Client.create().resource(
+        webClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/privilege");
     }
@@ -72,7 +73,7 @@ public class RestNoSubjectHeaderTest {
     public void search() throws Exception {
         String result = webClient
             .path("/")
-            .queryParam("subject", hashedTokenId)
+            .queryParam("subject", hashedTokenId).request()
             .cookie(cookie)
             .get(String.class);
         // no subject header is set, this should not throw any exception

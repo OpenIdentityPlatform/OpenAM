@@ -46,10 +46,11 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import java.net.URLEncoder;
 import java.security.AccessController;
 import java.util.Collections;
@@ -58,6 +59,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONObject;
@@ -79,8 +82,8 @@ public class RestPermissionTest {
     private static final SSOToken adminToken = (SSOToken)
         AccessController.doPrivileged(AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-    private WebResource decisionClient;
-    private WebResource privilegeClient;
+    private WebTarget decisionClient;
+    private WebTarget privilegeClient;
     private String hashedTokenId;
     private String tokenIdHeader;
     private Cookie cookie;
@@ -95,10 +98,10 @@ public class RestPermissionTest {
         login();
         createPrivilege();
 
-        decisionClient = Client.create().resource(
+        decisionClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/decision");
-        privilegeClient = Client.create().resource(
+        privilegeClient = ClientBuilder.newClient().target(
             SystemProperties.getServerInstanceName() +
             "/ws/1/entitlement/privilege");
     }
@@ -150,7 +153,7 @@ public class RestPermissionTest {
     public void negativeDecisionTest() throws Exception {
         try {
             decisionRestCall();
-        } catch (UniformInterfaceException ex) {
+        } catch (WebApplicationException ex) {
             if (ex.getResponse().getStatus() != 401) {
                 throw ex;
             }
@@ -168,7 +171,7 @@ public class RestPermissionTest {
     public void negativePrivilegeTest() throws Exception {
         try {
             getAndPutRestCall();
-        } catch (UniformInterfaceException ex) {
+        } catch (WebApplicationException ex) {
             if (ex.getResponse().getStatus() != 401) {
                 throw ex;
             }
@@ -185,7 +188,7 @@ public class RestPermissionTest {
     private void getAndPutRestCall() throws Exception {
         String result = privilegeClient
             .path(PRIVILEGE_NAME)
-            .queryParam("subject", hashedTokenId)
+            .queryParam("subject", hashedTokenId).request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .get(String.class);
@@ -196,14 +199,16 @@ public class RestPermissionTest {
             new JSONObject(jsonStr));
         privilege.setDescription("desciption1");
 
-        Form form = new Form();
+        MultivaluedMap form = new MultivaluedHashMap();
         form.add("privilege.json", privilege.toMinimalJSONObject());
         result = privilegeClient
             .path(PRIVILEGE_NAME)
             .queryParam("subject", hashedTokenId)
+            .request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
-            .put(String.class, form);
+            //.put(String.class, form);
+        	.put(Entity.form(form)).readEntity(String.class);
         JSONObject jo = new JSONObject(result);
         if (jo.optInt("statusCode") != 200) {
             throw new Exception("PrivilegeRestTest.getAndPutRestCall failed.");
@@ -224,14 +229,12 @@ public class RestPermissionTest {
     }
     
     private void decisionRestCall() throws Exception {
-        Form params = new Form();
-        params.add("subject", hashedTokenId);
-        params.add("resource", "http://www.example.com/index.html");
-        params.add("action", "GET");
-        params.add("realm", REALM);
-
         decisionClient
-            .queryParams(params)
+            .queryParam("subject", hashedTokenId)
+            .queryParam("resource", "http://www.example.com/index.html")
+            .queryParam("action", "GET")
+            .queryParam("realm", REALM)
+            .request()
             .header(RestServiceManager.SUBJECT_HEADER_NAME, tokenIdHeader)
             .cookie(cookie)
             .accept("text/plain")
