@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>14.1.17</version>
+        <version>14.1.18-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM ServletContext License Locator</name>
