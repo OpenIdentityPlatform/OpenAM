@@ -12,10 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * 
+ * Copyright 2019 Open Identity Platform Community.
  */
 package com.sun.identity.authentication.jaas;
 
 import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.authentication.spi.SetNextModuleException;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -269,6 +273,26 @@ public class LoginContextTest {
     }
 
     /**
+     * When login first time set next module index to the last module in chaon
+     * 
+     * @throws LoginException
+     *         Can be thrown by invocation of the authentication framework.
+     */
+    @Test
+    public void setNextModule() throws LoginException {
+    	whenLoginReturnTrue(requiredDelegate, requisiteDelegate, sufficientDelegate);
+        whenCommitReturnTrue(requiredDelegate, requisiteDelegate, sufficientDelegate);
+        whenLoginSetNextModuleException(requiredDelegate);
+
+        context.login();
+
+        verifyInitialize(requiredDelegate, requisiteDelegate, sufficientDelegate);
+        verifyLogin(requiredDelegate, sufficientDelegate);
+        verifyCommit(requiredDelegate, requisiteDelegate, sufficientDelegate);
+        verifyNoMoreInteractions(requiredDelegate, requisiteDelegate, sufficientDelegate);
+    }
+    
+    /**
      * Convenient method for setting login expectations.
      *
      * @param modules
@@ -293,6 +317,20 @@ public class LoginContextTest {
     private void whenLoginThrowInvalidPasswordException(LoginModule... modules) throws LoginException {
         for (LoginModule module : modules) {
             when(module.login()).thenThrow(new InvalidPasswordException("test-pw-failure"));
+        }
+    }
+    
+    /**
+     * Convenient method for setting set next module exception.
+     *
+     * @param modules
+     *         Modules for which the expectations are to be set.
+     * @throws LoginException
+     *         Can be thrown from module invocation.
+     */
+    private void whenLoginSetNextModuleException(LoginModule... modules) throws LoginException {
+        for (LoginModule module : modules) {
+            when(module.login()).thenThrow(new SetNextModuleException(2));
         }
     }
 
