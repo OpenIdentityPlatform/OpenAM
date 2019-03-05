@@ -54,6 +54,7 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
 
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.authentication.spi.ResetAuthChainException;
 import com.sun.identity.authentication.spi.SetNextModuleException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
@@ -238,13 +239,18 @@ public class LoginContext implements org.forgerock.openam.authentication.service
      * Resets auth chain to particular module, auth chain starts with this module
      * 
      * @param moduleIndex index of module
+     * @throws ResetAuthChainException 
      */
     
-    public void resetAuthChainToModule(int moduleIndex) {
+    public void resetAuthChainToModule(int moduleIndex) throws ResetAuthChainException {
     	for(int i = 0; i < moduleStack.length; i++ ) {
-    		if(i >= moduleIndex) {
-	    		ModuleInfo info = moduleStack[i];
-	    		
+    		ModuleInfo info = moduleStack[i];
+    		if(i == moduleIndex) {
+        		if(info.entry instanceof AppConfigurationEntry && ((AppConfigurationEntry)info.entry).getOptions().containsKey("reset-deny")) {
+        			throw new ResetAuthChainException();         			
+        		}
+    		}
+    		else if(i > moduleIndex) {
 	    		if(info.getModule() instanceof AMLoginModule) {
 	    			AMLoginModule loginModule = (AMLoginModule)info.getModule();
 	    			loginModule.resetCurrentState();
