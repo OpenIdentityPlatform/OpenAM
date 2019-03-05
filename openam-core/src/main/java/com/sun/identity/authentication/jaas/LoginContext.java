@@ -250,7 +250,7 @@ public class LoginContext implements org.forgerock.openam.authentication.service
         			throw new ResetAuthChainException();         			
         		}
     		}
-    		else if(i > moduleIndex) {
+    		if(i >= moduleIndex) {
 	    		if(info.getModule() instanceof AMLoginModule) {
 	    			AMLoginModule loginModule = (AMLoginModule)info.getModule();
 	    			loginModule.resetCurrentState();
