@@ -1319,6 +1319,15 @@ public abstract class AMLoginModule implements LoginModule {
     }
     
     /**
+     * Resets the current state in the authentication process
+     * @param state
+     */
+    
+    public void resetCurrentState() {
+    	this.currentState = ISAuthConstants.LOGIN_START;
+    }
+    
+    /**
      * Returns the <code>HttpServletRequest</code> object that
      * initiated the call to this module.
      *

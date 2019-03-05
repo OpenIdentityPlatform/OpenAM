@@ -37,9 +37,11 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -50,6 +52,7 @@ import javax.security.auth.login.LoginException;
 
 import org.forgerock.openam.audit.context.AuditRequestContext;
 
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.SetNextModuleException;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -210,6 +213,43 @@ public class LoginContext implements org.forgerock.openam.authentication.service
     	}
     	if(moduleStackQueue.isEmpty()) {
     		moduleStackQueue.addAll(Arrays.asList(moduleStack));
+    	}
+    }
+    
+    /**
+     * Returns module instance names list
+     * 
+     * @return module instance names list
+     */
+    
+    public List<String> getModuleInstanceNames() {
+    	List<String> moduleNames = new ArrayList<>();
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		ModuleInfo info = moduleStack[i];
+    		if(info.entry instanceof AppConfigurationEntry) {
+    			String moduleInstanceName = String.valueOf(((AppConfigurationEntry)info.entry).getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME));
+    			moduleNames.add(moduleInstanceName);
+    		}
+    	}
+    	return moduleNames;
+    }
+    
+    /**
+     * Resets auth chain to particular module, auth chain starts with this module
+     * 
+     * @param moduleIndex index of module
+     */
+    
+    public void resetAuthChainToModule(int moduleIndex) {
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		if(i >= moduleIndex) {
+	    		ModuleInfo info = moduleStack[i];
+	    		
+	    		if(info.getModule() instanceof AMLoginModule) {
+	    			AMLoginModule loginModule = (AMLoginModule)info.getModule();
+	    			loginModule.resetCurrentState();
+	    		}
+    		}
     	}
     }
 
