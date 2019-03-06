@@ -1222,6 +1222,16 @@ public class AMLoginContext {
             return null;
         }
     }
+    
+    /**
+     * Returns current login context
+     * 
+     * @return login context
+     */
+    public LoginContext getLoginContext() {
+    	return this.loginContext;
+    }
+    
 
     /* retrieve config name from config component based on the
      * indexType , indexName , orgDN and clientType

@@ -29,15 +29,19 @@
 
 package com.sun.identity.authentication.jaas;
 
-import static com.sun.identity.authentication.config.AMAuthConfigUtils.*;
-import static org.forgerock.openam.audit.AuditConstants.*;
+import static com.sun.identity.authentication.config.AMAuthConfigUtils.getControlFlagAsString;
+import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -48,7 +52,11 @@ import javax.security.auth.login.LoginException;
 
 import org.forgerock.openam.audit.context.AuditRequestContext;
 
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.authentication.spi.ResetAuthChainException;
+import com.sun.identity.authentication.spi.SetNextModuleException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -76,6 +84,9 @@ public class LoginContext implements org.forgerock.openam.authentication.service
     private Map state = new HashMap();
 
     private ModuleInfo[] moduleStack;
+    
+    //to manage auth module stack as queue
+    private LinkedList<ModuleInfo> moduleStackQueue = null;
 
     boolean success = false;
     private static final Debug debug = Debug.getInstance("amJAAS");
@@ -92,6 +103,7 @@ public class LoginContext implements org.forgerock.openam.authentication.service
                 entries[i].getOptions()),
                 null);
         }
+        moduleStackQueue = new LinkedList<>();
     }
 
     public LoginContext(AppConfigurationEntry[] entries,
@@ -156,6 +168,96 @@ public class LoginContext implements org.forgerock.openam.authentication.service
             return null;
         return subject;
     }
+    
+    /**
+     * Sets next module by module name, allows to modify auth chain during auth
+     * 
+     * @param moduleName
+     * 
+     */
+   
+    public void setNextModule(String moduleName) {
+    	boolean found = false;
+    	moduleStackQueue.clear();
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		ModuleInfo info = moduleStack[i];
+    		if(info.entry instanceof AppConfigurationEntry) {
+    			String moduleInstanceName = String.valueOf(((AppConfigurationEntry)info.entry).getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME));
+    			if(moduleInstanceName.equals(moduleName)) {
+    				found = true;
+    			}
+    		}
+    		if(found) {
+    			moduleStackQueue.add(info);
+    		}
+    	}
+    	if(moduleStackQueue.isEmpty()) {
+    		moduleStackQueue.addAll(Arrays.asList(moduleStack));
+    	}
+    }
+    
+    /**
+     * Sets next module by module index in chain, allows to modify auth chain during auth
+     * 
+     * @param moduleName
+     * 
+     */
+    
+    public void setNextModule(int moduleIndex) {
+    	moduleStackQueue.clear();
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		ModuleInfo info = moduleStack[i];
+    		
+    		if(i >= moduleIndex) {
+    			moduleStackQueue.add(info);
+    		}
+    	}
+    	if(moduleStackQueue.isEmpty()) {
+    		moduleStackQueue.addAll(Arrays.asList(moduleStack));
+    	}
+    }
+    
+    /**
+     * Returns module instance names list
+     * 
+     * @return module instance names list
+     */
+    
+    public List<String> getModuleInstanceNames() {
+    	List<String> moduleNames = new ArrayList<>();
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		ModuleInfo info = moduleStack[i];
+    		if(info.entry instanceof AppConfigurationEntry) {
+    			String moduleInstanceName = String.valueOf(((AppConfigurationEntry)info.entry).getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME));
+    			moduleNames.add(moduleInstanceName);
+    		}
+    	}
+    	return moduleNames;
+    }
+    
+    /**
+     * Resets auth chain to particular module, auth chain starts with this module
+     * 
+     * @param moduleIndex index of module
+     * @throws ResetAuthChainException 
+     */
+    
+    public void resetAuthChainToModule(int moduleIndex) throws ResetAuthChainException {
+    	for(int i = 0; i < moduleStack.length; i++ ) {
+    		ModuleInfo info = moduleStack[i];
+    		if(i == moduleIndex) {
+        		if(info.entry instanceof AppConfigurationEntry && ((AppConfigurationEntry)info.entry).getOptions().containsKey("reset-deny")) {
+        			throw new ResetAuthChainException();         			
+        		}
+    		}
+    		if(i >= moduleIndex) {
+	    		if(info.getModule() instanceof AMLoginModule) {
+	    			AMLoginModule loginModule = (AMLoginModule)info.getModule();
+	    			loginModule.resetCurrentState();
+	    		}
+    		}
+    	}
+    }
 
     /**
      * Attempts to invoke the method described by methodName against each module within the stack.
@@ -166,10 +268,13 @@ public class LoginContext implements org.forgerock.openam.authentication.service
      *         Throw in the case of some login failure.
      */
     private void invoke(String methodName) throws LoginException {
+    	moduleStackQueue.clear();
+    	moduleStackQueue.addAll(Arrays.asList(moduleStack));
+        //for (int i = 0; i < moduleStack.length; i++) {
+    	while(moduleStackQueue.size() > 0) {
 
-        for (int i = 0; i < moduleStack.length; i++) {
-
-            ModuleInfo info = moduleStack[i];
+            //ModuleInfo info = moduleStack[i];
+    		ModuleInfo info = moduleStackQueue.poll();
             LoginModuleControlFlag controlFlag = info.entry.getControlFlag();
             AuditRequestContext.putProperty(LOGIN_MODULE_CONTROL_FLAG, getControlFlagAsString(controlFlag));
 
@@ -275,6 +380,14 @@ public class LoginContext implements org.forgerock.openam.authentication.service
                                 "replaced by new exception with empty detail msg");
                         debug.message("original security exception: " + ite.getTargetException().toString());
                     }
+                } else if(ite.getTargetException() instanceof SetNextModuleException) {
+                	int nextModuleIndex = ((SetNextModuleException) ite.getTargetException()).getModuleIndex();
+                	if (debug.messageEnabled()) {
+                        debug.message("set next module to " + nextModuleIndex);
+                        debug.message("original security exception: " + ite.getTargetException().toString());
+                    }
+                	setNextModule(nextModuleIndex);
+                	continue;
                 } else {
                     // capture an unexpected LoginModule exception
                     StringWriter sw = new StringWriter();

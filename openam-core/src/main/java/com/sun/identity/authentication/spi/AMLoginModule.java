@@ -244,7 +244,7 @@ public abstract class AMLoginModule implements LoginModule {
     
     private static Debug debug = Debug.getInstance("amLoginModule");
     
-    private int currentState = ISAuthConstants.LOGIN_START;
+    protected int currentState = ISAuthConstants.LOGIN_START;
     
     private final String EMPTY_STRING = "";
     private String moduleName = null;
@@ -1316,6 +1316,15 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public int getCurrentState() {
         return currentState;
+    }
+    
+    /**
+     * Resets the current state in the authentication process
+     * @param state
+     */
+    
+    public void resetCurrentState() {
+    	this.currentState = ISAuthConstants.LOGIN_START;
     }
     
     /**
