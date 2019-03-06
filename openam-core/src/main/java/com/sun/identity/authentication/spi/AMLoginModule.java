@@ -244,7 +244,7 @@ public abstract class AMLoginModule implements LoginModule {
     
     private static Debug debug = Debug.getInstance("amLoginModule");
     
-    private int currentState = ISAuthConstants.LOGIN_START;
+    protected int currentState = ISAuthConstants.LOGIN_START;
     
     private final String EMPTY_STRING = "";
     private String moduleName = null;
