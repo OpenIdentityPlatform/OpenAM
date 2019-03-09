@@ -33,8 +33,6 @@
     <properties>
         <!-- Default settings for standard embedded dj. -->
         <dj.backend.type>je</dj.backend.type>
-        <!-- By default this property is empty so as not to include the SecurID auth module. -->
-        <auth.securID.xml />
         <!-- Default settings for the exclusion list to use for creating the opendj zip file. -->
         <exclusion.list.filename>opendj_exclusion_list</exclusion.list.filename>
         <!-- Default folder to use for pulling in third party distribution legal notices. -->
@@ -484,93 +482,6 @@
             </properties>
         </profile>
         <profile>
-            <id>release</id>
-            <dependencies>
-                <dependency>
-                    <artifactId>openam-auth-securid</artifactId>
-                    <groupId>org.forgerock.openam</groupId>
-                </dependency>
-            </dependencies>
-            <properties>
-                <auth.securID.xml>amAuthSecurID.xml</auth.securID.xml>
-            </properties>
-            <build>
-                <plugins>
-                    <!-- Transform the 'amAuth.xml' to add the SecurID auth module -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>transform</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <catalogs>
-                                <catalog>src/main/xslt/catalog.xml</catalog>
-                            </catalogs>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>${project.build.outputDirectory}</dir>
-                                    <includes>
-                                        <include>amAuth.xml</include>
-                                    </includes>
-                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
-                                    <outputDir>${project.build.outputDirectory}</outputDir>
-                                </transformationSet>
-                            </transformationSets>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>development</id>
-            <dependencies>
-                <dependency>
-                    <artifactId>openam-auth-securid</artifactId>
-                    <groupId>org.forgerock.openam</groupId>
-                </dependency>
-            </dependencies>
-            <properties>
-                <auth.securID.xml>amAuthSecurID.xml</auth.securID.xml>
-            </properties>
-            <build>
-                <plugins>
-                    <!-- Transform the 'amAuth.xml' to add the SecurID auth module -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>transform</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <catalogs>
-                                <catalog>src/main/xslt/catalog.xml</catalog>
-                            </catalogs>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>${project.build.outputDirectory}</dir>
-                                    <includes>
-                                        <include>amAuth.xml</include>
-                                    </includes>
-                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
-                                    <outputDir>${project.build.outputDirectory}</outputDir>
-                                </transformationSet>
-                            </transformationSets>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>precompile-jsps</id>
             <build>
                 <plugins>
@@ -904,6 +815,11 @@
             <artifactId>openam-auth-recaptcha</artifactId>
         </dependency>
 
+		<dependency>
+            <artifactId>openam-auth-securid</artifactId>
+            <groupId>org.forgerock.openam</groupId>
+        </dependency>
+                
         <dependency>
             <artifactId>openam-auth-windowsdesktopsso</artifactId>
             <groupId>org.forgerock.openam</groupId>
