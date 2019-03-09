@@ -58,23 +58,9 @@
         <module>openam-auth-device-id</module>
         <module>openam-auth-saml2</module>
         <module>openam-auth-amster</module>
+        <module>openam-auth-securid</module>
         <module>openam-auth-recaptcha</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <modules>
-                <module>openam-auth-securid</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>development</id>
-            <modules>
-                <module>openam-auth-securid</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <dependencies>
         <dependency>

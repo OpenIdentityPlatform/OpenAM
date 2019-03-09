@@ -81,8 +81,8 @@
 							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
 							<com.iplanet.services.debug.directory />
 							<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
-							<XUI.enable>false</XUI.enable>
-<!-- 						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
+<!-- 							<XUI.enable>false</XUI.enable> -->
+<!-- 							<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
 	                    </systemProperties>
 	                </container>
 	                <deployables>
@@ -96,8 +96,37 @@
 	                </deployables>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins </groupId>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<port>8080</port>
+					<path>/openam</path>
+<!-- 					<serverXml>${basedir}/config/tomcat/server.xml</serverXml> -->
+<!-- 					<tomcatUsers>${basedir}/config/tomcat/tomcat-users.xml</tomcatUsers> -->
+					<useTestClasspath>false</useTestClasspath>
+					<ignorePackaging>true</ignorePackaging>
+					<tomcatLoggingFile>${basedir}/src/test/resources/logging.properties</tomcatLoggingFile>
+<!-- 					<warDirectory>/tmp/openam</warDirectory> -->
+<!-- 					<warFile>~/.m2/repository/org/forgerock/openam/openam-server/14.1.15-SNAPSHOT/openam-server-14.1.15-SNAPSHOT.war </warFile> -->
+					<systemProperties>
+						<file.encoding>UTF-8</file.encoding>
+						<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
+<!-- 						<com.iplanet.services.configpath>${basedir}/target/config</com.iplanet.services.configpath> -->
+<!-- 						<com.sun.identity.configuration.directory>${basedir}/target/config</com.sun.identity.configuration.directory> -->
+						<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
+						<ssoadm.disabled>false</ssoadm.disabled>
+						<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
+						<com.iplanet.services.debug.directory />
+						<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
+<!-- 						<XUI.enable>false</XUI.enable> -->
+<!-- 						<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
+					</systemProperties>
+				</configuration>
+			</plugin>
+		   <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
