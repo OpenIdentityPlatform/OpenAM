@@ -108,8 +108,7 @@
 					<useTestClasspath>false</useTestClasspath>
 					<ignorePackaging>true</ignorePackaging>
 					<tomcatLoggingFile>${basedir}/src/test/resources/logging.properties</tomcatLoggingFile>
-<!-- 					<warDirectory>/tmp/openam</warDirectory> -->
-<!-- 					<warFile>~/.m2/repository/org/forgerock/openam/openam-server/14.1.15-SNAPSHOT/openam-server-14.1.15-SNAPSHOT.war </warFile> -->
+					<warDirectory>${project.build.directory}/${project.build.finalName}</warDirectory>
 					<systemProperties>
 						<file.encoding>UTF-8</file.encoding>
 						<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
