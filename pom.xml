@@ -2551,6 +2551,21 @@
                 <generatePom>true</generatePom>
               </configuration>
             </execution>
+            <execution>
+              <id>install-jar-authapi</id>
+              <goals>
+                <goal>install-file</goal>
+              </goals>
+              <phase>validate</phase>
+              <configuration>
+                <groupId>external</groupId>
+            	<artifactId>authapi</artifactId>
+                <version>2005-08-12</version>
+                <packaging>jar</packaging>
+                <file>${basedir}/extlib/authapi-2005-08-12.jar</file>
+                <generatePom>true</generatePom>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
       </plugins>
