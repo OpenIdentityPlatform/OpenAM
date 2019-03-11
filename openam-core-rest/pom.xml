@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.1.18-SNAPSHOT</version>
+        <version>14.2.1</version>
     </parent>
 
     <name>OpenAM Core REST</name>
