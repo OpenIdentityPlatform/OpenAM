@@ -76,6 +76,7 @@
                         <Value>org.forgerock.openam.authentication.modules.push.AuthenticatorPush</Value>
                         <Value>org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration</Value>
                         <Value>org.forgerock.openam.authentication.modules.amster.Amster</Value>
+                        <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
                         <Value>org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha</Value>
                     </DefaultValues>
                 </AttributeSchema>

@@ -47,7 +47,7 @@
   <name>OpenAM Project</name>
   <groupId>org.forgerock.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.1.18-SNAPSHOT</version>
+  <version>14.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -90,7 +90,7 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-    <opendj.server.version>4.3.6-SNAPSHOT</opendj.server.version>
+    <opendj.server.version>4.4.2-SNAPSHOT</opendj.server.version>
     <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
     <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
@@ -2548,6 +2548,21 @@
                 <version>2008-08-08</version>
                 <packaging>jar</packaging>
                 <file>${basedir}/extlib/cc_zh-2008-08-08.jar</file>
+                <generatePom>true</generatePom>
+              </configuration>
+            </execution>
+            <execution>
+              <id>install-jar-authapi</id>
+              <goals>
+                <goal>install-file</goal>
+              </goals>
+              <phase>validate</phase>
+              <configuration>
+                <groupId>external</groupId>
+            	<artifactId>authapi</artifactId>
+                <version>2005-08-12</version>
+                <packaging>jar</packaging>
+                <file>${basedir}/extlib/authapi-2005-08-12.jar</file>
                 <generatePom>true</generatePom>
               </configuration>
             </execution>
