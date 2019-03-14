@@ -2146,11 +2146,11 @@ public class AMSetupServlet extends HttpServlet {
    }
 
     private static void registerListeners() {
-        //if (isCurrentConfigurationValid()) { //always register setup listeners
+        if (isConfigured()) { //always register setup listeners
             ServiceLoader<SetupListener> listeners = ServiceLoader.load(SetupListener.class);
             for (SetupListener p : listeners) {
                 p.setupComplete();
             }
-        //}
+        }
     }
 }
