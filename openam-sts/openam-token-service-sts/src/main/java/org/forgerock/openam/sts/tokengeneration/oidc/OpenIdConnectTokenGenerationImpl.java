@@ -158,7 +158,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
 
     private void handleClaims(SSOToken subjectToken, STSOpenIdConnectToken openIdConnectToken, OpenIdConnectTokenConfig tokenConfig) throws TokenCreationException {
         if (!MapUtils.isEmpty(tokenConfig.getClaimMap())) {
-            Map<String, String> mappedClaims =
+            Map<String, Object> mappedClaims =
                     openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
             //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
             for (String key : mappedClaims.keySet()) {
