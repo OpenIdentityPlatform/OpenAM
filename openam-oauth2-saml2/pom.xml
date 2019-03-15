@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>14.2.2-SNAPSHOT</version>
+        <version>14.2.2</version>
     </parent>
 
     <artifactId>openam-oauth2-saml2</artifactId>

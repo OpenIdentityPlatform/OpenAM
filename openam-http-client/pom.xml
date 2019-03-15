@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.2.2-SNAPSHOT</version>
+        <version>14.2.2</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
@@ -47,7 +47,7 @@
         <url>https://svn.forgerock.org/commons/forgerock-http-client/trunk</url>
         <connection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</developerConnection>
-      <tag>release/13.0.0</tag>
+      <tag>14.2.2</tag>
   </scm>
 
     <repositories>
