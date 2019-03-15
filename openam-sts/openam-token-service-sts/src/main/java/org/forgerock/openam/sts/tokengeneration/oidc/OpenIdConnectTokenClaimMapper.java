@@ -42,5 +42,5 @@ public interface OpenIdConnectTokenClaimMapper {
      * will be inserted. All entries should be non-null.
      * @throws TokenCreationException if the attribute lookup fails
      */
-    Map<String, String> getCustomClaims(SSOToken token, Map<String, String> claimMap) throws TokenCreationException;
+    Map<String, Object> getCustomClaims(SSOToken token, Map<String, String> claimMap) throws TokenCreationException;
 }

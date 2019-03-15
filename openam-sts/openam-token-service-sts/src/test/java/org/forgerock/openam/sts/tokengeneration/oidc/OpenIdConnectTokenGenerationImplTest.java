@@ -64,7 +64,7 @@ public class OpenIdConnectTokenGenerationImplTest {
     private static final String EMAIL_CLAIM_VALUE = "cornholio@dingus.com";
     private static final String EMAIL_CLAIM_ATTRIBUTE = "mail";
     private final Map<String, String> mappedClaimConfig;
-    private final Map<String, String> mappedClaimAttributes;
+    private final Map<String, Object> mappedClaimAttributes;
 
     public OpenIdConnectTokenGenerationImplTest() {
         mappedClaimConfig = new HashMap<>();

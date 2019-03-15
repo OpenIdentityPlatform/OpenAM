@@ -85,7 +85,7 @@ public class RestSTSService implements SingletonResourceProvider {
             /*
             This block entered for TokenMarshalException, TokenValidationException and TokenCreationException instances
              */
-            logger.error("Exception caught in translateToken call: " + e, e);
+            logger.warn("{}: {}",invocationState ,e.toString());
             return e.asPromise();
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking translateToken: " + e, e);
