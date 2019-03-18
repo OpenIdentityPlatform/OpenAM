@@ -107,7 +107,7 @@ public class BootstrapCreator {
         if (!AMSetupServlet.isCurrentConfigurationValid()) {
             return; // dont try to save bootstrap if we are not in a valid state
         }
-
+       
         try {
             final String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
             final BootstrapConfig bootConfig = getBootstrapConfig(dsCfg);
@@ -138,7 +138,9 @@ public class BootstrapCreator {
       				DEBUG.warning("save {} {}",BootstrapData.CONFIG_PWD_KEY, e.toString());
       			}
 			}
-
+        	if (SystemProperties.get("org.forgerock.donotupgrade")!=null && new File(baseDir + "/boot.json").exists())
+            	return;
+        	
             bootConfig.writeConfig(baseDir + "/boot.json");
             // We delay deletion of legacy bootstrap until the very end.
             // If there are exceptions, this will leave the bootstrap in place
