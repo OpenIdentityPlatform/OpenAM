@@ -21,10 +21,10 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.sm.DNMapper;
-
+import com.google.common.base.Joiner;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,19 +39,21 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class DefaultOpenIdConnectTokenClaimMapper implements OpenIdConnectTokenClaimMapper {
     @Override
-    public Map<String, Object> getCustomClaims(SSOToken token, Map<String, String> claimMap) throws TokenCreationException {
+    public Map<String, String> getCustomClaims(SSOToken token, Map<String, String> claimMap) throws TokenCreationException {
         try {
-        	
             final AMIdentity amIdentity = IdUtils.getIdentity(token);
             final HashSet<String> attributeNames = new HashSet<>(claimMap.size());
             attributeNames.addAll(claimMap.values());
-            final Map<String, Object> joinedMappings =  joinMultiValues(amIdentity.getAttributes(attributeNames));
-            final Map<String, Object> adjustedMap = new HashMap<>(joinedMappings.size());
-            adjustedMap.put("ip", token.getProperty("Host", true));
-            adjustedMap.put("realm", DNMapper.orgNameToRealmName(amIdentity.getRealm()));
-            
+            Map<String, String> joinedMappings =  joinMultiValues(amIdentity.getAttributes(attributeNames));
+            /*
+             At this point, the key entries joinedMappings will be the attribute name, and the value will be the
+             corresponding value pulled from the user data store. Because I need to return a Map where the keys are the
+             claim names, as in the claimMap parameter, I need to create a new map, whose keys correspond to the
+             keys in the claimMap parameter, and whose value correspond to the joinedMappings value.
+             */
+            Map<String, String> adjustedMap = new HashMap<>(joinedMappings.size());
             for (Map.Entry<String, String> claimMapEntry : claimMap.entrySet()) {
-                if (joinedMappings.get(claimMapEntry.getValue())!=null) {
+                if (!StringUtils.isEmpty(joinedMappings.get(claimMapEntry.getValue()))) {
                     adjustedMap.put(claimMapEntry.getKey(), joinedMappings.get(claimMapEntry.getValue()));
                 }
             }
@@ -62,13 +64,11 @@ public class DefaultOpenIdConnectTokenClaimMapper implements OpenIdConnectTokenC
         }
     }
 
-    private Map<String, Object> joinMultiValues(Map<String, Set<String>> customClaims) {
-        HashMap<String, Object> claimMap = new HashMap<>(customClaims.size());
+    private Map<String, String> joinMultiValues(Map<String, Set<String>> customClaims) {
+        HashMap<String, String> claimMap = new HashMap<>(customClaims.size());
+        Joiner joiner = Joiner.on(" ").skipNulls();
         for (Map.Entry<String, Set<String>> entry : customClaims.entrySet()) {
-        	if (((Set)entry.getValue()).size()==1)
-				claimMap.put(entry.getKey(), ((Set)entry.getValue()).iterator().next());
-			else if (((Set)entry.getValue()).size()>1)
-				claimMap.put(entry.getKey(), ((Set)entry.getValue()).toArray(new String[0]) );
+            claimMap.put(entry.getKey(), joiner.join(entry.getValue()));
         }
         return claimMap;
     }

@@ -177,8 +177,8 @@ class STSOpenIdConnectToken extends JsonValue {
         return this;
     }
 
-    void setClaims(Map<String, Object> privateClaims) {
-        for (Map.Entry<String, Object> claim : privateClaims.entrySet()) {
+    void setClaims(Map<String, String> privateClaims) {
+        for (Map.Entry<String, String> claim : privateClaims.entrySet()) {
             put(claim.getKey(), claim.getValue());
         }
     }
