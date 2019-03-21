@@ -599,6 +599,9 @@
                             <includes>
                                 <include>**/**</include>
                             </includes>
+                            <excludes>
+                            	<exclude>com/sun/identity/entitlement/rest/**</exclude>
+                            </excludes>
                         </filter>
                         <filter>
                             <artifact>org.forgerock.openam:openam-client-sts</artifact>
