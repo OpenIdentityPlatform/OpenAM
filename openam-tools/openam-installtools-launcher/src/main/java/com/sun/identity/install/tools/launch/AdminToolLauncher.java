@@ -276,26 +276,7 @@ public class AdminToolLauncher {
     }
 
     private static void initJavaVersion() throws Exception {
-        String version = System.getProperty(STR_JAVA_VERSION);
-        int firstSeparatorIndex = version.indexOf('.');
-        String majorVersion = version.substring(0, firstSeparatorIndex);
-        int secondSeparatorIndex = version
-                .indexOf('.', firstSeparatorIndex + 1);
-        String minorVersion = version.substring(firstSeparatorIndex + 1,
-                secondSeparatorIndex);
-
-        int majorVersionInt = Integer.parseInt(majorVersion);
-        int minorVersionInt = Integer.parseInt(minorVersion);
-
-        int code = majorVersionInt * 10 + minorVersionInt;
-
-        if (code < 13) {
-            throw new Exception("Unsupported JDK version in use: " + version);
-        } else if (code == 13) {
-            setIsJDK14OrAbove(false);
-        } else if (code > 13) {
-            setIsJDK14OrAbove(true);
-        }
+    	return;
     }
 
     public static void main(String[] args) {
