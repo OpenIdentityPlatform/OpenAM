@@ -335,6 +335,7 @@
                                 <include>com/sun/identity/policy/util/PolicyDecisionUtils*</include>
 								<include>com/sun/identity/policy/client/*</include>
 								<include>com/sun/identity/policy/remote/*</include>
+								<include>com/sun/identity/policy/*</include>
 								
                                 <include>com/sun/identity/protocol/**</include>
                                 <include>com/sun/identity/security/AMSecurityPropertiesException*</include>
