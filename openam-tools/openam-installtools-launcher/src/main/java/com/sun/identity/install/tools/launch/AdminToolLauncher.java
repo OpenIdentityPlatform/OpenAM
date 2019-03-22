@@ -276,6 +276,7 @@ public class AdminToolLauncher {
     }
 
     private static void initJavaVersion() throws Exception {
+    	setIsJDK14OrAbove(true);
     	return;
     }
 
