@@ -57,8 +57,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>	
-			<artifactId>cassandra-embedded</artifactId>
-			<version>${project.version}</version>
+			<artifactId>openam-cassandra-embedded</artifactId>
 			<scope>test</scope>
 		</dependency>
   </dependencies>
