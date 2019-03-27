@@ -440,6 +440,8 @@
     <module>openam-notifications</module>
     <module>openam-notifications-websocket</module>
     <module>openam-notifications-integration</module>
+    <!-- openam cassandra submodules -->
+    <module>openam-cassandra</module>
   </modules>
   <!-- Mailing Lists -->
   <mailingLists>
@@ -1896,6 +1898,23 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>RELEASE</version>
+      </dependency>
+      
+      <!-- Cassandra dependencies -->
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-cassandra-embedded</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-cassandra-datastore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-cassandra-cts</artifactId>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

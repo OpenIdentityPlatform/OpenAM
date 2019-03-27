@@ -1,0 +1,204 @@
+CREATE KEYSPACE cts WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+
+CREATE TABLE cts.tokens (
+    coreTokenId text PRIMARY KEY,
+    coreTokenDate01 timestamp,
+    coreTokenDate02 timestamp,
+    coreTokenDate03 timestamp,
+    coreTokenDate04 timestamp,
+    coreTokenDate05 timestamp,
+    coreTokenExpirationDate timestamp,
+    coreTokenInteger01 int,
+    coreTokenInteger02 int,
+    coreTokenInteger03 int,
+    coreTokenInteger04 int,
+    coreTokenInteger05 int,
+    coreTokenInteger06 int,
+    coreTokenInteger07 int,
+    coreTokenInteger08 int,
+    coreTokenInteger09 int,
+    coreTokenInteger10 int,
+    coreTokenObject blob,
+    coreTokenString01 text,
+    coreTokenString02 text,
+    coreTokenString03 text,
+    coreTokenString04 text,
+    coreTokenString05 text,
+    coreTokenString06 text,
+    coreTokenString07 text,
+    coreTokenString08 text,
+    coreTokenString09 text,
+    coreTokenString10 text,
+    coreTokenString11 text,
+    coreTokenString12 text,
+    coreTokenString13 text,
+    coreTokenString14 text,
+    coreTokenString15 text,
+    coreTokenMultiString01 text,
+    coreTokenMultiString02 text,
+    coreTokenMultiString03 text,
+    coreTokenType text,
+    coreTokenUserId text,
+    etag text,
+    createTimestamp timestamp
+) WITH bloom_filter_fp_chance = 0.01
+    AND default_time_to_live = 3600
+    AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'}
+ ;
+CREATE MATERIALIZED VIEW cts.coreTokenDate01 AS SELECT * FROM cts.tokens WHERE coreTokenDate01 IS NOT NULL PRIMARY KEY (coreTokenDate01, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenDate02 AS SELECT * FROM cts.tokens WHERE coreTokenDate02 IS NOT NULL PRIMARY KEY (coreTokenDate02, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenDate03 AS SELECT * FROM cts.tokens WHERE coreTokenDate03 IS NOT NULL PRIMARY KEY (coreTokenDate03, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenDate04 AS SELECT * FROM cts.tokens WHERE coreTokenDate04 IS NOT NULL PRIMARY KEY (coreTokenDate04, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenDate05 AS SELECT * FROM cts.tokens WHERE coreTokenDate05 IS NOT NULL PRIMARY KEY (coreTokenDate05, coreTokenId)  WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+    
+CREATE MATERIALIZED VIEW cts.coreTokenExpirationDate AS SELECT * FROM cts.tokens WHERE coreTokenExpirationDate IS NOT NULL PRIMARY KEY (coreTokenExpirationDate, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ 
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger01 AS SELECT * FROM cts.tokens WHERE coreTokenInteger01 IS NOT NULL PRIMARY KEY (coreTokenInteger01, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger02 AS SELECT * FROM cts.tokens WHERE coreTokenInteger02 IS NOT NULL PRIMARY KEY (coreTokenInteger02, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger03 AS SELECT * FROM cts.tokens WHERE coreTokenInteger03 IS NOT NULL PRIMARY KEY (coreTokenInteger03, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger04 AS SELECT * FROM cts.tokens WHERE coreTokenInteger04 IS NOT NULL PRIMARY KEY (coreTokenInteger04, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger05 AS SELECT * FROM cts.tokens WHERE coreTokenInteger05 IS NOT NULL PRIMARY KEY (coreTokenInteger05, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger06 AS SELECT * FROM cts.tokens WHERE coreTokenInteger06 IS NOT NULL PRIMARY KEY (coreTokenInteger06, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger07 AS SELECT * FROM cts.tokens WHERE coreTokenInteger07 IS NOT NULL PRIMARY KEY (coreTokenInteger07, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger08 AS SELECT * FROM cts.tokens WHERE coreTokenInteger08 IS NOT NULL PRIMARY KEY (coreTokenInteger08, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger09 AS SELECT * FROM cts.tokens WHERE coreTokenInteger09 IS NOT NULL PRIMARY KEY (coreTokenInteger09, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenInteger10 AS SELECT * FROM cts.tokens WHERE coreTokenInteger10 IS NOT NULL PRIMARY KEY (coreTokenInteger10, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+
+CREATE MATERIALIZED VIEW cts.coreTokenString01 AS SELECT * FROM cts.tokens WHERE coreTokenString01 IS NOT NULL PRIMARY KEY (coreTokenString01, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString02 AS SELECT * FROM cts.tokens WHERE coreTokenString02 IS NOT NULL PRIMARY KEY (coreTokenString02, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString03 AS SELECT * FROM cts.tokens WHERE coreTokenString03 IS NOT NULL PRIMARY KEY (coreTokenString03, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString04 AS SELECT * FROM cts.tokens WHERE coreTokenString04 IS NOT NULL PRIMARY KEY (coreTokenString04, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString05 AS SELECT * FROM cts.tokens WHERE coreTokenString05 IS NOT NULL PRIMARY KEY (coreTokenString05, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString06 AS SELECT * FROM cts.tokens WHERE coreTokenString06 IS NOT NULL PRIMARY KEY (coreTokenString06, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString07 AS SELECT * FROM cts.tokens WHERE coreTokenString07 IS NOT NULL PRIMARY KEY (coreTokenString07, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString08 AS SELECT * FROM cts.tokens WHERE coreTokenString08 IS NOT NULL PRIMARY KEY (coreTokenString08, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString09 AS SELECT * FROM cts.tokens WHERE coreTokenString09 IS NOT NULL PRIMARY KEY (coreTokenString09, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString10 AS SELECT * FROM cts.tokens WHERE coreTokenString10 IS NOT NULL PRIMARY KEY (coreTokenString10, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString11 AS SELECT * FROM cts.tokens WHERE coreTokenString11 IS NOT NULL PRIMARY KEY (coreTokenString11, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ CREATE MATERIALIZED VIEW cts.coreTokenString12 AS SELECT * FROM cts.tokens WHERE coreTokenString12 IS NOT NULL PRIMARY KEY (coreTokenString12, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString13 AS SELECT * FROM cts.tokens WHERE coreTokenString13 IS NOT NULL PRIMARY KEY (coreTokenString13, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString14 AS SELECT * FROM cts.tokens WHERE coreTokenString14 IS NOT NULL PRIMARY KEY (coreTokenString14, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenString15 AS SELECT * FROM cts.tokens WHERE coreTokenString15 IS NOT NULL PRIMARY KEY (coreTokenString15, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+
+CREATE MATERIALIZED VIEW cts.coreTokenMultiString01 AS SELECT * FROM cts.tokens WHERE coreTokenMultiString01 IS NOT NULL PRIMARY KEY (coreTokenMultiString01, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenMultiString02 AS SELECT * FROM cts.tokens WHERE coreTokenMultiString02 IS NOT NULL PRIMARY KEY (coreTokenMultiString02, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+CREATE MATERIALIZED VIEW cts.coreTokenMultiString03 AS SELECT * FROM cts.tokens WHERE coreTokenMultiString03 IS NOT NULL PRIMARY KEY (coreTokenMultiString03, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ 
+ CREATE MATERIALIZED VIEW cts.coreTokenType AS SELECT * FROM cts.tokens WHERE coreTokenType IS NOT NULL PRIMARY KEY (coreTokenType, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+    
+ CREATE MATERIALIZED VIEW cts.coreTokenUserId AS SELECT * FROM cts.tokens WHERE coreTokenUserId IS NOT NULL PRIMARY KEY (coreTokenUserId, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+    
+ CREATE MATERIALIZED VIEW cts.etag AS SELECT * FROM cts.tokens WHERE etag IS NOT NULL PRIMARY KEY (etag, coreTokenId) WITH 
+    	AND gc_grace_seconds = 600
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '20', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
