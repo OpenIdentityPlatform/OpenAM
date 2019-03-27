@@ -32,7 +32,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 
-import ru.org.openam.embedded.cassandra.Server;
+import org.openidentityplatform.openam.cassandra.embedded.Server;
 
 public class IdRepoTest {
 
