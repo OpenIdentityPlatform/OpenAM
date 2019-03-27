@@ -12,9 +12,10 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Copyright 2019 Open Identity Platform Community.
  */
 
-package ru.org.openam.cassandra;
+package org.openidentityplatform.openam.cassandra;
 
 import javax.inject.Inject;
 
