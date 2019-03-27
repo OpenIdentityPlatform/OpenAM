@@ -14,7 +14,7 @@
  * Copyright 2019 Open Identity Platform Community.
  */
 
-package ru.org.openam.embedded.cassandra;
+package org.openidentityplatform.openam.cassandra;
 
 import java.io.Closeable;
 import java.io.File;

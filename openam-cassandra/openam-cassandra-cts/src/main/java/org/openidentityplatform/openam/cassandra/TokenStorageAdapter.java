@@ -1,4 +1,20 @@
-package ru.org.openam.cassandra;
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2019 Open Identity Platform Community.
+ */
+
+package org.openidentityplatform.openam.cassandra;
 
 import java.nio.ByteBuffer;
 import java.text.MessageFormat;
@@ -9,9 +25,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -32,15 +48,14 @@ import org.forgerock.util.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Using;
 import com.datastax.driver.core.querybuilder.Select.Where;
+import com.datastax.driver.core.querybuilder.Using;
 import com.google.common.primitives.Ints;
 
 public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter {
@@ -154,7 +169,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 	public Collection<Token> query(TokenFilter query) throws DataLayerException {
 		final Collection<Token> res = new ArrayList<Token>();
 		try {
-			final Filter filter=query.getQuery().accept(new ru.org.openam.cassandra.QueryFilterVisitor(),null);
+			final Filter filter=query.getQuery().accept(new org.openidentityplatform.openam.cassandra.QueryFilterVisitor(),null);
 			Where where=com.datastax.driver.core.querybuilder.QueryBuilder
 	    			.select()
 	    			.from(cfg.getKeySpace(), filter.getTable())
@@ -193,7 +208,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 			for (CoreTokenField tokenField : requestedCoreTokenFields) 
 				requestedAttributes.add(tokenField.toString());
 			requestedAttributes.add("coreTokenId");
-			final Filter filter=query.getQuery().accept(new ru.org.openam.cassandra.QueryFilterVisitor(),null);
+			final Filter filter=query.getQuery().accept(new org.openidentityplatform.openam.cassandra.QueryFilterVisitor(),null);
 	    		Where where=com.datastax.driver.core.querybuilder.QueryBuilder
 	    			.select(requestedAttributes.toArray(new String[0]))
 	    			.from(cfg.getKeySpace(), filter.getTable())
