@@ -56,7 +56,6 @@
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>
 			<artifactId>openam-cassandra-datastore</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
