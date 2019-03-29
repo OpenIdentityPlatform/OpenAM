@@ -94,9 +94,9 @@ public class TokenGenerationServiceInvocationState {
 
     private final String ssoTokenString;
     private final TokenType tokenType;
-    private final String stsInstanceId;
+    private String stsInstanceId;
     private final AMSTSConstants.STSType stsType;
-    private final String realm;
+    private String realm;
     private final SAML2TokenGenerationState saml2TokenGenerationState;
     private final OpenIdConnectTokenGenerationState openIdConnectTokenGenerationState;
 
@@ -138,12 +138,21 @@ public class TokenGenerationServiceInvocationState {
         return stsInstanceId;
     }
 
+    public void setStsInstanceId(String stsInstanceId) {
+        this.stsInstanceId=stsInstanceId;
+    }
+
+    
     public AMSTSConstants.STSType getStsType() {
         return stsType;
     }
 
     public String getRealm() {
         return realm;
+    }
+    
+    public void setRealm(String realm) {
+        this.realm=realm;
     }
 
     public SAML2TokenGenerationState getSaml2TokenGenerationState() {
