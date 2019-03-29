@@ -94,6 +94,11 @@
 	                        <pingURL>http://localhost:8080/openam</pingURL>
 	                    </deployable>
 	                </deployables>
+	                <configuration>
+				    	<properties>
+				        	<cargo.rmi.port>8206</cargo.rmi.port>
+				        </properties>
+				    </configuration>
                 </configuration>
             </plugin>
 			<plugin>

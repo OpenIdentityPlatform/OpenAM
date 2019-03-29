@@ -197,9 +197,14 @@ class TokenGenerationService implements CollectionResourceProvider {
             logger.debug("TokenGenerationService:validateAssertionSubjectSession subjectRealm " + subjectSessionRealm
                     + " invocation realm: " + invocationRealm);
             if (!invocationRealm.equalsIgnoreCase(subjectSessionRealm)) {
-                logger.error("TokenGenerationService:validateAssertionSubjectSession realms do not match: Subject realm : "
-                        + subjectSessionRealm + " invocation realm: " + invocationRealm);
-                throw new ForbiddenException("SSO token subject realm does not match invocation realm");
+            	if (subjectSessionRealm.startsWith(invocationRealm)) { //alow get sub realm instance STS
+            		logger.debug("TokenGenerationService:validateAssertionSubjectSession realms do not match: Subject realm : "+ subjectSessionRealm + " invocation realm: " + invocationRealm);
+                    invocationState.setRealm(subjectSessionRealm);
+                    invocationState.setStsInstanceId(subjectSessionRealm.substring(1)+"/"+invocationState.getStsInstanceId());
+            	}else {
+	                logger.error("TokenGenerationService:validateAssertionSubjectSession realms do not match: Subject realm : "+ subjectSessionRealm + " invocation realm: " + invocationRealm);
+	                throw new ForbiddenException("SSO token subject realm does not match invocation realm");
+            	}
             }
         } catch (SSOException | IdRepoException e) {
             logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
