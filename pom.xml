@@ -168,6 +168,8 @@
     <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
     <forgerock.license.version>1.0.0</forgerock.license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
+    <logback.version>1.2.3</logback.version>
+
   </properties>
   <!-- Profiles -->
   <profiles>
