@@ -37,7 +37,7 @@
     <Service name="sunIdentityRepositoryService" version="1.0">
         <Schema
             i18nFileName="amIdRepoService"
-            revisionNumber="30"
+            revisionNumber="31"
             i18nKey="">
 
             <Global>
@@ -4335,6 +4335,96 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
+                <SubSchema i18nKey="Cassandra" inheritance="multiple"
+					maintainPriority="no" name="CassandraRepo"
+					supportsApplicableOrganization="no" validate="yes">
+					<AttributeSchema cosQualifier="default"
+						isSearchable="no" name="RequiredValueValidator" syntax="string"
+						type="validator">
+						<DefaultValues>
+							<Value>com.sun.identity.sm.RequiredValueValidator</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema any="required" cosQualifier="default"
+						i18nKey="a4010" isSearchable="no" name="sunIdRepoClass" syntax="string"
+						type="single" validator="RequiredValueValidator">
+						<DefaultValues>
+							<Value>org.openidentityplatform.openam.cassandra.Repo</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema any="required" cosQualifier="default"
+						i18nKey="Servers" isSearchable="no"
+						name="sun-idrepo-ldapv3-config-ldap-server" syntax="string" type="list"
+						validator="RequiredValueValidator">
+						<DefaultValues>
+							<Value>localhost</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Keyspace"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-organization_name" syntax="string"
+						type="single">
+						<DefaultValues>
+							<Value>keyspace</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Username"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-authid" syntax="string"
+						type="single">
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Password"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-authpw" syntax="password"
+						type="single">
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Operations"
+						isSearchable="no" name="sunIdRepoSupportedOperations" syntax="string"
+						type="list"
+						validator="validatatorClass for verifying this list against supported list">
+						<DefaultValues>
+							<Value>realm=read,create,edit,delete,service</Value>
+							<Value>user=read,create,edit,delete,service</Value>
+							<Value>group=read,create,edit,delete</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Tables"
+						isSearchable="no" name="sunIdRepoAttributeMapping"
+						syntax="string" type="list">
+						<DefaultValues>
+							<Value>realm=realm</Value>
+							<Value>user=user</Value>
+							<Value>group=group</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="TTL"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-user-attributes"
+						syntax="string" type="list">
+						<DefaultValues>
+							<Value>realm:attr1=86400</Value>
+							<Value>user:attr2=86400</Value>
+							<Value>group:attr3=86400</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="a20172"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-isactive" syntax="string"
+						type="single">
+						<DefaultValues>
+							<Value>inetuserstatus</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="a20173"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-active" syntax="string"
+						type="single">
+						<DefaultValues>
+							<Value>Active</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="a2023"
+						isSearchable="no" name="sun-idrepo-ldapv3-config-memberof" syntax="string"
+						type="single">
+						<DefaultValues>
+							<Value>memberOf</Value>
+						</DefaultValues>
+					</AttributeSchema>
+				</SubSchema>
 
                 <OrganizationAttributeSchema>
                     <AttributeSchema name="sunOrganizationStatus"
