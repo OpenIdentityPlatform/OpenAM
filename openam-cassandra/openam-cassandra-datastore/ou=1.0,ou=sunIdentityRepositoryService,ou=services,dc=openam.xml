@@ -12,7 +12,7 @@
 						i18nKey="a4010" isSearchable="no" name="sunIdRepoClass" syntax="string"
 						type="single" validator="RequiredValueValidator">
 						<DefaultValues>
-							<Value>ru.org.openam.cassandra.Repo</Value>
+							<Value>org.openidentityplatform.openam.cassandra.Repo</Value>
 						</DefaultValues>
 					</AttributeSchema>
 					<AttributeSchema any="required" cosQualifier="default"
