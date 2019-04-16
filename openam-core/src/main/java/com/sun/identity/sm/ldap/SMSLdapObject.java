@@ -37,6 +37,8 @@ import com.iplanet.ums.DataLayer;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.security.AdminDNAction;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSDataEntry;
@@ -66,6 +68,8 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
@@ -125,6 +129,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
     //static int entriesPresentCacheSize = 1000;
 
+    private ConfigAuditorFactory auditorFactory;
     static boolean initializedNotification;
 
     Cache<String,Boolean> entriesPresent = CacheBuilder
@@ -170,6 +175,9 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         if (initialized) {
             return;
         }
+        try {
+        	auditorFactory = InjectorHolder.getInstance(ConfigAuditorFactory.class);
+        }catch (Throwable e) {}
         // Obtain the I18N resource bundle & Debug
         debug = Debug.getInstance("amSMSLdap");
         AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
@@ -325,8 +333,14 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
      */
     public void create(SSOToken token, String dn, Map attrs)
             throws SMSException, SSOException {
-        // Call the private method that takes the principal name
+    	SMSAuditor auditor = newAuditor(token, dn, null);
+
+    	// Call the private method that takes the principal name
         create(token.getPrincipal(), dn, attrs);
+        
+        if (auditor != null) {
+            auditor.auditCreate(attrs);
+        }
         // Update entryPresent cache
         objectChanged(dn, ADD);
     }
@@ -375,6 +389,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
      */
     public void modify(SSOToken token, String dn, ModificationItem mods[])
             throws SMSException, SSOException {
+    	SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
         int retry = 0;
         ModifyRequest request = copyModItemsToModifyRequest(DN.valueOf(dn), mods);
         while (retry <= connNumRetry) {
@@ -382,6 +397,9 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
             try (Connection conn = getConnection(token.getPrincipal())) {
                 conn.modify(request);
+                if (auditor != null) {
+                    auditor.auditModify(mods);
+                }
                 debug.message("SMSLdapObject.modify(): Successfully modified entry: {}", dn);
                 break;
             } catch (LdapException e) {
@@ -406,6 +424,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
      */
     public void delete(SSOToken token, String dn) throws SMSException,
             SSOException {
+    	SMSAuditor auditor = newAuditor(token, dn, readCurrentState(dn));
         // Check if there are sub-entries, delete if present
         for (String entry : subEntries(token, dn, "*", 0, false, false)) {
             debug.message("SMSLdapObject: deleting sub-entry: {}", entry);
@@ -425,6 +444,9 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         delete(token.getPrincipal(), dn);
         // Update entriesPresent cache
         objectChanged(dn, DELETE);
+        if (auditor != null) {
+            auditor.auditDelete();
+        }
     }
 
     private static void delete(Principal p, String dn)
@@ -1107,5 +1129,32 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         debug.message("SMSLdapObject.searchSubOrganizationName: Successfully obtained suborganization names for {}: {}",
                 dn, answer);
         return answer;
+    }
+    
+    private SMSAuditor newAuditor(SSOToken token, String dn, Map initialState) {
+        if (!AMSetupServlet.isCurrentConfigurationValid() || auditorFactory==null) {
+            return null;
+        }
+        String objectId = dn;
+        String realm = SMSAuditor.getRealmFromDN(dn);
+
+        if (initialState == null) {
+            initialState = new HashMap();
+        }
+
+        return auditorFactory.create(token, realm, objectId, initialState);
+    }
+    
+    /**
+     * Read the specified value using an admin token
+     * @param dn The distinguished name
+     * @return The map if the read was successful, null otherwise
+     */
+    private Map readCurrentState(String dn) {
+        try {
+            return read(AccessController.doPrivileged(AdminTokenAction.getInstance()), dn);
+        } catch (SMSException | SSOException e) {
+            return null;
+        }
     }
 }
