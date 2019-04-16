@@ -175,7 +175,9 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
         if (initialized) {
             return;
         }
-        auditorFactory = InjectorHolder.getInstance(ConfigAuditorFactory.class);
+        try {
+        	auditorFactory = InjectorHolder.getInstance(ConfigAuditorFactory.class);
+        }catch (Throwable e) {}
         // Obtain the I18N resource bundle & Debug
         debug = Debug.getInstance("amSMSLdap");
         AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
@@ -1130,7 +1132,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
     }
     
     private SMSAuditor newAuditor(SSOToken token, String dn, Map initialState) {
-        if (!AMSetupServlet.isCurrentConfigurationValid()) {
+        if (!AMSetupServlet.isCurrentConfigurationValid() || auditorFactory==null) {
             return null;
         }
         String objectId = dn;
