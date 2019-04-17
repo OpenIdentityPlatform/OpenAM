@@ -576,7 +576,6 @@ public class AMIdentity {
             }
             binaryModMap.clear();
         }
-
     }
 
     // SERVICE RELATED APIS

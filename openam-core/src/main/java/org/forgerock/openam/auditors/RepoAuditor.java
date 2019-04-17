@@ -151,6 +151,7 @@ public class RepoAuditor {
             JsonValue afterState = convertObjectToJsonValue(modified);
             AMConfigAuditEventBuilder builder = getBaseBuilder()
                     .operation(ConfigOperation.UPDATE);
+
             recordBeforeStateIfNotNull(builder, beforeState);
             recordAfterStateIfNotNull(builder, afterState);
 
