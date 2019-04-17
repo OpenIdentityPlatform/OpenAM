@@ -18,32 +18,33 @@ package org.forgerock.openam.auditors;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.utils.Time.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.debug.Debug;
-
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
-import org.forgerock.openam.audit.AMConfigAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.AuditConstants.*;
-import org.forgerock.openam.audit.AuditEventFactory;
-import org.forgerock.openam.audit.AuditEventPublisher;
-import org.forgerock.openam.audit.context.AuditRequestContext;
+import static org.forgerock.openam.audit.AuditConstants.ACTIVITY_TOPIC;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
+
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
+import org.forgerock.openam.audit.AMConfigAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditConstants.ConfigOperation;
+import org.forgerock.openam.audit.AuditConstants.EventName;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for publishing audit repo events for a configuration operation.
@@ -141,6 +142,44 @@ public class RepoAuditor {
             AMConfigAuditEventBuilder builder = getBaseBuilder()
                     .operation(ConfigOperation.UPDATE)
                     .changedFields(modifiedAttributes);
+            recordBeforeStateIfNotNull(builder, beforeState);
+            recordAfterStateIfNotNull(builder, afterState);
+
+            auditEventPublisher.tryPublish(ACTIVITY_TOPIC, builder.toEvent());
+        }
+    }
+    
+    public void auditRemoveAttributes(String[] removedAttributes) {
+        if (shouldAudit(ConfigOperation.UPDATE)) {
+            JsonValue afterState = convertObjectToJsonValue(Collections.singletonMap("removedAttributes", removedAttributes));
+            AMConfigAuditEventBuilder builder = getBaseBuilder()
+                    .operation(ConfigOperation.UPDATE);
+            recordBeforeStateIfNotNull(builder, beforeState);
+            recordAfterStateIfNotNull(builder, afterState);
+
+            auditEventPublisher.tryPublish(ACTIVITY_TOPIC, builder.toEvent());
+        }
+    }
+    
+    
+    
+    public void auditSetPassword() {
+        if (shouldAudit(ConfigOperation.UPDATE)) {
+            JsonValue afterState = convertObjectToJsonValue(Collections.singletonMap("userPassword", "*******"));
+            AMConfigAuditEventBuilder builder = getBaseBuilder()
+                    .operation(ConfigOperation.UPDATE);
+            recordBeforeStateIfNotNull(builder, beforeState);
+            recordAfterStateIfNotNull(builder, afterState);
+
+            auditEventPublisher.tryPublish(ACTIVITY_TOPIC, builder.toEvent());
+        }
+    }
+    
+    public void auditSetActive(boolean active) {
+        if (shouldAudit(ConfigOperation.UPDATE)) {
+            JsonValue afterState = convertObjectToJsonValue(Collections.singletonMap("active", active));
+            AMConfigAuditEventBuilder builder = getBaseBuilder()
+                    .operation(ConfigOperation.UPDATE);
             recordBeforeStateIfNotNull(builder, beforeState);
             recordAfterStateIfNotNull(builder, afterState);
 

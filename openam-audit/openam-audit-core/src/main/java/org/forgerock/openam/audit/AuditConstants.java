@@ -55,7 +55,7 @@ public final class AuditConstants {
         /** Event for a change in configuration. */
         AM_CONFIG_CHANGE("AM-CONFIG-CHANGE"),
     	/** Evet for a change in user repo*/
-    	AM_USER_CHANGE("AM-USER-CHANGE");
+    	AM_USER_CHANGE("AM-IDREPO-CHANGE");
 
         private final String name;
 
