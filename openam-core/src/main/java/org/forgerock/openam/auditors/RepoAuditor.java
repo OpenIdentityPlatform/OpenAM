@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.debug.Debug;
 
@@ -139,13 +141,13 @@ public class RepoAuditor {
      */
     public void auditModify(Map<String, Object> finalState) {
         if (shouldAudit(ConfigOperation.UPDATE)) {
-        	Map<String, Object> modified = new HashMap<>(finalState);
+        	Map<String, Object> modified = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        	modified.putAll(finalState);
+        	
         	if(modified.containsKey("userpassword")) {
         		modified.put("userpassword", "********");
         	}
-        	if(modified.containsKey("userPassword")) {
-        		modified.put("userPassword", "********");
-        	}
+
             JsonValue afterState = convertObjectToJsonValue(modified);
             AMConfigAuditEventBuilder builder = getBaseBuilder()
                     .operation(ConfigOperation.UPDATE);
