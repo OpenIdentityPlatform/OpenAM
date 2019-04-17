@@ -53,7 +53,9 @@ public final class AuditConstants {
         /** Event for auth process logout. */
         AM_LOGOUT("AM-LOGOUT"),
         /** Event for a change in configuration. */
-        AM_CONFIG_CHANGE("AM-CONFIG-CHANGE");
+        AM_CONFIG_CHANGE("AM-CONFIG-CHANGE"),
+    	/** Evet for a change in user repo*/
+    	AM_USER_CHANGE("AM-IDREPO-CHANGE");
 
         private final String name;
 

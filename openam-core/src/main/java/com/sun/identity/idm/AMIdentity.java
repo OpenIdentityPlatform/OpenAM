@@ -35,7 +35,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.auditors.RepoAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
@@ -48,6 +50,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.common.IdRepoUtils;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -119,6 +122,8 @@ public class AMIdentity {
     private final AMHashMap binaryModMap = new AMHashMap(true);
 
     protected String univDN = null;
+    
+    private RepoAuditorFactory auditorFactory;
 
     /**
      * @supported.api
@@ -182,6 +187,10 @@ public class AMIdentity {
         name = LDAPUtils.unescapeValue(LDAPUtils.rdnValue(universalId.rdn()));
         type = new IdType(LDAPUtils.rdnValue(universalId.parent().rdn()));
         orgName = universalId.parent().parent().toString();
+        
+    	try {
+    		auditorFactory = InjectorHolder.getInstance(RepoAuditorFactory.class);
+    	} catch(Throwable e) {}
     }
 
     /**
@@ -229,6 +238,9 @@ public class AMIdentity {
         } catch (LocalizedIllegalArgumentException e) {
             throw new IllegalArgumentException("Cannot parse orgName: " + orgName, e);
         }
+    	try {
+    		auditorFactory = InjectorHolder.getInstance(RepoAuditorFactory.class);
+    	} catch(Throwable e) {}
     }
 
     // General APIs
@@ -304,7 +316,12 @@ public class AMIdentity {
         throws IdRepoException, SSOException {
         IdServices idServices =
             IdServicesFactory.getDataStoreServices();
+        RepoAuditor auditor = newAuditor(token, orgName, univIdWithoutDN, Collections.singletonMap("active", this.isActive()));
+        
         idServices.setActiveStatus(token, type, name, orgName, univDN, active);
+        if(auditor != null) {
+        	auditor.auditSetActive(active);
+        }
     }
 
     /**
@@ -456,6 +473,11 @@ public class AMIdentity {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
         idServices.changePassword(token, type, name, oldPassword,
             newPassword, orgName, getDN());
+        
+        RepoAuditor auditor = newAuditor(token, orgName, univIdWithoutDN, null);
+        if(auditor != null) {
+        	auditor.auditSetPassword();
+        }
     }
 
     /**
@@ -515,6 +537,11 @@ public class AMIdentity {
                 modMap.put(attr, Collections.EMPTY_SET);
             }
         }
+        
+        RepoAuditor auditor = newAuditor(token, orgName, univIdWithoutDN, null);
+        if(auditor != null) {
+        	auditor.auditRemoveAttributes((String[]) attrNames.toArray(new String[] {}));
+        }
     }
 
     /**
@@ -530,6 +557,9 @@ public class AMIdentity {
      */
     public void store() throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
+ 
+        RepoAuditor auditor = newAuditor(token, orgName, univIdWithoutDN, null);
+        
         if (modMap != null && !modMap.isEmpty()) {
             idServices.setAttributes(token, type, name, modMap, false, orgName,
                     univDN, true);
@@ -539,6 +569,10 @@ public class AMIdentity {
             idServices.setAttributes(token, type, name, binaryModMap, false,
                     orgName, univDN, false);
             binaryModMap.clear();
+        }
+        
+        if(auditor != null && modMap != null && !modMap.isEmpty()) {
+        	auditor.auditModify(modMap, (String[]) modMap.keySet().toArray());
         }
     }
 
@@ -1438,4 +1472,15 @@ public class AMIdentity {
     private static Debug debug = Debug.getInstance("amIdm");
 
     public static String COS_PRIORITY = "cospriority";
+    
+    private RepoAuditor newAuditor(SSOToken token, String realm, String dn, Map initialState) {
+        if (!AMSetupServlet.isCurrentConfigurationValid() || auditorFactory==null) {
+            return null;
+        }
+        if (initialState == null) {
+            initialState = new HashMap();
+        }
+
+        return auditorFactory.create(token, realm, dn, initialState);
+    }
 }
