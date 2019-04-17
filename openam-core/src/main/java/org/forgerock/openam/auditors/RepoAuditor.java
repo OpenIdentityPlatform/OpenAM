@@ -23,6 +23,7 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -136,12 +137,18 @@ public class RepoAuditor {
      * @param finalState The derived final state of the entry
      * @param modifiedAttributes The attributes modified
      */
-    public void auditModify(Map<String, Object> finalState, String[] modifiedAttributes) {
+    public void auditModify(Map<String, Object> finalState) {
         if (shouldAudit(ConfigOperation.UPDATE)) {
-            JsonValue afterState = convertObjectToJsonValue(finalState);
+        	Map<String, Object> modified = new HashMap<>(finalState);
+        	if(modified.containsKey("userpassword")) {
+        		modified.put("userpassword", "********");
+        	}
+        	if(modified.containsKey("userPassword")) {
+        		modified.put("userPassword", "********");
+        	}
+            JsonValue afterState = convertObjectToJsonValue(modified);
             AMConfigAuditEventBuilder builder = getBaseBuilder()
-                    .operation(ConfigOperation.UPDATE)
-                    .changedFields(modifiedAttributes);
+                    .operation(ConfigOperation.UPDATE);
             recordBeforeStateIfNotNull(builder, beforeState);
             recordAfterStateIfNotNull(builder, afterState);
 

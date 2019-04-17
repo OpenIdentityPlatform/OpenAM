@@ -563,17 +563,20 @@ public class AMIdentity {
         if (modMap != null && !modMap.isEmpty()) {
             idServices.setAttributes(token, type, name, modMap, false, orgName,
                     univDN, true);
+            if(auditor != null && modMap != null && !modMap.isEmpty()) {
+            	auditor.auditModify(modMap);
+            }
             modMap.clear();
         }
         if (binaryModMap != null && !binaryModMap.isEmpty()) {
             idServices.setAttributes(token, type, name, binaryModMap, false,
                     orgName, univDN, false);
+            if(auditor != null && binaryModMap != null && !binaryModMap.isEmpty()) {
+            	auditor.auditModify(binaryModMap);
+            }
             binaryModMap.clear();
         }
-        
-        if(auditor != null && modMap != null && !modMap.isEmpty()) {
-        	auditor.auditModify(modMap, (String[]) modMap.keySet().toArray());
-        }
+
     }
 
     // SERVICE RELATED APIS
