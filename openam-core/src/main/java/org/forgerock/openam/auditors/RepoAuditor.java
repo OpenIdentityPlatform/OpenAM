@@ -23,8 +23,10 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -43,6 +45,7 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.debug.Debug;
 
@@ -136,12 +139,19 @@ public class RepoAuditor {
      * @param finalState The derived final state of the entry
      * @param modifiedAttributes The attributes modified
      */
-    public void auditModify(Map<String, Object> finalState, String[] modifiedAttributes) {
+    public void auditModify(Map<String, Object> finalState) {
         if (shouldAudit(ConfigOperation.UPDATE)) {
-            JsonValue afterState = convertObjectToJsonValue(finalState);
+        	Map<String, Object> modified = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        	modified.putAll(finalState);
+        	
+        	if(modified.containsKey("userpassword")) {
+        		modified.put("userpassword", "********");
+        	}
+
+            JsonValue afterState = convertObjectToJsonValue(modified);
             AMConfigAuditEventBuilder builder = getBaseBuilder()
-                    .operation(ConfigOperation.UPDATE)
-                    .changedFields(modifiedAttributes);
+                    .operation(ConfigOperation.UPDATE);
+
             recordBeforeStateIfNotNull(builder, beforeState);
             recordAfterStateIfNotNull(builder, afterState);
 
