@@ -63,7 +63,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         setFileRetentionPolicies(csvHandlerConfiguration, attributes);
         csvHandlerConfiguration.setBufferingConfiguration(getBufferingConfiguration(attributes));
         csvHandlerConfiguration.setSecurity(getCsvSecurity(attributes));
-
+        csvHandlerConfiguration.getFormatting().setDelimiterChar(';');
         return new CsvAuditEventHandler(csvHandlerConfiguration, configuration.getEventTopicsMetaData(),
                 new DefaultKeyStoreHandlerProvider());
     }
