@@ -33,6 +33,7 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
+import org.forgerock.openam.auditors.RepoAuditor;
 import org.forgerock.openam.auditors.SMSAuditFilter;
 import org.forgerock.openam.auditors.SMSAuditor;
 import org.forgerock.openam.blacklist.Blacklist;
@@ -92,6 +93,7 @@ import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
+import com.sun.identity.idm.RepoAuditorFactory;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -147,6 +149,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(DataLayerConstants.DATA_LAYER_DEBUG));
         bind(Debug.class).annotatedWith(Names.named("amSMS"))
                 .toInstance(Debug.getInstance("amSMS"));
+        bind(Debug.class).annotatedWith(Names.named("amIdm"))
+        		.toInstance(Debug.getInstance("amIdm"));
         bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(OAuth2Constants.DEBUG_LOG_NAME))
@@ -178,6 +182,11 @@ public class CoreGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(SMSAuditor.class, SMSAuditor.class)
                 .build(ConfigAuditorFactory.class));
+        
+        install(new FactoryModuleBuilder()
+                .implement(RepoAuditor.class, RepoAuditor.class)
+                .build(RepoAuditorFactory.class));
+
 
         Multibinder.newSetBinder(binder(), SMSAuditFilter.class);
 

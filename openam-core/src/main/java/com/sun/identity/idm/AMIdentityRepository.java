@@ -40,6 +40,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.auditors.RepoAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
 
 import com.google.inject.assistedinject.Assisted;
@@ -48,6 +50,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -79,6 +82,8 @@ public class AMIdentityRepository {
     public static Map listeners = new CaseInsensitiveHashMap();
 
     private static Set<IdRepoCreationListener> creationListeners = new HashSet<IdRepoCreationListener>();
+
+    private RepoAuditorFactory auditorFactory;
 
     /**
      * @supported.api
@@ -116,6 +121,9 @@ public class AMIdentityRepository {
         idRealmName = realmName;
         organizationDN = DNMapper.orgNameToDN(realmName);
         notifyCreationListeners();
+        try {
+    		auditorFactory = InjectorHolder.getInstance(RepoAuditorFactory.class);
+    	} catch(Throwable e) {}
     }
 
     /**
@@ -460,7 +468,13 @@ public class AMIdentityRepository {
     public AMIdentity createIdentity(IdType type, String idName, Map attrMap)
             throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
-        return idServices.create(token, type, idName, attrMap, organizationDN);
+        
+        AMIdentity id = idServices.create(token, type, idName, attrMap, organizationDN);
+        RepoAuditor auditor = newAuditor(token, organizationDN, id.getUniversalId());
+        if(auditor != null) {
+        	auditor.auditCreate(attrMap);
+        }
+        return id;
     }
 
     /**
@@ -562,13 +576,19 @@ public class AMIdentityRepository {
         if (identities == null || identities.isEmpty()) {
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ILLEGAL_ARGUMENTS, null);
         }
-
+        
         Iterator it = identities.iterator();
         while (it.hasNext()) {
             AMIdentity id = (AMIdentity) it.next();
             IdServices idServices = IdServicesFactory.getDataStoreServices();
             idServices.delete(token, id.getType(), id.getName(), organizationDN,
                     id.getDN());
+            
+            RepoAuditor auditor = newAuditor(token, organizationDN, id.getUniversalId());
+            if(auditor != null) {
+            	auditor.auditDelete();
+            }
+            
         }
     }
 
@@ -839,5 +859,12 @@ public class AMIdentityRepository {
             }
         }
         return resultMap;
+    }
+    
+    private RepoAuditor newAuditor(SSOToken token, String realm, String dn) {
+        if (!AMSetupServlet.isCurrentConfigurationValid() || auditorFactory==null) {
+            return null;
+        }
+        return auditorFactory.create(token, realm, dn, new HashMap());
     }
 }
