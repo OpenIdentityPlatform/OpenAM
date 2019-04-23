@@ -812,14 +812,20 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         try {
             conn = createConnection();
+            
             List<Filter> filters = new ArrayList<>();
-            for (String userObjectClass : userObjectClasses) {
-            	filters.add(Filter.equality("objectClass", userObjectClass)); 
-            	
-			}
+            if (type.equals(IdType.USER)) {
+                for (String userObjectClass : userObjectClasses) {
+                	filters.add(Filter.equality("objectClass", userObjectClass)); 
+    			}
+            }
+            String filterString = Filter.objectClassPresent().toString();
+            if(filters.size() == 0) {
+            	filterString = Filter.and(filters.toArray(new Filter[filters.size()])).toString();
+            }
             SearchRequest searchRequest = LDAPRequests.newSingleEntrySearchRequest(dn, 
             		SearchScope.BASE_OBJECT, 
-            		Filter.and(filters.toArray(new Filter[filters.size()])).toString(),
+            		filterString,
             		attrs.toArray(new String[attrs.size()]));
             DEBUG.message("executing request: "+ searchRequest.toString());
             SearchResultEntry entry = conn.searchSingleEntry(searchRequest);
