@@ -22,11 +22,13 @@ import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -810,8 +812,17 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         try {
             conn = createConnection();
-            SearchResultEntry entry = conn.searchSingleEntry(
-                    LDAPRequests.newSingleEntrySearchRequest(dn, attrs.toArray(new String[attrs.size()])));
+            List<Filter> filters = new ArrayList<>();
+            for (String userObjectClass : userObjectClasses) {
+            	filters.add(Filter.equality("objectClass", userObjectClass)); 
+            	
+			}
+            SearchRequest searchRequest = LDAPRequests.newSingleEntrySearchRequest(dn, 
+            		SearchScope.BASE_OBJECT, 
+            		Filter.and(filters.toArray(new Filter[filters.size()])).toString(),
+            		attrs.toArray(new String[attrs.size()]));
+            DEBUG.message("executing request: "+ searchRequest.toString());
+            SearchResultEntry entry = conn.searchSingleEntry(searchRequest);
             for (Attribute attribute : entry.getAllAttributes()) {
                 String attrName = attribute.getAttributeDescriptionAsString();
                 if (!definedAttributes.isEmpty() && !definedAttributes.contains(attrName)) {
