@@ -162,6 +162,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
 	        }catch (Throwable e) {
 	        	openIdConnectToken.put("realm", subjectToken.getProperty("Organization", true));
 			}
+	        
+	        openIdConnectToken.put("auth:ctxid", subjectToken.getProperty("AMCtxId", true));
 	        openIdConnectToken.put("auth:service", subjectToken.getProperty("Service", true));
 	        openIdConnectToken.put("auth:module", subjectToken.getProperty("AuthType", true));
 	        openIdConnectToken.put("auth:level", subjectToken.getProperty("AuthLevel", true));
