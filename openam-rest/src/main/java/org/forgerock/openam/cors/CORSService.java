@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -182,9 +183,11 @@ public class CORSService {
      */
     private boolean handleActualRequestFlow(final HttpServletRequest req, final HttpServletResponse res) {
 
-        if (req.getHeaderNames() != null) {
-            while (req.getHeaderNames().hasMoreElements()) {
-                String header = req.getHeaderNames().nextElement();
+        Enumeration<String> headerNames = req.getHeaderNames();
+
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String header = headerNames.nextElement();
                 if (!acceptedHeaders.contains(header.toLowerCase()) && !simpleHeaders.contains(header.toLowerCase())) {
                     DEBUG.warning("CORS Fail - Headers do not match allowed headers.");
                     return false;
