@@ -18,7 +18,10 @@ package org.forgerock.openam.sts.tokengeneration.oidc;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.sm.DNMapper;
+
 import org.apache.commons.collections.MapUtils;
 import com.google.common.collect.Lists;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
@@ -151,7 +154,23 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         if (tokenGenerationState.getAuthenticationTimeInSeconds() != 0) {
             openIdConnectToken.setAuthTime(tokenGenerationState.getAuthenticationTimeInSeconds());
         }
-
+        //auth claims
+        try {
+	        openIdConnectToken.put("ip", subjectToken.getProperty("Host", true));
+	        try {
+	        	openIdConnectToken.put("realm", DNMapper.orgNameToRealmName(subjectToken.getProperty("Organization", true)));
+	        }catch (Throwable e) {
+	        	openIdConnectToken.put("realm", subjectToken.getProperty("Organization", true));
+			}
+	        openIdConnectToken.put("auth:service", subjectToken.getProperty("Service", true));
+	        openIdConnectToken.put("auth:module", subjectToken.getProperty("AuthType", true));
+	        openIdConnectToken.put("auth:level", subjectToken.getProperty("AuthLevel", true));
+	        openIdConnectToken.put("auth:time:max:idle", currentTimeMillis()+subjectToken.getMaxIdleTime()*60*1000);
+	        openIdConnectToken.put("auth:time:max", currentTimeMillis()+subjectToken.getMaxSessionTime()*60*1000);
+        }catch (SSOException e) {
+			throw new TokenCreationException(1,"token expired",e);
+		}
+        
         handleClaims(subjectToken, openIdConnectToken, tokenConfig);
         return openIdConnectToken;
     }

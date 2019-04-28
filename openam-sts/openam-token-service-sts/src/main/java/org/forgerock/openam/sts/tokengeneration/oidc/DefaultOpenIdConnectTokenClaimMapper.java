@@ -53,8 +53,6 @@ public class DefaultOpenIdConnectTokenClaimMapper implements OpenIdConnectTokenC
              keys in the claimMap parameter, and whose value correspond to the joinedMappings value.
              */
             Map<String, String> adjustedMap = new HashMap<>(joinedMappings.size());
-            adjustedMap.put("ip", token.getProperty("Host", true));
-            adjustedMap.put("realm", DNMapper.orgNameToRealmName(amIdentity.getRealm()));
             for (Map.Entry<String, String> claimMapEntry : claimMap.entrySet()) {
                 if (!StringUtils.isEmpty(joinedMappings.get(claimMapEntry.getValue()))) {
                     adjustedMap.put(claimMapEntry.getKey(), joinedMappings.get(claimMapEntry.getValue()));
