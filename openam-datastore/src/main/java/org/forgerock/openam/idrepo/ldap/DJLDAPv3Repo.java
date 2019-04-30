@@ -820,8 +820,8 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     			}
             }
             String filterString = Filter.objectClassPresent().toString();
-            if(filters.size() == 0) {
-            	filterString = Filter.and(filters.toArray(new Filter[filters.size()])).toString();
+            if(filters.size() > 0) {
+            	filterString = Filter.or(filters.toArray(new Filter[filters.size()])).toString();
             }
             SearchRequest searchRequest = LDAPRequests.newSingleEntrySearchRequest(dn, 
             		SearchScope.BASE_OBJECT, 
