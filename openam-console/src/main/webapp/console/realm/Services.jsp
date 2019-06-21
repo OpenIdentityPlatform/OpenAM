@@ -106,4 +106,13 @@
 </cc:form>
 
 </cc:header>
+<script>
+//deal with tomcat 8.5 links
+if(document.querySelectorAll) {
+	var navLinks = document.querySelectorAll('.TblNavLnk');
+	navLinks.forEach(function( navLink ){
+	  navLink.setAttribute('href', navLink.getAttribute('href').replace('[', '%5B').replace(']', '%5D')));
+	})
+}
+</script>
 </jato:useViewBean>
