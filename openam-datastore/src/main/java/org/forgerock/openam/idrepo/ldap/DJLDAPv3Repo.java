@@ -2362,6 +2362,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             while (reader.hasNext()) {
                 if (reader.isEntry()) {
                     if (entry != null) {
+                    	SearchResultEntry anotherEntry = reader.readEntry();
+                    	DEBUG.error("DJLDAPv3Repo.getDN: found multiple entrires: " 
+                    			+ entry.getName().toString() 
+                    			+ " and " + anotherEntry.getName().toString());
                         throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED,
                                 IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED, CLASS_NAME,
                                 ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue());
