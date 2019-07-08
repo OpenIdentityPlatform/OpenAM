@@ -38,7 +38,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthService"
                 i18nFileName="amAuth"
-                revisionNumber="60"
+                revisionNumber="61"
                 i18nKey="iplanet-am-auth-service-description"
                 resourceName="EMPTY">
             <Global>
@@ -78,6 +78,8 @@
                         <Value>org.forgerock.openam.authentication.modules.amster.Amster</Value>
                         <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
                         <Value>org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha</Value>
+                        <Value>org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration</Value>
+                        <Value>org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"

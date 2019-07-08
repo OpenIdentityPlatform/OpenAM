@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+    <Service name="sunAMAuthWebAuthnAuthenticationService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthWebAuthnAuthenticationService"
+            i18nFileName="amAuthWebAuthn"
+            revisionNumber="1"
+            i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.description"
+            resourceName="webauthn">
+
+            <Organization>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.authlevel"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.authlevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.timeout"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.timeout">
+                    <DefaultValues>
+                        <Value>60000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.userAttribute"
+                    type="single"
+                    syntax="string"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.userAttribute">
+                    <DefaultValues>
+                        <Value>sunIdentityServerPPSignKey</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                	<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.authlevel"
+	                    	type="single"
+	                    	syntax="number_range" 
+	                    	rangeStart="0" 
+	                    	rangeEnd="2147483647"
+	                    	i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.authlevel">
+	                    <DefaultValues>
+	                        <Value>0</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.timeout"
+	                    type="single"
+	                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+	                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.timeout">
+	                    <DefaultValues>
+	                        <Value>60000</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.userAttribute"
+	                    type="single"
+	                    syntax="string"
+	                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.userAttribute">
+	                    <DefaultValues>
+	                        <Value>sunIdentityServerPPSignKey</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
