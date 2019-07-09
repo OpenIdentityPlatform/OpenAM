@@ -25,13 +25,16 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +48,6 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.security.auth.callback.PasswordCallback;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.AttestationConveyancePreference;
 import com.webauthn4j.data.AuthenticatorAttachment;
@@ -161,7 +163,7 @@ public class WebAuthnRegistration extends AMLoginModule {
 	}
 	
 	public int requestCredentials() throws AuthLoginException, JsonProcessingException {
-		
+
 		PublicKeyCredentialCreationOptions credentialCreationOptions = webAuthnRegistrationProcessor.requestCredentials(username, getHttpServletRequest());
         
 	    String credentialCreationOptionsString = mapper.writeValueAsString(credentialCreationOptions);
@@ -184,10 +186,19 @@ public class WebAuthnRegistration extends AMLoginModule {
 	
     @SuppressWarnings("unchecked")
 	protected void save(Authenticator authenticator) throws AuthLoginException {
-    	Map<String, Set<String>> attributes = new HashMap<>();
+		Map<String, Set<String>> attributes = new HashMap<>();
     	attributes.put("uid", Collections.singleton(username));
-    	AMIdentity user = accountProvider.provisionUser(getAMIdentityRepository(getRequestOrg()), attributes);
-    	
+    	AMIdentity user = accountProvider.searchUser(getAMIdentityRepository(getRequestOrg()), attributes);
+
+		if(user == null) {
+			attributes = new HashMap<>();
+	    	attributes.put("uid", Collections.singleton(username));
+	    	String randomPassword = RandomStringUtils.random(20, true, true);
+	    	attributes.put("userPassword", CollectionUtils.asSet(randomPassword));
+	        attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
+	    	user = accountProvider.provisionUser(getAMIdentityRepository(getRequestOrg()), attributes);
+		}
+		
     	try {
 			user.setActiveStatus(true);
 			Set<String> authenticators =  user.getAttribute(userAttribute);
