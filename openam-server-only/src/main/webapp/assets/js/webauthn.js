@@ -60,11 +60,10 @@ function assert(assertion) {
     var rawId = new Uint8Array(assertion.rawId);
 
     document.getElementById("IDToken1").value = assertion.id;
-    document.getElementById('IDToken2').value = assertion.type;
-    document.getElementById('IDToken3').value = bufferEncode( new Uint8Array(authenticatorData));
-    document.getElementById('IDToken4').value = bufferEncode( new Uint8Array(clientDataJSON));
-    document.getElementById('IDToken5').value = bufferEncode( new Uint8Array(signature));
-    document.getElementById('IDToken6').value = bufferEncode(userHandle);
+    document.getElementById('IDToken2').value = bufferEncode( new Uint8Array(authenticatorData));
+    document.getElementById('IDToken3').value = bufferEncode( new Uint8Array(clientDataJSON));
+    document.getElementById('IDToken4').value = bufferEncode( new Uint8Array(signature));
+    document.getElementById('IDToken5').value = bufferEncode(userHandle);
 
     document.querySelector("form").submit();
 

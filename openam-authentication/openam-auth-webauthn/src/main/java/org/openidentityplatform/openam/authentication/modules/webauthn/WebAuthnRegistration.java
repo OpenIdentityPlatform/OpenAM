@@ -34,7 +34,6 @@ import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,18 +185,13 @@ public class WebAuthnRegistration extends AMLoginModule {
 	
     @SuppressWarnings("unchecked")
 	protected void save(Authenticator authenticator) throws AuthLoginException {
+
 		Map<String, Set<String>> attributes = new HashMap<>();
     	attributes.put("uid", Collections.singleton(username));
-    	AMIdentity user = accountProvider.searchUser(getAMIdentityRepository(getRequestOrg()), attributes);
-
-		if(user == null) {
-			attributes = new HashMap<>();
-	    	attributes.put("uid", Collections.singleton(username));
-	    	String randomPassword = RandomStringUtils.random(20, true, true);
-	    	attributes.put("userPassword", CollectionUtils.asSet(randomPassword));
-	        attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
-	    	user = accountProvider.provisionUser(getAMIdentityRepository(getRequestOrg()), attributes);
-		}
+    	String randomPassword = RandomStringUtils.random(20, true, true);
+    	attributes.put("userPassword", Collections.singleton(randomPassword));
+        attributes.put("inetuserstatus", Collections.singleton("Active"));
+        AMIdentity user = accountProvider.provisionUser(getAMIdentityRepository(getRequestOrg()), attributes);
 		
     	try {
 			user.setActiveStatus(true);

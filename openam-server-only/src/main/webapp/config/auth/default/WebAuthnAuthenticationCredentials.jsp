@@ -101,7 +101,7 @@
                                 <h1><jato:getDisplayFieldValue name='StaticTextHeader' defaultValue='Authentication' fireDisplayEvents='true' escape='false'/></h1>
                             </jato:content>
                             <jato:content name="validContent">
-                                <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL">
+                                <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL" style="display:none;">
                                     <jato:tiledView name="tiledCallbacks"
                                                     type="com.sun.identity.authentication.UI.CallBackTiledView">
 
