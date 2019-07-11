@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -48,6 +49,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.xml.wss.impl.callback.PasswordCallback;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
+import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
 
 /**
  * 
@@ -88,6 +90,8 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	private long timeout;
 	
 	private AccountProvider accountProvider = new DefaultAccountProvider();
+
+	private Set<Authenticator> authenticators;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -146,7 +150,7 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	
 	public int requestCredentials() throws AuthLoginException, JsonProcessingException {
 		
-		Set<Authenticator> authenticators = loadAuthenticators();
+		authenticators = loadAuthenticators();
 		PublicKeyCredentialRequestOptions credentialCreationOptions = 
 				webAuthnAuthenticationProcessor.requestCredentials(username, getHttpServletRequest(), authenticators);
         
@@ -165,9 +169,14 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		String signatureStr = 			((PasswordCallback) callbacks[CHALLENGE_SIGNATURE_CB_INDEX]).getPassword();
 		String userHandleStr = 			((PasswordCallback) callbacks[CHALLENGE_USER_HANDLE_CB_INDEX]).getPassword();
 		
-		webAuthnAuthenticationProcessor.processCredentials(getHttpServletRequest(), id, authenticatorDataStr, 
-				clientDataJSONStr, signatureStr, userHandleStr);
 		
+		AuthenticatorData<?> authenticatorData = webAuthnAuthenticationProcessor.processCredentials(getHttpServletRequest(), id, authenticatorDataStr, 
+				clientDataJSONStr, signatureStr, userHandleStr, authenticators);
+		
+		if(authenticatorData == null) {
+			logger.warn("processCredentials: authenticator data with id {} not found for identity: {}", id, username);
+			throw new InvalidPasswordException("authenticator not found");
+		}
 		return ISAuthConstants.LOGIN_SUCCEED;
 	}
 	

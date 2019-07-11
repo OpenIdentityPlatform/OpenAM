@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.webauthn4j.authenticator.Authenticator;
@@ -58,16 +60,29 @@ public class WebAuthnAuthenticationProcessor {
         return publicKeyCredentialRequestOptions;
 	}
 	
-	public AuthenticatorData<?> processCredentials(HttpServletRequest request, String idStr, String authenticatorDataStr, String clientDataJSONStr, String signatureStr, String userHandleStr) {
+	public AuthenticatorData<?> processCredentials(HttpServletRequest request, String idStr, 
+			String authenticatorDataStr, String clientDataJSONStr, String signatureStr, 
+			String userHandleStr, Set<Authenticator> authenticators) {
 		byte[] id = idStr.getBytes();
 		byte[] clientDataJSON = clientDataJSONStr.getBytes();
 		byte[] authenticatorData = clientDataJSONStr.getBytes();
 		byte[] signature = signatureStr.getBytes();
 		
+		Authenticator foundAuthenticator = null;
+		for(Authenticator authenticator : authenticators ) {
+			if(ArrayUtils.isEquals(authenticator.getAttestedCredentialData().getCredentialId(), id)) {
+				foundAuthenticator = authenticator;
+				break;
+			}
+		}
+		
+		if(foundAuthenticator == null) {
+			return null;
+		}
+		
 		Origin origin = new Origin(request.getScheme(), request.getServerName(), request.getServerPort());
         String rpId = request.getServerName();
-        
-        
+               
         
         byte[] tokenBindingId = null;
         ServerProperty serverProperty = new ServerProperty(origin, rpId, challenge, tokenBindingId);
@@ -82,11 +97,12 @@ public class WebAuthnAuthenticationProcessor {
                         serverProperty,
                         userVerificationRequired
                 );
-        Authenticator authenticator = null; // please load authenticator object persisted in the registration process in your manner
+        
+        WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = 
+        		new WebAuthnAuthenticationContextValidator();
 
-        WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = new WebAuthnAuthenticationContextValidator();
-
-        WebAuthnAuthenticationContextValidationResponse response = webAuthnAuthenticationContextValidator.validate(authenticationContext, authenticator);
+        WebAuthnAuthenticationContextValidationResponse response = 
+        		webAuthnAuthenticationContextValidator.validate(authenticationContext, foundAuthenticator);
         
         return response.getAuthenticatorData();
 	}
