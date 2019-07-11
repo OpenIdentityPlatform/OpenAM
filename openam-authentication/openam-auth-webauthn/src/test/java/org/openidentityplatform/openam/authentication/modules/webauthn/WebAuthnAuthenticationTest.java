@@ -3,9 +3,9 @@ package org.openidentityplatform.openam.authentication.modules.webauthn;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
@@ -52,13 +52,13 @@ public class WebAuthnAuthenticationTest {
 		NameCallback userNameCallback = new NameCallback("Username", "user1");
 		userNameCallback.setName("user1");
 		Callback[] callbacks = new Callback[] {userNameCallback};
-		assertEquals(2, webAuthnAuthentication.process(callbacks, 1));
+		assertEquals(webAuthnAuthentication.process(callbacks, 1), 2);
 	}
 	
 	@Test
 	public void testProcessRequestCredentials() throws Exception {
 		webAuthnAuthentication.init(null, Collections.singletonMap(webAuthnAuthentication.getUserKey(), "user1"), Collections.EMPTY_MAP);
-		assertEquals(2, webAuthnAuthentication.process(null, 1));
+		assertEquals(webAuthnAuthentication.process(null, 1), 2);
 	}
 	
 }

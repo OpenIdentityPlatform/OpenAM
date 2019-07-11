@@ -46,7 +46,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.xml.wss.impl.callback.PasswordCallback;
+import javax.security.auth.callback.PasswordCallback;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
@@ -65,8 +65,6 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	}
 	
 	private final static int LOGIN_REQUEST_CREDENTIALS_STATE = 2;
-	private final static int LOGIN_REGISTRATION_SUCCESS_STATE = 3;
-
 	private static final int CHALLENGE_ID_CB_INDEX = 0;
 
 	private static final int CHALLENGE_AUTH_DATA_CB_INDEX = 1;
@@ -132,8 +130,6 @@ public class WebAuthnAuthentication extends AMLoginModule {
 				}
 			case LOGIN_REQUEST_CREDENTIALS_STATE:
 				return processCredentials(callbacks);
-			case LOGIN_REGISTRATION_SUCCESS_STATE: 
-				return ISAuthConstants.LOGIN_SUCCEED;
 			default:
 				break;
 			}
@@ -158,16 +154,16 @@ public class WebAuthnAuthentication extends AMLoginModule {
         TextOutputCallback credentialCreationOptionsCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, credentialCreationOptionsString);
         replaceCallback(LOGIN_REQUEST_CREDENTIALS_STATE, CREDENTIAL_REQUEST_CB_INDEX, credentialCreationOptionsCallback);
         
-		return LOGIN_REQUEST_CREDENTIALS_STATE;
+        return LOGIN_REQUEST_CREDENTIALS_STATE;
 	}
 	
 	private int processCredentials(Callback[] callbacks) throws AuthLoginException {
 		
-        String id = 					((PasswordCallback) callbacks[CHALLENGE_ID_CB_INDEX]).getPassword();
-		String authenticatorDataStr = 	((PasswordCallback) callbacks[CHALLENGE_AUTH_DATA_CB_INDEX]).getPassword();
-		String clientDataJSONStr = 		((PasswordCallback) callbacks[CHALLENGE_CLIENT_DATA_CB_INDEX]).getPassword();
-		String signatureStr = 			((PasswordCallback) callbacks[CHALLENGE_SIGNATURE_CB_INDEX]).getPassword();
-		String userHandleStr = 			((PasswordCallback) callbacks[CHALLENGE_USER_HANDLE_CB_INDEX]).getPassword();
+        String id = 					new String(((PasswordCallback) callbacks[CHALLENGE_ID_CB_INDEX]).getPassword());
+		String authenticatorDataStr = 	new String(((PasswordCallback) callbacks[CHALLENGE_AUTH_DATA_CB_INDEX]).getPassword());
+		String clientDataJSONStr = 		new String(((PasswordCallback) callbacks[CHALLENGE_CLIENT_DATA_CB_INDEX]).getPassword());
+		String signatureStr = 			new String(((PasswordCallback) callbacks[CHALLENGE_SIGNATURE_CB_INDEX]).getPassword());
+		String userHandleStr = 			new String(((PasswordCallback) callbacks[CHALLENGE_USER_HANDLE_CB_INDEX]).getPassword());
 		
 		
 		AuthenticatorData<?> authenticatorData = webAuthnAuthenticationProcessor.processCredentials(getHttpServletRequest(), id, authenticatorDataStr, 

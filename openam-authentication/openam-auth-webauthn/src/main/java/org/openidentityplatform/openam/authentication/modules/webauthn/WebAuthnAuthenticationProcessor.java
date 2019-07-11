@@ -63,10 +63,10 @@ public class WebAuthnAuthenticationProcessor {
 	public AuthenticatorData<?> processCredentials(HttpServletRequest request, String idStr, 
 			String authenticatorDataStr, String clientDataJSONStr, String signatureStr, 
 			String userHandleStr, Set<Authenticator> authenticators) {
-		byte[] id = idStr.getBytes();
-		byte[] clientDataJSON = clientDataJSONStr.getBytes();
-		byte[] authenticatorData = clientDataJSONStr.getBytes();
-		byte[] signature = signatureStr.getBytes();
+		byte[] id = Base64Utils.decodeFromUrlSafeString(idStr);
+		byte[] clientDataJSON = Base64Utils.decodeFromUrlSafeString(clientDataJSONStr);
+		byte[] authenticatorData = Base64Utils.decodeFromUrlSafeString(authenticatorDataStr);
+		byte[] signature = Base64Utils.decodeFromUrlSafeString(signatureStr);
 		
 		Authenticator foundAuthenticator = null;
 		for(Authenticator authenticator : authenticators ) {

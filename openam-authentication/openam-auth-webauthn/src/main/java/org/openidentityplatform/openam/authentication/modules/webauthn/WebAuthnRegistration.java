@@ -69,8 +69,6 @@ public class WebAuthnRegistration extends AMLoginModule {
 	
 	private final static int LOGIN_REQUEST_CREDENTIALS_STATE = 2;
 	
-	private final static int LOGIN_REGISTRATION_SUCCESS_STATE = 3;
-	
 	private final static int CHALLENGE_ID_CB_INDEX = 0;
 	private final static int CHALLENGE_TYPE_CB_INDEX = 1;
 	private final static int CHALLENGE_ATTESTATION_CB_INDEX = 2;
@@ -145,8 +143,6 @@ public class WebAuthnRegistration extends AMLoginModule {
 				}
 			case LOGIN_REQUEST_CREDENTIALS_STATE:
 				return processCredentials(callbacks);
-			case LOGIN_REGISTRATION_SUCCESS_STATE: 
-				return ISAuthConstants.LOGIN_SUCCEED;
 			default:
 				break;
 			}
@@ -180,7 +176,7 @@ public class WebAuthnRegistration extends AMLoginModule {
 		
 		Authenticator authenticator = webAuthnRegistrationProcessor.processCredentials(id, type, attestationObjectStr, clientDataJSONStr, getHttpServletRequest());
 		save(authenticator);
-		return LOGIN_REGISTRATION_SUCCESS_STATE;
+		return ISAuthConstants.LOGIN_SUCCEED;
 	}
 	
     @SuppressWarnings("unchecked")
@@ -200,6 +196,7 @@ public class WebAuthnRegistration extends AMLoginModule {
 			String authStr = Base64Utils.encodeToUrlSafeString(bytes);
 			authenticators.add(authStr);
 			user.setAttributes(Collections.singletonMap(userAttribute, authenticators));
+			user.store();
 		} catch (SSOException | IdRepoException e) {
 			logger.error("save: error update user : {}", e);
 			throw new AuthLoginException(e);

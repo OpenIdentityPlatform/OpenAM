@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.webauthn4j.authenticator.Authenticator;
 
 public class WebAuthnRegistrationTest {
@@ -82,7 +83,7 @@ public class WebAuthnRegistrationTest {
 		Callback[] callbacks = new Callback[] {idCallback, typeCallback, 
 				attestationObjectCallback, clientDataJSONCallback, credentials};
 		
-		assertEquals(3, webAuthnRegistration.process(callbacks, 2));
+		assertEquals(ISAuthConstants.LOGIN_SUCCEED, webAuthnRegistration.process(callbacks, 2));
 	}
 
 }
