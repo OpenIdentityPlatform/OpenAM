@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 ForgeRock AS. All rights reserved.
+ * Copyright 2019 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -53,6 +53,7 @@ import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
 
 /**
  * 
+ * WebAuthn Login Authentication Module 
  *
  */
 public class WebAuthnAuthentication extends AMLoginModule {
