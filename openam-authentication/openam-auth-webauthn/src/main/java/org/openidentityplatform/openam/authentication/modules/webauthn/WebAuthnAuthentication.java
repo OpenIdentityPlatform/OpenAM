@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 
@@ -46,7 +47,6 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.security.auth.callback.PasswordCallback;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
@@ -92,6 +92,8 @@ public class WebAuthnAuthentication extends AMLoginModule {
 
 	private Set<Authenticator> authenticators;
 	
+	private int authLevel = 0;
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void init(Subject subject, Map sharedState, Map options) {
@@ -103,6 +105,10 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		this.userAttribute = CollectionHelper.getMapAttr(options, 
 				WebAuthnAuthentication.class.getName().concat(".userAttribute"),
 				"sunIdentityServerPPSignKey");
+		
+		this.authLevel = Integer.parseInt(CollectionHelper.getMapAttr(options, 
+				WebAuthnAuthentication.class.getName().concat(".authlevel"),
+				"0"));
 	}
 
 	@Override
@@ -174,6 +180,9 @@ public class WebAuthnAuthentication extends AMLoginModule {
 			logger.warn("processCredentials: authenticator data with id {} not found for identity: {}", id, username);
 			throw new InvalidPasswordException("authenticator not found");
 		}
+		
+		setAuthLevel(this.authLevel);
+		
 		return ISAuthConstants.LOGIN_SUCCEED;
 	}
 	

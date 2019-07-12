@@ -86,6 +86,8 @@ public class WebAuthnRegistration extends AMLoginModule {
 	private String userAttribute = null;
 	
 	private AccountProvider accountProvider = new DefaultAccountProvider();
+
+	private int authLevel = 0;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -114,6 +116,10 @@ public class WebAuthnRegistration extends AMLoginModule {
 		this.userAttribute = CollectionHelper.getMapAttr(options, 
 				WebAuthnRegistration.class.getName().concat(".userAttribute"),
 				"sunIdentityServerPPSignKey");
+		
+		this.authLevel  = Integer.parseInt(CollectionHelper.getMapAttr(options, 
+				WebAuthnRegistration.class.getName().concat(".authlevel"),
+				"0"));
 	}
 
 	@Override
@@ -176,6 +182,9 @@ public class WebAuthnRegistration extends AMLoginModule {
 		
 		Authenticator authenticator = webAuthnRegistrationProcessor.processCredentials(id, type, attestationObjectStr, clientDataJSONStr, getHttpServletRequest());
 		save(authenticator);
+		
+		setAuthLevel(authLevel);
+		
 		return ISAuthConstants.LOGIN_SUCCEED;
 	}
 	
