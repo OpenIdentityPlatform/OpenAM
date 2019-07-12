@@ -2,10 +2,13 @@
 
 W3C WebAutn standart implementation
 
+## Notes
 For local development and testing you can use emulators:
 
 For Linux: U2F emulator written in Rust [https://github.com/danstiner/rust-u2f](https://github.com/danstiner/rust-u2f)
 For Mac: U2F Emulator by GitHub [https://github.com/github/SoftU2F](https://github.com/danstiner/rust-u2f)
+
+**WebAuthn works only for localhost hostname or for SSL connection**
 
 ## WebAuth Registration
 
