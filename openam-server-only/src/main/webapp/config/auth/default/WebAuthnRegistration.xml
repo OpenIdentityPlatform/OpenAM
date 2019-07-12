@@ -35,7 +35,7 @@
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
 <ModuleProperties moduleName="WebAuthnRegistration"  header="WebAuthn Registration"  version="1.0" >
-    <Callbacks length="1" order="1" timeout="120" header="Sign in to OpenAM" >
+    <Callbacks length="1" order="1" timeout="120" header="WebAuthn Registration" >
         <NameCallback>
             <Prompt>User Name:</Prompt>
         </NameCallback>
