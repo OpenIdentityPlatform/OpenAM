@@ -60,6 +60,7 @@
         <module>openam-auth-amster</module>
         <module>openam-auth-securid</module>
         <module>openam-auth-recaptcha</module>
+        <module>openam-auth-webauthn</module>
     </modules>
 
     <dependencies>

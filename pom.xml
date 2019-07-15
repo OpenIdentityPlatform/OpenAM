@@ -776,6 +776,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-auth-webauthn</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-coretoken</artifactId>
         <version>${project.version}</version>

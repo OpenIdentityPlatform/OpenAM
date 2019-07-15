@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+    <Service name="sunAMAuthWebAuthnRegistrationService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthWebAuthnRegistrationService"
+            i18nFileName="amAuthWebAuthn"
+            revisionNumber="1"
+            i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.description"
+            resourceName="webauthn">
+
+            <Organization>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authlevel"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authlevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.attestation"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.attestation">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="none">none</ChoiceValue>
+                        <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
+                        <ChoiceValue i18nKey="direct">direct</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authType"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authType">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="unspecified">unspecified</ChoiceValue>
+                        <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
+                        <ChoiceValue i18nKey="platform">platform</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>unspecified</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.timeout"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.timeout">
+                    <DefaultValues>
+                        <Value>60000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.userAttribute"
+                    type="single"
+                    syntax="string"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.userAttribute">
+                    <DefaultValues>
+                        <Value>sunIdentityServerPPSignKey</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                	<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authlevel"
+	                    	type="single"
+	                    	syntax="number_range" 
+	                    	rangeStart="0" 
+	                    	rangeEnd="2147483647"
+	                    	i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authlevel">
+	                    <DefaultValues>
+	                        <Value>0</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.attestation"
+	                    	type="single_choice"
+	                    	syntax="string"
+	                    	i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.attestation">
+	                    <ChoiceValues>
+	                        <ChoiceValue i18nKey="none">None</ChoiceValue>
+	                        <ChoiceValue i18nKey="indirect">Indirect</ChoiceValue>
+	                        <ChoiceValue i18nKey="direct">Direct</ChoiceValue>
+	                    </ChoiceValues>
+	                    <DefaultValues>
+	                        <Value>none</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authType"
+	                    	type="single_choice"
+	                        syntax="string"
+	                        i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authType">
+	                    <ChoiceValues>
+	                        <ChoiceValue i18nKey="unspecified">Unspecified</ChoiceValue>
+	                        <ChoiceValue i18nKey="cross-platform">Cross-platform</ChoiceValue>
+	                        <ChoiceValue i18nKey="platform">Platform</ChoiceValue>
+	                    </ChoiceValues>
+	                    <DefaultValues>
+	                        <Value>unspecified</Value>
+	                    </DefaultValues>
+	                </AttributeSchema> 
+	                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.timeout"
+	                    type="single"
+	                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+	                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.timeout">
+	                    <DefaultValues>
+	                        <Value>60000</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+					<AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.userAttribute"
+	                    type="single"
+	                    syntax="string"
+	                    i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.userAttribute">
+	                    <DefaultValues>
+	                        <Value>sunIdentityServerPPSignKey</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
