@@ -816,6 +816,11 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-auth-recaptcha</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-auth-webauthn</artifactId>
+        </dependency>
 
 		<dependency>
             <artifactId>openam-auth-securid</artifactId>
