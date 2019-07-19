@@ -355,6 +355,14 @@ public class AMIdentitySubject implements Subject {
                                     + "returning false");
                         }
                         return false;
+                    } else if (!userIdentity.isExists()) {
+                    	if (debug.messageEnabled()) {
+                            debug.message("AMidentitySubject.isMember():"
+                                    + "userIdentity does not exists");
+                            debug.message("AMidentitySubject.isMember():"
+                                    + "returning false");
+                        }
+                        return false;
                     }
 
                     if (debug.messageEnabled()) {
