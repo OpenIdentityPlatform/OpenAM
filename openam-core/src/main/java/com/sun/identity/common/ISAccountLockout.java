@@ -228,7 +228,7 @@ public class ISAccountLockout {
         }        
         
         if (((lastFailTime + failureLockoutTime) > now) &&
-            (fail_count == failureLockoutCount)
+            (fail_count >= failureLockoutCount)
         ) {
             lockedAt = now;
         }
