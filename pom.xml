@@ -47,7 +47,7 @@
   <name>OpenAM Project</name>
   <groupId>org.forgerock.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.3.2-SNAPSHOT</version>
+  <version>14.4.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -90,7 +90,7 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-    <opendj.server.version>4.4.3-SNAPSHOT</opendj.server.version>
+    <opendj.server.version>4.4.4-SNAPSHOT</opendj.server.version>
     <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
     <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
