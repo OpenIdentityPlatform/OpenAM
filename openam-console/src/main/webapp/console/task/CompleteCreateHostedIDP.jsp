@@ -25,6 +25,7 @@
    $Id: CompleteCreateHostedIDP.jsp,v 1.6 2009/07/06 21:58:43 babysunil Exp $
 
    Portions Copyrighted 2015 ForgeRock AS.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation
 --%>
 
 <%@ page info="CompleteCreateHostedIDP" language="java" %>
@@ -90,7 +91,7 @@
     }
 
 </script>
-<console:redirectToXui realm="encodeURIComponent(frm.elements['CompleteCreateHostedIDP.tfrealm'].value)"
+<console:redirectToXui realm="encodeURIComponent(document.forms[0].elements['CompleteCreateHostedIDP.tfrealm'].value)"
                        xuiPath="../XUI#realms/{realm}/dashboard"/>
 <blockquote>
 <blockquote>
