@@ -42,10 +42,19 @@ mvn install -f OpenAM
 ```
 
 ## How-to run after build
+Add FQDN host name in /etc/hosts (Windows c:\windows\systems32\drivers\etc\hosts):
+
+```bash
+127.0.0.1 login.domain.com
+```
+
+Run OpenAM from source:
+
 ```bash
 mvn cargo:run -f OpenAM/openam-server
 ```
-The next step is then to go to [http://localhost:8080/openam](http://localhost:8080/openam) where you'll see the OpenAM welcome page
+
+The next step is then to go to [http://login.domain.com:8080/openam](http://login.domain.com:8080/openam) where you'll see the OpenAM welcome page
 
 ## Support and Mailing List Information
 * OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
