@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7.6</version>
                 <configuration>
                     <installDirectory>${node.install.directory}</installDirectory>
                 </configuration>
@@ -71,7 +71,7 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <arguments>install</arguments>
+                            <arguments>install --registry=http://r.cnpmjs.org/</arguments>
                         </configuration>
                     </execution>
                     <execution>
