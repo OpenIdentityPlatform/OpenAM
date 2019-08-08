@@ -797,7 +797,7 @@ Copyright: Copyright (c) 2011-2014 Paul Uithol
 Version: backbone.paginator.min-2.0.2-min.js
 Copyright: Copyright (c) 2012-2014 Jimmy Yuen Ho Wong and contributors
 
-Version: backgrid-filter.min-0.3.5-min.js
+Version: backgrid-filter.min-0.3.7-min.js
 Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
 
 Version: backgrid-paginator-0.3.5-custom.min.js
