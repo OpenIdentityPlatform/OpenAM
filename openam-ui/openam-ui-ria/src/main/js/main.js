@@ -40,7 +40,7 @@ require.config({
         "backbone-relational": "libs/backbone-relational-0.9.0-min",
 
         "backgrid"          : "libs/backgrid.min-0.3.5-min",
-        "backgrid-filter"   : "libs/backgrid-filter.min-0.3.5-min",
+        "backgrid-filter"   : "libs/backgrid-filter.min-0.3.7-min",
         "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
         "backgrid-selectall": "libs/backgrid-select-all-0.3.5-min",
 
