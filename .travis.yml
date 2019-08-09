@@ -1,6 +1,9 @@
 language: java
 git:
   depth: 9999
+cache:
+  directories:
+   - $HOME/.m2
 matrix:
   include:
   - os: linux
@@ -72,7 +75,7 @@ before_install:
   - git log `git describe --tags --abbrev=0 HEAD^ --always`..HEAD --oneline 
 install:
   - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/forgerock-parent
-  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ -P\!distribution
+  - mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ 
 script:
   - mvn -B install 
 after_failure:
