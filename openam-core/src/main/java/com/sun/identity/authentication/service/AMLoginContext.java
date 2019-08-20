@@ -457,6 +457,9 @@ public class AMLoginContext {
                     authImpl.incSsoServerAuthenticationFailureCount();
                 }
             }
+            if (indexType == IndexType.USER && AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND.equals(ae.getErrorCode())) {
+                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_LOGIN_FAILED, null, ae);
+            }
             throw ae;
         } catch (LoginException le) {
             debug.error("in creating LoginContext.");
@@ -1826,7 +1829,7 @@ public class AMLoginContext {
                 setErrorMsgAndTemplate();
                 //destroySession();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_USER_INACTIVE, null);
+                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_LOGIN_FAILED, null);
             } else if (ignoreProfile) {
                 setAuthError(AMAuthErrorCode.AUTH_PROFILE_ERROR, "loginDenied");
                 throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_PROFILE_ERROR, null);
