@@ -36,15 +36,8 @@ import org.openidentityplatform.openam.cassandra.embedded.Server;
 
 public class IdRepoTest {
 
-	static{
-//		SystemProperties.initializeProperties(Repo.class.getName()+".minIdle","1");
-//		System.setProperty(Repo.class.getName()+".url","jdbc:postgresql://wsso-idm1.inside.mts.ru/openam");
-	}
-
 	static Repo repo=null;
-	
 	static Server cassandra;
-	
 	
 	@BeforeClass
 	public static void init() throws SSOException, IdRepoException{
