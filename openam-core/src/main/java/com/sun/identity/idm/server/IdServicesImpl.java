@@ -1086,17 +1086,29 @@ public class IdServicesImpl implements IdServices {
        Exception lastException=null;
        final Iterator it = configuredPluginClasses.iterator();
        boolean exists = false;
-       try {
-           while (it.hasNext()) {
-               final IdRepo idRepo = (IdRepo) it.next();
-               exists = idRepo.isExists(token, type, name);
-               if (exists) 
+       while (it.hasNext()) {
+           final IdRepo idRepo = (IdRepo) it.next();
+           try {
+        	   exists = idRepo.isExists(token, type, name);
+        	   if (exists) 
             	   return exists;
                lastException=null; //has good repo
+           } catch (IdRepoFatalException idf) {
+               // fatal ..throw it all the way up
+               DEBUG.error("IdServicesImpl.isExists: Fatal Exception ", idf);
+               throw idf;
+           } catch (IdRepoException ide) {
+               if (idRepo != null && DEBUG.warningEnabled()) {
+                   DEBUG.warning("IdServicesImpl.isExists: "
+                       + "Unable to check isActive identity in the "
+                       + "following repository "
+                       + idRepo.getClass().getName() + " :: "
+                       + ide.getMessage());
+               }
+               lastException = ide;
            }
-       } catch (Exception idm) {
-    	   lastException=idm;
        }
+
        if (lastException!=null) {
     	   if  (lastException instanceof IdRepoException)
     		   throw (IdRepoException)lastException;
