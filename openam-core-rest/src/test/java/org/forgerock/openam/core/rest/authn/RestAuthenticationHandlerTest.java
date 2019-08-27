@@ -399,7 +399,7 @@ public class RestAuthenticationHandlerTest {
 
         //When
         JsonValue response = restAuthenticationHandler.continueAuthentication(request, httpResponse,
-                postBody, sessionUpgradeSSOTokenId);
+                postBody, AuthIndexType.MODULE.getIndexType().toString(), "INDEX_VALUE", sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");

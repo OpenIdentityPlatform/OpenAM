@@ -142,14 +142,15 @@ public class AuthenticationServiceV1 {
             final HttpServletRequest request = getHttpServletRequest(context, jsonContent);
             JsonValue jsonResponse;
 
+            final String authIndexType = urlQueryString.getFirst("authIndexType");
+            final String authIndexValue = urlQueryString.getFirst("authIndexValue");
             if (jsonContent != null && jsonContent.size() > 0) {
                 // submit requirements
-                jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
-                        sessionUpgradeSSOTokenId);
+            	 jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
+                		authIndexType, authIndexValue, sessionUpgradeSSOTokenId);
             } else {
                 // initiate
-                final String authIndexType = urlQueryString.getFirst("authIndexType");
-                final String authIndexValue = urlQueryString.getFirst("authIndexValue");
+
                 jsonResponse = restAuthenticationHandler.initiateAuthentication(request, response, authIndexType,
                         authIndexValue, sessionUpgradeSSOTokenId);
             }
