@@ -116,8 +116,9 @@ public class RestAuthenticationHandler {
      * @return The Response of the authentication request.
      */
     public JsonValue continueAuthentication(HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, String sessionUpgradeSSOTokenId) throws RestAuthException {
-        return authenticate(request, response, postBody, null, null, sessionUpgradeSSOTokenId);
+    		 JsonValue postBody, String authIndexType, 
+    		 String indexValue, String sessionUpgradeSSOTokenId) throws RestAuthException {
+        return authenticate(request, response, postBody, authIndexType, indexValue, sessionUpgradeSSOTokenId);
     }
 
     /**
