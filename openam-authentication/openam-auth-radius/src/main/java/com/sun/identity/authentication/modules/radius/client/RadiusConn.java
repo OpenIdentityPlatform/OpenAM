@@ -192,12 +192,13 @@ public class RadiusConn {
      *
      * @param name     the username.
      * @param password the password.
+     * @return the response packet.
      * @throws IOException              if there is a problem.
      * @throws NoSuchAlgorithmException if there is a problem.
      * @throws RejectException          if there is a problem.
      * @throws ChallengeException       if there is a problem.
      */
-    public void authenticate(String name, String password)
+    public Packet authenticate(String name, String password)
             throws IOException, NoSuchAlgorithmException,
             RejectException, ChallengeException {
         AccessRequest req = createAccessRequest();
@@ -206,7 +207,7 @@ public class RadiusConn {
                 secret, password));
         req.addAttribute(new NASIPAddressAttribute(InetAddress.getLocalHost()));
         req.addAttribute(new NASPortAttribute(socket.getLocalPort()));
-        sendPacket(req);
+        return sendPacket(req);
     }
 
     /**
@@ -215,12 +216,13 @@ public class RadiusConn {
      * @param name     the username.
      * @param password the password.
      * @param ce       the challenge exception providing access to the original challenge response.
+     * @return the response packet.
      * @throws IOException              if there is a problem.
      * @throws NoSuchAlgorithmException if there is a problem.
      * @throws RejectException          if there is a problem.
      * @throws ChallengeException       if there is a problem.
      */
-    public void replyChallenge(String name, String password,
+    public Packet replyChallenge(String name, String password,
                                ChallengeException ce) throws IOException, NoSuchAlgorithmException,
             RejectException, ChallengeException {
         StateAttribute state = (StateAttribute)
@@ -238,18 +240,19 @@ public class RadiusConn {
         req.addAttribute(new NASIPAddressAttribute(InetAddress.getLocalHost()));
         req.addAttribute(new NASPortAttribute(socket.getLocalPort()));
 
-        sendPacket(req);
+        return sendPacket(req);
     }
 
     /**
      * Finds an available server and then sends a packet to that servers.
      *
      * @param packet the packet.
+     * @return the response packet.
      * @throws IOException        if there is a problem.
      * @throws RejectException    if there is a problem.
      * @throws ChallengeException if there is a problem.
      */
-    private void sendPacket(Packet packet) throws IOException,
+    private Packet sendPacket(Packet packet) throws IOException,
             RejectException, ChallengeException {
         Packet res = null;
         RADIUSServer server = null;
@@ -286,6 +289,7 @@ public class RadiusConn {
                 }
             }
         }
+        return res;
     }
 
     /**
