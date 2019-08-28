@@ -43,6 +43,9 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.openam.radius.common.Packet;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.LinkedHashSet;
@@ -211,6 +214,8 @@ public class RADIUS extends AMLoginModule {
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         String tmpPasswd = null;
         String sState;
+        
+        final Packet response;
 
         switch (state) {
         case ISAuthConstants.LOGIN_START:
@@ -249,7 +254,7 @@ public class RADIUS extends AMLoginModule {
 
             try {
                 succeeded = false;
-                radiusConn.authenticate(username, tmpPasswd);
+                response = radiusConn.authenticate(username, tmpPasswd);
             } catch (RejectException re) {
                 if (getCredentialsFromSharedState && !isUseFirstPassEnabled()) {
                     getCredentialsFromSharedState = false;
@@ -331,7 +336,7 @@ public class RADIUS extends AMLoginModule {
 
             try {
                 succeeded = false;
-                radiusConn.replyChallenge(username, passwd, cException);
+                response = radiusConn.replyChallenge(username, passwd, cException);
             } catch (ChallengeException ce) {
                 sState = ce.getState();
 
@@ -386,7 +391,7 @@ public class RADIUS extends AMLoginModule {
             throw new AuthLoginException(AM_AUTH_RADIUS, "RadiusLoginFailed", null);
         }
 
-        if (succeeded) {
+        if (succeeded && response != null) {
             if (debug.messageEnabled()) {
                 debug.message("RADIUS authentication successful");
             }
@@ -399,6 +404,8 @@ public class RADIUS extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("userTokenID: " + userTokenId);
             }
+            
+            readAttributesFromResponsePacket(response);
 
             shutdown();
             return ISAuthConstants.LOGIN_SUCCEED;
@@ -408,6 +415,16 @@ public class RADIUS extends AMLoginModule {
             }
             return ISAuthConstants.LOGIN_IGNORE;
         }
+    }
+
+    /**
+     * Extension point to handle additional response attributes
+     * @param response the RADIUS authentication response packet
+     * @throws AuthLoginException exception thrown if login has to fail based on additional attributes
+     */
+    protected void readAttributesFromResponsePacket(Packet response) throws AuthLoginException
+    {
+        // NoOp by default, provided for extension
     }
 
     /**
