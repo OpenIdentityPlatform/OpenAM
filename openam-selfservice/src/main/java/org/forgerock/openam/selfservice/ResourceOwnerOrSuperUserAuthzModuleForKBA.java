@@ -83,7 +83,7 @@ public class ResourceOwnerOrSuperUserAuthzModuleForKBA extends AdminOnlyAuthzMod
 
     protected String getUserIdFromUri(Context context) throws InternalServerErrorException {
         String username = context.asContext(UriRouterContext.class).getRemainingUri();
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        String realm = context.asContext(RealmContext.class).getRealm().asPath();
         if (username != null && realm != null) {
             AMIdentity theId = IdUtils.getIdentity(username, realm);
             if (theId != null) {
