@@ -345,7 +345,7 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <arguments>install --registry=http://r.cnpmjs.org/</arguments>
+                            <arguments>install</arguments>
 <!--                             <environmentVariables> -->
 <!--                                 <PHANTOMJS_CDNURL>http://maven.forgerock.org/repo/forgerock-third-party-virtual</PHANTOMJS_CDNURL> -->
 <!--                             </environmentVariables> -->
