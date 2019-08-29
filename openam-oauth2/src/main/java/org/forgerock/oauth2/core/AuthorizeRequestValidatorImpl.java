@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -28,8 +29,9 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.oauth2.OAuth2Constants.EndpointType;
+import org.forgerock.util.Reject;
 
 /**
  * Implementation of the request validator for the OAuth2 authorize endpoint.
@@ -84,7 +86,7 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter("client_id"),
                 request);
 
-        if (request.getParameter(OAuth2Constants.DeviceCode.USER_CODE) == null) {
+        if (request.getEndpointType() != EndpointType.END_USER_VERIFICATION_URI) {
             redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
         }
 

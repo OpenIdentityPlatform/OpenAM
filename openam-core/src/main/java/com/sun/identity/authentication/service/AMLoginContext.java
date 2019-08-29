@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -455,6 +456,9 @@ public class AMLoginContext {
                 if (authImpl != null) {
                     authImpl.incSsoServerAuthenticationFailureCount();
                 }
+            }
+            if (indexType == IndexType.USER && AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND.equals(ae.getErrorCode())) {
+                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_LOGIN_FAILED, null, ae);
             }
             throw ae;
         } catch (LoginException le) {
@@ -1493,7 +1497,7 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("resProperty is.. :" + resProperty);
             }
-            String errorMsg = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_MESSAGE);
+            String errorMsg = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_MESSAGE, bundle);
             String templateName = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_TEMPLATE);
 
             if (debug.messageEnabled()) {
@@ -1825,7 +1829,7 @@ public class AMLoginContext {
                 setErrorMsgAndTemplate();
                 //destroySession();
                 loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_USER_INACTIVE, null);
+                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_LOGIN_FAILED, null);
             } else if (ignoreProfile) {
                 setAuthError(AMAuthErrorCode.AUTH_PROFILE_ERROR, "loginDenied");
                 throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_PROFILE_ERROR, null);
