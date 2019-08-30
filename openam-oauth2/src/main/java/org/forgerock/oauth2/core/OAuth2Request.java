@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -28,7 +29,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.JsonValue;
+import org.forgerock.openam.oauth2.OAuth2Constants.EndpointType;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -314,5 +317,19 @@ public class OAuth2Request {
         public java.util.Locale getLocale() {
             throw new UnsupportedOperationException();
         }
+    }
+    
+    /**
+     * Get EndpointType.
+     * @return EndpointType
+     */
+    public EndpointType getEndpointType() {
+        String resourcePath = null;
+        String realmUrl = (String) request.getAttributes().get(RestletRealmRouter.REALM_URL);
+        String resourceUrl = request.getResourceRef().toString(false, false);
+        if (resourceUrl.startsWith(realmUrl)) {
+            resourcePath = resourceUrl.substring(realmUrl.length());
+        }
+       return EndpointType.get(resourcePath);
     }
 }

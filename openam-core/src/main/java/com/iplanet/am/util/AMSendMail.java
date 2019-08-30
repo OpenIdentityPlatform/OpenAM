@@ -25,6 +25,7 @@
  * $Id: AMSendMail.java,v 1.6 2009/12/22 19:57:19 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 package com.iplanet.am.util;
 
@@ -190,7 +191,7 @@ public class AMSendMail {
         Properties moduleProps = new Properties();
 
         moduleProps.put("mail.smtp.host", host);
-        moduleProps.put("mail.debug", "true");
+        moduleProps.put("mail.debug", "false");
         moduleProps.put("mail.smtp.port", port);
         moduleProps.put("mail.smtp.socketFactory.port", port);
         if (ssl) {

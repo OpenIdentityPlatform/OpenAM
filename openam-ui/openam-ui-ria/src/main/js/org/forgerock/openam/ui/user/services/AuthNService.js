@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 define([
     "jquery",
@@ -169,6 +170,13 @@ define([
                 // we timed out, so let's try again with a fresh session
                 oldReqs = requirementList[0];
                 obj.resetProcess();
+
+                // Suppress retry when using Redirect Callback
+                if (AuthenticationToken.get()) {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
+                    return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
+                }
+
                 return obj.begin().then((requirements) => {
                     obj.handleRequirements(requirements);
                     if (requirements.hasOwnProperty("authId")) {

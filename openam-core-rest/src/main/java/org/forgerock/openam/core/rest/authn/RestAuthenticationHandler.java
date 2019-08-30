@@ -11,7 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
+<<<<<<< HEAD
  * Copyright 2013-2016 ForgeRock AS.
+=======
+ * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
+>>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -367,8 +372,7 @@ public class RestAuthenticationHandler {
             return AuthIndexType.getAuthIndexType(authIndexType);
         } catch (IllegalArgumentException e) {
             DEBUG.message("Unknown Authentication Index Type, " + authIndexType);
-            throw new RestAuthException(ResourceException.BAD_REQUEST, "Unknown Authentication Index Type, "
-                    + authIndexType);
+            throw new RestAuthException(ResourceException.BAD_REQUEST, "Unknown Authentication Index Type");
         }
     }
 }

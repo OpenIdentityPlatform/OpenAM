@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.selfservice;
@@ -73,6 +74,7 @@ public final class SelfServiceRestRouteProvider extends AbstractRestRouteProvide
                 .route("/selfservice/user")
                 .auditAs(USERS)
                 .authenticateWith(ssoToken())
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModuleForKBA.class)
                 .toCollection(UserUpdateService.class);
 
         realmRouter
