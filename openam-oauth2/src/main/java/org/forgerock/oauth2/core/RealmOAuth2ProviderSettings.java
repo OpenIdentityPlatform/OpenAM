@@ -639,13 +639,75 @@ public class RealmOAuth2ProviderSettings implements OAuth2ProviderSettings {
         return new JsonValue(Collections.singletonMap("keys", jwks));
     }
 
+    /**
+     * Encodes the given value as a unsigned Big Endian within an octet string
+     * of octetStringSize bytes.
+     * 
+     * @param i
+     *            the integer to encode
+     * @param octetStringSize
+     *            the number of octets in the octetString returned
+     * @return the encoding of i
+     * @throws IllegalArgumentException
+     *             if the given integer i is negative
+     * @throws IllegalArgumentException
+     *             if the octetStringSize is zero or lower
+     * @throws IllegalArgumentException
+     *             if the given BigInteger does not fit into octetStringSize
+     *             bytes
+     */
+    private static byte[] integerToOctetString(final BigInteger i,
+	final int octetStringSize) {
+
+        // throws NullPointerException if i = null
+        if (i.signum() < 0) {
+    	    throw new IllegalArgumentException(
+	        "argument i should not be negative");
+        }
+
+        if (octetStringSize <= 0) {
+	    throw new IllegalArgumentException("octetStringSize argument ("
+	        + octetStringSize
+	        + ") should be higher than 0 to store any integer");
+        }
+
+        if (i.bitLength() > octetStringSize * Byte.SIZE) {
+	    throw new IllegalArgumentException("argument i (" + i
+	        + ") does not fit into " + octetStringSize + " octets");
+        }
+
+        final byte[] signedEncoding = i.toByteArray();
+        final int signedEncodingLength = signedEncoding.length;
+
+        if (signedEncodingLength == octetStringSize) {
+	    return signedEncoding;
+        }
+
+        final byte[] unsignedEncoding = new byte[octetStringSize];
+        if (signedEncoding[0] == (byte) 0x00) {
+	    // skip first padding byte to create a (positive) unsigned encoding for this number 
+            System.arraycopy(signedEncoding, 1, unsignedEncoding,
+	        octetStringSize - signedEncodingLength + 1,
+	        signedEncodingLength - 1);
+        } else {
+	    System.arraycopy(signedEncoding, 0, unsignedEncoding,
+	        octetStringSize - signedEncodingLength,
+	        signedEncodingLength);
+        }
+        return unsignedEncoding;
+    }
+
+    private static byte[] integerToOctetString(final BigInteger i) {
+        return integerToOctetString(i, (i.bitLength() / Byte.SIZE) + (i.bitLength() % Byte.SIZE > 0 ? 1: 0));
+    }
+
     @VisibleForTesting
     static Map<String, Object> createRSAJWK(String alias, RSAPublicKey key, KeyUse use, String alg)
             throws ServerException {
         String kid = Hash.hash(alias + key.getModulus().toString() + key.getPublicExponent().toString());
         return json(object(field("kty", "RSA"), field(OAuth2Constants.JWTTokenParams.KEY_ID, kid),
                 field("use", use.toString()), field("alg", alg),
-                field("n", Base64url.encode(key.getModulus().toByteArray())),
+                field("n", Base64url.encode(integerToOctetString(key.getModulus()))),
                 field("e", Base64url.encode(key.getPublicExponent().toByteArray())))).asMap();
     }
 
