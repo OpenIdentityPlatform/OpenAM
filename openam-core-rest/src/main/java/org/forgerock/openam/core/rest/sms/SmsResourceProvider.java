@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -271,8 +272,7 @@ public abstract class SmsResourceProvider implements Describable<ApiDescription,
             SMSException {
         String lastedMatchedUri = context.asContext(UriRouterContext.class).getMatchedUri();
         return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName)
-                && AUTO_CREATED_AUTHENTICATION_MODULES.containsKey(resourceId.toLowerCase())
-                && AUTO_CREATED_AUTHENTICATION_MODULES.get(resourceId.toLowerCase()).equalsIgnoreCase(lastedMatchedUri);
+               && resourceId.equalsIgnoreCase(lastedMatchedUri);
     }
 
     /**
