@@ -85,7 +85,7 @@ define([
 
     obj.agents = {
         java       : agentsRedirector(181),
-        oauth20    : agentsRedirector(183),
+        oauth20    : agentsRedirector(186),
         web        : agentsRedirector(180),
         redirectToTab (tabIndex, realm) {
             obj.getJATOPageSession(realm).done((session) => {
