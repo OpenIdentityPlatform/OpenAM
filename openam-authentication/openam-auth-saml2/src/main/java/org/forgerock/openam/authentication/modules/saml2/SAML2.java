@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -374,6 +375,11 @@ public class SAML2 extends AMLoginModule {
 
         //generate a sub-login context, owned by this module, and start login sequence to it
         authenticationContext = new AuthContext(realm);
+        authenticationContext.setLocale(getLoginLocale());
+        /* TODO: Some auth methods such as DeskTop SSO require information stored in
+           request/response objects. The last two parameters should be request and response
+           insted of null and null.
+        */  
         authenticationContext.login(AuthContext.IndexType.SERVICE, localChain, null, null, null, null);
 
         return injectCallbacks(null, state);
