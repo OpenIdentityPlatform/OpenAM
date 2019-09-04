@@ -11,7 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
+<<<<<<< HEAD
  * Copyright 2014-2016 ForgeRock AS.
+=======
+ * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+>>>>>>> 675e7a8ddd... Issue #42  acr_values not working if the user is login in more than one chain (#101)
  */
 
 package org.forgerock.oauth2.core;
@@ -51,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
@@ -311,24 +317,24 @@ public class ResourceOwnerSessionValidator {
     private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
             throws NotFoundException, ServerException, SSOException, AccessDeniedException,
             UnsupportedEncodingException, URISyntaxException, ResourceOwnerAuthenticationRequired {
-        String serviceUsed = token.getProperty(ISAuthConstants.SERVICE);
+        Set<String> serviceUsedSet = AMAuthUtils.getAuthenticatedServices(token);
         Set<String> acrValues = new HashSet<>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
         final Request req = request.getRequest();
-        boolean matched = false;
-        for (String acr : acrValues) {
-            if (acrMap.containsKey(acr)) {
-                if (serviceUsed.equals(acrMap.get(acr).getName())) {
-                    req.getAttributes().put(OAuth2Constants.JWTTokenParams.ACR, acr);
-                    matched = true;
-                    break;
+
+        String matchedAcr = UNMATCHED_ACR_VALUE;
+        for (String serviceUsed : serviceUsedSet) {
+            for (String acr : acrValues) {
+                if (acrMap.containsKey(acr)) {
+                    if (serviceUsed.equals(acrMap.get(acr).getName())) {
+                        matchedAcr = acr;
+                        break;
+                    }
                 }
             }
         }
-        if (!matched) {
-            req.getAttributes().put(OAuth2Constants.JWTTokenParams.ACR, UNMATCHED_ACR_VALUE);
-        }
+        req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, matchedAcr);
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request, SSOToken token)
