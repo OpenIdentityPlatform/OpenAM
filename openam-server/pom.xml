@@ -97,7 +97,7 @@
 	                <configuration>
 				    	<properties>
 				        	<cargo.rmi.port>8206</cargo.rmi.port>
-				        	<cargo.jvmargs>-verbose:class</cargo.jvmargs>
+<!-- 				        	<cargo.jvmargs>-verbose:class</cargo.jvmargs> -->
 				        </properties>
 				    </configuration>
                 </configuration>
