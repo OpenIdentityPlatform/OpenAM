@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.entitlement.guice;
@@ -177,6 +178,8 @@ public class EntitlementRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.INVALID_QUERY_ID, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.QUERY_ID_MISSING_UID, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.UNABLE_TO_QUERY_POLICY_INVALID_UID, ResourceException.INTERNAL_ERROR);
+            handlers.put(EntitlementException.INVALID_APPLICATION_ID, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_POLICY_ID, ResourceException.BAD_REQUEST);
 
             return handlers;
         }

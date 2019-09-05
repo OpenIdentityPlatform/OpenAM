@@ -25,6 +25,7 @@
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
  * Portions copyright 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package com.sun.identity.entitlement;
@@ -148,6 +149,8 @@ public class EntitlementException extends Exception {
     public static final int PAIR_PROPERTY_NOT_DEFINED = 741;
     public static final int END_IP_BEFORE_START_IP = 750;
     public static final int INVALID_SCRIPT_ID = 760;
+    public static final int INVALID_APPLICATION_ID = 770;
+    public static final int INVALID_POLICY_ID = 771;
 
     public static final int PROPERTY_IS_NOT_AN_INTEGER = 800;
     public static final int PROPERTY_IS_NOT_A_SET = 801;

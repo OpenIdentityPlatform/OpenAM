@@ -1,5 +1,5 @@
 {{#if entity.name}}
-    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.authorization.common.resourceType" icon="cube" }}
+    {{> headers/_TitleWithSubAndIcon title=entity.name dynamicTitle="true" type="console.authorization.common.resourceType" icon="cube" }}
 {{/if}}
 
 <p class="panel-description">{{entity.description}}</p>

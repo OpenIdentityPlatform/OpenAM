@@ -3,7 +3,7 @@
     {{#if newEntity}}
         {{> headers/_Title title="console.realms.newRealm"}}
     {{else}}
-        {{> headers/_TitleWithSubAndIcon title=realmName type="console.realms.edit.title" icon="cloud" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
+        {{> headers/_TitleWithSubAndIcon title=realmName dynamicTitle="true" type="console.realms.edit.title" icon="cloud" buttons="templates/admin/views/realms/partials/_HeaderDeleteButton" }}
     {{/if}}
 
     <div class="panel panel-default">

@@ -12,12 +12,20 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.console.task.model;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -32,6 +40,8 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
 
     private static final String NAME_PREFIX = "configure.oauth2profile.name.";
     private static final String HELP_PREFIX = "configure.oauth2profile.help.";
+    private static final Set<String> ACCEPTABLE_TYPE_NAMES = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList("oauth2", "oidc", "mobileconnect", "uma")));
 
     private final String type;
 
@@ -52,7 +62,10 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
         if (StringUtils.isEmpty(type)) {
             throw new IllegalStateException("type parameter is required");
         }
-        return getLocalizedString(NAME_PREFIX + type);
+        if (ACCEPTABLE_TYPE_NAMES.contains(type)) {
+            return getLocalizedString(NAME_PREFIX + type);
+        }
+        throw new IllegalStateException("type parameter is invalid");
     }
 
     @Override
@@ -60,7 +73,9 @@ public class OAuth2ModelImpl extends AMModelBase implements OAuth2Model {
         if (StringUtils.isEmpty(type)) {
             throw new IllegalStateException("type parameter is required");
         }
-        return getLocalizedString(HELP_PREFIX + type);
+        if (ACCEPTABLE_TYPE_NAMES.contains(type)) {
+            return getLocalizedString(HELP_PREFIX + type);
+        }
+        throw new IllegalStateException("type parameter is invalid");
     }
-
 }
