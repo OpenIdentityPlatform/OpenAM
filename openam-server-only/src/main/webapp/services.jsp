@@ -23,6 +23,10 @@
 
 --%>
 
+<%--
+   Portions copyright 2019 Open Source Solution Technology Corporation
+--%>
+
 <%@ page language="java" %>
 <%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.sun.identity.sm.*" %>
@@ -175,7 +179,7 @@
 <%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
 <%
 
-    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "services.jsp");
     if (ssoToken == null) {
 %>
 </body></html>
