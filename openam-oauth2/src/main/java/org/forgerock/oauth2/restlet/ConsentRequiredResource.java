@@ -12,9 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corp.
  */
 package org.forgerock.oauth2.restlet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,10 +29,13 @@ import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.rest.service.RouterContextResource;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
+import org.restlet.data.Language;
+import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Router;
@@ -91,6 +96,12 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
         if (token != null) {
             data.put("csrf", token.getTokenID().toString());
         }
+        List<String> locale = new ArrayList<>();
+        for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
+            locale.add(language.getMetadata().getName());
+        }
+        data.put("locale", OAuth2Utils.joinStatic(locale, " "));
+
         return data;
     }
 
