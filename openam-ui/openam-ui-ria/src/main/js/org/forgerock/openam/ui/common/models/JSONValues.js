@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
  /**
@@ -102,8 +103,9 @@ define([
             if (hasDefaults) {
                 values = ungroupCollectionProperties(values, "defaults");
             }
-
-            this.raw = Object.freeze(values);
+            if (values) {
+                this.raw = Object.freeze(values);
+            }
         }
         addInheritance (inheritance) {
             const valuesWithInheritance = _.mapValues(this.raw, (value, key) => ({
