@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corp.
  */
 
 package org.forgerock.openam.oauth2;
@@ -124,7 +125,7 @@ public class OAuth2Utils {
         return !isBlank(val);
     }
 
-    public String join(Iterable<? extends Object> iterable, String delimiter) {
+    public static String joinStatic(Iterable<? extends Object> iterable, String delimiter) {
         if (null != iterable) {
             Iterator<? extends Object> iterator = iterable.iterator();
             if (!iterator.hasNext()) {
@@ -139,6 +140,11 @@ public class OAuth2Utils {
             return buffer.toString();
         }
         return null;
+    }
+
+
+    public String join(Iterable<? extends Object> iterable, String delimiter) {
+        return joinStatic(iterable, delimiter);
     }
 
     public Set<String> split(String string, String delimiter) {

@@ -17,7 +17,11 @@
         {{#if detail}}
             <span class="page-header-detail {{detail.class}}">{{#if detail.icon}}<i class="fa {{detail.icon}}"></i> {{/if}} {{t detail.text safeString=false}}</span>
         {{/if}}
-        <h1 class="wordwrap">{{t title safeString=false}}</h1>
+        {{#if dynamicTitle}}
+            <h1 class="wordwrap">{{title}}</h1>
+        {{else}}
+            <h1 class="wordwrap">{{t title}}</h1>
+        {{/if}}
     </div>
 
 </header>

@@ -23,6 +23,7 @@
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   ~
   ~ Portions Copyrighted 2014 Nomura Research Institute, Ltd
+  ~ Portions Copyrighted 2019 Open Source Solution Technology Corp.
   -->
 <html lang="en">
     <head>
@@ -39,7 +40,7 @@
         <script type="text/javascript">
             pageData = {
                 <#if realm??>realm: "${realm?js_string}",</#if>
-                <#if ui_locales??>locale: "${ui_locales?js_string}",</#if>
+                <#if ui_locales??>locale: "${ui_locales?js_string}",<#elseif locale??>locale: "${locale?js_string}",</#if>
                 baseUrl : "${baseUrl?js_string}/XUI",
                 oauth2Data: {
                     <#if redirect_uri??>redirectUri: "${redirect_uri?js_string}",</#if>

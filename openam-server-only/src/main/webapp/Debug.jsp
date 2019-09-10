@@ -28,6 +28,7 @@
 
 <%--
    Portions Copyrighted 2010-2014 ForgeRock AS.
+   Portions copyright 2019 Open Source Solution Technology Corporation
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
@@ -75,7 +76,7 @@
 <%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
 <%
 
-    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "Debug.jsp");
     if (ssoToken == null) {
 %>
 </body></html>

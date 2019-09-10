@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014-2016 ForgeRock AS.
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation.
 */
 package org.forgerock.openam.entitlement.rest;
 
@@ -215,10 +216,11 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         final String realm = getRealm(context);
+        String applicationId = null;
         try {
             ApplicationWrapper applicationWrapper = createApplicationWrapper(request.getContent(), subject);
             ensureApplicationIdMatch(applicationWrapper, request.getNewResourceId());
-            String applicationId = applicationWrapper.getName();
+            applicationId = applicationWrapper.getName();
             validateApplicationId(applicationId);
             if (applicationExists(applicationId, realm, subject)) {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
@@ -227,8 +229,8 @@ public class ApplicationsResource extends RealmAwareResource {
             return newResultPromise(newResourceResponse(application.getName(),
                     Long.toString(application.getLastModifiedDate()), applicationToJson(application)));
         } catch (EntitlementException e) {
-            debug.error("ApplicationsResource :: CREATE by {}: Application creation failed. ",
-                    getPrincipalNameFromSubject(subject), e);
+            debug.error("ApplicationsResource :: CREATE by {}: Application creation failed. {}",
+                    getPrincipalNameFromSubject(subject), applicationId, e);
             return exceptionMappingHandler.handleError(context, request, e).asPromise();
         }
     }
@@ -533,7 +535,7 @@ public class ApplicationsResource extends RealmAwareResource {
         // What we should do is to encode the name for storage purposes, and decode it before presentation to the
         // user.
         if (!applicationId.equals(DN.escapeAttributeValue(applicationId))) {
-            throw new EntitlementException(EntitlementException.INVALID_VALUE, "policy name \"" + applicationId + "\"");
+            throw new EntitlementException(EntitlementException.INVALID_APPLICATION_ID);
         }
     }
 

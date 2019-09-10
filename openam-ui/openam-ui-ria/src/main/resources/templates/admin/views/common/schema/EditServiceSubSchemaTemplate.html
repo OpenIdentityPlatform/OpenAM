@@ -1,4 +1,4 @@
-{{> headers/_TitleWithSubAndIcon title=subSchemaInstanceId type=type icon="plug" }}
+{{> headers/_TitleWithSubAndIcon title=title dynamicTitle="true" type=(tWithParams "console.services.subSchema.title" subSchema=subSchemaType) icon="plug" }}
 {{#if hasTabs}}
     <form data-json-form></form>
 {{else}}

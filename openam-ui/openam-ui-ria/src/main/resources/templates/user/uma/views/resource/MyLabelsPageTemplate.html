@@ -1,5 +1,5 @@
 {{#if label}}
-    {{> headers/_TitleWithSubAndIcon title=label.name type="uma.resources.myLabels.title" buttons="templates/user/uma/views/resource/_DeleteLabelButton" }}
+    {{> headers/_TitleWithSubAndIcon title=label.name dynamicTitle="true" type="uma.resources.myLabels.title" buttons="templates/user/uma/views/resource/_DeleteLabelButton" }}
     <p class="page-description">{{label.path}}</p>
 
     <div class="tab-content clearfix">
