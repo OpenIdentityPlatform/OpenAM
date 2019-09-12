@@ -108,7 +108,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
             }
         } catch (IOException e) {
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught making principal from session invocation: " + e, e);
+                    "Exception caught making principal from session invocation "+sessionToUsernameUrl+": " + e, e);
         }
     }
 
