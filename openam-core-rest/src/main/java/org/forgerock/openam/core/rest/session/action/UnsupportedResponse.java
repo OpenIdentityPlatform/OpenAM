@@ -211,4 +211,9 @@ final class UnsupportedResponse implements HttpServletResponse {
     public Locale getLocale() {
         throw new UnsupportedOperationException();
     }
+
+	@Override
+	public void setContentLengthLong(long len) {
+		throw new UnsupportedOperationException();
+	}
 }

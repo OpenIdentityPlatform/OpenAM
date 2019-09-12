@@ -153,6 +153,12 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
         }
     }
 
+    public void setContentLengthLong(long len) {
+        if (response != null) {
+            this.response.setContentLengthLong(len);
+        }
+    }
+
     /**
      * The default behavior of this method is to call setContentType(String type)
      * on the wrapped response object. Not Serialized.

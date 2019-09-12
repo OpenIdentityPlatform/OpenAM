@@ -253,6 +253,10 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     public int getContentLength() {
 	    return request != null ? this.request.getContentLength() : contentLength;
     }
+    
+    public long getContentLengthLong() {
+	    return request != null ? this.request.getContentLengthLong() : new Long(contentLength);
+    }
 
     /**
     * The default behavior of this method is to return getContentType()

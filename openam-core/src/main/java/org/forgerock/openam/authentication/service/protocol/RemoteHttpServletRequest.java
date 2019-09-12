@@ -42,6 +42,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 /**
@@ -447,5 +448,15 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
     public Part getPart(String name) throws IOException, ServletException {
          return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getPart(name) : null;
     }
+
+	@Override
+	public String changeSessionId() {
+		return this._getHttpServletRequest() != null ? this._getHttpServletRequest().changeSessionId() : null;
+	}
+
+	@Override
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+		return this._getHttpServletRequest() != null ? this._getHttpServletRequest().upgrade(handlerClass) : null;
+	}
 
 }
