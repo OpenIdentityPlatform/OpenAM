@@ -28,6 +28,7 @@
 
 package com.sun.identity.console.session.model;
 
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -122,6 +123,12 @@ public class SMSessionCache
                     sData.setMaxSessionTime(sess.getMaxSessionTime());
                     sData.setIdleTime(sess.getIdleTime()/60);
                     sData.setMaxIdleTime(sess.getMaxIdleTime());
+                    sData.setOrganization(sess.getProperty(Constants.ORGANIZATION));
+                    sData.setService(sess.getProperty("Service"));
+                    sData.setAuthType(sess.getProperty("AuthType"));
+                    sData.setAuthLevel(sess.getProperty("AuthLevel"));
+                    sData.setaMCtxId(sess.getProperty(Constants.AM_CTX_ID));
+                    
                     results.put(userId +id, sData);
                 }
             } catch (SessionException se) {
