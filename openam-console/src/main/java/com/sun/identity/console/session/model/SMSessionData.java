@@ -44,6 +44,12 @@ public class SMSessionData implements Serializable
     private long maxSessionTime;
     private long idleTime;
     private long maxIdleTime;
+    
+    private String organization = null;
+    private String service = null;
+    private String authType = null;
+    private String authLevel = null;
+    private String aMCtxId = null;
 
     /**
      * Sets session id.
@@ -98,6 +104,53 @@ public class SMSessionData implements Serializable
     public void setMaxIdleTime(long value) {
         maxIdleTime = value;
     }
+    
+
+    /**
+     * Set Organization
+     *
+     * @param Organization
+     */
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+	
+    /**
+     * Set Service
+     *
+     * @param Service
+     */
+	public void setService(String service) {
+		this.service = service;
+	}
+	
+    /**
+     * Set AuthType
+     *
+     * @param AuthType
+     */
+	public void setAuthType(String authType) {
+		this.authType = authType;
+	}
+	
+    /**
+     * Set AuthLevel
+     *
+     * @param AuthLevel
+     */
+	public void setAuthLevel(String authLevel) {
+		this.authLevel = authLevel;
+	}
+
+    /**
+     * Set AMCtxId
+     *
+     * @param AMCtxId
+     */
+	public void setaMCtxId(String aMCtxId) {
+		this.aMCtxId = aMCtxId;
+	}
+
 
     /**
      * Returns session ID.
@@ -152,4 +205,50 @@ public class SMSessionData implements Serializable
     public long getMaxIdleTime() {
         return maxIdleTime;
     }
+
+    /**
+     * Returns Organization
+     * 
+     * @return Organization
+     */
+	public String getOrganization() {
+		return organization;
+	}
+
+    /**
+     * Returns Service
+     * 
+     * @return Service
+     */
+	public String getService() {
+		return service;
+	}
+	
+    /**
+     * Returns AuthType
+     * 
+     * @return AuthType
+     */
+	public String getAuthType() {
+		return authType;
+	}
+
+    /**
+     * Returns AuthLevel
+     * 
+     * @return AuthLevel
+     */
+	public String getAuthLevel() {
+		return authLevel;
+	}
+
+    /**
+     * Returns AMCtxId
+     * 
+     * @return AMCtxId
+     */
+	public String getaMCtxId() {
+		return aMCtxId;
+	}
+
 }

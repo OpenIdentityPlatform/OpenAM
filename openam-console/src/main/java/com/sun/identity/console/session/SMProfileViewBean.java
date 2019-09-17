@@ -100,6 +100,20 @@ public class SMProfileViewBean
     private static final String TBL_DATA_IDLE_TIME = "tblDataIdleTime";
     private static final String TBL_DATA_MAX_IDLE_TIME = "tblDataMaxIdleTime";
     private static final String TBL_DATA_SESSION_ID = "sessionId";
+    
+    private static final String TBL_COL_ORGANIZATION = "tblColOrganization";
+    private static final String TBL_COL_SERVICE = "tblColService";
+    private static final String TBL_COL_AUTH_TYPE = "tblColAuthType";
+    private static final String TBL_COL_AUTH_LEVEL = "tblColAuthLevel";
+    private static final String TBL_COL_AM_CTX_ID = "tblColAMCtxId";
+    
+    
+    private static final String TBL_DATA_ORGANIZATION = "tblDataOrganization";
+    private static final String TBL_DATA_SERVICE = "tblDataService";
+    private static final String TBL_DATA_AUTH_TYPE = "tblDataAuthType";
+    private static final String TBL_DATA_AUTH_LEVEL = "tblDataAuthLevel";
+    private static final String TBL_DATA_AM_CTX_ID = "tblDataAMCtxId";
+    
 
     public static final String CHILD_SERVER_NAME_HREF = "serverNameHref";
     public static final String CHILD_SERVER_NAME_MENU = "serverNameMenu";
@@ -275,6 +289,18 @@ public class SMProfileViewBean
             "table.session.idletime.column.name");
         tblModel.setActionValue(TBL_COL_MAX_IDLE_TIME, 
             "table.session.maxidletime.column.name");
+        
+        
+        tblModel.setActionValue(TBL_COL_ORGANIZATION, 
+                "table.session.organization.column.name");
+        tblModel.setActionValue(TBL_COL_SERVICE, 
+                "table.session.service.column.name");
+        tblModel.setActionValue(TBL_COL_AUTH_TYPE, 
+                "table.session.authtype.column.name");
+        tblModel.setActionValue(TBL_COL_AUTH_LEVEL, 
+                "table.session.authlevel.column.name");
+        tblModel.setActionValue(TBL_COL_AM_CTX_ID, 
+                "table.session.amctxid.column.name");
     }
 
     /**
@@ -321,6 +347,18 @@ public class SMProfileViewBean
                     String.valueOf(sData.getIdleTime()));
                 tblModel.setValue(TBL_DATA_MAX_IDLE_TIME, 
                     String.valueOf(sData.getMaxIdleTime()));
+                
+                tblModel.setValue(TBL_DATA_ORGANIZATION, 
+                        String.valueOf(sData.getOrganization()));
+                tblModel.setValue(TBL_DATA_SERVICE, 
+                        String.valueOf(sData.getService()));
+                tblModel.setValue(TBL_DATA_AUTH_TYPE, 
+                        String.valueOf(sData.getAuthType()));
+                tblModel.setValue(TBL_DATA_AUTH_LEVEL, 
+                        String.valueOf(sData.getAuthLevel()));
+                tblModel.setValue(TBL_DATA_AM_CTX_ID, 
+                        String.valueOf(sData.getaMCtxId()));
+
             }
             szCache.setValue((Serializable)sessionList);
         } else {
