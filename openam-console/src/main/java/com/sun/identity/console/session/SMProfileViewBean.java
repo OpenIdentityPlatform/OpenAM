@@ -40,6 +40,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.opendj.ldap.DN;
+
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
@@ -57,6 +59,7 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
+import com.sun.identity.sm.DNMapper;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
@@ -349,7 +352,7 @@ public class SMProfileViewBean
                     String.valueOf(sData.getMaxIdleTime()));
                 
                 tblModel.setValue(TBL_DATA_ORGANIZATION, 
-                        String.valueOf(sData.getOrganization()));
+                        String.valueOf(DNMapper.orgNameToRealmName(sData.getOrganization())));
                 tblModel.setValue(TBL_DATA_SERVICE, 
                         String.valueOf(sData.getService()));
                 tblModel.setValue(TBL_DATA_AUTH_TYPE, 
