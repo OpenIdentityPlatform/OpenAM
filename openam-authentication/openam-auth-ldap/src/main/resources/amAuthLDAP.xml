@@ -27,6 +27,7 @@
     $Id: amAuthLDAP.xml,v 1.8 2010/01/25 22:09:17 qcheng Exp $
 
     Portions Copyrighted 2011-2016 ForgeRock AS.
+    Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -269,6 +270,20 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-override-sharedstate-username-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a200"
+                    order="1201"
+                    resourceName="overrideSharedstateUsername">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
@@ -494,6 +509,20 @@
                         resourceName="operationTimeout">
                         <DefaultValues>
                             <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-override-sharedstate-username-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a200"
+                        order="1201"
+                        resourceName="overrideSharedstateUsername">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

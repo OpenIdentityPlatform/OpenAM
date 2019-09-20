@@ -25,6 +25,7 @@
  * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -72,8 +73,9 @@ public class LDAP extends AMLoginModule {
     private boolean sslTrustAll = false;
     private boolean isSecure = false;
     private boolean useStartTLS = false;
-    
+
     private static final String OPERATION_TIMEOUT_ATTR = "openam-auth-ldap-operation-timeout";
+    private static final String OVERRIDE_SHAREDSTATE_USERNAME_ENABLED = "iplanet-am-auth-ldap-override-sharedstate-username-enabled";
 
     // local variables
     ResourceBundle bundle = null;
@@ -90,6 +92,7 @@ public class LDAP extends AMLoginModule {
     private boolean isReset;
     private boolean isProfileCreationEnabled;
     private boolean getCredentialsFromSharedState;
+    private boolean overrideSharedstateUsernameEnabled;
 
     private AMAuthCallBackImpl callbackImpl = null;
 
@@ -154,6 +157,7 @@ public class LDAP extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
         currentConfig = options;
         currentConfigName = (String) options.get(ISAuthConstants.MODULE_INSTANCE_NAME);
+        overrideSharedstateUsernameEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(currentConfig, OVERRIDE_SHAREDSTATE_USERNAME_ENABLED, "false")).booleanValue();
         Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(amAuthLDAP, locale);
         if (debug.messageEnabled()) {
@@ -246,7 +250,7 @@ public class LDAP extends AMLoginModule {
                     "openam-auth-ldap-heartbeat-interval", 10, debug);
             String heartBeatTimeUnit = CollectionHelper.getMapAttr(currentConfig,
                     "openam-auth-ldap-heartbeat-timeunit", "SECONDS");
-            
+
             final int operationTimeout = CollectionHelper.getIntMapAttr(currentConfig, OPERATION_TIMEOUT_ATTR , 0 , debug);
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
@@ -362,6 +366,12 @@ public class LDAP extends AMLoginModule {
                         replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), invalidMsg);
                         currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                         passwordValidationSuccessFlag = false;
+                    }
+                    if (overrideSharedstateUsernameEnabled) {
+                        storeUsernamePasswd(ldapUtil.getUserNamingValue(), userPassword);
+                        if (debug.messageEnabled()) {
+                            debug.message("Override SharedState UserName -> ldapUtil.getUserNamingValue(): " + ldapUtil.getUserNamingValue());
+                        }
                     }
                 }
 
