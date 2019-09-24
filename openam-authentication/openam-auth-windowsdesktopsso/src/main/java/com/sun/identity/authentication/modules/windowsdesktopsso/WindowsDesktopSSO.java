@@ -622,6 +622,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
             }
             wtc.setPrincipalName(servicePrincipalName);
             wtc.setKeyTab(keyTabFile);
+            if(options.containsKey("debug")) {
+            	wtc.setDebug(CollectionHelper.getMapAttr(options, "debug"));
+            }
             Configuration.setConfiguration(wtc);
 
             // perform service authentication using JDK Kerberos module
