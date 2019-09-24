@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.ldap;
@@ -1318,6 +1319,15 @@ public class LDAPAuthUtils {
         } else {
             return name;
         }
+    }
+
+    /**
+     * Return the user naming value.
+     *
+     * @return The user naming value.
+     */
+    public String getUserNamingValue() {
+            return userNamingValue;
     }
 
     /**

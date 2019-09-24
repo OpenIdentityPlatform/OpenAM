@@ -334,7 +334,7 @@ public class ResourceOwnerSessionValidator {
                 }
             }
         }
-        req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, matchedAcr);
+        req.getAttributes().put(OAuth2Constants.JWTTokenParams.ACR, matchedAcr);
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request, SSOToken token)
