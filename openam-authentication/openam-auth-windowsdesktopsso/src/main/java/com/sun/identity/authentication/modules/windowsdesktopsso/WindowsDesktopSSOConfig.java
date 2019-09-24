@@ -49,6 +49,7 @@ public class WindowsDesktopSSOConfig extends Configuration {
     private String servicePrincipal = null;
     private String keytab = null;
     private String refreshConf = "false";
+    private String debug = null;
 
     /**
      * Constructor
@@ -106,6 +107,9 @@ public class WindowsDesktopSSOConfig extends Configuration {
                 hashmap.put("doNotPrompt", "true");
                 hashmap.put("refreshKrb5Config", refreshConf);
             }
+            if(debug != null) {
+            	hashmap.put("debug", debug);
+            }
 
             AppConfigurationEntry appConfigurationEntry =
                 new AppConfigurationEntry(
@@ -123,5 +127,13 @@ public class WindowsDesktopSSOConfig extends Configuration {
     public void refresh() {
         config.refresh();
     }
+
+    /**
+     * TODO-JAVADOC
+     */
+	public void setDebug(String debug) {
+		this.debug = debug;
+		
+	}
 }
 
