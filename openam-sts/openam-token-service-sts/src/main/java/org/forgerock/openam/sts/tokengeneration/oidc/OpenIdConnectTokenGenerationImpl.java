@@ -173,7 +173,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
 		        openIdConnectToken.put("auth:module", subjectToken.getProperty("AuthType", true));
 		        openIdConnectToken.put("auth:level", subjectToken.getProperty("AuthLevel", true));
 		        openIdConnectToken.put("auth:time:max:idle", currentTimeMillis()/1000+subjectToken.getMaxIdleTime()*60);
-		        openIdConnectToken.put("auth:time:max", currentTimeMillis()/1000+subjectToken.getMaxSessionTime()*60);
+		        openIdConnectToken.put("auth:time:max", currentTimeMillis()/1000+subjectToken.getTimeLeft()*60);
 	        }catch (SSOException e) {
 				throw new TokenCreationException(1,"token expired",e);
 			}
