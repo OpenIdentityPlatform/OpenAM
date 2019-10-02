@@ -56,6 +56,16 @@ mvn cargo:run -f OpenAM/openam-server
 
 The next step is then to go to [http://login.domain.com:8080/openam](http://login.domain.com:8080/openam) where you'll see the OpenAM welcome page
 
+---
+**Important Note**
+
+You must allocate at least 1024m (2048m with embedded OpenDJ) heap memory for OpenAM JVM using -Xmx option. 
+
+For example, `-Xmx2048m`
+
+---
+
+
 ## Support and Mailing List Information
 * OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com

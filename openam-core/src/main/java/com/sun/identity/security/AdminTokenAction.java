@@ -290,20 +290,22 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
                     AuthContext ac = new AuthContext(new AuthPrincipal(adminDN),
                             adminPassword.toCharArray());
                     internalAppSSOToken = ssoAuthToken = ac.getSSOToken();
+                    debug.error("created internalAppSSOToken:{}, authInitialized: {}, SystemProperties.isServerMode(): {},  SystemProperties.get(AMADMIN_MODE): {}", 
+                    		internalAppSSOToken.getTokenID().toString(), authInitialized, SystemProperties.isServerMode(), SystemProperties.get(AMADMIN_MODE));
                 } else {
                     // Copy the authentication state
-                    boolean authInit = authInitialized;
-                    if (authInit) {
-                        authInitialized = false;
-                    }
+//                    boolean authInit = authInitialized;
+//                    if (authInit) {
+//                        authInitialized = false;
+//                    }
 
                     // Obtain SSOToken using AuthN service
                     ssoAuthToken = new SystemAppTokenProvider(adminDN, adminPassword).getAppSSOToken();
 
                     // Restore the authentication state
-                    if (authInit && ssoAuthToken != null) {
-                        authInitialized = true;
-                    }
+//                    if (authInit && ssoAuthToken != null) {
+//                        authInitialized = true;
+//                    }
                 }
             }
         } catch (NoClassDefFoundError ne) {
