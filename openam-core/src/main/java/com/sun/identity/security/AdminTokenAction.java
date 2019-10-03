@@ -206,22 +206,27 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
             }
         }
 
-        // Check if internalAppSSOToken is present
-        if (internalAppSSOToken != null && tokenManager.isValidToken(internalAppSSOToken)) {
-            return internalAppSSOToken;
-        }
 
         // Try getting the token from serverconfig.xml
-        SSOToken answer = getSSOToken();
-        if (answer != null) {
-            if (!SystemProperties.isServerMode() || authInitialized) {
-                appSSOToken = answer;
-            }
-            return answer;
-        } else if (debug.messageEnabled()) {
-            debug.message("AdminTokenAction::run Unable to get SSOToken from serverconfig.xml");
-        }
+        SSOToken answer = null;
+        synchronized (instance) {
 
+            // Check if internalAppSSOToken is present
+            if (internalAppSSOToken != null && tokenManager.isValidToken(internalAppSSOToken)) {
+                return internalAppSSOToken;
+            }
+            
+        	answer = getSSOToken();
+            if (answer != null) {
+                if (!SystemProperties.isServerMode() || authInitialized) {
+                    appSSOToken = answer;
+                }
+                return answer;
+            } else if (debug.messageEnabled()) {
+                debug.message("AdminTokenAction::run Unable to get SSOToken from serverconfig.xml");
+            }
+		}
+        
         // Check for configured Application Token Provider in AMConfig.properties
         String appTokenProviderName = SystemProperties.get(ADMIN_TOKEN_PROVIDER);
         if (appTokenProviderName != null) {
@@ -294,18 +299,19 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
                     		internalAppSSOToken.getTokenID().toString(), authInitialized, SystemProperties.isServerMode(), SystemProperties.get(AMADMIN_MODE));
                 } else {
                     // Copy the authentication state
-//                    boolean authInit = authInitialized;
-//                    if (authInit) {
-//                        authInitialized = false;
-//                    }
+                    boolean authInit = authInitialized;
+                    if (authInit) {
+                        authInitialized = false;
+                    }
 
                     // Obtain SSOToken using AuthN service
                     ssoAuthToken = new SystemAppTokenProvider(adminDN, adminPassword).getAppSSOToken();
 
                     // Restore the authentication state
-//                    if (authInit && ssoAuthToken != null) {
-//                        authInitialized = true;
-//                    }
+                    if (authInit && ssoAuthToken != null) {
+                        authInitialized = true;
+                        internalAppSSOToken = null;
+                    }
                 }
             }
         } catch (NoClassDefFoundError ne) {
