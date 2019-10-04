@@ -2,9 +2,10 @@
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
 <ModuleProperties moduleName="ReCaptcha" version="1.0" >
-    <Callbacks length="1" order="1" timeout="600" header="Are you human ?" template="ReCaptcha.jsp"  >
-        <PasswordCallback echoPassword="true" >
-            <Prompt> </Prompt>
-        </PasswordCallback>
+    <Callbacks length="2" order="1" timeout="600" header="Are you human ?" template="ReCaptcha.jsp"  >
+        <HiddenValueCallback>
+            <Id>recaptchaValue</Id>
+        </HiddenValueCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
     </Callbacks>
 </ModuleProperties>

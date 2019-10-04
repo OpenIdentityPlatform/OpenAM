@@ -7,15 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-
-import ru.org.openam.httpdump.Dump;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,10 +29,16 @@ import org.json.JSONObject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+
+import ru.org.openam.httpdump.Dump;
 
 public class ReCaptcha extends AMLoginModule {
 	
@@ -135,6 +136,8 @@ public class ReCaptcha extends AMLoginModule {
         	}catch (Throwable e) {
 	        		debug.error("invalid {}: {}",ipMask,e.getMessage());
 		}
+		
+		setForceCallbacksRead(true);
 
 	}
 	
@@ -153,6 +156,7 @@ public class ReCaptcha extends AMLoginModule {
 		getHttpServletRequest().setAttribute("g-recaptcha-js-url", jsUrl);
 		getHttpServletRequest().setAttribute("g-recaptcha-invisible", invisible);
 		
+		
 		if (in_callbacks.length!=0){
 			Integer CT=0;
 			Integer pwdCT=module_pwdCT;
@@ -169,10 +173,8 @@ public class ReCaptcha extends AMLoginModule {
 						sharedState.put(getUserKey(), username);
 					replaceCallback(state, CT, new NameCallback(((NameCallback)callback).getPrompt(), ((NameCallback)callback).getName()));
 					userProcessed=true;
-				}else if (callback instanceof PasswordCallback && ((PasswordCallback)callback).getPassword()!=null){
-					sharedState.put(getPwdKey().concat(pwdCT==0?"":pwdCT.toString()), new String(((PasswordCallback)callback).getPassword()));
-					replaceCallback(state, CT, callback);
-					in_code=new String(((PasswordCallback)callback).getPassword());//last password in is recaptcha token
+				}else if (callback instanceof HiddenValueCallback && ((HiddenValueCallback)callback).getValue()!=null){
+					in_code=((HiddenValueCallback)callback).getValue();//last hidden value is recaptcha token
 					pwdCT++;
 				}
 				CT++;
@@ -191,7 +193,21 @@ public class ReCaptcha extends AMLoginModule {
 			
 		}
 		
+		if(state == ISAuthConstants.LOGIN_START) {
+			TextOutputCallback scriptCallback = getScriptCallback();
+			replaceCallback(state, 1, scriptCallback);
+		}
+		
+		
 		return state;
+	}
+	
+	private TextOutputCallback getScriptCallback() {
+		return new ScriptTextOutputCallback(""
+				+ "if (window.$ && window.require) { \n"
+				+ "	$('#recaptcha-container').attr('data-sitekey', '"+key+"');\n"
+				+ "	require(['"+jsUrl+"'], function() {});\n"
+				+ "}");
 	}
 	
 	boolean validateRecaptcha(String token) throws AuthLoginException {
