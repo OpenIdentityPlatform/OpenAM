@@ -1,0 +1,28 @@
+<div class="container">
+    {{#if reqs.header}}
+    <div class="page-header">
+        <h1 class="text-center">{{reqs.header}}</h1>
+    </div>
+    {{/if}}
+    <script type="text/javascript">
+	    function captchaCompleted(token) {
+			var tokenCtrl = document.getElementById('recaptchaValue');
+			tokenCtrl.value = token;
+		}
+    </script>
+    <style>
+    	#recaptcha-container > div {
+    		margin: 0 auto;
+    	}
+    </style>
+    <div id="recaptcha-container" class="g-recaptcha" data-sitekey="" data-callback="captchaCompleted"></div>
+    <form action="" method="post" class="form col-sm-6 col-sm-offset-3" autocomplete="off" data-stage="{{reqs.stage}}">
+        <fieldset>
+            {{#each reqs.callbacks}}
+            <div class="form-group">
+                {{callbackRender}}
+            </div>
+            {{/each}}
+        </fieldset>
+    </form>
+</div>

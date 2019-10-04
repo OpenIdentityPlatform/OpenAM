@@ -135,7 +135,15 @@
                                         </jato:content>
                                         <jato:content name="hiddenValueBox">
                                             <input class="hiddenValueBox" type="hidden" name="<jato:text name="txtId" />" id="<jato:text name="txtId" />" value="<jato:text name="txtValue" />" />
+                                            <script>
+                                               	function captchaCompleted(token) {
+                                               		var tokenCtrl = document.getElementById('recaptchaValue');
+                                               		tokenCtrl.value = token;
+                                               	}
+                                        	</script>
+                                        	<div class="g-recaptcha" data-sitekey="${requestScope['g-recaptcha-sitekey']}" data-callback="captchaCompleted"></div>
                                         </jato:content>
+                                        
                                         <jato:content name="password">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
@@ -145,14 +153,7 @@
                                                              title="Required Field" width="7" height="14" />
                                                     </jato:content>
                                                 </label>
-                                                <script>
-                                                	function captchaCompleted(token) {
-                                                		var tokenCtrl = document.getElementById('IDToken<jato:text name="txtIndex" />');
-                                                		tokenCtrl.value = token;
-                                                	}
-                                                </script>
                                                 <input class="textbox" type="password" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="" style="display: none;" />
-                                                <div class="g-recaptcha" data-sitekey="${requestScope['g-recaptcha-sitekey']}" data-callback="captchaCompleted"></div>
                                             </div>
                                         </jato:content>
                                         <jato:content name="choice">
