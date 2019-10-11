@@ -58,6 +58,7 @@ public abstract class RestTokenProviderBase<T> implements RestTokenProvider<T> {
     protected String getAdminToken() {
     	SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
     	while(token instanceof AuthSSOToken ) {
+    		logger.warn("token is internal AuthSSOToken: {} try to invalidate and get SSOTokenImpl", token.getTokenID());
     		AdminTokenAction.invalid();
     		token = AccessController.doPrivileged(AdminTokenAction.getInstance());
     	}
