@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts.rest.token.provider;
 
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.internal.AuthSSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
@@ -54,7 +56,12 @@ public abstract class RestTokenProviderBase<T> implements RestTokenProvider<T> {
     }
 
     protected String getAdminToken() {
-        return AccessController.doPrivileged(AdminTokenAction.getInstance()).getTokenID().toString();
+    	SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+    	while(token instanceof AuthSSOToken ) {
+    		AdminTokenAction.invalid();
+    		token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+    	}
+        return token.getTokenID().toString();
     }
 
 }
