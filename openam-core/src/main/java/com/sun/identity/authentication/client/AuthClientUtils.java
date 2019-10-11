@@ -72,6 +72,8 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -1403,12 +1405,10 @@ public class AuthClientUtils {
     public static String getOrganizationDN(String orgParam,boolean noQueryParam,
         HttpServletRequest request) {
         String orgName = null;
-        SSOToken token = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
 
         // try to get the host name if org or domain Param is null
         try {
-            orgName = IdUtils.getOrganization(token,orgParam);
+        	orgName=Realm.of(orgParam).asDN();
             if ((orgName != null) && (orgName.length() != 0)) {
                 orgName = orgName.toLowerCase();
             }
@@ -1433,7 +1433,7 @@ public class AuthClientUtils {
                 }
 
                 try {
-                    orgName = IdUtils.getOrganization(token,orgParam);
+                    orgName=Realm.of(orgParam).asDN();
                 } catch (Exception e) {
                     if (utilDebug.messageEnabled()) {
                         utilDebug.message("Could not get orgName='{}'", orgParam, e);
