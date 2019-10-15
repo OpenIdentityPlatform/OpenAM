@@ -29,6 +29,7 @@ import java.security.ProtectionDomain;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import org.apache.cassandra.security.SecurityThreadGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

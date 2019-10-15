@@ -33,7 +33,7 @@
 	
 	<properties>
 	    <cassandra.driver.version>3.6.0</cassandra.driver.version>
-	    <cassandra.version>3.11.1</cassandra.version>
+	    <cassandra.version>3.11.4</cassandra.version>
 	</properties>
     <!-- Child Modules -->
     <modules>
