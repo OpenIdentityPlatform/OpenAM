@@ -42,6 +42,9 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.util.thread.listener.ShutdownListener;
 
 import java.security.PrivilegedAction;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The class is used to perform privileged operations using
@@ -90,7 +93,7 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     /**
      * Singleton instance.
      */
-    private static volatile AdminTokenAction instance;
+    private static AdminTokenAction instance;
 
     private final SSOTokenManager tokenManager;
     private SSOToken appSSOToken;
@@ -119,6 +122,7 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
         }
         return instance;
     }
+    ScheduledExecutorService refreshToken=Executors.newScheduledThreadPool(1);
 
     /**
      * Default constructor
@@ -132,6 +136,20 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
             }
         });
         validateSession = SystemProperties.getAsBoolean(VALIDATE_SESSION);
+        if (!validateSession) {
+        	refreshToken.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					if (appSSOToken != null && tokenManager.isValidToken(appSSOToken))
+						try {
+							tokenManager.refreshSession(appSSOToken);
+						} catch (SSOException e) {
+							internalAppSSOToken=null;
+							appSSOToken=null;
+						} 
+				}
+			}, 3, 3, TimeUnit.MINUTES);
+        }
     }
 
     /**
@@ -192,30 +210,43 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
      * @see java.security.PrivilegedAction#run()
      */
     public SSOToken run() {
-        // Check if we have a valid cached SSOToken
-        if (appSSOToken != null && tokenManager.isValidToken(appSSOToken)) {
-            try {
-                if (validateSession) {
-                    tokenManager.refreshSession(appSSOToken);
-                }
-                if (tokenManager.isValidToken(appSSOToken)) {
-                    return appSSOToken;
-                }
-            } catch (SSOException ssoe) {
-                debug.error("AdminTokenAction.reset: couldn't retrieve valid token.", ssoe);
-            }
-        }
-
-
-        // Try getting the token from serverconfig.xml
         SSOToken answer = null;
-        synchronized (instance) {
+    	synchronized (this) {
+	        // Check if we have a valid cached SSOToken
+	        if (appSSOToken != null) {
+	        	if(tokenManager.isValidToken(appSSOToken)) {
+		            try {
+		                if (validateSession) {
+		                    tokenManager.refreshSession(appSSOToken);
+		                }
+		                if (tokenManager.isValidToken(appSSOToken)) {
+		                    return appSSOToken;
+		                }else {
+		            		debug.message("AdminTokenAction.reset: invalid token.");
+		            		internalAppSSOToken=null;
+		                    appSSOToken = null;
+		            	}
+		            } catch (SSOException ssoe) {
+		                debug.error("AdminTokenAction.reset: couldn't retrieve valid token.", ssoe);
+	            		internalAppSSOToken=null;
+	                    appSSOToken = null;
+		            }
+	        	}else {
+	        		debug.message("AdminTokenAction.reset: invalid token.");
+	        		internalAppSSOToken=null;
+	                appSSOToken = null;
+	        	}
+	        }
 
+        	// Try getting the token from serverconfig.xml
             // Check if internalAppSSOToken is present
-            if (internalAppSSOToken != null && tokenManager.isValidToken(internalAppSSOToken)) {
-                return internalAppSSOToken;
+            if (internalAppSSOToken != null) { 
+            	if (tokenManager.isValidToken(internalAppSSOToken)) {
+            		return internalAppSSOToken;
+            	}else {
+            		internalAppSSOToken=null;
+            	}
             }
-            
         	answer = getSSOToken();
             if (answer != null) {
                 if (!SystemProperties.isServerMode() || authInitialized) {
