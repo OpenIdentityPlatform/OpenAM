@@ -13,6 +13,7 @@
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
   Copyright 2016 ForgeRock AS
+  Portions copyright 2019 Open Identity Community
 -->
 <html>
 <head>
@@ -20,29 +21,37 @@
     <title>API Explorer</title>
     <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16" />
-    <link href="css/typography.css" media="screen" rel="stylesheet" type="text/css"/>
-    <link href="css/reset.css" media="screen" rel="stylesheet" type="text/css"/>
-    <link href="css/screen.css" media="screen" rel="stylesheet" type="text/css"/>
-    <link href="css/reset.css" media="print" rel="stylesheet" type="text/css"/>
-    <link href="css/print.css" media="print" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
+    <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
 
-    <script src="lib/object-assign-pollyfill.js" type="text/javascript"></script>
-    <script src="lib/jquery-1.8.0.min.js" type="text/javascript"></script>
-    <script src="lib/jquery.slideto.min.js" type="text/javascript"></script>
-    <script src="lib/jquery.wiggle.min.js" type="text/javascript"></script>
-    <script src="lib/jquery.ba-bbq.min.js" type="text/javascript"></script>
-    <script src="lib/handlebars-4.0.5.js" type="text/javascript"></script>
-    <script src="lib/lodash.min.js" type="text/javascript"></script>
-    <script src="lib/backbone-min.js" type="text/javascript"></script>
-    <script src="swagger-ui.js" type="text/javascript"></script>
-    <script src="lib/highlight.9.1.0.pack.js" type="text/javascript"></script>
-    <script src="lib/highlight.9.1.0.pack_extended.js" type="text/javascript"></script>
-    <script src="lib/jsoneditor.min.js" type="text/javascript"></script>
-    <script src="lib/marked.js" type="text/javascript"></script>
-    <script src="lib/swagger-oauth.js" type="text/javascript"></script>
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
+
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
+    </style>
+   
+</head>
+<body class="swagger-section">
+<div id="swagger-ui"></div>
+ <script src="swagger-ui-bundle.js" type="text/javascript"></script>
+    <script src="swagger-ui-standalone-preset.js" type="text/javascript"></script>
 
     <script type="text/javascript">
-        $(function () {
+    window.onload = function() {
             var path = window.location.pathname.replace(new RegExp("^/|/$", "g"), "").split("/");
             path.splice(-1);
             var joinedPath = path.join("/");
@@ -66,31 +75,24 @@
                 }
             };
 
-            window.swaggerUi = new SwaggerUi({
-                url: url,
-                validatorUrl : null,
-                dom_id: "swagger-ui-div",
-                defaultModelRendering: 'schema',
-                supportedSubmitMethods: ['get', 'delete', 'patch', 'post', 'put'],
-                docExpansion: "list",
-                onComplete: function (swaggerApi, swaggerUi) {
-                    $('pre code').each(function (i, e) {
-                        hljs.highlightBlock(e)
-                    });
+            const ui = SwaggerUIBundle({
+                url: "https://petstore.swagger.io/v2/swagger.json",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                  SwaggerUIBundle.presets.apis,
+                  SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                  SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+              })
+              // End Swagger UI call region
 
-                    var cookieValue = getCookie("iPlanetDirectoryPro");
+              window.ui = ui
 
-                    window.swaggerUi.api.clientAuthorizations.add("iPlanetDirectoryPro",
-                            new SwaggerClient.ApiKeyAuthorization("iPlanetDirectoryPro", cookieValue, "header"));
-                }
-            });
-
-            window.swaggerUi.load();
-        });
+        };
     </script>
-</head>
-<body class="swagger-section">
-<div id="swagger-ui-div" class="swagger-ui-wrap" style="margin-left: 0px; min-width: 0px">
-</div>
 </body>
 </html>

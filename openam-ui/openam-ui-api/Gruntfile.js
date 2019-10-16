@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Identity Community
  */
 module.exports = function (grunt) {
     var serverDeployDirectory = process.env.OPENAM_HOME + '/api',
@@ -21,21 +22,13 @@ module.exports = function (grunt) {
             swagger: {
                 files: [{
                     expand: true,
-                    cwd: 'node_modules/swagger-ui/dist/',
-                    src: ['swagger-ui.js', 'css/*', 'fonts/*', 'images/*', 'lang/*', 'lib/*'],
+                    cwd: 'node_modules/swagger-ui-dist/',
+                    src: ['swagger-ui-bundle.js', 'swagger-ui-standalone-preset.js', 'swagger-ui.css'],
                     dest: compiledDirectory
                 }],
                 options: {
                     noProcess: ['**/*.{png,gif,jpg,ico,svg,ttf,eot,woff}']
                 }
-            },
-            swaggerThemes: {
-                files: [{
-                    expand: true,
-                    cwd: 'node_modules/swagger-ui-themes/themes/',
-                    src: ['theme-flattop.css'],
-                    dest: compiledDirectory
-                }]
             },
             resources: {
                 files: [{
@@ -59,7 +52,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('build:dev', ['build:prod', 'copy:server']);
-    grunt.registerTask('build:prod', ['copy:swagger', 'copy:swaggerThemes', 'copy:resources']);
+    grunt.registerTask('build:prod', ['copy:swagger', 'copy:resources']);
 
     grunt.registerTask("default", ["build:dev"]);
 };
