@@ -76,7 +76,7 @@ public class NonExpiringSessionManagerTest {
     public void shouldSetUpSessionCorrectly() {
         nonExpiringSessionManager.addNonExpiringSession(mockInternalSession);
         verify(mockInternalSession).setMaxSessionTime(InternalSession.NON_EXPIRING_SESSION_LENGTH_MINUTES);
-        verify(mockInternalSession).setMaxIdleTime(10);
+        verify(mockInternalSession).setMaxIdleTime(5*10);
         verify(mockInternalSession).setLatestAccessTime();
     }
 

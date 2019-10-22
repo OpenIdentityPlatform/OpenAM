@@ -23,10 +23,12 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class tracks sessions created by this server which are not set to expire. It achieves this by periodically
@@ -65,7 +67,7 @@ class NonExpiringSessionManager {
             throw new IllegalStateException("Tried to add session which would expire to NonExpiringSessionManager");
         }
         session.setMaxSessionTime(NON_EXPIRING_SESSION_LENGTH_MINUTES);
-        session.setMaxIdleTime(refreshPeriodInMinutes * 2);
+        session.setMaxIdleTime(refreshPeriodInMinutes * 10);
         updateSession(session);
         nonExpiringSessions.add(session.getID());
     }
@@ -81,9 +83,12 @@ class NonExpiringSessionManager {
 
         @Override
         public void run() {
-            for (SessionID sessionID : nonExpiringSessions) {
-                updateSession(sessionAccessManager.getInternalSession(sessionID));
-            }
+            for (SessionID sessionID : nonExpiringSessions) 
+	            try{
+	                updateSession(sessionAccessManager.getInternalSession(sessionID));
+	            }catch (Throwable e) {
+	            	Debug.getInstance(SessionConstants.SESSION_DEBUG).warning("error update "+sessionID.toString(), e);
+				}
         }
     }
 }
