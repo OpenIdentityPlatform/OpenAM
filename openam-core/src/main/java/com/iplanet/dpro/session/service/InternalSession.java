@@ -121,7 +121,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     private static boolean isEnableHostLookUp = SystemProperties.getAsBoolean(Constants.ENABLE_HOST_LOOKUP);
 
     /* Maximum frequency with which the access time in the repository will be updated. */
-    private static int interval = SystemProperties.getAsInt("com.sun.identity.session.interval", 10);
+    private static int interval = SystemProperties.getAsInt("com.sun.identity.session.interval", 3);
 
     /* default idle time for invalid sessions */
     @JsonProperty("maxDefaultIdleTime")
