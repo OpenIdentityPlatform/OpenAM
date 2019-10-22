@@ -122,8 +122,6 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
         }
         return instance;
     }
-    ScheduledExecutorService refreshToken=Executors.newScheduledThreadPool(1);
-
     /**
      * Default constructor
      */
@@ -136,21 +134,7 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
             }
         });
         validateSession = SystemProperties.getAsBoolean(VALIDATE_SESSION);
-        if (!validateSession) {
-        	refreshToken.scheduleAtFixedRate(new Runnable() {
-				@Override
-				public void run() {
-					if (appSSOToken != null && tokenManager.isValidToken(appSSOToken))
-						try {
-							tokenManager.refreshSession(appSSOToken);
-						} catch (SSOException e) {
-							internalAppSSOToken=null;
-							appSSOToken=null;
-						} 
-				}
-			}, 3, 3, TimeUnit.MINUTES);
-        }
-    }
+   }
 
     /**
      * Informs AdminTokenAction that Authentication has been initialized
@@ -320,34 +304,39 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
             if (AdminUtils.getAdminPassword() != null) {
                 String adminDN = AdminUtils.getAdminDN();
                 String adminPassword = new String(AdminUtils.getAdminPassword());
-                if (!authInitialized && (SystemProperties.isServerMode() ||
-                        SystemProperties.get(AMADMIN_MODE) != null)) {
+                if (!authInitialized && (SystemProperties.isServerMode() || SystemProperties.get(AMADMIN_MODE) != null)) {
                     // Use internal auth context to get the SSOToken
-                    AuthContext ac = new AuthContext(new AuthPrincipal(adminDN),
-                            adminPassword.toCharArray());
+                    AuthContext ac = new AuthContext(new AuthPrincipal(adminDN), adminPassword.toCharArray());
                     internalAppSSOToken = ssoAuthToken = ac.getSSOToken();
                     debug.error("created internalAppSSOToken:{}, authInitialized: {}, SystemProperties.isServerMode(): {},  SystemProperties.get(AMADMIN_MODE): {}", 
                     		internalAppSSOToken.getTokenID().toString(), authInitialized, SystemProperties.isServerMode(), SystemProperties.get(AMADMIN_MODE));
                 } else {
                     // Copy the authentication state
-                    boolean authInit = authInitialized;
-                    if (authInit) {
-                        authInitialized = false;
-                    }
-
-                    // Obtain SSOToken using AuthN service
-                    ssoAuthToken = new SystemAppTokenProvider(adminDN, adminPassword).getAppSSOToken();
-
-                    // Restore the authentication state
-                    if (authInit && ssoAuthToken != null) {
-                        authInitialized = true;
-                        internalAppSSOToken = null;
+                    final boolean authInit = authInitialized;
+                    while (ssoAuthToken==null) {
+	                    try {
+	                    	 if (authInit) 
+	                    		 authInitialized = false;
+	                         // Obtain SSOToken using AuthN service
+		                    ssoAuthToken = new SystemAppTokenProvider(adminDN, adminPassword).getAppSSOToken();
+	                    } catch (NoClassDefFoundError ne) {
+	                        throw ne;
+	                    } catch (Throwable e) {
+	                    	debug.error("AdminTokenAction::getSSOToken Exception reading from serverconfig.xml", e);
+							if (!authInit)
+								break;
+						}finally {
+							// Restore the authentication state
+		                    if (authInit && ssoAuthToken != null) {
+		                        authInitialized = true;
+		                        internalAppSSOToken = null;
+		                    }
+						}
                     }
                 }
             }
         } catch (NoClassDefFoundError ne) {
             debug.error("AdminTokenAction::getSSOToken Not found AdminDN and AdminPassword.", ne);
-
         } catch (Throwable t) {
             debug.error("AdminTokenAction::getSSOToken Exception reading from serverconfig.xml", t);
         }
