@@ -151,8 +151,6 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
                     ((appSSOToken == null) ? "null" :
                             appSSOToken.getClass().getName()));
         }
-        // Clear internalAppSSOToken
-        internalAppSSOToken = null;
     }
 
     /**
@@ -207,24 +205,21 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
 		                    return appSSOToken;
 		                }else {
 		            		debug.message("AdminTokenAction.reset: invalid token.");
-		            		internalAppSSOToken=null;
 		                    appSSOToken = null;
 		            	}
 		            } catch (SSOException ssoe) {
 		                debug.error("AdminTokenAction.reset: couldn't retrieve valid token.", ssoe);
-	            		internalAppSSOToken=null;
 	                    appSSOToken = null;
 		            }
 	        	}else {
 	        		debug.message("AdminTokenAction.reset: invalid token.");
-	        		internalAppSSOToken=null;
 	                appSSOToken = null;
 	        	}
 	        }
 
         	// Try getting the token from serverconfig.xml
             // Check if internalAppSSOToken is present
-            if (internalAppSSOToken != null) { 
+            if (!authInitialized && internalAppSSOToken != null) { 
             	if (tokenManager.isValidToken(internalAppSSOToken)) {
             		return internalAppSSOToken;
             	}else {
@@ -329,7 +324,6 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
 							// Restore the authentication state
 		                    if (authInit && ssoAuthToken != null) {
 		                        authInitialized = true;
-		                        internalAppSSOToken = null;
 		                    }
 						}
                     }
