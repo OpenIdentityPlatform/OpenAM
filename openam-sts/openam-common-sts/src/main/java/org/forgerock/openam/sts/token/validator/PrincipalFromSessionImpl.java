@@ -12,120 +12,31 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2019 3A Systems, LLC. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
 
-import org.forgerock.json.JsonException;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.HttpURLConnectionWrapper;
-import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.utils.JsonValueBuilder;
+
+import com.iplanet.sso.SSOTokenManager;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- * @see org.forgerock.openam.sts.token.validator.PrincipalFromSession
- */
 public class PrincipalFromSessionImpl implements PrincipalFromSession {
-    private static final String ID = "id";
-
-    private final UrlConstituentCatenator urlConstituentCatenator;
-    private final String amDeploymentUrl;
-    private final String amJsonRestBase;
-    private final String realm;
-    private final String amRestIdFromSessionUriElement;
-    private final String amSessionCookieName;
-    private final String crestVersionUsersService;
-    private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
-    public PrincipalFromSessionImpl(
-            @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
-            @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestBase,
-            @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT) String idFromSessionUriElement,
-            @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
-            @Named(AMSTSConstants.REALM) String realm,
-            @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE) String crestVersionUsersService,
-            UrlConstituentCatenator urlConstituentCatenator,
-            HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
-        this.amDeploymentUrl = amDeploymentUrl;
-        this.amJsonRestBase = jsonRestBase;
-        this.amRestIdFromSessionUriElement = idFromSessionUriElement;
-        this.amSessionCookieName = amSessionCookieName;
-        this.realm = realm;
-        this.crestVersionUsersService = crestVersionUsersService;
-        this.urlConstituentCatenator = urlConstituentCatenator;
-        this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
+    public PrincipalFromSessionImpl() {
     }
+
     @Override
     public Principal getPrincipalFromSession(String sessionId) throws TokenValidationException {
-        return obtainPrincipalFromSession(constitutePrincipalFromSessionUrl(), sessionId);
+    	try {
+    		return SSOTokenManager.getInstance().createSSOToken(sessionId).getPrincipal();
+    	}catch (Exception e) {
+			throw new TokenValidationException(401,"Session invalid",e);
+		}
     }
 
-    /**
-     * Creates the String representing the url at which the principal id from session token functionality can be
-     * consumed.
-     * @return A String representing the url of OpenAM's Restful principal from session id service
-     */
-    private String constitutePrincipalFromSessionUrl() {
-        return urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, amJsonRestBase, realm, amRestIdFromSessionUriElement);
-    }
-
-    private Principal obtainPrincipalFromSession(String sessionToUsernameUrl, String sessionId) throws TokenValidationException {
-        if ((sessionId == null) || sessionId.isEmpty()) {
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
-                    "the sessionId passed to PrincipalFromSession is null or empty.");
-        }
-        try {
-            Map<String, String> headerMap = new HashMap<>();
-            headerMap.put(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
-            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionUsersService);
-            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
-                    .httpURLConnectionWrapper(new URL(sessionToUsernameUrl))
-                    .setRequestHeaders(headerMap)
-                    .setRequestMethod(AMSTSConstants.POST)
-                    .makeInvocation();
-            final int responseCode = connectionResult.getStatusCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new TokenValidationException(responseCode, "Non-200 response from posting principal from session request: "
-                        + connectionResult.getResult());
-            } else {
-                return parsePrincipalFromResponse(connectionResult.getResult());
-            }
-        } catch (IOException e) {
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught making principal from session invocation "+sessionToUsernameUrl+": " + e, e);
-        }
-    }
-
-    private Principal parsePrincipalFromResponse(String response) throws TokenValidationException {
-        JsonValue responseJson;
-        try {
-            responseJson = JsonValueBuilder.toJsonValue(response);
-        } catch (JsonException e) {
-            String message = "Exception caught getting the text of the json principal from session response: " + e;
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message, e);
-        }
-        JsonValue principalIdJsonValue = responseJson.get(ID);
-        if (!principalIdJsonValue.isString()) {
-            String message = "Principal from session response does not contain " + ID + " string entry. The obtained entry: "
-                    + principalIdJsonValue.toString() + "; The response: " + responseJson.toString();
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message);
-        }
-        return new STSPrincipal(principalIdJsonValue.asString());
-    }
 }
