@@ -50,8 +50,8 @@ import com.sun.identity.shared.debug.Debug;
 public class HttpURLConnectionManager {
   
     private static Debug debug = Debug.getInstance("PLLClient");
-    private static int READ_TIMEOUT = 30000;
-    private static int CONNECT_TIMEOUT = 10000;
+    private static int READ_TIMEOUT = 3000;
+    private static int CONNECT_TIMEOUT = 1500;
     private static final String URL_READ_TIMEOUT = "com.sun.identity.url.readTimeout";
     private static final String URL_CONNECT_TIMEOUT = "org.forgerock.openam.url.connectTimeout";
     private static String prot_handler_string = null;
