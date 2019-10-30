@@ -242,7 +242,7 @@ public class TokenGenerationService implements CollectionResourceProvider {
 			}
 		});
     	try {
-    		return res.get().getContent().toString();
+    		return res.get().getContent().get("issued_token").asString();
     	}catch (Exception e) {
     		throw new TokenCreationException(401,"Invalid token",e.getCause()==null?e:e.getCause());
 		}
