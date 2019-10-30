@@ -12,14 +12,12 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2019 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.token.provider;
 
-import org.forgerock.json.JsonException;
-import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
@@ -33,12 +31,13 @@ import org.forgerock.openam.sts.service.invocation.SAML2TokenGenerationState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -54,7 +53,6 @@ import static org.forgerock.openam.sts.service.invocation.TokenGenerationService
 public class TokenServiceConsumerImpl implements TokenServiceConsumer {
     private static final String COOKIE = "Cookie";
     private static final ProofTokenState NULL_PROOF_TOKEN_STATE = null;
-    private static final String CREATE_ACTION_PARAM = SharedSTSConstants.PUBLISH_SERVICE_CREATE_ACTION_URL_ELEMENT;
     private static final String DELETE = "DELETE";
 
     private final AMSTSConstants.STSType stsType;
@@ -216,25 +214,24 @@ public class TokenServiceConsumerImpl implements TokenServiceConsumer {
         }
     }
 
-    private String invokeTokenCreation(String invocationString, String callerSSOTokenString) throws TokenCreationException {
-        try {
-            Map<String, String> headerMap = makeCommonHeaders(callerSSOTokenString);
-            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
-                    .httpURLConnectionWrapper(new URL(urlConstituentCatenator.catenateUrlConstituents(tokenServiceEndpoint, CREATE_ACTION_PARAM)))
-                    .setRequestHeaders(headerMap)
-                    .setRequestMethod(AMSTSConstants.POST)
-                    .setRequestPayload(invocationString)
-                    .makeInvocation();
-            final int responseCode = connectionResult.getStatusCode();
-            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                return parseTokenServiceResponse(connectionResult.getResult());
-            } else {
-                throw new TokenCreationException(responseCode, connectionResult.getResult());
-            }
-        } catch (IOException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught invoking TokenService to create a token: " + e);
-        }
+    static Method  createInstance=null;;
+    
+    static {
+    	try {
+			createInstance=Class.forName("org.forgerock.openam.sts.tokengeneration.service.TokenGenerationService").getMethod("createInstance", String.class);
+		} catch (Exception e) {}
+    }
+    
+    private String invokeTokenCreation(final String invocationString, String callerSSOTokenString) throws TokenCreationException {
+    	if (createInstance==null)
+    		throw new TokenCreationException(500,"org.forgerock.openam.sts.tokengeneration.service.TokenGenerationService create error");
+    	try {
+    		return (String)createInstance.invoke(null, invocationString);
+    	}catch (InvocationTargetException e) {
+    		throw (TokenCreationException)e.getTargetException();
+		}catch (IllegalAccessException e) {
+    		throw new TokenCreationException(500,"org.forgerock.openam.sts.tokengeneration.service.TokenGenerationService",e);
+		}
     }
 
     private Map<String, String> makeCommonHeaders(String callerSSOTokenString) {
@@ -249,27 +246,4 @@ public class TokenServiceConsumerImpl implements TokenServiceConsumer {
         return amSessionCookieName + AMSTSConstants.EQUALS + callerSSOTokenString;
     }
 
-    private String parseTokenServiceResponse(String response) throws TokenCreationException {
-        /*
-            This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
-            org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
-            for details.
-        */
-        JsonValue responseContent;
-        try {
-            responseContent = JsonValueBuilder.toJsonValue(response);
-        } catch (JsonException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Could not map the response from the TokenService to a json object. The response: "
-                            + response + "; The exception: " + e);
-        }
-        JsonValue assertionJson = responseContent.get(AMSTSConstants.ISSUED_TOKEN);
-        if (!assertionJson.isString()) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "The json response returned from the TokenService did not have " +
-                            "a non-null string element for the " + AMSTSConstants.ISSUED_TOKEN + " key. The json: "
-                            + responseContent.toString());
-        }
-        return assertionJson.asString();
-    }
 }

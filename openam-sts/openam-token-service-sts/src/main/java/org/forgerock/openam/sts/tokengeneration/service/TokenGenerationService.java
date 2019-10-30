@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2019 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.service;
@@ -21,10 +22,16 @@ import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -34,7 +41,9 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.services.context.Context;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -49,7 +58,10 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.RequestType;
+import org.forgerock.json.resource.RequestVisitor;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourcePath;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RestUtils;
@@ -60,6 +72,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
+import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
@@ -68,6 +81,7 @@ import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
 import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
 import org.forgerock.openam.sts.user.invocation.STSIssuedTokenState;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.i18n.PreferredLocales;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -77,7 +91,7 @@ import org.slf4j.Logger;
  * This service will be consumed by the REST/SOAP STS to issue tokens.
  *
  */
-class TokenGenerationService implements CollectionResourceProvider {
+public class TokenGenerationService implements CollectionResourceProvider {
     private static final String RESULT = "result";
     private static final String EMPTY_STRING = "";
     private final SAML2TokenGeneration saml2TokenGeneration;
@@ -91,7 +105,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     Ctor invoked by the TokenGenerationServiceConnectionFactory, using the SAML2TokenGeneration, STSInstanceStateProvider,
     and Logger bound by guice.
      */
-    TokenGenerationService(SAML2TokenGeneration saml2TokenGeneration, OpenIdConnectTokenGeneration openIdConnectTokenGeneration,
+    public TokenGenerationService(SAML2TokenGeneration saml2TokenGeneration, OpenIdConnectTokenGeneration openIdConnectTokenGeneration,
                            STSInstanceStateProvider<RestSTSInstanceState> restSTSInstanceStateProvider,
                            STSInstanceStateProvider<SoapSTSInstanceState> soapSTSInstanceStateProvider,
                            CTSTokenPersistence ctsTokenPersistence,
@@ -104,6 +118,136 @@ class TokenGenerationService implements CollectionResourceProvider {
         this.logger = logger;
     }
 
+    static ObjectMapper mapper = new ObjectMapper();
+    public static String createInstance(String invocationString) throws TokenCreationException {
+    	final TokenGenerationService tokenGenerationService =
+                new TokenGenerationService(
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(OpenIdConnectTokenGeneration.class)),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(CTSTokenPersistence.class)),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
+    	final JsonValue data;
+    	try {
+    		data=new JsonValue(mapper.readValue(invocationString, HashMap.class));
+    	}catch (IOException e) {
+			throw new TokenCreationException(500, "Invalid request", e);
+		}
+    	final Promise<ResourceResponse, ResourceException> res=tokenGenerationService.createInstance(null, new CreateRequest() {
+			
+			@Override
+			public JsonValue toJsonValue() {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setResourceVersion(Version resourceVersion) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setResourcePath(ResourcePath path) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setResourcePath(String path) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setPreferredLocales(PreferredLocales preferredLocales) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setNewResourceId(String id) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setContent(JsonValue content) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest setAdditionalParameter(String name, String value) throws BadRequestException {
+				return null;
+			}
+			
+			@Override
+			public Version getResourceVersion() {
+				return null;
+			}
+			
+			@Override
+			public ResourcePath getResourcePathObject() {
+				return null;
+			}
+			
+			@Override
+			public String getResourcePath() {
+				return null;
+			}
+			
+			@Override
+			public RequestType getRequestType() {
+				return null;
+			}
+			
+			@Override
+			public PreferredLocales getPreferredLocales() {
+				return null;
+			}
+			
+			@Override
+			public String getNewResourceId() {
+				return null;
+			}
+			
+			@Override
+			public List<JsonPointer> getFields() {
+				return null;
+			}
+			
+			@Override
+			public JsonValue getContent() {
+				return data;
+			}
+			
+			@Override
+			public Map<String, String> getAdditionalParameters() {
+				return null;
+			}
+			
+			@Override
+			public String getAdditionalParameter(String name) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest addField(String... fields) {
+				return null;
+			}
+			
+			@Override
+			public CreateRequest addField(JsonPointer... fields) {
+				return null;
+			}
+			
+			@Override
+			public <R, P> R accept(RequestVisitor<R, P> v, P p) {
+				return null;
+			}
+		});
+    	try {
+    		return res.get().getContent().toString();
+    	}catch (Exception e) {
+    		throw new TokenCreationException(401,"Invalid token",e.getCause()==null?e:e.getCause());
+		}
+    }
+    
     @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         TokenGenerationServiceInvocationState invocationState;
