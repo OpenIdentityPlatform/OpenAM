@@ -106,19 +106,19 @@
     <slf4j.version>1.7.25</slf4j.version>
     <santuario.xmlsec.version>2.1.4</santuario.xmlsec.version>
     <click.version>2.3.0</click.version>
-    <commons-beanutils.version>1.8.3</commons-beanutils.version>
-    <commons-codec.version>1.6</commons-codec.version>
-    <commons-collections.version>3.2.2</commons-collections.version>
+    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <commons-codec.version>1.13</commons-codec.version>
+     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-digester.version>2.1</commons-digester.version>
-    <commons-fileupload.version>1.3.1</commons-fileupload.version>
+    <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-io.version>2.3</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <commons-logging.version>1.1.3</commons-logging.version>
     <commons-logging-api.version>1.1</commons-logging-api.version>
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
-    <esapiport.version>2.1.0.1</esapiport.version>
+    <esapiport.version>2.2.0.0</esapiport.version>
     <geoip.version>2.0.0</geoip.version>
-    <groovy.version>2.4.6</groovy.version>
+    <groovy.version>2.5.8</groovy.version>
     <groovy-sandbox.version>1.6</groovy-sandbox.version>
     <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
@@ -1234,6 +1234,12 @@
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
         <version>${esapiport.version}</version>
+        <exclusions>
+        	<exclusion>
+        		<groupId>org.apache.httpcomponents</groupId>
+        		<artifactId>httpclient</artifactId>
+        	</exclusion>
+        </exclusions>
       </dependency>
       <!--
             <dependency>

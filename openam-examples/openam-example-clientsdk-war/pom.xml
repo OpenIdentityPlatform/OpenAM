@@ -91,7 +91,7 @@
         </dependency>
         <dependency>
              <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
+             <artifactId>esapi</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
