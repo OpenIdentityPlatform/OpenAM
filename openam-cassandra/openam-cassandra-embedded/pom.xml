@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.cassandraunit</groupId>
 			<artifactId>cassandra-unit</artifactId>
-			<version>3.5.0.1</version>
+			<version>3.11.2.0</version>
 			<exclusions>
 				<exclusion>
 				    <groupId>org.apache.httpcomponents</groupId>
@@ -96,6 +96,14 @@
                 	<groupId>org.slf4j</groupId>
                 	<artifactId>log4j-over-slf4j</artifactId>
                 </exclusion>
+				<exclusion>
+				    <groupId>org.codehaus.jackson</groupId>
+				    <artifactId>jackson-core-asl</artifactId>
+				</exclusion>
+				<exclusion>
+				    <groupId>org.codehaus.jackson</groupId>
+				    <artifactId>jackson-mapper-asl</artifactId>
+				</exclusion> 
 		    </exclusions>
 		</dependency>
 		<dependency>
