@@ -191,6 +191,7 @@
           <name>Forgerock Internal Repository</name>
           <url>http://maven.forgerock.org/repo/internal</url>
         </repository>
+        
       </repositories>
       <dependencyManagement>
         <dependencies>
@@ -471,6 +472,10 @@
   </mailingLists>
   <!-- Maven Repositories -->
   <repositories>
+  	<repository>
+		<id>redhat-ga</id>
+		<url>https://maven.repository.redhat.com/ga/</url>
+	</repository>
     <!-- ForgeRock Common Internal Project Repositories -->
     <!--         <repository> -->
     <!--             <id>forgerock-staging-repository</id> -->
@@ -1938,6 +1943,16 @@
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-validator</artifactId>
 		    <version>5.4.3.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-core-asl</artifactId>
+		    <version>1.9.13.redhat-4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-mapper-asl</artifactId>
+		    <version>1.9.13.redhat-4</version>
 		</dependency>
     </dependencies>
   </dependencyManagement>
