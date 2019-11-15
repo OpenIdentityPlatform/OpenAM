@@ -163,11 +163,11 @@
                         	<artifactItem>
 							<groupId>org.forgerock.commons.ui.libs</groupId>
 			                <artifactId>handlebars</artifactId>
-			                <version>3.0.3</version>
+			                <version>4.4.2</version>
 			                <packaging>js</packaging>
 			                <classifier>min</classifier>
 							<downloadUrl>
-								https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js
+								https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.4.2/handlebars.min.js
                         		</downloadUrl>
                         	</artifactItem>
                         	<artifactItem>
