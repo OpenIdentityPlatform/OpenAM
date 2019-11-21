@@ -85,10 +85,11 @@ public class EndSession extends ServerResource {
         final OAuth2Request request = requestFactory.create(getRequest());
         final String idToken = request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT);
         final String redirectUri = request.getParameter(OAuth2Constants.Params.POST_LOGOUT_REDIRECT_URI);
+        final String state = request.getParameter(OAuth2Constants.Params.STATE);
         try {
             openIDConnectEndSession.endSession(request, idToken);
             if (StringUtils.isNotEmpty(redirectUri)) {
-                return handleRedirect(request, idToken, redirectUri);
+                return handleRedirect(request, idToken, redirectUri, state);
             }
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
@@ -106,13 +107,19 @@ public class EndSession extends ServerResource {
         exceptionHandler.handle(throwable, getResponse());
     }
 
-    private Representation handleRedirect(OAuth2Request request, String idToken, String redirectUri)
+    private Representation handleRedirect(OAuth2Request request, String idToken, String redirectUri, String state)
             throws RedirectUriMismatchException, InvalidClientException, 
             RelativeRedirectUriException, NotFoundException {
 
         validateRedirect(request, idToken, redirectUri);
         Response response = getResponse();
-        new Redirector(getContext(), new Reference(redirectUri).toString(), Redirector.MODE_CLIENT_FOUND).
+
+	Reference redirectUrlWithState = new Reference(redirectUri);
+	if (state != null && !state.isEmpty()) {
+		redirectUrlWithState.addQueryParameter(OAuth2Constants.Params.STATE, state);
+	}
+
+        new Redirector(getContext(), redirectUrlWithState.toString(), Redirector.MODE_CLIENT_FOUND).
                 handle(getRequest(), response);
         return response == null ? null : response.getEntity();
     }
