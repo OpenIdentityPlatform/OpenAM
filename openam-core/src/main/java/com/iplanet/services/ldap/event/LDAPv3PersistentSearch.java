@@ -306,7 +306,8 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                                 previousDn = control.getPreviousName();
                             }
                             type = changeType;
-                        }
+                        }else
+                        	return true;
                     } catch (DecodeException de) {
                         DEBUG.warning("Unable to decode EntryChangeNotificationResponseControl", de);
                     }
@@ -348,7 +349,11 @@ public abstract class LDAPv3PersistentSearch<T, H> {
                 default:
                     throw new IllegalStateException("Persistent search mode has invalid value: " + mode);
             }
-
+            if (type==null) {
+            	if (DEBUG.errorEnabled())
+            		DEBUG.error("cannot get type {} {} {}", entry,dn, previousDn);
+            	return true;
+            }
             return getSearchResultEntryHandler().handle(entry, dn, previousDn, type);
         }
 
