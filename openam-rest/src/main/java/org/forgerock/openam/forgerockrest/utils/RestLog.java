@@ -55,20 +55,24 @@ public final class RestLog {
         this.authzLogger = authzLogger;
     }
 
-    private synchronized void init() {
+    private void init() {
         if (status == null) {
-            try {
-                status = SystemProperties.get(Constants.AM_LOGSTATUS);
+        	synchronized (this) {
+        		if (status == null) {
+        			try {
+                        status = SystemProperties.get(Constants.AM_LOGSTATUS);
 
-                if ("ACTIVE".equalsIgnoreCase(status)) {
-                    accessLogger = (Logger) Logger.getLogger(LogConstants.REST_ACCESS);
-                    authzLogger = (Logger) Logger.getLogger(LogConstants.REST_AUTHZ);
-                    msgProvider = MessageProviderFactory.getProvider(RestLog.LOG_NAME);
-                }
+                        if ("ACTIVE".equalsIgnoreCase(status)) {
+                            accessLogger = (Logger) Logger.getLogger(LogConstants.REST_ACCESS);
+                            authzLogger = (Logger) Logger.getLogger(LogConstants.REST_AUTHZ);
+                            msgProvider = MessageProviderFactory.getProvider(RestLog.LOG_NAME);
+                        }
 
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e);
+                    }
+        		}
+			}
         }
     }
 
