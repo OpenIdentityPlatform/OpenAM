@@ -133,7 +133,7 @@ public class DeviceCodeResource extends ServerResource {
                 final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
                 verificationUrl = baseURLProviderFactory.get(realm).getRootURL(servletRequest) + "/oauth2/device/user";
             }
-            result.put(VERIFICATION_URL, verificationUrl);
+            result.put(VERIFICATION_URI, verificationUrl);
 
             return jacksonRepresentationFactory.create(result);
         } catch (OAuth2Exception e) {
