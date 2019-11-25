@@ -808,7 +808,7 @@ public class OAuth2Constants {
     public static class DeviceCode {
         public static final String DEVICE_CODE = "device_code";
         public static final String USER_CODE = "user_code";
-        public static final String VERIFICATION_URL = "verification_url";
+        public static final String VERIFICATION_URI = "verification_uri";
         public static final String INTERVAL = "interval";
     }
 
