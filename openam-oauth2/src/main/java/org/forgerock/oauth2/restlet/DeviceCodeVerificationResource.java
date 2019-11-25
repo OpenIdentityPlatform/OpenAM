@@ -145,29 +145,42 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         addRequestParamsFromDeviceCode(restletRequest, deviceCode);
 
         try {
-            final String decision = request.getParameter("decision");
-            if (StringUtils.isNotEmpty(decision)) {
+            OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+            ClientRegistration clientRegistration =
+                 clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
+            final boolean requireConsent = !providerSettings.clientsCanSkipConsent()
+                 || !clientRegistration.isConsentImplied();
 
-                if (csrfProtection.isCsrfAttack(request)) {
-                    logger.debug("Session id from consent request does not match users session");
-                    throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
-                }
+            if (requireConsent) {
+                final String decision = request.getParameter("decision");
+                if (StringUtils.isNotEmpty(decision)) {
 
-                final boolean consentGiven = "allow".equalsIgnoreCase(decision);
-                final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
-                if (saveConsent) {
-                    saveConsent(request);
-                }
-                if (consentGiven) {
-                    ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-                    deviceCode.setResourceOwnerId(resourceOwner.getId());
-                    deviceCode.setAuthorized(true);
-                    tokenStore.updateDeviceCode(deviceCode, request);
+                    if (csrfProtection.isCsrfAttack(request)) {
+                        logger.debug("Session id from consent request does not match users session");
+                        throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
+                    }
+
+                    final boolean consentGiven = !requireConsent || "allow".equalsIgnoreCase(decision);
+                    final boolean saveConsent = requireConsent && "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
+                    if (saveConsent) {
+                        saveConsent(request);
+                    }
+                    if (consentGiven) {
+                        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+                        deviceCode.setResourceOwnerId(resourceOwner.getId());
+                        deviceCode.setAuthorized(true);
+                        tokenStore.updateDeviceCode(deviceCode, request);
+                    } else {
+                        tokenStore.deleteDeviceCode(deviceCode.getClientId(), deviceCode.getDeviceCode(), request);
+                    }
                 } else {
-                    tokenStore.deleteDeviceCode(deviceCode.getClientId(), deviceCode.getDeviceCode(), request);
+                    authorizationService.authorize(request);
                 }
             } else {
-                authorizationService.authorize(request);
+                ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+                deviceCode.setResourceOwnerId(resourceOwner.getId());
+                deviceCode.setAuthorized(true);
+                tokenStore.updateDeviceCode(deviceCode, request);
             }
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("client_id")) {
