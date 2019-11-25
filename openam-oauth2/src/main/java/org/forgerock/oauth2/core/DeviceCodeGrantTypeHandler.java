@@ -16,7 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CODE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.DEVICE_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
@@ -76,7 +76,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
             InvalidScopeException, NotFoundException, InvalidClientException, AuthorizationDeclinedException,
             ExpiredTokenException, BadRequestException, AuthorizationPendingException {
 
-        final String code = request.getParameter(CODE);
+        final String code = request.getParameter(DEVICE_CODE);
 
         if (isEmpty(code)) {
             throw new BadRequestException("code is a required parameter");
