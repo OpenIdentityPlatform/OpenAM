@@ -20,6 +20,7 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.NONCE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.EXPIRES_IN;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.GRANT_TYPE;
@@ -187,6 +188,7 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(SCOPE, scope)
                 .claim(CLAIMS, claims)
                 .claim(REALM, realm)
+                .claim(NONCE, nonce)
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(OAUTH_TOKEN_TYPE, BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
