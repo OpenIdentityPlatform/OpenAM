@@ -131,7 +131,7 @@
     <jato.version>2005-05-04</jato.version>
     <cc-ui.version>2008-08-08</cc-ui.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
-    <jstl.version>1.1.2</jstl.version>
+    <jstl.version>1.2.5</jstl.version>
     <mail.version>1.5.1</mail.version>
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
@@ -1434,8 +1434,8 @@
         <version>${jsr311-api.version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jstl</artifactId>
+		<groupId>org.apache.taglibs</groupId>
+		<artifactId>taglibs-standard-impl</artifactId>
         <version>${jstl.version}</version>
       </dependency>
       <dependency>
