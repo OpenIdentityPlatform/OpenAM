@@ -25,7 +25,7 @@ public class AuthorizationPendingException extends OAuth2Exception {
      * Constructs a new exception.
      */
     public AuthorizationPendingException() {
-        super(403, "authorization_pending", "The user has not yet completed authorization");
+        super(400, "authorization_pending", "The user has not yet completed authorization");
     }
 
 }
