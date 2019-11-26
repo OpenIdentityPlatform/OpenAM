@@ -107,4 +107,10 @@ public interface OAuth2Uris {
      */
     String getResourceSetRegistrationEndpoint();
 
+    /**
+     * Returns the default URL for this provider's Device Flow Authorization endpoint.
+     *
+     * @return The URL.
+     */
+    String getDeviceAuthorizationEndpoint();
 }

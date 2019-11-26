@@ -100,6 +100,7 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("acr_values_supported", providerSettings.getAcrMapping().keySet());
         configuration.put("claims_parameter_supported", providerSettings.getClaimsParameterSupported());
         configuration.put("token_endpoint_auth_methods_supported", providerSettings.getEndpointAuthMethodsSupported());
+        configuration.put("device_authorization_endpoint", uris.getDeviceAuthorizationEndpoint());
 
         return new JsonValue(configuration);
     }

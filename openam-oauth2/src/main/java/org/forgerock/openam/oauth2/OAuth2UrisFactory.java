@@ -197,5 +197,10 @@ public class OAuth2UrisFactory {
         public String getClientRegistrationEndpoint() {
             return baseUrl + "/connect/register";
         }
+
+        @Override
+        public String getDeviceAuthorizationEndpoint() {
+            return baseUrl + "/device/code";
+        }
     }
 }
