@@ -111,7 +111,6 @@ public interface OAuth2Uris {
      * Returns the default URL for this provider's Device Flow Authorization endpoint.
      *
      * @return The URL.
-     * @throws ServerException If any internal server error occurs.
      */
     String getDeviceAuthorizationEndpoint();
 }
