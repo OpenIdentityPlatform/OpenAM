@@ -68,8 +68,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
+		    <groupId>org.apache.taglibs</groupId>
+		    <artifactId>taglibs-standard-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

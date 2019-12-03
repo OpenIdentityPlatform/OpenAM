@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.util.DateUtil;
+import org.apache.http.client.utils.DateUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthUtil;
@@ -136,7 +136,7 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	public static long getSyncOffset() throws Exception {
 		Map<String, List<String>> headers = HttpRequestContent.getInstance().getHeadersUsingHEAD(ESIA_HOST_SYNC_TIME);
 		String strDate = headers.get("Date").get(0);
-		Date networkDate = DateUtil.parseDate(strDate);
+		Date networkDate = DateUtils.parseDate(strDate);
 		return Calendar.getInstance().getTime().getTime() - networkDate.getTime();
 	}
 	

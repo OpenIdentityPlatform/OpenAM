@@ -34,7 +34,9 @@ public class StandardScriptEvaluatorTest {
     private static final ScriptEngineConfiguration CONFIGURATION =
             ScriptEngineConfiguration.builder()
                 // Allow any java.* classes for the unit tests
-                .withWhiteList(Arrays.asList(Pattern.compile("java\\..*"), Pattern.compile("groovy\\..*")))
+                .withWhiteList(Arrays.asList(Pattern.compile("java\\..*"),
+                		Pattern.compile("groovy\\..*"), 
+                		Pattern.compile("org\\.apache\\.groovy\\..*")))
                 // But deny access to reflection
                 .withBlackList(Arrays.asList(Pattern.compile("java\\.lang\\.Class"),
                         Pattern.compile("java\\.lang\\.reflect\\..*")))

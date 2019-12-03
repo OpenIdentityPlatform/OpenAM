@@ -33,7 +33,8 @@
 	
 	<properties>
 	    <cassandra.driver.version>3.6.0</cassandra.driver.version>
-	    <cassandra.version>3.11.4</cassandra.version>
+	    <cassandra.version>3.11.5</cassandra.version>
+	    <caffeine.version>2.8.0</caffeine.version>
 	</properties>
     <!-- Child Modules -->
     <modules>
@@ -47,6 +48,11 @@
 				<groupId>com.datastax.cassandra</groupId>
 				<artifactId>cassandra-driver-core</artifactId>
 				<version>${cassandra.driver.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>com.github.ben-manes.caffeine</groupId>
+			    <artifactId>caffeine</artifactId>
+			    <version>${caffeine.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

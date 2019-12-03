@@ -120,30 +120,7 @@ public class ApiDocsService implements Describable.Listener {
      * @see <a href="http://schneems.com/2014/04/15/gem-path.html">GEM_PATH variable</a>
      */
     private Asciidoctor initializeAsciidoctor() {
-        List<String> gemPaths = new ArrayList<>();
-        try {
-            for (URL url : Collections.list(Thread.currentThread().getContextClassLoader().getResources("gems"))) {
-                if ("vfs".equals(url.getProtocol())) {
-                    String path;
-                    try {
-                        URI uri = url.toURI();
-                        uri = uri.getPath().endsWith("/") ? uri.resolve("..") : uri.resolve(".");
-                        path = uri.getSchemeSpecificPart();
-                    } catch (URISyntaxException urise) {
-                        path = url.getPath();
-                    }
-                    gemPaths.add(path.endsWith("/") ? path.substring(0, path.length() - 1) : path);
-                } else {
-                    break;
-                }
-            }
-        } catch (IOException ignored) {
-        }
-        if (gemPaths.isEmpty()) {
-            return Asciidoctor.Factory.create();
-        } else {
-            return Asciidoctor.Factory.create(Joiner.on(":").join(gemPaths));
-        }
+    	return Asciidoctor.Factory.create();
     }
 
     /**
@@ -181,7 +158,7 @@ public class ApiDocsService implements Describable.Listener {
         File docs = File.createTempFile("openam-api.", ".html");
         docs.deleteOnExit();
         try (Reader reader = new FileReader(asciidoc); Writer writer = new FileWriter(docs)) {
-            asciidoctor.render(
+            asciidoctor.convert(
                     reader,
                     writer,
                     OptionsBuilder.options()

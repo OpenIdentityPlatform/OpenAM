@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.cassandraunit</groupId>
 			<artifactId>cassandra-unit</artifactId>
-			<version>3.5.0.1</version>
+			<version>3.11.2.0</version>
 			<exclusions>
 				<exclusion>
 				    <groupId>org.apache.httpcomponents</groupId>
@@ -107,5 +107,9 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
 		</dependency>
-  </dependencies>
+		  <dependency>
+  			 <groupId>com.github.ben-manes.caffeine</groupId>
+			 <artifactId>caffeine</artifactId>
+	    </dependency>
+	</dependencies>
 </project>
