@@ -59,28 +59,24 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
 
     @Override
     public boolean action(InternalSession is, Map<String, Long> sessions) {
-
         String nextExpiringSessionID = null;
-        long largestExpTime = -1;
+        long smallExpTime = Long.MAX_VALUE;
         for (Map.Entry<String, Long> entry : sessions.entrySet()) 
-        		if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
-	            String sid = entry.getKey();
-	            long expirationTime = entry.getValue();
-	            if (expirationTime > largestExpTime) {
-	            		largestExpTime = expirationTime;
-	            		nextExpiringSessionID = sid;
+    		if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
+	            if (entry.getValue() < smallExpTime || nextExpiringSessionID==null) {
+            		nextExpiringSessionID = entry.getKey();
+            		smallExpTime = entry.getValue();
 	            }
-	
 	        }
         if (nextExpiringSessionID != null) 
             try {
-            		Session s=sessionCache.getSession(new SessionID(nextExpiringSessionID), true, false);
+            	Session s=sessionCache.getSession(new SessionID(nextExpiringSessionID), true, false);
                 s.destroySession(s);
-                debug.error("{} {} {} {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(largestExpTime).getTimeInMillis()));
+                debug.error("{} {} {} {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(smallExpTime).getTimeInMillis()));
             } catch (SessionException e) {
-            		debug.error("{} {} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(largestExpTime).getTimeInMillis()),e.toString());
+            	debug.error("{} {} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(smallExpTime).getTimeInMillis()),e.toString());
             }finally {
-            		sessions.remove(nextExpiringSessionID);
+            	sessions.remove(nextExpiringSessionID);
 			}
         return false;
     }
