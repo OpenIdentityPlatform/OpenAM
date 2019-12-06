@@ -1029,6 +1029,8 @@ public class AMIdentity {
      */
     public boolean isMember(AMIdentity identity) throws IdRepoException,
             SSOException {
+    	if (identity!=null && !getRealm().equals(identity.getRealm()))
+    		return false;
         boolean ismember = false;
         IdRepoException idException = null;
         IdServices idServices = IdServicesFactory.getDataStoreServices();
