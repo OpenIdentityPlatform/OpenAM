@@ -259,7 +259,7 @@ public class SessionPersistenceStore {
         try {
             Collection<Token> collection =
                     coreTokenService.query(new TokenFilterBuilder().withQuery(
-                            QueryFilter.contains(
+                            QueryFilter.equalTo(
                                     SessionTokenField.RESTRICTED_TOKENS.getField(),
                                     sessionID.toString()))
                             .build());
