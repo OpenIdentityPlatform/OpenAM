@@ -119,7 +119,7 @@
     <esapiport.version>2.2.0.0</esapiport.version>
     <geoip.version>2.0.0</geoip.version>
     <groovy.version>2.5.8</groovy.version>
-    <groovy-sandbox.version>1.19</groovy-sandbox.version>
+    <groovy-sandbox.version>1.25</groovy-sandbox.version>
     <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
@@ -136,7 +136,7 @@
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7R4</rhino.version>
+    <rhino.version>1.7.11</rhino.version>
     <saaj-api.version>1.3.4</saaj-api.version>
     <saaj-impl.version>1.3.19</saaj-impl.version>
     <jsp-api.version>2.1</jsp-api.version>
@@ -475,6 +475,10 @@
   	<repository>
 		<id>redhat-ga</id>
 		<url>https://maven.repository.redhat.com/ga/</url>
+	</repository>
+	<repository>
+		<id>jenkins</id>
+		<url>https://repo.jenkins-ci.org/releases/</url>
 	</repository>
     <!-- ForgeRock Common Internal Project Repositories -->
     <!--         <repository> -->
@@ -1937,12 +1941,12 @@
 		<dependency>
 		    <groupId>org.apache.thrift</groupId>
 		    <artifactId>libthrift</artifactId>
-		    <version>0.12.0</version>
+		    <version>0.13.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-validator</artifactId>
-		    <version>5.4.3.Final</version>
+		    <version>6.1.0.Final</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.codehaus.jackson</groupId>
