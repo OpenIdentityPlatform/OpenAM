@@ -20,7 +20,7 @@
     <packaging>pom</packaging>
 
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-distribution</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>

@@ -37,30 +37,30 @@
             <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>org.forgerock.openam:openam-shared</include>
-                <include>org.forgerock.openam:openam-core</include>
-                <include>org.forgerock.openam:openam-cli-definitions</include>
-                <include>org.forgerock.openam:openam-cli-impl</include>
-                <include>org.forgerock.openam:openam-entitlements</include>
-                <include>org.forgerock.openam:openam-federation-library</include>
-                <include>org.forgerock.openam:OpenFM</include>
-                <include>org.forgerock.openam:openam-dtd-schema</include>
-                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
-                <include>org.forgerock.openam:openam-idsvcs-schema</include>
-                <include>org.forgerock.openam:openam-liberty-schema</include>
-                <include>org.forgerock.openam:openam-saml2-schema</include>
-                <include>org.forgerock.openam:openam-xacml3-schema</include>
-                <include>org.forgerock.openam:openam-wsfederation-schema</include>
-                <include>org.forgerock.opendj:opendj-server</include>
-                <include>org.forgerock.commons:forgerock-util</include>
-                <include>org.forgerock.openam:openam-license-manager-cli</include>
-                <include>org.forgerock.commons:forgerock-guice-core</include>
-                <include>org.forgerock.openam:openam-license-core</include>
-                <include>org.forgerock.openam:openam-auth-scripted</include>
-                <include>org.forgerock.openam:openam-scripting</include>
-                <include>org.forgerock.openam:openam-ldap-utils</include>
-                <include>org.forgerock.openam:openam-audit-context</include>
-                <include>org.forgerock.commons:json-resource</include>
+                <include>org.openidentityplatform.openam:openam-shared</include>
+                <include>org.openidentityplatform.openam:openam-core</include>
+                <include>org.openidentityplatform.openam:openam-cli-definitions</include>
+                <include>org.openidentityplatform.openam:openam-cli-impl</include>
+                <include>org.openidentityplatform.openam:openam-entitlements</include>
+                <include>org.openidentityplatform.openam:openam-federation-library</include>
+                <include>org.openidentityplatform.openam:OpenFM</include>
+                <include>org.openidentityplatform.openam:openam-dtd-schema</include>
+                <include>org.openidentityplatform.openam:openam-jaxrpc-schema</include>
+                <include>org.openidentityplatform.openam:openam-idsvcs-schema</include>
+                <include>org.openidentityplatform.openam:openam-liberty-schema</include>
+                <include>org.openidentityplatform.openam:openam-saml2-schema</include>
+                <include>org.openidentityplatform.openam:openam-xacml3-schema</include>
+                <include>org.openidentityplatform.openam:openam-wsfederation-schema</include>
+                <include>org.openidentityplatform.opendj:opendj-server</include>
+                <include>org.openidentityplatform.commons:forgerock-util</include>
+                <include>org.openidentityplatform.openam:openam-license-manager-cli</include>
+                <include>org.openidentityplatform.commons:forgerock-guice-core</include>
+                <include>org.openidentityplatform.openam:openam-license-core</include>
+                <include>org.openidentityplatform.openam:openam-auth-scripted</include>
+                <include>org.openidentityplatform.openam:openam-scripting</include>
+                <include>org.openidentityplatform.openam:openam-ldap-utils</include>
+                <include>org.openidentityplatform.openam:openam-audit-context</include>
+                <include>org.openidentityplatform.commons:json-resource</include>
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
@@ -87,11 +87,11 @@
                 <include>org.codehaus.groovy:groovy</include>
                 <include>org.kohsuke:groovy-sandbox</include>
                 <include>org.codehaus.groovy:groovy-jsr223:jar</include>
-                <include>org.forgerock.opendj:opendj-core</include>
-                <include>org.forgerock.commons:i18n-core</include>
-                <include>org.forgerock.commons:forgerock-audit-core</include>
+                <include>org.openidentityplatform.opendj:opendj-core</include>
+                <include>org.openidentityplatform.commons:i18n-core</include>
+                <include>org.openidentityplatform.commons:forgerock-audit-core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
-                <include>org.forgerock.openam:openam-auth-fr-oath</include>
+                <include>org.openidentityplatform.openam:openam-auth-fr-oath</include>
             </includes>
         </dependencySet>
         <dependencySet>

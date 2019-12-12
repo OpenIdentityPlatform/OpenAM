@@ -24,39 +24,39 @@
 
     <parent>
         <artifactId>openam</artifactId>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-http-client</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
 
@@ -85,12 +85,12 @@
             <artifactId>guice-assistedinject</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>org.openidentityplatform.http</groupId>
             <artifactId>chf-client-apache-sync</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-i18n</artifactId>
         </dependency>
 
@@ -117,12 +117,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>forgerock-guice-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
@@ -187,7 +187,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.forgerock.maven.plugins</groupId>
+                <groupId>org.openidentityplatform.maven.plugins</groupId>
                 <artifactId>build-helper-plugin</artifactId>
                 <executions>
                     <execution>

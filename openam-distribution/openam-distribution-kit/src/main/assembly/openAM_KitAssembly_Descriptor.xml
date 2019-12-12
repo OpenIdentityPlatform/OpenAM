@@ -40,16 +40,16 @@
             <outputFileNameMapping>${artifact.build.finalName}.${artifact.extension}</outputFileNameMapping>
             <!-- Include fully packaged Modules -->
             <includes>
-                <include>org.forgerock.openam:openam-server:war</include>
-                <include>org.forgerock.openam:openam-clientsdk:jar</include>
-                <include>org.forgerock.openam:openam-distauth:war</include>
-                <include>org.forgerock.openam:openam-example-clientsdk-cli:zip</include>
-                <include>org.forgerock.openam:openam-example-clientsdk-war:war</include>
-                <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
-                <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
-                <include>org.forgerock.openam:openam-distribution-ssoconfiguratortools:zip</include>
-                <include>org.forgerock.openam:openam-idpdiscovery-war:war</include>
-                <include>org.forgerock.openam:openam-soap-sts-server:war</include>
+                <include>org.openidentityplatform.openam:openam-server:war</include>
+                <include>org.openidentityplatform.openam:openam-clientsdk:jar</include>
+                <include>org.openidentityplatform.openam:openam-distauth:war</include>
+                <include>org.openidentityplatform.openam:openam-example-clientsdk-cli:zip</include>
+                <include>org.openidentityplatform.openam:openam-example-clientsdk-war:war</include>
+                <include>org.openidentityplatform.openam:openam-distribution-fedlet-unconfigured:zip</include>
+                <include>org.openidentityplatform.openam:openam-distribution-ssoadmintools:zip</include>
+                <include>org.openidentityplatform.openam:openam-distribution-ssoconfiguratortools:zip</include>
+                <include>org.openidentityplatform.openam:openam-idpdiscovery-war:war</include>
+                <include>org.openidentityplatform.openam:openam-soap-sts-server:war</include>
             </includes>
         </dependencySet>
     </dependencySets>

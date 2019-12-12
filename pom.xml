@@ -38,14 +38,14 @@
     -->
   <!-- Parent Project -->
   <parent>
-    <groupId>org.forgerock</groupId>
+    <groupId>org.openidentityplatform</groupId>
     <artifactId>forgerock-parent</artifactId>
     <version>2.0.6</version>
     <relativePath>forgerock-parent</relativePath>
   </parent>
   <!-- Component Definition -->
   <name>OpenAM Project</name>
-  <groupId>org.forgerock.openam</groupId>
+  <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
   <version>14.4.3-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -164,7 +164,7 @@
     <webAgentsDocCommunityVersion>4.0.0-SNAPSHOT</webAgentsDocCommunityVersion>
     <javaEEAgentsDocCommunityVersion>3.5.0-SNAPSHOT</javaEEAgentsDocCommunityVersion>
     <!-- Default license (CDDL) to package into the artifacts -->
-    <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
+    <forgerock.license.groupId>org.openidentityplatform</forgerock.license.groupId>
     <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
     <forgerock.license.version>1.0.0</forgerock.license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
@@ -294,7 +294,7 @@
                 </taglet>
               </taglets>
               <tagletArtifact>
-                <groupId>org.forgerock.openam</groupId>
+                <groupId>org.openidentityplatform.openam</groupId>
                 <artifactId>javadoc-utils</artifactId>
                 <version>${javadoc-utils.version}</version>
               </tagletArtifact>
@@ -306,7 +306,7 @@
                             </subpackages>
               <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
               <docletArtifact>
-                <groupId>org.forgerock.openam</groupId>
+                <groupId>org.openidentityplatform.openam</groupId>
                 <artifactId>javadoc-utils</artifactId>
                 <version>${javadoc-utils.version}</version>
               </docletArtifact>
@@ -333,9 +333,9 @@
                       <message>No snapshot dependencies allowed</message>
                       <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
                       <excludes>
-                        <exclude>org.forgerock.openam:*</exclude>
-                        <exclude>org.forgerock.commons:forgerock-persistit-core:*</exclude>
-                        <exclude>org.forgerock.openig:openig-toolkit:*</exclude>
+                        <exclude>org.openidentityplatform.openam:*</exclude>
+                        <exclude>org.openidentityplatform.commons:forgerock-persistit-core:*</exclude>
+                        <exclude>org.openidentityplatform.openig:openig-toolkit:*</exclude>
                       </excludes>
                     </requireReleaseDeps>
                   </rules>
@@ -549,7 +549,7 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>commons-bom</artifactId>
         <version>21.0.0-SNAPSHOT</version>
         <scope>import</scope>
@@ -563,215 +563,215 @@
 		</dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-audit-context</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-audit-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-audit-configuration</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-audit-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-shared</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-core</artifactId>
         <type>test-jar</type>
         <scope>test</scope>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-core-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-radius-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-radius-server</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-push-notification</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-notifications</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-notifications-websocket</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-notifications-integration</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- Include all Authentication Modules -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-ad</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-anonymous</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-adaptive</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-application</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-cert</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-datastore</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-persistentcookie</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-hotp</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-httpbasic</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-jdbc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-ldap</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-scripted</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-device-id</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-membership</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-msisdn</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-nt</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-oath</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-fr-oath</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-saml2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-push</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-oauth2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-radius</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-safeword</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-securid</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-windowsdesktopsso</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-oidc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-amster</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -786,264 +786,264 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-coretoken</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-entitlements</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-restlet</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-dashboard</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-annotations</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-datastore</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ldap-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-federation-library</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-fedlet-unconfigured-war</artifactId>
         <type>war</type>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-idpdiscovery</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>OpenFM</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-idpdiscovery-war</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-example-clientsdk-cli</artifactId>
         <version>${project.version}</version>
         <type>zip</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-example-clientsdk-war</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-oauth2-saml2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-uma</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-installtools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-installtools-launcher</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-certs</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-selfservice</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- OpenAM schema projects -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-dtd-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-jaxrpc-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-saml2-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-mib-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-wsfederation-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-idsvcs-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-liberty-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-xacml3-schema</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-common-auth-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-server-auth-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-installer-tools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-rest-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-publish-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-soap-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-soap-sts-server</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-common-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-token-service-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-client-sts</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-slf4j</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-scripting</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-http-client</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-tokens</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-http</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- New RIA Client UI -->
       <dependency>
-        <groupId>org.forgerock.commons.ui</groupId>
+        <groupId>org.openidentityplatform.commons.ui</groupId>
         <artifactId>forgerock-ui-user</artifactId>
         <version>${forgerock.ui.version}</version>
         <type>zip</type>
         <classifier>www</classifier>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui-ria</artifactId>
         <version>${project.version}</version>
         <classifier>www</classifier>
         <type>zip</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui-api</artifactId>
         <version>${project.version}</version>
         <type>jar</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.commons.ui.libs</groupId>
+        <groupId>org.openidentityplatform.commons.ui.libs</groupId>
         <artifactId>jquery.qrcode</artifactId>
         <version>0.11.0</version>
         <type>js</type>
@@ -1051,100 +1051,100 @@
       </dependency>
       <!-- CLI components -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-cli-definitions</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-cli-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- License -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-license-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-license-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-license-servlet</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-installer-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- Distribution dependencies -->
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-server</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-server-only</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-console</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-clientsdk</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-configurator-tool</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-upgrade-tool</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
         <version>${project.version}</version>
         <type>zip</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-distribution-ssoadmintools</artifactId>
         <version>${project.version}</version>
         <type>zip</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
         <version>${project.version}</version>
         <type>zip</type>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-upgrade</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-authfilter-shared</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-i18n</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1497,25 +1497,25 @@
       </dependency>
       <!-- OpenDJ API -->
       <dependency>
-        <groupId>org.forgerock.opendj</groupId>
+        <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-core</artifactId>
         <version>${opendj.sdk.version}</version>
       </dependency>
       <!-- OpenDJ Grizzly -->
       <dependency>
-        <groupId>org.forgerock.opendj</groupId>
+        <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-grizzly</artifactId>
         <version>${opendj.sdk.version}</version>
       </dependency>
       <!-- OpenDJ Server -->
       <dependency>
-        <groupId>org.forgerock.opendj</groupId>
+        <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-server</artifactId>
         <version>${opendj.server.version}</version>
       </dependency>
       <!-- OpenDJ Server -->
       <dependency>
-        <groupId>org.forgerock.opendj</groupId>
+        <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-server-legacy</artifactId>
         <version>${opendj.server.legacy}</version>
         <exclusions>
@@ -1530,7 +1530,7 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.opendj</groupId>
+        <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-server-legacy</artifactId>
         <version>${opendj.server.legacy}</version>
         <type>zip</type>
@@ -1651,12 +1651,12 @@
       </dependency>
       <!-- Commons Dependencies -->
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>forgerock-bloomfilter-core</artifactId>
         <version>${forgerock.bloomfilter.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>forgerock-bloomfilter-monitoring</artifactId>
         <version>${forgerock.bloomfilter.version}</version>
       </dependency>
@@ -1729,17 +1729,17 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>forgerock-guice-core</artifactId>
         <version>${forgerock.guice.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>forgerock-guice-servlet</artifactId>
         <version>${forgerock.guice.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.commons</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>forgerock-guice-test</artifactId>
         <version>${forgerock.guice.version}</version>
         <scope>test</scope>
@@ -1891,7 +1891,7 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-test-utils</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
@@ -1908,7 +1908,7 @@
         <version>${hikaricp.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-time-travel</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1979,7 +1979,7 @@
           <force>true</force>
           <artifactItems>
             <artifactItem>
-              <groupId>org.forgerock</groupId>
+              <groupId>org.openidentityplatform</groupId>
               <artifactId>cddl-license</artifactId>
               <version>1.0.0</version>
               <packaging>txt</packaging>
@@ -2094,7 +2094,7 @@
       <!--                 </executions> -->
       <!--                 <dependencies> -->
       <!--                     <dependency> -->
-      <!--                         <groupId>org.forgerock.openam.pmd.rules</groupId> -->
+      <!--                         <groupId>org.openidentityplatform.openam.pmd.rules</groupId> -->
       <!--                         <artifactId>enforce-timeservice</artifactId> -->
       <!--                         <version>1.0.0</version> -->
       <!--                     </dependency> -->
@@ -2168,7 +2168,7 @@
             </taglet>
           </taglets>
           <tagletArtifact>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>javadoc-utils</artifactId>
             <version>${javadoc-utils.version}</version>
           </tagletArtifact>
@@ -2180,7 +2180,7 @@
                             </subpackages>
           <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
           <docletArtifact>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>javadoc-utils</artifactId>
             <version>${javadoc-utils.version}</version>
           </docletArtifact>
@@ -2211,7 +2211,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.forgerock.maven.plugins</groupId>
+        <groupId>org.openidentityplatform.maven.plugins</groupId>
         <artifactId>javadoc-updater-maven-plugin</artifactId>
         <version>1.0.0</version>
         <executions>
@@ -2269,7 +2269,7 @@
           <version>2.0-alpha-01</version>
         </plugin>
         <plugin>
-          <groupId>org.forgerock.maven.plugins</groupId>
+          <groupId>org.openidentityplatform.maven.plugins</groupId>
           <artifactId>build-helper-plugin</artifactId>
           <version>${project.version}</version>
         </plugin>

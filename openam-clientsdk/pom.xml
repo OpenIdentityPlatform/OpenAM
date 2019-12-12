@@ -19,7 +19,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
@@ -111,29 +111,29 @@
                     -->
                     <artifactSet>
                         <includes>
-                            <include>org.forgerock.commons:forgerock-util</include>
-                            <include>org.forgerock.openam:openam-core</include>
-                            <include>org.forgerock.openam:openam-entitlements</include>
-                            <include>org.forgerock.openam:openam-audit-context</include>
-                            <include>org.forgerock.openam:openam-shared</include>
-                            <include>org.forgerock.openam:openam-dtd-schema</include>
-                            <include>org.forgerock.openam:openam-jaxrpc-schema</include>
-                            <include>org.forgerock.openam:openam-ldap-utils</include>
-                            <include>org.forgerock.openam:openam-liberty-schema</include>
-                            <include>org.forgerock.openam:openam-mib-schema</include>
-                            <include>org.forgerock.openam:openam-saml2-schema</include>
-                            <include>org.forgerock.openam:openam-xacml3-schema</include>
-                            <include>org.forgerock.openam:openam-federation-library</include>
-                            <include>org.forgerock.openam:OpenFM</include>
-                            <include>org.forgerock.openam:openam-client-sts</include>
-                            <include>org.forgerock.openam:openam-notifications</include>
+                            <include>org.openidentityplatform.commons:forgerock-util</include>
+                            <include>org.openidentityplatform.openam:openam-core</include>
+                            <include>org.openidentityplatform.openam:openam-entitlements</include>
+                            <include>org.openidentityplatform.openam:openam-audit-context</include>
+                            <include>org.openidentityplatform.openam:openam-shared</include>
+                            <include>org.openidentityplatform.openam:openam-dtd-schema</include>
+                            <include>org.openidentityplatform.openam:openam-jaxrpc-schema</include>
+                            <include>org.openidentityplatform.openam:openam-ldap-utils</include>
+                            <include>org.openidentityplatform.openam:openam-liberty-schema</include>
+                            <include>org.openidentityplatform.openam:openam-mib-schema</include>
+                            <include>org.openidentityplatform.openam:openam-saml2-schema</include>
+                            <include>org.openidentityplatform.openam:openam-xacml3-schema</include>
+                            <include>org.openidentityplatform.openam:openam-federation-library</include>
+                            <include>org.openidentityplatform.openam:OpenFM</include>
+                            <include>org.openidentityplatform.openam:openam-client-sts</include>
+                            <include>org.openidentityplatform.openam:openam-notifications</include>
                             <include>org.json:json</include>
-                            <include>org.forgerock.opendj:opendj-core</include>
-                            <include>org.forgerock.opendj:opendj-grizzly</include>
-                            <include>org.forgerock.commons:i18n-core</include>
-                            <include>org.forgerock.commons:i18n-slf4j</include>
+                            <include>org.openidentityplatform.opendj:opendj-core</include>
+                            <include>org.openidentityplatform.opendj:opendj-grizzly</include>
+                            <include>org.openidentityplatform.commons:i18n-core</include>
+                            <include>org.openidentityplatform.commons:i18n-slf4j</include>
                             <include>com.google.guava:guava:jar:</include>
-                            <include>org.forgerock.http:chf-http-core</include>
+                            <include>org.openidentityplatform.http:chf-http-core</include>
                             <include>com.fasterxml.jackson.core:jackson-databind</include>
                             <include>com.fasterxml.jackson.core:jackson-core</include>
                             <include>com.fasterxml.jackson.core:jackson-annotations</include>
@@ -147,7 +147,7 @@
                     </artifactSet>
                     <filters>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-core</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-core</artifact>
                             <includes>
                                 <include>amAuth.properties</include>
                                 <include>amAuthContext.properties</include>
@@ -412,7 +412,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-shared</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-shared</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -421,7 +421,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-audit-context</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-audit-context</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -430,7 +430,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-jaxrpc-schema</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-jaxrpc-schema</artifact>
                             <includes>
                                 <include>com/iplanet/sso/**</include>
                                 <include>com/sun/identity/liberty/ws/security/**</include>
@@ -442,7 +442,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:OpenFM</artifact>
+                            <artifact>org.openidentityplatform.openam:OpenFM</artifact>
                             <includes>
                                 <include>famSTS.properties</include>
                                 <include>fmConfigurationService.properties</include>
@@ -479,7 +479,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-federation-library</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-federation-library</artifact>
                             <includes>
                                 <include>libAuthnSvc.properties</include>
                                 <include>libBinarySecurityToken.properties</include>
@@ -568,7 +568,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-liberty-schema</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-liberty-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -577,25 +577,25 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-saml2-schema</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-saml2-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-xacml3-schema</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-xacml3-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-dtd-schema</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-dtd-schema</artifact>
                             <includes>
                                 <include>com/sun/identity/log/messageid/amLogMessage.dtd</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-entitlements</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-entitlements</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -604,7 +604,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-client-sts</artifact>
+                            <artifact>org.openidentityplatform.openam:openam-client-sts</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -616,19 +616,19 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.opendj:opendj-core</artifact>
+                            <artifact>org.openidentityplatform.opendj:opendj-core</artifact>
                             <includes>
                                 <include>**/*</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.opendj:opendj-grizzly</artifact>
+                            <artifact>org.openidentityplatform.opendj:opendj-grizzly</artifact>
                             <includes>
                                 <include>**/*</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.commons:i18n-core</artifact>
+                            <artifact>org.openidentityplatform.commons:i18n-core</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -708,43 +708,43 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-client-sts</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.opendj</groupId>
+            <groupId>org.openidentityplatform.opendj</groupId>
             <artifactId>opendj-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.opendj</groupId>
+            <groupId>org.openidentityplatform.opendj</groupId>
             <artifactId>opendj-grizzly</artifactId>
         </dependency>
 <!--         <dependency> -->
-<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <groupId>org.openidentityplatform.commons.guava</groupId> -->
 <!--             <artifactId>forgerock-guava-collect</artifactId> -->
 <!--         </dependency> -->
 <!--         <dependency> -->
-<!--             <groupId>org.forgerock.commons.guava</groupId> -->
+<!--             <groupId>org.openidentityplatform.commons.guava</groupId> -->
 <!--             <artifactId>forgerock-guava-base</artifactId> -->
 <!--         </dependency> -->
 		<dependency>
@@ -756,7 +756,7 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>org.openidentityplatform.http</groupId>
             <artifactId>chf-http-core</artifactId>
         </dependency>
         <dependency>

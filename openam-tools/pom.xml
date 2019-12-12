@@ -19,7 +19,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
@@ -59,7 +59,7 @@
 					<force>true</force>
 					<artifactItems>
 						<artifactItem>
-							<groupId>org.forgerock</groupId>
+							<groupId>org.openidentityplatform</groupId>
 			                <artifactId>cddl-license</artifactId>
 			                <version>1.0.0</version>
 			                <packaging>txt</packaging>

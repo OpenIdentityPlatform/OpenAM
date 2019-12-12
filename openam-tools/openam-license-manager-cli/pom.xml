@@ -19,7 +19,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-tools</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
@@ -76,7 +76,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-license-core</artifactId>
         </dependency>
 
