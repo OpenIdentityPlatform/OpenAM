@@ -33,6 +33,7 @@ package com.sun.identity.entitlement.opensso;
 import static com.iplanet.am.util.SystemProperties.isServerMode;
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
@@ -117,7 +118,10 @@ public class OpenSSOPrivilege extends Privilege {
 
                     });
         } catch (Exception ex) {
-            PolicyConstants.DEBUG.error("OpenSSOPrivilege.evaluate", ex);
+        	if (ex instanceof com.sun.identity.entitlement.EntitlementException && ((com.sun.identity.entitlement.EntitlementException)ex).getCause() instanceof SSOException)
+        		PolicyConstants.DEBUG.message("OpenSSOPrivilege.evaluate", ex);
+        	else
+        		PolicyConstants.DEBUG.error("OpenSSOPrivilege.evaluate", ex);
         }
 
         return Collections.emptyList();
