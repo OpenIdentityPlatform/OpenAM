@@ -19,7 +19,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.forgerock.openam.examples</groupId>
+    <groupId>org.openidentityplatform.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
     <version>14.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -44,12 +44,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-core</artifactId>
             <version>${openam.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
             <version>${openam.version}</version>
         </dependency>

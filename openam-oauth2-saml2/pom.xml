@@ -19,7 +19,7 @@
 
     <parent>
         <artifactId>openam</artifactId>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
 
@@ -42,12 +42,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-oauth2</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
 

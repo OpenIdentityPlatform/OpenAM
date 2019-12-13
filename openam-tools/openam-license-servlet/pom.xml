@@ -19,7 +19,7 @@
 
     <parent>
         <artifactId>openam-tools</artifactId>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
 
@@ -34,7 +34,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-license-core</artifactId>
         </dependency>
         <dependency>

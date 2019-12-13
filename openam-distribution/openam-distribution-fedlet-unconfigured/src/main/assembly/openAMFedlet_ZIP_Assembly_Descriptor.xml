@@ -35,7 +35,7 @@
     <dependencySets>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam:openam-fedlet-unconfigured-war:war</include>
+                <include>org.openidentityplatform.openam:openam-fedlet-unconfigured-war:war</include>
             </includes>
             <outputFileNameMapping>fedlet.war</outputFileNameMapping>
             <useProjectArtifact>false</useProjectArtifact>

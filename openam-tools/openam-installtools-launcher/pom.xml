@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-tools</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>

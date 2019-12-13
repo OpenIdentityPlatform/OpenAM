@@ -17,7 +17,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
@@ -35,7 +35,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.commons.ui</groupId>
+            <groupId>org.openidentityplatform.commons.ui</groupId>
             <artifactId>forgerock-ui-user</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
@@ -45,86 +45,86 @@
             <artifactId>rhino</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>selectize-non-standalone</artifactId>
             <version>0.12.1</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>text</artifactId>
             <version>2.0.15</version>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>sifter</artifactId>
             <version>0.4.1</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>microplugin</artifactId>
             <version>0.0.3</version>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>qrcode</artifactId>
             <version>1.0.0</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>jquery-sortable</artifactId>
             <version>0.9.13</version>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>jsoneditor</artifactId>
             <version>0.7.9</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>bootstrap-tabdrop</artifactId>
             <version>1.0</version>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>CodeMirror</artifactId>
             <version>${codemirror.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>bootstrap-clockpicker</artifactId>
             <version>0.0.7</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>bootstrap-clockpicker</artifactId>
             <version>0.0.7</version>
             <classifier>min</classifier>
             <type>css</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>bootstrap-datetimepicker</artifactId>
             <version>4.14.30</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>bootstrap-datetimepicker</artifactId>
             <version>4.14.30</version>
             <classifier>min</classifier>
@@ -132,48 +132,48 @@
         </dependency>
         <dependency>
             <!-- handlebars need for fix the processing dependencies in the release build -->
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>handlebars</artifactId>
             <version>${handlebars.version}</version>
             <type>js</type>
             <classifier>min</classifier>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>redux</artifactId>
             <version>3.5.2</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>react-bootstrap</artifactId>
             <version>0.30.1</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>classnames</artifactId>
             <version>2.2.5</version>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>react-input-autosize</artifactId>
             <version>1.1.0</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>react-select</artifactId>
             <version>1.0.0-rc.2</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>react-select</artifactId>
             <version>1.0.0-rc.2</version>
             <classifier>min</classifier>
@@ -181,35 +181,35 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>sinon</artifactId>
             <version>1.15.4</version>
             <type>js</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>qunit</artifactId>
             <version>1.15.0</version>
             <type>js</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>qunit</artifactId>
             <type>css</type>
             <version>1.15.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>squire</artifactId>
             <version>0.2.0</version>
             <type>js</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>base64</artifactId>
             <version>1.0.0</version>
             <classifier>min</classifier>
@@ -273,7 +273,7 @@
                             <outputDirectory>target/dependencies-expanded/forgerock-ui-user</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.forgerock.commons.ui</groupId>
+                                    <groupId>org.openidentityplatform.commons.ui</groupId>
                                     <artifactId>forgerock-ui-user</artifactId>
                                     <version>${forgerock.ui.version}</version>
                                     <type>zip</type>
@@ -292,7 +292,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.forgerock.commons.ui.libs</groupId>
+                                    <groupId>org.openidentityplatform.commons.ui.libs</groupId>
                                     <artifactId>CodeMirror</artifactId>
                                     <type>zip</type>
                                 </artifactItem>

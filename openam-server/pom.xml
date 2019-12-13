@@ -19,7 +19,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.4.3-SNAPSHOT</version>
     </parent>
@@ -141,12 +141,12 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-server-only</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-console</artifactId>
             <type>war</type>
         </dependency>
@@ -157,7 +157,7 @@
             <id>push-perf-test</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.forgerock.openam</groupId>
+                    <groupId>org.openidentityplatform.openam</groupId>
                     <artifactId>openam-mock-sns</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                 </dependency>

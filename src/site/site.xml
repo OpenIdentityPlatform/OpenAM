@@ -29,7 +29,7 @@
  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
 
  <skin>
-  <groupId>org.forgerock.commons</groupId>
+  <groupId>org.openidentityplatform.commons</groupId>
   <artifactId>forgerock-community-skin</artifactId>
   <version>1.1.0-SNAPSHOT</version>
  </skin>
