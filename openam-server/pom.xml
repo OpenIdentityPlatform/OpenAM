@@ -38,28 +38,32 @@
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <extensions>true</extensions>
-				  <executions>
-				    <execution>
-				      <id>start</id>
-				      <phase>pre-integration-test</phase>
-				      <goals>
-				        <goal>start</goal>
-				      </goals>
-				      <configuration>
-				        <timeout>60000</timeout>
-				      </configuration>
-				    </execution>
-				    <execution>
-				      <id>stop</id>
-				      <phase>post-integration-test</phase>
-				      <goals>
-				        <goal>stop</goal>
-				      </goals>
-				      <configuration>
-				        <timeout>20000</timeout>
-				      </configuration>
-				    </execution>
-				</executions>
+                <executions>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <container>
+                                <timeout>180000</timeout>
+                            </container>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <container>
+                                <timeout>60000</timeout>
+                            </container>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <descriptor>src/assemble/merge.xml</descriptor>
                     <archive>
