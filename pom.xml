@@ -471,77 +471,56 @@
     </mailingList>
   </mailingLists>
   <!-- Maven Repositories -->
-  <repositories>
-  	<repository>
-		<id>redhat-ga</id>
-		<url>https://maven.repository.redhat.com/ga/</url>
-	</repository>
-	<repository>
-		<id>jenkins</id>
-		<url>https://repo.jenkins-ci.org/releases/</url>
-	</repository>
-    <!-- ForgeRock Common Internal Project Repositories -->
-    <!--         <repository> -->
-    <!--             <id>forgerock-staging-repository</id> -->
-    <!--             <name>ForgeRock Release Repository</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/releases</url> -->
-    <!--             <snapshots> -->
-    <!--                 <enabled>false</enabled> -->
-    <!--             </snapshots> -->
-    <!--         </repository> -->
-    <!--         <repository> -->
-    <!--             <id>forgerock-snapshots-repository</id> -->
-    <!--             <name>ForgeRock Snapshot Repository</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/snapshots</url> -->
-    <!--             <releases> -->
-    <!--                 <enabled>false</enabled> -->
-    <!--             </releases> -->
-    <!--             <snapshots> -->
-    <!--                 <enabled>true</enabled> -->
-    <!--             </snapshots> -->
-    <!--         </repository> -->
-    <!-- ForgeRock Internal Project Repository -->
-    <!--         <repository> -->
-    <!--             <id>maven.forgerock.org</id> -->
-    <!--             <name>maven.forgerock.org-openam-dependencies</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/openam-dependencies</url> -->
-    <!--             <releases> -->
-    <!--                 <enabled>true</enabled> -->
-    <!--             </releases> -->
-    <!--             <snapshots> -->
-    <!--                 <enabled>true</enabled> -->
-    <!--             </snapshots> -->
-    <!--         </repository> -->
-    <!--         <repository> -->
-    <!--             <id>restlet-cache</id> -->
-    <!--             <name>Restlet Cache Repository</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/maven.restlet.org</url> -->
-    <!--             <releases> -->
-    <!--                 <enabled>true</enabled> -->
-    <!--             </releases> -->
-    <!--             <snapshots> -->
-    <!--                 <enabled>false</enabled> -->
-    <!--             </snapshots> -->
-    <!--         </repository> -->
-  </repositories>
-  <!-- For Deployment to ForgeRock Maven Repository -->
-  <distributionManagement>
-    <!--         <repository> -->
-    <!--             <id>maven.forgerock.org</id> -->
-    <!--             <name>maven.forgerock.org-releases</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/releases</url> -->
-    <!--         </repository> -->
-    <!--         <snapshotRepository> -->
-    <!--             <id>maven.forgerock.org</id> -->
-    <!--             <name>maven.forgerock.org-snapshots</name> -->
-    <!--             <url>http://maven.forgerock.org/repo/snapshots</url> -->
-    <!--         </snapshotRepository> -->
-    <!--         <site> -->
-    <!--             <id>forgerock.org</id> -->
-    <!--             <name>OpenAM Project</name> -->
-    <!--             <url>${siteDistributionURL}</url> -->
-    <!--         </site> -->
-  </distributionManagement>
+	<repositories>
+		<repository>
+			<id>redhat-ga</id>
+			<url>https://maven.repository.redhat.com/ga/</url>
+		</repository>
+		<repository>
+			<id>jenkins</id>
+			<url>https://repo.jenkins-ci.org/releases/</url>
+		</repository>
+		<repository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/service/local/repositories/orgopenidentityplatform-1000/content/</url>
+		</repository>
+		<repository>
+			<id>ossrh-snapshots</id>
+			<name>Sonatype OSS Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/service/local/repositories/orgopenidentityplatform-1000/content/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>ossrh-snapshots</id>
+			<name>Sonatype OSS Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<id>ossrh</id>
+			<name>Sonatype OSS Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<name>Sonatype OSS Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
   <!-- Source Control -->
   <scm>
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
@@ -1970,7 +1949,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.savage7.maven.plugins</groupId>
+        <groupId>org.openidentityplatform.commons</groupId>
         <artifactId>maven-external-dependency-plugin</artifactId>
         <version>0.6-SNAPSHOT</version>
         <inherited>false</inherited>
@@ -2007,13 +1986,13 @@
               <goal>install-external</goal>
             </goals>
           </execution>
-          <execution>
-            <id>deploy-external-dependencies</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>deploy-external</goal>
-            </goals>
-          </execution>
+<!--           <execution> -->
+<!--             <id>deploy-external-dependencies</id> -->
+<!--             <phase>deploy</phase> -->
+<!--             <goals> -->
+<!--               <goal>deploy-external</goal> -->
+<!--             </goals> -->
+<!--           </execution> -->
         </executions>
       </plugin>
       <plugin>
