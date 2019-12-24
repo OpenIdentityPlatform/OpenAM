@@ -52,6 +52,7 @@ import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.descriptor.Describable;
 import org.forgerock.util.Reject;
 
 /**
@@ -953,6 +954,11 @@ public class Routers {
             }
 
             versionRouter.addRoute(version, resource);
+            
+            boolean resourceDescribable = resource instanceof Describable;
+            if(resourceDescribable) {
+            	((Describable)resource).removeDescriptorListener(versionRouter);
+            }
 
             route.addRoute(mode, versionRouter);
 
