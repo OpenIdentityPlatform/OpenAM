@@ -31,6 +31,7 @@ import SimplePageHeader from "components/SimplePageHeader";
 import withRouter from "org/forgerock/commons/ui/common/components/hoc/withRouter";
 import withRouterPropType from "org/forgerock/commons/ui/common/components/hoc/withRouterPropType";
 
+/*
 const fetchUsersByPartialId = _.debounce((userId, callback) => {
     if (_.isEmpty(userId)) {
         callback(null, { options: [] });
@@ -42,6 +43,7 @@ const fetchUsersByPartialId = _.debounce((userId, callback) => {
         }, (error) => callback(error.statusText));
     }
 }, 300);
+*/
 
 class SessionsView extends Component {
     constructor (props) {
@@ -50,6 +52,7 @@ class SessionsView extends Component {
         this.handleSelectAsyncOnChange = this.handleSelectAsyncOnChange.bind(this);
         this.handleInvalidateSessions = this.handleInvalidateSessions.bind(this);
         this.fetchSessionsByUserIdAndRealm = this.fetchSessionsByUserIdAndRealm.bind(this);
+        this.fetchUsersByPartialId = _.debounce(this.fetchUsersByPartialId.bind(this), 300);
         this.state = {
             sessions: []
         };
@@ -76,6 +79,19 @@ class SessionsView extends Component {
 
         if (userId) {
             this.fetchSessionsByUserIdAndRealm(userId, this.props.router.params[0]);
+        }
+    }
+
+    fetchUsersByPartialId (userId, callback) {
+        var realm = this.props.router.params[0];
+        if (_.isEmpty(userId)) {
+            callback(null, { options: [] });
+        } else {
+            getByIdStartsWith(userId, realm).then((response) => {
+                callback(null, {
+                    options: _.map(response, (user) => ({ label: user, value: user }))
+                });
+            }, (error) => callback(error.statusText));
         }
     }
 
@@ -108,7 +124,7 @@ class SessionsView extends Component {
                             id: "findAUser"
                         } }
                         isLoading
-                        loadOptions={ fetchUsersByPartialId }
+                        loadOptions={ this.fetchUsersByPartialId }
                         noResultsText={ t("console.sessions.search.noResults") }
                         onChange={ this.handleSelectAsyncOnChange }
                         placeholder={ t("console.sessions.search.placeholder") }

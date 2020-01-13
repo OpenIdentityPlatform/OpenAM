@@ -24,9 +24,9 @@ import fetchUrl from "org/forgerock/openam/ui/common/services/fetchUrl";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 
-export function getByIdStartsWith (id) {
+export function getByIdStartsWith (id, realm) {
     return obj.serviceCall({
-        url: fetchUrl(`/users?_queryId=${id}*`, { realm: false }),
+        url: fetchUrl(`/users?_queryId=${id}*`, { realm: !!realm ? realm : false }),
         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
     }).then((response) => response.result);
 }
