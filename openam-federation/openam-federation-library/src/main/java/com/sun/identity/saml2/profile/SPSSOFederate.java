@@ -272,16 +272,10 @@ public class SPSSOFederate {
             }
 
             // create AuthnRequest 
-            AuthnRequest authnRequest = createAuthnRequest(realm, spEntityID, paramsMap, spConfigAttrsMap,
+            AuthnRequest authnRequest = createAuthnRequest(request, response, realm, spEntityID, idpEntityID, paramsMap, spConfigAttrsMap,
                     extensionsList, spsso, idpsso, ssoURL, false);
             if (null != auditor && null != authnRequest) {
                 auditor.setRequestId(authnRequest.getID());
-            }
-
-            // invoke SP Adapter class if registered
-            SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(spEntityID, realmName);
-            if (spAdapter != null) {
-                spAdapter.preSingleSignOnRequest(spEntityID, idpEntityID, realmName, request, response, authnRequest);
             }
 
             String authReqXMLString = authnRequest.toXMLString(true, true);
@@ -528,17 +522,9 @@ public class SPSSOFederate {
             List extensionsList = getExtensionsList(spEntityID, realm);
 
             // create AuthnRequest 
-            AuthnRequest authnRequest = createAuthnRequest(realm, spEntityID,
+            AuthnRequest authnRequest = createAuthnRequest(request, response, realm, spEntityID, null,
                 paramsMap, spConfigAttrsMap, extensionsList, spsso, null, null,
                 true);
-
-            // invoke SP Adapter class if registered
-            SAML2ServiceProviderAdapter spAdapter =
-                SAML2Utils.getSPAdapterClass(spEntityID, realm);
-            if (spAdapter != null) {
-                spAdapter.preSingleSignOnRequest(spEntityID, realm, null,
-                    request, response, authnRequest);
-            }
 
             String alias = SAML2Utils.getSigningCertAlias(realm, spEntityID,
                 SAML2Constants.SP_ROLE);
@@ -795,8 +781,11 @@ public class SPSSOFederate {
     /**
      * Create an AuthnRequest.
      *
+     * @param request the Http request object.
+     * @param response the http response object.
      * @param realmName the authentication realm for this request
      * @param spEntityID the entity id for the service provider
+     * @param idpEntityID the entity id for the identity provider
      * @param paramsMap the map of parameters for the authentication request
      * @param spConfigMap the configuration map for the service provider
      * @param extensionsList a list of extendsions for the authentication request
@@ -807,8 +796,11 @@ public class SPSSOFederate {
      * @return a new AuthnRequest object
      * @throws SAML2Exception
      */
-    public static AuthnRequest createAuthnRequest(final String realmName,
+    public static AuthnRequest createAuthnRequest(final HttpServletRequest request, 
+                                                  final HttpServletResponse response, 
+                                                  final String realmName,
                                                   final String spEntityID,
+                                                  final String idpEntityID,
                                                   final Map paramsMap,
                                                   final Map spConfigMap,
                                                   final List extensionsList,
@@ -927,7 +919,13 @@ public class SPSSOFederate {
              }
              authnReq.setScoping(scoping);
          }
- 
+
+        // invoke SP Adapter class if registered
+        SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(spEntityID, realmName);
+        if (spAdapter != null) {
+            spAdapter.preSingleSignOnRequest(spEntityID, idpEntityID, realmName, request, response, authnReq);
+        }
+
         return authnReq;        
     }
 
