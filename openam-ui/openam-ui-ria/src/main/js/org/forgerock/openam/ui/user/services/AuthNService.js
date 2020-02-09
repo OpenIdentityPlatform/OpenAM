@@ -241,7 +241,8 @@ define([
             _.get(auth, "urlParams.authIndexValue") !== _.get(knownAuth, "urlParams.authIndexValue");
     }
     obj.getRequirements = function (args) {
-        if (AuthenticationToken.get()) {
+        if (AuthenticationToken.get() &&
+            !(requirementList.length !== 0 && _.some(_.last(requirementList).callbacks, "type", "RedirectCallback"))) {
             return obj.submitRequirements(_.extend({ authId: AuthenticationToken.get() },
                 Configuration.globalData.auth.urlParams)).done(() => {
                     knownAuth = _.clone(Configuration.globalData.auth);
