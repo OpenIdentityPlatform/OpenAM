@@ -31,8 +31,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-core</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

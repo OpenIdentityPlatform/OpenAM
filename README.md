@@ -71,7 +71,7 @@ For example, `-Xmx2048m`
 * OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
 * OpenAM Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
 * OpenAM Community on Gitter: https://gitter.im/OpenIdentityPlatform/OpenAM
-* OpenAM Commercial support RFP: support@openam.org.ru (English, Russian)
+* OpenAM Commercial support RFP: support@3a-systems.ru (English, Russian)
 
 ## Contributing
 Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)

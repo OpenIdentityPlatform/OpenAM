@@ -33,20 +33,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.8.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>
 			<artifactId>openam-core</artifactId>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>testng</artifactId>
-					<groupId>org.testng</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.javassist</groupId>

@@ -36,7 +36,7 @@
     <dependencies>
         <dependency>
             <groupId>org.openidentityplatform.commons.ui</groupId>
-            <artifactId>forgerock-ui-user</artifactId>
+            <artifactId>user</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>
@@ -274,8 +274,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.openidentityplatform.commons.ui</groupId>
-                                    <artifactId>forgerock-ui-user</artifactId>
-                                    <version>${forgerock.ui.version}</version>
+                                    <artifactId>user</artifactId>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>

@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-util</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>

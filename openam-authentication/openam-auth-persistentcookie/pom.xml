@@ -32,8 +32,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
+            <groupId>org.openidentityplatform.commons.authn-filter.jaspi-modules</groupId>
+    		<artifactId>jwt-session-module</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

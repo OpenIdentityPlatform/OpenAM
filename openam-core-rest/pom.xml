@@ -47,8 +47,8 @@
             <artifactId>openam-dashboard</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-selfservice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.selfservice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-test-utils</artifactId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

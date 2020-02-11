@@ -47,9 +47,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
+                                    <groupId>${license.groupId}</groupId>
+                                    <artifactId>${license.artifactId}</artifactId>
+                                    <version>${license.version}</version>
                                     <type>txt</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.outputDirectory}</outputDirectory>
@@ -70,10 +70,10 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.slf4j</groupId> -->
+<!--             <artifactId>slf4j-nop</artifactId> -->
+<!--         </dependency> -->
 
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

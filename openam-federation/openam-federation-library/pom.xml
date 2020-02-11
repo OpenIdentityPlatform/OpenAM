@@ -114,8 +114,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>

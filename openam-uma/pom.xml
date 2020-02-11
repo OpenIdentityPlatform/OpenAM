@@ -49,8 +49,8 @@
             <artifactId>openam-oauth2</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-http-core</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
@@ -76,8 +76,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-test</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-test-utils</artifactId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

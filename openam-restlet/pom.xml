@@ -90,12 +90,12 @@
             <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>authz-framework</artifactId>
+            <groupId>org.openidentityplatform.commons.auth-filters.authz-filter</groupId>
+   			<artifactId>framework</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-jaspi-runtime</artifactId>
+            <groupId>org.openidentityplatform.commons.authn-filter</groupId>
+            <artifactId>jaspi-runtime</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->

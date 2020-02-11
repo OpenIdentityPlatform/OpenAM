@@ -47,9 +47,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
+                                    <groupId>${license.groupId}</groupId>
+                                    <artifactId>${license.artifactId}</artifactId>
+                                    <version>${license.version}</version>
                                     <type>txt</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.outputDirectory}</outputDirectory>
@@ -89,8 +89,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

@@ -37,8 +37,8 @@
             openam-audit-context,forgerock-guice-core,forgerock-guava-base,forgerock-guava-collect,guava,
             guice,guice-assistedinject,commons-lang,commons-collections,org.apache.servicemix.bundles.javax-inject,
             slf4j-api,slf4j-nop,opendj-core,opendj-grizzly,i18n-core,openam-ldap-utils,grizzly-framework,
-            forgerock-audit-core,openam-audit-configuration,i18n-slf4j,
-            opendj-server-legacy,opendj-config,opendj-cli,chf-http-core,joda-time,
+            org.openidentityplatform.commons.audit:core,openam-audit-configuration,i18n-slf4j,
+            opendj-server-legacy,opendj-config,opendj-cli,core,joda-time,
             jackson-core,jackson-databind,jackson-annotations
         </setupArtifactIDs>
     </properties>
@@ -63,9 +63,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
+                                    <groupId>${license.groupId}</groupId>
+                                    <artifactId>${license.artifactId}</artifactId>
+                                    <version>${license.version}</version>
                                     <type>txt</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/legal-notices</outputDirectory>
@@ -85,7 +85,7 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <excludeArtifactIds>${forgerock.license.artifactId},openam-rest,openam-installtools,openam-slf4j</excludeArtifactIds>
+                            <excludeArtifactIds>${license.artifactId},openam-rest,openam-installtools,openam-slf4j</excludeArtifactIds>
                         </configuration>
                     </execution>
                     <execution>
@@ -257,8 +257,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-http-core</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>

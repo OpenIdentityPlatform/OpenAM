@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-test-utils</artifactId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

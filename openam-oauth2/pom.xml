@@ -52,8 +52,8 @@
             <artifactId>openam-i18n</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-http-core</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>
@@ -63,8 +63,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
+           	<groupId>org.openidentityplatform.commons.authn-filter.jaspi-modules</groupId>
+    		<artifactId>openid-connect-module</artifactId>
         </dependency>
 
 
@@ -101,8 +101,8 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
              <groupId>org.owasp.esapi</groupId>
@@ -164,7 +164,7 @@
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-test-utils</artifactId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

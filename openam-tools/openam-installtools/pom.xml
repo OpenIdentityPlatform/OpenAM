@@ -59,10 +59,9 @@
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <shadeSourcesContent>true</shadeSourcesContent>
-                            <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
+                            <createSourcesJar>false</createSourcesJar>
                             <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-
-                            <transformers>
+							<transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                             <relocations>

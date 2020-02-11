@@ -75,8 +75,9 @@
                     </archive>
                     <container>
 	                    <containerId>tomcat8x</containerId>
+<!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
 	                    <systemProperties>
-	                        <file.encoding>UTF-8</file.encoding>
+	                    	<file.encoding>UTF-8</file.encoding>
 							<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
 							<com.iplanet.services.configpath>${basedir}/target/config</com.iplanet.services.configpath>
 							<com.sun.identity.configuration.directory>${basedir}/target/config</com.sun.identity.configuration.directory>
@@ -95,13 +96,14 @@
 	                        <properties>
 	                            <context>openam</context>
 	                        </properties>
-	                        <pingURL>http://localhost:8080/openam</pingURL>
+	                        <pingURL>http://localhost:8205/openam</pingURL>
 	                    </deployable>
 	                </deployables>
 	                <configuration>
 				    	<properties>
 				        	<cargo.rmi.port>8206</cargo.rmi.port>
-<!-- 				        	<cargo.jvmargs>-verbose:class</cargo.jvmargs> -->
+				        	<cargo.servlet.port>8205</cargo.servlet.port>
+<!--			        	<cargo.jvmargs>-verbose:class</cargo.jvmargs> -->
 				        </properties>
 				    </configuration>
                 </configuration>

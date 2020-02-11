@@ -10,3 +10,4 @@ openam-ui/openam-ui-ria/npm-debug.log.*
 .project
 test-output
 .DS_Store
+bin/

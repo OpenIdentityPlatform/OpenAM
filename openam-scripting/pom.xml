@@ -31,13 +31,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-util</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
 
         <dependency>
@@ -85,8 +85,8 @@
             <artifactId>guice-assistedinject</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-client-apache-sync</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>client-apache-sync</artifactId>
         </dependency>
 
         <dependency>
@@ -117,8 +117,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-test</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -62,8 +62,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-http-core</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>
@@ -87,8 +87,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>
@@ -98,7 +98,7 @@
 
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-util</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
 
         <!-- IPv6 -->
@@ -119,7 +119,7 @@
 
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-test-utils</artifactId>
+            <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
 

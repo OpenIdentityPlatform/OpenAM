@@ -32,12 +32,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
+            <groupId>org.openidentityplatform.commons.authn-filter.jaspi-modules</groupId>
+   			<artifactId>openid-connect-module</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-jaspi-runtime</artifactId>
+            <groupId>org.openidentityplatform.commons.authn-filter</groupId>
+            <artifactId>jaspi-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
