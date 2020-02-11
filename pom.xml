@@ -1170,12 +1170,6 @@
         <artifactId>jdom</artifactId>
         <version>${jdom.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.sleepycat</groupId>
-        <artifactId>je</artifactId>
-        <version>7.5.11</version>
-        <scope>runtime</scope>
-      </dependency>
 		<dependency>
 		    <groupId>org.glassfish.jersey.bundles</groupId>
 		    <artifactId>jaxrs-ri</artifactId>

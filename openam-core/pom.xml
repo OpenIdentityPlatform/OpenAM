@@ -301,11 +301,6 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.sleepycat</groupId>
-            <artifactId>je</artifactId>
-        </dependency>
-
 		<dependency>
 		    <groupId>org.glassfish.jersey.bundles</groupId>
 		    <artifactId>jaxrs-ri</artifactId>
