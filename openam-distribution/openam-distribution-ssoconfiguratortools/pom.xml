@@ -48,9 +48,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
+                                    <groupId>${license.groupId}</groupId>
+                                    <artifactId>${license.artifactId}</artifactId>
+                                    <version>${license.version}</version>
                                     <type>txt</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/legal-notices</outputDirectory>

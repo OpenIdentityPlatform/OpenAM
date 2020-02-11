@@ -30,37 +30,30 @@
 		<dependency>
 			<groupId>org.cassandraunit</groupId>
 			<artifactId>cassandra-unit</artifactId>
-			<version>3.11.2.0</version>
 			<exclusions>
 				<exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpcore</artifactId>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-core-asl</artifactId>
 				</exclusion>
 				<exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpclient</artifactId>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
 				</exclusion>
-			    <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-                <exclusion>
-		            <groupId>org.apache.cassandra</groupId>
-		            <artifactId>cassandra-all</artifactId>
-		        </exclusion>
-		        <exclusion>
-		            <groupId>org.hectorclient</groupId>
-		            <artifactId>hector-core</artifactId>
-		        </exclusion>
-		        <exclusion>
-		        	<groupId>io.netty</groupId>
-		        	<artifactId>netty-handler</artifactId>
-		        </exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-core-asl</artifactId>
+		    <version>1.9.13</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-mapper-asl</artifactId>
+		    <version>1.9.13</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.datastax.cassandra</groupId>
+		  <artifactId>cassandra-driver-core</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>org.hectorclient</groupId>
@@ -68,48 +61,9 @@
 		    <version>2.0-0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.cassandra</groupId>
-		    <artifactId>cassandra-all</artifactId>
-		    <version>${cassandra.version}</version>
-		    <exclusions>
-		    	<exclusion>
-			        <groupId>io.netty</groupId>
-			        <artifactId>netty-all</artifactId>
-		        </exclusion>
-				<exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpcore</artifactId>
-				</exclusion>
-				<exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpclient</artifactId>
-				</exclusion>
-				<exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-core</artifactId>
-                </exclusion>
-                <exclusion>
-                	<groupId>org.slf4j</groupId>
-                	<artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
-		    </exclusions>
-		</dependency>
-		<dependency>
-		  <groupId>com.datastax.cassandra</groupId>
-		  <artifactId>cassandra-driver-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
 		</dependency>
-		  <dependency>
-  			 <groupId>com.github.ben-manes.caffeine</groupId>
-			 <artifactId>caffeine</artifactId>
-	    </dependency>
 	</dependencies>
 </project>

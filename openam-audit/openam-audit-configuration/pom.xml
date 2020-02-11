@@ -40,28 +40,28 @@
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-csv</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-csv</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-syslog</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-syslog</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-jdbc</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-elasticsearch</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-elasticsearch</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-splunk</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-splunk</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-handler-jms</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>handler-jms</artifactId>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

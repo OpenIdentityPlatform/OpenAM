@@ -26,30 +26,10 @@
   <artifactId>openam-cassandra-datastore</artifactId>
   <name>OpenAM Cassandra DataStore</name>
   <dependencies>
-		
-		<dependency>
-		    <groupId>org.hectorclient</groupId>
-		    <artifactId>hector-core</artifactId>
-		    <version>2.0-0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.cassandra</groupId>
-		    <artifactId>cassandra-all</artifactId>
-		    <version>${cassandra.version}</version>
-		    <exclusions>
-		    	<exclusion>
-			       	<groupId>io.netty</groupId>
-			       	<artifactId>netty-all</artifactId>
-		        </exclusion>
-		        <exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpcore</artifactId>
-				</exclusion>
-				<exclusion>
-				    <groupId>org.apache.httpcomponents</groupId>
-    				<artifactId>httpclient</artifactId>
-				</exclusion>
-		    </exclusions>
+  		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
 		</dependency>
 		<dependency>
 		  <groupId>com.datastax.cassandra</groupId>
@@ -59,6 +39,28 @@
 			<groupId>org.openidentityplatform.openam</groupId>	
 			<artifactId>openam-cassandra-embedded</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-core-asl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-core-asl</artifactId>
+		    <version>1.9.13</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-mapper-asl</artifactId>
+		    <version>1.9.13</version>
+		    <scope>test</scope>
 		</dependency>
   </dependencies>
 </project>

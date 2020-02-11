@@ -17,32 +17,6 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!-- Build Notes:
-
-         To Build all of OpenAM use the following Maven Command:
-         cd to openam top directory.
-         mvn clean install
-
-         To Build only a specify Module: (This will pull existing modules whichever is newest local or remote).
-         mvn clean install -pl <module Name>
-
-         To Build only specific Module and Dependencies
-         mvn clean install -pl <module Name> -am
-
-         Skipping Tests add:
-         -DskipTests=true
-
-         Running only a test or list of tests:
-         -DfailIfNoTests=false -Dtest=org.forgerock.restlet.ext.openam.OpenAMParametersTest
-
-    -->
-  <!-- Parent Project -->
-  <parent>
-    <groupId>org.openidentityplatform</groupId>
-    <artifactId>forgerock-parent</artifactId>
-    <version>2.0.6</version>
-    <relativePath>forgerock-parent</relativePath>
-  </parent>
   <!-- Component Definition -->
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
@@ -53,7 +27,7 @@
   <inceptionYear>2010</inceptionYear>
   <organization>
     <name>Open Identity Platform Community</name>
-    <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
+    <url>https://github.com/OpenIdentityPlatform</url>
   </organization>
   <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
   <issueManagement>
@@ -90,25 +64,20 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-    <opendj.server.version>4.4.4-SNAPSHOT</opendj.server.version>
-    <opendj.sdk.version>${opendj.server.version}</opendj.sdk.version>
-    <opendj.server.legacy>${opendj.server.version}</opendj.server.legacy>
+	<maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <forgerock.bloomfilter.version>1.0.2-SNAPSHOT</forgerock.bloomfilter.version>
-    <forgerock.ui.version>16.0.1-SNAPSHOT</forgerock.ui.version>
-    <forgerock.guice.version>2.0.0</forgerock.guice.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
     <restlet.version>2.3.4</restlet.version>
     <powermock.version>2.0.0-RC.4</powermock.version>
-    <slf4j.version>1.7.25</slf4j.version>
+<!--     <slf4j.version>1.7.25</slf4j.version> -->
     <santuario.xmlsec.version>2.1.4</santuario.xmlsec.version>
     <click.version>2.3.0</click.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
-    <commons-codec.version>1.13</commons-codec.version>
-     <commons-collections.version>3.2.2</commons-collections.version>
+    <commons-collections.version>3.2.2</commons-collections.version>
     <commons-digester.version>2.1</commons-digester.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-io.version>2.3</commons-io.version>
@@ -119,7 +88,7 @@
     <esapiport.version>2.2.0.0</esapiport.version>
     <geoip.version>2.0.0</geoip.version>
     <groovy.version>2.5.8</groovy.version>
-    <groovy-sandbox.version>1.25</groovy-sandbox.version>
+    <groovy-sandbox.version>1.19</groovy-sandbox.version>
     <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
@@ -127,12 +96,8 @@
     <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
     <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
     <jdom.version>2.0.1</jdom.version>
-    <je.version>7.5.11</je.version>
-    <jato.version>2005-05-04</jato.version>
-    <cc-ui.version>2008-08-08</cc-ui.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
     <jstl.version>1.2.5</jstl.version>
-    <mail.version>1.5.1</mail.version>
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
@@ -143,7 +108,6 @@
     <xsdlib.version>20060615</xsdlib.version>
     <authapi.version>2005-08-12</authapi.version>
     <FastInfoset.version>2006-26-09</FastInfoset.version>
-    <jdmk.version>2007-01-10</jdmk.version>
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.19</freemarker.version>
@@ -153,7 +117,6 @@
     <h2database.version>1.4.188</h2database.version>
     <activemq.version>[5.15.9,)</activemq.version>
     <javax.inject.version>1_2</javax.inject.version>
-    <fastinfoset.version>1.2.13</fastinfoset.version>
     <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
     <javax.websocket-api.version>1.1</javax.websocket-api.version>
@@ -164,75 +127,14 @@
     <webAgentsDocCommunityVersion>4.0.0-SNAPSHOT</webAgentsDocCommunityVersion>
     <javaEEAgentsDocCommunityVersion>3.5.0-SNAPSHOT</javaEEAgentsDocCommunityVersion>
     <!-- Default license (CDDL) to package into the artifacts -->
-    <forgerock.license.groupId>org.openidentityplatform</forgerock.license.groupId>
-    <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
-    <forgerock.license.version>1.0.0</forgerock.license.version>
+    <license.groupId>org.openidentityplatform</license.groupId>
+    <license.artifactId>cddl-license</license.artifactId>
+    <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.2.3</logback.version>
-
   </properties>
   <!-- Profiles -->
   <profiles>
-    <!-- Place Default Profiles here to override and determine Environment. -->
-    <profile>
-      <id>release</id>
-      <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <properties>
-        <generate.clientsdk.sources>true</generate.clientsdk.sources>
-      </properties>
-      <repositories>
-        <repository>
-          <id>forgerock-internal</id>
-          <name>Forgerock Internal Repository</name>
-          <url>http://maven.forgerock.org/repo/internal</url>
-        </repository>
-        
-      </repositories>
-      <dependencyManagement>
-        <dependencies>
-          <!-- Don't include the authapi*.jar in the war for a release build -->
-          <dependency>
-            <groupId>external</groupId>
-            <artifactId>authapi</artifactId>
-            <version>${authapi.version}</version>
-            <scope>provided</scope>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
-    </profile>
-    <!--         When building an Enterprise binary download, include the correct binary license terms. -->
-    <!--         <profile> -->
-    <!--             Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
-    <!--             <id>binary-licensing</id> -->
-    <!--             <repositories> -->
-    <!--                 <repository> -->
-    <!--                     <id>forgerock-internal</id> -->
-    <!--                     <name>Forgerock Internal Repository</name> -->
-    <!--                     <url>http://maven.forgerock.org/repo/internal</url> -->
-    <!--                 </repository> -->
-    <!--             </repositories> -->
-    <!--             <properties> -->
-    <!--                 <forgerock.license.groupId>com.forgerock</forgerock.license.groupId> -->
-    <!--                 <forgerock.license.artifactId>binary-license</forgerock.license.artifactId> -->
-    <!--                 <forgerock.license.version>1.0.0</forgerock.license.version> -->
-    <!--             </properties> -->
-    <!--         </profile> -->
-    <!--         <profile> -->
-    <!--             <id>development</id> -->
-    <!--             <repositories> -->
-    <!--                 <repository> -->
-    <!--                     <id>forgerock-internal</id> -->
-    <!--                     <name>Forgerock Internal Repository</name> -->
-    <!--                     <url>http://maven.forgerock.org/repo/internal</url> -->
-    <!--                 </repository> -->
-    <!--             </repositories> -->
-    <!--         </profile> -->
-    <!-- The clover profile should be activated to generate coverage reports using Atlassian Clover -->
     <profile>
       <id>clover</id>
       <properties>
@@ -471,20 +373,12 @@
     </mailingList>
   </mailingLists>
   <!-- Maven Repositories -->
-	<repositories>
-		<repository>
-			<id>redhat-ga</id>
-			<url>https://maven.repository.redhat.com/ga/</url>
-		</repository>
-		<repository>
-			<id>jenkins</id>
-			<url>https://repo.jenkins-ci.org/releases/</url>
-		</repository>
-		<repository>
-			<id>ossrh-releases</id>
-			<name>Sonatype OSS</name>
-			<url>https://oss.sonatype.org/service/local/repositories/orgopenidentityplatform-1000/content/</url>
-		</repository>
+  	<repositories>
+<!-- 		<repository> -->
+<!-- 			<id>ossrh-releases</id> -->
+<!-- 			<name>Sonatype OSS</name> -->
+<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
+<!-- 		</repository> -->
 		<repository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -495,11 +389,11 @@
 		</repository>
 	</repositories>
 	<pluginRepositories>
-		<pluginRepository>
-			<id>ossrh-releases</id>
-			<name>Sonatype OSS</name>
-			<url>https://oss.sonatype.org/service/local/repositories/orgopenidentityplatform-1000/content/</url>
-		</pluginRepository>
+<!-- 		<pluginRepository> -->
+<!-- 			<id>ossrh-releases</id> -->
+<!-- 			<name>Sonatype OSS</name> -->
+<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
+<!-- 		</pluginRepository> -->
 		<pluginRepository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -509,6 +403,7 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+
 	<distributionManagement>
 		<repository>
 			<id>ossrh</id>
@@ -531,12 +426,17 @@
   <!-- Dependency Management -->
   <dependencyManagement>
     <dependencies>
+	   <dependency>
+    		<groupId>org.openidentityplatform.opendj</groupId>
+		    <artifactId>opendj-parent</artifactId>
+			<version>4.4.4-SNAPSHOT</version>
+    		<type>pom</type>
+    		<scope>import</scope>
+      </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>commons-bom</artifactId>
-        <version>21.0.0-SNAPSHOT</version>
-        <scope>import</scope>
-        <type>pom</type>
+          <groupId>com.sun.mail</groupId>
+          <artifactId>javax.mail</artifactId>
+          <version>1.5.1</version>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
@@ -1006,13 +906,6 @@
       </dependency>
       <!-- New RIA Client UI -->
       <dependency>
-        <groupId>org.openidentityplatform.commons.ui</groupId>
-        <artifactId>forgerock-ui-user</artifactId>
-        <version>${forgerock.ui.version}</version>
-        <type>zip</type>
-        <classifier>www</classifier>
-      </dependency>
-      <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui-ria</artifactId>
         <version>${project.version}</version>
@@ -1150,7 +1043,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>${commons-codec.version}</version>
+        <version>1.14</version>
       </dependency>
       <dependency>
         <groupId>commons-collections</groupId>
@@ -1229,28 +1122,6 @@
         	</exclusion>
         </exclusions>
       </dependency>
-      <!--
-            <dependency>
-                <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
-                <version>2.0.1</version>
-            </dependency>
-            -->
-      <dependency>
-        <groupId>com.maxmind.geoip2</groupId>
-        <artifactId>geoip2</artifactId>
-        <version>${geoip.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk-sns</artifactId>
@@ -1277,31 +1148,6 @@
         <artifactId>wsit-impl</artifactId>
         <version>2.4.0</version>
       </dependency>
-      <!--             <dependency> -->
-      <!--                 <groupId>javax.xml.bind</groupId> -->
-      <!--                 <artifactId>jaxb-api</artifactId> -->
-      <!--                 <version>${jaxb.version}</version> -->
-      <!--             </dependency> -->
-      <!--             <dependency> -->
-      <!--                 <groupId>com.sun.xml.bind</groupId> -->
-      <!--                 <artifactId>jaxb1-impl</artifactId> -->
-      <!--                 <version>${jaxb1.version}</version> -->
-      <!--             </dependency> -->
-      <!--             <dependency> -->
-      <!--                 <groupId>com.sun.xml.bind</groupId> -->
-      <!--                 <artifactId>jaxb-impl</artifactId> -->
-      <!--                 <version>${jaxb.version}</version> -->
-      <!--             </dependency> -->
-      <!--             <dependency> -->
-      <!--                 <groupId>com.sun.xml.bind</groupId> -->
-      <!--                 <artifactId>jaxb-libs</artifactId> -->
-      <!--                 <version>1.0.6</version> -->
-      <!--             </dependency> -->
-      <!--             <dependency> -->
-      <!--                 <groupId>com.sun.xml.bind</groupId> -->
-      <!--                 <artifactId>jaxb-xjc</artifactId> -->
-      <!--                 <version>${jaxb.version}</version> -->
-      <!--             </dependency> -->
       <dependency>
         <groupId>javax.xml</groupId>
         <artifactId>jaxrpc-api</artifactId>
@@ -1324,91 +1170,85 @@
         <artifactId>jdom</artifactId>
         <version>${jdom.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.sleepycat</groupId>
-        <artifactId>je</artifactId>
-        <version>${je.version}</version>
-        <scope>runtime</scope>
-      </dependency>
 		<dependency>
 		    <groupId>org.glassfish.jersey.bundles</groupId>
 		    <artifactId>jaxrs-ri</artifactId>
 		    <version>2.28</version>
 		</dependency>
       <dependency>
-        <groupId>com.iplanet.jato</groupId>
+        <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
-        <version>${jato.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.web.ui</groupId>
+        <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
         <artifactId>cc</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_de</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_es</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_fr</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_it</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_ja</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_ko</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_sv</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_zh</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_zh_CN</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_zh_HK</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
         <artifactId>cc_zh_TW</artifactId>
-        <version>${cc-ui.version}</version>
+        <version>2008-08-08</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1422,15 +1262,9 @@
         <version>${jstl.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-nop</artifactId>
-        <version>${slf4j.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
         <groupId>com.sun.mail</groupId>
         <artifactId>javax.mail</artifactId>
-        <version>${mail.version}</version>
+        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -1463,11 +1297,6 @@
         <version>${saaj-impl.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.xml.fastinfoset</groupId>
-        <artifactId>FastInfoset</artifactId>
-        <version>${fastinfoset.version}</version>
-      </dependency>
-      <dependency>
         <groupId>javax.servlet.jsp</groupId>
         <artifactId>jsp-api</artifactId>
         <version>${jsp-api.version}</version>
@@ -1479,45 +1308,45 @@
         <version>${xsdlib.version}</version>
       </dependency>
       <!-- OpenDJ API -->
-      <dependency>
-        <groupId>org.openidentityplatform.opendj</groupId>
-        <artifactId>opendj-core</artifactId>
-        <version>${opendj.sdk.version}</version>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
+<!--         <artifactId>opendj-core</artifactId> -->
+<!--         <version>${opendj.sdk.version}</version> -->
+<!--       </dependency> -->
       <!-- OpenDJ Grizzly -->
-      <dependency>
-        <groupId>org.openidentityplatform.opendj</groupId>
-        <artifactId>opendj-grizzly</artifactId>
-        <version>${opendj.sdk.version}</version>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
+<!--         <artifactId>opendj-grizzly</artifactId> -->
+<!--         <version>${opendj.sdk.version}</version> -->
+<!--       </dependency> -->
       <!-- OpenDJ Server -->
-      <dependency>
-        <groupId>org.openidentityplatform.opendj</groupId>
-        <artifactId>opendj-server</artifactId>
-        <version>${opendj.server.version}</version>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
+<!--         <artifactId>opendj-server</artifactId> -->
+<!--         <version>${opendj.server.version}</version> -->
+<!--       </dependency> -->
       <!-- OpenDJ Server -->
-      <dependency>
-        <groupId>org.openidentityplatform.opendj</groupId>
-        <artifactId>opendj-server-legacy</artifactId>
-        <version>${opendj.server.legacy}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.opendj</groupId>
-        <artifactId>opendj-server-legacy</artifactId>
-        <version>${opendj.server.legacy}</version>
-        <type>zip</type>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
+<!--         <artifactId>opendj-server-legacy</artifactId> -->
+<!--         <version>${opendj.server.legacy}</version> -->
+<!--         <exclusions> -->
+<!--           <exclusion> -->
+<!--             <groupId>org.slf4j</groupId> -->
+<!--             <artifactId>slf4j-jdk14</artifactId> -->
+<!--           </exclusion> -->
+<!--           <exclusion> -->
+<!--             <groupId>javax.servlet</groupId> -->
+<!--             <artifactId>javax.servlet-api</artifactId> -->
+<!--           </exclusion> -->
+<!--         </exclusions> -->
+<!--       </dependency> -->
+<!--       <dependency> -->
+<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
+<!--         <artifactId>opendj-server-legacy</artifactId> -->
+<!--         <version>${opendj.server.legacy}</version> -->
+<!--         <type>zip</type> -->
+<!--       </dependency> -->
       <!-- Legacy External Libraries for OpenAM -->
       <!-- We need to eventually ween off of these -->
       <!-- Dependencies for the Build Helper Maven Plugin -->
@@ -1545,20 +1374,14 @@
         <version>${authapi.version}</version>
       </dependency>
       <dependency>
-        <groupId>external</groupId>
-        <artifactId>FastInfoset</artifactId>
-        <version>${FastInfoset.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>external</groupId>
+        <groupId>org.openidentityplatform.external</groupId>
         <artifactId>jdmkrt</artifactId>
-        <version>${jdmk.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>external</groupId>
         <artifactId>jdmktk</artifactId>
-        <version>${jdmk.version}</version>
-        <scope>compile</scope>
+        <version>2007-01-10</version>
       </dependency>
       <dependency>
         <groupId>external</groupId>
@@ -1634,16 +1457,6 @@
       </dependency>
       <!-- Commons Dependencies -->
       <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>forgerock-bloomfilter-core</artifactId>
-        <version>${forgerock.bloomfilter.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>forgerock-bloomfilter-monitoring</artifactId>
-        <version>${forgerock.bloomfilter.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
         <version>3.0.0</version>
@@ -1710,22 +1523,6 @@
             <artifactId>guice</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>forgerock-guice-core</artifactId>
-        <version>${forgerock.guice.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>forgerock-guice-servlet</artifactId>
-        <version>${forgerock.guice.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>forgerock-guice-test</artifactId>
-        <version>${forgerock.guice.version}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <!-- Use OSGi-compatible javax.inject to satisfy commons dependencies -->
@@ -1898,7 +1695,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>RELEASE</version>
+        <version>2.10.5</version>
       </dependency>
       
       <!-- Cassandra dependencies -->
@@ -1948,53 +1745,77 @@
   <!-- Build -->
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.openidentityplatform.commons</groupId>
-        <artifactId>maven-external-dependency-plugin</artifactId>
-        <version>0.6-SNAPSHOT</version>
-        <inherited>false</inherited>
-        <configuration>
-          <stagingDirectory>
-						${project.build.directory}/dependencies/
-                    </stagingDirectory>
-          <createChecksum>false</createChecksum>
-          <skipChecksumVerification>true</skipChecksumVerification>
-          <force>true</force>
-          <artifactItems>
-            <artifactItem>
-              <groupId>org.openidentityplatform</groupId>
-              <artifactId>cddl-license</artifactId>
-              <version>1.0.0</version>
-              <packaging>txt</packaging>
-              <downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
-            </artifactItem>
-          </artifactItems>
-        </configuration>
-        <executions>
-          <execution>
-            <id>clean-external-dependencies</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>clean-external</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>resolve-install-external-dependencies</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>resolve-external</goal>
-              <goal>install-external</goal>
-            </goals>
-          </execution>
-<!--           <execution> -->
-<!--             <id>deploy-external-dependencies</id> -->
-<!--             <phase>deploy</phase> -->
-<!--             <goals> -->
-<!--               <goal>deploy-external</goal> -->
-<!--             </goals> -->
-<!--           </execution> -->
-        </executions>
-      </plugin>
+	<plugin>
+		<groupId>org.openidentityplatform.commons</groupId>
+		<artifactId>maven-external-dependency-plugin</artifactId>
+		<inherited>false</inherited>
+		<configuration>
+			<stagingDirectory>
+				${project.build.directory}/dependencies/
+			</stagingDirectory>
+			<createChecksum>false</createChecksum>
+			<skipChecksumVerification>true</skipChecksumVerification>
+			<force>true</force>
+			<artifactItems>
+				<artifactItem>
+					<groupId>org.openidentityplatform</groupId>
+					<artifactId>cddl-license</artifactId>
+					<version>1.0.0</version>
+					<packaging>txt</packaging>
+					<downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
+					<deploy>false</deploy>
+				</artifactItem>
+				<artifactItem>
+					<groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
+					<artifactId>jato</artifactId>
+					<version>${project.version}</version>
+					<packaging>jar</packaging>
+					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
+					<deploy>true</deploy>
+				</artifactItem>
+				<artifactItem>
+                	<groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
+                	<artifactId>cc</artifactId>
+                	<version>${project.version}</version>
+                	<packaging>jar</packaging>
+                	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
+                	<deploy>true</deploy>
+              	</artifactItem>
+              	<artifactItem>
+                	<groupId>org.openidentityplatform.external</groupId>
+                	<artifactId>jdmkrt</artifactId>
+                	<version>${project.version}</version>
+                	<packaging>jar</packaging>
+                	<downloadUrl>${basedir}/extlib/jdmkrt-2007-01-10.jar</downloadUrl>
+                	<deploy>true</deploy>
+              	</artifactItem>
+			</artifactItems>
+		</configuration>
+		<executions>
+			<execution>
+				<id>clean-external-dependencies</id>
+				<phase>clean</phase>
+				<goals>
+					<goal>clean-external</goal>
+				</goals>
+			</execution>
+			<execution>
+				<id>resolve-install-external-dependencies</id>
+				<phase>process-resources</phase>
+				<goals>
+					<goal>resolve-external</goal>
+					<goal>install-external</goal>
+				</goals>
+			</execution>
+			<execution>
+				<id>deploy-external-dependencies</id>
+				<phase>deploy</phase>
+				<goals>
+					<goal>deploy-external</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
@@ -2244,372 +2065,418 @@
         </executions>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.github.searls</groupId>
-          <artifactId>jasmine-maven-plugin</artifactId>
-          <version>2.0-alpha-01</version>
-        </plugin>
-        <plugin>
-          <groupId>org.openidentityplatform.maven.plugins</groupId>
-          <artifactId>build-helper-plugin</artifactId>
-          <version>${project.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>jaxb2-maven-plugin</artifactId>
-          <version>1.3.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.portals.jetspeed-2</groupId>
-          <artifactId>jetspeed-unpack-maven-plugin</artifactId>
-          <version>2.2.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
-        <plugin>
-          <groupId>net.ju-n.maven.plugins</groupId>
-          <artifactId>checksum-maven-plugin</artifactId>
-          <version>1.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.skins</groupId>
-          <artifactId>maven-default-skin</artifactId>
-          <version>1.0</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.skins</groupId>
-          <artifactId>maven-skins</artifactId>
-          <version>4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.bsc.maven</groupId>
-          <artifactId>maven-processor-plugin</artifactId>
-          <version>2.2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>xml-maven-plugin</artifactId>
-          <version>1.0</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>jslint-maven-plugin</artifactId>
-          <version>1.0.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>webminifier-maven-plugin</artifactId>
-          <version>1.0.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>jetty-maven-plugin</artifactId>
-          <version>8.1.12.v20130726</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>js-import-maven-plugin</artifactId>
-          <version>1.0.1</version>
-        </plugin>
-        <plugin>
-          <groupId>com.github.mcheely</groupId>
-          <artifactId>requirejs-maven-plugin</artifactId>
-          <version>2.0.0</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.7.10</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <inherited>false</inherited>
-          <executions>
-            <execution>
-              <id>install-jar-lib-jdmkrt</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>external</groupId>
-                <artifactId>jdmkrt</artifactId>
-                <version>2007-01-10</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/jdmkrt-2007-01-10.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-jdmktk</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>external</groupId>
-                <artifactId>jdmktk</artifactId>
-                <version>2007-01-10</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/jdmktk-2007-01-10.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-jato</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.iplanet.jato</groupId>
-                <artifactId>jato</artifactId>
-                <version>2005-05-04</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/jato-2005-05-04.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_de</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_de</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_de-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_es</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_es</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_es-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_fr</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_fr</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_fr-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_it</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_it</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_it-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_ja</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_ja</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_ja-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_ko</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_ko</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_ko-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_sv</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_sv</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_sv-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_zh_CC</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_zh_CC</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_zh_CC-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_zh_CN</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_zh_CN</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_zh_CN-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_zh_HK</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_zh_HK</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_zh_HK-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_zh_TW</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_zh_TW</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_zh_TW-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-lib-cc_zh</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>com.sun.web.ui</groupId>
-                <artifactId>cc_zh</artifactId>
-                <version>2008-08-08</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/cc_zh-2008-08-08.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-            <execution>
-              <id>install-jar-authapi</id>
-              <goals>
-                <goal>install-file</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <groupId>external</groupId>
-            	<artifactId>authapi</artifactId>
-                <version>2005-08-12</version>
-                <packaging>jar</packaging>
-                <file>${basedir}/extlib/authapi-2005-08-12.jar</file>
-                <generatePom>true</generatePom>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+	<pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+			</plugin>
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<fork>true</fork>
+					<compilerArgs>
+						<arg>-XDignore.symbol.file</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.3</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M4</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.1.0</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M4</version>
+				<configuration>
+					<argLine>-server</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.searls</groupId>
+				<artifactId>jasmine-maven-plugin</artifactId>
+				<version>2.0-alpha-01</version>
+			</plugin>
+			<plugin>
+				<groupId>org.openidentityplatform.maven.plugins</groupId>
+				<artifactId>build-helper-plugin</artifactId>
+				<version>${project.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.3.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.portals.jetspeed-2</groupId>
+				<artifactId>jetspeed-unpack-maven-plugin</artifactId>
+				<version>2.2.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.1.0</version>
+			</plugin>
+			<plugin>
+				<groupId>net.ju-n.maven.plugins</groupId>
+				<artifactId>checksum-maven-plugin</artifactId>
+				<version>1.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.skins</groupId>
+				<artifactId>maven-default-skin</artifactId>
+				<version>1.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.skins</groupId>
+				<artifactId>maven-skins</artifactId>
+				<version>4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jslint-maven-plugin</artifactId>
+				<version>1.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webminifier-maven-plugin</artifactId>
+				<version>1.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>8.1.12.v20130726</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>js-import-maven-plugin</artifactId>
+				<version>1.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>com.github.mcheely</groupId>
+				<artifactId>requirejs-maven-plugin</artifactId>
+				<version>2.0.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.7.10</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>3.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>install-jar-lib-jdmktk</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>external</groupId>
+							<artifactId>jdmktk</artifactId>
+							<version>2007-01-10</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/jdmktk-2007-01-10.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_de</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_de</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_de-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_es</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_es</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_es-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_fr</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_fr</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_fr-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_it</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_it</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_it-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_ja</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_ja</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_ja-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_ko</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_ko</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_ko-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_sv</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_sv</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_sv-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_zh_CC</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_zh_CC</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_zh_CC-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_zh_CN</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_zh_CN</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_zh_CN-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_zh_HK</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_zh_HK</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_zh_HK-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_zh_TW</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_zh_TW</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_zh_TW-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-lib-cc_zh</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>com.sun.web.ui</groupId>
+							<artifactId>cc_zh</artifactId>
+							<version>2008-08-08</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/cc_zh-2008-08-08.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-jar-authapi</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>external</groupId>
+							<artifactId>authapi</artifactId>
+							<version>2005-08-12</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/extlib/authapi-2005-08-12.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</pluginManagement>
   </build>
   <reporting>
     <plugins>

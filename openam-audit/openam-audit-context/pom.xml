@@ -33,11 +33,11 @@
     <dependencies>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-util</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-audit-core</artifactId>
+            <groupId>org.openidentityplatform.commons.audit</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -50,8 +50,8 @@
             <classifier>no_aop</classifier>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.commons</groupId>
-            <artifactId>forgerock-guice-core</artifactId>
+            <groupId>org.openidentityplatform.commons.guice</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.easytesting</groupId>

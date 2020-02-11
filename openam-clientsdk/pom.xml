@@ -133,13 +133,13 @@
                             <include>org.openidentityplatform.commons:i18n-core</include>
                             <include>org.openidentityplatform.commons:i18n-slf4j</include>
                             <include>com.google.guava:guava:jar:</include>
-                            <include>org.openidentityplatform.http:chf-http-core</include>
+                            <include>org.openidentityplatform.commons.http-framework:core</include>
                             <include>com.fasterxml.jackson.core:jackson-databind</include>
                             <include>com.fasterxml.jackson.core:jackson-core</include>
                             <include>com.fasterxml.jackson.core:jackson-annotations</include>
                             <include>joda-time:joda-time</include>
                             <include>org.slf4j:slf4j-api</include>
-                            <include>external:jdmkrt</include>
+                            <include>org.openidentityplatform.external:jdmkrt</include>
                             <include>javax.xml.bind:jaxb-api</include>
                             <include>com.sun.xml.bind:jaxb-core</include>
                             <include>com.sun.xml.bind:jaxb-impl</include>
@@ -739,14 +739,6 @@
             <groupId>org.openidentityplatform.opendj</groupId>
             <artifactId>opendj-grizzly</artifactId>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.openidentityplatform.commons.guava</groupId> -->
-<!--             <artifactId>forgerock-guava-collect</artifactId> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.openidentityplatform.commons.guava</groupId> -->
-<!--             <artifactId>forgerock-guava-base</artifactId> -->
-<!--         </dependency> -->
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
@@ -756,8 +748,8 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.http</groupId>
-            <artifactId>chf-http-core</artifactId>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
