@@ -243,7 +243,7 @@ public class SAML2 extends AMLoginModule {
         final List extensionsList = SPSSOFederate.getExtensionsList(spEntityID, realm);
         final Map<String, Collection<String>> spConfigAttrsMap
                 = SPSSOFederate.getAttrsMapForAuthnReq(realm, spEntityID);
-        authnRequest = SPSSOFederate.createAuthnRequest(realm, spEntityID, params,
+        authnRequest = SPSSOFederate.createAuthnRequest(request, response, realm, spEntityID, this.entityName, params,
                 spConfigAttrsMap, extensionsList, spsso, idpsso, ssoURL, false);
         final AuthnRequestInfo reqInfo = new AuthnRequestInfo(request, response, realm, spEntityID, null,
                 authnRequest, null, params);
