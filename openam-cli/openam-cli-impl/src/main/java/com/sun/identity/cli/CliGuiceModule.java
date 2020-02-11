@@ -27,6 +27,7 @@ import org.forgerock.openam.entitlement.service.EntitlementConfigurationFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 import org.forgerock.openam.entitlement.utils.NullNotificationBroker;
+import org.forgerock.openam.notifications.LocalOnly;
 import org.forgerock.openam.notifications.NotificationBroker;
 import org.forgerock.openam.session.SessionCache;
 
@@ -47,6 +48,7 @@ public class CliGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(NotificationBroker.class).to(NullNotificationBroker.class);
+        bind(NotificationBroker.class).annotatedWith(LocalOnly.class).to(NullNotificationBroker.class);
         bind(ResourceTypeConfiguration.class).to(ResourceTypeConfigurationImpl.class);
         bind(ResourceTypeService.class).to(ResourceTypeServiceImpl.class);
         bind(ConstraintValidator.class).to(ConstraintValidatorImpl.class);
