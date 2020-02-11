@@ -52,9 +52,9 @@
                 <include>org.openidentityplatform.openam:openam-xacml3-schema</include>
                 <include>org.openidentityplatform.openam:openam-wsfederation-schema</include>
                 <include>org.openidentityplatform.opendj:opendj-server</include>
-                <include>org.openidentityplatform.commons:forgerock-util</include>
+                <include>org.openidentityplatform.commons:util</include>
                 <include>org.openidentityplatform.openam:openam-license-manager-cli</include>
-                <include>org.openidentityplatform.commons:forgerock-guice-core</include>
+                <include>org.openidentityplatform.commons.guice:core</include>
                 <include>org.openidentityplatform.openam:openam-license-core</include>
                 <include>org.openidentityplatform.openam:openam-auth-scripted</include>
                 <include>org.openidentityplatform.openam:openam-scripting</include>
@@ -88,8 +88,8 @@
                 <include>org.kohsuke:groovy-sandbox</include>
                 <include>org.codehaus.groovy:groovy-jsr223:jar</include>
                 <include>org.openidentityplatform.opendj:opendj-core</include>
-                <include>org.openidentityplatform.commons:i18n-core</include>
-                <include>org.openidentityplatform.commons:forgerock-audit-core</include>
+                <include>org.openidentityplatform.commons.i18n-framework:core</include>
+                <include>org.openidentityplatform.commons.audit:core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
                 <include>org.openidentityplatform.openam:openam-auth-fr-oath</include>
             </includes>

@@ -38,7 +38,7 @@
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>com.google.inject:guice:jar:no_aop</include>
-                <include>org.openidentityplatform.commons:forgerock-guice-core</include>
+                <include>org.openidentityplatform.commons.guice:core</include>
                 <include>org.openidentityplatform.openam:openam-license-manager-cli</include>
                 <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
                 <include>org.slf4j:slf4j-api</include>
