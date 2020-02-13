@@ -106,7 +106,7 @@ IF "%5" == "-p" SET path_AMConfig=%~6
 IF "%5" == "--path" SET path_AMConfig=%~6
 
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;${windows.setup.classpath}"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%\lib\*"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%\resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main %accept_license%

@@ -31,16 +31,6 @@
     <artifactId>openam-distribution-ssoadmintools</artifactId>
     <packaging>pom</packaging>
     <properties>
-        <setupArtifactIDs>
-            opendj-server,forgerock-util,json,xmlsec,openam-core,
-            openam-entitlements,openam-shared,openam-dtd-schema,openam-license-manager-cli,openam-license-core,
-            openam-audit-context,forgerock-guice-core,forgerock-guava-base,forgerock-guava-collect,guava,
-            guice,guice-assistedinject,commons-lang,commons-collections,org.apache.servicemix.bundles.javax-inject,
-            slf4j-api,slf4j-nop,opendj-core,opendj-grizzly,i18n-core,openam-ldap-utils,grizzly-framework,
-            org.openidentityplatform.commons.audit:core,openam-audit-configuration,i18n-slf4j,
-            opendj-server-legacy,opendj-config,opendj-cli,core,joda-time,
-            jackson-core,jackson-databind,jackson-annotations
-        </setupArtifactIDs>
     </properties>
 
 
@@ -86,34 +76,7 @@
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <excludeArtifactIds>${license.artifactId},openam-rest,openam-installtools,openam-slf4j</excludeArtifactIds>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>Unix setup classpath</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>build-classpath</goal>
-                        </goals>
-                        <configuration>
-                            <fileSeparator>/</fileSeparator>
-                            <pathSeparator>:</pathSeparator>
-                            <prefix>$TOOLS_HOME/lib</prefix>
-                            <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
-                            <outputProperty>unix.setup.classpath</outputProperty>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>Windows setup classpath</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>build-classpath</goal>
-                        </goals>
-                        <configuration>
-                            <fileSeparator>\</fileSeparator>
-                            <pathSeparator>;</pathSeparator>
-                            <prefix>%TOOLS_HOME%\lib</prefix>
-                            <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
-                            <outputProperty>windows.setup.classpath</outputProperty>
+                            <prependGroupId>true</prependGroupId>
                         </configuration>
                     </execution>
                 </executions>

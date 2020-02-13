@@ -34,7 +34,7 @@
     <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
-            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>org.openidentityplatform.openam:openam-shared</include>
