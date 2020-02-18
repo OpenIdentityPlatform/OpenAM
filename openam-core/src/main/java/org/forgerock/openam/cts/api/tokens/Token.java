@@ -382,7 +382,7 @@ public class Token {
             } else if (field.equals(CoreTokenField.BLOB)) {
                 value = Long.toString(getBlob().length) + " bytes";
             } else {
-                value = String.valueOf(getAttribute(field));
+                value = (getAttribute(field)==null)?null:getAttribute(field).toString();
             }
 
             if (value == null) {
