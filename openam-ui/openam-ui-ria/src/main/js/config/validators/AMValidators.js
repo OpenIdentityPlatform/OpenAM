@@ -45,6 +45,21 @@ define([
                     callback();
                 }
             }
+        },
+        "atLeastXLowercaseLetters": {
+            "name": "Minimum occurrence of lowercase letter characters in string",
+            "dependencies": [],
+            "validator": (el, input, callback) => {
+                var v = input.val(),
+                    minLowers = input.attr("atLeastXLowercaseLetters"),
+                    foundLowers = v.match(/[(a-z)]/g);
+
+                if (!foundLowers || foundLowers.length < minLowers) {
+                    callback([$.t("common.form.validation.AT_LEAST_X_LOWERCASE_LETTERS", { numLowers: minLowers })]);
+                } else {
+                    callback();
+                }
+            }
         }
     };
     return obj;
