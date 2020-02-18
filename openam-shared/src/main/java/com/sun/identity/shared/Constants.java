@@ -201,6 +201,11 @@ public interface Constants {
     static final String AM_COOKIE_HTTPONLY = "com.sun.identity.cookie.httponly";
 
     /**
+     * Property string for cookie SameSite flag.
+     */
+    static final String AM_COOKIE_SAMESITE = "org.openidentityplatform.openam.cookie.samesite";
+
+    /**
      * Property string for cookie encoding.
      */
     static final String AM_COOKIE_ENCODE = "com.iplanet.am.cookie.encode";

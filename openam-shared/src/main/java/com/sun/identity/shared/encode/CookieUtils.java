@@ -65,12 +65,15 @@ public class CookieUtils {
             equalsIgnoreCase("true"));
 
     static boolean cookieHttpOnly = 
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY) != null) && 
+        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY) != null) &&
         (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY).
             equalsIgnoreCase("true"));
 
-    static boolean cookieEncoding = 
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_ENCODE) != null) && 
+    static String cookieSameSite = SystemPropertiesManager.get(
+            Constants.AM_COOKIE_SAMESITE);
+
+    static boolean cookieEncoding =
+        (SystemPropertiesManager.get(Constants.AM_COOKIE_ENCODE) != null) &&
         (SystemPropertiesManager.get(Constants.AM_COOKIE_ENCODE)
             .equalsIgnoreCase("true"));
 
@@ -168,6 +171,15 @@ public class CookieUtils {
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Returns property value of "org.openidentityplatform.openam.cookie.samesite"
+     *
+     * @return the property value of "org.openidentityplatform.openam.cookie.samesite"
+     */
+    public static String getCookieSameSite() {
+        return cookieSameSite;
     }
 
     /**
@@ -410,12 +422,12 @@ public class CookieUtils {
         if (response==null || cookie == null) {
             return;
         }
-        if (!isCookieHttpOnly()) {
+        if (!isCookieHttpOnly() && getCookieSameSite() == null) {
             response.addCookie(cookie);
             return;
         }
 
-        if (setHttpOnlyMethod != null) {
+        if (setHttpOnlyMethod != null && getCookieSameSite() == null) {
             try {
                 setHttpOnlyMethod.invoke(cookie, true);
                 response.addCookie(cookie);
@@ -451,7 +463,12 @@ public class CookieUtils {
         if (CookieUtils.isCookieSecure() || cookie.getSecure()) {
             sb.append(";secure");
         }
-        sb.append(";httponly");
+        if(isCookieHttpOnly()) {
+            sb.append(";httponly");
+        }
+        if(getCookieSameSite() != null) {
+            sb.append(";SameSite=").append(getCookieSameSite());
+        }
         if (debug.messageEnabled()) {
             debug.message("CookieUtils:addCookieToResponse adds " + sb);
         }

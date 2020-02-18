@@ -39,6 +39,9 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.Locale;
 
@@ -60,6 +63,9 @@ public class CookieUtils {
             != null) &&
         (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY).
             equalsIgnoreCase("true"));
+
+    static String cookieSameSite = SystemPropertiesManager.get(
+        Constants.AM_COOKIE_SAMESITE);
 
     static boolean cookieEncoding =
         (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_ENCODE)
@@ -94,6 +100,16 @@ public class CookieUtils {
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
     }
+
+    /**
+     * Returns property value of "org.openidentityplatform.openam.cookie.samesite"
+     *
+     * @return the property value of "org.openidentityplatform.openam.cookie.samesite"
+     */
+    public static String getCookieSameSite() {
+        return cookieSameSite;
+    }
+
 
     public static boolean isSAML2(HttpServletRequest req) {
         // check this is for idff or saml2
@@ -397,7 +413,7 @@ public class CookieUtils {
         if (cookie == null) {
             return;
         }
-        if (!isCookieHttpOnly()) {
+        if (!isCookieHttpOnly() && getCookieSameSite() == null) {
             response.addCookie(cookie);
             return;
         }
@@ -423,7 +439,12 @@ public class CookieUtils {
         if (CookieUtils.isCookieSecure()) {
             sb.append(";secure");
         }
-        sb.append(";httponly");
+        if(isCookieHttpOnly()) {
+            sb.append(";httponly");
+        }
+        if(getCookieSameSite() != null) {
+            sb.append(";SameSite=").append(getCookieSameSite());
+        }
         if (debug.messageEnabled()) {
             debug.message("CookieUtils:addCookieToResponse adds " + sb);
         }

@@ -65,11 +65,13 @@ public interface IDPDiscoveryConstants {
                         "com.iplanet.am.cookie.secure";
     public static final String AM_COOKIE_ENCODE = 
                         "com.iplanet.am.cookie.encode";
-    public static final String AM_COOKIE_HTTPONLY = 
+    public static final String AM_COOKIE_HTTPONLY =
                         "com.sun.identity.cookie.httponly";
-    public static final String SAML2_WRITER_URI = "/saml2writer"; 
+    static final String AM_COOKIE_SAMESITE =
+                        "org.openidentityplatform.openam.cookie.samesite";
+    public static final String SAML2_WRITER_URI = "/saml2writer";
     public static final String IDFF_WRITER_URI = "/idffwriter";
-    public static final String SAML2_READER_URI = "/saml2reader"; 
+    public static final String SAML2_READER_URI = "/saml2reader";
     public static final String IDFF_READER_URI = "/idffreader";
     public static final String SAML2_COOKIE_NAME = "_saml_idp";
     public static final String IDFF_COOKIE_NAME = "_liberty_idp";   
