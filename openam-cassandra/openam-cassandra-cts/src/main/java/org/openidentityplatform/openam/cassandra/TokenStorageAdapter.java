@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -51,11 +51,11 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Select.Where;
 import com.datastax.driver.core.querybuilder.Using;
+import com.datastax.driver.core.querybuilder.Select.Where;
+import com.datastax.driver.core.querybuilder.Update.Assignments;
 import com.google.common.primitives.Ints;
 
 public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter {
@@ -71,8 +71,44 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		this.connectionFactory = connectionFactory;
 	}
 
-    public Token update(Token previous, Token updated, Options options) throws DataLayerException {
-        return create(updated,options);
+	public Token update(Token token, boolean ifExists) throws DataLayerException {
+		try {
+			if (token.getAttribute(CoreTokenField.ETAG)==null)
+				token.setAttribute(CoreTokenField.ETAG, "");
+			Assignments update = QueryBuilder.update(cfg.getKeySpace(), cfg.getTableName()).with();
+			final Using TTL = QueryBuilder.ttl(new Long(Math.min(((token.getExpiryTimestamp().getTimeInMillis() - System.currentTimeMillis()) / 1000)+5*60,24*60*60)).intValue());
+			for (CoreTokenField field : CoreTokenField.values()) {
+				if (!CoreTokenField.TOKEN_ID.equals(field)) {
+					Object value = null;
+					try {
+						value = token.getAttribute(field);
+					}catch (Throwable e) {
+						logger.warn("create {} for {} {}",e.toString(),field,token);
+						throw e;
+					}
+					if (value!=null) {
+						if (value instanceof TokenType)
+							value = value.toString();
+						else if (CoreTokenFieldTypes.isCalendar(field))
+							value = ((Calendar) value).getTime();
+						else if (value instanceof byte[])
+							value = ByteBuffer.wrap((byte[]) value);
+					}
+					update=update.and(QueryBuilder.set(field.toString(), value));
+				}
+			}
+			if (ifExists)
+				new ExecuteCallback(getSession(), update.using(TTL).where(QueryBuilder.eq(CoreTokenField.TOKEN_ID.toString(), token.getAttribute(CoreTokenField.TOKEN_ID))).ifExists()).execute();
+			else
+				new ExecuteCallback(getSession(), update.using(TTL).where(QueryBuilder.eq(CoreTokenField.TOKEN_ID.toString(), token.getAttribute(CoreTokenField.TOKEN_ID)))).execute();
+		} catch (Throwable e) {
+			throw new DataLayerException("update", e);
+		}
+		return token;
+	}
+	
+    public Token update(Token previous, Token token, Options options) throws DataLayerException {
+    	return update(token, true);
     }
 
     /**
@@ -85,34 +121,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
      * @throws org.forgerock.openam.sm.datalayer.api.DataLayerException If the operation failed for a known reason.
      */
 	public Token create(Token token, Options options) throws DataLayerException {
-		try {
-			if (token.getAttribute(CoreTokenField.ETAG)==null)
-				token.setAttribute(CoreTokenField.ETAG, "");
-			Insert insert = QueryBuilder.insertInto(cfg.getKeySpace(), cfg.getTableName());
-			final Using TTL = QueryBuilder.ttl(new Long(Math.min(((token.getExpiryTimestamp().getTimeInMillis() - System.currentTimeMillis()) / 1000)+5*60,24*60*60)).intValue());
-			for (CoreTokenField field : CoreTokenField.values()) {
-				Object value = null;
-				try {
-					value = token.getAttribute(field);
-				}catch (Throwable e) {
-					logger.warn("create {} for {} {}",e.toString(),field,token);
-					throw e;
-				}
-				if (value!=null) {
-					if (value instanceof TokenType)
-						value = value.toString();
-					else if (CoreTokenFieldTypes.isCalendar(field))
-						value = ((Calendar) value).getTime();
-					else if (value instanceof byte[])
-						value = ByteBuffer.wrap((byte[]) value);
-				}
-				insert = insert.value(field.toString(), value);
-			}
-			new ExecuteCallback(getSession(), insert.using(TTL)).execute();
-		} catch (Throwable e) {
-			throw new DataLayerException("create", e);
-		}
-		return token;
+		return update(token, false);
 	}
 
 	/**
@@ -146,7 +155,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		try {
 			Token token = read(tokenId,options);
 			if (token != null) {
-				new ExecuteCallback(getSession(), QueryBuilder.delete().all().from(cfg.getKeySpace(), cfg.getTableName()).where(QueryBuilder.eq(CoreTokenField.TOKEN_ID.toString(), tokenId))).executeAsync();
+				new ExecuteCallback(getSession(), QueryBuilder.delete().all().from(cfg.getKeySpace(), cfg.getTableName()).where(QueryBuilder.eq(CoreTokenField.TOKEN_ID.toString(), tokenId))).execute();
 				
 				final Map<CoreTokenField, Object> entry=new HashMap<CoreTokenField, Object>();
 				entry.put(CoreTokenField.TOKEN_ID, token.getAttribute(CoreTokenField.TOKEN_ID));
@@ -315,3 +324,4 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		return connectionFactory.create();
 	}
 }
+
