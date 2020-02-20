@@ -42,7 +42,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
+							<useRepositoryLayout>true</useRepositoryLayout>
+						</configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -52,11 +53,12 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
                             <mainClass>com.sun.identity.setup.Main</mainClass>
+                            
+                            <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <classpathLayoutType>custom</classpathLayoutType>
-                            <customClasspathLayout>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</customClasspathLayout>
+              				<classpathLayoutType>repository</classpathLayoutType>
+              				<useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
                 </configuration>

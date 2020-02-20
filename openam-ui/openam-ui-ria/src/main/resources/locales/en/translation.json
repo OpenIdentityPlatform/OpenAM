@@ -348,6 +348,7 @@
                 "VALID_NAME_FORMAT": "Contains invalid characters",
                 "VALID_EMAIL_ADDRESS_FORMAT": "Not a valid email address",
                 "AT_LEAST_X_CAPITAL_LETTERS" : "At least __numCaps__ capital letters",
+                "AT_LEAST_X_LOWERCASE_LETTERS" : "At least __numLowers__ lowercase letters",
                 "AT_LEAST_X_NUMBERS" : "At least __numNums__ numbers",
                 "CANNOT_CONTAIN_OTHERS" : "Cannot contain values from: __disallowedFields__",
                 "MIN_LENGTH" : "At least __minLength__ characters",
