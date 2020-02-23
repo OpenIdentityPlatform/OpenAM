@@ -38,7 +38,8 @@ RUN chgrp -R 0 /usr/openam/ && \
 RUN chgrp -R 0 /usr/local/tomcat && \
   chmod -R g=u /usr/local/tomcat
 
-RUN useradd -m -r -u 1001 -g root $OPENAM_USER
+RUN useradd -m -r -u 1001 -g root $OPENAM_USER \
+    && install -d -o $OPENAM_USER $OPENAM_DATA_DIR
 
 USER $OPENAM_USER
 
