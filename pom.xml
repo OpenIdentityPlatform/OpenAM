@@ -429,7 +429,7 @@
 	   <dependency>
     		<groupId>org.openidentityplatform.opendj</groupId>
 		    <artifactId>opendj-parent</artifactId>
-			<version>4.4.4-SNAPSHOT</version>
+			<version>4.4.5-SNAPSHOT</version>
     		<type>pom</type>
     		<scope>import</scope>
       </dependency>
@@ -1775,6 +1775,7 @@
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
                 	<deploy>true</deploy>
+                	<force>true</force>
               	</artifactItem>
               	<artifactItem>
                 	<groupId>org.openidentityplatform.external</groupId>
