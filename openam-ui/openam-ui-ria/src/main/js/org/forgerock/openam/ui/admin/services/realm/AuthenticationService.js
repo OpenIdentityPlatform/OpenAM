@@ -167,7 +167,8 @@ define([
                 var promise = $.Deferred(),
                     request = obj.serviceCall({
                         url: fetchUrl.default(
-                            `/realm-config/authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`, { realm }
+                            "/realm-config/authentication/modules?" +
+                            `_queryFilter=_id eq %22${name}%22&_fields=_id`, { realm }
                         ),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
