@@ -828,7 +828,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.api = routeTree.handleApiRequest(
                 new UriRouterContext(new RootContext(), "", "", Collections.<String, String>emptyMap()),
                 newApiRequest(ResourcePath.empty()));
-        if (!oldApi.equals(api)) {
+        if (oldApi!=null && !oldApi.equals(api)) {
             for (Listener listener : apiListeners) {
                 listener.notifyDescriptorChange();
             }
