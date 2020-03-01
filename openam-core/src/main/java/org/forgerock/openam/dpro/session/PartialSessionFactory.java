@@ -104,7 +104,7 @@ public class PartialSessionFactory {
     public PartialSession fromSSOToken(SSOToken ssoToken) {
         Builder builder = new Builder();
         try {
-            String universalId = ssoToken.getPrincipal().getName();
+            String universalId = ssoToken.getProperty("sun.am.UniversalIdentifier");
             builder.username(identityUtils.getIdentityName(universalId));
             builder.universalId(universalId);
             builder.realm(dnWrapper.orgNameToRealmName(ssoToken.getProperty("Organization")));
