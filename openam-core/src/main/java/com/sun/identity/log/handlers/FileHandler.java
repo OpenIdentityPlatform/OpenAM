@@ -48,6 +48,9 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.zip.GZIPOutputStream;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.log.NullLocationException;
@@ -106,7 +109,7 @@ public class FileHandler extends java.util.logging.Handler {
      */
     private boolean rotatingBySize = true;
 
-    private static final String DEFAULT_LOG_SUFFIX_FORMAT = "-MM.dd.yy-kk.mm";
+    private static final String DEFAULT_LOG_SUFFIX_FORMAT = "-MM.dd.yy-kk.mm.gz";
 
     private class MeteredStream extends OutputStream {
 
@@ -116,7 +119,7 @@ public class FileHandler extends java.util.logging.Handler {
         MeteredStream(File fileName, boolean append) throws IOException {
             this.filename = fileName.toString();
             FileOutputStream fout = new FileOutputStream(filename, append);
-            this.out = new BufferedOutputStream(fout);
+            this.out = StringUtils.endsWith(filename, ".gz")|StringUtils.endsWith(filename, ".gzip")?new GZIPOutputStream(fout,1*1024): new BufferedOutputStream(fout);
         }
 
         /**
