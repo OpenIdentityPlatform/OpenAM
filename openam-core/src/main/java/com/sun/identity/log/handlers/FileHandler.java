@@ -109,7 +109,7 @@ public class FileHandler extends java.util.logging.Handler {
      */
     private boolean rotatingBySize = true;
 
-    private static final String DEFAULT_LOG_SUFFIX_FORMAT = "-MM.dd.yy-kk.mm.gz";
+    private static final String DEFAULT_LOG_SUFFIX_FORMAT = "-yyyy.MM.dd-kk.mm.gz";
 
     private class MeteredStream extends OutputStream {
 

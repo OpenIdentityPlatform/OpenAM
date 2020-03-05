@@ -101,7 +101,7 @@
                     order="500"
                     resourceName="suffix">
                     <DefaultValues>
-                        <Value>-MM.dd.yy-kk.mm.gz</Value>
+                        <Value>-yyyy.MM.dd-kk.mm.gz</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-logging-file-rotation"
