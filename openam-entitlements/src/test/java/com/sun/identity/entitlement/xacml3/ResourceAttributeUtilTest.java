@@ -15,6 +15,7 @@
  */
 package com.sun.identity.entitlement.xacml3;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceAttribute;
@@ -54,7 +55,7 @@ public class ResourceAttributeUtilTest {
     public void shouldCatchFailureIfDeserialisationFails() throws IOException {
         // Given
         ObjectMapper mockMapper = mock(ObjectMapper.class);
-        given(mockMapper.readValue(anyString(), any(Class.class))).willThrow(new IOException());
+        given(mockMapper.readValue(anyString(), any(Class.class))).willThrow(new JsonProcessingException("") {});
         util = new ResourceAttributeUtil(mockMapper);
 
         // When / Then
