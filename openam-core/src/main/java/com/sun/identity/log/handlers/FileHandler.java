@@ -415,17 +415,18 @@ public class FileHandler extends java.util.logging.Handler {
         SimpleDateFormat suffixDateFormat = null;
         if (suffixFormat != null && suffixFormat.trim().length() > 0) {
             try {
-                suffixDateFormat = new SimpleDateFormat(suffixFormat);
+                suffixDateFormat = new SimpleDateFormat(StringUtils.removeEnd(suffixFormat,".gz"));
+                newFileName.append(suffixDateFormat.format(newDate()));
+                if (StringUtils.endsWith(suffixFormat, ".gz"))
+                	newFileName.append(".gz");
             } catch (IllegalArgumentException iae) {
                 Debug.error("Date format invalid; " + suffixFormat, iae);
             }
         }
         if (rotationInterval > 0 && suffixDateFormat == null) {
             //fallback to a default dateformat, so the logfilenames will differ
-            suffixDateFormat = new SimpleDateFormat(DEFAULT_LOG_SUFFIX_FORMAT);
-        }
-        if (suffixDateFormat != null) {
-            newFileName.append(suffixDateFormat.format(newDate()));
+            suffixDateFormat = new SimpleDateFormat(StringUtils.removeEnd(DEFAULT_LOG_SUFFIX_FORMAT,".gz"));
+            newFileName.append(suffixDateFormat.format(newDate())).append(".gz");
         }
         return newFileName.toString();
 
