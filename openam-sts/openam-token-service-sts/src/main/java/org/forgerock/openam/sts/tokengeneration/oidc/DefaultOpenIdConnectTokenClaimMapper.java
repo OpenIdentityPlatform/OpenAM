@@ -26,6 +26,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.utils.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -62,6 +63,7 @@ public class DefaultOpenIdConnectTokenClaimMapper implements OpenIdConnectTokenC
                 else 
                 	adjustedMap.put(claimMapEntry.getKey(), token.getProperty(claimMapEntry.getValue(),true));
             }
+            adjustedMap.put("status", ""+amIdentity.isActive()); //add status to token
             return adjustedMap;
         } catch (IdRepoException | SSOException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,

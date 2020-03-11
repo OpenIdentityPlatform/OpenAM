@@ -188,7 +188,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
                     openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
             //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
             for (String key : mappedClaims.keySet()) {
-                if (openIdConnectToken.isDefined(key)) {
+                if (openIdConnectToken.isDefined(key)||key.equals("status")) {
                     logger.warn("In generating an OpenIdConnect token, the claim map for claim " + key +
                             " will over-write an existing claim.");
                 }
