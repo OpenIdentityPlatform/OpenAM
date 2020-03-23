@@ -88,6 +88,8 @@
                         <nonFilteredFileExtension>7z</nonFilteredFileExtension>
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
+                    <classesClassifier>classes</classesClassifier>
+                    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
 
@@ -98,7 +100,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
