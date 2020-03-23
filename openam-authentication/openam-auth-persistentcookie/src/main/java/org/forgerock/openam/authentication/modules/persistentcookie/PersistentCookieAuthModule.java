@@ -18,7 +18,6 @@ package org.forgerock.openam.authentication.modules.persistentcookie;
 
 import static org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookieModuleWrapper.*;
 
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Collection;
@@ -28,8 +27,6 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.message.MessageInfo;
 
@@ -43,8 +40,6 @@ import org.forgerock.openam.utils.ClientUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.service.LoginState;
-import com.sun.identity.authentication.service.LoginStateCallback;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
@@ -154,20 +149,8 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
         encryptedHmacKey = AccessController.doPrivileged(new EncodeAction(hmacKey));
 
         try {
-        		//add post processing
-        		try {
-	        		Callback[] callbacks = new Callback[1];
-	        		callbacks[0] = new LoginStateCallback();
-	        		CallbackHandler handler=getCallbackHandler();
-			    if (handler!= null) {
-			        handler.handle(callbacks);
-			        LoginState ls=((LoginStateCallback) callbacks[0]).getLoginState();
-			        ls.getPostLoginClassSet().add("org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookieAuthModulePostAuthenticationPlugin");
-			    }
-        		}catch (UnsupportedCallbackException|IOException e) {
-        			DEBUG.error("Error get LoginState", e);
-			}
-        		return persistentCookieModuleWrapper.generateConfig(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP,getRequestOrg(), secureCookie, httpOnlyCookie, cookieName, cookieDomains, hmacKey);
+            return persistentCookieModuleWrapper.generateConfig(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP,
+                    getRequestOrg(), secureCookie, httpOnlyCookie, cookieName, cookieDomains, hmacKey);
         } catch (SMSException e) {
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
@@ -211,15 +194,15 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
 	            }
 	            
 	            final Subject clientSubject = new Subject();
-	            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),getHttpServletResponse());
+	            MessageInfo messageInfo = persistentCookieModuleWrapper.prepareMessageInfo(getHttpServletRequest(),
+	                getHttpServletResponse());
 	            if (process(messageInfo, clientSubject, callbacks)) {
 	                if (principal != null) {
 	                    setAuthenticatingUserName(principal.getName());
 	                }
 	                return ISAuthConstants.LOGIN_SUCCEED;
 	            }
-	            //throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
-	            return ISAuthConstants.LOGIN_IGNORE;
+	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
 	        }
 	        default: {
 	            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "incorrectState", null);
@@ -244,14 +227,15 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
         final Jwt jwt = persistentCookieModuleWrapper.validateJwtSessionCookie(messageInfo);
 
         if (jwt == null) {
+            //BAD
             //remember check ?
             if (StringUtils.isNotBlank(UIField)) { 
             		setUserSessionProperty("openam.field.ui", UIField);
             		if (StringUtils.equalsIgnoreCase("POST",getHttpServletRequest().getMethod()) && getHttpServletRequest().getParameter(UIField)!=null)
             			setUserSessionProperty("remember.check", "1");
             }
-            //throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
-            return false;
+			
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "cookieNotValid", null);
         } else {
             //GOOD
 
