@@ -1384,4 +1384,9 @@ public interface Constants {
      * The name of the request attribute that tells whether this authentication happened via WS-Fed AR profile.
      */
     String WSFED_ACTIVE_LOGIN = "org.forgerock.openam.federation.wsfed.active.login";
+
+    /**
+     * Property that turns on the system http proxy for HttpClient classes.
+     */
+    public static final String SYSTEM_PROXY_ENABLED = "org.forgerock.openam.httpclienthandler.system.proxy.enabled";
 }
