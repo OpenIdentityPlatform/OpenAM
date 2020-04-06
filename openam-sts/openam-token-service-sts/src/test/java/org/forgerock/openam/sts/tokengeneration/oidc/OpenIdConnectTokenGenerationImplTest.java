@@ -17,6 +17,8 @@
 package org.forgerock.openam.sts.tokengeneration.oidc;
 
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
+
 import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolverFactory;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -78,6 +80,9 @@ public class OpenIdConnectTokenGenerationImplTest {
         SSOTokenIdentity mockSSOTokenIdentity = mock(SSOTokenIdentity.class);
         when(mockSSOTokenIdentity.validateAndGetTokenPrincipal(any(SSOToken.class))).thenReturn(SUBJECT_NAME);
         SSOToken mockSSOToken = mock(SSOToken.class);
+        SSOTokenID ssoTokenId = mock(SSOTokenID.class);
+        when(ssoTokenId.toString()).thenReturn("token_id");
+        when(mockSSOToken.getTokenID()).thenReturn(ssoTokenId);
         STSInstanceState mockSTSInstanceState = mock(STSInstanceState.class);
         STSInstanceConfig mockSTSInstanceConfig = mock(STSInstanceConfig.class);
         when(mockSTSInstanceState.getConfig()).thenReturn(mockSTSInstanceConfig);
@@ -109,6 +114,9 @@ public class OpenIdConnectTokenGenerationImplTest {
         SSOTokenIdentity mockSSOTokenIdentity = mock(SSOTokenIdentity.class);
         when(mockSSOTokenIdentity.validateAndGetTokenPrincipal(any(SSOToken.class))).thenReturn(SUBJECT_NAME);
         SSOToken mockSSOToken = mock(SSOToken.class);
+        SSOTokenID ssoTokenId = mock(SSOTokenID.class);
+        when(ssoTokenId.toString()).thenReturn("token_id");
+        when(mockSSOToken.getTokenID()).thenReturn(ssoTokenId);
         STSInstanceState mockSTSInstanceState = mock(STSInstanceState.class);
         STSInstanceConfig mockSTSInstanceConfig = mock(STSInstanceConfig.class);
         when(mockSTSInstanceState.getConfig()).thenReturn(mockSTSInstanceConfig);
