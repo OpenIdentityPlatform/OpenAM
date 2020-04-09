@@ -16,6 +16,7 @@
 
 <form class="form" id="userQuery" aria-labelledby="userQueryDescription">
     <input type="hidden" aria-hidden="true" name="queryFilter" data-validator="required" />
+    <input type="hidden" aria-hidden="true" name="querystringParams" id="input-querystringParams" />
 
     <p id="userQueryDescription">{{t 'common.user.userQuery.title'}}</p>
 
@@ -57,3 +58,9 @@
 
     <input type="submit" class="btn btn-lg btn-primary btn-block btn-uppercase" value="{{t 'common.form.submit'}}" />
 </form>
+
+<script>
+  require(["jquery"], function($) {
+    $('#input-querystringParams').val(window.location.search.replace("?", ""));    
+  });
+</script>
