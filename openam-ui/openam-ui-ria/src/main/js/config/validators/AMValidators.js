@@ -60,6 +60,24 @@ define([
                     callback();
                 }
             }
+        },
+        "atLeastXSpecialChars": {
+            "name": "Minimum occurrence of special characters in string",
+            "dependencies": [],
+            "validator": (el, input, callback) => {
+                var v = input.val(),
+                    minSpecials = input.attr("atLeastXSpecialChars"),
+                    specialChars = input.attr("specialChars"),
+                    escapedSpecialChars = specialChars.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+                    foundSpecials = v.match(new RegExp(`[${escapedSpecialChars}]`, "g"));
+
+                if (!foundSpecials || foundSpecials.length < minSpecials) {
+                    callback([$.t("common.form.validation.AT_LEAST_X_SPECIAL_CHARACTERS",
+                        { numSpecials: minSpecials, specialChars })]);
+                } else {
+                    callback();
+                }
+            }
         }
     };
     return obj;
