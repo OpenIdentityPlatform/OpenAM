@@ -477,7 +477,12 @@ public class OpenAMScopeValidator implements ScopeValidator {
      */
     public Map<String, String> additionalDataToReturnFromAuthorizeEndpoint(Map<String, Token> tokens,
             OAuth2Request request) {
-        return Collections.emptyMap();
+    	final Map<String, String> additionalData = new HashMap<String, String>();
+    	if("fragment".equals(request.getParameter("response_mode"))) {
+    		additionalData.put("returnLocation", "fragment");
+    		additionalData.put("session_state", (String)request.getParameter("nonce"));
+    	}
+        return additionalData;
     }
 
     /**

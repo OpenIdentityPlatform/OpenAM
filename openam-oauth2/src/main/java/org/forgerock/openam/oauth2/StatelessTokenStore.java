@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
@@ -32,16 +33,29 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.ums.IDynamicMembership;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -50,6 +64,7 @@ import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
 import org.forgerock.json.jose.jwe.CompressionAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
@@ -176,6 +191,27 @@ public class StatelessTokenStore implements TokenStore {
         } catch (org.forgerock.json.resource.NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }
+        
+        Map<String, Set<String>> realmAccess = new HashMap<String, Set<String>>();
+        //realmAccess.put("roles", new HashSet<>(Arrays.asList( new String[] {"admin", "user"} )));
+        
+        AuthorizationCode authCode = request.getToken(AuthorizationCode.class);
+        if (authCode != null) {
+            String sessionId = authCode.getSessionId();
+            if (StringUtils.isNotBlank(sessionId)) {
+                try {
+                    final SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
+                    final SSOToken token = ssoTokenManager.createSSOToken(sessionId);
+                    AMIdentity identity = IdUtils.getIdentity(token);
+                    Set<AMIdentity> memberships = identity.getMemberships(IdType.GROUP);
+                    Set<String> roles = memberships.stream().map(m -> m.getName()).collect(Collectors.toSet());;
+                    realmAccess.put("roles", roles);
+                } catch (SSOException | IdRepoException e) {
+                    logger.error("Error retrieving session from AuthorizationCode", e);
+                }
+            }
+        }
+        
         String jwtId = UUID.randomUUID().toString();
         JwtClaimsSetBuilder claimsSetBuilder = jwtBuilder.claims()
                 .jti(jwtId)
@@ -185,16 +221,20 @@ public class StatelessTokenStore implements TokenStore {
                 .iat(newDate(currentTime.getMillis()))
                 .nbf(newDate(currentTime.getMillis()))
                 .iss(oAuth2UrisFactory.get(request).getIssuer())
-                .claim(SCOPE, scope)
+                .claim(SCOPE,  org.apache.commons.lang.StringUtils.join(scope, " "))
+                .claim("realm_access", realmAccess)
                 .claim(CLAIMS, claims)
                 .claim(REALM, realm)
                 .claim(NONCE, nonce)
                 .claim(TOKEN_NAME, OAUTH_ACCESS_TOKEN)
                 .claim(OAUTH_TOKEN_TYPE, BEARER)
+                .claim("typ", BEARER)
                 .claim(EXPIRES_IN, expiresIn.getMillis())
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
+        
+        
 
         JsonValue confirmationJwk = utils.getConfirmationKey(request);
         if (confirmationJwk != null) {
@@ -203,17 +243,36 @@ public class StatelessTokenStore implements TokenStore {
 
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
+        
+        final String encryptionKeyId = generateKid(providerSettings.getJWKSet(), signingAlgorithm.toString());
+        
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))
                 .claims(claimsSetBuilder.build())
                 .headers()
                 .alg(signingAlgorithm)
                 .zip(compressionAlgorithm)
+                .headerIfNotNull("kid", encryptionKeyId)
                 .done()
                 .asJwt();
         StatelessAccessToken accessToken = new StatelessAccessToken(jwt, jwt.build());
         request.setToken(AccessToken.class, accessToken);
         createStatelessTokenMetadata(jwtId, expiryTime.getMillis(), accessToken);
         return accessToken;
+    }
+    
+
+    private String generateKid(JsonValue jwkSet, String algorithm) {
+
+        final JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
+        if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType()) ||
+                JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
+            JsonValue jwks = jwkSet.get(OAuth2Constants.JWTTokenParams.KEYS);
+            if (!jwks.isNull() && !jwks.asList().isEmpty()) {
+                return jwks.get(0).get(OAuth2Constants.JWTTokenParams.KEY_ID).asString();
+            }
+        }
+
+        return null;
     }
 
     private CompressionAlgorithm getCompressionAlgorithm(final OAuth2Request request)
@@ -425,7 +484,11 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, authGrantId)
                 .claim(AUTH_TIME, authTime);
-
+        for(org.forgerock.oauth2.core.Token token : request.getTokens()) {
+        	if(token instanceof AuthorizationCode) {
+        		claimsSetBuilder.claim(NONCE, ((AuthorizationCode)token).getNonce());
+        	}
+        }
         String authModules = null;
         String acr = null;
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
