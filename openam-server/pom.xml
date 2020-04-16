@@ -96,13 +96,13 @@
 	                        <properties>
 	                            <context>openam</context>
 	                        </properties>
-	                        <pingURL>http://localhost:8205/openam</pingURL>
+	                        <pingURL>http://localhost:8207/openam</pingURL>
 	                    </deployable>
 	                </deployables>
 	                <configuration>
 				    	<properties>
 				        	<cargo.rmi.port>8206</cargo.rmi.port>
-				        	<cargo.servlet.port>8205</cargo.servlet.port>
+				        	<cargo.servlet.port>8207</cargo.servlet.port>
 <!--			        	<cargo.jvmargs>-verbose:class</cargo.jvmargs> -->
 				        </properties>
 				    </configuration>
