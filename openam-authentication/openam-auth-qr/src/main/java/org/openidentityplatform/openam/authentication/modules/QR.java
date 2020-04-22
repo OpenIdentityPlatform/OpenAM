@@ -55,10 +55,7 @@ public class QR extends AMLoginModule {
 			}else { //accept QR
 				if (cb==null) {
 					getCallbackHandler().handle(
-							new Callback[]{
-									new PagePropertiesCallback("QR", "Please enter secret from QR code", null, 1*60, "Login.jsp", false, null)
-									,new PasswordCallback("Secret from QR", false)
-								}
+							requestQR()
 					);
 				}else {
 					final String secret=new String(((PasswordCallback)cb[0]).getPassword());
@@ -72,14 +69,22 @@ public class QR extends AMLoginModule {
 		return ISAuthConstants.LOGIN_IGNORE; 
 	}
 
+	protected Callback[] requestQR() {
+		return new Callback[]{
+				new PagePropertiesCallback("QR", "Please enter secret from QR code", null, 1*60, "Login.jsp", false, null)
+				,new PasswordCallback("Secret from QR", false)
+			};
+	}
+
 
 	@Override
 	public Principal getPrincipal() {
 		return null;
 	}
 	
+	
 	Callback[] qr=null;
-	Callback[] getQR() {
+	protected Callback[] getQR() {
 		if (qr!=null)
 			return qr;
 		try {
