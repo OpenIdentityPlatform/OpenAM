@@ -821,6 +821,11 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-auth-webauthn</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-auth-qr</artifactId>
+        </dependency>
 
 		<dependency>
             <artifactId>openam-auth-securid</artifactId>

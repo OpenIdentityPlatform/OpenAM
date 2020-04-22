@@ -61,6 +61,7 @@
         <module>openam-auth-securid</module>
         <module>openam-auth-recaptcha</module>
         <module>openam-auth-webauthn</module>
+        <module>openam-auth-qr</module>
     </modules>
 
     <dependencies>
