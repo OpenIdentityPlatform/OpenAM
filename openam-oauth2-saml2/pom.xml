@@ -31,7 +31,7 @@
 	<repositories>
 	     <repository>
        		<id>mvnrepository.com</id>
-       		<url>https://repo.boundlessgeo.com/main</url>
+       		<url>https://repo.spring.io/libs-milestone</url>
        </repository>
 	</repositories>
     <dependencies>
