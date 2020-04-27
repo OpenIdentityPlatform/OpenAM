@@ -81,12 +81,7 @@ public class QR extends AMLoginModule {
 						if (pre_session!=null) {
 							pre_session.setProperty("am.protected.qr.uid", ls.getOldSession().getProperty("sun.am.UniversalIdentifier"));
 							ls.setReceivedCallback_NoThread(null); //reset last received callback
-							getCallbackHandler().handle(
-									new Callback[]{
-											new PagePropertiesCallback("QR", "QR code correct", null, 1*60, "Login.jsp", false, null)
-											,new TextOutputCallback(TextOutputCallback.INFORMATION,"OK")
-										}
-							);
+							getCallbackHandler().handle(sendOK());
 						}
 					}catch (SessionException e) {}
 					throw new UserNamePasswordValidationException("Invalid token");
@@ -97,6 +92,13 @@ public class QR extends AMLoginModule {
 	        throw (e instanceof AuthLoginException)?(AuthLoginException)e:new UserNamePasswordValidationException(e);
        	}
 		return ISAuthConstants.LOGIN_IGNORE; 
+	}
+
+	protected Callback[] sendOK() {
+		return new Callback[]{
+				new PagePropertiesCallback("QR", "QR code correct", null, 1*60, "Login.jsp", false, null)
+				,new TextOutputCallback(TextOutputCallback.INFORMATION,"OK")
+			};
 	}
 
 	protected Callback[] requestQR() {
