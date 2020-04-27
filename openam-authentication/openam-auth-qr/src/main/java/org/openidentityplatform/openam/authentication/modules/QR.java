@@ -79,7 +79,7 @@ public class QR extends AMLoginModule {
 					try {
 						Session pre_session=Session.getSession(new SessionID(Crypt.decode(secret)));
 						if (pre_session!=null) {
-							pre_session.setProperty("am.protected.qr.uid", ls.getOldSession().getProperty("sun.am.UniversalIdentifier"));
+							pre_session.setProperty("am.protected.qr.uid",ls.getOldSession().getProperty("am.protected.oauth2.uid")!=null?ls.getOldSession().getProperty("am.protected.oauth2.uid"):ls.getOldSession().getProperty("sun.am.UniversalIdentifier"));
 							ls.setReceivedCallback_NoThread(null); //reset last received callback
 							getCallbackHandler().handle(sendOK());
 						}
@@ -125,7 +125,7 @@ public class QR extends AMLoginModule {
 			MatrixToImageWriter.writeToStream(new MultiFormatWriter().encode(secret, BarcodeFormat.QR_CODE, 300, 300), "PNG", out);
 			qr=new Callback[]{
 					new PagePropertiesCallback("QR", "Please scan QR code", null, 1*60, "Login.jsp", false, null)
-					,new TextOutputCallback(TextOutputCallback.INFORMATION, Base64.getEncoder().encodeToString(out.toByteArray()))
+					,new TextOutputCallback(TextOutputCallback.INFORMATION, "data:image/png;base64,".concat(Base64.getEncoder().encodeToString(out.toByteArray())))
 					,new TextOutputCallback(TextOutputCallback.INFORMATION,secret)
 				};
 		}catch (Exception e) {
