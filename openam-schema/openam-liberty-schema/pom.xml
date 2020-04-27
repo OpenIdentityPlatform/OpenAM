@@ -104,6 +104,10 @@
             <groupId>com.sun.msv.datatype.xsd</groupId>
             <artifactId>xsdlib</artifactId>
         </dependency>
+        <dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb1-impl</artifactId>
+		</dependency>
     </dependencies>
 </project>
 

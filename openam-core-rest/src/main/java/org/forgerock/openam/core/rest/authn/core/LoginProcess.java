@@ -262,10 +262,10 @@ public class LoginProcess {
 
         } else if (isSuccessful()) {
 
-            if (authContext.isForceAuth()) {
-                DEBUG.message("Force Auth succeeded - restoring updated session.");
-                authContext.destroySession();
-                authContext.restoreOldSession();
+            if (authContext.isForceAuth()) { //no need restore updated session
+//                DEBUG.message("Force Auth succeeded - restoring updated session.");
+//                authContext.destroySession();
+//                authContext.restoreOldSession();
 
             } else if (authContext.hasOldSession()
                     && SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {

@@ -596,7 +596,7 @@ public abstract class AMLoginModule implements LoginModule {
     protected void forceCallbacksInit () throws AuthLoginException {
         if (internal == null) {
             // get the callbacks for this class;
-            origList = AMModuleProperties.getModuleProperties(fileName);
+            origList = (fileName==null)?new ArrayList():AMModuleProperties.getModuleProperties(fileName);
             if (origList == null || origList.isEmpty()) {
                 // we got file whose size is zero, this is the case for
                 // Cert/Anonymous based authentication
