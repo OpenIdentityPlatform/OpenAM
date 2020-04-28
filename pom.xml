@@ -664,6 +664,11 @@
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-auth-qr</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-coretoken</artifactId>
         <version>${project.version}</version>
       </dependency>
