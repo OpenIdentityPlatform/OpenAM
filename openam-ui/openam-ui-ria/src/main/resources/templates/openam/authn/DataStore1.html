@@ -21,9 +21,10 @@
             {{/each}}
 
             {{> login/_SelfService }}
-
-            {{#if showSocialLogin}}
-                {{> login/_SocialAuthn }}
+            {{#if firstUserNamePassStage}}
+                {{#if showSocialLogin}}
+                    {{> login/_SocialAuthn }}
+                {{/if}}
             {{/if}}
         </fieldset>
     </form>
