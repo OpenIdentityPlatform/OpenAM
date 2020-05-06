@@ -33,6 +33,7 @@
 package com.sun.identity.authentication.spi;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.callbacks.NameValueOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.share.AuthXMLTags;
@@ -441,6 +442,21 @@ class AMModuleProperties {
                         }
 
                         p++;
+                } else if (nodeName.equals("NameValueOutputCallback")) {
+                     sub = node.getFirstChild();
+                     sub = sub.getNextSibling();
+                     String name = sub.getFirstChild().getNodeValue();
+
+                     String value = null;
+                     sub = sub.getNextSibling().getNextSibling();
+                     if (sub != null) {
+                         sub = sub.getFirstChild();
+                         value = sub.getNodeValue();
+                     }
+                     callbacks[p] = new NameValueOutputCallback(name, value);
+
+                     
+                     p++;              
                 } else if (nodeName.equals("LanguageCallback")) {
                     for (sub = node.getFirstChild(); sub != null; sub = sub.getNextSibling()) {
                         if (sub.getNodeName().equals("ChoiceValue")) {

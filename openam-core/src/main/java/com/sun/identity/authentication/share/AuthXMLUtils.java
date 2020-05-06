@@ -30,6 +30,7 @@
 package com.sun.identity.authentication.share;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.callbacks.NameValueOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -312,6 +313,17 @@ public class AuthXMLUtils {
                  } else {
                      callbackList.add(createRedirectCallback(childNode,null));
                 }
+            } else if (childNodeName.equals(AuthXMLTags.NAMEVALUEOUTPUT_CALLBACK)) {
+                if (callbacks != null) {
+                	 diIndex = getNameValueOutputCallbackIndex(callbacks,ppIndex);
+                    if ( tiIndex >= 0) {
+                        callbackList.add(createNameValueOutputCallback(childNode,
+                        callbacks[tiIndex]));
+                    }
+                    tiIndex = tiIndex + 1;
+                } else {
+                    callbackList.add(createNameValueOutputCallback(childNode,null));
+                }
             }
         }
         
@@ -435,6 +447,10 @@ public class AuthXMLUtils {
                 RedirectCallback redirectCallback =
                          (RedirectCallback) callbacks[i];
                 xmlString.append(getRedirectCallbackXML(redirectCallback));
+            } else if (callbacks[i] instanceof NameValueOutputCallback) {
+            	NameValueOutputCallback nameValueOutputCallback =
+                         (NameValueOutputCallback) callbacks[i];
+                xmlString.append(getNameValueOutputCallbackXML(nameValueOutputCallback));                
             } else {
                 AuthenticationCallbackXMLHelper callbackXMLHelper =
                 AuthenticationCallbackXMLHelperFactory.getCallbackXMLHelper();
@@ -908,6 +924,33 @@ public class AuthXMLUtils {
         }
         return hc;
     }
+    
+    static NameValueOutputCallback createNameValueOutputCallback(
+            Node childNode,
+            Callback callback) {
+    	NameValueOutputCallback nameValueOutputCallback= null;
+        if (callback != null) {
+            if (callback instanceof NameValueOutputCallback) {
+            	nameValueOutputCallback = (NameValueOutputCallback)callback;
+            }
+        }
+        
+        if (nameValueOutputCallback == null) {
+        	String value = getValue(childNode);
+            if (debug.messageEnabled()) {
+                debug.message("Value is : " + value);
+            }
+            
+            Node pNode = XMLUtils.getChildNode(childNode, AuthXMLTags.NAME);
+            String name = null;
+            if (pNode != null) {
+                name = (XMLUtils.getValueOfValueNode(pNode));
+            }
+            
+            nameValueOutputCallback = new NameValueOutputCallback(name, value);
+        }
+        return nameValueOutputCallback;
+    }
 
     protected static String getRedirectURL(Node node) {
         Node pNode = XMLUtils.getChildNode(node, AuthXMLTags.REDIRECT_URL);
@@ -1311,8 +1354,26 @@ public class AuthXMLUtils {
         
         xmlString.append(AuthXMLTags.PAGEP_CALLBACK_END);
         return xmlString.toString();
-    }    
+    }
     
+    
+    static String getNameValueOutputCallbackXML(
+            NameValueOutputCallback nameValueOutputCallback) {
+        StringBuilder xmlString = new StringBuilder();
+        
+        xmlString.append(AuthXMLTags.NAMEVALUEOUTPUT_CALLBACK_BEGIN)
+        	.append(AuthXMLTags.NAME_BEGIN)
+        	.append(XMLUtils.escapeSpecialCharacters(nameValueOutputCallback.getName()))
+        	.append(AuthXMLTags.NAME_END)
+           	.append(AuthXMLTags.VALUE_BEGIN)
+        	.append(XMLUtils.escapeSpecialCharacters(nameValueOutputCallback.getValue()))
+        	.append(AuthXMLTags.VALUE_END);
+
+	    
+	    xmlString.append(AuthXMLTags.NAMEVALUEOUTPUT_CALLBACK_END);
+	    return xmlString.toString();
+    }
+     
     static String listToString(List<String> list) {
         StringBuilder buffer = new StringBuilder();
         Iterator<String> it = list.iterator();
@@ -1893,6 +1954,16 @@ public class AuthXMLUtils {
         }
         return -1;
     }
+    
+    static int getNameValueOutputCallbackIndex(Callback[] callbacks,int startIndex) {
+        int i=0;
+        for (i = startIndex;i < callbacks.length;i++) {
+            if (callbacks[i] instanceof NameValueOutputCallback) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     static LanguageCallback createLanguageCallback(
         Node childNode,
@@ -1988,6 +2059,7 @@ public class AuthXMLUtils {
         
         return xmlString.toString();
     }
+
     
     /**
      * returns the value of DefaultValue Node
