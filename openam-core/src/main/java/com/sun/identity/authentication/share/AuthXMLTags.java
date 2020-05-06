@@ -77,11 +77,13 @@ public interface AuthXMLTags {
     public static final String X509CERTIFICATE_CALLBACK =
         "X509CertificateCallback";
     public static final String CUSTOM_CALLBACK = "CustomCallback";
+    public static final String NAMEVALUEOUTPUT_CALLBACK = "NameValueOutputCallback";
     public static final String PROMPT = "Prompt";
     public static final String ID = "Id";
     public static final String ECHO_PASSWORD = "echoPassword";
     public static final String MULTI_SELECT_ALLOWED =
         "multipleSelectionsAllowed";
+    public static final String NAME = "Name";
     public static final String VALUE = "Value";
     public static final String SELECTED_VALUE = "SelectedValue";
     public static final String DEFAULT_OPTION_VALUE = "DefaultOptionValue";
@@ -275,6 +277,12 @@ public interface AuthXMLTags {
     public static final String PAGEP_CALLBACK_END="</PagePropertiesCallback>";
     public static final String LANGUAGE_CALLBACK_BEGIN="<LanguageCallback>";
     public static final String LANGUAGE_CALLBACK_END="</LanguageCallback>";
+    public static final String NAMEVALUEOUTPUT_CALLBACK_BEGIN="<NameValueOutputCallback>";
+    public static final String NAMEVALUEOUTPUT_CALLBACK_END="</NameValueOutputCallback>";
+    public static final String NAME_BEGIN = "<Name>";
+    public static final String NAME_END = "</Name>";
+    
+    
     public static final String LOCALE_BEGIN="<Locale>";
     public static final String LOCALE_END ="</Locale>";
 
