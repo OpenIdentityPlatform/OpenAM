@@ -2477,9 +2477,17 @@ public class LoginState {
                     (isApplicationModule(indexName) && LazyConfig.AUTHD.isSuperAdmin(userDN))) {
                 if (LazyConfig.AUTHD.isSuperAdmin(userDN)) {
                     amIdentityUser = LazyConfig.AUTHD.getIdentity(IdType.USER, userDN, getOrgDN());
+                } else if(LDAPUtils.isDN(userDN)) { 
+                	amIdentityUser = new AMIdentity(null, userDN);
+                	
+                	//set org match identity
+                    if(!amIdentityUser.getRealm().equals(qualifiedOrgDN)) {
+                    	orgDN = amIdentityUser.getRealm();
+                    	qualifiedOrgDN = orgDN;
+                    }
+                    
                 } else {
-                    amIdentityUser =
-                            new AMIdentity(null, userDN, IdType.USER, getOrgDN(), null);
+                    amIdentityUser = new AMIdentity(null, userDN, IdType.USER, getOrgDN(), null);
                 }
                 userDN = getUserDN(amIdentityUser);
                 populateDefaultUserAttributes();
