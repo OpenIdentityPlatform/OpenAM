@@ -31,6 +31,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.UserNamePasswordValidationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 
 public class QR extends AMLoginModule {
@@ -64,6 +65,11 @@ public class QR extends AMLoginModule {
 					final Session session=Session.getSession(new SessionID(sessions.keySet().iterator().next()));
 					final String uid=session.getProperty("am.protected.qr.uid");
 					if (uid!=null) {
+						try {
+			    			setAuthLevel(Integer.parseInt(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.QR.authlevel","0")));
+			    		} catch (Exception e) {
+			    			setAuthLevel(0);
+			    		}
 						principal=new QRPrincipal(uid);
 						return ISAuthConstants.LOGIN_SUCCEED; 
 					}
@@ -144,10 +150,18 @@ public class QR extends AMLoginModule {
 		is.putProperty("sun.am.UniversalIdentifier",uid);
 		is.setMaxCachingTime(1);
 		is.setMaxIdleTime(2);
-		is.setMaxSessionTime(20);  
+		is.setMaxSessionTime(maxSecretTime());  
 		is.setType(SessionType.USER);
 		is.activate(uid);
 		InjectorHolder.getInstance(AuthenticationSessionStore.class).promoteSession(is.getID());
 		return is.getSessionID().toString();
+	}
+	
+	protected long maxSecretTime() {
+		try {
+			return Long.parseLong(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime","20"));
+		} catch (Exception e) {
+			return 20;
+		}
 	}
 }
