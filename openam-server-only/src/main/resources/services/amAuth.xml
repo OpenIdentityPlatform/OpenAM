@@ -38,7 +38,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthService"
                 i18nFileName="amAuth"
-                revisionNumber="61"
+                revisionNumber="62"
                 i18nKey="iplanet-am-auth-service-description"
                 resourceName="EMPTY">
             <Global>
@@ -80,6 +80,7 @@
                         <Value>org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha</Value>
                         <Value>org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration</Value>
                         <Value>org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication</Value>
+                        <Value>org.openidentityplatform.openam.authentication.modules.QR</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"
