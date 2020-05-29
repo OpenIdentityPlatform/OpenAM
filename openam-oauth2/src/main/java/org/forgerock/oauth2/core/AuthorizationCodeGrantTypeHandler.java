@@ -20,12 +20,15 @@ import static org.forgerock.oauth2.core.Utils.joinScope;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.http.MutableUri;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -119,8 +122,21 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
                 logger.error("Authorization Code has already been issued, " + code);
                 throw new InvalidGrantException();
             }
+            
+            MutableUri mutableCodeUri = null;
+            try {
+            	mutableCodeUri = MutableUri.uri(authorizationCode.getRedirectUri());
+    	        if(mutableCodeUri.getRawQuery() != null) {
+    	        	mutableCodeUri.setQuery(null);
+    	        }
+    	        if(mutableCodeUri.getRawFragment() != null) {
+    	        	mutableCodeUri.setRawFragment(null);
+    	        }
+            }catch(URISyntaxException e) {
+            	 throw new InvalidRequestException("Invalid parameter: redirect_uri");
+            }
 
-            if (!authorizationCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
+            if (!mutableCodeUri.toString().equalsIgnoreCase(redirectUri)) {
                 logger.error("Authorization code was issued with a different redirect URI, " + code + ". Expected, "
                         + authorizationCode.getRedirectUri() + ", actual, " + redirectUri);
                 throw new InvalidGrantException();

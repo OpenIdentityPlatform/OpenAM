@@ -19,6 +19,9 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.forgerock.http.MutableUri;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 
@@ -50,7 +53,19 @@ public class RedirectUriValidator {
             throw new InvalidRequestException("Missing parameter: redirect_uri");
         }
 
-        final URI request = URI.create(redirectUri);
+        MutableUri mutableRequest = null;
+        try {
+	        mutableRequest = MutableUri.uri(redirectUri);
+	        if(mutableRequest.getRawQuery() != null) {
+	        	mutableRequest.setQuery(null);
+	        }
+	        if(mutableRequest.getRawFragment() != null) {
+	        	mutableRequest.setRawFragment(null);
+	        }
+        }catch(URISyntaxException e) {
+        	 throw new InvalidRequestException("Invalid parameter: redirect_uri");
+        }
+        final URI request = mutableRequest.asURI();
 
         if (request.getFragment() != null) {
             throw new RedirectUriMismatchException();
