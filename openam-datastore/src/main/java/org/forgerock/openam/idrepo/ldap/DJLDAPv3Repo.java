@@ -1175,6 +1175,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, scope, filter, attrs);
         searchRequest.setSizeLimit(maxResults < 1 ? defaultSizeLimit : maxResults);
         searchRequest.setTimeLimit(maxTime < 1 ? defaultTimeLimit : maxTime);
+        if (DEBUG.messageEnabled()) {
+        	DEBUG.message("DJLDAPv3Repo.search: executing request: "+ searchRequest.toString());
+        }
         Connection conn = null;
         Set<String> names = new HashSet<>();
         Map<String, Map<String, Set<String>>> entries = new HashMap<>();
