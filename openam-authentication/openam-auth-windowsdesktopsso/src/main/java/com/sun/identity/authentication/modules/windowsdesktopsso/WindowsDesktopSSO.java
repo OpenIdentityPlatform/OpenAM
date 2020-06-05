@@ -113,8 +113,6 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private Set<String> trustedKerberosRealms = Collections.EMPTY_SET;
     
     private static final String REALM_SEPARATOR = "@";
-    
-    private static boolean searchProfileByAlias = Boolean.parseBoolean(SystemProperties.get(WindowsDesktopSSO.class.getName().concat(".searchProfileByAlias"), "true"));
 
     /**
      * Constructor
@@ -719,19 +717,13 @@ public class WindowsDesktopSSO extends AMLoginModule {
         IdSearchControl searchControl = new IdSearchControl();
         searchControl.setMaxResults(1);
         searchControl.setTimeOut(3000);
-        String filter = attributeValue;
-        if(searchProfileByAlias) {
-        	searchControl.setSearchModifiers(IdSearchOpModifier.OR, buildSearchControl(attributeValue));
-        	filter = "*";
-        }
-
-        
+        searchControl.setSearchModifiers(IdSearchOpModifier.OR, buildSearchControl(attributeValue));
         searchControl.setAllReturnAttributes(false);
 
         try {
             AMIdentityRepository amirepo = new AMIdentityRepository(getSSOSession(), organization);
 
-            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, filter, searchControl);
+            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, "*", searchControl);
             if (searchResults.getErrorCode() == IdSearchResults.SUCCESS && searchResults != null) {
                 Set<AMIdentity> results = searchResults.getSearchResults();
                 if (!results.isEmpty()) {
