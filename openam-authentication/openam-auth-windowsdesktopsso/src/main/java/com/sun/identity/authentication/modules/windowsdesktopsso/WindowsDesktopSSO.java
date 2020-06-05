@@ -29,6 +29,7 @@
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -716,7 +717,6 @@ public class WindowsDesktopSSO extends AMLoginModule {
         IdSearchControl searchControl = new IdSearchControl();
         searchControl.setMaxResults(1);
         searchControl.setTimeOut(3000);
-
         searchControl.setSearchModifiers(IdSearchOpModifier.OR, buildSearchControl(attributeValue));
         searchControl.setAllReturnAttributes(false);
 

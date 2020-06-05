@@ -1148,15 +1148,18 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         String searchAttr = getSearchAttribute(type);
         String[] attrs;
-        Filter first;
+        Filter first = null;
 
         if (crestQuery.hasQueryId()) {
-            first = Filter.valueOf(searchAttr + "=" + crestQuery.getQueryId());
+        	if(!"*".equals(crestQuery.getQueryId()) || avPairs == null  || avPairs.size() == 0) {
+        		first = Filter.valueOf(searchAttr + "=" + crestQuery.getQueryId());
+        	}
         } else {
             first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
         }
 
-        Filter filter = Filter.and(first, getObjectClassFilter(type));
+        Filter filter = (first != null ?  Filter.and(first, getObjectClassFilter(type)) : getObjectClassFilter(type));
+        
         Filter tempFilter = constructFilter(filterOp, avPairs);
         if (tempFilter != null) {
             filter = Filter.and(tempFilter, filter);
@@ -1175,6 +1178,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, scope, filter, attrs);
         searchRequest.setSizeLimit(maxResults < 1 ? defaultSizeLimit : maxResults);
         searchRequest.setTimeLimit(maxTime < 1 ? defaultTimeLimit : maxTime);
+        if (DEBUG.messageEnabled()) {
+        	DEBUG.message("DJLDAPv3Repo.search: executing request: "+ searchRequest.toString());
+        }
         Connection conn = null;
         Set<String> names = new HashSet<>();
         Map<String, Map<String, Set<String>>> entries = new HashMap<>();
