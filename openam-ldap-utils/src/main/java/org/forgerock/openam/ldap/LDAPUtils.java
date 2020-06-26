@@ -146,9 +146,9 @@ public final class LDAPUtils {
             Options ldapOptions) {
         List<ConnectionFactory> factories = new ArrayList<ConnectionFactory>(servers.size());
         for (LDAPURL ldapurl : servers) {
-            ConnectionFactory cf = Connections.newFixedConnectionPool(
+            ConnectionFactory cf = Connections.newCachedConnectionPool(
                     newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
-                    ldapOptions), maxSize);
+                    ldapOptions), 1,maxSize,60L, TimeUnit.SECONDS);
             factories.add(cf);
         }
 
