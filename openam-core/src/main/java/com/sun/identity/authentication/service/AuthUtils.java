@@ -990,13 +990,17 @@ public class AuthUtils extends AuthClientUtils {
                 (sessionUpgrade)) {
                 try {
                     loginState = new LoginState();
-                    InternalSession oldSession = null;
+                    InternalSession oldSession = sess;
                     if (sid != null) {
                         oldSession = AuthD.getSession(sid);
                         loginState.setOldSession(oldSession);
                     }
+		    // #297 Bug. Session Upgrade fails since user is different than original authenticated user
+		    if(oldSession == null) {
+			 oldSession = sess;
+		    }
                     if (sessionUpgrade) {
-                        loginState.setOldSession(oldSession);
+                        loginState.setOldSession(sess);
                         loginState.setSessionUpgrade(sessionUpgrade);
                     }
                     authContext = loginState.createAuthContext(sid,orgName,req);
