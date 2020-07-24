@@ -990,7 +990,7 @@ public class AuthUtils extends AuthClientUtils {
                 (sessionUpgrade)) {
                 try {
                     loginState = new LoginState();
-                    InternalSession oldSession = sess;
+                    InternalSession oldSession = null;
                     if (sid != null) {
                         oldSession = AuthD.getSession(sid);
                         loginState.setOldSession(oldSession);
@@ -1000,7 +1000,7 @@ public class AuthUtils extends AuthClientUtils {
 			 oldSession = sess;
 		    }
                     if (sessionUpgrade) {
-                        loginState.setOldSession(sess);
+                        loginState.setOldSession(oldSession);
                         loginState.setSessionUpgrade(sessionUpgrade);
                     }
                     authContext = loginState.createAuthContext(sid,orgName,req);
