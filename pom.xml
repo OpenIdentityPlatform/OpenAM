@@ -100,7 +100,7 @@
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7.11</rhino.version>
+    <rhino.version>1.7.12</rhino.version>
     <saaj-api.version>1.3.4</saaj-api.version>
     <saaj-impl.version>1.3.19</saaj-impl.version>
     <jsp-api.version>2.1</jsp-api.version>
