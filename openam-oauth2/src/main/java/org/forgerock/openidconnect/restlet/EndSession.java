@@ -21,6 +21,7 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -40,6 +41,8 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Redirector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -51,6 +54,7 @@ import java.net.URI;
  * @since 11.0.0
  */
 public class EndSession extends ServerResource {
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
     private final OAuth2RequestFactory requestFactory;
     private final OpenIDConnectEndSession openIDConnectEndSession;
@@ -86,8 +90,14 @@ public class EndSession extends ServerResource {
         final String idToken = request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT);
         final String redirectUri = request.getParameter(OAuth2Constants.Params.POST_LOGOUT_REDIRECT_URI);
         final String state = request.getParameter(OAuth2Constants.Params.STATE);
+
         try {
-            openIDConnectEndSession.endSession(request, idToken);
+            try {
+                openIDConnectEndSession.endSession(request, idToken);
+            } catch (ServerException e) {
+                this.logger.warn("Error while removing session, possibly already timed out. Skipping...", e);
+            }
+
             if (StringUtils.isNotEmpty(redirectUri)) {
                 return handleRedirect(request, idToken, redirectUri, state);
             }
