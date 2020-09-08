@@ -102,7 +102,7 @@ public class SessionServiceConfig {
     private static final int DEFAULT_NOTIFICATION_THEAD_POOL_THRESHOLD = DEFAULT_NOTIFICATION_THEAD_POOL_SIZE * 10;
     private final int notificationThreadPoolThreshold;
 
-    private static final long DEFAULT_APPLICATION_MAX_CACHING_TIME = Long.MAX_VALUE / 60;
+    private static final long DEFAULT_APPLICATION_MAX_CACHING_TIME = 10;
     private final long applicationMaxCachingTime;
 
     private static final boolean DEFAULT_RETURN_APP_SESSION = false;
