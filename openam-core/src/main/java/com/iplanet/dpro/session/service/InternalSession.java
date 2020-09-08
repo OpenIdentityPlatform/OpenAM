@@ -360,8 +360,8 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      */
     public void setMaxIdleTime(long maxIdleTimeInMinutes) {
     	if (this.maxIdleTimeInMinutes != maxIdleTimeInMinutes) {
-	    	if (willExpireFlag == false && maxIdleTimeInMinutes<NON_EXPIRING_SESSION_LENGTH_MINUTES)
-	    		willExpireFlag = true;
+//	    	if (willExpireFlag == false && maxIdleTimeInMinutes<NON_EXPIRING_SESSION_LENGTH_MINUTES)
+//	    		willExpireFlag = true;
 	            
 	    	this.maxIdleTimeInMinutes = maxIdleTimeInMinutes;
 	        notifyPersistenceManager();
