@@ -54,6 +54,16 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+   	<developer>
+   		<id>Open Identity Platform Community</id>
+   		<name>Open Identity Platform Community</name>
+   		<email>open-identity-platform@googlegroups.com</email>
+   		<organization>Open Identity Platform Community</organization>
+   		<organizationUrl>https://www.openidentityplatform.org/</organizationUrl>
+   		<url>https://github.com/OpenIdentityPlatform/commons</url>
+   	</developer>
+   </developers>
   <!-- Component Properties -->
   <properties>
     <!-- **************************************************************** -->
@@ -273,6 +283,36 @@
         <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
       </properties>
     </profile>
+   	<profile>
+        <id>release-sign-artifacts</id>
+        <activation>
+            <property>
+		        <name>gpg.passphrase</name>
+		    </property>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-gpg-plugin</artifactId>
+			      <version>1.6</version>
+			      <configuration>
+                     	<passphrase>${gpg.passphrase}</passphrase>
+                       <useAgent>true</useAgent>
+                     </configuration>
+			      <executions>
+			        <execution>
+			          <id>sign-artifacts</id>
+			          <phase>verify</phase>
+			          <goals>
+			            <goal>sign</goal>
+			          </goals>
+			        </execution>
+			      </executions>
+			    </plugin>
+            </plugins>
+        </build>
+    </profile>
   </profiles>
   <!-- OpenAM Child Modules -->
   <!-- Build order will be determined by the Maven Reactor. -->
@@ -373,11 +413,11 @@
   </mailingLists>
   <!-- Maven Repositories -->
   	<repositories>
-<!-- 		<repository> -->
-<!-- 			<id>ossrh-releases</id> -->
-<!-- 			<name>Sonatype OSS</name> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
-<!-- 		</repository> -->
+		<repository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
 		<repository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -388,11 +428,11 @@
 		</repository>
 	</repositories>
 	<pluginRepositories>
-<!-- 		<pluginRepository> -->
-<!-- 			<id>ossrh-releases</id> -->
-<!-- 			<name>Sonatype OSS</name> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
-<!-- 		</pluginRepository> -->
+		<pluginRepository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</pluginRepository>
 		<pluginRepository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -428,7 +468,7 @@
 	   <dependency>
     		<groupId>org.openidentityplatform.opendj</groupId>
 		    <artifactId>opendj-parent</artifactId>
-			<version>4.4.6-SNAPSHOT</version>
+			<version>4.4.7</version>
     		<type>pom</type>
     		<scope>import</scope>
       </dependency>
@@ -2060,19 +2100,48 @@
           <quiet>true</quiet>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+		<plugin>
+	         <groupId>org.apache.maven.plugins</groupId>
+	         <artifactId>maven-source-plugin</artifactId>
+	         <executions>
+	          <execution>
+	            <id>attach-sources</id>
+	            <phase>verify</phase>
+	            <goals>
+	              <goal>jar-no-fork</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+          </plugin>
+          <plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-javadoc-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>attach-javadocs</id>
+		      <goals>
+		        <goal>jar</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+		  <configuration>
+		  	<failOnError>false</failOnError>
+		  </configuration>
+		</plugin>
+		<plugin>
+	      <groupId>org.sonatype.plugins</groupId>
+	      <artifactId>nexus-staging-maven-plugin</artifactId>
+	      <version>1.6.7</version>
+	      <extensions>true</extensions>
+	      <configuration>
+	        <serverId>ossrh</serverId>
+	        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+	        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+	        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+	        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
+	        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+	      </configuration>
+	    </plugin>
     </plugins>
 	<pluginManagement>
 		<plugins>
