@@ -62,7 +62,7 @@
 			                <artifactId>cddl-license</artifactId>
 			                <version>1.0.0</version>
 			                <packaging>txt</packaging>
-							<downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
+							<downloadUrl>https://raw.githubusercontent.com/OpenIdentityPlatform/OpenAM/master/LICENSE.md</downloadUrl>
                         	</artifactItem>
  					</artifactItems>
 				</configuration>
