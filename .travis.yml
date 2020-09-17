@@ -14,7 +14,7 @@ jobs:
       - git config --local user.name "Open Identity Platform Community" && git config --local user.email "open-identity-platform-openam@googlegroups.com"
       - git checkout -f $TRAVIS_BRANCH
       - git tag -f $git_version && git tag -d $git_version
-      - travis_wait 30 mvn -q -B -DtagNameFormat="$git_version" -DreleaseVersion="$git_version" -DtagNameFormat="@{project.version}" -DignoreSnapshots=true  -DpushChanges=false -DscmCommentPrefix="[ci skip] $TRAVIS_REPO_SLUG " -DskipTests -Darguments=-DskipTests -Dresume=false clean release:prepare 
+      - travis_wait 30 mvn -q -B -DtagNameFormat="$git_version" -DreleaseVersion="$git_version" -DtagNameFormat="@{project.version}" -DignoreSnapshots=false  -DpushChanges=false -DscmCommentPrefix="[ci skip] $TRAVIS_REPO_SLUG " -DskipTests -Darguments=-DskipTests -Dresume=false clean release:prepare 
       - git push --quiet --force https://$GITHUBKEY@github.com/$TRAVIS_REPO_SLUG.git >/dev/null 2>&1
       - git push --quiet --force https://$GITHUBKEY@github.com/$TRAVIS_REPO_SLUG.git $git_version >/dev/null 2>&1
       - export compare="$(git rev-list -n 1 $git_version_last)...$(git rev-list -n 1 $git_version)" && echo $compare
@@ -84,7 +84,7 @@ install:
   - #mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/commons
   - #mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ 
 script:
-  - mvn -B install 
+  - mvn -q -B install 
 after_failure:
   - echo 'remove build commits'
   - git reset --hard $TRAVIS_COMMIT
