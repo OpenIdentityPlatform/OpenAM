@@ -83,8 +83,8 @@ before_install:
 install:
   - #mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ/commons
   - #mvn -q -B -DskipTests -Dmaven.javadoc.skip=true install -f OpenDJ 
-script:
-  - mvn -q -B install -Dmaven.javadoc.skip=true
+#script:
+#  - mvn -q -B install -Dmaven.javadoc.skip=true
 after_failure:
   - echo 'remove build commits'
   - git reset --hard $TRAVIS_COMMIT
