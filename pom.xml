@@ -1017,6 +1017,12 @@
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-console</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-clientsdk</artifactId>
         <version>${project.version}</version>
       </dependency>
