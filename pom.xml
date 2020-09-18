@@ -1825,7 +1825,7 @@
 					<version>${project.version}</version>
 					<packaging>jar</packaging>
 					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
-					<deploy>true</deploy>
+					<deploy>false</deploy>
 				</artifactItem>
 				<artifactItem>
                 	<groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
@@ -1833,7 +1833,7 @@
                 	<version>${project.version}</version>
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
-                	<deploy>true</deploy>
+                	<deploy>false</deploy>
                 	<force>true</force>
               	</artifactItem>
               	<artifactItem>
@@ -1842,7 +1842,7 @@
                 	<version>${project.version}</version>
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/jdmkrt-2007-01-10.jar</downloadUrl>
-                	<deploy>true</deploy>
+                	<deploy>false</deploy>
               	</artifactItem>
 			</artifactItems>
 		</configuration>
