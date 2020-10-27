@@ -1426,11 +1426,11 @@
         <artifactId>authapi</artifactId>
         <version>${authapi.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.external</groupId>
-        <artifactId>jdmkrt</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+	  <dependency>
+	    <groupId>org.opendaylight.cardinal</groupId>
+	    <artifactId>jdmk</artifactId>
+	    <version>0.3.3</version>
+	  </dependency>
       <dependency>
         <groupId>external</groupId>
         <artifactId>jdmktk</artifactId>
@@ -1848,14 +1848,6 @@
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
                 	<deploy>true</deploy>
                 	<force>true</force>
-              	</artifactItem>
-              	<artifactItem>
-                	<groupId>org.openidentityplatform.external</groupId>
-                	<artifactId>jdmkrt</artifactId>
-                	<version>${project.version}</version>
-                	<packaging>jar</packaging>
-                	<downloadUrl>${basedir}/extlib/jdmkrt-2007-01-10.jar</downloadUrl>
-                	<deploy>true</deploy>
               	</artifactItem>
 			</artifactItems>
 		</configuration>

@@ -347,10 +347,10 @@
         </dependency>
 
         <!-- Legacy External Libraries for OpenAM -->
-        <dependency>
-            <groupId>org.openidentityplatform.external</groupId>
-            <artifactId>jdmkrt</artifactId>
-        </dependency>
+		<dependency>
+		    <groupId>org.opendaylight.cardinal</groupId>
+		    <artifactId>jdmk</artifactId>
+		</dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
