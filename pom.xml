@@ -120,7 +120,7 @@
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.19</freemarker.version>
-    <java-ipv6.version>0.14</java-ipv6.version>
+    <java-ipv6.version>0.17</java-ipv6.version>
     <json.version>20090211</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>1.4.188</h2database.version>
@@ -1595,7 +1595,7 @@
       <dependency>
         <groupId>org.asciidoctor</groupId>
         <artifactId>asciidoctorj</artifactId>
-        <version>2.1.0</version>
+        <version>2.4.1</version>
         <exclusions>
           <exclusion>
             <groupId>com.beust</groupId>
