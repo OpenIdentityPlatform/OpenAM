@@ -62,6 +62,10 @@
             <param-name>X-Frame-Options</param-name>
             <param-value>SAMEORIGIN</param-value>
         </init-param>
+        <init-param>
+            <param-name>excludes</param-name>
+            <param-value>/oauth2/connect/checkSession</param-value>
+        </init-param>
     </filter>
     <filter>
         <filter-name>CacheForFiveMinutes</filter-name>
