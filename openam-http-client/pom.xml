@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.5.3</version>
+        <version>14.5.4-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
@@ -44,10 +44,10 @@
     </issueManagement>
 
     <scm>
-        <url>https://svn.forgerock.org/commons/forgerock-http-client/trunk</url>
-        <connection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</developerConnection>
-      <tag>14.5.3</tag>
+        <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
+        <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:OpenIdentityPlatform/OpenAM.git</developerConnection>
+      <tag>HEAD</tag>
   </scm>
 
     <repositories>

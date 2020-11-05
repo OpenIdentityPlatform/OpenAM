@@ -21,7 +21,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.5.3</version>
+  <version>14.5.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -460,7 +460,7 @@
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
     <developerConnection>scm:git:ssh://git@github.com:OpenIdentityPlatform/OpenAM.git</developerConnection>
     <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
-    <tag>14.5.3</tag>
+    <tag>HEAD</tag>
   </scm>
   <!-- Dependency Management -->
   <dependencyManagement>
@@ -1838,7 +1838,7 @@
 					<version>${project.version}</version>
 					<packaging>jar</packaging>
 					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
-					<deploy>true</deploy>
+					<deploy>false</deploy>
 				</artifactItem>
 				<artifactItem>
                 	<groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
@@ -1846,7 +1846,7 @@
                 	<version>${project.version}</version>
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
-                	<deploy>true</deploy>
+                	<deploy>false</deploy>
                 	<force>true</force>
               	</artifactItem>
 			</artifactItems>
@@ -2102,6 +2102,20 @@
           <quiet>true</quiet>
         </configuration>
       </plugin>
+		<plugin>
+	      <groupId>org.sonatype.plugins</groupId>
+	      <artifactId>nexus-staging-maven-plugin</artifactId>
+	      <version>1.6.7</version>
+	      <extensions>true</extensions>
+	      <configuration>
+	        <serverId>ossrh</serverId>
+	        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+	        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+	        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+	        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
+	        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+	      </configuration>
+	    </plugin>
     </plugins>
 	<pluginManagement>
 		<plugins>

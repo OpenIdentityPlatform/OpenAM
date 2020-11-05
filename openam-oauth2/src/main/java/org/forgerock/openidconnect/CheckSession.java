@@ -149,7 +149,7 @@ public class CheckSession {
         }
         final SigningHandler signingHandler = signingManager.newHmacSigningHandler(
                 clientSecret.getBytes(Charset.forName("UTF-8")));
-        return jwt == null || !jwt.verify(signingHandler);
+        return jwt != null && jwt.verify(signingHandler);
     }
 
     /**
