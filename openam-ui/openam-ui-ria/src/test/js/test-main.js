@@ -32,11 +32,11 @@
         paths: {
             "backbone": "/base/target/dependencies/libs/backbone-1.1.2-min",
             "chai": "/base/node_modules/chai/chai",
-            "handlebars": "/base/target/dependencies/libs/handlebars-4.4.2",
+            "handlebars": "/base/target/dependencies/libs/handlebars-4.7.6",
             "i18next": "/base/target/dependencies/libs/i18next-1.7.3-min",
             "jquery": "/base/target/dependencies/libs/jquery-2.1.1-min",
             "lodash": "/base/target/dependencies/libs/lodash-3.10.1-min",
-            "moment": "/base/target/dependencies/libs/moment-2.8.1-min",
+            "moment": "/base/target/dependencies/libs/moment-2.28.0-min",
             "redux": "/base/target/dependencies/libs/redux-3.5.2-min",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
             "sinon": "/base/target/test-classes/libs/sinon-1.15.4",
