@@ -116,15 +116,15 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             // Obtain the cache size, if configured
             String cacheSizeStr = SystemProperties.get(Constants.EVENT_LISTENER_REMOTE_CLIENT_BACKLOG_CACHE);
             if (cacheSizeStr == null) {
-                cacheSize = 30;
+                cacheSize = 10;
             } else {
                 try {
                     cacheSize = Integer.parseInt(cacheSizeStr);
                     if (cacheSize < 0) {
-                        cacheSize = 30;
+                        cacheSize = 10;
                     }
                 } catch (NumberFormatException nfe) {
-                    cacheSize = 30;
+                    cacheSize = 10;
                 }
             }
             if (idRepoDebug.messageEnabled()) {
