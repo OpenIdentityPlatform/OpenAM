@@ -26,8 +26,8 @@
     <name>OpenAM SOAP STS</name>
 	<repositories>
 	     <repository>
-       		<id>mvnrepository.com</id>
-       		<url>https://repo.spring.io/libs-milestone</url>
+       		<id>maven-restlet</id>
+       		<url>https://maven.restlet.talend.com</url>
        </repository>
 	</repositories>
     <modules>
