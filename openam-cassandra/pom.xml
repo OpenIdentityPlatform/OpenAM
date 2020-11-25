@@ -38,14 +38,29 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+			    <groupId>com.datastax.oss</groupId>
+			    <artifactId>java-driver-core</artifactId>
+			    <version>4.3.1</version>
+			</dependency>
+			<dependency>
 				<groupId>com.datastax.cassandra</groupId>
 				<artifactId>cassandra-driver-core</artifactId>
-				<version>3.8.0</version>
+				<version>3.10.2</version>
 			</dependency>
 		    <dependency>
 				<groupId>org.cassandraunit</groupId>
 				<artifactId>cassandra-unit</artifactId>
-				<version>3.11.2.0</version>
+				<version>4.3.1.0</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.codehaus.jackson</groupId>
+			    <artifactId>jackson-core-asl</artifactId>
+			    <version>1.9.13</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.codehaus.jackson</groupId>
+			    <artifactId>jackson-mapper-asl</artifactId>
+			    <version>1.9.13</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -24,35 +24,30 @@ import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.cassandraunit.dataset.cql.FileCQLDataSet;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
-
 public class Server implements Runnable, Closeable {
-	Session session=null;
 	public void run() {
 		try {
 			if (System.getProperty("cassandra.native_transport_port")==null)
 				System.setProperty("cassandra.native_transport_port","9042");
 			EmbeddedCassandraServerHelper.startEmbeddedCassandra();//EmbeddedCassandraServerHelper.DEFAULT_CASSANDRA_YML_FILE,System.getProperty("java.io.tmpdir")+"/embeddedCassandra");
-			session = new Cluster.Builder().withPort(EmbeddedCassandraServerHelper.getNativeTransportPort()).addContactPoints("127.0.0.1").build().connect();
-			CQLDataLoader dataLoader = new CQLDataLoader(session);
-			String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","test.cql");
+			final com.datastax.oss.driver.api.core.CqlSession session = EmbeddedCassandraServerHelper.getSession();
+			final CQLDataLoader dataLoader = new CQLDataLoader(session);
+			String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
 			dataLoader.load(new File(dataSetLocation).exists()?new FileCQLDataSet(dataSetLocation): new ClassPathCQLDataSet(dataSetLocation));
+			session.close();
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-            		close();
+            	close();
             }
         });
 	}
 
 	public void close() {
 		EmbeddedCassandraServerHelper.stopEmbeddedCassandra();
-		if (session!=null)
-			session.close();
 	}
 	
 	public static void main(String[] args) {
