@@ -53,14 +53,9 @@
 				<version>4.3.1.0</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.codehaus.jackson</groupId>
-			    <artifactId>jackson-core-asl</artifactId>
-			    <version>1.9.13</version>
-			</dependency>
-			<dependency>
-			    <groupId>org.codehaus.jackson</groupId>
-			    <artifactId>jackson-mapper-asl</artifactId>
-			    <version>1.9.13</version>
+			    <groupId>org.apache.cassandra</groupId>
+			    <artifactId>cassandra-all</artifactId>
+			    <version>3.11.8</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
