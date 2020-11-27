@@ -465,11 +465,11 @@
   <dependencyManagement>
     <dependencies>
 	   <dependency>
-    		<groupId>org.openidentityplatform.opendj</groupId>
+    	<groupId>org.openidentityplatform.opendj</groupId>
 		<artifactId>opendj-parent</artifactId>
-		<version>4.4.8</version>
-    		<type>pom</type>
-    		<scope>import</scope>
+		<version>4.4.9-SNAPSHOT</version>
+    	<type>pom</type>
+    	<scope>import</scope>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
