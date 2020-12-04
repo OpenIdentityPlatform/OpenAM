@@ -24,7 +24,6 @@ import java.util.TreeMap;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openidentityplatform.openam.cassandra.Repo;
 
@@ -46,7 +45,7 @@ public class IdRepoTest {
 		
 		HashMap<String, Set<String>> configParams=new HashMap<String, Set<String>>();
 		//System.setProperty("DC", "DC1");
-		configParams.put("sun-idrepo-ldapv3-config-organization_name", new HashSet<String>(Arrays.asList(new String[] {"test_b2c_users"})));
+		configParams.put("sun-idrepo-ldapv3-config-organization_name", new HashSet<String>(Arrays.asList(new String[] {"realm_name"})));
 		configParams.put("sun-idrepo-ldapv3-config-ldap-server", new HashSet<String>(Arrays.asList(new String[] {"localhost"})));
 		configParams.put("sun-idrepo-ldapv3-config-authid", new HashSet<String>(Arrays.asList(new String[] {"cassandra"})));
 		configParams.put("sun-idrepo-ldapv3-config-user-attributes", new HashSet<String>(Arrays.asList(new String[] {"user:SunidentitymsisdnnumbeR=600","user:userPassword=700","user:cn=700"})));
@@ -59,14 +58,15 @@ public class IdRepoTest {
 		repo.shutdown();
 	}
 	
-	@Test
+	@Test 
 	public void delete_test() throws SSOException, IdRepoException{
 		repo.delete(null, IdType.USER, "9170000000");
+		repo.removeAttributes(null, IdType.USER, "9170000000", new HashSet<String>(Arrays.asList(new String[] {"uid","cn"})));
 		assertFalse(repo.isExists(null, IdType.USER, "9170000000"));
 		
 	}
 	
-	@Test @Ignore
+	@Test 
 	public void index_test() throws SSOException, IdRepoException, InterruptedException{
 		Map<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		
@@ -77,22 +77,18 @@ public class IdRepoTest {
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		param.put("userPassword", new HashSet<String>(Arrays.asList(new String[] {"{CLEAR}5155"})));
 		repo.create(null, IdType.USER, "9170000000",param);
-		assertTrue(repo.rowIndexGet(IdType.USER,"sunidentitymsisdnnumbeR", "9170000000").size()>0);
 		
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000+"})));
 		repo.setAttributes(null,IdType.USER, "9170000000", param, false);
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER,"sunidentitymsisdnnumbeR", "9170000000+").size()>0);
-		assertTrue(repo.rowIndexGet(IdType.USER,"sunidentitymsisdnnumbeR", "9170000000").size()==0);
 		
 		repo.delete(null, IdType.USER, "9170000000");
-		assertTrue(repo.rowIndexGet(IdType.USER,"sunidentitymsisdnnumbeR", "9170000000+").size()==0);
 		
 		
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss"})));
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		param.put("userPassword", new HashSet<String>(Arrays.asList(new String[] {"{CLEAR}5155"})));
+		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		repo.create(null, IdType.USER, "9170000000",param);
 		
 		//by UID
@@ -155,24 +151,13 @@ public class IdRepoTest {
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
 		
 		//restore row index
-		repo.rowIndexDelete(repo.getRowIndex(IdType.USER, "sunidentitymsisdnnumber"), "9170000000", "9170000000");
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==0);
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==1);
 		
 		//test parital row index
 		param.clear();
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss2"})));
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		repo.create(null, IdType.USER, "9170000001",param);
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==2);
-		
-		repo.rowIndexDelete(repo.getRowIndex(IdType.USER, "sunidentitymsisdnnumber"), "9170000000", "9170000001");
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==1);
 		
 		param.clear();
 		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
@@ -180,8 +165,7 @@ public class IdRepoTest {
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
 		
 		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000001"})));
-		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==1);
+		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==0);
 		
 		param.clear();
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss"})));
@@ -190,17 +174,12 @@ public class IdRepoTest {
 		
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss2"})));
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
-		Thread.sleep(1000);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==2);
 		
 		repo.delete(null, IdType.USER, "9170000000");
 		repo.delete(null, IdType.USER, "9170000001");
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000").size()==0);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000001").size()==0);
-		assertTrue(repo.rowIndexGet(IdType.USER, "sunidentitymsisdnnumber", "9170000000+").size()==0);
 	}
 	
-	@Test
+	@Test 
 	public void complex_test() throws SSOException, IdRepoException{
 		Map<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		

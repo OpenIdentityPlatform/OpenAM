@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.Host;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
@@ -73,7 +74,7 @@ public class ExecuteCallback implements FutureCallback<ResultSet> {
 		if (logger.isTraceEnabled())
 			logger.trace("{} ms {} {} ({}) {}->{} {}"
 					,System.currentTimeMillis()-start
-					,statement
+					,(statement instanceof BatchStatement)?((BatchStatement)statement).getStatements():statement
 					,statement.getConsistencyLevel()==null?session.getCluster().getConfiguration().getQueryOptions().getConsistencyLevel():statement.getConsistencyLevel()
 					,result.getAvailableWithoutFetching()
 					,result.getExecutionInfo().getQueriedHost()
@@ -85,7 +86,7 @@ public class ExecuteCallback implements FutureCallback<ResultSet> {
 	public void onFailure(Throwable t) {
 		logger.warn("{} ms {} {}: {} {}"
 				,System.currentTimeMillis()-start
-				,statement
+				,(statement instanceof BatchStatement)?((BatchStatement)statement).getStatements():statement
 				,statement.getConsistencyLevel()==null?session.getCluster().getConfiguration().getQueryOptions().getConsistencyLevel():statement.getConsistencyLevel()
 				,t.getMessage(),getStat(session));
 	}

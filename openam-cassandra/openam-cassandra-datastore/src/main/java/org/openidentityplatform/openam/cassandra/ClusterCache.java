@@ -46,6 +46,7 @@ import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.iplanet.am.util.SystemProperties;
 
+@SuppressWarnings("deprecation")
 public class ClusterCache {
 	final static Logger logger=LoggerFactory.getLogger(ClusterCache.class.getName());
 	static ConcurrentHashMap<String, Cluster> clusters=new ConcurrentHashMap<String, Cluster>();
