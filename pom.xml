@@ -1222,11 +1222,11 @@
         <artifactId>jdom</artifactId>
         <version>${jdom.version}</version>
       </dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.bundles</groupId>
-		    <artifactId>jaxrs-ri</artifactId>
-		    <version>2.28</version>
-		</dependency>
+	<dependency>
+	    <groupId>org.glassfish.jersey.bundles</groupId>
+	    <artifactId>jaxrs-ri</artifactId>
+	    <version>2.32</version>
+	</dependency>
       <dependency>
         <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
