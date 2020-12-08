@@ -582,6 +582,11 @@
                 <option label="sts.oidc.signature.algorithm.hmac.sha.384" value="HS384"/>
                 <option label="sts.oidc.signature.algorithm.hmac.sha.512" value="HS512"/>
                 <option label="sts.oidc.signature.algorithm.rsa.sha.256" value="RS256"/>
+                <option label="sts.oidc.signature.algorithm.rsa.sha.384" value="RS384"/>
+                <option label="sts.oidc.signature.algorithm.rsa.sha.512" value="RS512"/>
+                <option label="sts.oidc.signature.algorithm.ecdsa.sha.256" value="ES256"/>
+                <option label="sts.oidc.signature.algorithm.ecdsa.sha.384" value="ES384"/>
+                <option label="sts.oidc.signature.algorithm.ecdsa.sha.512" value="ES512"/>
                 <attribute name="multiple" value="false" />
             </cc>
             <fieldhelp name="helpOIDCSignatureAlgorithm" defaultValue="sts.oidc.signature.algorithm.help" />

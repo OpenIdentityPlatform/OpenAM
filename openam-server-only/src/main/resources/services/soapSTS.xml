@@ -268,6 +268,11 @@
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_384">RS384</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_512">RS512</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_256">ES256</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_384">ES384</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_512">ES512</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>RSA</Value>
@@ -555,6 +560,11 @@
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_384">RS384</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_512">RS512</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_256">ES256</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_384">ES384</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_512">ES512</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>RSA</Value>
