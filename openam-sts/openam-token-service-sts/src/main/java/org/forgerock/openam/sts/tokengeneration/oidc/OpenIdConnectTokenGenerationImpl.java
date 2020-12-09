@@ -24,7 +24,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.sm.DNMapper;
 
-import org.apache.commons.collections.MapUtils;
 import com.google.common.collect.Lists;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -183,20 +182,17 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
     }
 
     private void handleClaims(SSOToken subjectToken, STSOpenIdConnectToken openIdConnectToken, OpenIdConnectTokenConfig tokenConfig) throws TokenCreationException {
-        if (!MapUtils.isEmpty(tokenConfig.getClaimMap())) {
-            Map<String, String> mappedClaims =
-                    openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
-            //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
-            if (logger.isDebugEnabled()) {
-	            for (String key : mappedClaims.keySet()) {
-	                if (openIdConnectToken.isDefined(key)) {
-	                    logger.debug("In generating an OpenIdConnect token, the claim map for claim " + key +
-	                            " will over-write an existing claim.");
-	                }
-	            }
+        final Map<String, String> mappedClaims = openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
+        //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
+        if (logger.isDebugEnabled()) {
+            for (String key : mappedClaims.keySet()) {
+                if (openIdConnectToken.isDefined(key)) {
+                    logger.debug("In generating an OpenIdConnect token, the claim map for claim " + key +
+                            " will over-write an existing claim.");
+                }
             }
-            openIdConnectToken.setClaims(mappedClaims);
         }
+        openIdConnectToken.setClaims(mappedClaims);
     }
 
     private KeyPair getKeyPair(OpenIdConnectTokenPKIProvider cryptoProvider, String signatureKeyAlias, byte[] signatureKeyPassword)
