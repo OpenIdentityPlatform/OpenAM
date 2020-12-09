@@ -19,7 +19,7 @@
         "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
-    <Service name="SoapSecurityTokenService" version="1.0">
+    <Service name="SoapSecurityTokenService" version="2.0">
         <Schema
                 serviceHierarchy="/DSAMEConfig/SoapSecurityTokenService"
                 i18nFileName="soapSTS" revisionNumber="1"

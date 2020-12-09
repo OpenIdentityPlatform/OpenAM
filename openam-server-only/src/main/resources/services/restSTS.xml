@@ -19,7 +19,7 @@
         "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
-    <Service name="RestSecurityTokenService" version="1.0">
+    <Service name="RestSecurityTokenService" version="2.0">
         <Schema
                 serviceHierarchy="/DSAMEConfig/RestSecurityTokenService"
                 i18nFileName="restSTS" revisionNumber="1"
