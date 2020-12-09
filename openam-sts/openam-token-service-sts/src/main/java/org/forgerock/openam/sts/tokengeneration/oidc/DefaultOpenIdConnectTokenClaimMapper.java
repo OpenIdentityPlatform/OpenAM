@@ -66,7 +66,9 @@ public class DefaultOpenIdConnectTokenClaimMapper implements OpenIdConnectTokenC
                 else 
                 	adjustedMap.put(claimMapEntry.getKey(), token.getProperty(claimMapEntry.getValue(),true));
             }
-            adjustedMap.put("status", ""+(amIdentity.isExists()?amIdentity.isActive():true)); //add status to token
+            if (!adjustedMap.containsKey("status")) {
+            	adjustedMap.put("status", ""+(amIdentity.isExists()?amIdentity.isActive():true)); //add status to token
+            }
             return adjustedMap;
         } catch (IdRepoException | SSOException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
