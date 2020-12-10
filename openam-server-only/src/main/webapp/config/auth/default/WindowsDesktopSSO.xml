@@ -32,11 +32,16 @@
 
 
 <ModuleProperties moduleName="WindowsDesktopSSO" version="1.0" >
-    <Callbacks length="1" order="1" timeout="120" header="This server uses WindowsDesktopSSO Authentication" >
+    <Callbacks length="2" order="1" timeout="120" header="This server uses WindowsDesktopSSO Authentication" template="WindowsDesktopSSO.jsp" >
         <HttpCallback>
             <HttpHeader>Authorization</HttpHeader>
             <Negotiation>WWW-Authenticate:Negotiate</Negotiation> 
             <HttpErrorCode>401</HttpErrorCode>
         </HttpCallback>
+        <TextOutputCallback messageType="script"><![CDATA[
+        var p = new URLSearchParams(window.location.search);
+        p.set('skipKerberos', 'true');
+        window.location.search = p.toString();
+        ]]></TextOutputCallback>
     </Callbacks>
 </ModuleProperties>

@@ -971,7 +971,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 for (int i = 0; i < callbacks.length; i++) {
                     if (callbacks[i] instanceof HttpCallback) {
                         processHttpCallback((HttpCallback)callbacks[i]);
-                        return;
+                        //return;
                     } else if (callbacks[i] instanceof RedirectCallback) {
                         processRedirectCallback((RedirectCallback)callbacks[i]);
                         return;
@@ -1108,10 +1108,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                 ", code: " + hc.getNegotiationCode());
             }
             
-            forward = false;
+            //forward = false;
             response.setHeader(hc.getNegotiationHeaderName(),
             hc.getNegotiationHeaderValue());
-            response.sendError(hc.getNegotiationCode());
+            response.setStatus(hc.getNegotiationCode());
+            //response.sendError();
             return;
         }
     }
