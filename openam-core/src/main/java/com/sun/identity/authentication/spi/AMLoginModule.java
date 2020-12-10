@@ -2388,6 +2388,15 @@ public abstract class AMLoginModule implements LoginModule {
     public boolean isSharedStateEnabled() {
         return isSharedState;
     }
+    
+    
+    /**
+     * Updates shared state for the module
+     * @param val - if shared state enabled for the module.
+     */
+    public void setSharedStateEnabled(boolean val) {
+    	isSharedState = val;
+    }
 
     /**
      * Sets flag to force read call backs in auth chain process.
