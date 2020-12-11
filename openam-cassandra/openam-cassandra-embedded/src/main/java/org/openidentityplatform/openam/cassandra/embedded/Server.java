@@ -29,7 +29,7 @@ public class Server implements Runnable, Closeable {
 		try {
 			if (System.getProperty("cassandra.native_transport_port")==null)
 				System.setProperty("cassandra.native_transport_port","9042");
-			EmbeddedCassandraServerHelper.startEmbeddedCassandra();//EmbeddedCassandraServerHelper.DEFAULT_CASSANDRA_YML_FILE,System.getProperty("java.io.tmpdir")+"/embeddedCassandra");
+			EmbeddedCassandraServerHelper.startEmbeddedCassandra(EmbeddedCassandraServerHelper.DEFAULT_CASSANDRA_YML_FILE,System.getProperty("cassandra.path",System.getProperty("java.io.tmpdir")+"/embeddedCassandra"));
 			final com.datastax.oss.driver.api.core.CqlSession session = EmbeddedCassandraServerHelper.getSession();
 			final CQLDataLoader dataLoader = new CQLDataLoader(session);
 			String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
