@@ -130,7 +130,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
         this.options = options;
         HttpServletRequest request = getHttpServletRequest();
-        if (request != null && "true".equals(request.getParameter("skipKerberos"))) {
+        if (request == null || "true".equals(request.getParameter("skipKerberos"))) {
         	setSharedStateEnabled(true);
         }
     }

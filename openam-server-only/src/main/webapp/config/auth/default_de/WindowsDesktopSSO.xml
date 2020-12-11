@@ -23,7 +23,8 @@
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
 
-    $Id: WindowsDesktopSSO.xml,v 1.3 2008/06/25 05:44:57 qcheng Exp $
+   $Id: WindowsDesktopSSO.xml,v 1.9 2009/07/16 04:12:00 cbasha Exp $
+   $Id: WindowsDesktopSSO.xml,v 1.10 2020/12/11 12:30:00 Open Indentity Platform Community Exp $
 
 -->
 
@@ -32,7 +33,7 @@
 
 
 <ModuleProperties moduleName="WindowsDesktopSSO" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="This server uses WindowsDesktopSSO Authentication" template="WindowsDesktopSSO.jsp" >
+    <Callbacks length="2" order="1" timeout="120" header="Auf diesem Server kommt die WindowsDesktopSSO-Authentifizierung zum Einsatz." template="WindowsDesktopSSO.jsp" >
         <HttpCallback>
             <HttpHeader>Authorization</HttpHeader>
             <Negotiation>WWW-Authenticate:Negotiate</Negotiation> 
