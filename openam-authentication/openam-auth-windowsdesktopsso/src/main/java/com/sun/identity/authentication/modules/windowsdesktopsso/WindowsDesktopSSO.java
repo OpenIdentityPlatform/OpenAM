@@ -158,8 +158,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         // Check to see if the Rest Auth Endpoint has signified that IWA has failed.
         HttpServletRequest request = getHttpServletRequest();
-        if (request != null && 
-        		(hasWDSSOFailed(request) || "true".equals(request.getParameter("skipKerberos")))) {
+        if (request == null  
+        		|| hasWDSSOFailed(request) 
+        		|| "true".equals(request.getParameter("skipKerberos"))) {
             return ISAuthConstants.LOGIN_IGNORE;
         }
 
