@@ -134,8 +134,7 @@ public class InternalSessionFactory {
         SessionID sid;
         do {
             sid = SessionID.generateSessionID(serverConfig, domain);
-        } while (sessionAccessManager.getInternalSession(sid) != null
-                || sessionAccessManager.getInternalSessionByHandle(sid.toString()) != null);
+        } while (sessionAccessManager.getInternalSession(sid) != null);
         return sid;
     }
 
