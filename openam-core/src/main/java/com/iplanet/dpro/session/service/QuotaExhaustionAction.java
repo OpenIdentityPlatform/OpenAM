@@ -48,4 +48,5 @@ public interface QuotaExhaustionAction {
      * @return <code>true</code> if the session activation request should be rejected, <code>false</code> otherwise
      */
     public boolean action(InternalSession is, Map<String, Long> existingSessions);
+    
 }

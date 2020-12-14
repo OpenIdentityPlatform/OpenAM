@@ -22,40 +22,14 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.session.SessionConstants.*;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.QuotaExhaustionAction;
-import com.sun.identity.shared.debug.Debug;
+import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
 
-import java.util.Date;
 import java.util.Map;
-import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.TimeUtils;
 
-public class DestroyNextExpiringAction implements QuotaExhaustionAction {
-
-    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
-
-    private final SessionCache sessionCache;
-
-    public DestroyNextExpiringAction() {
-        this.sessionCache = InjectorHolder.getInstance(SessionCache.class);
-    }
-
-    @Inject
-    public DestroyNextExpiringAction(SessionCache sessionCache) {
-        this.sessionCache = sessionCache;
-    }
+public class DestroyNextExpiringAction extends QuotaExhaustionActionImpl {
 
     @Override
     public boolean action(InternalSession is, Map<String, Long> sessions) {
@@ -68,16 +42,9 @@ public class DestroyNextExpiringAction implements QuotaExhaustionAction {
             		smallExpTime = entry.getValue();
 	            }
 	        }
-        if (nextExpiringSessionID != null) 
-            try {
-            	Session s=sessionCache.getSession(new SessionID(nextExpiringSessionID), true, false);
-                s.destroySession(s);
-                debug.error("{} {} {} {} expire={}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(smallExpTime).getTimeInMillis()));
-            } catch (SessionException e) {
-            	debug.error("{} {} {} {} expire={} {}", this.getClass().getSimpleName(), nextExpiringSessionID,is.getClientID(),sessions.size()+1,new Date(TimeUtils.fromUnixTime(smallExpTime).getTimeInMillis()),e.toString());
-            }finally {
-            	sessions.remove(nextExpiringSessionID);
-			}
+        if (nextExpiringSessionID != null) { 
+        	destroy(nextExpiringSessionID,sessions);
+        }
         return false;
     }
 }

@@ -23,23 +23,11 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.session.SessionConstants.*;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.QuotaExhaustionAction;
-import com.sun.identity.shared.debug.Debug;
+import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
 import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
 
 /**
  * This action will invalidate all currently existing sessions, but it will
@@ -48,39 +36,14 @@ import org.forgerock.openam.session.SessionCache;
  *
  * @author Steve Ferris
  */
-public class DestroyAllAction implements QuotaExhaustionAction {
-
-    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
-
-    private final SessionCache sessionCache;
-
-    public DestroyAllAction() {
-        this.sessionCache = InjectorHolder.getInstance(SessionCache.class);
-    }
-
-    @Inject
-    public DestroyAllAction(SessionCache sessionCache) {
-        this.sessionCache = sessionCache;
-    }
+public class DestroyAllAction extends QuotaExhaustionActionImpl {
 
     @Override
-    public boolean action(InternalSession is, Map sessions) {
-        final Set<String> sids = sessions.keySet();
-        debug.message("there are " + sids.size() + " sessions");
-        for (String sid : sids) 
-        		if (!StringUtils.equals(is.getSessionID().toString(), sid))
+    public boolean action(InternalSession is, Map<String,Long> sessions) {
+        for (String sid : sessions.keySet()) 
+        	if (!StringUtils.equals(is.getSessionID().toString(), sid))
 	        {
-	            final SessionID sessID = new SessionID(sid);
-	            try {
-	                Session s=sessionCache.getSession(sessID, true, false);
-	                s.destroySession(s);
-	                debug.error("{} {} {} {}", this.getClass().getSimpleName(), sessID,is.getClientID(),s.getIdleTime());
-	                s.destroySession(s);
-	            } catch (SessionException se) {
-	                debug.error("{} {} {} {} {}", this.getClass().getSimpleName(), sessID,is.getClientID(),sessions.size()+1,se.toString());
-	            }finally {
-	            		sessions.remove(sid);
-				}
+        		destroy(sid,sessions);
 	        }
         return false;
     }
