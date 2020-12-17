@@ -79,11 +79,13 @@ public class UserDevicesDao {
 
             Set<String> set = (Set<String>) identity.getAttribute(attrName);
 
-            for (String profile : set) {
-                try {
-                    devices.add(deviceSerialisation.stringToDeviceProfile(profile));
-                } catch (JsonException jve) {
-                    //RTE, generally indicative that the profile attribute name has changed (still return devices set)
+            if (set != null) {
+                for (String profile : set) {
+                    try {
+                        devices.add(deviceSerialisation.stringToDeviceProfile(profile));
+                    } catch (JsonException jve) {
+                        //RTE, generally indicative that the profile attribute name has changed (still return devices set)
+                    }
                 }
             }
 
