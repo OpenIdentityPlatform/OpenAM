@@ -31,45 +31,22 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.datastax.cassandra</groupId>
-			<artifactId>cassandra-driver-core</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>io.netty</groupId>
-					<artifactId>netty-handler</artifactId>
-				</exclusion>
-			</exclusions>
+		    <groupId>com.datastax.oss</groupId>
+		    <artifactId>java-driver-core</artifactId>
+		</dependency>
+		<dependency>
+			  <groupId>com.datastax.oss</groupId>
+			  <artifactId>java-driver-query-builder</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>	
 			<artifactId>openam-cassandra-embedded</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-core-asl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-mapper-asl</artifactId>
-				</exclusion>
-<!-- 				<exclusion> -->
-<!-- 					<groupId>io.netty</groupId> -->
-<!-- 					<artifactId>netty-handler</artifactId> -->
-<!-- 				</exclusion> -->
-			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-core-asl</artifactId>
-		    <version>1.9.13</version>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-mapper-asl</artifactId>
-		    <version>1.9.13</version>
-		    <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
   </dependencies>
 </project>

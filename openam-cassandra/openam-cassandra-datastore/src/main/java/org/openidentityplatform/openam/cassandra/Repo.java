@@ -16,9 +16,9 @@
 
 package org.openidentityplatform.openam.cassandra;
 
+import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,13 +33,18 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select.Where;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.delete.Delete;
+import com.datastax.oss.driver.api.querybuilder.insert.Insert;
+
+import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
+import com.datastax.oss.driver.api.querybuilder.select.Select;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdOperation;
@@ -61,10 +66,10 @@ public class Repo extends IdRepo {
 	final Map<IdType,String> type2table=new HashMap<IdType, String>();
 	final Map<IdType,Map<String,Integer>> type2attr2ttl=new HashMap<IdType, Map<String,Integer>>();
 	
-	public Session session=null;
+	final String profile="repo";
+	public CqlSession session=null;
 	String activeAttr="inetuserstatus";
 	String activeValue="Active";
-	String keyspace="test";
 	String memberOf="memberOf";
 	@Override
 	public void initialize(Map<String, Set<String>> configParams) throws IdRepoException  {
@@ -81,10 +86,12 @@ public class Repo extends IdRepo {
 				String[] split=str.split("\\=");
 				if (split.length>1){
 					IdType idType=String2IdType(split[0]);
-					if (!supportedOps.containsKey(idType))
+					if (!supportedOps.containsKey(idType)) {
 						supportedOps.put(idType, new HashSet<IdOperation>());
-					for (String strOp : split[1].split(",")) 
+					}
+					for (String strOp : split[1].split(",")) {
 						supportedOps.get(idType).add(String2IdOperation(strOp));
+					}
 				}
 			}
 			
@@ -93,8 +100,9 @@ public class Repo extends IdRepo {
 			Set<String> sunIdRepoAttributeMapping=((Map<String, Set<String>>)configParams).get("sunIdRepoAttributeMapping");
 			for (String str : sunIdRepoAttributeMapping!=null?sunIdRepoAttributeMapping:new HashSet<String>(Arrays.asList(new String[]{"group=group","realm=realm","user=user"}))){ 
 				String[] split=str.split("\\=");
-				if (split.length>1)
+				if (split.length>1) {
 					type2table.put(String2IdType(split[0]), split[1]);
+				}
 			}
 			
 	//		sun-idrepo-ldapv3-config-user-attributes=[group:attr3=86400, realm:attr1=86400, user:attr2=86400], 
@@ -105,17 +113,35 @@ public class Repo extends IdRepo {
 					if (split.length>1){
 						String[] split2=split[0].split(":");
 						IdType idType=String2IdType(split2[0]);
-						if (!type2attr2ttl.containsKey(idType))
+						if (!type2attr2ttl.containsKey(idType)) {
 							type2attr2ttl.put(idType, new TreeMap<String,Integer>(String.CASE_INSENSITIVE_ORDER));
+						}
 						type2attr2ttl.get(idType).put(split2[1], Integer.parseInt(split[1]));
 					}
 				}
-			keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
-			Cluster cluster=ClusterCache.getCluster(
-					((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-ldap-server").toArray(new String[0]), 
-					CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authid","cassandra"), 
-					CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authpw","cassandra"));
-			session=cluster.connect(keyspace);
+			final String keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
+			final String[] servers=((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-ldap-server").toArray(new String[0]);
+			final String username=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authid",null);
+			final String password=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authpw",null);
+			
+			logger.info("create session {}/{}",username,servers);
+			CqlSessionBuilder builder=CqlSession.builder()
+					.withApplicationName("OpenAM datastore: "+keyspace)
+					.withConfigLoader(DriverConfigLoader.fromClasspath("/application.conf",this.getClass().getClassLoader()))
+					.withKeyspace(keyspace);
+			if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
+				builder=builder.withAuthCredentials(username, password);
+			}
+			if (servers!=null && servers.length>0) {
+				for (String address : servers) {
+					try {
+						builder=builder.addContactPoint(new InetSocketAddress(address,SystemProperties.getAsInt("cassandra.native_transport_port", 9042)));
+					}catch (Throwable e) {
+						logger.error("bad address {}: {}",address,e.getMessage());
+					}
+				}
+			}
+			session=builder.build();
 		}catch(Exception e){
 			logger.error("error",e);
 			throw new RuntimeException(e);
@@ -125,8 +151,10 @@ public class Repo extends IdRepo {
 	@Override
 	public void shutdown() {
 		super.shutdown();
-		if (session!=null && !session.isClosed())
+		if (session!=null && !session.isClosed()) {
 			session.close();
+		}
+		session=null;
 	}
 	
 	@Override
@@ -172,20 +200,22 @@ public class Repo extends IdRepo {
 		validate(type, IdOperation.READ);
 		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		try{
-			Where select=QueryBuilder.select().from(keyspace,"values")
-				.where(QueryBuilder.eq("type", type.getName()))
-				.and(QueryBuilder.eq("uid", name));
+			Select select=selectFrom("values").columns("field","value")
+					.whereColumn("type").isEqualTo(bindMarker("type"))
+					.whereColumn("uid").isEqualTo(bindMarker("uid"));
+			final Set<String> fields=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 			if (attrNames!=null && !attrNames.isEmpty()) {
-				final Set<String> fields=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+				select=select.whereColumn("field").in(bindMarker("fields"));
 				for (String field : attrNames)
 					fields.add(field.toLowerCase());
-				select=select.and(QueryBuilder.in("field", fields));
 			}
-			
-			final ResultSet rc=new ExecuteCallback(session,select).execute();
+			final SimpleStatement statement=select.builder()
+				.addNamedValue("type", type.getName())
+				.addNamedValue("uid", name)
+				.addNamedValue("fields", fields)
+				.build();
+			final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 			for (Row row : rc){
-				if (rc.getAvailableWithoutFetching() == (session.getCluster().getConfiguration().getQueryOptions().getFetchSize()-1) && !rc.isFullyFetched())
-					rc.fetchMoreResults(); // this is asynchronous
 				final String field=row.getString("field");
 				final Set<String> values=attr.getOrDefault(field, new LinkedHashSet<String>(1));
 				values.add(row.getString("value"));
@@ -231,32 +261,43 @@ public class Repo extends IdRepo {
 			
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				if (!isAdd) {//remove old values
-					final Statement update=QueryBuilder.delete().from(keyspace,"values")
-							.where(QueryBuilder.eq("type", type.getName()))
-							.and(QueryBuilder.eq("uid", name))
-							.and(QueryBuilder.eq("field", entry.getKey().toLowerCase()));
+					final Delete delete=deleteFrom("values")
+							.whereColumn("type").isEqualTo(bindMarker("type"))
+							.whereColumn("uid").isEqualTo(bindMarker("uid"))
+							.whereColumn("field").isEqualTo(bindMarker("field"));
+					final SimpleStatement statement=delete.builder()
+							.addNamedValue("type", type.getName())
+							.addNamedValue("uid", name)
+							.addNamedValue("field", entry.getKey().toLowerCase())
+							.build();
 					if (async)
-						new ExecuteCallback(session, update).executeAsync();
+						new ExecuteCallback(profile,session, statement).executeAsync();
 					else
-						new ExecuteCallback(session, update).execute();
-					
+						new ExecuteCallback(profile,session, statement).execute();
 				}
 				final Integer ttl=getTTL(type, entry.getKey());
+				Insert insert=insertInto("values")
+						.value("change",function("toTimestamp", function("now")))
+						.value("type",bindMarker("type"))
+						.value("uid",bindMarker("uid"))
+						.value("field",bindMarker("field"))
+						.value("value",bindMarker("value"));
+				if (ttl!=null && ttl>0)
+					insert=insert.usingTtl(ttl);
 				for (final String  value: convert(entry.getKey(),entry.getValue())) {
-					Statement update=QueryBuilder.update(keyspace,"values").with(QueryBuilder.set("change",new Date(System.currentTimeMillis())))
-							.where(QueryBuilder.eq("type", type.getName()))
-							.and(QueryBuilder.eq("uid", name))
-							.and(QueryBuilder.eq("field", entry.getKey().toLowerCase()))
-							.and(QueryBuilder.eq("value", value));
-					if (ttl!=null && ttl>0)
-						update=((com.datastax.driver.core.querybuilder.Update.Where)update).using(QueryBuilder.ttl(ttl));
+					final SimpleStatement statement=insert.builder()
+							//.addNamedValue("change", new Date(System.currentTimeMillis()))
+							.addNamedValue("type", type.getName())
+							.addNamedValue("uid", name)
+							.addNamedValue("field", entry.getKey().toLowerCase())
+							.addNamedValue("value", value)
+							.build();
 					if (async)
-						new ExecuteCallback(session, update).executeAsync();
+						new ExecuteCallback(profile,session, statement).executeAsync();
 					else
-						new ExecuteCallback(session, update).execute();
+						new ExecuteCallback(profile,session, statement).execute();
 				}
 			}
-			
 		}catch(Throwable e){
 			logger.error("setAttributes {} {} {} {}",type,name,attributes,isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
@@ -281,14 +322,21 @@ public class Repo extends IdRepo {
 				for (String field : attrNames){ 
 					deleteColums.add(field.toLowerCase());
 				}
-			
-			com.datastax.driver.core.querybuilder.Delete.Where statement=QueryBuilder.delete().from(keyspace,"values").where(QueryBuilder.eq("type", type.getName())).and(QueryBuilder.eq("uid", name));
+			Delete delete=deleteFrom("values")
+					.whereColumn("type").isEqualTo(bindMarker("type"))
+					.whereColumn("uid").isEqualTo(bindMarker("uid"));
 			if (!deleteColums.isEmpty())
-				statement=statement.and(QueryBuilder.in("field", deleteColums));
+				delete=delete.whereColumn("field").in(bindMarker("fields"));
+			
+			final SimpleStatement statement=delete.builder()
+					.addNamedValue("type", type.getName())
+					.addNamedValue("uid", name)
+					.addNamedValue("fields", deleteColums)
+					.build();
 			if (async)
-				new ExecuteCallback(session, statement).executeAsync();
+				new ExecuteCallback(profile,session, statement).executeAsync();
 			else
-				new ExecuteCallback(session, statement).execute();
+				new ExecuteCallback(profile,session, statement).execute();
 		}catch(Throwable e){
 			logger.error("removeAttributes {} {} {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
@@ -327,18 +375,21 @@ public class Repo extends IdRepo {
 			
 			//search by pattern/username without filter
 			if  (avPairs==null || avPairs.isEmpty()) {
-				Where select=QueryBuilder.select().from(keyspace,"values")
-					.where(QueryBuilder.eq("type", type.getName()));
+				Select select=selectFrom("values").columns("uid","field","value")
+						.whereColumn("type").isEqualTo(bindMarker("type"));
 				if (!StringUtils.equals(pattern, "*")){
-					select=select.and(QueryBuilder.eq("uid", pattern));
+					select=select.whereColumn("uid").isEqualTo(bindMarker("uid"));
 				}
 				if (attrNames!=null && !attrNames.isEmpty()) {
-					select=select.and(QueryBuilder.in("field", attrNames));
+					select=select.whereColumn("field").in(bindMarker("fields"));
 				}
-				final ResultSet rc=new ExecuteCallback(session,select.limit(32000).allowFiltering()).execute();
+				final SimpleStatement statement=select.limit(32000).allowFiltering().builder()
+						.addNamedValue("type", type.getName())
+						.addNamedValue("uid", pattern)
+						.addNamedValue("fields", attrNames)
+						.build();
+				final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 				for (Row row : rc){
-					if (rc.getAvailableWithoutFetching() == (session.getCluster().getConfiguration().getQueryOptions().getFetchSize()-1) && !rc.isFullyFetched())
-						rc.fetchMoreResults(); // this is asynchronous
 					final String uid=row.getString("uid");
 					Map<String, Set<String>> attr=result.get(uid);
 					if (attr==null) {
@@ -358,21 +409,22 @@ public class Repo extends IdRepo {
 			//search by filters
 			if (avPairs!=null) {
 				for (final Entry<String, Set<String>> filterEntry : avPairs.entrySet()){
-					if (session.getCluster().getMetadata().getKeyspace(keyspace).getMaterializedView("ix_".concat(filterEntry.getKey().toLowerCase()))==null) {
-						throw new RuntimeException("CREATE MATERIALIZED VIEW IF NOT EXISTS ix_"+filterEntry.getKey().toLowerCase()+" AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='"+filterEntry.getKey().toLowerCase()+"' and value IS NOT NULL PRIMARY KEY (type,field,value,uid)");
-					}
-					
 					final Map<String, Map<String,Set<String>>> users2attr=new HashMap<String, Map<String,Set<String>>>();
-					Where select=QueryBuilder.select().from(keyspace,"ix_".concat(filterEntry.getKey().toLowerCase()))
-							.where(QueryBuilder.eq("type", type.getName()))
-							.and(QueryBuilder.eq("field", filterEntry.getKey().toLowerCase()))
-							.and(QueryBuilder.in("value", filterEntry.getValue()));
-					if (!StringUtils.equals(pattern, "*"))
-						select=select.and(QueryBuilder.eq("uid", pattern));
-					final ResultSet rc=new ExecuteCallback(session,select.limit(32000)).execute();
+					Select select=selectFrom("ix_".concat(filterEntry.getKey().toLowerCase())).columns("uid","field","value")
+							.whereColumn("type").isEqualTo(bindMarker("type"))
+							.whereColumn("field").isEqualTo(bindMarker("field"))
+							.whereColumn("value").in(bindMarker("value"));
+					if (!StringUtils.equals(pattern, "*")) {
+						select=select.whereColumn("uid").isEqualTo(bindMarker("uid"));
+					}
+					final SimpleStatement statement=select.limit(32000).builder()
+							.addNamedValue("type", type.getName())
+							.addNamedValue("field", filterEntry.getKey().toLowerCase())
+							.addNamedValue("value", filterEntry.getValue())
+							.addNamedValue("uid", pattern)
+							.build();
+					final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 					for (Row row : rc){
-						if (rc.getAvailableWithoutFetching() == (session.getCluster().getConfiguration().getQueryOptions().getFetchSize()-1) && !rc.isFullyFetched())
-							rc.fetchMoreResults(); // this is asynchronous
 						final String uid=row.getString("uid");
 						Map<String, Set<String>> attr=users2attr.get(uid);
 						if (attr==null) {
@@ -419,7 +471,7 @@ public class Repo extends IdRepo {
 				}
 			}
 			return new RepoSearchResults(result.keySet(),(maxResults>0&&result.size()>maxResults)?RepoSearchResults.SIZE_LIMIT_EXCEEDED:RepoSearchResults.SUCCESS,result,type);
-		}catch(Throwable e){e.printStackTrace();
+		}catch(Throwable e){
 			logger.error("search {} {} {} {} {} {} {} {} {}",type,pattern,maxTime,maxResults,returnAttrs,returnAllAttrs,filterOp,avPairs,recursive,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}

@@ -28,12 +28,17 @@
   <description>OpenAM Embedded Cassandra</description>
   <dependencies>
 		<dependency>
-			<groupId>org.cassandraunit</groupId>
-			<artifactId>cassandra-unit</artifactId>
-		</dependency>
-		<dependency>
 		    <groupId>com.datastax.oss</groupId>
 		    <artifactId>java-driver-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.cassandra</groupId>
+		    <artifactId>cassandra-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

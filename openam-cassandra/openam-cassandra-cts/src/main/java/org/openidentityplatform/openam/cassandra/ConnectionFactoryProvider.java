@@ -16,56 +16,51 @@
 
 package org.openidentityplatform.openam.cassandra;
 
-import java.net.InetAddress;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-//import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
-//import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.datalayer.utils.TimeoutConfig;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
-import org.openidentityplatform.openam.cassandra.ClusterCache;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.sun.identity.shared.debug.Debug;
 
 /**
  * Responsible for generating ConnectionFactory instances. The instances
  * generated are tailored to the {@link ConnectionType} required by the caller.
- * <p/>
+ * <p>
  * This factory provider is aware of two main use cases for the service
  * management layer (also known as Data Layer).
- * <p/>
+ * <p>
  * Default - Uses the service management configuration for connections. This
  * will connect to the defined LDAP server, whether that is embedded or
  * external.
- * <p/>
+ * <p>
  * External - Uses CTS Configuration for CTS connections which are pointed
  * towards an external LDAP server. Uses service management configuration for
  * {@link StoreMode#DEFAULT} connections.
  */
 @Singleton
-public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datalayer.providers.ConnectionFactoryProvider<Session> {
-
+public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datalayer.providers.ConnectionFactoryProvider<CqlSession> {
+	public static String profile="cts";
 	// Injected
 	private final TimeoutConfig timeoutConfig;
 	private final ConnectionConfigFactory configFactory;
+	private final DataLayerConfiguration dataLayerConfiguration;
 
 	private final Debug debug;
 	private final ConnectionType connectionType;
@@ -73,52 +68,68 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 	/**
 	 * Generates an instance and registers the shutdown listener.
 	 *
+	 * @param connectionType
+	 *            Required, non null.
 	 * @param connectionConfigFactory
 	 *            Required to resolve configuration parameters, non null.
+	 * @param dataLayerConfiguration
+	 *            Required, non null.            
 	 * @param timeoutConfig
 	 *            Timeout Configuration, Non null.
-	 * @param count
-	 *            Connection Count logic, Non null.
 	 * @param debug
 	 *            Required for debugging.
 	 */
 	@Inject
-	public ConnectionFactoryProvider(ConnectionType connectionType, ConnectionConfigFactory connectionConfigFactory, TimeoutConfig timeoutConfig, @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug) {
+	public ConnectionFactoryProvider(ConnectionType connectionType, ConnectionConfigFactory connectionConfigFactory, DataLayerConfiguration dataLayerConfiguration,TimeoutConfig timeoutConfig, @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug) {
 		this.configFactory = connectionConfigFactory;
 		this.timeoutConfig = timeoutConfig;
 		this.debug = debug;
 		this.connectionType = connectionType;
+		this.dataLayerConfiguration=dataLayerConfiguration;
 	}
 
+	static ConnectionFactory connectionFactory=null;
 	/**
 	 * Creates instances of ConnectionFactory which are aware of the need to
 	 * share the DataLayer and CTS connections in the same connection pool.
 	 *
 	 * @return {@inheritDoc}
 	 */
-	Cluster cluster=null;
-	public org.forgerock.openam.sm.datalayer.api.ConnectionFactory<Session> createFactory() throws InvalidConfigurationException {
-		if (cluster==null) 
-			synchronized (this) {
-				if (cluster==null) {
-					ConnectionConfig config = configFactory.getConfig(connectionType);
-					int timeout = timeoutConfig.getTimeout(connectionType);
+	public org.forgerock.openam.sm.datalayer.api.ConnectionFactory<CqlSession> createFactory() throws InvalidConfigurationException {
+		if (connectionFactory==null) {
+			synchronized (this.getClass()) {
+				if (connectionFactory==null) {
+					final ConnectionConfig config = configFactory.getConfig(connectionType);
+					final int timeout = timeoutConfig.getTimeout(connectionType);
 			
 					debug("Creating Embedded Factory:\nURL: {0}\nMax Connections: {1}\nHeartbeat: {2}\nOperation Timeout: {3}", config.getLDAPURLs(), config.getMaxConnections(), config.getLdapHeartbeat(), timeout);
 			
-					List<String> seed = new ArrayList<String>(config.getLDAPURLs().size());
-					for (LDAPURL ldap : config.getLDAPURLs())
-						try {
-							seed.add(InetAddress.getByName(ldap.getHost()).getHostAddress());
-						} catch (Exception e) {
-							debug("{0} {1}", ldap.getHost().toString(), e.getMessage());
-						}
-					if (seed.size() < 1)
-						throw new InvalidConfigurationException("server list is empty");
-					cluster = ClusterCache.getCluster(seed.toArray(new String[0]), config.getBindDN(), new String(config.getBindPassword()));
+					final String keyspace=dataLayerConfiguration.getKeySpace();
+					
+			//		final String username=config.getBindDN();
+			//		final String password=new String(config.getBindPassword());
+					
+					CqlSessionBuilder builder=CqlSession.builder()
+							.withApplicationName("OpenAM CTS: "+keyspace)
+							.withConfigLoader(DriverConfigLoader.fromClasspath("/application.conf",this.getClass().getClassLoader()))
+							.withKeyspace(keyspace);
+			//		if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
+			//			builder=builder.withAuthCredentials(username, password);
+			//		}
+			//		if (config.getLDAPURLs()!=null) {
+			//			for (LDAPURL ldap : config.getLDAPURLs()) {
+			//				try {
+			//					builder=builder.addContactPoint(new InetSocketAddress(ldap.getHost(),SystemProperties.getAsInt("cassandra.native_transport_port", ldap.getPort())));
+			//				}catch (Throwable e) {
+			//					debug.error("bad address {}: {}",ldap,e.getMessage());
+			//				}
+			//			}
+			//		}
+					connectionFactory=new ConnectionFactory(builder);
 				}
 			}
-		return new ConnectionFactory(cluster);
+		}
+		return connectionFactory;
 	}
 
 	private void debug(String format, Object... args) {
@@ -126,48 +137,47 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 			debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
 	}
 
-	public static class ConnectionFactory implements org.forgerock.openam.sm.datalayer.api.ConnectionFactory<Session> {
-		final Cluster cluster;
+	public static class ConnectionFactory implements org.forgerock.openam.sm.datalayer.api.ConnectionFactory<CqlSession> {
+		final CqlSessionBuilder builder;
 
-		public ConnectionFactory(Cluster cluster) {
-			this.cluster = cluster;
+		public ConnectionFactory(CqlSessionBuilder cluster) {
+			this.builder = cluster;
 		}
 
 		@Override
-		public Promise<Session, DataLayerException> createAsync() {
-			final Promise<Session, DataLayerException> promise = PromiseImpl.create();
+		public Promise<CqlSession, DataLayerException> createAsync() {
+			final Promise<CqlSession, DataLayerException> promise = PromiseImpl.create();
 			try {
-				((PromiseImpl<Session, DataLayerException>) promise).tryHandleResult(create());
+				((PromiseImpl<CqlSession, DataLayerException>) promise).tryHandleResult(create());
 			} catch (Throwable e) {
-				((PromiseImpl<Session, DataLayerException>) promise).tryHandleException(new DataLayerException("session is null"));
+				((PromiseImpl<CqlSession, DataLayerException>) promise).tryHandleException(new DataLayerException("session is null"));
 			}
 			return promise;
 		}
 
-		Session session=null;
+		static CqlSession session=null;
 		@Override
-		public Session create() throws DataLayerException {
-			if (!isValid(session))
-				synchronized (this) {
-					if (!isValid(session))
-						session =  cluster.connect();
+		public CqlSession create() throws DataLayerException {
+			if (session==null) {
+				synchronized (this.getClass()) {
+					if (session==null) {
+						session=builder.build(); 
+					}
 				}
+			}
 			return session;
 		}
 
 		@Override
 		public void close() {
-			if (isValid(session))
-				synchronized (this) {
-					if (isValid(session))
-						session.close();
-				}
+			if (session!=null && !session.isClosed()) {
+				session.close();
+			}
 		}
 
 		@Override
-		public boolean isValid(Session session) {
+		public boolean isValid(CqlSession session) {
 			return session != null && !session.isClosed();
 		}
-
 	}
 }

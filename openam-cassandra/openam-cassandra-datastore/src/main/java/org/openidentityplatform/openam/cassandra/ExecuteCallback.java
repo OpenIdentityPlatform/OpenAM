@@ -16,43 +16,36 @@
 
 package org.openidentityplatform.openam.cassandra;
 
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.CompletionStage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.BatchStatement;
-import com.datastax.driver.core.Host;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
+import com.datastax.oss.driver.api.core.cql.ExecutionInfo;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Statement;
 
 
-public class ExecuteCallback implements FutureCallback<ResultSet> {
+public class ExecuteCallback {
 	final static Logger logger=LoggerFactory.getLogger(ExecuteCallback.class.getName());
 	
-	final Session session;
-	final Statement statement;
+	final CqlSession session;
+	final Statement<?> statement;
 	Long start;
 	
-	public ExecuteCallback(Session session,Statement statement){
+	public ExecuteCallback(String profile,CqlSession session,Statement<?> statement){
 		this.session=session;
 		this.statement=statement;
-		if (statement.getConsistencyLevel()==null)
-			statement.setConsistencyLevel(session.getCluster().getConfiguration().getQueryOptions().getConsistencyLevel());
+		this.statement.setExecutionProfileName(profile);
 	}
 	
 	public ResultSet execute(){
 		start=System.currentTimeMillis();
 		try{
 			final ResultSet result=session.execute(statement);
-			onSuccess(result);
+			onSuccess(result.getExecutionInfo());
 			return result;
 		}catch(Throwable e){
 			onFailure(e);
@@ -61,45 +54,39 @@ public class ExecuteCallback implements FutureCallback<ResultSet> {
 
 	}
 	
-	public ResultSetFuture executeAsync(){
+	public CompletionStage<AsyncResultSet> executeAsync(){
 		start=System.currentTimeMillis();
-		final ResultSetFuture future = session.executeAsync(statement);
-		Futures.addCallback(future, this,MoreExecutors.directExecutor());
-		//Futures.addCallback(future,this, ForkJoinPool.commonPool());
-		return future;
+		final CompletionStage<AsyncResultSet> sessionStage = session.executeAsync(statement);
+		sessionStage.whenComplete(
+		    (version, error) -> {
+		        if (error != null) {
+		          System.out.printf("Failed to retrieve the version: %s%n", error.getMessage());
+		        } else {
+		          System.out.printf("Server version: %s%n", version);
+		          onSuccess(version.getExecutionInfo());
+		        }
+		      });
+		return sessionStage;
 	}
 
-	@Override 
-	public void onSuccess(ResultSet result) {
+
+	public void onSuccess(ExecutionInfo result) {
 		if (logger.isTraceEnabled())
-			logger.trace("{} ms {} {} ({}) {}->{} {}"
+			logger.trace("{} ms {} {} ({}) ->{} {}"
 					,System.currentTimeMillis()-start
-					,(statement instanceof BatchStatement)?((BatchStatement)statement).getStatements():statement
-					,statement.getConsistencyLevel()==null?session.getCluster().getConfiguration().getQueryOptions().getConsistencyLevel():statement.getConsistencyLevel()
-					,result.getAvailableWithoutFetching()
-					,result.getExecutionInfo().getQueriedHost()
-					,result.getExecutionInfo().getTriedHosts(),getStat(session)
+					,statement
+					,statement.getConsistencyLevel()
+					,result.getCoordinator() 
+					//,result.getQueryTrace()
 			);
 	}
 	
-	@Override 
 	public void onFailure(Throwable t) {
 		logger.warn("{} ms {} {}: {} {}"
 				,System.currentTimeMillis()-start
-				,(statement instanceof BatchStatement)?((BatchStatement)statement).getStatements():statement
-				,statement.getConsistencyLevel()==null?session.getCluster().getConfiguration().getQueryOptions().getConsistencyLevel():statement.getConsistencyLevel()
-				,t.getMessage(),getStat(session));
-	}
-	
-	public static Map<String,String> getStat(Session session){ 
-		final Map<String,String> res=new TreeMap<String,String>(String.CASE_INSENSITIVE_ORDER);
-		Session.State state = session.getState();
-        for (Host host : state.getConnectedHosts())
-//        	final HostDistance distance = session.getCluster().getConfiguration().getPolicies().getLoadBalancingPolicy().distance(host);
-//        	final int connections = state.getOpenConnections(host);
-//        	final int maxConnections =session.getCluster().getConfiguration().getPoolingOptions().getMaxConnectionsPerHost(distance);
-//        	final int maxQueries=session.getCluster().getConfiguration().getPoolingOptions().getMaxRequestsPerConnection(distance);
-        	res.put(host.toString(), MessageFormat.format("{0}/{1}", state.getOpenConnections(host),state.getInFlightQueries(host)));
-        return res;
+				,statement
+				,statement.getConsistencyLevel()
+				,t.getMessage()
+		);
 	}
 }

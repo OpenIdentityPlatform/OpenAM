@@ -20,13 +20,13 @@ package org.openidentityplatform.openam.cassandra;
 import javax.inject.Inject;
 
 import org.forgerock.openam.tokens.CoreTokenField;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.inject.Injector;
 
 /**
  * A query factory for LDAP connections.
  */
-public class QueryFactory implements org.forgerock.openam.sm.datalayer.api.query.QueryFactory<Session, Filter> {
+public class QueryFactory implements org.forgerock.openam.sm.datalayer.api.query.QueryFactory<CqlSession, Filter> {
 
     private final Injector injector;
 
@@ -36,7 +36,7 @@ public class QueryFactory implements org.forgerock.openam.sm.datalayer.api.query
     }
 
 	@Override
-    public org.forgerock.openam.sm.datalayer.api.query.QueryBuilder<Session, Filter> createInstance() {
+    public org.forgerock.openam.sm.datalayer.api.query.QueryBuilder<CqlSession, Filter> createInstance() {
         return injector.getInstance(QueryBuilder.class);
     }
 

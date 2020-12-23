@@ -26,7 +26,6 @@
 
     <name>OpenAM Cassandra</name>
     <description>OpenAM Cassandra Integration Parent Project</description>
-    <groupId>org.openidentityplatform.openam</groupId>
     <artifactId>openam-cassandra</artifactId>
     <packaging>pom</packaging>
 	
@@ -40,22 +39,17 @@
 			<dependency>
 			    <groupId>com.datastax.oss</groupId>
 			    <artifactId>java-driver-core</artifactId>
-			    <version>4.3.1</version>
+			    <version>4.9.0</version>
 			</dependency>
 			<dependency>
-				<groupId>com.datastax.cassandra</groupId>
-				<artifactId>cassandra-driver-core</artifactId>
-				<version>3.10.2</version>
-			</dependency>
-		    <dependency>
-				<groupId>org.cassandraunit</groupId>
-				<artifactId>cassandra-unit</artifactId>
-				<version>4.3.1.0</version>
+			  <groupId>com.datastax.oss</groupId>
+			  <artifactId>java-driver-query-builder</artifactId>
+			  <version>4.9.0</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.apache.cassandra</groupId>
 			    <artifactId>cassandra-all</artifactId>
-			    <version>3.11.8</version>
+			    <version>4.0-beta3</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

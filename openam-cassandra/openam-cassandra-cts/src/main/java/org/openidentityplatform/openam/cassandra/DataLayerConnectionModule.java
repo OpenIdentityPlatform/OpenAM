@@ -67,7 +67,7 @@ public abstract class DataLayerConnectionModule extends org.forgerock.openam.sm.
 	        binder.bind(ConnectionFactory.class).toProvider(getConnectionFactoryProviderType());
 
 	        @SuppressWarnings("rawtypes")
-			MapBinder<Class, EntryConverter> entryConverterBinder = MapBinder.newMapBinder(binder, Class.class,EntryConverter.class);
+			final MapBinder<Class, EntryConverter> entryConverterBinder = MapBinder.newMapBinder(binder, Class.class,EntryConverter.class);
 	        entryConverterBinder.addBinding(String.class).to(EntryStringConverter.class);
 	        entryConverterBinder.addBinding(PartialToken.class).to(EntryPartialTokenConverter.class);
 	        entryConverterBinder.addBinding(Token.class).to(EntryTokenConverter.class);
@@ -87,6 +87,7 @@ public abstract class DataLayerConnectionModule extends org.forgerock.openam.sm.
 	     * Returns the provider of {@link org.forgerock.openam.sm.datalayer.api.ConnectionFactory}. The default is to use
 	     * {@link org.forgerock.openam.sm.datalayer.providers.DataLayerConnectionFactoryCache}.
 	     * @return
+	     *  return
 	     */
 	    @SuppressWarnings("rawtypes")
 		protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {

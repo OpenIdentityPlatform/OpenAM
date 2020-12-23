@@ -28,7 +28,6 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.util.query.QueryFilter;
 
-
 public class QueryFilterVisitor implements org.forgerock.util.query.QueryFilterVisitor<Filter, Void, CoreTokenField> {
 
     @Inject
@@ -43,7 +42,7 @@ public class QueryFilterVisitor implements org.forgerock.util.query.QueryFilterV
     @Override
     public Filter visitOrFilter(Void aVoid, List<QueryFilter<CoreTokenField>> subQueryFilters) {
         //return Filter.or(getSubFilters(subQueryFilters));
-    		throw new UnsupportedOperationException();
+   		throw new UnsupportedOperationException();
     }
 
     private List<Filter> getSubFilters(List<QueryFilter<CoreTokenField>> subQueryFilters) {
@@ -57,23 +56,23 @@ public class QueryFilterVisitor implements org.forgerock.util.query.QueryFilterV
     @Override
     public Filter visitNotFilter(Void aVoid, QueryFilter<CoreTokenField> queryFilter) {
         //return Filter.not(queryFilter.accept(this, null));
-    		Filter res=queryFilter.accept(this, null);
-    		return Filter.and(Arrays.asList( new Filter[] {
-    				Filter.greaterThan(res.field2value.keySet().iterator().next(), res.field2value.values().iterator().next()),
-    				Filter.lessThan(res.field2value.keySet().iterator().next(), res.field2value.values().iterator().next())
-    		}));
+		Filter res=queryFilter.accept(this, null);
+		return Filter.and(Arrays.asList( new Filter[] {
+				Filter.greaterThan(res.field2value.keySet().iterator().next(), res.field2value.values().iterator().next()),
+				Filter.lessThan(res.field2value.keySet().iterator().next(), res.field2value.values().iterator().next())
+		}));
     }
 
     @Override
     public Filter visitBooleanLiteralFilter(Void aVoid, boolean value) {
         //return value ? Filter.alwaysTrue() : Filter.alwaysFalse();
-    		throw new UnsupportedOperationException();
+   		throw new UnsupportedOperationException();
     }
 
     @Override
     public Filter visitContainsFilter(Void aVoid, CoreTokenField field, Object value) {
         //return Filter.substrings(field.toString(), null, Arrays.asList(value), null);
-    		return visitEqualsFilter(aVoid, field, value);
+   		return visitEqualsFilter(aVoid, field, value);
     }
 
     @Override
@@ -104,13 +103,13 @@ public class QueryFilterVisitor implements org.forgerock.util.query.QueryFilterV
     @Override
     public Filter visitPresentFilter(Void aVoid, CoreTokenField field) {
         //return Filter.present(field.toString());
-    		throw new UnsupportedOperationException();
+   		throw new UnsupportedOperationException();
     }
 
     @Override
     public Filter visitStartsWithFilter(Void aVoid, CoreTokenField field, Object value) {
         //return Filter.substrings(field.toString(), value, null, null);
-    		throw new UnsupportedOperationException();
+   		throw new UnsupportedOperationException();
     }
 
     @Override
@@ -122,7 +121,7 @@ public class QueryFilterVisitor implements org.forgerock.util.query.QueryFilterV
 		if (value instanceof TokenType)
 			value = value.toString();
 		else if (value instanceof Calendar)
-			value = ((Calendar) value).getTime();
+			value = ((Calendar) value).getTime().toInstant();
 		else if (value instanceof byte[])
 			value = ByteBuffer.wrap((byte[]) value);
 		return value;

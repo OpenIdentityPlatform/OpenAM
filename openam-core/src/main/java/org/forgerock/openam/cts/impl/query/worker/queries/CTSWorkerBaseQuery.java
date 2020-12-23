@@ -37,7 +37,7 @@ import org.forgerock.openam.utils.IOUtils;
  *
  * @param <C> Connection type.
  */
-public abstract class CTSWorkerBaseQuery<C extends Closeable> implements CTSWorkerQuery {
+public abstract class CTSWorkerBaseQuery<C> implements CTSWorkerQuery {
 
     private final ConnectionFactory<C> factory;
     private Iterator<Collection<PartialToken>> results;
@@ -80,7 +80,9 @@ public abstract class CTSWorkerBaseQuery<C extends Closeable> implements CTSWork
 
     @Override
     public final void close() {
-        IOUtils.closeIfNotNull(connection);
+    	if (connection instanceof Closeable) {
+    		IOUtils.closeIfNotNull((Closeable)connection);
+    	}
         connection = null;
         results = null;
     }
