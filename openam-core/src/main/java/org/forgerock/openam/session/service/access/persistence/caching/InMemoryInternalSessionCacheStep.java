@@ -246,7 +246,6 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .concurrencyLevel(16)
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
-                    .softValues()
                     .build();
     }
 
@@ -270,7 +269,11 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
      * for this key".
      */
     private static class NullResultException extends Exception {
-        private static final NullResultException INSTANCE = new NullResultException();
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private static final NullResultException INSTANCE = new NullResultException();
 
         private NullResultException() {
             // Private constructor
