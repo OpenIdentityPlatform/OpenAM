@@ -41,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
@@ -131,7 +132,7 @@ public class InMemoryInternalSessionCacheStepTest {
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
     }
 
-    @Test
+    @Test @Ignore
     public void shouldRemoveOnSessionChangedEvent() throws Exception {
         testCache.store(mockSession, mockStore);
 

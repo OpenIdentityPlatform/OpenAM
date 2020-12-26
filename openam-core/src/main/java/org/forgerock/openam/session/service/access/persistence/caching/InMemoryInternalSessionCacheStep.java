@@ -77,7 +77,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         watcher.addListener(new SessionModificationListener() {
             @Override
             public void sessionChanged(SessionID sessionID) {
-                invalidateCache(sessionID);
+                //invalidateCache(sessionID);
             }
         });
     }
