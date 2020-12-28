@@ -62,7 +62,7 @@ import org.w3c.dom.NodeList;
  * This class has methods for creating object and message for
  * Federation Termination.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -29,6 +29,6 @@
 /**
  * Defines Interaction service.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.interaction;

@@ -56,7 +56,7 @@ import org.forgerock.openam.utils.StringUtils;
  * Interface is to define what needs to be implemented to do the OpenID Connect check session endpoint.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public class CheckSession {
 

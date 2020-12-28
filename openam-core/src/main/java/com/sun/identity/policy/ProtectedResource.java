@@ -36,7 +36,7 @@ import java.util.Set;
  * Class that encapsulates a resource and policies protecting the resource
  * for a given user
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

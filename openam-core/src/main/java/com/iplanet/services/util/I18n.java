@@ -75,7 +75,7 @@ import java.util.TimeZone;
  * file name. It is assumed that the properties file is present in
  * <code>CLASSPATH</code>
  *
- * @supported.api
+ * 
  */
 public class I18n {
 
@@ -124,7 +124,7 @@ public class I18n {
      *            name of the service for which messages must be
      *            internationalized
      * @return I18n object
-     * @supported.api
+     * 
      */
     public static I18n getInstance(String serviceName) {
         if (serviceName == null)
@@ -209,7 +209,7 @@ public class I18n {
      * @param locale
      *            locale in a string format
      * @return returns internationalized message for the specified key
-     * @supported.api
+     * 
      */
     public String getString(String key, String locale) {
         initialize();
@@ -227,7 +227,7 @@ public class I18n {
      * @param key
      *            Key string in the properties file
      * @return Returns value to the specified key
-     * @supported.api
+     * 
      */
     public String getString(String key) {
         initialize();
@@ -249,7 +249,7 @@ public class I18n {
      * @param params
      *            parameters to be applied to the message
      * @return returns internationalized message for the specified key
-     * @supported.api
+     * 
      */
     public String getString(String key, String locale, Object[] params) {
         initialize();
@@ -267,7 +267,7 @@ public class I18n {
      * @param params
      *            parameters to be applied to the message
      * @return Returns value to the specified key
-     * @supported.api
+     * 
      */
     public String getString(String key, Object[] params) {
         initialize();

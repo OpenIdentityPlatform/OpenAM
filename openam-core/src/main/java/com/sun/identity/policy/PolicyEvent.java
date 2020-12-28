@@ -37,7 +37,7 @@ import java.util.Set;
  *  notify interested listeners
  *  @see com.sun.identity.policy.interfaces.PolicyListener
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

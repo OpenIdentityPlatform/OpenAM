@@ -51,7 +51,7 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 /**
  * Represents search results. Each search result is a PersistentObject
  * 
- * @supported.api
+ * 
  */
 public class SearchResults implements java.io.Serializable {
 
@@ -67,7 +67,7 @@ public class SearchResults implements java.io.Serializable {
      * Integer getting the content count from the VirtualListResponse control
      * returned by server after a search
      * 
-     * @supported.api
+     * 
      */
     public static final String VLVRESPONSE_CONTENT_COUNT = "vlvContentCount";
 
@@ -76,7 +76,7 @@ public class SearchResults implements java.io.Serializable {
      * Integer getting the index of first position from VirtualListResponse
      * control returned by server after a search
      * 
-     * @supported.api
+     * 
      */
     public static final String VLVRESPONSE_FIRST_POSITION = "vlvFirstPosition";
 
@@ -85,7 +85,7 @@ public class SearchResults implements java.io.Serializable {
      * Integer getting the result code from from VirtualListResponse control
      * returned by server after a search.
      * 
-     * @supported.api
+     * 
      */
     public static final String VLVRESPONSE_RESULT_CODE = "vlvResultCode";
 
@@ -94,7 +94,7 @@ public class SearchResults implements java.io.Serializable {
      * String getting the context cookie from VirtualListResponse control
      * returned by server after a search.
      * 
-     * @supported.api
+     * 
      */
     public static final String VLVRESPONSE_CONTEXT = "vlvContext";
 
@@ -163,7 +163,7 @@ public class SearchResults implements java.io.Serializable {
      * Checks whether there are entries available.
      * 
      * @return <code>true</code> if there is more to read
-     * @supported.api
+     * 
      */
     public boolean hasMoreElements() {
         boolean hasGotMoreElements = false;
@@ -202,7 +202,7 @@ public class SearchResults implements java.io.Serializable {
      * 
      * @throws UMSException
      *             No more entries in the search results.
-     * @supported.api
+     * 
      */
     public PersistentObject next() throws UMSException {
         // TODO: define detailed exception list (eg. referral, ...)
@@ -258,7 +258,7 @@ public class SearchResults implements java.io.Serializable {
      * @throws EntryNotFoundException
      *             if there is no entry at all
      * 
-     * @supported.api
+     * 
      */
     public PersistentObject assertOneEntry() throws EntryNotFoundException,
             UMSException {
@@ -292,7 +292,7 @@ public class SearchResults implements java.io.Serializable {
      * @throws UMSException
      *             from accessor methods on LDAPVirtualListResponse control
      * 
-     * @supported.api
+     * 
      */
     public Object get(String name) throws UMSException {
 
@@ -411,7 +411,7 @@ public class SearchResults implements java.io.Serializable {
      * 
      * @throws UMSException
      *             from abandoning a search operation from LDAP
-     * @supported.api
+     * 
      */
     public void abandon() throws UMSException {
         //Nothing to do

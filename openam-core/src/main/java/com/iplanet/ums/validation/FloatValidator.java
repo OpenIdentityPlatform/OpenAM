@@ -30,7 +30,7 @@ package com.iplanet.ums.validation;
 
 /**
  * 
- * @supported.all.api
+ * 
  */
 public class FloatValidator implements IValidator {
 

@@ -40,7 +40,7 @@ import com.sun.identity.saml.assertion.NameIdentifier;
  * create <code>SAML1.0</code> and <code>SAML1.1</code> Assertions / Security 
  * Tokens.
  * 
- * @supported.all.api 
+ *  
  */
 public class AssertionTokenSpec implements SecurityTokenSpec {
 

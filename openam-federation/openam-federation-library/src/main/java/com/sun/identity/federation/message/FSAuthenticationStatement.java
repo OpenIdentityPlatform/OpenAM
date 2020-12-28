@@ -55,7 +55,7 @@ import org.w3c.dom.NodeList;
  * authentication statement by the issuer that it's subject was authenticated
  * by a  particular means at a particular time.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

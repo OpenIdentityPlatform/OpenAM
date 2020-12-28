@@ -40,7 +40,7 @@ import com.iplanet.sso.SSOException;
  * not specified, this class will use the default implementation of the 
  * Token Provider.
  * 
- * @supported.all.api
+ * 
  */
 public class SecurityTokenFactory {
 

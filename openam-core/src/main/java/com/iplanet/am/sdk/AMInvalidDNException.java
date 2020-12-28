@@ -35,7 +35,7 @@ import com.iplanet.ums.UMSException;
  * DN was used.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 
 public class AMInvalidDNException extends AMException {

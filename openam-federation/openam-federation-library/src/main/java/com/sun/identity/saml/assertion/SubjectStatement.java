@@ -42,7 +42,7 @@ import com.sun.identity.saml.common.SAMLUtilsCommon;
  * extension elements must use <code>xsi:type</code> attribute to indicate
  * the derived type. 
  *
- * @supported.all.api
+ * 
  */
 public abstract class SubjectStatement extends Statement {
     //The subject 

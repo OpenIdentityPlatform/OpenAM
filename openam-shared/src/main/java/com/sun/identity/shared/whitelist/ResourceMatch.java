@@ -33,7 +33,7 @@ package com.sun.identity.shared.whitelist;
  * The class <code>ResourceMatch</code> defines the results
  * of a resource match with respect to Policy.
  *
- * @supported.all.api
+ * 
  */
 public class ResourceMatch extends Object {
 

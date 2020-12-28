@@ -39,7 +39,7 @@ import com.sun.identity.saml.common.SAMLException;
  * This class contains methods to create Service Provider 
  * <code>NameIdentifier</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

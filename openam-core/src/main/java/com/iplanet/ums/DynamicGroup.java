@@ -45,7 +45,7 @@ import org.forgerock.opendj.ldap.SearchScope;
 /**
  * Represents a dynamic group entry.
  *
- * @supported.api
+ * 
  */
 public class DynamicGroup extends PersistentObject implements
         IDynamicMembership {
@@ -102,7 +102,7 @@ public class DynamicGroup extends PersistentObject implements
      *        <code>memberUrl</code>.
      * @exception UMSException if fail to instantiate from persistent storage.
      *
-     * @supported.api
+     * 
      */
     public DynamicGroup(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -146,7 +146,7 @@ public class DynamicGroup extends PersistentObject implements
      * 
      * @exception UMSException if fail to instantiate from persistent storage.
      *
-     * @supported.api
+     * 
      */
     public DynamicGroup(
         CreationTemplate template,
@@ -169,7 +169,7 @@ public class DynamicGroup extends PersistentObject implements
      * 
      * @param filter Search filter for evaluating members of the group.
      *
-     * @supported.api
+     * 
      */
     public void setSearchFilter(String filter) {
         LDAPUrl url = getUrl();
@@ -192,7 +192,7 @@ public class DynamicGroup extends PersistentObject implements
      *         the filter has to be <code>LDAPv2.SCOPE_ONE</code> or
      *         <code>LDAPv2.SCOPE_SUB</code>.
      *
-     * @supported.api
+     * 
      */
     public String getSearchFilter() {
         return getUrl().getFilter().toString();
@@ -203,7 +203,7 @@ public class DynamicGroup extends PersistentObject implements
      * 
      * @param baseGuid Search base for evaluating members of the group.
      *
-     * @supported.api
+     * 
      */
     public void setSearchBase(Guid baseGuid) {
         LDAPUrl url = getUrl();
@@ -223,7 +223,7 @@ public class DynamicGroup extends PersistentObject implements
      * 
      * @return Search base for evaluating members of the group.
      *
-     * @supported.api
+     * 
      */
     public Guid getSearchBase() {
         return new Guid(getUrl().getName().toString());
@@ -236,7 +236,7 @@ public class DynamicGroup extends PersistentObject implements
      *        the search scope <code>SCOPE_BASE</code>,
      *        <code>SCOPE_ONE</code>, or <code>SCOPE_SUB</code>.
      *
-     * @supported.api
+     * 
      */
     public void setSearchScope(int scope) {
         LDAPUrl url = getUrl();
@@ -256,7 +256,7 @@ public class DynamicGroup extends PersistentObject implements
      * 
      * @return Search scope for evaluating members of the group.
      *
-     * @supported.api
+     * 
      */
     public int getSearchScope() {
         return getUrl().getScope().intValue();
@@ -387,7 +387,7 @@ public class DynamicGroup extends PersistentObject implements
      * @return Iterator for unique identifiers for members of the group.
      * @exception UMSException if fail to search.
      *
-     * @supported.api
+     * 
      */
     public SearchResults getMemberIDs() throws UMSException {
         String[] attributesToGet = { "objectclass" };
@@ -400,7 +400,7 @@ public class DynamicGroup extends PersistentObject implements
      * @return Number of members of the group.
      * @exception UMSException if fail to search.
      *
-     * @supported.api
+     * 
      */
     public int getMemberCount() throws UMSException {
         int count = 0;
@@ -420,7 +420,7 @@ public class DynamicGroup extends PersistentObject implements
      * @return Unique identifier for a member.
      * @exception UMSException if fail to search.
      *
-     * @supported.api
+     * 
      */
     public Guid getMemberIDAt(int index) throws UMSException {
         if (index < 0) {
@@ -451,7 +451,7 @@ public class DynamicGroup extends PersistentObject implements
      * @return <code>true</code> if it is a member.
      * @exception UMSException if fail to evaluate group
      *
-     * @supported.api
+     * 
      */
     public boolean hasMember(Guid guid) throws UMSException {
         String filter = getSearchFilter();

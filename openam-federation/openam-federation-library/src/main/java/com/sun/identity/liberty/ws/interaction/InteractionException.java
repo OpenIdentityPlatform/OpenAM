@@ -34,7 +34,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * Base class for exceptions that could be thrown from
  * <code>InteractionService</code> framework.
  *
- * @supported.all.api
+ * 
  */
 public class InteractionException extends L10NMessageImpl {
 

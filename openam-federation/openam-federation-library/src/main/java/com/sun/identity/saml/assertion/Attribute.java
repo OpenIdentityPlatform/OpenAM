@@ -44,7 +44,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * <code>AttributeDesignator</code> element 
  * that allows the attribute value to be specified. 
  *
- * @supported.all.api 
+ *  
  */
 public class Attribute extends AttributeDesignator {
     protected  List _attributeValue; 

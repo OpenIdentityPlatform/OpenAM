@@ -80,7 +80,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 
 public class DSTQuery {

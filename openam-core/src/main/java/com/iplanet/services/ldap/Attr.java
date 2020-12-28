@@ -40,7 +40,7 @@ import org.forgerock.opendj.ldap.Attributes;
 /**
  * Represents an attribute value pair in UMS. The value of an attribute can be
  * of multiple values.
- * @supported.api
+ * 
  */
 public class Attr implements java.io.Serializable, java.lang.Cloneable {
 
@@ -54,7 +54,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
 
     /**
      * Default constructor
-     * @supported.api
+     * 
      */
     public Attr() {
     }
@@ -64,7 +64,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param name
      *            attribute name
-     * @supported.api
+     * 
      */
     public Attr(String name) {
         _name = name.toLowerCase();
@@ -77,7 +77,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            the name of attribute
      * @param value
      *            string value of attribute
-     * @supported.api
+     * 
      */
     public Attr(String name, String value) {
         _name = name.toLowerCase();
@@ -92,7 +92,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            the name of attribute
      * @param value
      *            multiple string values of attribute
-     * @supported.api
+     * 
      */
     public Attr(String name, String[] value) {
         _name = name.toLowerCase();
@@ -110,7 +110,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            attribute name
      * @param value
      *            byte array as input for value
-     * @supported.api
+     * 
      */
     public Attr(String name, byte[] value) {
         _name = name.toLowerCase();
@@ -125,7 +125,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            attribute name
      * @param value
      *            array of byte array as input for value
-     * @supported.api
+     * 
      */
     public Attr(String name, byte[][] value) {
         _name = name.toLowerCase();
@@ -184,7 +184,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            the attribute value to be set
-     * @supported.api
+     * 
      */
     public void setValue(String value) {
         if (_stringValues == null) {
@@ -199,7 +199,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            value to be added to the attribute
-     * @supported.api
+     * 
      */
     public void addValue(String value) {
         if (_stringValues == null) {
@@ -215,7 +215,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param values
      *            string values to be added to the attribute
-     * @supported.api
+     * 
      */
     public void addValues(String[] values) {
         int size = values.length;
@@ -229,7 +229,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            specified value to be remvoed from the value array
-     * @supported.api
+     * 
      */
     public void removeValue(String value) {
         if (_stringValues == null) {
@@ -249,7 +249,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            the attribute value to be set
-     * @supported.api
+     * 
      */
     public void setValue(byte[] value) {
         if (_byteValues == null) {
@@ -264,7 +264,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            byte array value to be added to the attribute
-     * @supported.api
+     * 
      */
     public void addValue(byte[] value) {
         if (_byteValues == null) {
@@ -278,7 +278,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param values
      *            of byte array values to be added to the attribute
-     * @supported.api
+     * 
      */
     public void addValues(byte[][] values) {
         int size = values.length;
@@ -292,7 +292,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param value
      *            specified value to be remvoed from the value array
-     * @supported.api
+     * 
      */
     public void removeValue(byte[] value) {
         if (_byteValues == null) {
@@ -312,7 +312,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Get name of an UMS attribute
      * 
      * @return name of an UMS attribute
-     * @supported.api
+     * 
      */
     public String getName() {
         return _name;
@@ -324,7 +324,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * @param locale
      *            Given locale for the attribute name to return
      * @return name of an UMS attribute
-     * @supported.api
+     * 
      */
     public String getName(Locale locale) {
         return Attr.getName(_name, locale);
@@ -338,7 +338,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * @param locale
      *            desired locale for the attribute
      * @return attribute name with locale attached for retrieval
-     * @supported.api
+     * 
      */
     static public String getName(String attrName, Locale locale) {
         String name = null;
@@ -368,7 +368,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * of "cn;lang-en" or "cn;lang-ja" is "cn"
      * 
      * @return basename of an attribute
-     * @supported.api
+     * 
      */
     public String getBaseName() {
         if (_name != null) {
@@ -382,7 +382,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * name of "cn;lang-en" or "cn;lang-ja" is "cn"
      * 
      * @return basename of the given attribute name
-     * @supported.api
+     * 
      */
     static public String getBaseName(String attrName) {
         String basename = attrName;
@@ -397,7 +397,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Get one string value of the attribute
      * 
      * @return one value of the attribute
-     * @supported.api
+     * 
      */
     public String getValue() {
         String value = null;
@@ -414,7 +414,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Get the string values of the attribute
      * 
      * @return the values in an string array
-     * @supported.api
+     * 
      */
     public String[] getStringValues() {
         // Returning a colletion would be better, but would break existing
@@ -446,7 +446,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            the value to check for
      * @return <code>true</code> if the value already exists,
      *         <code>false</code> otherwise
-     * @supported.api
+     * 
      */
     public boolean contains(String value) {
         boolean contained = false;
@@ -469,7 +469,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * getStringValues()
      * 
      * @return one byte[] value
-     * @supported.api
+     * 
      */
     public byte[] getByteValue() {
         // Not cloning the value before returning. Do we need to clone?
@@ -487,7 +487,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Get the byte[] values of the attribute
      * 
      * @return the byte[] values in array
-     * @supported.api
+     * 
      */
     public byte[][] getByteValues() {
         // Not cloning the values before returning. Do we need to clone?
@@ -511,7 +511,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      *            the value to check for
      * @return <code>true</code> if the value already exists,
      *         <code>false</code> otherwise
-     * @supported.api
+     * 
      */
     public boolean contains(byte[] value) {
         boolean contained = false;
@@ -533,7 +533,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Get the number of values of the attribute
      * 
      * @return The number of values of the attribute
-     * @supported.api
+     * 
      */
     public int size() {
         int size = 0;
@@ -551,7 +551,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Return a copy of the object
      * 
      * @return A copy of the object
-     * @supported.api
+     * 
      */
     public Object clone() {
         /*
@@ -577,7 +577,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * Retrieves the string representation of an attribute
      * 
      * @return string representation of the attribute.
-     * @supported.api
+     * 
      */
     public String toString() {
         if (_stringValues == null) {

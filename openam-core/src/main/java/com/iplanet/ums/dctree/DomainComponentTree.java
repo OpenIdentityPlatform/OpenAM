@@ -76,7 +76,7 @@ import org.forgerock.opendj.ldap.DN;
  * level dc node being mapped to an organizational DIT.
  * 
  * @see DomainComponent
- * @supported.api
+ * 
  */
 public class DomainComponentTree {
 
@@ -98,7 +98,7 @@ public class DomainComponentTree {
      *        <code>o=internet</code>.
      * @throws InvalidDCRootException if invalid root specification.
      * @throws UMSException if other read error occurred.
-     * @supported.api
+     * 
      */
     public DomainComponentTree(SSOToken token, Guid dcRoot)
             throws InvalidDCRootException, UMSException {
@@ -164,7 +164,7 @@ public class DomainComponentTree {
      * 
      * @param root
      *            Identification of the root of the tree such as o=internet
-     * @supported.api
+     * 
      */
     public void setDCRoot(Guid root) throws UMSException {
         SSOToken token = getSSOToken();
@@ -185,7 +185,7 @@ public class DomainComponentTree {
      * tree)
      * 
      * @return PersistentObject representing the dctree root in the dctree DIT
-     * @supported.api
+     * 
      */
     public PersistentObject getDCRoot() {
         return m_dcRoot;
@@ -202,7 +202,7 @@ public class DomainComponentTree {
      *             if dcroot is not defined
      * @throws UMSException
      *             for write problem in adding domain to dctree
-     * @supported.api
+     * 
      */
     public DomainComponent addDomain(String domain) throws UMSException {
         if (domain == null || domain.length() == 0) {
@@ -267,7 +267,7 @@ public class DomainComponentTree {
      *             upon failure to remove the corresponding dc entry in the
      *             dctree
      * 
-     * @supported.api
+     * 
      */
     public void removeDomain(String domain) throws UMSException {
         if (m_dcRoot == null)
@@ -291,7 +291,7 @@ public class DomainComponentTree {
      *             if domain id not defined
      * @throws UMSException
      *             upon write failure
-     * @supported.api
+     * 
      */
     public void setDomainMapping(String domain, PersistentObject org)
             throws UMSException {
@@ -306,7 +306,7 @@ public class DomainComponentTree {
      * @param orgGuid Identifiication of Organization entry to be mapped from
      *        dctree to organization DIT (the convergence tree in nortel spec).
      * @throws UMSException if write failed.
-     * @supported.api
+     * 
      */
     public void setDomainMapping(String domain, Guid orgGuid)
             throws UMSException {
@@ -326,7 +326,7 @@ public class DomainComponentTree {
      * @throws UMSException
      *             upon write failure
      * 
-     * @supported.api
+     * 
      */
     public void setDomainStatus(String domain, String status)
             throws DomainNotFoundException, UMSException {
@@ -344,7 +344,7 @@ public class DomainComponentTree {
      *             if domain not found in dctree
      * @throws UMSException
      *             upon read failure
-     * @supported.api
+     * 
      */
     public String getDomainStatus(String domain)
             throws DomainNotFoundException, UMSException {
@@ -359,7 +359,7 @@ public class DomainComponentTree {
      * @param domain
      *            Fully qualified domain name
      * @return String representation of the Distinguished Name in the DC Tree
-     * @supported.api
+     * 
      */
     public String mapDomainToDN(String domain) {
         StringTokenizer st = new StringTokenizer(domain, ".");
@@ -387,7 +387,7 @@ public class DomainComponentTree {
      *             if given domain is not found in the dctree
      * @throws UMSException
      *             upon read error
-     * @supported.api
+     * 
      */
     public DomainComponent getDomainComponent(String domain)
             throws DomainNotFoundException, UMSException {
@@ -419,7 +419,7 @@ public class DomainComponentTree {
      *             if domain is not found
      * @throws UMSException
      *             for reading problem in instantiating the mapped organization
-     * @supported.api
+     * 
      */
     public PersistentObject getOrganization(String domain)
             throws DomainNotFoundException, UMSException {
@@ -448,7 +448,7 @@ public class DomainComponentTree {
      *             if domain is not found
      * @throws UMSException
      *             upon failure in instantiating the user object
-     * @supported.api
+     * 
      */
     public User getUser(String uid, String domain)
             throws DomainNotFoundException, UMSException {
@@ -481,7 +481,7 @@ public class DomainComponentTree {
      *             if domain is not found
      * @throws UMSException
      *             upon failure in instantiating the user object
-     * @supported.api
+     * 
      */
     public User getUser(String namingAttribute, String value, String domain)
             throws DomainNotFoundException, UMSException {
@@ -500,7 +500,7 @@ public class DomainComponentTree {
      * @param dc
      *            A domain component that lives in the dctree
      * @return Fully qualified domain name
-     * @supported.api
+     * 
      */
     public String mapDCToDomainName(DomainComponent dc) {
 
@@ -537,7 +537,7 @@ public class DomainComponentTree {
      *         DIT.
      * @throws UMSException
      *             upon failure in searching all mapped domains
-     * @supported.api
+     * 
      */
     public Hashtable getChildDomainIDs() throws UMSException {
 

@@ -15,6 +15,6 @@
  */
 /**
  * This package contains utility methods to ease/unify development when using the OpenDJ LDAP SDK.
- * @supported.api
+ * 
  */
 package org.forgerock.openam.ldap;

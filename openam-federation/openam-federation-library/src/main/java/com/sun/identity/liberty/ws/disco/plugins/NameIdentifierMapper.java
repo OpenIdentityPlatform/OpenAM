@@ -38,7 +38,7 @@ import java.util.List;
  * used to map user's <code>NameIdentifier</code> from one provider 
  * to another.
  * <p>
- * @supported.all.api
+ * 
  *
  */
 public interface NameIdentifierMapper {

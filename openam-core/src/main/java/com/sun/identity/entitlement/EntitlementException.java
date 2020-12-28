@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 /**
  * Entitlement related exception.
  *
- * @supported.all.api
+ * 
  */
 public class EntitlementException extends Exception {
     public static final String RES_BUNDLE_NAME = "EntitlementException";

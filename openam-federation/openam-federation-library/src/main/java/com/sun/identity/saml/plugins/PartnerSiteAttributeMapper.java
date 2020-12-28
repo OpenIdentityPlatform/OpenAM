@@ -48,7 +48,7 @@ import java.util.List;
  *      <code>ConsumerSiteAttributeMapper</code> instead.
  * @see ConsumerSiteAttributeMapper
  *
- * @supported.all.api
+ * 
  */
 public interface PartnerSiteAttributeMapper {
 

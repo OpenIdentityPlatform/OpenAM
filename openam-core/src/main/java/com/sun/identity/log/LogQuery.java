@@ -40,7 +40,7 @@ import java.util.ArrayList;
  * be satisfied or any one to be satisfied. It also allows
  * caller to set required number of most recent records and
  * to specify the <code>sortby</code> field name (optional).
- * @supported.all.api
+ * 
  */
 
 public class LogQuery {

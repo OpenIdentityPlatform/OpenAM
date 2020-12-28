@@ -45,7 +45,7 @@ import org.forgerock.openam.utils.CrestQuery;
  * This interface defines the methods which need to be implemented by plugins.
  * Two plugins are supported, <code> ldap </code> and <code> remote </code>.
  *
- * @supported.all.api
+ * 
  */
 public abstract class IdRepo {
 

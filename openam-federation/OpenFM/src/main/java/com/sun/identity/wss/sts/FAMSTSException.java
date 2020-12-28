@@ -34,7 +34,7 @@ package com.sun.identity.wss.sts;
  * exceptions during failures for generating or handling Security
  * tokens via Security Token Service.
  *
- * @supported.all.api
+ * 
  */
 
 public class FAMSTSException extends Exception {

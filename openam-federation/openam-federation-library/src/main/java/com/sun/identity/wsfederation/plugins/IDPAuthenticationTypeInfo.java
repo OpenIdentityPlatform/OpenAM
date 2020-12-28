@@ -37,7 +37,7 @@ import java.util.Set;
  * between <code>AuthenticationType</code> and the actual 
  * authentication mechanism at the Identity Provider. 
  * 
- * @supported.all.api 
+ *  
  */ 
 
 public class IDPAuthenticationTypeInfo {

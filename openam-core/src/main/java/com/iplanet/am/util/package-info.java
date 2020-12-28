@@ -33,6 +33,6 @@
  * Provides utility classes for use by other OpenAM SDK and custom
  * applications accessing OpenAM SDK.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.am.util;

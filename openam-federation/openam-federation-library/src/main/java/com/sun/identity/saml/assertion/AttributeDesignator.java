@@ -41,7 +41,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
  * The <code>AttributeDesignator</code> element identifies an attribute
  * name within an attribute namespace. The element is used in an attribute query
  * to request that attribute values within a specific namespace be returned. 
- * @supported.all.api
+ * 
  */
 public class AttributeDesignator {
     protected String _attributeName = null;

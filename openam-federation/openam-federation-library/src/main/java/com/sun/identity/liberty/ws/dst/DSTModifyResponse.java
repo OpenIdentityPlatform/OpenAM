@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class DSTModifyResponse {
 

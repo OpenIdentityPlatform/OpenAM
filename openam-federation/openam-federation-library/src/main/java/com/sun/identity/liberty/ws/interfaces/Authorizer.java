@@ -31,7 +31,7 @@ package com.sun.identity.liberty.ws.interfaces;
 /**
  * This class <code>Authorizer</code> is an interface for identity service
  * to check authorization of a <code>WSC</code>.
- * @supported.all.api
+ * 
  */
 public interface Authorizer {
 

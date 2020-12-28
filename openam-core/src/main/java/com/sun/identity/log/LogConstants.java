@@ -37,19 +37,19 @@ import java.util.logging.Level;
  * Defines constants used in the Logging service. <tt> LogConstants </TT>
  * helps in maintaining a central repository of all the constants used in the
  * package.
- * @supported.api
+ * 
  */
 public class LogConstants {
     /**
      * Attribute defining the maximum (flat) file size, above which
      * the files are either archived or rotated.
-     * @supported.api
+     * 
      */
     public static final String MAX_FILE_SIZE =
         "iplanet-am-logging-max-file-size";
     /**
      * Attribute defining the location where the logs go.
-     * @supported.api
+     * 
      */
     public static final String LOG_LOCATION = "iplanet-am-logging-location";
     /**
@@ -61,7 +61,7 @@ public class LogConstants {
     /**
      * Attribute defining whether the logs to be stored in
      * flat-files or to a Database.
-     * @supported.api
+     * 
      */
     public static final String BACKEND = "iplanet-am-logging-type";
     /**
@@ -76,7 +76,7 @@ public class LogConstants {
     public static final String DB_PASSWORD = "iplanet-am-logging-db-password";
     /**
      * Attribute defining the Database Driver.
-     * @supported.api
+     * 
      */
     public static final String DB_DRIVER = "iplanet-am-logging-db-driver";
     /**
@@ -87,13 +87,13 @@ public class LogConstants {
      * Attribute defining the set of all fields being logged. These fields are
      * predefined to be time, Date, LoginID, Domain, LogLevel, Data, IPAddr,
      * and HostName.
-     * @supported.api
+     * 
      */
     public static final String ALL_FIELDS = "iplanet-am-logging-allfields";
     /**
      * Attribute defining the fields currently selected by the administrator
      * to be logged.
-     * @supported.api
+     * 
      */
     public static final String LOG_FIELDS = "iplanet-am-logging-logfields";
     /**
@@ -112,7 +112,7 @@ public class LogConstants {
     /**
      * Attribute defining the number of history files a (flat file)
      * log should have.
-     * @supported.api
+     * 
      */
     public static final String NUM_HISTORY_FILES =
         "iplanet-am-logging-num-hist-file";
@@ -184,12 +184,12 @@ public class LogConstants {
     "iplanet-am-naming-logging-url";
     /**
      * Defines CarriageReturn/LineFeed characters.
-     * @supported.api
+     * 
      */
     public static final String CRLF = "\r\n";
     /**
      * Defines the LoggingService name.
-     * @supported.api
+     * 
      */
     public static final String LOGGING_SERVICE = "Logging";
     /**
@@ -282,7 +282,7 @@ public class LogConstants {
     /**
      * Attribute defining the Class that implements the custom
      * debug method in the case of log failure.
-     * @supported.api
+     * 
      */
     public static final String DEBUG_IMPL_CLASS =
     "iplanet-am-logging-debug-class";
@@ -293,26 +293,26 @@ public class LogConstants {
     "iplanet-am-logging";
     /**
      * Attribute defining the Buffer size.
-     * @supported.api
+     * 
      */
     public static final String BUFFER_SIZE = "iplanet-am-logging-buffer-size";
     /**
      * Attribute defining the Maximum LogRecords held in memory if
      * DB logging fails.
-     * @supported.api
+     * 
      */
     public static final String DB_MEM_MAX_RECS =
         "sun-am-logging-db-max-in-mem";
     /**
      * Attribute defining the Buffering time.
-     * @supported.api
+     * 
      */
     public static final String BUFFER_TIME =
         "iplanet-am-logging-buffer-time-in-seconds";
     public static final long BUFFER_TIME_DEFAULT = 3600;
     /**
      * Attribute defining the Time Buffering Status; ON or OFF.
-     * @supported.api
+     * 
      */
     public static final String TIME_BUFFERING_STATUS =
         "iplanet-am-logging-time-buffering-status";
@@ -413,7 +413,7 @@ public class LogConstants {
 
     /**
      * Property defining whether logging is enabled
-     * @supported.api
+     * 
      */
     public static final String LOG_STATUS =
         "com.iplanet.am.logstatus";
@@ -439,60 +439,60 @@ public class LogConstants {
     /**
      * The Date/Time field. This field is one of the two required in
      * any log record.
-     * @supported.api
+     * 
      */
     public static final String TIME = "TIME";
     /**
      * The Data field. This field is one of the two required in
      * any log record.
-     * @supported.api
+     * 
      */
     public static final String DATA = "Data";
     /**
      * The LogLevel field. The level at which the log record was
      * logged.
-     * @supported.api
+     * 
      */
     public static final String LOG_LEVEL = "LogLevel";
     /**
      * The Domain field. The AM Domain pertaining to the log record's
      * Data field.
-     * @supported.api
+     * 
      */
     public static final String DOMAIN = "Domain";
     /**
      * The LoginID field. The AM Login ID pertaining to the log record's
      * Data field.
-     * @supported.api
+     * 
      */
     public static final String LOGIN_ID = "LoginID";
     /**
      * The IPAddr field. The IP Address pertaining to the log record's
      * Data field.
-     * @supported.api
+     * 
      */
     public static final String IP_ADDR = "IPAddr";
     /**
      * The HostName field. The HostName pertaining to the log record's
      * Data field.
-     * @supported.api
+     * 
      */
     public static final String HOST_NAME = "HostName";
     /**
      * The ModuleName field. The AM Module pertaining to the log record's
      * Data field.
-     * @supported.api
+     * 
      */
     public static final String MODULE_NAME = "ModuleName";
     /**
      * The LoggedBy field. The ID associated with who logged the record.
-     * @supported.api
+     * 
      */
     public static final String LOGGED_BY = "LoggedBy";
     /**
      * The ContextID field. The ID associated with the user's session
      * that is the subject of this log record.
-     * @supported.api
+     * 
      */
     public static final String CONTEXT_ID = "ContextID";
     /**
@@ -503,14 +503,14 @@ public class LogConstants {
     /**
      * The MessageID field. The unique Message Identifier associated with
      * this particular log record data field.
-     * @supported.api
+     * 
      */
     public static final String MESSAGE_ID = "MessageID";
 
     /**
      * The NameID field. The Name Identifier associated with
      * this particular log record data field.
-     * @supported.api
+     * 
      */
     public static final String NAME_ID = "NameID";
 
@@ -519,7 +519,7 @@ public class LogConstants {
      * Includes Time, Data, LogLevel, Domain, LoginID, IPAddr,
      * HostName, ModuleName, LoggedBy, ContextID, MessageID, NameID.
      * Be sure to increment if more fields are added.
-     * @supported.api
+     * 
      */
     public static final int MAX_FIELDS = 12;
 

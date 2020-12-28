@@ -41,7 +41,7 @@ import com.iplanet.ums.UMSException;
  * applications, if they wish to.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public class AMPreCallBackException extends AMException {
 

@@ -36,7 +36,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * is thrown when the user-entered tokens cause the authentication module to 
  * be authenticated to <b>fail</b>.
  *
- * @supported.all.api
+ * 
  */
 public class AuthenticationException extends L10NMessageImpl {
     /**

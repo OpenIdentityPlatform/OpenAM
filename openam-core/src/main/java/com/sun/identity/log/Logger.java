@@ -69,7 +69,7 @@ import javax.security.auth.Subject;
  * <pre>
  * http://java.sun.com/j2se/1.4.1/docs/api/java/util/logging/Logger.html
  * </pre>
- * @supported.all.api
+ * 
  */
 public class Logger extends java.util.logging.Logger {
     

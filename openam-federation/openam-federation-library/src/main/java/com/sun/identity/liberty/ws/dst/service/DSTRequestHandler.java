@@ -53,7 +53,7 @@ import org.w3c.dom.Node;
  * rules defined by Liberty DST specification, it is an extension point
  * for any Liberty DST based web services.
  *
- * @supported.all.api
+ * 
  */
 public abstract class DSTRequestHandler implements RequestHandler {
  

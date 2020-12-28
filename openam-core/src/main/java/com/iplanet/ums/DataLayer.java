@@ -103,7 +103,7 @@ import org.forgerock.util.thread.listener.ShutdownManager;
  * pools of connections for mulitple (host,port) to DS servers instead of single
  * host and port.
  * 
- * @supported.api
+ * 
  */
 public class DataLayer implements java.io.Serializable {
 
@@ -237,7 +237,7 @@ public class DataLayer implements java.io.Serializable {
     /**
      * Create the singleton DataLayer object if it doesn't exist already.
      *
-     * @supported.api
+     * 
      */
     public synchronized static DataLayer getInstance(ServerInstance serverCfg)
         throws UMSException {
@@ -269,7 +269,7 @@ public class DataLayer implements java.io.Serializable {
      * Create the singleton DataLayer object if it doesn't exist already.
      * Assumes the server instance for "LDAPUser.Type.AUTH_PROXY".
      *
-     * @supported.api
+     * 
      */
     public static DataLayer getInstance() throws UMSException {
         // Make sure only one instance of this class is created.
@@ -291,7 +291,7 @@ public class DataLayer implements java.io.Serializable {
      * 
      * @return connection that is available to use.
      *
-     * @supported.api
+     * 
      */
     public Connection getConnection(java.security.Principal principal) throws LdapException {
         if (_ldapPool == null)
@@ -318,7 +318,7 @@ public class DataLayer implements java.io.Serializable {
      * @param guid distinguished name.
      * @param attrName attribute name.
      *
-     * @supported.api
+     * 
      */
     public String[] getAttributeString(Principal principal, Guid guid, String attrName) {
         String id = guid.getDn();
@@ -349,7 +349,7 @@ public class DataLayer implements java.io.Serializable {
      * @param guid Distinguished name.
      * @param attrName Attribute name.
      *
-     * @supported.api
+     * 
      */
     public Attr getAttribute(Principal principal, Guid guid, String attrName) {
         String id = guid.getDn();
@@ -381,7 +381,7 @@ public class DataLayer implements java.io.Serializable {
      * @param attrNames Attribute names.
      * @return collection of Attr.
      *
-     * @supported.api
+     * 
      */
     public Collection<Attr> getAttributes(Principal principal, Guid guid, Collection<String> attrNames) {
         String id = guid.getDn();
@@ -422,7 +422,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception EntryAlreadyExistsException if the entry already exists.
      * @exception UMSException if fail to add entry.
      *
-     * @supported.api
+     * 
      */
     public void addEntry(
         java.security.Principal principal,
@@ -488,7 +488,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception UMSException
      *                Fail to delete the entry
      *
-     * @supported.api
+     * 
      */
     public void deleteEntry(java.security.Principal principal, Guid guid)
             throws UMSException {
@@ -548,7 +548,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception UMSException
      *                Fail to read the entry
      *
-     * @supported.api
+     * 
      */
     public AttrSet read(java.security.Principal principal, Guid guid)
             throws UMSException {
@@ -565,7 +565,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception EntryNotFoundException if the entry is not found.
      * @exception UMSException if fail to read the entry.
      *
-     * @supported.api
+     * 
      */
     public AttrSet read(
         java.security.Principal principal,
@@ -658,7 +658,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception EntryNotFoundException if the entry is not found.
      * @exception UMSException if failure
      *
-     * @supported.api
+     * 
      */
     public void modify(Principal principal, Guid guid, Collection<Modification> modifications)
             throws UMSException {
@@ -717,7 +717,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception EntryNotFoundException if the entry is not found.
      * @exception UMSException if failure
      *
-     * @supported.api
+     * 
      */
     public void changePassword(Guid guid, String attrName, String oldPassword, String newPassword)
             throws UMSException {
@@ -767,7 +767,7 @@ public class DataLayer implements java.io.Serializable {
      * @param value Value to be added to the attribute.
      * @throws UMSException if there is any error while adding the value.
      *
-     * @supported.api
+     * 
      */
     public void addAttributeValue(Principal principal, Guid guid, String name, String value) throws UMSException {
         // Delegate to the other modify() method.
@@ -783,7 +783,7 @@ public class DataLayer implements java.io.Serializable {
      * @param value Value to be removed from the attribute.
      * @throws UMSException if there is any error while removing the value.
      *
-     * @supported.api
+     * 
      */
     public void removeAttributeValue(Principal principal, Guid guid, String name, String value) throws UMSException {
         // Delegate to the other modify() method.
@@ -843,7 +843,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception UMSException if failure.
      * @exception InvalidSearchFilterException if failure
      *
-     * @supported.api
+     * 
      */
     public SearchResults search(
         java.security.Principal principal,
@@ -967,7 +967,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception UMSException if failure.
      * @exception InvalidSearchFilterException if failure.
      *
-     * @supported.api
+     * 
      */
     public SearchResults searchIDs(
         java.security.Principal principal,
@@ -994,7 +994,7 @@ public class DataLayer implements java.io.Serializable {
      * @exception LdapException
      *                Error with LDAP connection.
      *
-     * @supported.api
+     * 
      */
     public Schema getSchema(java.security.Principal principal) throws UMSException {
         ResultCode errorCode;

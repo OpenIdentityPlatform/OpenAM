@@ -44,7 +44,7 @@ import java.util.HashSet;
 /**
  *The <code>SubjectConfirmation</code> element specifies a subject by specifying
  *data that authenticates the subject. 
- *@supported.all.api
+ *
  */
 public class SubjectConfirmation {
     static SAMLConstants sc;

@@ -42,7 +42,7 @@ import com.sun.identity.wsfederation.profile.RequestSecurityTokenResponse;
  * the implementation class are configured at the <code>Partner URLs</code> 
  * field in SAML service.
  *
- * @supported.all.api
+ * 
  */
 
 public interface SPAccountMapper {

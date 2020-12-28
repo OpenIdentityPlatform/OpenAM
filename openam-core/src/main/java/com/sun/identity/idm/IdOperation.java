@@ -40,7 +40,7 @@ package com.sun.identity.idm;
  * The usage of the respective operations are defined along with their
  * declaration.
  *
- * @supported.all.api
+ * 
  */
 public class IdOperation {
 

@@ -39,7 +39,7 @@ package com.sun.identity.sm;
  * <code> SchemaType.DYNAMIC </code>. The usage of the respective schema types
  * are defined along with their declaration.
  *
- * @supported.all.api
+ * 
  */
 public class SchemaType extends Object {
 

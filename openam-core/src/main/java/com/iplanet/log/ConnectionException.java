@@ -30,7 +30,7 @@ package com.iplanet.log;
 
 /**
  * Throw a log exception when the connection to the Database fails.
- * @supported.all.api
+ * 
  */
 public class ConnectionException extends LogException {
     /**

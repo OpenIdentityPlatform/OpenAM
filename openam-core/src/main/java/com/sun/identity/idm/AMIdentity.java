@@ -100,7 +100,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  *
  * </PRE>
  *
- * @supported.api
+ * 
  */
 
 public class AMIdentity {
@@ -126,7 +126,7 @@ public class AMIdentity {
     private RepoAuditorFactory auditorFactory;
 
     /**
-     * @supported.api
+     * 
      *
      * Constructor for the <code>AMIdentity</code> object.
      *
@@ -143,7 +143,7 @@ public class AMIdentity {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Constructor for the <code>AMIdentity</code> object.
      *
@@ -249,7 +249,7 @@ public class AMIdentity {
      * Returns the name of the identity.
      *
      * @return Name of the identity
-     * @supported.api
+     * 
      */
     public String getName() {
         String sname = name;
@@ -265,7 +265,7 @@ public class AMIdentity {
      * Returns the Type of the Identity.
      *
      * @return <code>IdType</code> representing the type of this object.
-     * @supported.api
+     * 
      */
     public IdType getType() {
         return type;
@@ -275,7 +275,7 @@ public class AMIdentity {
      * Returns the realm for this identity.
      *
      * @return String representing realm name.
-     * @supported.api
+     * 
      */
     public String getRealm() {
         return orgName;
@@ -292,7 +292,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public boolean isActive() throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
@@ -310,7 +310,7 @@ public class AMIdentity {
      * assigned the value corresponding to activated.
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void setActiveStatus(boolean active)
         throws IdRepoException, SSOException {
@@ -333,7 +333,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Map getAttributes() throws IdRepoException, SSOException {
 
@@ -359,7 +359,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Map getAttributes(Set attrNames) throws IdRepoException,
             SSOException {
@@ -397,7 +397,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Map getBinaryAttributes(Set attrNames) throws IdRepoException,
             SSOException {
@@ -421,7 +421,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Set getAttribute(String attrName) throws IdRepoException,
             SSOException {
@@ -451,7 +451,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void setAttributes(Map attrMap) throws IdRepoException, SSOException
     {
@@ -465,7 +465,7 @@ public class AMIdentity {
      * @param newPassword new password
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void changePassword(String oldPassword, String newPassword)
         throws IdRepoException, SSOException {
@@ -493,7 +493,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void setBinaryAttributes(Map attrMap) throws IdRepoException,
             SSOException {
@@ -512,7 +512,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If the user's single sign on token is invalid
-     * @supported.api
+     * 
      */
     public void removeAttributes(Set attrNames) throws IdRepoException,
             SSOException {
@@ -553,7 +553,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void store() throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
@@ -590,7 +590,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Set<String> getAssignedServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
@@ -629,7 +629,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Set<String> getAssignableServices() throws IdRepoException, SSOException {
         // Get all service names for the type from SMS
@@ -678,7 +678,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void assignService(String serviceName, Map attributes)
             throws IdRepoException, SSOException {
@@ -765,7 +765,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void unassignService(String serviceName) throws IdRepoException,
             SSOException {
@@ -834,7 +834,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Map<String, Set<String>> getServiceAttributes(String serviceName)
         throws IdRepoException, SSOException {
@@ -887,7 +887,7 @@ public class AMIdentity {
      * @return Map of attribute-values.
      * @throws IdRepoException if there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Map getServiceAttributesAscending(String serviceName)
         throws IdRepoException, SSOException {
@@ -920,7 +920,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void modifyService(String serviceName, Map attrMap)
             throws IdRepoException, SSOException {
@@ -997,7 +997,7 @@ public class AMIdentity {
      * @param attrNames Set of attributes name.
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public void removeServiceAttributes(String serviceName, Set attrNames)
         throws IdRepoException, SSOException {
@@ -1025,7 +1025,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             if user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public boolean isMember(AMIdentity identity) throws IdRepoException,
             SSOException {
@@ -1107,7 +1107,7 @@ public class AMIdentity {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * If membership is supported then add the new identity as a member.
      *
@@ -1128,7 +1128,7 @@ public class AMIdentity {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Removes the identity from this identity's membership.
      *
@@ -1149,7 +1149,7 @@ public class AMIdentity {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Removes the identities from this identity's membership.
      *
@@ -1188,7 +1188,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             if user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Set getMembers(IdType mtype) throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
@@ -1209,7 +1209,7 @@ public class AMIdentity {
      *             if there are repository related error conditions.
      * @throws SSOException
      *             if user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public Set getMemberships(IdType mtype) throws IdRepoException,
             SSOException {
@@ -1228,7 +1228,7 @@ public class AMIdentity {
      *             If there are repository related error conditions.
      * @throws SSOException
      *             If user's single sign on token is invalid.
-     * @supported.api
+     * 
      */
     public boolean isExists() throws IdRepoException, SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
@@ -1240,7 +1240,7 @@ public class AMIdentity {
      *
      * @param o Object for comparison.
      * @return <code>true</code> if the given object is equal to this object.
-     * @supported.api
+     * 
      */
     @Override
     public boolean equals(Object o) {
@@ -1308,7 +1308,7 @@ public class AMIdentity {
      * Returns the universal identifier of this object.
      *
      * @return String representing the universal identifier of this object.
-     * @supported.api
+     * 
      */
     public String getUniversalId() {
         return univIdWithoutDN;

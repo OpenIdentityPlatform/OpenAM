@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  * and is used by the authentication module with HTTP protocol based
  * handshaking negotiation.
  *
- * @supported.all.api
+ * 
  */
 public class HttpCallback implements Callback, Serializable {
     private String tokenHeader = null;

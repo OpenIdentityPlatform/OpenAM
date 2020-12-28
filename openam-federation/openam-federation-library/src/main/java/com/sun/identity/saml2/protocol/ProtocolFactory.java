@@ -69,7 +69,7 @@ import com.sun.identity.saml2.protocol.impl.StatusDetailImpl;
  * <code>createElementName(String value)</code>,
  * <code>createElementName(org.w3c.dom.Element value)</code>.
  *
- * @supported.all.api
+ * 
  */
 public class ProtocolFactory  {
     

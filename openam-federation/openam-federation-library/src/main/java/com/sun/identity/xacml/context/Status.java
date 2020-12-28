@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * The <code>Status</code> element is a container of 
  * one or more <code>Status</code>s issuded by authorization authority.
- * @supported.all.api
+ * 
  * <p/>
  * <pre>
  *

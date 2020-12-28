@@ -29,6 +29,6 @@
 /**
  * Defines STS client API and end user token conversion interface (SPI) classes. 
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wss.sts;

@@ -34,7 +34,7 @@ package com.sun.identity.policy;
  * the policy component. All other exceptions in this package are derived
  * from this exception.
  *
- * @supported.all.api
+ * 
  */
 public class PolicyException extends ChainedException {
     /**

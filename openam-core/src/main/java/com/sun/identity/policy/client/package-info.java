@@ -35,6 +35,6 @@
  * Client policy API implementation maintains a local cache of policy 
  * decisions. Cache decisions are kept current either by a configurable time 
  * to live and/or notifications from policy service.
- * @supported.api
+ * 
  */
 package com.sun.identity.policy.client;

@@ -33,7 +33,7 @@ import com.iplanet.services.util.Crypt;
 /**
  * This class which contains utilities to encrypt and decrypt attribute value of
  * password type.
- * @supported.all.api
+ * 
  */
 public class AMPasswordUtil {
 

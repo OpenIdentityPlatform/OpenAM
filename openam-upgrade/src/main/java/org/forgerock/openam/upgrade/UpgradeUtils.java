@@ -122,7 +122,7 @@ import org.w3c.dom.NodeList;
  * This class contains utilities to upgrade the service schema
  * configuration to be compatible with OpenAM.
  *
- * @supported.api
+ * 
  */
 public class UpgradeUtils {
 
@@ -262,7 +262,7 @@ public class UpgradeUtils {
      *
      * @param fileName Name of the service schema XML to be loaded.
      * @throws UpgradeException if there is an error creating a service.
-     * @supported.api
+     * 
      */
     public static void createService(String fileName) throws UpgradeException {
         String classMethod = "UpgradeUtils:createService : ";
@@ -713,7 +713,7 @@ public class UpgradeUtils {
      *         XML file containing attribute schema definition.
      * @throws UpgradeException if there is an error adding the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void addAttributeToSubSchema(
             String serviceName,
@@ -795,7 +795,7 @@ public class UpgradeUtils {
      * @param attributeName name of the attribute
      * @param defaultValues a set of values to be added to the attribute
      * @throws UpgradeException if there is an error.
-     * @supported.api
+     * 
      */
     public static void setAttributeDefaultValues(
             String serviceName,
@@ -832,7 +832,7 @@ public class UpgradeUtils {
      * @param attributeName name of the attribute
      * @param defaultValues a set of values to be added to the attribute
      * @throws <code>UpgradeException</code> if there is an error.
-     * @supported.api
+     * 
      */
     public static void addAttributeDefaultValues(
             String serviceName,
@@ -920,7 +920,7 @@ public class UpgradeUtils {
      * @param adminToken admin SSOToken
      * @throws UpgradeException if there is an error adding the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void addAttributeToSchema(
             String serviceName,
@@ -940,7 +940,7 @@ public class UpgradeUtils {
      * @param attributeSchemaNode The attribute is add
      * @throws UpgradeException if there is an error adding the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void addAttributeToSchema(ServiceSchema serviceSchema,
             Node attributeSchemaNode)
@@ -977,7 +977,7 @@ public class UpgradeUtils {
      * @param adminToken admin SSOToken
      * @throws UpgradeException if there is an error removing the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void removeAttributeSchema(
             String serviceName,
@@ -997,7 +997,7 @@ public class UpgradeUtils {
      * @param attributeName The attribute is remove
      * @throws UpgradeException if there is an error removing the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void removeAttributeSchema(ServiceSchema serviceSchema,
             String attributeName)
@@ -1032,7 +1032,7 @@ public class UpgradeUtils {
      * @param attributeSchemaNode The attribute to update
      * @throws UpgradeException if there is an error updating the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void replaceAttributeSchema(
             String serviceName,
@@ -1053,7 +1053,7 @@ public class UpgradeUtils {
      * @param attributeSchemaNode The attribute to update
      * @throws UpgradeException if there is an error updating the
      *         attribute schema.
-     * @supported.api
+     * 
      */
     public static void replaceAttributeSchema(
             ServiceSchema serviceSchema,

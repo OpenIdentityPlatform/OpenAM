@@ -20,6 +20,6 @@
  * a published STS instance, and their class will be invoked to produce the specific statement type for inclusion in the
  * SAML2 assertion.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;

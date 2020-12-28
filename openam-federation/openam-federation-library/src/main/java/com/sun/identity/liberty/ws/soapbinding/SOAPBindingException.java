@@ -33,7 +33,7 @@ package com.sun.identity.liberty.ws.soapbinding;
  * The <code>SOAPBindingException</code> class represents a error while
  * processing SOAP request and response.
  *
- * @supported.all.api
+ * 
  */
 public class SOAPBindingException extends Exception {
 

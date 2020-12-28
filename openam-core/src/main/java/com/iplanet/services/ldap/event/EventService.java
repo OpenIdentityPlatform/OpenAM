@@ -74,7 +74,7 @@ import com.sun.identity.sm.ldap.LDAPEventManager;
  * The EventService is responsible for listening to and dispatching to listening objects
  * messages returning from persistent searches running in an underlying LDAP implementation.
  *
- * @supported.api
+ * 
  */
 public class EventService {
 
@@ -151,7 +151,7 @@ public class EventService {
     /**
      * Returns the event service (presuming we are not in the process of shutting down).
      *
-     * @supported.api
+     * 
      * @return The singleton instance of the EventService.
      */
     public synchronized static EventService getEventService() throws EventException, LdapException {

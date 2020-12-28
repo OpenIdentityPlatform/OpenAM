@@ -39,7 +39,7 @@ import com.iplanet.sso.SSOException;
  * Java System Access Manager objects and their attributes.
  *
  * @deprecated As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public interface AMObject extends AMConstants {
 

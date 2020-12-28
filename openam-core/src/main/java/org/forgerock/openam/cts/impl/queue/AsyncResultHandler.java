@@ -39,10 +39,8 @@ import com.sun.identity.shared.debug.Debug;
  * is sized to one to enforce the usage of this ResultHandler as being used only
  * once.
  *
- * @see TaskDispatcher#read(String, org.forgerock.openam.sm.datalayer.api.ResultHandler)
- * @see TaskDispatcher#query(TokenFilter, org.forgerock.openam.sm.datalayer.api.ResultHandler)
  *
- * @param <T> {@inheritDoc}
+ * @param
  */
 public class AsyncResultHandler<T> implements ResultHandler<T, CoreTokenException> {
     private static final String NULL_SIGNAL = "--NULL--";

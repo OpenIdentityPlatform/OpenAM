@@ -16,6 +16,6 @@
 /**
  * Deprecated classes for LDAP support.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.services.ldap;

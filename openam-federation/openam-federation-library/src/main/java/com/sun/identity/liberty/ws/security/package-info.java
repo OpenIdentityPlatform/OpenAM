@@ -29,7 +29,7 @@
 /**
  * Provides interface to manage liberty security
  *
- * @supported.all.api
+ * 
  */
 package com.sun.identity.liberty.ws.security;
 

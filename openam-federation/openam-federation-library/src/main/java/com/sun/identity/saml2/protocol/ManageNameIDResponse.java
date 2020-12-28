@@ -42,7 +42,7 @@ import com.sun.identity.saml2.protocol.impl.ManageNameIDResponseImpl;
  * &lt;element name="ManageNameIDResponse" type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

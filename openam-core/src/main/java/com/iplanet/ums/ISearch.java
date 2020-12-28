@@ -79,7 +79,7 @@ package com.iplanet.ums;
  * 
  * @see com.iplanet.ums.SearchControl
  * 
- * @supported.all.api
+ * 
  */
 public interface ISearch {
 

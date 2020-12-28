@@ -34,7 +34,7 @@ import java.util.List;
  * This class has methods to create <code>EntityName</code>
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

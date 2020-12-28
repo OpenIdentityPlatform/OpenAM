@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
  * string value to be validated and set of Stringvalues against which the value
  * should be validated to validate function, true is returned if the value is
  * present in the set.
- * @supported.all.api
+ * 
  */
 public class SetValidator implements IValidator {
 

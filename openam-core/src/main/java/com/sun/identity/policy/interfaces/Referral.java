@@ -41,7 +41,7 @@ import java.util.*;
  * There would be many implementations with different policy delegation 
  * mechanisms such as delegating to peer organizations only 
  * or delegating to sub organizations only. 
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
  * This  class defines methods for setting and retrieving attributes and
  * elements associated with a Liberty Response . 
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

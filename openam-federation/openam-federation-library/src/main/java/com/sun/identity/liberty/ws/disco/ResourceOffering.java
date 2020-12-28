@@ -90,7 +90,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * &lt;/ResourceOffering>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class ResourceOffering {
 

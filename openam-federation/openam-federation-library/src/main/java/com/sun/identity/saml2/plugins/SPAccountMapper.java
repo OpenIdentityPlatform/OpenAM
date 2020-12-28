@@ -42,7 +42,7 @@ import com.sun.identity.saml2.protocol.ManageNameIDRequest;
  *
  * @see com.sun.identity.saml2.plugins.IDPAccountMapper
  *
- * @supported.all.api
+ * 
  */ 
 public interface SPAccountMapper {
 

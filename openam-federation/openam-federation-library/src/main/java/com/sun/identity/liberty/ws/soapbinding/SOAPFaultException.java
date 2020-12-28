@@ -34,7 +34,7 @@ package com.sun.identity.liberty.ws.soapbinding;
  * The <code>SOAPFaultException</code> class represents a SOAP Fault while
  * processing SOAP request.
  *
- * @supported.all.api
+ * 
  */
 public class SOAPFaultException extends Exception {
 

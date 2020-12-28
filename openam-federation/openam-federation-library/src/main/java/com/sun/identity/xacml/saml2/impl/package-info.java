@@ -16,6 +16,6 @@
 /**
  * Defines XACML implementations for SAMLv2.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.saml2.impl;

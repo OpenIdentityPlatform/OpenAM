@@ -35,7 +35,7 @@ import java.util.Set;
  * <code>ConfigurationInstance</code> is the interface that provides the
  * operations on service configuration. 
  *
- * @supported.all.api
+ * 
  */
 public interface ConfigurationInstance {
 

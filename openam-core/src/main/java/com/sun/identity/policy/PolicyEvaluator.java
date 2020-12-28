@@ -77,7 +77,7 @@ import org.forgerock.openam.utils.CollectionUtils;
 /**
  * The class <code>PolicyEvaluator</code> evaluates policies
  * and provides policy decisions.
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -88,7 +88,7 @@ public class PolicyEvaluator {
      * The resources include the sub resources of all resource prefixes of 
      * resource type
      *
-     * @supported.api
+     * 
      */
     public static final String ALL_RESOURCES 
             = "---ALL_RESOURCES---";
@@ -99,7 +99,7 @@ public class PolicyEvaluator {
     /**
      * Constant used to identity empty resource
      *
-     * @supported.api
+     * 
      */
     public static final String EMPTY_RESOURCE_NAME = "";
 
@@ -295,7 +295,7 @@ public class PolicyEvaluator {
      *                      <code>serviceTypeName</code> is not found
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public PolicyEvaluator(String serviceTypeName)
         throws SSOException, NameNotFoundException, PolicyException {
@@ -491,7 +491,7 @@ public class PolicyEvaluator {
      * @throws SSOException single-sign-on token invalid or expired
      * @throws PolicyException for any other abnormal condition
      * 
-     * @supported.api
+     * 
      */
     public boolean isAllowed(SSOToken token, String resourceName,
                               String actionName, Map envParameters) throws SSOException,
@@ -672,7 +672,7 @@ public class PolicyEvaluator {
      * @throws SSOException single-sign-on token invalid or expired
      * @throws PolicyException for any other abnormal condition
      * 
-     * @supported.api
+     * 
      */
     public PolicyDecision getPolicyDecision(
             SSOToken token, String resourceName, Set actionNames,
@@ -994,7 +994,7 @@ public class PolicyEvaluator {
      * @throws PolicyException for any other abnormal condition
      * @see ProtectedResource
      *
-     * @supported.api
+     * 
      *
      */
     public Set getProtectedResourcesIgnoreConditions(
@@ -1319,7 +1319,7 @@ public class PolicyEvaluator {
      * @see ResourceResult#SELF_SCOPE
      *
      * 
-     * @supported.api
+     * 
      */
     public Set getResourceResults(SSOToken token, 
             String resourceName, String scope, Map envParameters) 
@@ -1543,7 +1543,7 @@ public class PolicyEvaluator {
      *
      * @deprecated Use <code>getResourceResults()</code>
      *
-     * @supported.api
+     * 
      *
      */
     public ResourceResult getResourceResult(SSOToken token, 
@@ -2000,7 +2000,7 @@ public class PolicyEvaluator {
       *
       *  @param policyListener the listener to be added
       * 
-      * @supported.api
+      * 
       */
       public void addPolicyListener(PolicyListener policyListener) {
           policyCache.addPolicyListener(policyListener);
@@ -2013,7 +2013,7 @@ public class PolicyEvaluator {
       *
       *  @param policyListener the listener to be removed
       * 
-      * @supported.api
+      * 
       */
       public void removePolicyListener(PolicyListener policyListener) {
           policyCache.removePolicyListener(policyListener);

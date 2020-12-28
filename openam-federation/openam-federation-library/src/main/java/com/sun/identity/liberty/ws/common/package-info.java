@@ -29,7 +29,7 @@
 /**
  * Defines common classes used by liberty service components.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.common;
 

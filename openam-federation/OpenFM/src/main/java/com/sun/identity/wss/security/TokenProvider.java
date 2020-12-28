@@ -36,7 +36,7 @@ package com.sun.identity.wss.security;
  * to generate the <code>SecurityToken</code>s that may be attached to the
  * Web services security (SOAP) headers.
  * 
- * @supported.all.api
+ * 
  */
 public interface TokenProvider {
 

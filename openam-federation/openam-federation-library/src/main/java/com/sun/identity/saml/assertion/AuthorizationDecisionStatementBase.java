@@ -45,7 +45,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
  *
  * This class is an abstract base class for all AuthorizationDecisionStatement
  * implementations and encapsulates common functionality.
- * @supported.all.api
+ * 
  */
 public abstract class AuthorizationDecisionStatementBase
     extends SubjectStatement {

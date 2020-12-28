@@ -35,7 +35,7 @@ package com.iplanet.ums;
  * If LDAP is the underlying persistent storage, this exception is thrown upon
  * receiving LDAPException with error code for LDAPException.NO_SUCH_OBJECT.
  *
- * @supported.all.api
+ * 
  */
 public class EntryNotFoundException extends UMSException {
 

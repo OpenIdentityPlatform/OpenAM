@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  * This class implements the interface <code>SecurityTokenSpec</code> to
  * create <code>SAML2</code> Assertions / Security tokens.
  *
- * @supported.all.api
+ * 
  */
 public class SAML2TokenSpec implements SecurityTokenSpec {
     

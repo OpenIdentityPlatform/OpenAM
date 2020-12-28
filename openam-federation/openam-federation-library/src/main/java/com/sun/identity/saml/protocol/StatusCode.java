@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
  * <code>SubStatusCode</code> element. It corresponds to
  * <code>samlp:StatusCodeType</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public class StatusCode {
 

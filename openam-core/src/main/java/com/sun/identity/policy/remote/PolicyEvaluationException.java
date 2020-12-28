@@ -35,7 +35,7 @@ import com.sun.identity.policy.PolicyException;
  * for the error happening in policy request XML parsing and policy 
  * request evaluation. 
  *
- * @supported.all.api
+ * 
  */
 public class PolicyEvaluationException extends PolicyException {
 

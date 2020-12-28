@@ -41,7 +41,7 @@ import javax.security.auth.login.LoginException;
 /**
  * This class is for handling message localization in LoginException.
  *
- * @supported.api
+ * 
  */
 public class AuthLoginException extends LoginException implements L10NMessage {
 
@@ -75,7 +75,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      * @param nestedException
      *            Exception nested in the new exception.
      *
-     * @supported.api
+     * 
      */
     public AuthLoginException(Throwable nestedException) {
         initCause(nestedException);
@@ -92,7 +92,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      *            message for this exception. This message can be later
      *            retrieved by <code>getMessage()</code> method.
      *
-     * @supported.api
+     * 
      */
     public AuthLoginException(String message) {
         super(message);
@@ -123,7 +123,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      * @param nestedException
      *            The nested <code>Throwable</code>.
      *
-     * @supported.api
+     * 
      */
     public AuthLoginException(String rbName, String errorCode, Object[] args,
             Throwable nestedException) {
@@ -152,7 +152,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      * @param args
      *            arguments to message. If it is not present pass them as null
      *
-     * @supported.api
+     * 
      */
     public AuthLoginException(String rbName, String errorCode, Object[] args) {
         this(rbName, errorCode, args, null);
@@ -165,7 +165,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      *            the locale in which the message will be returned.
      * @return String localized error message.
      *
-     * @supported.api
+     * 
      */
     public String getL10NMessage(Locale locale) {
         String result = super.getMessage();
@@ -203,7 +203,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      * @return Resource Bundle Name associated with this error message.
      * @see #getL10NMessage(java.util.Locale).
      *
-     * @supported.api
+     * 
      */
     public String getResourceBundleName() {
         return _bundleName;
@@ -214,7 +214,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      *
      * @return Error code associated with this error message.
      *
-     * @supported.api
+     * 
      */
     public String getErrorCode() {
         return _errorCode;
@@ -227,7 +227,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      *         <code>MessageFormat</code> class to format the message. It can
      *         be null.
      *
-     * @supported.api
+     * 
      */
     public Object[] getMessageArgs() {
         return _args;
@@ -244,7 +244,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      *         locale. To get localized message, use the getL10NMessage(Locale)
      *         method.
      *
-     * @supported.api
+     * 
      */
     public String getMessage() {
         return getL10NMessage(Locale.ENGLISH);

@@ -39,7 +39,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * &lt;element name="AssertionIDRef" type="NCName"/>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 public interface AssertionIDRef {
     

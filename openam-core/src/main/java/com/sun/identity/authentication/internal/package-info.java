@@ -16,6 +16,6 @@
 /**
  * Internal classes to handle Authentication.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.authentication.internal;

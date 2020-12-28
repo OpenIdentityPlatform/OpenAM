@@ -44,7 +44,7 @@ import javax.security.auth.callback.Callback;
  * whether a template is an error page, page header, image name , page timeout
  * value, name of module.
  *
- * @supported.all.api
+ * 
  */
 public class PagePropertiesCallback implements Callback {
     private String image=null;

@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  * This class has methods to construct an object or
  * message representing a list of trusted Identity Providers.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

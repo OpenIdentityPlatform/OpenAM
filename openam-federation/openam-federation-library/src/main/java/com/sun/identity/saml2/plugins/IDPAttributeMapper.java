@@ -42,7 +42,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * Sign On Token and returns the SAML <code>Attribute</code>s.
  * @see com.sun.identity.saml2.plugins.SPAttributeMapper
  *
- * @supported.all.api
+ * 
  */
 
 public interface IDPAttributeMapper {

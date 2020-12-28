@@ -42,7 +42,7 @@ import org.forgerock.opendj.ldap.SearchScope;
  * Represents a dynamic group entry that uses memberOf as its filter. It checks
  * whether the user is the member of the specified group
  *
- * @supported.api
+ * 
  */
 public class AssignableDynamicGroup extends DynamicGroup implements
         IAssignableMembership {
@@ -57,7 +57,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
     /**
      * Default constructor
      *
-     * @supported.api
+     * 
      */
     public AssignableDynamicGroup() {
     }
@@ -86,7 +86,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @param attrSet Attribute/value set.
      * @exception UMSException if fail to instantiate from persistent storage.
      *
-     * @supported.api
+     * 
      */
     public AssignableDynamicGroup(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -129,7 +129,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      *        <code>LDAPv2.SCOPE_ONE</code> or <code>LDAPv2.SCOPE_SUB</code>.
      * @exception UMSException if fail to instantiate from persistent storage
      *
-     * @supported.api
+     * 
      */
     public AssignableDynamicGroup(CreationTemplate template, AttrSet attrSet,
             Guid baseGuid, int scope) throws UMSException {
@@ -149,7 +149,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      *        scope in the filter has to be <code>LDAPv2.SCOPE_ONE</code> or
      *        <code>LDAPv2.SCOPE_SUB</code>.
      *
-     * @supported.api
+     * 
      */
     public void setSearchFilter(String filter) {
         LDAPUrl url = getUrl();
@@ -193,7 +193,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @exception UMSException if fail to save to persistent storage or if the
      *            user is not within the scope of the group.
      *
-     * @supported.api
+     * 
      */
     public void addMember(Guid userGuid) throws UMSException {
         // UMSSession session = getUMSSession();
@@ -212,7 +212,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @exception UMSException if fail to save to persistent storage or if the
      *            user is not within the scope of the group.
      *
-     * @supported.api
+     * 
      */
     public void addMember(PersistentObject member) throws UMSException {
         // check whether the userGuid is within the scope of memberUrl
@@ -242,7 +242,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @param guids Array of member GUIDs to be added as members to the group.
      * @exception UMSException if fail to save to persistent storage.
      *
-     * @supported.api
+     * 
      */
     public void addMembers(Guid[] guids) throws UMSException {
         if (guids == null) {
@@ -261,7 +261,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @param guid Unique identifier for the member to be removed.
      * @exception UMSException if fail to save to persistent storage.
      *
-     * @supported.api
+     * 
      */
     public void removeMember(Guid guid) throws UMSException {
         PersistentObject member = UMSObject.getObject(getPrincipal(), guid);
@@ -275,7 +275,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @param member Object to be removed.
      * @exception UMSException if fail to save to persistent storage.
      *
-     * @supported.api
+     * 
      */
     public void removeMember(PersistentObject member) throws UMSException {
         member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.DELETE);
@@ -287,7 +287,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * 
      * @exception UMSException if fail to save to persistent storage.
      *
-     * @supported.api
+     * 
      */
     public void removeAllMembers() throws UMSException {
 
@@ -312,7 +312,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @return <code>true</code> if it is a member.
      * @exception UMSException if fail to read object for guid.
      *
-     * @supported.api
+     * 
      */
     public boolean hasMember(Guid guid) throws UMSException {
         if (getPrincipal() == null) {

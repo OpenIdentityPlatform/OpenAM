@@ -48,7 +48,7 @@ import org.forgerock.opendj.ldap.ModificationType;
  * the nortel specication).
  * 
  * @see DomainComponentTree
- * @supported.api
+ * 
  */
 public class DomainComponent extends PersistentObject {
 
@@ -74,7 +74,7 @@ public class DomainComponent extends PersistentObject {
      * 
      * @param dcName
      *            Domain Componet name
-     * @supported.api
+     * 
      */
     public DomainComponent(SSOToken token, String dcName) throws UMSException {
         setAttribute(new Attr("objectclass", dcObjectClasses));
@@ -96,7 +96,7 @@ public class DomainComponent extends PersistentObject {
      * @param org
      *            Organization entry to be associated with the dc entry in the
      *            dctree
-     * @supported.api
+     * 
      */
     public void setAssociatedOrganization(PersistentObject org)
             throws UMSException {
@@ -110,7 +110,7 @@ public class DomainComponent extends PersistentObject {
      * 
      * @param orgGuid Identifier for organization.
      * @throws UMSException if mapping of dc entry cannot be set.
-     * @supported.api
+     * 
      */
     public void setAssociatedOrganization(Guid orgGuid) throws UMSException {
         if (orgGuid == null || orgGuid.getDn().length() == 0) {
@@ -133,7 +133,7 @@ public class DomainComponent extends PersistentObject {
      * 
      * @return PersistentObject representing the organization entry associated
      *         with dc entry
-     * @supported.api
+     * 
      */
     public PersistentObject getOrganization() throws UMSException {
 
@@ -146,7 +146,7 @@ public class DomainComponent extends PersistentObject {
      * mapping is in terms of DN
      * 
      * @return identifier for the domain mapping associated with this dc entry
-     * @supported.api
+     * 
      */
     public Guid getAssociatedOrganizationGuid() throws UMSException {
 
@@ -163,7 +163,7 @@ public class DomainComponent extends PersistentObject {
      * Get the domain status in the dc entry
      * 
      * @return Domain status in the dc entry
-     * @supported.api
+     * 
      */
     public String getDomainStatus() throws UMSException {
         Attr attr = getAttribute(TAG_DOMAIN_STATUS);
@@ -180,7 +180,7 @@ public class DomainComponent extends PersistentObject {
      * 
      * @param status
      *            Domain status to be set
-     * @supported.api
+     * 
      */
     public void setDomainStatus(String status) throws UMSException {
         modify(new Attr(TAG_DOMAIN_STATUS, status), ModificationType.REPLACE);
@@ -194,7 +194,7 @@ public class DomainComponent extends PersistentObject {
 
     /**
      * Get the naming attribute for the dc entry
-     * @supported.api
+     * 
      */
     public String getNamingAttribute() {
         return (DEFAULT_NAMING_ATTR);

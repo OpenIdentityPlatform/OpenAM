@@ -52,7 +52,7 @@ import java.util.Set;
  * or the <code>FederationManager</code>.
  * @see com.sun.identity.saml2.plugins.IDPAttributeMapper
  *
- * @supported.all.api
+ * 
  */
 
 public interface SPAttributeMapper {

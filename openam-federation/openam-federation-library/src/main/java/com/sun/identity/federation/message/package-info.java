@@ -29,7 +29,7 @@
 /**
  * Defines federation protocol message classes. 
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.federation.message;

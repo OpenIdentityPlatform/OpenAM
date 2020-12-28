@@ -32,7 +32,7 @@ package com.iplanet.ums;
  * This is a common iterface from which different roles can
  * be implemented.
  *
- * @supported.all.api
+ * 
  */
 public interface IRole {
     /**

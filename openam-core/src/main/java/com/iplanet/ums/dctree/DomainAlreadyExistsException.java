@@ -32,7 +32,7 @@ import com.iplanet.ums.UMSException;
 
 /**
  * Exception occurs when adding a domain that already exists in the dctree
- * @supported.all.api
+ * 
  */
 public class DomainAlreadyExistsException extends UMSException {
 

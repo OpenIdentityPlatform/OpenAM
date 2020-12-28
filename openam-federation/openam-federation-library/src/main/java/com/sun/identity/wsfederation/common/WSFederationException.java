@@ -34,7 +34,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * This class is an extension point for all WS-Federation related exceptions.
  * It also handles message localization in WS-Federation exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class WSFederationException extends L10NMessageImpl {
     /**

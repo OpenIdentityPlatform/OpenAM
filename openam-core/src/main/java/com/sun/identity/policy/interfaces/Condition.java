@@ -74,7 +74,7 @@ import java.util.Set;
  * constructor.
  *
  * @see com.sun.identity.policy.ConditionDecision
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.EntitlementCondition}
  */
 @Deprecated

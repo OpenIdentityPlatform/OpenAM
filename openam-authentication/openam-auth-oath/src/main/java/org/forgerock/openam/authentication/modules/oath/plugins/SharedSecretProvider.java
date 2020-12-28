@@ -20,7 +20,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 
 /**
  * Provided as an extension point to allow customised transformation of the OATH shared secret attribute.
- * @supported.all.api
+ * 
  */
 public interface SharedSecretProvider {
 

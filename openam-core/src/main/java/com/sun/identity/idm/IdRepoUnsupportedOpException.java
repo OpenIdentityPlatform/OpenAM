@@ -37,7 +37,7 @@ package com.sun.identity.idm;
  * <code>CONFIG_PROBLEM</code> or <code>LDAP_OP_FAILED</code> (typically a
  * bug).
  *
- * @supported.all.api
+ * 
  */
 public class IdRepoUnsupportedOpException extends IdRepoException {
 

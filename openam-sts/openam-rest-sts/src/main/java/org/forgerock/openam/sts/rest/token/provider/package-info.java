@@ -17,6 +17,6 @@
 /**
  * Contains classes and interface definitions common to all token provider classes.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts.rest.token.provider;

@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
  * Element. This element specifies a URI which resolves to
  * the complete IDPList.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

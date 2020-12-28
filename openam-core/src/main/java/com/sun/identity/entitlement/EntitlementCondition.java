@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * Encapsulates a Strategy to decide if a {@link com.sun.identity.entitlement.Privilege} applies to a given request.
  *
- * @supported.all.api
+ * 
  */
 public interface EntitlementCondition {
 

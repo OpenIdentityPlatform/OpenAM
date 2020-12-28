@@ -32,6 +32,6 @@
 /**
  * Defines IDPP common.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.idpp.common;

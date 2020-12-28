@@ -34,7 +34,7 @@
  * functionality such as the implementation of request for
  * authenticating, user credential callbacks.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.authentication.server;
 

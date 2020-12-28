@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  * The class <code>Extension</code> is used to create , parse
  * <code>Extension</code> object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

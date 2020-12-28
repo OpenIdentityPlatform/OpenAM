@@ -49,7 +49,7 @@ import java.security.cert.X509Certificate;
  * The class <code>SecurityTokenManager</code> is a final class that
  * provides interfaces to manage Web Service Security (WSS) Tokens.
  *
- * @supported.api
+ * 
  */
 
 public final class SecurityTokenManager {
@@ -77,7 +77,7 @@ public final class SecurityTokenManager {
      *   to see if access to this security token manager is allowed.
      * @throws SecurityTokenException if unable to access the
      *         the security token manager.
-     * @supported.api
+     * 
      */
     public SecurityTokenManager(java.lang.Object credential)
                                 throws SecurityTokenException {
@@ -161,7 +161,7 @@ public final class SecurityTokenManager {
      * @param certAlias String alias name for the certificate.
      * @throws SecurityTokenException if certificate for the
      *            <code>certAlias</code> could not be found in key store.
-     * @supported.api
+     * 
      */
     public void setCertAlias(java.lang.String certAlias)
     throws SecurityTokenException {
@@ -188,7 +188,7 @@ public final class SecurityTokenManager {
      * @return <code>X509</code> certificate Token.
      * @throws SecurityTokenException if the binary security token could
      * not be obtained.
-     * @supported.api
+     * 
      */
     public BinarySecurityToken getX509CertificateToken()
     throws SecurityTokenException {
@@ -366,7 +366,7 @@ public final class SecurityTokenManager {
      * @param recipientProviderID recipient's provider ID.
      * @return the <code>SecurityAssertion</code> object.
      * @throws SecurityTokenException if the assertion could not be obtained
-     * @supported.api
+     * 
      */
     public SecurityAssertion getSAMLBearerToken(
             NameIdentifier senderIdentity,

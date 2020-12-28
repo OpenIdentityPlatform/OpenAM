@@ -48,7 +48,7 @@ import java.util.StringTokenizer;
  * This class <code>Locale.java</code> is a utility that provides
  * functionality for applications and services to internationalize their
  * messages.
- * @supported.all.api
+ * 
  */
 public class Locale {
     static BitSet dontEncode;

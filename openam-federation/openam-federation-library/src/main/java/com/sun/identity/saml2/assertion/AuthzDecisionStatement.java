@@ -59,7 +59,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * @supported.all.api
+ * 
  */
 public interface AuthzDecisionStatement extends Statement {
 

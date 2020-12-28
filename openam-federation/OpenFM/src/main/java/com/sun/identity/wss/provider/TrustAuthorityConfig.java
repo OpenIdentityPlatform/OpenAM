@@ -63,7 +63,7 @@ import com.sun.identity.security.AdminTokenAction;
  * 
  * <p>All the static methods in this class are for the persistent 
  * operations.
- * @supported.all.api
+ * 
  */
 
 public abstract class TrustAuthorityConfig {

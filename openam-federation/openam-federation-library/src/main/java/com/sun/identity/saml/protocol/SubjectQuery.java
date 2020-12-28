@@ -36,7 +36,7 @@ import com.sun.identity.saml.assertion.Subject;
  * subject. It corresponds to
  * <code>&lt;samlp:SubjectQueryAbstractType&gt;</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public abstract class SubjectQuery extends Query {
    

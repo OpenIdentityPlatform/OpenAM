@@ -40,7 +40,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * confirmation method MUST define the exact mechanism by which the
  * confirmation data can be used. The optional attributes defined by
  * <code>SubjectConfirmationData</code> MAY also appear.
- * @supported.all.api 
+ *  
  */
 public interface KeyInfoConfirmationData extends SubjectConfirmationData {
     

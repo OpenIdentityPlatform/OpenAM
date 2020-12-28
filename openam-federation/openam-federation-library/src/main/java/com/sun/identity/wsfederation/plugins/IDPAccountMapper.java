@@ -50,7 +50,7 @@ import com.sun.identity.wsfederation.common.WSFederationException;
  * platform or the <code>FederationManager</code> platform.
  * @see com.sun.identity.wsfederation.plugins.SPAccountMapper
  *
- * @supported.all.api
+ * 
  */
 public interface IDPAccountMapper {
 

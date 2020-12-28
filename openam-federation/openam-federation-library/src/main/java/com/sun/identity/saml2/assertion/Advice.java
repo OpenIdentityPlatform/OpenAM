@@ -38,7 +38,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * of zero or more <code>Assertion</code>, <code>EncryptedAssertion</code>,
  * <code>AssertionIDRef</code>, and <code>AssertionURIRef</code>.
  *
- * @supported.all.api
+ * 
  */
 public interface Advice {
 

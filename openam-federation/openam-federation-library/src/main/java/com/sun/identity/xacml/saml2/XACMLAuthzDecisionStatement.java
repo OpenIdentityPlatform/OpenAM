@@ -69,7 +69,7 @@ import com.sun.identity.saml2.assertion.Statement;
  * </pre>
  * </p>
  *
- *@supported.all.api
+ *
  *
  **/
 

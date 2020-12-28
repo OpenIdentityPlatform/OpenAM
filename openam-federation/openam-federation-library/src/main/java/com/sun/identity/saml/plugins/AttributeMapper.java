@@ -45,7 +45,7 @@ import java.util.List;
  * class are configured at the <code>Trusted Partner Sites</code> field
  * in SAML service.
  *
- * @supported.all.api
+ * 
  */
 public interface AttributeMapper {
 

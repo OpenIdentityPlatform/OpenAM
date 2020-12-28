@@ -32,7 +32,7 @@ package com.iplanet.services.ldap.event;
 import org.forgerock.openam.ldap.PersistentSearchChangeType;
 
 /**
- * @supported.api
+ * 
  */
 public class DSEvent {
 
@@ -69,7 +69,7 @@ public class DSEvent {
     /**
      * Returns the type of change event either add, modify, delete, etc.
      * 
-     * @supported.api
+     * 
      */
     public int getEventType() {
         return _eventType;
@@ -85,7 +85,7 @@ public class DSEvent {
     /**
      * Return the Directory Server ID assigned to the entry changed
      * 
-     * @supported.api
+     * 
      */
     public String getID() {
         return _id;
@@ -101,7 +101,7 @@ public class DSEvent {
     /**
      * Returns the Directory Server class name for the given entry
      * 
-     * @supported.api
+     * 
      */
     public String getClassName() {
         return _className;
@@ -117,7 +117,7 @@ public class DSEvent {
     /**
      * Returns the Directory Server search ID that was assigned when the
      * persistent search was first submited. 
-     * @supported.api
+     * 
      */
     public String getSearchID() {
         return _searchId;

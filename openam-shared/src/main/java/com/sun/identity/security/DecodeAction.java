@@ -59,7 +59,7 @@ import com.iplanet.services.util.Crypt;
  * 
  * </PRE>
  *
- * @supported.all.api
+ * 
  */
 public class DecodeAction implements PrivilegedAction<String> {
 

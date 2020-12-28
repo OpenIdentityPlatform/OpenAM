@@ -33,6 +33,6 @@
  * in order to identity each of them with their unique configuration. This 
  * configuration would be attribute / value pairs.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wss.provider;

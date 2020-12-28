@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
  * SAML Response in <code>samlp</code> namespace. It corresponds to
  * <code>ResponseAbstractType</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public abstract class AbstractResponse {
 

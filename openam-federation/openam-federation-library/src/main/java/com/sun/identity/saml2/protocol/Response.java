@@ -54,7 +54,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

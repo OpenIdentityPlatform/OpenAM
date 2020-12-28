@@ -16,6 +16,6 @@
 /**
  * Defines classes and interfaces to work with entitlements.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.entitlement;

@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * An OAuth 2.0 token abstraction for introspection.
  *
- * @supported.all.api
+ * 
  */
 public interface IntrospectableToken extends Token {
 

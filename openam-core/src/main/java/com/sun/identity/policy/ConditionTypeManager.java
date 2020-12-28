@@ -44,7 +44,7 @@ import com.sun.identity.shared.locale.Locale;
  * methods to get a list of configured <code>Condition
  * </code> objects, and to obtain a factory object for it.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

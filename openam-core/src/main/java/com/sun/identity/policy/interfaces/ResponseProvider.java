@@ -77,7 +77,7 @@ import java.util.Set;
  *
  * All <code>ResponseProvider</code> implementations should have a public no 
  * argument constructor.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.ResourceAttribute}
  */
 @Deprecated

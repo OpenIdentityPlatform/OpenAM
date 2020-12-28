@@ -36,7 +36,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  The <code>ECPRequest</code> interface defines methods for properties
  *  required by an ECP request.
  *
- *  @supported.all.api
+ *  
  */
 
 public interface ECPRequest {

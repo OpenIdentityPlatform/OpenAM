@@ -29,6 +29,6 @@
 /**
  * Defines DST service.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.dst.service;

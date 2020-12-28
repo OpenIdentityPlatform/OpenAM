@@ -16,6 +16,6 @@
 /**
  * Defines classes for basic resource matching.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.shared.whitelist;

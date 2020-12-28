@@ -37,7 +37,7 @@ package com.iplanet.ums.validation;
  * alphabeticvalidated and optional rule to validate function. The function
  * returns true value if the string is valid alphabetic string
  *
- * @supported.all.api
+ * 
  */
 public class AlphaValidator implements IValidator {
 

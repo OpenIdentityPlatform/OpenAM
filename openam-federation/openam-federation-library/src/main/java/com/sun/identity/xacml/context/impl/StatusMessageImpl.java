@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 /**
  * The <code>StatusMessage</code> element is a container of 
  * one or more <code>StatusMessage</code>s issuded by authorization authority.
- * @supported.all.api
+ * 
  * <p/>
  * <pre>
  *

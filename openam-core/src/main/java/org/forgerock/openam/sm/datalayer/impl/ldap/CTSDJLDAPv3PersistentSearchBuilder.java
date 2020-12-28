@@ -37,8 +37,7 @@ public class CTSDJLDAPv3PersistentSearchBuilder {
     /**
      * Generates a new builder.
      *
-     * @param connectionFactory The {@link ConnectionFactory<org.forgerock.opendj.ldap.Connection>}
-     *                          to be passed into generated persistent searches.
+     * @param connectionFactory 
      */
     public CTSDJLDAPv3PersistentSearchBuilder(ConnectionFactory connectionFactory) {
         Reject.ifNull(connectionFactory);

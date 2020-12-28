@@ -49,7 +49,7 @@ import com.sun.identity.shared.locale.Locale;
  * methods to get a list of configured <code>Referral
  * </code> objects
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

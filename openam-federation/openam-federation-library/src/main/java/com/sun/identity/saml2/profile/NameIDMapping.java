@@ -80,7 +80,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This class provides methods to send or process
  * <code>NameIDMappingRequest</code>.
  *
- * @supported.api
+ * 
  */
 
 public class NameIDMapping {
@@ -119,7 +119,7 @@ public class NameIDMapping {
      * @return the <code>NameIDMappingResponse</code>
      * @throws SAML2Exception if error initiating request to remote entity.
      *
-     * @supported.api
+     * 
      */
     public static NameIDMappingResponse initiateNameIDMappingRequest(
         Object session, String realm, String spEntityID, String idpEntityID,

@@ -39,7 +39,7 @@ import com.sun.identity.policy.interfaces.ResourceName;
 /**
  * Class that encapsulates a tree of resource names, with each node 
  *  having an associated policy decision. 
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -48,7 +48,7 @@ public class ResourceResult {
     /**
      * Constant to indicate subtree level scope for ResourceResult evaluation
      *
-     * @supported.api
+     * 
      */
     public static final String SUBTREE_SCOPE = "subtree";
 
@@ -56,7 +56,7 @@ public class ResourceResult {
      * Constant to indicate strict subtree level scope for 
      * <code>ResourceResult</code> evaluation
      *
-     * @supported.api
+     * 
      */
     public static final String STRICT_SUBTREE_SCOPE = "strict-subtree";
 
@@ -64,7 +64,7 @@ public class ResourceResult {
      * Constant to indicate base (self) level scope for 
      * <code>ResourceResult</code> evaluation
      *
-     * @supported.api
+     * 
      */
     public static final String SELF_SCOPE = "self";
 
@@ -117,7 +117,7 @@ public class ResourceResult {
     /**
      * Returns the resource name of this resource result
      * @return resource name of this resource result
-     * @supported.api
+     * 
      */
     public String getResourceName() {
         return resourceName;
@@ -138,7 +138,7 @@ public class ResourceResult {
     /**
      * Returns the policy decision associated with this resource result
      * @return policy decision associated with this resource result
-     * @supported.api
+     * 
      */
     public PolicyDecision getPolicyDecision() {
         return policyDecision;
@@ -164,7 +164,7 @@ public class ResourceResult {
     /**
      * Returns the child resource results of this resource result
      * @return child resource results of this resource result
-     * @supported.api
+     * 
      */
     public Set getResourceResults() {
         return resourceResults;
@@ -249,7 +249,7 @@ public class ResourceResult {
     /**
      * Returns a string representation of this resource result 
      * @return a string representation of this resource result
-     * @supported.api
+     * 
      */
     public String toString() {
         if (stringForm == null) {
@@ -269,7 +269,7 @@ public class ResourceResult {
     /**
      * Returns an XML representation of this resource result 
      * @return an XML representation of this resource result
-     * @supported.api
+     * 
      */
     public String toXML() {
         if (xmlForm == null) {

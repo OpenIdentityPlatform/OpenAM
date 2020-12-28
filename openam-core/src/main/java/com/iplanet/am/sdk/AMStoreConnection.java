@@ -134,7 +134,7 @@ import java.util.StringTokenizer;
  * in the Javadocs of the method below.
  * 
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public final class AMStoreConnection implements AMConstants {
     // ~ Static fields/initializers

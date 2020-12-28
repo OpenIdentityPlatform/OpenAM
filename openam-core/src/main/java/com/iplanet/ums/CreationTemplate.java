@@ -56,7 +56,7 @@ import com.iplanet.ums.validation.ValidationElement;
  * @see Template
  * @see SearchTemplate
  *
- * @supported.api
+ * 
  */
 public class CreationTemplate extends Template {
 
@@ -140,7 +140,7 @@ public class CreationTemplate extends Template {
      *         attributeName is <CODE>null</CODE>, or the attribute is not
      *         found.
      * 
-     * @supported.api
+     * 
      */
     public Attr getAttribute(String attributeName) {
         if (attributeName == null) {
@@ -161,7 +161,7 @@ public class CreationTemplate extends Template {
      * 
      * @return Names of all required attributes defined
      * 
-     * @supported.api
+     * 
      */
     public String[] getRequiredAttributeNames() {
         return (m_required == null) ? new String[0] : m_required
@@ -173,7 +173,7 @@ public class CreationTemplate extends Template {
      * 
      * @return Names of all optional attributes defined
      * 
-     * @supported.api
+     * 
      */
     public String[] getOptionalAttributeNames() {
         return (m_optional == null) ? new String[0] : m_optional
@@ -185,7 +185,7 @@ public class CreationTemplate extends Template {
      * 
      * @return set of required attributes
      * 
-     * @supported.api
+     * 
      */
     public AttrSet getRequiredAttributeSet() {
         return m_required;
@@ -196,7 +196,7 @@ public class CreationTemplate extends Template {
      * 
      * @return set of optional attributes
      * 
-     * @supported.api
+     * 
      */
     public AttrSet getOptionalAttributeSet() {
         return m_optional;
@@ -207,7 +207,7 @@ public class CreationTemplate extends Template {
      * 
      * @return classes associated with this template
      * 
-     * @supported.api
+     * 
      */
     public ArrayList getCreationClasses() {
         return m_classes;
@@ -220,7 +220,7 @@ public class CreationTemplate extends Template {
      *            Attribute name
      * @return Enumeration of ValidationElement
      * 
-     * @supported.api
+     * 
      */
     public Enumeration getValidation(String attrName) {
         Vector v = new Vector();
@@ -245,7 +245,7 @@ public class CreationTemplate extends Template {
      * 
      * @return a list of attribute names registered for validation
      * 
-     * @supported.api
+     * 
      */
     public String[] getValidatedAttributeNames() {
         return (m_validated == null) ? new String[0] : m_validated
@@ -396,7 +396,7 @@ public class CreationTemplate extends Template {
      * 
      * @return the naming attribute
      * 
-     * @supported.api
+     * 
      */
     public String getNamingAttribute() {
         return m_namingAttribute;
@@ -407,7 +407,7 @@ public class CreationTemplate extends Template {
      * 
      * @return a copy of the template
      * 
-     * @supported.api
+     * 
      */
     public Object clone() {
         CreationTemplate t = (CreationTemplate) super.clone();
@@ -499,7 +499,7 @@ public class CreationTemplate extends Template {
      * 
      * @return The object in printable form
      * 
-     * @supported.api
+     * 
      */
     public String toString() {
         return "CreationTemplate: " + getName() + " { Required " + m_required

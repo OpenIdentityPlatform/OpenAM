@@ -72,7 +72,7 @@ import org.w3c.dom.NodeList;
  * <code>ResourceAccessStatement</code> and
  * <code>SessionContextStatement</code>.
  *
- * @supported.all.api
+ * 
  */
 public class SecurityAssertion extends Assertion {
     

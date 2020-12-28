@@ -55,7 +55,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * @supported.all.api
+ * 
  */
 @JsonDeserialize(as=AttributeStatementImpl.class)
 public interface AttributeStatement extends Statement {

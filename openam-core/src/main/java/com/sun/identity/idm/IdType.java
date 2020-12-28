@@ -39,7 +39,7 @@ import java.util.Set;
  * <code>IdType.GROUP</code> and <code>IdType.AGENT</code>. The usage of
  * the respective types are defined along with their declaration.
  *
- * @supported.all.api
+ * 
  */
 public class IdType implements java.io.Serializable {
     private String idType;

@@ -62,7 +62,7 @@ import org.w3c.dom.NamedNodeMap;
  * The <code>SAML2SDKUtils</code> contains utility methods for SAML 2.0
  * implementation.
  *
- * @supported.all.api
+ * 
  */
 public class SAML2SDKUtils {
     //

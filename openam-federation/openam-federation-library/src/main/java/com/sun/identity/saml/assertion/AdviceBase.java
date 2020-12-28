@@ -47,7 +47,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This class is an abstract base class for all Advice implementations and
  * encapsulates common functionality.
  *
- *@supported.all.api
+ *
  */
 public abstract class AdviceBase {
     protected List _assertionIDRef       = null; 

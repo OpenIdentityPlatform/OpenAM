@@ -30,7 +30,7 @@ package com.iplanet.log;
 
 /**
  * Throw a log exception when loading the JDBC driver fails
- * @supported.all.api
+ * 
  */
 public class DriverLoadException extends LogException {
     /**

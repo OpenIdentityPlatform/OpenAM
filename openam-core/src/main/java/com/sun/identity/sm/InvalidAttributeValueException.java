@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
  * @see java.lang.Exception
  * @see java.lang.Throwable
  *
- * @supported.all.api
+ * 
  */
 public class InvalidAttributeValueException extends SMSException {
     private String resourceBundleName;

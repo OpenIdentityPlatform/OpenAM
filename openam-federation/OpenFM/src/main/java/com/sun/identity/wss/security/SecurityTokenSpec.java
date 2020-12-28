@@ -36,7 +36,7 @@ package com.sun.identity.wss.security;
  * of this is to group the all the Security Token specifications. Each
  * Security Token specification must implement this interface. 
  * 
- * @supported.all.api
+ * 
  */
 public interface SecurityTokenSpec {
 

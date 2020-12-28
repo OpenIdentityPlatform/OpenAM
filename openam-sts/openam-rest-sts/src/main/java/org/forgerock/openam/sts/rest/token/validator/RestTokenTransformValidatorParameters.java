@@ -22,7 +22,7 @@ package org.forgerock.openam.sts.rest.token.validator;
  *
  *  For custom RestTokenTransformValidator implementations, this generic type will be {@link org.forgerock.json.JsonValue}
  *
- *  @supported.all.api
+ *  
  */
 public interface RestTokenTransformValidatorParameters<T> {
 

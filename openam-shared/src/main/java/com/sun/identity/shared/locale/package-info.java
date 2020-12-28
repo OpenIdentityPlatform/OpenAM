@@ -16,6 +16,6 @@
 /**
  * Defines classes to handle localization.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.shared.locale;

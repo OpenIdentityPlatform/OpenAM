@@ -46,7 +46,7 @@ import org.forgerock.opendj.ldap.SearchScope;
  * the member's nsRoleDN attribute. When a member is removed from the role, the
  * DN of the role is removed from the member's nsRoleDN attribute value.
  *
- * @supported.api
+ * 
  */
 public class ManagedRole extends BaseRole implements IAssignableMembership {
 
@@ -56,21 +56,21 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * Name of the member attribute, which is modified when the member is added
      * to/removed from the role. To be added as a member of the role, the member
      * object should allow this attribute.
-     * @supported.api
+     * 
      */
     public static final String MEMBER_ATTR_NAME = "nsRoleDN";
 
     /**
      * Name of the computed member attribute, which would be computed by
      * Directory server for role, when the member entry is read.
-     * @supported.api
+     * 
      */
     public static final String COMPUTED_MEMBER_ATTR_NAME = "nsRole";
 
     /**
      * LDAP object classes that define the nsManagedRoleDefinition, the iPlanet
      * Directory Server object class, that maps to ManagedRole
-     * @supported.api
+     * 
      */
     public static final String[] MANAGEDROLE_OBJECTCLASSES = { "top",
             "ldapsubentry", "nsroledefinition", "nssimpleroledefinition",
@@ -79,14 +79,14 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
     /**
      * The attribute that is must for ManagedRole. Any creation template for
      * ManagedRole should have this attribute
-     * @supported.api
+     * 
      */
     public static final String[] MANAGEDROLE_ATTRIBUTES = { "cn" };
 
     /**
      * No argument constructor
      * 
-     * @supported.api
+     * 
      */
     public ManagedRole() {
     }
@@ -130,7 +130,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      *            Attribute/value set
      * @throws UMSException
      *             on failure to instantiate
-     * @supported.api
+     * 
      */
     public ManagedRole(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -144,7 +144,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      *            Object to be added as member
      * @throws UMSException
      *             on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void addMember(PersistentObject member) throws UMSException {
         member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.ADD);
@@ -167,7 +167,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * 
      * @param guid Globally unique identifier for the member to be added.
      * @throws UMSException if fail to save to persistent storage.
-     * @supported.api
+     * 
      */
     public void addMember(Guid guid) throws UMSException {
 
@@ -188,7 +188,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      *            Array of member guids to be added as members to the role
      * @throws UMSException
      *             on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void addMembers(Guid[] guids) throws UMSException {
         if (guids == null) {
@@ -273,7 +273,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @return Iterator for unique identifiers for members of the role
      * @throws UMSException
      *             on failure to search
-     * @supported.api
+     * 
      */
     public SearchResults getMemberIDs() throws UMSException {
         String[] attributesToGet = { "objectclass" };
@@ -287,7 +287,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @return <code>SearchResults</code> that can be used to iterate over the
      *         unique identifiers for members of the role.
      * @throws UMSException if fail to search.
-     * @supported.api
+     * 
      */
     public SearchResults getMemberIDs(String filter) throws UMSException {
         String[] attributesToGet = { "objectclass" };
@@ -300,7 +300,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @return Number of members of the role
      * @throws UMSException
      *             on failure to search
-     * @supported.api
+     * 
      */
     public int getMemberCount() throws UMSException {
         int count = 0;
@@ -321,7 +321,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @return Unique identifier for a member
      * @throws UMSException
      *             on failure to search
-     * @supported.api
+     * 
      */
     public Guid getMemberIDAt(int index) throws UMSException {
         if (index < 0) {
@@ -349,7 +349,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      *            member to be removed from the role
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeMember(PersistentObject member) throws UMSException {
 
@@ -373,7 +373,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      *            Unique identifier for the member to be removed
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeMember(Guid guid) throws UMSException {
 
@@ -391,7 +391,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * 
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeAllMembers() throws UMSException {
         SearchResults searchResults = getMemberIDs();
@@ -408,7 +408,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @return <code>true</code> if it is a member
      * @exception UMSException
      *                on failure to read object for guid
-     * @supported.api
+     * 
      */
     public boolean hasMember(Guid guid) throws UMSException {
 

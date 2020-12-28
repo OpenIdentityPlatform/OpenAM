@@ -60,7 +60,7 @@ import org.forgerock.opendj.ldap.SearchScope;
 /**
  * This class has the responsibility of adding, removing and replacing COS
  * definitions. It also provides search capabilities for COS definitions.
- * @supported.api
+ * 
  */
 public class COSManager {
 
@@ -122,7 +122,7 @@ public class COSManager {
      *        this guid.
      * @throws UMSException
      *             The exception thrown from the COSManager constructor.
-     * @supported.api
+     * 
      */
     public static COSManager getCOSManager(SSOToken token, Guid guid)
             throws UMSException {
@@ -152,7 +152,7 @@ public class COSManager {
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void addDefinition(ICOSDefinition cosDef) throws UMSException {
         if (!(cosDef instanceof DirectCOSDefinition)) {
@@ -199,7 +199,7 @@ public class COSManager {
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void removeDefinition(String name) throws UMSException {
         Guid guid = new Guid(ICOSDefinition.DEFAULT_NAMING_ATTR + "=" + name
@@ -218,7 +218,7 @@ public class COSManager {
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void updateDefinition(ICOSDefinition cosDef) throws UMSException {
         PersistentObject pObject = (PersistentObject) cosDef;
@@ -237,7 +237,7 @@ public class COSManager {
      * @return A COS definition with the specified name.
      * @throws UMSException if exception occurred at the data layer.
      * @throws COSNotFoundException if the COS object is not found.
-     * @supported.api
+     * 
      */
     public ICOSDefinition getDefinition(String name) throws UMSException,
             COSNotFoundException {
@@ -269,7 +269,7 @@ public class COSManager {
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public Collection getDefinitions() throws UMSException {
         Collection cosDefinitions = new ArrayList();
@@ -298,7 +298,7 @@ public class COSManager {
      * 
      * @throws UMSException
      *             If a data layer exception occurs.
-     * @supported.api
+     * 
      */
     public void assignCOSDef(PersistentObject pObject, ICOSDefinition cosDef,
             COSTemplate cosTemplate) throws UMSException {
@@ -346,7 +346,7 @@ public class COSManager {
      *             o the target object is not persistent. o the COS definition
      *             is not one of the valid COS definitions. o an exception is
      *             propagated from any of the "remove" methods.
-     * @supported.api
+     * 
      */
     public void removeCOSAssignment(PersistentObject pObject,
             ICOSDefinition cosDef, COSTemplate cosTemplate) throws UMSException 

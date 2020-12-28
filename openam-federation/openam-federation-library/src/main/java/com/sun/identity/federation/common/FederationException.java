@@ -30,7 +30,7 @@ package com.sun.identity.federation.common;
 
 /**
  * This class is the public exception class that Federation Manager exposes.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

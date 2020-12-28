@@ -41,7 +41,7 @@ import org.forgerock.util.thread.listener.ShutdownManager;
  * The class <code>SMSThreadPool</code> provides interfaces to manage
  * notfication thread pools shared by idm and sm. 
  *
- * @supported.api
+ * 
  */
 public class SMSThreadPool {
     
@@ -124,7 +124,7 @@ public class SMSThreadPool {
      * @param task 
      *            task to be scheduled.
      *
-     * @supported.api
+     * 
      */
     public static boolean scheduleTask(Runnable task) {
         boolean success = true;

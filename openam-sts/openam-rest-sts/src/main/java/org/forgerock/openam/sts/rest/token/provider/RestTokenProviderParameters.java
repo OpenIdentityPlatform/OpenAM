@@ -27,7 +27,7 @@ import org.forgerock.openam.sts.TokenTypeId;
  * other than a marker interface. Note also that this type is reflected in the RestTokenProvider interface, and it
  * should be as generic as possible, as to support user-defined RestTokenProvider implementations.
  *
- * @supported.all.api
+ * 
  */
 public interface RestTokenProviderParameters<T> {
     /**

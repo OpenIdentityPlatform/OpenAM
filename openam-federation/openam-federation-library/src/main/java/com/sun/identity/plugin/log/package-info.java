@@ -28,7 +28,7 @@
 
 /**
  * Contains Log SPI.
- * @supported.api
+ * 
  */
 package com.sun.identity.plugin.log;
 

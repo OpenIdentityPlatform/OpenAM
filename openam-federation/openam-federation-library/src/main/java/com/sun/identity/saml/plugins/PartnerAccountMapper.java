@@ -44,7 +44,7 @@ import java.util.Map;
  * the implementation class are configured at the <code>Partner URLs</code> 
  * field in SAML service.
  *
- * @supported.all.api
+ * 
  */
 
 public interface PartnerAccountMapper {

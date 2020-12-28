@@ -29,6 +29,6 @@
 /**
  * Defines IDPP plugin.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.idpp.plugin;

@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  *    &lt;xs:attribute name="Issuer" type="xs:string" use="optional"/>
  * &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public class AttributeImpl implements Attribute {
 

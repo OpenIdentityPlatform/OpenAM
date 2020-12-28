@@ -71,7 +71,7 @@ import com.sun.identity.saml.common.SAMLException;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class QueryResponse {
 

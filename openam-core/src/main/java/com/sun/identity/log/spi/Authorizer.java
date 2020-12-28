@@ -35,7 +35,7 @@ import com.sun.identity.log.LogManagerUtil;
 /**
  * This class is used to verify the authorization of the
  * of the person who is trying to perform a log operation.
- * @supported.all.api
+ * 
  */
 
 public class Authorizer {

@@ -95,7 +95,7 @@ import java.text.ParseException;
 /**
  * This class <code>SecureSOAPMessage</code> constructs the secured 
  * <code>SOAPMessage</code> for the given security mechanism token.
- * @supported.all.api
+ * 
  */
 public class SecureSOAPMessage {
 

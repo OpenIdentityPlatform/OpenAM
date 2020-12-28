@@ -36,7 +36,7 @@ import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This interface defines constants used by <code>AM SDK</code>.
- * @supported.all.api
+ * 
  * 
  * <br>
  * @deprecated  As of Sun Java System Access Manager 7.1.

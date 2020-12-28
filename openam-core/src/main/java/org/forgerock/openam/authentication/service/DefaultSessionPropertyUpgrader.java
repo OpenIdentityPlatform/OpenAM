@@ -30,7 +30,7 @@ package org.forgerock.openam.authentication.service;
  * property into the new session.
  * 
  * @author Peter Major
- * @supported.all.api
+ * 
  */
 public final class DefaultSessionPropertyUpgrader extends SessionPropertyUpgrader {
 

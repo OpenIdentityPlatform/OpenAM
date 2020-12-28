@@ -63,7 +63,7 @@ import java.security.AccessController;
  * The cache is updated through policy change notifications and/or
  * polling.
  *
- * @supported.api
+ * 
  */
 public class PolicyEvaluator {
 
@@ -269,7 +269,7 @@ public class PolicyEvaluator {
      *         reason other than single sign on token problem.
      * @throws SSOException if single sign on token is not valid
      *
-     * @supported.api
+     * 
      */
     public boolean isAllowed(SSOToken token, String resourceName,
 			     String actionName,
@@ -371,7 +371,7 @@ public class PolicyEvaluator {
      *         reason other than single sign on token problem.
      * @throws SSOException if single sign on token is invalid or expired.
      *
-     * @supported.api
+     * 
      */
     public PolicyDecision getPolicyDecision(SSOToken token,
 					    String resourceName,

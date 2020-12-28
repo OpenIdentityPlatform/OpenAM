@@ -29,6 +29,6 @@
 /**
  * Defines XACML2 context classes 
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.context;

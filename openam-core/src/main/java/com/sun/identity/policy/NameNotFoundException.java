@@ -34,7 +34,7 @@ package com.sun.identity.policy;
  * Exception thrown if an object such as policy, rule or 
  * referral for the given name does not exist.
  *
- * @supported.all.api
+ * 
  */
 public class NameNotFoundException extends PolicyException {
 

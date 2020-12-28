@@ -39,7 +39,7 @@ import javax.security.auth.Subject;
  * Encapsulates a Strategy to decide if a {@link com.sun.identity.entitlement.Privilege} applies to a given
  * {@link Subject}.
  *
- * @supported.all.api
+ * 
  */
 public interface EntitlementSubject {
 

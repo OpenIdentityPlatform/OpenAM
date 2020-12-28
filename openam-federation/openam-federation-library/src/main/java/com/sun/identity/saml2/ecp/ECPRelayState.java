@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  The <code>ECPRelayState</code> interface defines methods for properties
  *  required by an ECP RelayState.
  *
- *  @supported.all.api
+ *  
  */
 public interface ECPRelayState {
     

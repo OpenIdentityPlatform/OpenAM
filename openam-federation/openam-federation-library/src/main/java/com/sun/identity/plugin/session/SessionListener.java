@@ -31,7 +31,7 @@ package com.sun.identity.plugin.session;
 /**
  * Interface used for session invalidation notification.
  *
- * @supported.all.api
+ * 
  */
 public interface SessionListener {
 

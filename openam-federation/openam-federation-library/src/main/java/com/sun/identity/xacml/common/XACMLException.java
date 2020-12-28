@@ -35,7 +35,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * This class is an extension point for all XACML related exceptions.
  * This class also handles message localization in XACML exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class XACMLException extends SAML2Exception {
     

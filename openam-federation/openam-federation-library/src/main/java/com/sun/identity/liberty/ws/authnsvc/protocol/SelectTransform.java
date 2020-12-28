@@ -38,7 +38,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * that removes all characters except those specified in the "allowed"
  * parameter.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

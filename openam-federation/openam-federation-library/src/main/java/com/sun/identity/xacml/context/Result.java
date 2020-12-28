@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * The <code>Result</code> element is a container of 
  * one or more <code>Result</code>s issuded by authorization authority.
- * @supported.all.api
+ * 
  * <p/>
  * <pre>
  * schema:

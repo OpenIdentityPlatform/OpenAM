@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  * The <code>ConsentHeader</code> class represents <code>Consent</code> element
  * defined in SOAP binding schema.
  *
- * @supported.all.api
+ * 
  */
 public class ConsentHeader {   
 

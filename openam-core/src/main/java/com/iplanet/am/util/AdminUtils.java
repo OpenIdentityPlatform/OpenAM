@@ -46,7 +46,7 @@ import java.security.AccessController;
  * This class contains methods to retrieve Top Level Administrator information.
  * The information comes from the server configuration file 
  * (<code>serverconfig.xml</code>).
- * @supported.all.api
+ * 
  */
 public class AdminUtils {
 

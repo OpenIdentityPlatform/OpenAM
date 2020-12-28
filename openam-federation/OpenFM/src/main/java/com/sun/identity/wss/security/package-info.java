@@ -31,6 +31,6 @@
  * with their respective implementation classes for different WS-* Security
  * Tokens.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wss.security;

@@ -16,6 +16,6 @@
 /**
  * Defines interfaces and classes for the Session Service.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.session.service;

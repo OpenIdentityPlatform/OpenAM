@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * used to translate the HTTP request.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public class OAuth2Request {
 

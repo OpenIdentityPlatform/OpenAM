@@ -16,6 +16,6 @@
 /**
  * Deprecated classes to manage LDAP ACIs.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.services.ldap.aci;

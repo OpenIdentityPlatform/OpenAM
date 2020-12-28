@@ -28,6 +28,6 @@
 
 /**
  * Provides classes for accessing the Identity Repository interfaces.
- * @supported.api
+ * 
  */
 package com.sun.identity.idm;

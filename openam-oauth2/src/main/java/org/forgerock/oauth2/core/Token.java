@@ -26,7 +26,7 @@ import java.util.Map;
  * Models a OAuth2 token.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public interface Token {
 

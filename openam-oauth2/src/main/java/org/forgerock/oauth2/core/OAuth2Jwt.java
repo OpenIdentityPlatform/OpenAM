@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * for OAuth2 client authentication.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public class OAuth2Jwt {
 

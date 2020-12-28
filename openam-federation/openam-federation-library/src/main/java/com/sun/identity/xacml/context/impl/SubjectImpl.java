@@ -60,7 +60,7 @@ import org.w3c.dom.NodeList;
  *  default="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"/>
  * &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public class SubjectImpl implements Subject {
     private List  attributes ;

@@ -27,7 +27,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
  * Models a client registration in the OAuth2 provider.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public interface ClientRegistration {
 

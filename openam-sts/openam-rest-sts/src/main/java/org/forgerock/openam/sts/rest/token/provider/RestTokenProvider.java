@@ -24,7 +24,7 @@ import org.forgerock.openam.sts.TokenCreationException;
  * which provides the state necessary to produce a token of the specified type. The creation of any
  * specific token (SAML2, OIDC) requires specific state which cannot be subsumed in a specific type.
  *
- * @supported.all.api
+ * 
  */
 public interface RestTokenProvider<T> {
 

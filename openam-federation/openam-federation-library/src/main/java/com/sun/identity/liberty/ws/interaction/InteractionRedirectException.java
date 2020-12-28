@@ -33,7 +33,7 @@ package com.sun.identity.liberty.ws.interaction;
  * <code>WSC</code> side, to indicate that the User Agent is redirected to
  * <code>WSP</code>.
  *
- * @supported.all.api
+ * 
  */
 public class InteractionRedirectException extends InteractionException {
 
@@ -44,7 +44,7 @@ public class InteractionRedirectException extends InteractionException {
      * @param messageID <code>messageID</code> of SOAP request message that
      *        caused this exception
      *
-     * @supported.api
+     * 
      */
     public InteractionRedirectException(String messageID) {
         super(messageID);
@@ -63,7 +63,7 @@ public class InteractionRedirectException extends InteractionException {
      *
      * @return <code>messageID</code> of SOAP request message that caused this
      *                  exception
-     * @supported.api
+     * 
      */
     public String getMessageID() {
         return messageID;

@@ -56,7 +56,7 @@ import com.iplanet.sso.SSOTokenManager;
  *       UMSObject.removeObject(java.security.Principal principal, String guid);
  * </pre>
  *
- * @supported.api
+ * 
  */
 public class UMSObject {
 
@@ -81,7 +81,7 @@ public class UMSObject {
      * @throws UMSException if there is an error while instantiating
      *         the right type of object. In addition, it propagates any
      *         exception from the datalayer.
-     * @supported.api
+     * 
      */
     static public PersistentObject getObject(SSOToken token, Guid guid)
             throws UMSException {
@@ -100,7 +100,7 @@ public class UMSObject {
      * @throws UMSException if there is an error while instantiating
      *         the right type of object. In addition, it propagates any
      *         exception from the datalayer.
-     * @supported.api
+     * 
      */
     static public PersistentObject getObject(
         SSOToken token,
@@ -131,7 +131,7 @@ public class UMSObject {
      * @throws EntryNotFoundException if the entry is not found.
      * @throws UMSException if there is an error while removing the object from
      *         persistence store
-     * @supported.api
+     * 
      */
     static public void removeObject(SSOToken token, Guid guid)
             throws EntryNotFoundException, UMSException {
@@ -205,7 +205,7 @@ public class UMSObject {
      * @throws UMSException
      *             for failure to create the object
      * 
-     * @supported.api
+     * 
      */
     public static PersistentObject getObjectHandle(SSOToken token, Guid guid)
             throws UMSException {

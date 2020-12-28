@@ -51,7 +51,7 @@ import static org.forgerock.json.JsonValue.object;
  * It may be that PublicKey based proof tokens need to be supported in the future. If so, this class will add a ctor
  * which takes a PublicKey, and encode which sort of proof-token-state has been provided (e.g. X509Certificate or PublicKey).
  *
- * @supported.all.api
+ * 
  */
 public class ProofTokenState {
 

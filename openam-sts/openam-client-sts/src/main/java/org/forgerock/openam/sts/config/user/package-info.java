@@ -18,6 +18,6 @@
  * Contains the classes which encapsulate the user-provided configuration state necessary to publish a STS instance.
  * This state includes the supported token operations, crypto context, and deployment information.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts.config.user;

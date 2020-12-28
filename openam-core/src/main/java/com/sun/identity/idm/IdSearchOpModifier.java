@@ -34,7 +34,7 @@ package com.sun.identity.idm;
  * basic search performed by each plugin. The two basic modifications allowed
  * are OR and AND which are defined statically in this class.
  *
- * @supported.all.api
+ * 
  */
 public final class IdSearchOpModifier {
     private int sOp;

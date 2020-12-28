@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * Interface to define the resulting behavior when the session quota is exhausted.
  *
- * @supported.all.api
+ * 
  */
 public interface QuotaExhaustionAction {
 

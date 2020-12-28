@@ -29,7 +29,7 @@
 package com.iplanet.ums.validation;
 
 /**
- * @supported.all.api
+ * 
  */
 public class BooleanValidator implements IValidator {
 

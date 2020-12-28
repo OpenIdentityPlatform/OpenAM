@@ -151,7 +151,7 @@ import org.forgerock.opendj.ldap.LdapException;
  * @see #getRootCause()
  * @see java.lang.Exception
  * @see java.lang.RuntimeException
- * @supported.api
+ * 
  */
 public class UMSException extends java.lang.Exception {
 
@@ -168,7 +168,7 @@ public class UMSException extends java.lang.Exception {
      * 
      * @param message
      *            Detailed message for this exception.
-     * @supported.api
+     * 
      */
     public UMSException(String message) {
         super(message);
@@ -182,7 +182,7 @@ public class UMSException extends java.lang.Exception {
      *            Detailed message for this exception.
      * @param rootCause
      *            An embedded exception
-     * @supported.api
+     * 
      */
     public UMSException(String message, Throwable rootCause) {
         super(message);
@@ -200,7 +200,7 @@ public class UMSException extends java.lang.Exception {
 
     /**
      * Returns the detail message of this exception and all embedded exceptions.
-     * @supported.api
+     * 
      */
     public String getMessage() {
 
@@ -229,7 +229,7 @@ public class UMSException extends java.lang.Exception {
 
     /**
      * Returns the embedded exception.
-     * @supported.api
+     * 
      */
     public Throwable getRootCause() {
         return rootCause;
@@ -243,7 +243,7 @@ public class UMSException extends java.lang.Exception {
      * 
      * @return The out parameter passed in.
      * @see java.io.PrintWriter
-     * @supported.api
+     * 
      */
     public PrintWriter log(PrintWriter out) {
         return log(this, out);
@@ -259,7 +259,7 @@ public class UMSException extends java.lang.Exception {
      * 
      * @return The out parameter passed in.
      * @see java.io.PrintWriter
-     * @supported.api
+     * 
      */
     static public PrintWriter log(Throwable xcpt, PrintWriter out) {
 
@@ -274,7 +274,7 @@ public class UMSException extends java.lang.Exception {
 
     /**
      * Formats a UMSException exception message; includes embedded exceptions.
-     * @supported.api
+     * 
      */
     public String toString() {
 
@@ -300,7 +300,7 @@ public class UMSException extends java.lang.Exception {
      * Prints this exception's stack trace to <tt>System.err</tt>. If this
      * exception has a root exception; the stack trace of the root exception is
      * printed to <tt>System.err</tt> instead.
-     * @supported.api
+     * 
      */
     public void printStackTrace() {
         printStackTrace(System.err);
@@ -313,7 +313,7 @@ public class UMSException extends java.lang.Exception {
      * 
      * @param ps
      *            The non-null print stream to which to print.
-     * @supported.api
+     * 
      */
     public void printStackTrace(java.io.PrintStream ps) {
         if (rootCause != null) {
@@ -334,7 +334,7 @@ public class UMSException extends java.lang.Exception {
      * the print writer instead.
      * 
      * @param pw The non-null print writer to which to print.
-     * @supported.api
+     * 
      */
     public void printStackTrace(java.io.PrintWriter pw) {
         if (rootCause != null) {

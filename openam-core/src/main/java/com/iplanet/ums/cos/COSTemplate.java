@@ -40,7 +40,7 @@ import org.forgerock.opendj.ldap.ModificationType;
  * This class represents a COS Template. A COS Template has attributes and
  * attribute values which will be dynamically added to entries affected by COS
  * definitions.
- * @supported.api
+ * 
  */
 public class COSTemplate extends PersistentObject {
 
@@ -62,7 +62,7 @@ public class COSTemplate extends PersistentObject {
      *             The exception thrown from the parent class constructor.
      * @see com.iplanet.ums.PersistentObject#PersistentObject (CreationTemplate,
      *      AttrSet)
-     * @supported.api
+     * 
      */
     public COSTemplate(CreationTemplate temp, String name) throws UMSException {
         super(temp,
@@ -73,7 +73,7 @@ public class COSTemplate extends PersistentObject {
      * Returns the name of this COS template.
      * 
      * @return The name of this COS template.
-     * @supported.api
+     * 
      */
     public String getName() {
         String attributeValue = null;
@@ -90,7 +90,7 @@ public class COSTemplate extends PersistentObject {
      * templates. A priority of "0" is the highest priority.
      * 
      * @param priority Priority for this template.
-     * @supported.api
+     * 
      */
     public void setPriority(int priority) {
         setAttribute(new Attr("cosPriority", new Integer(priority).toString()));
@@ -105,7 +105,7 @@ public class COSTemplate extends PersistentObject {
      * 
      * @param value
      *            the value of the attribute
-     * @supported.api
+     * 
      */
     public void addTemplateAttribute(String name, String value) {
         modify(name, value, ModificationType.ADD);
@@ -116,7 +116,7 @@ public class COSTemplate extends PersistentObject {
      * 
      * @param name
      *            the name of the attribute
-     * @supported.api
+     * 
      */
     public void removeTemplateAttribute(String name) {
         removeAttribute(new Attr(name));

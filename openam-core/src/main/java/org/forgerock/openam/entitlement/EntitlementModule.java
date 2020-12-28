@@ -21,7 +21,7 @@ package org.forgerock.openam.entitlement;
  * {@link java.util.ServiceLoader} mechanism to allow extensions to be loaded.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public interface EntitlementModule {
 

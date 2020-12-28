@@ -79,7 +79,7 @@ import com.sun.identity.saml2.protocol.StatusCode;
 /**
  * This class provides methods to send or process <code>AuthnQuery</code>.
  *
- * @supported.api
+ * 
  */
 
 public class AuthnQueryUtil {
@@ -103,7 +103,7 @@ public class AuthnQueryUtil {
      * @return the <code>Response</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     public static Response sendAuthnQuery(AuthnQuery authnQuery,
         String authnAuthorityEntityID, String realm, String binding)

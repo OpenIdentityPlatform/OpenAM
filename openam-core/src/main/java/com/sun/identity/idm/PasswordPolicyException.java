@@ -21,7 +21,7 @@ import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * The exception class whose instance is thrown if there is any error related with password issue.
- * @supported.all.api
+ * 
  */
 public class PasswordPolicyException extends IdRepoException {
 

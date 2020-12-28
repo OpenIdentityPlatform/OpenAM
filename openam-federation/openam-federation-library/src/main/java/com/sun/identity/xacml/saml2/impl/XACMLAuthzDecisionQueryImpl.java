@@ -96,7 +96,7 @@ import java.text.ParseException;
  *  	&lt;attribute name="Consent" type="anyURI" use="optional"/>
  *  &lt;complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public class XACMLAuthzDecisionQueryImpl extends RequestAbstractImpl 
         implements XACMLAuthzDecisionQuery {

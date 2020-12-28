@@ -40,7 +40,7 @@ import java.util.*;
 /**
  * @author alin.brici@forgerock.com
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPv6Condition} instead.
+ * @deprecated Use org.forgerock.openam.entitlement.conditions.environment.IPv6Condition instead.
  */
 @Deprecated
 public class IPv6Condition implements Condition {
@@ -215,7 +215,6 @@ public class IPv6Condition implements Condition {
      * @see #DNS_NAME
      * @see #REQUEST_IP
      * @see #REQUEST_DNS_NAME
-     * @see com.sun.identity.policy.
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env)
             throws PolicyException, SSOException {

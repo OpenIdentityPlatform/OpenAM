@@ -57,7 +57,7 @@ import com.sun.identity.shared.debug.Debug;
  * <code>SSOProvider</code> interface and provides implementation of the methods
  * to create , destroy , check the validity of a single sign on token.
  *
- * @supported.api
+ * 
  *
  * Note: Used by ClientSDK, therefore must not use Guice for initialisation.
  */
@@ -86,7 +86,7 @@ public final class SSOProviderImpl implements SSOProvider {
      * Constructs a instance of <code>SSOProviderImpl</code>
      *
      * @throws SSOException
-     * @supported.api
+     * 
      */
     public SSOProviderImpl() throws SSOException {
         this(SessionCache.getInstance());
@@ -434,7 +434,7 @@ public final class SSOProviderImpl implements SSOProvider {
      *             if the there was an error during communication with session
      *             service.
      *
-     * @supported.api
+     * 
      */
     public void destroyToken(SSOToken destroyer, SSOToken destroyed)
             throws SSOException {
@@ -463,7 +463,7 @@ public final class SSOProviderImpl implements SSOProvider {
      *             if the there was an error during communication with session
      *             service.
      *
-     * @supported.api
+     * 
      */
     public Set<SSOToken> getValidSessions(SSOToken requester, String server)
             throws SSOException {

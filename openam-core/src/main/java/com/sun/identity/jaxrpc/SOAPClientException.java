@@ -32,7 +32,7 @@ package com.sun.identity.jaxrpc;
  * An <code>SOAPClientException</code> is thrown when there are errors related
  * to JAXRPC and SOAP methods.
  *
- * @supported.all.api
+ * 
  * @deprecated As of OpenSSO version 8.0
  *             {@link com.sun.identity.shared.jaxrpc.SOAPClientException}
  */

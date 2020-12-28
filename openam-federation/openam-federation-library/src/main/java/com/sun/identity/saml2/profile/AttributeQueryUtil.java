@@ -91,7 +91,7 @@ import com.sun.identity.saml2.xmlenc.EncManager;
 /**
  * This class provides methods to send or process <code>AttributeQuery</code>.
  *
- * @supported.api
+ * 
  */
 public class AttributeQueryUtil {
 
@@ -128,7 +128,7 @@ public class AttributeQueryUtil {
      * @return the <code>Response</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     public static Response sendAttributeQuery(AttributeQuery attrQuery,
         String attrAuthorityEntityID, String realm, String attrQueryProfile,
@@ -189,7 +189,7 @@ public class AttributeQueryUtil {
      *
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
      public static void sendAttributeQuery(AttributeQuery attrQuery,
         HttpServletRequest request, HttpServletResponse response,
@@ -1332,7 +1332,7 @@ public class AttributeQueryUtil {
      * @return the <code>Map</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     public static Map<String, Set<String>> getAttributesForFedlet(String spEntityID, String idpEntityID,
             String nameIDValue, List<String> attrsList, String attrQueryProfileAlias, String subjectDN)
@@ -1437,7 +1437,7 @@ public class AttributeQueryUtil {
      *
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     private static AttributeQuery constructAttrQueryForFedlet(
                              String spEntityID,
@@ -1519,7 +1519,7 @@ public class AttributeQueryUtil {
      *
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     private static boolean validateSAMLResponseForFedlet(
                               Response samlResp,
@@ -1577,7 +1577,7 @@ public class AttributeQueryUtil {
      *
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     private static Assertion getDecryptedAssertion(
                                       EncryptedAssertion eAssertion,

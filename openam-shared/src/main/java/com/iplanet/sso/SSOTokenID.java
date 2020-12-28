@@ -34,7 +34,7 @@ package com.iplanet.sso;
  * The random string in the <code>SSOTokenID</code> is unique on a given server.
  * 
  * @see com.iplanet.sso.SSOToken
- * @supported.all.api
+ * 
  */
 public interface SSOTokenID {
     /**

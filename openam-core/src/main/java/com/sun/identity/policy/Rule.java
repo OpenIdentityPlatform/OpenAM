@@ -45,7 +45,7 @@ import java.util.Iterator;
  * A rule constains the rule name, service type,
  * a resource and a map containing action names and action values.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -95,7 +95,7 @@ public class Rule extends Object implements Cloneable {
      * not exist
      * @exception InvalidNameException the resource name, action name,
      * or values is not valid
-     * @supported.api
+     * 
      */
     public Rule(String serviceName, String resourceName, Map actions) throws
             NameNotFoundException, InvalidNameException {
@@ -123,7 +123,7 @@ public class Rule extends Object implements Cloneable {
      * not exist
      * @exception InvalidNameException the resource name, action name,
      * or values is not valid
-     * @supported.api
+     * 
      */
     public Rule(String serviceName, Map actions) throws
             NameNotFoundException, InvalidNameException {
@@ -151,7 +151,7 @@ public class Rule extends Object implements Cloneable {
      * not exist
      * @exception InvalidNameException the resource name, action name,
      * or values is not valid
-     * @supported.api
+     * 
      */
     public Rule(String ruleName, String serviceName,
             String resourceName, Map actions) throws
@@ -331,7 +331,7 @@ public class Rule extends Object implements Cloneable {
      * if it was not constructed with a name.
      *
      * @return rule name
-     * @supported.api
+     * 
      */
     public String getName() {
         return (ruleName);
@@ -343,7 +343,7 @@ public class Rule extends Object implements Cloneable {
      *
      * @param ruleName rule name.
      * @throws InvalidNameException if rule name is invalid.
-     * @supported.api
+     * 
      */
     public void setName(String ruleName) throws InvalidNameException {
         if (ruleName != null) {
@@ -359,7 +359,7 @@ public class Rule extends Object implements Cloneable {
      * created.
      *
      * @return service name
-     * @supported.api
+     * 
      */
     public String getServiceTypeName() {
         return (serviceTypeName);
@@ -372,7 +372,7 @@ public class Rule extends Object implements Cloneable {
      * the rule cannot be changed once the rule is created.
      *
      * @return resource name
-     * @supported.api
+     * 
      */
     public String getResourceName() {
         return ((resourceNames == null) || resourceNames.isEmpty())
@@ -386,7 +386,7 @@ public class Rule extends Object implements Cloneable {
      * the rule cannot be changed once the rule is created.
      *
      * @return resource name
-     * @supported.api
+     * 
      */
     public Set<String> getResourceNames() {
         return resourceNames;
@@ -399,7 +399,7 @@ public class Rule extends Object implements Cloneable {
      * the rule cannot be changed once the rule is created.
      *
      * @param resourceNames resource name
-     * @supported.api
+     * 
      */
     public void setResourceNames(Set<String> resourceNames) {
         this.resourceNames = new HashSet<String>();
@@ -414,7 +414,7 @@ public class Rule extends Object implements Cloneable {
      * action names or a subset of it.
      *
      * @return action names defined in this rule for the service
-     * @supported.api
+     * 
      */
     public Set getActionNames() {
         return (new HashSet(actions.keySet()));
@@ -428,7 +428,7 @@ public class Rule extends Object implements Cloneable {
      * @return action names defined in this rule for the service
      * @throws NameNotFoundException if actions name is not
      *         found in the rule
-     * @supported.api
+     * 
      */
     public Set getActionValues(String actionName)
             throws NameNotFoundException {
@@ -449,7 +449,7 @@ public class Rule extends Object implements Cloneable {
      * which contains the action values as strings.
      *
      * @return all action names and corresponding action values
-     * @supported.api
+     * 
      */
     public Map getActionValues() {
         return (new HashMap(actions));
@@ -461,7 +461,7 @@ public class Rule extends Object implements Cloneable {
      *
      * @param actionValues action names and their corresponding values
      * @throws InvalidNameException if action name is invalid.
-     * @supported.api
+     * 
      */
     public void setActionValues(Map actionValues)
             throws InvalidNameException {
@@ -570,7 +570,7 @@ public class Rule extends Object implements Cloneable {
      * Returns an XML string representing the rule.
      *
      * @return an XML string representing the rule.
-     * @supported.api
+     * 
      */
     public String toXML() {
         StringBuilder answer = new StringBuilder(100);

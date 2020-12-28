@@ -40,7 +40,7 @@ import com.sun.identity.sm.SMSException;
  * 
  * @deprecated This class has been deprecated. Please use
  *             <code>com.sun.identity.sm.AttributeSchema</code>.
- * @supported.all.api
+ * 
  */
 public class AMAttributeSchema extends Object {
 

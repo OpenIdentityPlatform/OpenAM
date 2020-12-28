@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * The <code>Obligation</code> element is a container of 
  * one or more <code>AttributeAssignment</code>s issuded by 
  * authorization authority.
- * @supported.all.api
+ * 
  *
  * <p>
  * <pre>

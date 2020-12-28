@@ -49,7 +49,7 @@ import com.iplanet.services.ldap.AttrSet;
  * 
  * </PRE>
  *
- * @supported.api
+ * 
  */
 public class OrganizationalUnit extends PersistentObject {
 
@@ -98,7 +98,7 @@ public class OrganizationalUnit extends PersistentObject {
      *            optional attributes, and possibly default values
      * @param attrSet
      *            attribute/value set
-     * @supported.api
+     * 
      */
     public OrganizationalUnit(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -109,7 +109,7 @@ public class OrganizationalUnit extends PersistentObject {
      * Return name of the organizational unit
      * 
      * @return name of the organizational unit
-     * @supported.api
+     * 
      */
     public String getName() throws UMSException {
         return (getAttribute(getNamingAttribute()).getValue());

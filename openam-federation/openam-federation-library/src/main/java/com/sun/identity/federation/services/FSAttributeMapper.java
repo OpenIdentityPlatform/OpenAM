@@ -44,7 +44,7 @@ import java.util.Map;
  * </p>
  * @deprecated This SPI is deprecated.
  * @see com.sun.identity.federation.services.FSRealmAttributeMapper
- * @supported.all.api
+ * 
  */ 
 public interface FSAttributeMapper {
 

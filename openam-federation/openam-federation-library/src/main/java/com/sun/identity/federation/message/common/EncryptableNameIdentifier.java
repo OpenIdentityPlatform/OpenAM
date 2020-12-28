@@ -46,7 +46,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This class contains methods for encrypting the  <code>NameIdentifier</code> 
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

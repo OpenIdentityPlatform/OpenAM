@@ -49,7 +49,7 @@ import com.sun.identity.log.spi.Debug;
  * the first row, i.e. 0th row, always holds the header info (field names)
  * present in the ELF formatted file.
  * Other rows hold the value present under those columns.
- * @supported.all.api
+ * 
  */
 public class LogReader {
     /* private attributes */

@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 /**
  *  The <code>BaseID</code> is an extension point that allows 
  *  applications to add new kinds of identifiers.
- *  @supported.all.api
+ *  
  */
 public interface BaseID extends BaseIDAbstract {
 

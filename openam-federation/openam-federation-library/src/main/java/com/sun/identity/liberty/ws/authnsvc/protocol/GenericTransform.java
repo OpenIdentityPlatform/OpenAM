@@ -33,7 +33,7 @@ package com.sun.identity.liberty.ws.authnsvc.protocol;
  * The <code>GenericTransform</code> class represents a generic
  * <code>Transform</code> that doesn't transform.
  * 
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

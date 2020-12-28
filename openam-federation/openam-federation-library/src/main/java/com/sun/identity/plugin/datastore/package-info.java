@@ -28,7 +28,7 @@
 
 /**
  * Contains data store plugin SPIs.
- * @supported.all.api
+ * 
  */
 package com.sun.identity.plugin.datastore;
 

@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * The <code>Response</code> element is a container of 
  * one or more <code>Result</code>s issued by policy decision point
- * @supported.all.api
+ * 
  * <p/>
  * <pre>
  * schema:

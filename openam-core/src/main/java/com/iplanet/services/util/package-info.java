@@ -16,6 +16,6 @@
 
 /**
  * Utilities for service management.
- * @supported.api
+ * 
  */
 package com.iplanet.services.util;

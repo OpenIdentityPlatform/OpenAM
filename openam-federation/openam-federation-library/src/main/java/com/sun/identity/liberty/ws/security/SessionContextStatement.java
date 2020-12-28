@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * of an entity to another system entity within the body of an
  * <code>&lt;saml:assertion&gt;</code> element.
  *
- * @supported.all.api
+ * 
  */
 public class SessionContextStatement extends SubjectStatement {
     /**

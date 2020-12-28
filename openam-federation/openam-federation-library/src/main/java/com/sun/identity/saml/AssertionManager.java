@@ -81,7 +81,7 @@ import javax.servlet.http.HttpServletResponse;
  * <code>Query</code>.
  * <p>
  * This class could only be used in the same JVM as OpenAM.
- * @supported.api
+ * 
  */
 public final class AssertionManager {
 
@@ -266,7 +266,7 @@ public final class AssertionManager {
      * @return The singleton <code>AssertionManager</code> instance
      * @throws SAMLException if unable to get the singleton
      *         <code>AssertionManager</code> instance.
-     * @supported.api
+     * 
      */
     public static AssertionManager getInstance() throws SAMLException {
         // not throwing any exception
@@ -292,7 +292,7 @@ public final class AssertionManager {
      *     <code>AuthenticationStatement</code>. 
      * @return Assertion The created Assertion.
      * @throws SAMLException If the Assertion cannot be created.
-     * @supported.api
+     * 
      */
     public Assertion createAssertion(Object token)
         throws SAMLException
@@ -321,7 +321,7 @@ public final class AssertionManager {
      *     create the <code>AttributeStatement</code> for the Assertion.
      * @return Assertion The created Assertion.
      * @throws SAMLException If the Assertion cannot be created.
-     * @supported.api
+     * 
      */
     public Assertion createAssertion(Object token, List attributes)
         throws SAMLException
@@ -369,7 +369,7 @@ public final class AssertionManager {
      * @return <code>AssertionArtifact</code>
      * @throws SAMLException If the <code>AssertionArtifact</code> cannot be
      *         created.
-     * @supported.api
+     * 
      */
     public AssertionArtifact createAssertionArtifact(Assertion assertion,
                                                         String destID)
@@ -527,7 +527,7 @@ public final class AssertionManager {
      * @return A Set of valid Assertion IDs. Each element in the Set is a
      * String representing an Assertion ID. 
      * @throws SAMLException If this method can not gets all valid Assertions.
-     * @supported.api
+     * 
      */
     public Set getAssertions(Object token)
         throws SAMLException
@@ -596,7 +596,7 @@ public final class AssertionManager {
      *     an artifact.
      * @throws SAMLException If this method can not gets all valid 
      *     <code>AssertionArtifacts</code>.
-     * @supported.api
+     * 
      */
     public Set getAssertionArtifacts(Object token)
         throws SAMLException
@@ -2206,7 +2206,7 @@ public final class AssertionManager {
      * @throws SAMLException If an error occurred during the process; the token
      *         does not have the privilege; or the assertion could not be
      *         found.
-     * @supported.api
+     * 
      */
     public Assertion getAssertion(AssertionIDReference idRef, Object token)
         throws SAMLException {
@@ -2238,7 +2238,7 @@ public final class AssertionManager {
      * @return the Assertion referenced by the <code>AsertionIDReference</code>.
      * @throws SAMLException If an error occurred during the process; or
      *          the assertion could not be found.
-     * @supported.api
+     * 
      */
     public Assertion getAssertion(AssertionIDReference idRef, String destID)
                                 throws SAMLException {
@@ -2266,7 +2266,7 @@ public final class AssertionManager {
      * @return the Assertion referenced by the <code>AsertionIDReference</code>.
      * @throws SAMLException If an error occurred during the process; or
      *          the assertion could not be found.
-     * @supported.api
+     * 
      */
     public Assertion getAssertion(AssertionIDReference idRef, Set destID)
                                 throws SAMLException {

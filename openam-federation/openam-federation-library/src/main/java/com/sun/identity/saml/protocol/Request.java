@@ -67,7 +67,7 @@ import org.w3c.dom.NodeList;
  * This <code>Request</code> class represents a Request XML document.
  * It extends from the abstract base class <code>AbstractRequest</code>.
  *
- * @supported.all.api
+ * 
  */
 public class Request extends AbstractRequest {
     /*

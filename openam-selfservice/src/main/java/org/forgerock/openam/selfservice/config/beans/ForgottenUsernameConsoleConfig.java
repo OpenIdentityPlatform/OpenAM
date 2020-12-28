@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Represents forgotten username console configuration.
  *
- * @supported.all.api
+ * 
  * @since 13.0.0
  */
 public final class ForgottenUsernameConsoleConfig extends CommonConsoleConfig {

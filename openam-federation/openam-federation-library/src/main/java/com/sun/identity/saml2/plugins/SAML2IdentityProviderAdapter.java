@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * This interface <code> SAML2IdentityProviderAdapter</code> is used to perform
  * specific tasks in the IdP
  *
- * @supported.all.api
+ * 
  */
 public interface SAML2IdentityProviderAdapter {
 

@@ -35,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * This <code>SSOException</code> is thrown when there are single sign on token 
  * operation error.
  *
- * @supported.all.api
+ * 
  */
 public class SSOException extends L10NMessageImpl {
 

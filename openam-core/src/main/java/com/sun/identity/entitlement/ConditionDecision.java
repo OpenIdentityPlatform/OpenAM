@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Class to represent {@link EntitlementCondition} evaluation match result and - if applicable - its advice.
  *
- * @supported.all.api
+ * 
  */
 public class ConditionDecision {
 

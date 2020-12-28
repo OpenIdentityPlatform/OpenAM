@@ -43,7 +43,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
  * the subject of the statement. A single SAML authority may advertise its
  * presence over multiple protocol binding, at multiple locations, and as
  * more than one kind of authority by sending multiple elements as needed.
- * @supported.all.api
+ * 
  */
 public class AuthorityBinding  { 
     private String _binding = null;

@@ -49,7 +49,7 @@ import javax.servlet.http.HttpServletRequest;
  * Detection Class provided in Client Detection Module Service and gets the
  * client type. Default client type will be returned if there is no Client
  * Detection Implementation provided
- * @supported.all.api
+ * 
  */
 public class AMClientDetector {
 

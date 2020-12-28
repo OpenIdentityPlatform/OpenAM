@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  * The <code>XACMLSDKUtils</code> contains utility methods for XACML 2.0
  * implementation.
  *
- * @supported.all.api
+ * 
  */
 public class XACMLSDKUtils extends SAML2SDKUtils {
     //

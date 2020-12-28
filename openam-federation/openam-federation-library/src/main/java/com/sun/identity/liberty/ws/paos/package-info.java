@@ -29,7 +29,7 @@
 /**
  * Reverse SOAP Binding classes.
  *
- * @supported.all.api
+ * 
  */
 package com.sun.identity.liberty.ws.paos;
 

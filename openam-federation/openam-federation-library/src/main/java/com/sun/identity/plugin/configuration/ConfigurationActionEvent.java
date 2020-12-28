@@ -32,7 +32,7 @@ package com.sun.identity.plugin.configuration;
  * The <code>ConfigurationActionEvent</code> class represents 
  * Configuration event.
  *
- * @supported.all.api
+ * 
  */
 public interface ConfigurationActionEvent {
     /**

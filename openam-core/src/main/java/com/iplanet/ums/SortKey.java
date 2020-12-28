@@ -31,7 +31,7 @@ package com.iplanet.ums;
 /**
  * This class represents data structure for sort key.
  *
- * @supported.all.api
+ * 
  */
 public class SortKey implements java.io.Serializable {
 

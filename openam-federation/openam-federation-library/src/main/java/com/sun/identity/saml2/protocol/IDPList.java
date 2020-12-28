@@ -40,7 +40,7 @@ import java.util.List;
  * This interface specifies the identity providers trusted by the requester
  * to authenticate the presenter.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

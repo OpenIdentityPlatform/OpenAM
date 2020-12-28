@@ -32,7 +32,7 @@ package com.sun.identity.saml2.common;
  * This class is an extension point for all SAML related exceptions.
  * This class also handles message localization in SAML exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class SAML2InvalidNameIDPolicyException extends SAML2Exception {
 

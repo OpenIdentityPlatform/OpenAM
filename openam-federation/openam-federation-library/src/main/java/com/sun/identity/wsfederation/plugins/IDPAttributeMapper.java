@@ -42,7 +42,7 @@ import com.sun.identity.wsfederation.common.WSFederationException;
  * Sign On Token and returns the SAML <code>Attribute</code>s.
  * @see com.sun.identity.wsfederation.plugins.SPAttributeMapper
  *
- * @supported.all.api
+ * 
  */
 
 public interface IDPAttributeMapper {

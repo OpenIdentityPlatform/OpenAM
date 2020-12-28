@@ -80,7 +80,7 @@ import com.sun.identity.sm.SMSEntry;
  * If multiple servers are running, each may have their own configuration file.
  * The naming convention for such scenarios is
  * <code>AMConfig-&lt;serverName></code>.
- * @supported.all.api
+ * 
  */
 public class SystemProperties {
 

@@ -33,7 +33,7 @@ import com.sun.identity.xacml.common.XACMLException;
 /**
  * The <code>Decision</code> element is a container of 
  * one or more <code>Decision</code>s issued by policy decision point
- * @supported.all.api
+ * 
  * <p/>
  * Schema:
  * <pre>

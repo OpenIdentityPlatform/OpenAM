@@ -36,7 +36,7 @@ import com.sun.identity.saml2.assertion.impl.IssuerImpl;
 /**
  *  The <code>Issuer</code> provides information about the issuer of  
  *  a SAML assertion or protocol message.
- *  @supported.all.api 
+ *   
  */
 @JsonDeserialize(as=IssuerImpl.class)
 public interface Issuer extends NameIDType {

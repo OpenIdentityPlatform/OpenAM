@@ -29,6 +29,6 @@
 /**
  * Defines SAML Assertion Manager and SAML Client APIs.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml;

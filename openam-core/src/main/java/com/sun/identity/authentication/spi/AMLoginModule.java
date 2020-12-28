@@ -195,7 +195,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * For a complete sample, please refer to
  * &lt;install_root&gt;/SUNWam/samples/authentication/providers
  *
- * @supported.api
+ * 
  */
 public abstract class AMLoginModule implements LoginModule {
 
@@ -510,7 +510,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return An administrative <code>SSOToken</code>.
      * @exception AuthLoginException if the authentication SSO session
      *         is null.
-     * @supported.api
+     * 
      */
     public SSOToken getSSOSession() throws AuthLoginException {
         SSOToken sess = AuthD.getAuth().getSSOAuthSession();
@@ -530,7 +530,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return Callback array for this state, return 0-length Callback array
      *     if there is no Callback defined for this state
      * @throws AuthLoginException if unable to read the callbacks
-     * @supported.api
+     * 
      */
     public Callback[] getCallback(int index) throws AuthLoginException {
         return getCallback(index, false);
@@ -549,7 +549,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return Callback array for this state, return 0-length Callback array
      *     if there is no Callback defined for this state
      * @throws AuthLoginException if unable to read the callbacks
-     * @supported.api
+     * 
      */
     public Callback[] getCallback(int index, boolean fetchOrig) 
         throws AuthLoginException 
@@ -626,7 +626,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param callback Callback instance to be replaced
      * @exception AuthLoginException if state or index is out of 
      *         bound, or callback instance is null.
-     * @supported.api
+     * 
      */
     public void replaceCallback(int state, int index, Callback callback)
     throws AuthLoginException {
@@ -718,7 +718,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param callback the callback to associate the info text
      * @param infoText the infotext for the callback
      * @throws AuthLoginException if state/callback is out of bounds
-     * @supported.api
+     * 
      */
     public void substituteInfoText(int state, int callback, String infoText) 
     throws AuthLoginException {
@@ -754,7 +754,7 @@ public abstract class AMLoginModule implements LoginModule {
      * 
      * @param state The state to clear all infotexts
      * @throws AuthLoginException Invalid state
-     * @supported.api
+     * 
      */
     public void clearInfoText(int state)
     throws AuthLoginException {
@@ -797,7 +797,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param state state state in which the Callback[] to be reset
      * @param header The text of the header to be replaced
      * @throws AuthLoginException if state is out of bounds
-     * @supported.api
+     * 
      */
     public void substituteHeader(int state, String header)
     throws AuthLoginException {
@@ -836,7 +836,7 @@ public abstract class AMLoginModule implements LoginModule {
      *        with 0, i.e. 0 means first callback instance, 1 means
      *        the second callback instance.
      * @throws AuthLoginException if state or index is out of bound.
-     * @supported.api
+     * 
      */
     public void resetCallback(int state, int index)
     throws AuthLoginException {
@@ -980,7 +980,7 @@ public abstract class AMLoginModule implements LoginModule {
      *     attribute configuration for this module. The key of the map is the
      *     attribute name (e.g. <code>iplanet-am-auth-ldap-server</code>) as
      *     String, the value is the value of the corresponding attribute as Set.
-     * @supported.api
+     * 
      */
     abstract public void init(Subject subject,
     java.util.Map sharedState,
@@ -999,7 +999,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return order of next state.  return -1 if authentication
      *     is successful, return 0 if the LoginModule should be ignored.
      * @exception LoginException if login fails.
-     * @supported.api
+     * 
      */
     abstract public int process(Callback[] callbacks, int state)
     throws LoginException;
@@ -1008,7 +1008,7 @@ public abstract class AMLoginModule implements LoginModule {
      * Abstract method must be implemeted by each login module to
      * get the user Principal
      * @return Principal
-     * @supported.api
+     * 
      */
     abstract public java.security.Principal getPrincipal();
     
@@ -1016,7 +1016,7 @@ public abstract class AMLoginModule implements LoginModule {
      * This method should be overridden by each login module
      * to destroy dispensable state fields.
      *
-     * @supported.api
+     * 
      */
     public void  destroyModuleState(){};
     
@@ -1271,7 +1271,7 @@ public abstract class AMLoginModule implements LoginModule {
      * Returns authentication level that has been set for the module
      *
      * @return authentication level of this authentication session
-     * @supported.api
+     * 
      */
     public int getAuthLevel() {
         // get login state for this authentication session
@@ -1292,7 +1292,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param auth_level authentication level string to be set
      * @return <code>true</code> if setting is successful,<code>false</code> 
      *         otherwise
-     * @supported.api
+     * 
      */
     public boolean setAuthLevel(int auth_level) {
         // get login state for this authentication session
@@ -1312,7 +1312,7 @@ public abstract class AMLoginModule implements LoginModule {
      * Returns the current state in the authentication process.
      *
      * @return the current state in the authentication process.
-     * @supported.api
+     * 
      */
     public int getCurrentState() {
         return currentState;
@@ -1334,7 +1334,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return <code>HttpServletRequest</code> for this request, returns null
      *         if the <code>HttpServletRequest</code> object could not be
      *         obtained.
-     * @supported.api
+     * 
      */
     public HttpServletRequest getHttpServletRequest() {
         // get login state for this authentication session
@@ -1408,7 +1408,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @return <code>HttpServletResponse</code> for this request, returns null
      * if the <code>HttpServletResponse</code> object could not be obtained.
-     * @supported.api
+     * 
      */
     public HttpServletResponse getHttpServletResponse() {
         // get login state for this authentication session
@@ -1439,7 +1439,7 @@ public abstract class AMLoginModule implements LoginModule {
      *         session.
      * @throws AuthLoginException if problem in accessing the 
                locale.
-     * @supported.api
+     * 
      */
     public String getLocale() throws AuthLoginException {
         // get login state for this authentication session
@@ -1451,7 +1451,7 @@ public abstract class AMLoginModule implements LoginModule {
      * login module.
      *
      * @return the number of authentication states for this login module.
-     * @supported.api
+     * 
      */
     public int getNumberOfStates() {
         return stateLength;
@@ -1461,7 +1461,7 @@ public abstract class AMLoginModule implements LoginModule {
      * Returns the organization DN for this authentication session.
      *
      * @return organization DN.
-     * @supported.api
+     * 
      */
     public String getRequestOrg() {
         // get login state for this authentication session
@@ -1479,7 +1479,7 @@ public abstract class AMLoginModule implements LoginModule {
      * This key will be unique throughout an entire Web browser session.
      *
      * @return null is unable to get the key,
-     * @supported.api
+     * 
      */
     public String getSessionId() {
         // get login state for this authentication session
@@ -1507,7 +1507,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return Map that contains all attribute key/value pairs defined
      *         in the organization.
      * @throws AuthLoginException if cannot get organization profile.
-     * @supported.api
+     * 
      */
     public Map getOrgProfile(String orgDN) throws AuthLoginException {
         Map orgMap = null;
@@ -1541,7 +1541,7 @@ public abstract class AMLoginModule implements LoginModule {
      *         organization service template.
      * @throws AuthLoginException if cannot get organization service
      *         template.
-     * @supported.api
+     * 
      */
     public Map getOrgServiceTemplate(String orgDN, String serviceName)
             throws AuthLoginException {
@@ -1586,7 +1586,7 @@ public abstract class AMLoginModule implements LoginModule {
      *         the service configuration.
      * @throws AuthLoginException if error in accessing the service schema.
      *
-     * @supported.api
+     * 
      */
     public Map getServiceConfig(String name) throws AuthLoginException {
         try {
@@ -1634,7 +1634,7 @@ public abstract class AMLoginModule implements LoginModule {
      *             available in the "Customizing Identity Data Storage" chapter
      *             of the OpenAM Developer's Guide.
      *
-     * @supported.api
+     * 
      */
      public AMUser getUserProfile(String userDN) throws AuthLoginException{
         AMUser user = null;
@@ -1655,7 +1655,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return The property value.
      * @throws AuthLoginException if the user session is invalid.
      *
-     * @supported.api
+     * 
      */
     public String getUserSessionProperty(String name)
             throws AuthLoginException {
@@ -1683,7 +1683,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param value The property value.
      * @throws AuthLoginException if the user session is invalid.
      *
-     * @supported.api
+     * 
      */
     public void setUserSessionProperty(String name, String value)
             throws AuthLoginException {
@@ -1719,7 +1719,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return a set of auto-generated user IDs
      * @throws AuthLoginException if the class instantiation failed
      *
-     * @supported.api
+     * 
      */
     public Set getNewUserIDs(Map attributes, int num)
             throws AuthLoginException {
@@ -1764,7 +1764,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param url URL to go when authentication failed.
      * @throws AuthLoginException if unable to set the URL.
      *
-     * @supported.api
+     * 
      */
     public void setLoginFailureURL(String url) throws AuthLoginException {
         getLoginState("setLoginFailureURL()").setFailureLoginURL(url);
@@ -1789,7 +1789,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @param url <code>URL</code> to go when authentication is successful.
      * @throws AuthLoginException if unable to set the URL.
-     * @supported.api
+     * 
      */
     public void setLoginSuccessURL(String url) throws AuthLoginException {
         getLoginState("setLoginSuccessURL()").setSuccessLoginURL(url);
@@ -1822,7 +1822,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return <code>true</code> if the callback corresponding to the number
      *         in the specified state is required to have value,
      *         <code>false</code> otherwise
-     * @supported.api
+     * 
      */
     public boolean isRequired(int state, int index) {
         // check state
@@ -1861,7 +1861,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param state The state to fetch the info text
      * @param index The callback to fetch the info text
      * @return The info text
-     * @supported.api
+     * 
      */
     public String getInfoText(int state, int index) {
         // check state
@@ -1898,7 +1898,7 @@ public abstract class AMLoginModule implements LoginModule {
      *        starts with 0.
      * @return Name of the attribute, empty string will be returned
      *         if the attribute is not defined.
-     * @supported.api
+     * 
      */
     public String getAttribute(int state, int index) {
         // check state
@@ -2019,7 +2019,7 @@ public abstract class AMLoginModule implements LoginModule {
      * the OpenSSO error logs.
      *
      * @param userID user name of user who failed authentication.
-     * @supported.api
+     * 
      */
     public void setFailureID(String userID) {
         // get login state for this authentication session
@@ -2047,7 +2047,7 @@ public abstract class AMLoginModule implements LoginModule {
      * and its values. The key is the attribute name and the value
      * is a Set of values.
      *
-     * @supported.api
+     * 
      */
     public void setUserAttributes(Map attributeValuePairs) {
         // get login state for this authentication session
@@ -2069,7 +2069,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param userName source string which should be validated.
      * @param regEx the pattern for which to search.
      * @throws UserNamePasswordValidationException if user name is invalid.
-     * @supported.api
+     * 
      */
     public void validateUserName(String userName, String regEx)
             throws UserNamePasswordValidationException {
@@ -2170,7 +2170,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @param userPassword source string which should be validated.
      * @throws UserNamePasswordValidationException if user password is invalid.
      *
-     * @supported.api
+     * 
      */
     public void validatePassword(String userPassword)
     throws UserNamePasswordValidationException {
@@ -2456,7 +2456,7 @@ public abstract class AMLoginModule implements LoginModule {
      * @return number of failed attempts, -1 id account locking is not enabled. 
      * @throws AuthenticationException if the user name passed in is not valid 
      * or  null, or for any other error condition.
-     * @supported.api
+     * 
      */
      public int getFailCount(AMIdentity amIdUser) throws AuthenticationException {
          AccountLockoutInfo acInfo = null;
@@ -2516,7 +2516,7 @@ public abstract class AMLoginModule implements LoginModule {
      * before when their account is locked out.
      *
      * @return the maximum number of failed attempts
-     * @supported.api
+     * 
      */
     public int getMaximumFailCount()
     throws AuthenticationException {
@@ -2537,7 +2537,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @throws AuthenticationException if the user name passed in is not valid
      * or null, or for any other error condition.
-     * @supported.api
+     * 
      */
     public void incrementFailCount(String userName)
     throws AuthenticationException {
@@ -2558,7 +2558,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @throws AuthenticationException if the user name passed in is not valid
      * or null, or for any other error condition.
-     * @supported.api
+     * 
      */
     public boolean isAccountLocked(String userName)
     throws AuthenticationException {
@@ -2675,7 +2675,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @param userName the username of the user who's session quota will be checked
      * @return true if the user session quota is reached, false otherwise
-     * @supported.api
+     * 
      */
     public boolean isSessionQuotaReached(String userName) {
         int sessionCount = -1;
@@ -2747,7 +2747,7 @@ public abstract class AMLoginModule implements LoginModule {
      *
      * @param userName The username to be used to query the sessions
      * @return The set of SSOTokens for the user's current sessions, returns null on error
-     * @supported.api
+     * 
      */
     public Set<SSOToken> getUserSessions(String userName) {
         Set<SSOToken> sessions = new HashSet<SSOToken>();

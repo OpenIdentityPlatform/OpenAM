@@ -49,7 +49,7 @@ import java.net.URI;
  *  default="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"/>
  * &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public interface Subject {
     /**

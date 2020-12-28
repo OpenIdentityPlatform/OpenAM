@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  * This class <code>RequestAuthnContext</code> represents the requesting
  * Authentication Context as part of the <code>FSAuthnRequest</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

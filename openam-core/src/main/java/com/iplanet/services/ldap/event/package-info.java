@@ -16,6 +16,6 @@
 /**
  * Classes to handle LDAP persistent searches.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.services.ldap.event;

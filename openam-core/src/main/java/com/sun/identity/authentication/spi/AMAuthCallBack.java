@@ -52,7 +52,7 @@ import java.util.Map;
  * <code>etc.</code>
  * <p>
  *
- * @supported.all.api
+ * 
  */
 public interface AMAuthCallBack {
 

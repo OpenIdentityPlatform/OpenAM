@@ -16,6 +16,6 @@
 /**
  * Exception classes for audit logging.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.log;

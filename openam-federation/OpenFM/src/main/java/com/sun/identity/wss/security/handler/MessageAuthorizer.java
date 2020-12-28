@@ -37,7 +37,7 @@ import com.sun.identity.wss.provider.ProviderConfig;
 /**
  * This interface provides a pluggable authorizer for the webservices
  * to authorize the web service clients.
- * @supported.all.api
+ * 
  */
 public interface MessageAuthorizer {
 

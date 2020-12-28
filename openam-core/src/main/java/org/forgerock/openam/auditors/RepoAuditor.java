@@ -137,7 +137,6 @@ public class RepoAuditor {
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      * @param finalState The derived final state of the entry
-     * @param modifiedAttributes The attributes modified
      */
     public void auditModify(Map<String, Object> finalState) {
         if (shouldAudit(ConfigOperation.UPDATE)) {

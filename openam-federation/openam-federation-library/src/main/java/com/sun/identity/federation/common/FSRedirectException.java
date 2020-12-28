@@ -164,7 +164,7 @@ import java.io.StringWriter;
  * @see java.lang.Exception
  * @see java.lang.RuntimeException
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -201,7 +201,7 @@ public class FSRedirectException extends L10NMessageImpl {
      *
      * @param message
      * Detailed message for this exception.
-     * @supported.api
+     * 
      */
     public FSRedirectException(String message) {
         super(message);
@@ -215,7 +215,7 @@ public class FSRedirectException extends L10NMessageImpl {
      *
      * @param message  Detailed message for this exception.
      * @param rootCause  An embedded exception
-     * @supported.api
+     * 
      */
     public FSRedirectException(Throwable rootCause, String message) {
         super(message);
@@ -228,7 +228,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * Constructs a <code>FSRedirectException</code> with an exception.
      *
      * @param ex  Exception
-     * @supported.api
+     * 
      */
     public FSRedirectException(Exception ex) {
        super(ex);
@@ -238,7 +238,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * Returns the embedded exception.
      *
      * @return the embedded exception.
-     * @supported.api
+     * 
      */
     public Throwable getRootCause() {
         return rootCause;
@@ -251,7 +251,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * @param out <code>PrintWriter</code> to write exception to.
      * @return The out parameter passed in.
      * @see java.io.PrintWriter
-     * @supported.api
+     * 
      */
     public PrintWriter log(PrintWriter out) {
         return log(this, out);
@@ -264,7 +264,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * @param out <code>PrintWriter</code> to write exception to.
      * @return The out parameter passed in.
      * @see java.io.PrintWriter
-     * @supported.api
+     * 
      */
     static public PrintWriter log(Throwable xcpt, PrintWriter out) {
         
@@ -282,7 +282,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * includes embedded exceptions.
      *
      * @return a formatted <code>FSRedirectException</code> exception message.
-     * @supported.api
+     * 
      */
     public String toString() {
         
@@ -308,7 +308,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * Prints this exception's stack trace to <tt>System.err</tt>.
      * If this exception has a root exception; the stack trace of the
      * root exception is printed to <tt>System.err</tt> instead.
-     * @supported.api
+     * 
      */
     public void printStackTrace() {
         printStackTrace( System.err );
@@ -319,7 +319,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * If this exception has a root exception, the stack trace of the
      * root exception is printed to the print stream instead.
      * @param ps The non-null print stream to which to print.
-     * @supported.api
+     * 
      */
     public void printStackTrace(java.io.PrintStream ps) {
         if ( rootCause != null ) {
@@ -340,7 +340,7 @@ public class FSRedirectException extends L10NMessageImpl {
      * If this exception has a root exception; the stack trace of the
      * root exception is printed to the print writer instead.
      * @param pw The non-null print writer to which to print.
-     * @supported.api
+     * 
      */
     public void printStackTrace(java.io.PrintWriter pw) {
         if ( rootCause != null ) {

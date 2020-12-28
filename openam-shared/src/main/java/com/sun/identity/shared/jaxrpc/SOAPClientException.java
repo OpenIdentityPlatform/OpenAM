@@ -32,7 +32,7 @@ package com.sun.identity.shared.jaxrpc;
  * An <code>SOAPClientException</code> is thrown when there are errors related
  * to JAXRPC and SOAP methods.
  *
- * @supported.all.api
+ * 
  */
 public class SOAPClientException extends Exception {
     private String message = null;

@@ -44,7 +44,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcException;
  * The <code>PasswordTransforms</code> class represents 'PasswordTransforms'
  * element defined in Authentication Service schema.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

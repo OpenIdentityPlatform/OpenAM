@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 /**
  * The <code>ConditionAbstract</code> is abstract and is thus usable 
  * as the base of a derived class
- * @supported.all.api
+ * 
  */
 public interface ConditionAbstract {
 

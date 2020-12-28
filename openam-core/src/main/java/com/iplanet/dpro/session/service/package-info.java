@@ -32,7 +32,7 @@
  * This package contains classes and interfaces that represent 
  * methods to validate/update/destroy/persist/retrieve the internal session data
  *
- * @supported.api
+ * 
  */
 
 package com.iplanet.dpro.session.service;

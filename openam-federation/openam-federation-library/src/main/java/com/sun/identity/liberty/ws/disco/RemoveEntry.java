@@ -48,7 +48,7 @@ import com.sun.identity.liberty.ws.disco.common.DiscoConstants;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class RemoveEntry {
 

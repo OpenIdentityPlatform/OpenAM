@@ -40,7 +40,7 @@ import com.iplanet.sso.SSOException;
  * This class acts as a factory to get an instance of 
  * <code>com.sun.idenity.policy.client.PolicyEvaluator</code>
  *
- * @supported.all.api
+ * 
  */
 public class PolicyEvaluatorFactory {
 

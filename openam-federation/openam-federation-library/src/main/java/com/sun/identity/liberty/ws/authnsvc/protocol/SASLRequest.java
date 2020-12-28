@@ -43,7 +43,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
 /**
  * The <code>SASLRequest</code> class represents <code>SASLRequest</code>
  * element defined in Authentication Service schema.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

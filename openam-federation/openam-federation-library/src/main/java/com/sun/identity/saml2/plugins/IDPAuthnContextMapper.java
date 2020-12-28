@@ -43,7 +43,7 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
  * The implementation of this class will be used by the IDP to find out
  * the authentication mechaism and set the AuthnContext in the Assertion.
  *
- * @supported.all.api
+ * 
  */ 
 
 public interface IDPAuthnContextMapper {

@@ -16,6 +16,6 @@
 /**
  * A collection of classes which support the authentication service.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.authentication.service;

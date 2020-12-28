@@ -47,7 +47,7 @@ import java.util.List;
  *   &lt;xs:anyAttribute namespace="##any" processContents="lax"/>
  * &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public interface ResourceContent {
 

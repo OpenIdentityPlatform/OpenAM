@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * Interface used for creating sessions, and for accessing session
  * information.
  *
- * @supported.all.api
+ * 
  */
 public interface SessionProvider {
 

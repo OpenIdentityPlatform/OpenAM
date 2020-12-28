@@ -38,7 +38,7 @@ import com.sun.identity.saml2.protocol.impl.IDPEntryImpl;
  * This interface defines methods to set/retrieve single identity provider
  * information trusted by the request issuer to authenticate the presenter.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

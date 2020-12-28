@@ -32,14 +32,14 @@ package com.iplanet.ums;
  * Exception occurs upon insufficient access rights to perform operations in the
  * underlying persistent storage.
  *
- * @supported.api
+ * 
  */
 public class AccessRightsException extends UMSException {
 
     /**
      * Default constructor
      *
-     * @supported.api
+     * 
      */
     public AccessRightsException() {
         super();
@@ -52,7 +52,7 @@ public class AccessRightsException extends UMSException {
      * @param msg
      *            Message string for the exception
      *
-     * @supported.api
+     * 
      */
     public AccessRightsException(String msg) {
         super(msg);
@@ -67,7 +67,7 @@ public class AccessRightsException extends UMSException {
      * @param t
      *            The embedded exception
      *
-     * @supported.api
+     * 
      */
     public AccessRightsException(String msg, Throwable t) {
         super(msg, t);

@@ -39,7 +39,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
 /** 
  *The <code>AttributeStatement</code> element supplies a statement by the issuer
  *that the specified subject is associated with the specified attributes. 
- *@supported.all.api
+ *
  */
 public class AttributeStatement extends SubjectStatement {
     private List _attributes = null;

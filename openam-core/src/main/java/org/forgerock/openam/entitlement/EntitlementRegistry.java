@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentMap;
  * to be registered by client extensions (see {@link EntitlementModule}).
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public final class EntitlementRegistry {
 

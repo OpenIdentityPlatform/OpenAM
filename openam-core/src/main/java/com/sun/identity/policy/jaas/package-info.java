@@ -31,7 +31,7 @@
  * Provides classes for performing policy evaluation against OpenAM
  * using JAAS (Java Authentication and Authorization) framework.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.policy.jaas;
 

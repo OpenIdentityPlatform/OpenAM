@@ -38,7 +38,7 @@ import java.io.Serializable;
  * 
  * @see CreationTemplate
  * @see SearchTemplate
- * @supported.all.api
+ * 
  */
 public abstract class Template implements Serializable, Cloneable {
     /**

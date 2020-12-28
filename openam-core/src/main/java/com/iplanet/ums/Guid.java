@@ -40,7 +40,7 @@ import org.forgerock.opendj.ldap.DN;
  * returned (not a DN string or a guid in the LDAP sense). Methods of the Guid
  * object could then be used to get the actual DN, etc.
  *
- * @supported.all.api
+ * 
  */
 public class Guid {
 

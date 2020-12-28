@@ -46,7 +46,7 @@ import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * This class represents a Direct (or Classic) COS definition.
- * @supported.api
+ * 
  */
 public class DirectCOSDefinition extends PersistentObject implements
         ICOSDefinition {
@@ -70,7 +70,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      *             accepting a creation template and attribute set.
      * @see com.iplanet.ums.cos.DirectCOSDefinition#DirectCOSDefinition
      *      (CreationTemplate, AttrSet)
-     * @supported.api
+     * 
      */
     public DirectCOSDefinition(AttrSet attrSet) throws UMSException {
         this(TemplateManager.getTemplateManager().getCreationTemplate(_class,
@@ -89,7 +89,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      *             The exception thrown from the parent class constructor.
      * @see com.iplanet.ums.PersistentObject#PersistentObject (CreationTemplate,
      *      AttrSet)
-     * @supported.api
+     * 
      */
     public DirectCOSDefinition(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -101,7 +101,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @param name
      *            the name of this COS.
-     * @supported.api
+     * 
      */
     public void setName(String name) {
         setAttribute(new Attr(ICOSDefinition.DEFAULT_NAMING_ATTR, name));
@@ -111,7 +111,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * Returns the name of this COS.
      * 
      * @return the name of this COS
-     * @supported.api
+     * 
      */
     public String getName() {
         String attributeValue = null;
@@ -141,7 +141,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void addCOSAttribute(String attrName, int qualifier)
             throws UMSException {
@@ -163,7 +163,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @param attrName
      *            The name of the attribute to be removed.
-     * @supported.api
+     * 
      */
     public void removeCOSAttribute(String attrName) {
         modify(new Attr(ICOSDefinition.COSATTRIBUTE, attrName), ModificationType.DELETE);
@@ -174,7 +174,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @return String[] A string array of COS attributes (for example,
      *         mailquota).
-     * @supported.api
+     * 
      */
     public String[] getCOSAttributes() {
         Attr attr = getAttribute(ICOSDefinition.COSATTRIBUTE);
@@ -187,7 +187,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @param cosSpecifier
      *            The COS specifier.
-     * @supported.api
+     * 
      */
     public void setCOSSpecifier(String cosSpecifier) {
         setAttribute(new Attr(COSSPECIFIER, cosSpecifier));
@@ -199,7 +199,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * @return the COS specifier
      * 
      * @see DirectCOSDefinition#setCOSSpecifier(String cosSpecifier)
-     * @supported.api
+     * 
      */
     public String getCOSSpecifier() {
         String attributeValue = null;
@@ -219,7 +219,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void addCOSTemplate(COSTemplate cosTemplate) throws UMSException {
         if (getGuid() == null) {
@@ -244,7 +244,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void removeCOSTemplate(String name) throws UMSException {
         Guid tGuid = new Guid(COSTemplate.DEFAULT_NAMING_ATTR + "=" + name
@@ -257,7 +257,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public void removeCOSTemplates() throws UMSException {
         ArrayList aList = (ArrayList) getCOSTemplates();
@@ -279,7 +279,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      *             The exception thrown if the COS template is not found.
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public COSTemplate getCOSTemplate(String name) throws COSNotFoundException,
             UMSException {
@@ -305,7 +305,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * 
      * @throws UMSException
      *             The exception thrown from the data layer.
-     * @supported.api
+     * 
      */
     public Collection getCOSTemplates() throws UMSException {
         COSTemplate cosTemplate = null;

@@ -27,7 +27,7 @@ import java.util.List;
  * Defines the concerns of generating the AttributeStatement list to be included in the SAML2 assertion. If no custom
  * class is specified in the SAML2Config, then the DefaultAttributeStatementsProvider will be used.
  *
- * @supported.all.api
+ * 
  */
 public interface AttributeStatementsProvider {
 

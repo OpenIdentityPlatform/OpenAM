@@ -28,7 +28,7 @@ import org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation;
  * Handles the issuing of Tokens for a response type, i.e. code, token, id_token.
  *
  * @since 12.0.0
- * @supported.all.api
+ * 
  */
 public interface ResponseTypeHandler {
 

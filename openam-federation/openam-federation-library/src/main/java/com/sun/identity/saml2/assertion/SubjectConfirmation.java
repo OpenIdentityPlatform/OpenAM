@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  party to verify the correspondence of the subject of the assertion
  *  with the party with whom the relying party is communicating.
  *
- *  @supported.all.api
+ *  
  */
 public interface SubjectConfirmation {
 

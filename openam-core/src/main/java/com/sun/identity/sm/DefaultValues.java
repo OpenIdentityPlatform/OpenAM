@@ -44,7 +44,7 @@ import org.w3c.dom.Node;
  * class name must be specified within the XML node
  * <code>DefaultValuesClassName</code>.
  *
- * @supported.all.api
+ * 
  */
 public abstract class DefaultValues {
 

@@ -47,7 +47,7 @@ import com.iplanet.am.util.AMClientDetector;
  * call store() to save changes into SMS. versions of the getInstance methods
  * that accept a SSO token should be used if the client code wishes to set
  * client data.
- * @supported.api
+ * 
  */
 public class ClientsManager {
 
@@ -68,7 +68,7 @@ public class ClientsManager {
      * @return Requested Client instance.
      * @throws ClientException
      *             if specified client type is null or not defined.
-     * @supported.api
+     * 
      */
     public static Client getInstance(String clientType) throws ClientException {
         if (clientType == null) {

@@ -60,7 +60,7 @@ import com.sun.identity.xacml.context.Subject;
 /**
  * This class provides methods to send or process <code>AttributeQuery</code>.
  *
- * @supported.api
+ * 
  */
 
 public class XACMLQueryUtil {
@@ -93,7 +93,7 @@ public class XACMLQueryUtil {
      * @return the <code>String</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
 
     public static String getPolicyDecisionForFedlet(HttpServletRequest request,

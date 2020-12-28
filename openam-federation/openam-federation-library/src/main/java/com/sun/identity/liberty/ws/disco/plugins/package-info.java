@@ -29,7 +29,7 @@
 /**
  * Defines plugin interface for Liberty Discovery Service implementation.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.disco.plugins;
 

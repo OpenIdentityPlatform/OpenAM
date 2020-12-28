@@ -47,7 +47,7 @@ import com.iplanet.ums.IUMSConstants;
  * configuration information of a service configuration. It provides methods to
  * get and set configuration parameters for this service configuration.
  *
- * @supported.all.api
+ * 
  */
 public class ServiceConfig {
     // Instance variables

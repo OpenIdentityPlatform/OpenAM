@@ -33,8 +33,6 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
 /**
  * This class is an extension point for all Upgrade related exceptions.
  * This class also handles message localization in Upgrade exceptions.
- *
- * @supported.all.api
  */
 public class UpgradeException extends L10NMessageImpl {
 

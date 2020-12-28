@@ -38,7 +38,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * identifier in encrypted fasion. It contains an <code>EncryptedData</code>
  * and zero or more <code>EncryptedKey</code>s.
  * 
- * @supported.all.api 
+ *  
  */
 public interface EncryptedID extends EncryptedElement {
 

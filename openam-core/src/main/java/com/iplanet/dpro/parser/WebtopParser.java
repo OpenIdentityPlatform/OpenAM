@@ -52,7 +52,7 @@ import org.xml.sax.SAXParseException;
  * XMLParser provides a way for applications to handle a hook into
  * applications and applications and its server.
  *
- * @supported.all.api
+ * 
  */
 public class WebtopParser {
     private Hashtable elemmap = new Hashtable();

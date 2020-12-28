@@ -69,7 +69,7 @@ import org.w3c.dom.Document;
 /**
  * This class has methods to create a Liberty <code>LogoutResponse</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

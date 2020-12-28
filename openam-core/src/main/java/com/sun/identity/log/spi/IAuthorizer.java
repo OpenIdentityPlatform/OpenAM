@@ -30,7 +30,7 @@ package com.sun.identity.log.spi;
 
 /**
  * This interface defines method for authorization of log operation.
- * @supported.all.api
+ * 
  */
 public interface IAuthorizer {
     /**

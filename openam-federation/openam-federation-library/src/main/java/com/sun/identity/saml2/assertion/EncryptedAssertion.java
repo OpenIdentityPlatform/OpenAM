@@ -39,7 +39,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * Processing specification [XMLEnc]. The EncryptedAssertion contains 
  * an <code>EncryptedData</code> and zero or more 
  * <code>EncryptedKey</code>s.
- * @supported.all.api
+ * 
  */
 public interface EncryptedAssertion extends EncryptedElement {
 

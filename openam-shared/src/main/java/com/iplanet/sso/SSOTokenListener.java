@@ -34,7 +34,7 @@ package com.iplanet.sso;
  * <code>ssoTokenChanged()</code> is invoked when an SSO token event arrives.
  * 
  * @see com.iplanet.sso.SSOTokenEvent
- * @supported.all.api
+ * 
  */
 public interface SSOTokenListener {
     /**

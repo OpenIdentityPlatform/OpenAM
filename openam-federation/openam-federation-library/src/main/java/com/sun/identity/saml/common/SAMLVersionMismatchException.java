@@ -33,7 +33,7 @@ package com.sun.identity.saml.common;
  * This exception is thrown when the receiver could not process the request
  * because the version was incorrect.
  *
- * @supported.all.api
+ * 
  */
 public class SAMLVersionMismatchException extends SAMLException {
 

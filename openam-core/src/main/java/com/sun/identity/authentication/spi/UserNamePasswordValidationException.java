@@ -34,7 +34,7 @@ package com.sun.identity.authentication.spi;
  * password validation plugin is failed or any invalid characters detected in
  * user name.
  *
- * @supported.all.api
+ * 
  */
 public class UserNamePasswordValidationException extends AuthLoginException {
     /**

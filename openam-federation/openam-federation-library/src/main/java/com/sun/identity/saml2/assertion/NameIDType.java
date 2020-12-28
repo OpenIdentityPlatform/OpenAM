@@ -40,7 +40,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *    <code>SPNameQualifier</code>
  *    <code>Format</code>
  *    <code>SPProvidedID</code>
- *  @supported.all.api 
+ *   
  */
 public interface NameIDType {
 

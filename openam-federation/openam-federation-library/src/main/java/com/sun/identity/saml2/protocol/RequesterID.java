@@ -39,7 +39,7 @@ import com.sun.identity.saml2.protocol.impl.RequesterIDImpl;
  * This interface identifies the requester in an <code>AuthnRequest</code> 
  * message.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

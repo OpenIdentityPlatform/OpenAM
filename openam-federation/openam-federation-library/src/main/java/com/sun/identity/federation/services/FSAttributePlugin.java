@@ -38,7 +38,7 @@ import java.util.List;
  * during the Single Sign-on process. The implementation of this plugin
  * must return list of SAML <code>AttributeStatement</code>s.
  * </p>
- * @supported.all.api
+ * 
  * @deprecated This SPI is deprecated.
  * @see com.sun.identity.federation.services.FSRealmAttributePlugin
  */ 

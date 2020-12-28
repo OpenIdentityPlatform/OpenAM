@@ -37,7 +37,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * <code>AssertionIDReference</code> element makes reference to a SAML
  * assertion.
  *
- * @supported.all.api
+ * 
  */
 public class AssertionIDReference {     
     protected String assertionID = null;

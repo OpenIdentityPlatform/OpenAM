@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This interface <code>FSRealmIDPProxy</code> is used to find a preferred 
  * Identity Authenticating provider to proxy the authentication request.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

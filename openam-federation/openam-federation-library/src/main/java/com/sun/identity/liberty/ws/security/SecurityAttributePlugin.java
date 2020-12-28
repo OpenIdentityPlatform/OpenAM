@@ -38,7 +38,7 @@ import java.util.List;
  * the <code>SecurityAssertion</code> during the discovery  service 
  * credential generation.
  *
- * @supported.all.api
+ * 
  */
 public interface SecurityAttributePlugin {
 

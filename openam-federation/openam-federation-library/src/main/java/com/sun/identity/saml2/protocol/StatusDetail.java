@@ -52,7 +52,7 @@ import com.sun.identity.saml2.protocol.impl.StatusDetailImpl;
  * &lt;/complexType>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

@@ -41,7 +41,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * The NameIdentifier element specifies a <code>Subject</code> by a   
  * combination of a name and a security domain governing the name of the
  * <code>Subject</code>.
- * @supported.all.api
+ * 
  */
 public class NameIdentifier {
     static SAMLConstants sc;

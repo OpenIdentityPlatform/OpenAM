@@ -85,7 +85,7 @@ import com.sun.identity.wss.trust.ClaimType;
  * API class that retrieves Security Tokens from STS service by making WS-Trust 
  * request and receiving WS-Trust response. 
  * 
- * @supported.all.api
+ * 
  */
 public class TrustAuthorityClient {
     

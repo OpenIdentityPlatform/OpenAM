@@ -45,7 +45,7 @@ import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Represents a static group entry.
- * @supported.api
+ * 
  */
 public class StaticGroup extends PersistentObject implements
         IAssignableMembership {
@@ -54,7 +54,7 @@ public class StaticGroup extends PersistentObject implements
      * Level indicator for no nesting of group membership. Use this level
      * indicator for getting direct membership in a group.
      * 
-     * @supported.api
+     * 
      */
     public static final int LEVEL_DIRECT = 0;
 
@@ -63,7 +63,7 @@ public class StaticGroup extends PersistentObject implements
      * level indicator in getting all direct and indirect members through nested
      * group behavior.
      * 
-     * @supported.api
+     * 
      */
     public static final int LEVEL_ALL = -1;
 
@@ -123,7 +123,7 @@ public class StaticGroup extends PersistentObject implements
      *            Attribute/value set
      * @exception UMSException
      *                on failure to instantiate from persistent storage
-     * @supported.api
+     * 
      */
     public StaticGroup(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -138,7 +138,7 @@ public class StaticGroup extends PersistentObject implements
      *            Globally unique identifier for the member to be added
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void addMember(Guid guid) throws UMSException {
 
@@ -172,7 +172,7 @@ public class StaticGroup extends PersistentObject implements
      *            Object to be added as member
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void addMember(PersistentObject member) throws UMSException {
         addMember(member.getGuid());
@@ -186,7 +186,7 @@ public class StaticGroup extends PersistentObject implements
      *            Array of member guids to be added as members to the group
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void addMembers(Guid[] guids) throws UMSException {
         if (guids == null) {
@@ -205,7 +205,7 @@ public class StaticGroup extends PersistentObject implements
      * @return SearchResults for members of the group
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public SearchResults getMemberIDs() throws UMSException {
         return getMembers(LEVEL_DIRECT);
@@ -225,7 +225,7 @@ public class StaticGroup extends PersistentObject implements
      * @return SearchResults for members of the group
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      * 
      */
     public SearchResults getMembers(int level) throws UMSException {
@@ -284,7 +284,7 @@ public class StaticGroup extends PersistentObject implements
      * @return Number of members of the group
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public int getMemberCount() throws UMSException {
         return getMemberCount(LEVEL_DIRECT);
@@ -298,7 +298,7 @@ public class StaticGroup extends PersistentObject implements
      * @return Number of members of the group
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public int getMemberCount(int level) throws UMSException {
 
@@ -331,7 +331,7 @@ public class StaticGroup extends PersistentObject implements
      * @return The unique identifier for a member
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public Guid getMemberIDAt(int index) throws UMSException {
         Attr attr = getAttribute(MEMBER_ATTR_NAME);
@@ -349,7 +349,7 @@ public class StaticGroup extends PersistentObject implements
      * @return The unique identifier for a member
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public Guid getMemberIDAt(int index, int level) throws UMSException {
         SearchResults allMembers = getMembers(level);
@@ -375,7 +375,7 @@ public class StaticGroup extends PersistentObject implements
      *            Unique identifier for the member to be removed
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeMember(Guid guid) throws UMSException {
         String dn = guid.getDn();
@@ -391,7 +391,7 @@ public class StaticGroup extends PersistentObject implements
      *            Object to be removed
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeMember(PersistentObject member) throws UMSException {
         removeMember(member.getGuid());
@@ -402,7 +402,7 @@ public class StaticGroup extends PersistentObject implements
      * 
      * @exception UMSException
      *                on failure to save to persistent storage
-     * @supported.api
+     * 
      */
     public void removeAllMembers() throws UMSException {
 
@@ -423,7 +423,7 @@ public class StaticGroup extends PersistentObject implements
      *            Identity of member to be checked for membership
      * @return <code>true if it is a member
      * @exception   Not thrown by this class
-     * @supported.api
+     * 
      */
     public boolean hasMember(Guid guid) throws UMSException {
         return isMemberAtLevel(guid.getDn(), LEVEL_DIRECT);
@@ -459,7 +459,7 @@ public class StaticGroup extends PersistentObject implements
      * @return <code>true</code> if it is a member
      * @exception Not
      *                thrown by this class
-     * @supported.api
+     * 
      */
     public boolean hasMember(Guid guid, int level) throws UMSException {
 

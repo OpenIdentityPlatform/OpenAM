@@ -33,7 +33,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * The <code>EncryptedElement</code> carries the content of an unencrypted
  * identifier in encrypted fasion. It contains an <code>EncryptedData</code>
  * and zero or more <code>EncryptedKey</code>s.
- * @supported.all.api 
+ *  
  */
 public interface EncryptedElement {
 

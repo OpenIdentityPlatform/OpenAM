@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
  * the service's schema. It provides access to <code>ServiceSchema</code>,
  * which represents a single "schema" in the service.
  *
- * @supported.api
+ * 
  */
 public class ServiceSchemaManager {
     
@@ -99,7 +99,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceSchemaManager(SSOToken token, String serviceName,
         String version) throws SMSException, SSOException {
@@ -119,7 +119,7 @@ public class ServiceSchemaManager {
      *
      * @return the name of the service
      *
-     * @supported.api
+     * 
      */
     public String getName() {
         return (serviceName);
@@ -130,7 +130,7 @@ public class ServiceSchemaManager {
      *
      * @return the version of the service
      *
-     * @supported.api
+     * 
      */
     public String getVersion() {
         return (version);
@@ -142,7 +142,7 @@ public class ServiceSchemaManager {
      *
      * @return the I18N properties file name for the service
      *
-     * @supported.api
+     * 
      */
     public String getI18NFileName() {
         validate();
@@ -159,7 +159,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void setI18NFileName(String url) throws SMSException, SSOException {
         SMSEntry.validateToken(token);
@@ -182,7 +182,7 @@ public class ServiceSchemaManager {
      * @return the URL of the JAR file containing the <code>I18N</code>
      *         properties file.
      *
-     * @supported.api
+     * 
      */
     public String getI18NJarURL() {
         validate();
@@ -200,7 +200,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     
     public void setI18NJarURL(String url) throws SMSException, SSOException {
@@ -221,7 +221,7 @@ public class ServiceSchemaManager {
      *
      * @return service hierarchy in slash format.
      *
-     * @supported.api
+     * 
      */
     public String getServiceHierarchy() {
         validate();
@@ -238,7 +238,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void setServiceHierarchy(String newhierarchy) throws SMSException,
             SSOException {
@@ -259,7 +259,7 @@ public class ServiceSchemaManager {
      *
      * @return i18nKey of the schema.
      *
-     * @supported.api
+     * 
      */
     public String getI18NKey() {
         validate();
@@ -276,7 +276,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired.
      *
-     * @supported.api
+     * 
      */
     public void setI18NKey(String i18nKey) throws SMSException, SSOException {
         SMSEntry.validateToken(token);
@@ -297,7 +297,7 @@ public class ServiceSchemaManager {
      *
      * @return URL for view bean
      *
-     * @supported.api
+     * 
      */
     public String getPropertiesViewBeanURL() {
         validate();
@@ -314,7 +314,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired.
      *
-     * @supported.api
+     * 
      */
     public void setPropertiesViewBeanURL(String url) throws SMSException,
         SSOException {
@@ -333,7 +333,7 @@ public class ServiceSchemaManager {
     /**
      * Returns the service's resource name for CREST representation, or the
      * service name if a resource name is not defined.
-     * @supported.api
+     * 
      */
     public String getResourceName() {
         validate();
@@ -351,7 +351,7 @@ public class ServiceSchemaManager {
      * @throws SSOException
      *             if the single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void setResourceName(String name) throws SMSException,
             SSOException {
@@ -409,7 +409,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public Set<SchemaType> getSchemaTypes() throws SMSException {
         SMSEntry.validateToken(token);
@@ -427,7 +427,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getSchema(String type) throws SMSException {
         validate();
@@ -454,7 +454,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getSchema(SchemaType type) throws SMSException {
         SMSEntry.validateToken(token);
@@ -502,7 +502,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public Set getServiceAttributeNames(SchemaType type) throws SMSException {
         SMSEntry.validateToken(token);
@@ -518,7 +518,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getGlobalSchema() throws SMSException {
         return (getSchema(SchemaType.GLOBAL));
@@ -532,7 +532,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getOrganizationSchema() throws SMSException {
         return (getSchema(SchemaType.ORGANIZATION));
@@ -545,7 +545,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getDynamicSchema() throws SMSException {
         return (getSchema(SchemaType.DYNAMIC));
@@ -558,7 +558,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getUserSchema() throws SMSException {
         return (getSchema(SchemaType.USER));
@@ -571,7 +571,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchema getPolicySchema() throws SMSException {
         return (getSchema(SchemaType.POLICY));
@@ -584,7 +584,7 @@ public class ServiceSchemaManager {
      * @throws SMSException
      *             if an error occurred while trying to perform the operation
      *
-     * @supported.api
+     * 
      */
     public InputStream getSchema() throws SMSException {
         SMSEntry.validateToken(token);
@@ -605,7 +605,7 @@ public class ServiceSchemaManager {
      * @throws IOException
      *             if an error occurred with the <code> InputStream </code>
      *
-     * @supported.api
+     * 
      */
     public void replaceSchema(InputStream xmlServiceSchema)
     throws SSOException, SMSException, IOException {
@@ -631,7 +631,7 @@ public class ServiceSchemaManager {
      *            object for comparison.
      * @return true if the given object equals this object.
      *
-     * @supported.api
+     * 
      */
     public boolean equals(Object o) {
         if (o instanceof ServiceSchemaManager) {
@@ -650,7 +650,7 @@ public class ServiceSchemaManager {
      *
      * @return the string representation of the Service Schema.
      *
-     * @supported.api
+     * 
      */
     public String toString() {
     	validate();
@@ -666,7 +666,7 @@ public class ServiceSchemaManager {
      *            callback object that will be invoked when schema changes.
      * @return an ID of the registered listener.
      *
-     * @supported.api
+     * 
      */
     public String addListener(ServiceListener listener) {
     	validate();
@@ -680,7 +680,7 @@ public class ServiceSchemaManager {
      * @param listenerID
      *            the listener ID issued when the listener was registered
      *
-     * @supported.api
+     * 
      */
     public void removeListener(String listenerID) {
         if (ssm !=null ) {

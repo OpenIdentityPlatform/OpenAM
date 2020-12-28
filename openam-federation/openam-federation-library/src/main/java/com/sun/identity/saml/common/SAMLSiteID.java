@@ -37,7 +37,7 @@ import java.security.MessageDigest;
 /**
  * This class is used to generate SAML Site ID.
  * 
- * @supported.all.api
+ * 
  */
 public class SAMLSiteID {
 

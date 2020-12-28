@@ -45,7 +45,7 @@ import org.forgerock.openam.shared.resourcename.BaseResourceName;
  * determine its hierarchy during policy evaluation and
  * also its display in the GUI. A class that implements
  * this interface must have a empty constructor.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

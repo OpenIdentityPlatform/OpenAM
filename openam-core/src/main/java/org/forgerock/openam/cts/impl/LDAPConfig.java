@@ -74,7 +74,6 @@ public abstract class LDAPConfig {
     }
 
     /**
-     * {@inheritDoc}
      *
      * Will update its configuration from the System Properties.
      */

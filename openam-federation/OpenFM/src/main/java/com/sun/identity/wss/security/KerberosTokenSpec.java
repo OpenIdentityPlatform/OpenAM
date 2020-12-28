@@ -34,7 +34,7 @@ import java.util.Map;
  * This class represents Kerberos Security Token Specification.
  * It implements <code>SecurityTokenSpec</code> interface.
  * 
- * @supported.all.api
+ * 
  */
 public class KerberosTokenSpec implements SecurityTokenSpec {
     

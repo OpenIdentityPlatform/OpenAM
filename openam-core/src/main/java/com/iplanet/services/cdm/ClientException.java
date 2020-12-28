@@ -31,7 +31,7 @@ package com.iplanet.services.cdm;
 /**
  * The <code>ClientException</code> is thrown to indicate that there is an
  * error in using the client detection module.
- * @supported.all.api
+ * 
  */
 public class ClientException extends Exception {
 

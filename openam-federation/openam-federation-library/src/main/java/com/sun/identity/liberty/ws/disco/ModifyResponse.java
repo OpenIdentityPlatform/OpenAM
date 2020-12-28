@@ -65,7 +65,7 @@ import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class ModifyResponse {
 

@@ -35,7 +35,7 @@ package com.sun.identity.saml.assertion;
  * elements must use <code>xsi:type</code> attribute to indicate the derived
  * type.
  *
- *@supported.all.api
+ *
  */
 public abstract class Statement {
     /**

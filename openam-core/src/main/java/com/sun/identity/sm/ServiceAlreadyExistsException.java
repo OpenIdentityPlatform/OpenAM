@@ -35,7 +35,7 @@ package com.sun.identity.sm;
  * @see java.lang.Exception
  * @see java.lang.Throwable
  *
- * @supported.all.api
+ * 
  */
 public class ServiceAlreadyExistsException extends SMSException {
 

@@ -30,7 +30,7 @@ import java.util.Set;
  * determine its hierarchy during policy evaluation and
  * also its display in the GUI. A class that implements
  * this interface must have a empty constructor.
- * @supported.all.api
+ * 
  * @param <T> The type that the compare method is going to return instances of.
  * @param <E> The exception type thrown by the canonicalize method.
  */

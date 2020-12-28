@@ -53,7 +53,7 @@ import javax.servlet.http.HttpServletRequest;
  * This class has methods for obtaining all the parts inside such
  * a header.
  *
- * @supported.all.api
+ * 
  */
 public class PAOSHeader {
 

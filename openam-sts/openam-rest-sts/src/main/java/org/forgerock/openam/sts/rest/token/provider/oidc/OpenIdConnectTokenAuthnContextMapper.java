@@ -28,7 +28,7 @@ import org.forgerock.openam.sts.TokenTypeId;
  * state associated with the published sts, and that class will be consulted to provide the value of the acr claim corresponding
  * to the input token state.
  *
- * @supported.all.api
+ * 
  */
 public interface OpenIdConnectTokenAuthnContextMapper {
     /**

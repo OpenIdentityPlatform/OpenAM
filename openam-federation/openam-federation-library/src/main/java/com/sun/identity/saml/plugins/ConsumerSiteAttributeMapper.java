@@ -46,7 +46,7 @@ import java.util.List;
  * the implementation class are configured at the <code>Partner URLs</code>
  * field in SAML service.
  *
- * @supported.all.api
+ * 
  */
 public interface ConsumerSiteAttributeMapper {
 

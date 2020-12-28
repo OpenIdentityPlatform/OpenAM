@@ -38,7 +38,7 @@ import com.sun.identity.liberty.ws.soapbinding.Message;
  * for different SASL mechanisms to authenticate. Each SASL mechanism
  * will correspond to one handler implementation which processes incoming
  * SASL request and generates SASL response.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

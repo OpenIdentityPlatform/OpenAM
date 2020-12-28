@@ -72,7 +72,7 @@ import java.util.concurrent.TimeUnit;
  *
  * </PRE>
  *
- * @supported.all.api
+ * 
  */
 public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     public static final String AMADMIN_MODE = "com.sun.identity.security.amadmin";

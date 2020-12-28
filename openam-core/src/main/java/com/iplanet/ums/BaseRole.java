@@ -43,7 +43,7 @@ import org.forgerock.opendj.ldap.ModificationType;
 /**
  * Abstract base class for all roles.
  *
- * @supported.api
+ * 
  */
 public abstract class BaseRole extends PersistentObject implements IRole {
     private static Debug debug;
@@ -78,7 +78,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
      * @see com.iplanet.ums.PersistentObject#PersistentObject(CreationTemplate
      *      template, AttrSet attrSet)
      *
-     * @supported.api
+     * 
      */
     public BaseRole(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -95,7 +95,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
      * @exception UMSException
      *                on failure to read object for guid
      *
-     * @supported.api
+     * 
      */
     public boolean hasMember(PersistentObject po) throws UMSException {
         boolean hasTheMember = false;
@@ -114,7 +114,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
      * 
      * @return AccessRightObject associated with the role
      *
-     * @supported.api
+     * 
      */
     public AccessRightObject getAccessRight() throws UMSException,
             ACIParseException {
@@ -181,7 +181,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
      * @param accessRight
      *            New access right to be set to the role
      *
-     * @supported.api
+     * 
      */
     public void newAccessRight(AccessRightObject accessRight)
             throws UMSException, ACIParseException {

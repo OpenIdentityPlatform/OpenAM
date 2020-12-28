@@ -33,7 +33,7 @@ package com.iplanet.ums;
  * IMembership by adding support for adding and removing members.
  * 
  * @see com.iplanet.ums.IMembership
- * @supported.api
+ * 
  */
 public interface IDynamicMembership extends IMembership {
 
@@ -43,7 +43,7 @@ public interface IDynamicMembership extends IMembership {
      * @param filter
      *            search filter for evaluating members of the group
      *
-     * @supported.api
+     * 
      */
     public void setSearchFilter(String filter);
 
@@ -52,7 +52,7 @@ public interface IDynamicMembership extends IMembership {
      * 
      * @return search filter for evaluating members of the group
      *
-     * @supported.api
+     * 
      */
     public String getSearchFilter();
 
@@ -61,7 +61,7 @@ public interface IDynamicMembership extends IMembership {
      * 
      * @param baseGuid Search base for evaluating members of the group.
      *
-     * @supported.api
+     * 
      */
     public void setSearchBase(Guid baseGuid);
 
@@ -70,7 +70,7 @@ public interface IDynamicMembership extends IMembership {
      * 
      * @return search base for evaluating members of the group
      *
-     * @supported.api
+     * 
      */
     public Guid getSearchBase();
 
@@ -81,7 +81,7 @@ public interface IDynamicMembership extends IMembership {
      *        the <code>LDAPv2</code> scopes: <code>SCOPE_BASE</code>,
      *        <code>SCOPE_ONE</code>, or <code>SCOPE_SUB</code>.
      *
-     * @supported.api
+     * 
      */
     public void setSearchScope(int scope);
 
@@ -90,7 +90,7 @@ public interface IDynamicMembership extends IMembership {
      * 
      * @return search scope for evaluating members of the group
      *
-     * @supported.api
+     * 
      */
     public int getSearchScope();
 }

@@ -68,7 +68,7 @@ import org.w3c.dom.Element;
  * The <code>Client</code> class provides web service clients with a method to
  * send requests using SOAP connection to web service servers.
  *
- * @supported.all.api
+ * 
  */
 public class Client {
 

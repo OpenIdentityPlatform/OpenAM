@@ -41,7 +41,7 @@ package com.iplanet.sso;
  * <li><code>SSO_TOKEN_PROPERTY_CHANGED</code>
  * </ul>
  *
- * @supported.all.api
+ * 
  */
 public interface SSOTokenEvent {
     /**

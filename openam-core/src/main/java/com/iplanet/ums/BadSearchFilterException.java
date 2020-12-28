@@ -31,7 +31,7 @@ package com.iplanet.ums;
 /**
  * Exception for invalid search filter.
  *
- * @supported.all.api
+ * 
  */
 public class BadSearchFilterException extends UMSException {
     /**

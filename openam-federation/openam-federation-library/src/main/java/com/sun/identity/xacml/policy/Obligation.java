@@ -37,7 +37,7 @@ import java.util.List;
  * The <code>Obligation</code> element is a container of 
  * one or more <code>AttributeAssignment</code>s issuded by 
  * authorization authority.
- * @supported.all.api
+ * 
  */
 public interface Obligation {
 

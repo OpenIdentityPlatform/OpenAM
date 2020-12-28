@@ -44,7 +44,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *     or affiliation of providers. This attribute provides an additional
  *     means to federate identifiers on the basis of the relying party
  *     or parties.
- *  @supported.all.api
+ *  
  */
 public interface BaseIDAbstract {
 

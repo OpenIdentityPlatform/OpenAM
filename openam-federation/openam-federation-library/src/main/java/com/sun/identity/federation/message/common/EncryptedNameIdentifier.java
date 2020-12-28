@@ -54,7 +54,7 @@ import org.w3c.dom.Node;
  * This class <code>EncryptedNameIdentifier</code> represents a
  * <code>EncryptableNameIdentifier</code> in an encrypted form.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

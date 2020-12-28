@@ -38,7 +38,7 @@ import com.sun.identity.saml.common.SAMLException;
  * that is implemented to map user account to name identifier in
  * assertion subject in OpenAM.
  *
- * @supported.all.api
+ * 
  */
 public interface NameIdentifierMapper {
 

@@ -44,7 +44,7 @@ import com.sun.identity.saml2.protocol.impl.SessionIndexImpl;
  * &lt;element name="SessionIndex" type="{http://www.w3.org/2001/XMLSchema}string"/>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

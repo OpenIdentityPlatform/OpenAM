@@ -40,7 +40,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcException;
  * The <code>Parameter</code> class represents 'Parameter' element in
  * 'Transform' element in 'PasswordTransforms' element defined in
  * Authentication Service schema.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -57,7 +57,7 @@ import org.w3c.dom.NodeList;
  * to another system entity. It is supplied to a relying party to support policy
  * enforcement.
  *
- * @supported.all.api
+ * 
  */
 public class SessionContext {
 

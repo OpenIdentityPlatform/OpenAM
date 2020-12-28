@@ -17,6 +17,6 @@
 /**
  * This package contains classes defining OpenId Connect Token generation and claim mapping.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts.tokengeneration.oidc;

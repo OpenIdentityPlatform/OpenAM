@@ -29,7 +29,7 @@
 /**
  * Provides classes to manage Liberty SOAP Binding.
  *
- * @supported.all.api
+ * 
  */
 package com.sun.identity.liberty.ws.soapbinding;
 

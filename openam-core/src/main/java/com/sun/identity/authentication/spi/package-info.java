@@ -41,7 +41,7 @@
  * <p>
  * Provides an interface to receive notifications of a user status change after
  * successful password reset or after account lockout (memory).
- * @supported.api
+ * 
  */
 
 package com.sun.identity.authentication.spi;

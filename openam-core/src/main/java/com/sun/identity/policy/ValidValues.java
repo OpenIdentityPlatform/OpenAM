@@ -38,7 +38,7 @@ import java.util.*;
  * code indicating if the search was successfully or time limit exceeded or
  * search limit exceeded.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

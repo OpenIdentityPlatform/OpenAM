@@ -43,7 +43,7 @@ import com.sun.identity.saml2.protocol.AttributeQuery;
  * AttributeAuthorityMapper uses an attribute on the HttpServletRequest to
  * pass information to the AttributeQueryUtil.
  *
- * @supported.all.api
+ * 
  */ 
 public interface AttributeAuthorityMapper {
 

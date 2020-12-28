@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * conditions.
  *
  * @author Steve Ferris steve.ferris@forgerock.com
- * @supported.all.api
+ * 
  */
 public class PrivilegeEvaluatorContext implements Serializable {
     private String realm;

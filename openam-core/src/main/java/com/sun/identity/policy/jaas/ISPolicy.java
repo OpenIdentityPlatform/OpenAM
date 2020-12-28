@@ -72,7 +72,7 @@ import java.util.Enumeration;
  *
  * @see java.security.ProtectionDomain
  * @see java.security.PermissionCollection
- * @supported.all.api
+ * 
  */
 public class ISPolicy extends java.security.Policy {
 

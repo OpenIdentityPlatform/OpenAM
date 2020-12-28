@@ -29,7 +29,7 @@
 /**
  * Defines Federation Adapter for Service Provider.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.federation.plugins;

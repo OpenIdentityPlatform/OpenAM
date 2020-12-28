@@ -44,7 +44,7 @@ import java.util.Set;
  * &lt;element name="NewEncryptedID" type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

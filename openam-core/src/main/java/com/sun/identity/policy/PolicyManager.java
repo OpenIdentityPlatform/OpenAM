@@ -94,7 +94,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * of this class must have valid <code>SSOToken</code>
  * and privileges to the backend datastore.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -102,14 +102,14 @@ public final class PolicyManager {
 
     /**
      * The service name for Policy component.
-     * @supported.api
+     * 
      */
     public static final String POLICY_SERVICE_NAME = "iPlanetAMPolicyService";
     public static final String POLICY_DEBUG_NAME = "amPolicy";
     
     /**
      * The key for the plugins to get the organization name.
-     * @supported.api
+     * 
      */
     public static final String ORGANIZATION_NAME = "OrganizationName";
     public static final String DELEGATION_REALM = 
@@ -211,7 +211,7 @@ public final class PolicyManager {
      * @throws SSOException invalid or expired single-sign-on token
      * @throws PolicyException for any other abnormal condition
      *  
-     * @supported.api
+     * 
      */
     public PolicyManager(SSOToken token) throws SSOException, PolicyException {
         this(token, "");
@@ -245,7 +245,7 @@ public final class PolicyManager {
      *          sub-organization or container name is not present
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public PolicyManager(SSOToken token, String name)
         throws SSOException, NameNotFoundException, PolicyException {
@@ -291,7 +291,7 @@ public final class PolicyManager {
      * @return organization name for which the policy manager was
      *           instantiated
      *
-     * @supported.api
+     * 
      */
     public String getOrganizationName() {
         return (givenOrgName);
@@ -346,7 +346,7 @@ public final class PolicyManager {
      *          privileges to get policy names
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public Set getPolicyNames() throws SSOException, NoPermissionException,
         PolicyException {
@@ -372,7 +372,7 @@ public final class PolicyManager {
      *          privileges to get policy names
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public Set getPolicyNames(String pattern) throws SSOException,
         NoPermissionException, PolicyException {
@@ -454,7 +454,7 @@ public final class PolicyManager {
      * @throws PolicyException for any other abnormal condition.
      *
      *
-     * @supported.api
+     * 
      */
     public Policy getPolicy(String policyName) throws SSOException,
             NoPermissionException, InvalidFormatException, 
@@ -562,7 +562,7 @@ public final class PolicyManager {
      * name already exists
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public void addPolicy(Policy policy) throws SSOException,
             NameAlreadyExistsException, NoPermissionException,
@@ -675,7 +675,7 @@ public final class PolicyManager {
      * data store has been corrupted or does not have a valid format
      * @throws PolicyException for any other abnormal condition.
      *
-     * @supported.api
+     * 
      */
     public void replacePolicy(Policy policy) throws SSOException,
         NameNotFoundException, NoPermissionException,
@@ -811,7 +811,7 @@ public final class PolicyManager {
      * privileges to remove policies
      * @throws PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      */
     public void removePolicy(String policyName) throws
         SSOException, NoPermissionException, PolicyException {
@@ -892,7 +892,7 @@ public final class PolicyManager {
      *
      * @return <code>ResourceManager</code> object
      *
-     * @supported.api
+     * 
      */    
     public ResourceManager getResourceManager() {
         return rm;
@@ -904,7 +904,7 @@ public final class PolicyManager {
      *
      * @return <code>SubjectTypeManager</code> object
      *
-     * @supported.api
+     * 
      */    
     public SubjectTypeManager getSubjectTypeManager() {
         if (stm == null) {
@@ -919,7 +919,7 @@ public final class PolicyManager {
      *
      * @return <code>ConditionTypeManager</code> object
      *
-     * @supported.api
+     * 
      */    
     public ConditionTypeManager getConditionTypeManager() {
         if (ctm == null) {
@@ -1145,7 +1145,7 @@ public final class PolicyManager {
      *
      * @return <code>ReferralTypeManager</code> associated with this 
      * policy manager.
-     * @supported.api
+     * 
      */
     public ReferralTypeManager getReferralTypeManager() {
         if ( rtm == null ) {

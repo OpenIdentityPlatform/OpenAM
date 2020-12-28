@@ -51,7 +51,7 @@ import java.util.logging.Level;
  * <pre>
  * http://java.sun.com/j2se/1.4.1/docs/api/java/util/logging/LogRecord.html
  * </pre>
- * @supported.api
+ * 
  */
 public class LogRecord extends java.util.logging.LogRecord
     implements ILogRecord
@@ -66,7 +66,7 @@ public class LogRecord extends java.util.logging.LogRecord
      * @param level The log Level
      * @param msg The message string
      *
-     * @supported.api
+     * 
      */
     public LogRecord(Level level, String msg) {
         super(level,msg);
@@ -80,7 +80,7 @@ public class LogRecord extends java.util.logging.LogRecord
      * @param msg The message string.
      * @param token The single sign-on token which will be used to fill in
      *        details like client IP address into the <code>LogRecord</code>.
-     * @supported.api
+     * 
      */
     public LogRecord(Level level, String msg, Object token) {
         this(level,msg);
@@ -162,7 +162,7 @@ public class LogRecord extends java.util.logging.LogRecord
      *        this piece of info is supposed to be added to the log string
      *        according to the selected log fields.
      * @param value The value which may form a part of the actual log-string.
-     * @supported.api
+     * 
      */
     public void addLogInfo(String key,Object value) {
         logInfoMap.put(key,value);
@@ -185,7 +185,7 @@ public class LogRecord extends java.util.logging.LogRecord
      * Convenience method to set the log information map.
      *
      * @param logInfoMap Handler to the map which contains the log info
-     * @supported.api
+     * 
      */
     public void setLogInfoMap(Map logInfoMap) {
         this.logInfoMap = logInfoMap;
@@ -195,7 +195,7 @@ public class LogRecord extends java.util.logging.LogRecord
      * their corresponding values.
      *
      * @return The log information map.
-     * @supported.api
+     * 
      */
     public Map getLogInfoMap() {
         return logInfoMap;

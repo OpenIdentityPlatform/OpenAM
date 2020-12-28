@@ -49,7 +49,7 @@ import java.util.Iterator;
  *
  * This class is an abstract base class for all Evidence implementations and
  * encapsulates common functionality.
- *@supported.all.api
+ *
  */
 public abstract class EvidenceBase  {
     static SAMLConstants sc;

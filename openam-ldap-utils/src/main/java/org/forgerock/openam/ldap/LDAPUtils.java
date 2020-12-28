@@ -69,7 +69,7 @@ import org.forgerock.util.time.Duration;
  * can prioritize manually (if the logic differs from this implementation) and create the corresponding {@link LDAPURL}
  * objects, or you can pass in the list to the newPrioritized* methods.
  *
- * @supported.all.api
+ * 
  */
 public final class LDAPUtils {
 

@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList;
  * This class <code>AuthnContext</code> represents an Authentication Context
  * for the authenticated user with a requested authn context.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

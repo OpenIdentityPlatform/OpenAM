@@ -39,7 +39,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  such as <code>Subject</code> and <code>SubjectConfirmation</code>
  *  elements, and in various protocol messages.
  *
- *  @supported.all.api  
+ *    
  */
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, defaultImpl = NameIDImpl.class)
 public interface NameID extends NameIDType {

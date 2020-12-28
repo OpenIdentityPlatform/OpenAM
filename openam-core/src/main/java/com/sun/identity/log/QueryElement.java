@@ -33,7 +33,7 @@ package com.sun.identity.log;
  * It stores field name, value and relationship between them.
  * Currently it supports Equal, Not Equal, Greater Than, Lesser Than,
  * Greater Than Or Equal and Lesser Than Or Equal relationships.
- * @supported.all.api
+ * 
  */
 public class QueryElement {
     /**

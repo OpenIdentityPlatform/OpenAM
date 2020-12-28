@@ -56,7 +56,7 @@ import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
  * This class keeps track of all the logger objects and does all the
  * bookkeeping work. It is extended from JDK's <code>LogManager</code> to add
  * functionalities, such as adding our logger listening to DS changes, etc.
- * @supported.all.api
+ * 
  */
 public class LogManager extends java.util.logging.LogManager {
 

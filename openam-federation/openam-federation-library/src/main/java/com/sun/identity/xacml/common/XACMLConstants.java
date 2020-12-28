@@ -31,7 +31,7 @@ package com.sun.identity.xacml.common;
 /**
  * This interface  defines constants common to all XACML elements.
  *
- * @supported.all.api
+ * 
  */
 public class  XACMLConstants {
       

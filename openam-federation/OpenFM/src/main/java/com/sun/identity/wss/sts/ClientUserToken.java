@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
  * Token Service configuration (via Admin Console) for server side and in 
  * client's AMConfig.properties for client side.
  * 
- * @supported.all.api
+ * 
  */
 public interface ClientUserToken extends Token {
     

@@ -36,7 +36,7 @@ import java.util.logging.Level;
  * the Federation Framework to write federation related
  * events and errors to the access and error log files.
  *
- * @supported.all.api
+ * 
  */
 
 public interface Logger {

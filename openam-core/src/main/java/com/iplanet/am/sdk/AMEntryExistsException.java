@@ -41,7 +41,7 @@ import com.iplanet.ums.UMSException;
  * @see AMException
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public class AMEntryExistsException extends AMException {
 

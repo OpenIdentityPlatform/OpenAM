@@ -35,7 +35,7 @@ import com.iplanet.sso.SSOToken;
  * don't run lengthy operations.
  *
  * @author Peter Major
- * @supported.all.api
+ * 
  */
 public interface SessionTimeoutHandler {
 

@@ -40,7 +40,7 @@ import com.sun.identity.saml2.protocol.impl.AuthnRequestImpl;
  *  The <code>AuthnRequest</code> interface defines methods for properties
  *  required by an authentication request.
  *
- *  @supported.all.api
+ *  
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

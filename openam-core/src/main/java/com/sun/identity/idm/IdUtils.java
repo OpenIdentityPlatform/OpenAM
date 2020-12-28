@@ -71,7 +71,7 @@ import org.forgerock.opendj.ldap.DN;
  * The class defines some static utilities used by other components like policy
  * and auth
  *
- * @supported.api
+ * 
  */
 public final class IdUtils {
     private static Debug debug = AMIdentityRepository.debug;
@@ -212,7 +212,7 @@ public final class IdUtils {
     }
 
     /**
-     * @supported.api 
+     *  
      * Returns a handle of the Identity object based on
      * the SSO Token passed in (<code>AMIdentity</code> object of the user
      * who is authenticated).
@@ -235,7 +235,7 @@ public final class IdUtils {
     }
 
     /**
-     * @supported.api
+     * 
      * 
      * Returns a string which uniquely represents this identity object.
      * 
@@ -249,7 +249,7 @@ public final class IdUtils {
     }
 
     /**
-     * @supported.api 
+     *  
      * 
      * Returns an <code>AMIdentity</code> object, if provided with a string 
      * identifier for the object.

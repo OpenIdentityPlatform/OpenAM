@@ -61,7 +61,7 @@ import com.sun.identity.saml2.protocol.impl.ManageNameIDRequestImpl;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
         defaultImpl = ManageNameIDRequestImpl.class)

@@ -29,6 +29,6 @@
 /**
  * Defines common WS-Federation utilities and constants.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wsfederation.common;

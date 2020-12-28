@@ -34,7 +34,7 @@ package com.sun.identity.policy;
  * The class <code>ResourceMatch</code> defines the results
  * of a resource match with respect to Policy.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

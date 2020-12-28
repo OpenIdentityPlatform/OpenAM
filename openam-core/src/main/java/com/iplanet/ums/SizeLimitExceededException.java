@@ -31,7 +31,7 @@ package com.iplanet.ums;
 /**
  * This exception will be thrown when the size limit has been exceeded during
  * search operations.
- * @supported.all.api
+ * 
  */
 public class SizeLimitExceededException extends UMSException {
     /**

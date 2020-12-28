@@ -38,7 +38,7 @@ import com.iplanet.am.util.Cache;
  * Factory class used to get ProxyPolicyEvaluator instances. 
  * This is a singleton.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

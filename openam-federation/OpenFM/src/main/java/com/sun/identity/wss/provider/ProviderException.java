@@ -32,7 +32,7 @@ package com.sun.identity.wss.provider;
  * This class <code>ProviderException</code> represents the Exception
  * that can be thrown for any errors in accessing any provider configuration 
  * (Web Services Client, Web Services Provider, STS client or Discovery client).
- * @supported.all.api
+ * 
  */
 
 public class ProviderException extends Exception {

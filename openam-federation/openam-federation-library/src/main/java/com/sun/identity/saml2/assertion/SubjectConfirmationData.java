@@ -40,7 +40,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  relationship between an entity presenting the assertion and the 
  *  subject of the assertion's claims.
  *
- *  @supported.all.api
+ *  
  */
 public interface SubjectConfirmationData {
 

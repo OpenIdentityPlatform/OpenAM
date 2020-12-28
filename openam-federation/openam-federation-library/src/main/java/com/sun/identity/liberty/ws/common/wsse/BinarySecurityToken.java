@@ -77,7 +77,7 @@ import com.sun.identity.liberty.ws.soapbinding.Utils;
  * &lt;/xsd:complexType>
  * </pre>
  * 
- * @supported.api
+ * 
  */
 public class BinarySecurityToken {
 
@@ -115,7 +115,7 @@ public class BinarySecurityToken {
      * @param valueType type of the value
      * @param encodingType encoding type of the value
      * @exception Exception if any input parameter is null
-     * @supported.api
+     * 
      */
     public BinarySecurityToken (String value,
                                 QName valueType,
@@ -138,7 +138,7 @@ public class BinarySecurityToken {
      * @param token Binary Security Token Element
      * @exception Exception if token Element is not a valid binary 
      *     security token 
-     * @supported.api
+     * 
      */
     public BinarySecurityToken(Element token) 
         throws Exception {
@@ -259,7 +259,7 @@ public class BinarySecurityToken {
      * Gets encoding type for the token.
      *
      * @return encoding type for the token. 
-     * @supported.api
+     * 
      */
     public QName getEncodingType() {
         return encodingType;
@@ -269,7 +269,7 @@ public class BinarySecurityToken {
      * Gets value type for the token.
      *
      * @return value type for the token. 
-     * @supported.api
+     * 
      */
     public QName getValueType() {
         return valueType;
@@ -279,7 +279,7 @@ public class BinarySecurityToken {
      * Gets id attribute for the tokens.
      *
      * @return id attribute for the token.
-     * @supported.api
+     * 
      */
     public String getId() {
         return id;
@@ -289,7 +289,7 @@ public class BinarySecurityToken {
      * Gets value of the token.
      *
      * @return value of the token.
-     * @supported.api
+     * 
      */
     public String getTokenValue() { 
         return value;
@@ -298,7 +298,7 @@ public class BinarySecurityToken {
     /**
      * Returns a String representation of the token.
      * @return A string containing the valid XML for this element
-     * @supported.api
+     * 
      */
     public String toString() {
         if (xmlString == null) {
@@ -333,7 +333,7 @@ public class BinarySecurityToken {
     /**
      * The <code>X509V3</code> value type indicates that
      * the value name given corresponds to a X509 Certificate.
-     * @supported.api
+     * 
      */
     public static final QName X509V3 = new QName("X509v3");
 
@@ -353,7 +353,7 @@ public class BinarySecurityToken {
      * The <code>PKCS7</code> value type indicates
      * that the value name given corresponds to a
      * PKCS7 object.
-     * @supported.api
+     * 
      */
     public static final QName PKCS7 = new QName("PKCS7");
 
@@ -361,7 +361,7 @@ public class BinarySecurityToken {
      * The <code>PKIPATH</code> value type indicates
      * that the value name given corresponds to a
      * PKI Path object.
-     * @supported.api
+     * 
      */
     public static final QName PKIPath = new QName("PKIPath");
 
@@ -379,7 +379,7 @@ public class BinarySecurityToken {
     /** 
      * The <code>BASE64BINARY</code> encoding type indicates that the encoding
      * name given corresponds to base64 encoding of a binary value.
-     * @supported.api
+     * 
      */
     public static final QName BASE64BINARY = new QName("Base64Binary");
         
@@ -387,7 +387,7 @@ public class BinarySecurityToken {
      * The <code>HEXBINARY</code> encoding type indicates that
      * the encoding name given corresponds to Hex encoding of
      * a binary value.
-     * @supported.api
+     * 
      */
     public static final QName HEXBINARY = new QName("HexBinary");
         

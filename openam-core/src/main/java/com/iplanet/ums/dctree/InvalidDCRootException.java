@@ -34,7 +34,7 @@ import com.iplanet.ums.UMSException;
  * Exception occurs when root of DCTree are not defined for DCTree to function
  * properly.
  *
- * @supported.all.api
+ * 
  */
 public class InvalidDCRootException extends UMSException {
 

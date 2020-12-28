@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Represents forgotten password console configuration.
  *
- * @supported.all.api
+ * 
  * @since 13.0.0
  */
 public final class ForgottenPasswordConsoleConfig extends CommonConsoleConfig {

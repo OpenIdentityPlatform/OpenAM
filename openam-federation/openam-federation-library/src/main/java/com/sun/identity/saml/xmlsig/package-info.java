@@ -29,7 +29,7 @@
 /**
  * Defines KeyProvider interface and default implementation class.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml.xmlsig;
 

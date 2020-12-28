@@ -40,7 +40,7 @@ import java.util.List;
  * of all of the statements in the assertion. It contains an identifier,
  * a series of one or more subject confirmations, or both.
  *
- * @supported.all.api
+ * 
  */
 @JsonDeserialize(as=SubjectImpl.class)
 public interface Subject {

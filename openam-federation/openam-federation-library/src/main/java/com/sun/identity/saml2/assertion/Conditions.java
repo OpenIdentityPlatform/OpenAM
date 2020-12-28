@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * The <code>Conditions</code> defines the SAML constructs that place
  * constraints on the acceptable use if SAML <code>Assertion</code>s.
- * @supported.all.api
+ * 
  */
 @JsonDeserialize(as=ConditionsImpl.class)
 public interface Conditions {

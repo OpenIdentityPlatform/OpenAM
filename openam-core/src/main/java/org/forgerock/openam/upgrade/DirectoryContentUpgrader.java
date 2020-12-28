@@ -105,7 +105,7 @@ public class DirectoryContentUpgrader {
 
     /**
      * This constructor will initialize the different directory content upgraders and ensures that each of them are
-     * actually applicable. At the end this upgrader will have a list of {@link Upgrader}s that needs to be executed.
+     * actually applicable. At the end this upgrader will have a list of Upgraders that needs to be executed.
      *
      * @param baseDir The base directory of OpenAM (where the configuration can be found).
      * @param baseDN The base DN of the configuration store.

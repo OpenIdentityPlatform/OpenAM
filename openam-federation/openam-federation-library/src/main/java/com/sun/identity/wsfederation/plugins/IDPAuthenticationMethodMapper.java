@@ -41,7 +41,7 @@ import com.sun.identity.wsfederation.common.WSFederationException;
  * the authentication mechaism and set the AuthnContext in the Assertion.
  * 
  * 
- * @supported.all.api 
+ *  
  */ 
 
 public interface IDPAuthenticationMethodMapper {

@@ -60,7 +60,7 @@ import com.iplanet.services.util.Crypt;
  * 
  * </PRE>
  *
- * @supported.all.api
+ * 
  */
 public class EncodeAction implements PrivilegedAction<String> {
     protected String value;

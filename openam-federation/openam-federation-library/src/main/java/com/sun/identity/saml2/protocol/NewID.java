@@ -40,7 +40,7 @@ import java.security.Key;
  * This interface identifies the new identifier in an 
  * <code>ManageNameIDRequest</code> message.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

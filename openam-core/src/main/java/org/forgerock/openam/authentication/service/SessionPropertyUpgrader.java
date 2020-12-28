@@ -40,7 +40,7 @@ import java.util.Set;
  * to override {@link #updateProperty(com.iplanet.dpro.session.service.InternalSession,
  * java.lang.String, java.lang.String)} method.
  *
- * @supported.all.api
+ * 
  */
 public abstract class SessionPropertyUpgrader {
 

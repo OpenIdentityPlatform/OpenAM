@@ -38,7 +38,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * This interface <code>AssertonIDRequestMapper</code> is used by asseriton
  * ID request service to process assertion ID request.
  *
- * @supported.all.api
+ * 
  */ 
 public interface AssertionIDRequestMapper {
 

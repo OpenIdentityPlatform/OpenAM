@@ -36,7 +36,7 @@ import com.sun.identity.policy.PolicyException;
  * Exception thrown if Application <code>SSOToken</code> is invalid.
  * Application SSO Token is used while communicating with policy service 
  * as a means of authenticating the client Policy Enforcement Point
- * @supported.all.api
+ * 
  */
 public class InvalidAppSSOTokenException extends PolicyException {
 
