@@ -277,7 +277,7 @@
         <!-- Disable Doclint on JDK8+ -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
         <!-- Surefire Argument Line -->
-        <java.surefire.options>-Xms256m -Xmx256m</java.surefire.options>
+        <java.surefire.options>-Xmx1g</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
       </properties>

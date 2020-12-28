@@ -324,10 +324,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     private void dirtyCache(String dn) {
         String key = DNUtils.normalizeDN(dn);
-        IdCacheBlock cb = getFromCache(key);
-        if (cb != null) {
-            cb.clear();
-        }
+       	idRepoCache.invalidate(key);
     }
 
     public Map getAttributes(SSOToken token, IdType type, String name,
