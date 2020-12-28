@@ -25,6 +25,8 @@
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * 
+ * Portions Copyrighted 2020 Open Identity Platform Community.
  */
 package com.sun.identity.shared;
 
@@ -347,6 +349,11 @@ public interface Constants {
      * Property name for maximum size of the internal session cache.
      */
     String AM_SESSION_MAX_CACHE_SIZE = "org.forgerock.openam.session.service.access.persistence.caching.maxsize";
+    
+    /**
+     * Property name for maximum lifetime of the internal session cache.
+     */
+    String AM_SESSION_MAX_CACHE_TIME = "org.openidentityplatform.openam.session.service.access.persistence.caching.maxtime";
 
     /**
      * Property string for security provider package.
