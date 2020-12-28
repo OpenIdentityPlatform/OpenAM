@@ -92,7 +92,7 @@ public class SessionModificationWatcher implements SetupListener {
 
         @Override
         public void objectChanged(String tokenId, Map<String, Attribute> changeSet, ChangeType changeType) {
-            if (changeType != ChangeType.ADD) {
+            if (changeType == ChangeType.DELETE) {
                 SessionID sessionID = new SessionID(
                         changeSet.get(SessionTokenField.SESSION_ID.getField().toString()).firstValue().toString());
                 for (SessionModificationListener listener : listeners) {

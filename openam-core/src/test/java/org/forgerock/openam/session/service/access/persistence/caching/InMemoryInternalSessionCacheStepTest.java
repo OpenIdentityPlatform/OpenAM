@@ -132,7 +132,7 @@ public class InMemoryInternalSessionCacheStepTest {
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
     }
 
-    @Test @Ignore
+    @Test
     public void shouldRemoveOnSessionChangedEvent() throws Exception {
         testCache.store(mockSession, mockStore);
 

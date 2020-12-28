@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.session.service.access.persistence.caching;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +32,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.base.Throwables;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
-import com.google.common.cache.Weigher;
-import com.google.common.collect.ImmutableMap;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreStep;
@@ -46,6 +41,12 @@ import org.forgerock.openam.session.service.access.persistence.watchers.SessionM
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.Weigher;
+import com.google.common.collect.ImmutableMap;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -77,7 +78,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         watcher.addListener(new SessionModificationListener() {
             @Override
             public void sessionChanged(SessionID sessionID) {
-                //invalidateCache(sessionID);
+                invalidateCache(sessionID);
             }
         });
     }
@@ -247,6 +248,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
                     .softValues()
+                    .expireAfterWrite(Duration.ofMinutes(1))
                     .build();
     }
 
