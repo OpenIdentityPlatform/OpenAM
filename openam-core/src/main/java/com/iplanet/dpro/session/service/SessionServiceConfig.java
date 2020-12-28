@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2020 Open Identity Platform Community.
  */
 
 package com.iplanet.dpro.session.service;
