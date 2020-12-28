@@ -52,8 +52,6 @@ import com.google.common.collect.ImmutableMap;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -252,7 +250,6 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .concurrencyLevel(16)
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
-                    .softValues()
                     .expireAfterWrite(Duration.ofMinutes(maxCacheTime))
                     .build();
     }
