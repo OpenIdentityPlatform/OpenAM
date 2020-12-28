@@ -51,6 +51,7 @@ import com.sun.identity.shared.debug.Debug;
 
 public class InMemoryInternalSessionCacheStepTest {
     private static final int MAX_SESSIONS = 42;
+    private static final long MAX_TIME = 1;
     private static final SessionID SESSION_ID = new SessionID("test");
 
     @Mock
@@ -75,6 +76,7 @@ public class InMemoryInternalSessionCacheStepTest {
     public void createTestCache() throws Exception {
         MockitoAnnotations.initMocks(this);
         given(mockSessionConfig.getMaxSessionCacheSize()).willReturn(MAX_SESSIONS);
+        given(mockSessionConfig.getMaxSessionCacheTime()).willReturn(MAX_TIME);
         given(mockSession.getID()).willReturn(SESSION_ID);
 
         setupMockCTSToCaptureQueryListener(mockSessionModificationWatcher);

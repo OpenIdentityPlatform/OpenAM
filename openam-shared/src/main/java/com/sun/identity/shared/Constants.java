@@ -347,6 +347,11 @@ public interface Constants {
      * Property name for maximum size of the internal session cache.
      */
     String AM_SESSION_MAX_CACHE_SIZE = "org.forgerock.openam.session.service.access.persistence.caching.maxsize";
+    
+    /**
+     * Property name for maximum lifetime of the internal session cache.
+     */
+    String AM_SESSION_MAX_CACHE_TIME = "org.forgerock.openam.session.service.access.persistence.caching.maxtime";
 
     /**
      * Property string for security provider package.

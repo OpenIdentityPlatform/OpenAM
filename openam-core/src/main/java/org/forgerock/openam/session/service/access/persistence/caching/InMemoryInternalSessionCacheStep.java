@@ -50,6 +50,8 @@ import com.google.common.collect.ImmutableMap;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -71,8 +73,9 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                                      @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
                                      SessionModificationWatcher watcher) {
         final int maxCacheSize = sessionConfig.getMaxSessionCacheSize();
+        final long maxCacheTime = sessionConfig.getMaxSessionCacheTime();
         this.sessionConfig = sessionConfig;
-        this.cache = new AtomicStampedReference<>(buildCache(maxCacheSize), maxCacheSize);
+        this.cache = new AtomicStampedReference<>(buildCache(maxCacheSize, maxCacheTime), maxCacheSize);
         this.debug = sessionDebug;
 
         watcher.addListener(new SessionModificationListener() {
@@ -223,7 +226,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         if (oldCacheSize != newCacheSize) {
             debug.message("InMemoryInternalSessionCacheStep: Detected change in cache size configuration (old: {}, " +
                     "new: {}). Rebuilding cache", oldCacheSize, newCacheSize);
-            final Cache<String, InternalSession> newCache = buildCache(newCacheSize);
+            final Cache<String, InternalSession> newCache = buildCache(newCacheSize, sessionConfig.getMaxSessionCacheTime());
             if (this.cache.compareAndSet(currentCache, newCache, oldCacheSize, newCacheSize)) {
                 newCache.putAll(currentCache.asMap());
                 currentCache.invalidateAll();
@@ -239,7 +242,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         return currentCache;
     }
 
-    private static Cache<String, InternalSession> buildCache(final int maxCacheSize) {
+    private static Cache<String, InternalSession> buildCache(final int maxCacheSize, final long maxCacheTime) {
         if (maxCacheSize <= 0) {
             return EmptyCache.INSTANCE;
         }
@@ -248,7 +251,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
                     .softValues()
-                    .expireAfterWrite(Duration.ofMinutes(1))
+                    .expireAfterWrite(Duration.ofMinutes(maxCacheTime))
                     .build();
     }
 
