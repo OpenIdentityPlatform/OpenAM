@@ -99,7 +99,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
             final SignedJwt signedJwt = symmetricSign(openIdConnectToken, jwsAlgorithm, tokenConfig.getClientSecret());
             tokenString = signedJwt.build();
         } else if (JwsAlgorithmType.RSA.equals(jwsAlgorithmType)||JwsAlgorithmType.ECDSA.equals(jwsAlgorithmType)) {
-            final SignedJwt signedJwt = asymmetricSign(openIdConnectToken, jwsAlgorithm, getKeyPair(stsInstanceState.getOpenIdConnectTokenPKIProvider(),
+            final SignedJwt signedJwt = asymmetricSign(openIdConnectToken, jwsAlgorithm,tokenConfig.getSignatureKeyAlias(), getKeyPair(stsInstanceState.getOpenIdConnectTokenPKIProvider(),
                     tokenConfig.getSignatureKeyAlias(), tokenConfig.getSignatureKeyPassword()), determinePublicKeyReferenceType(tokenConfig));
             tokenString = signedJwt.build();
         } else {
@@ -219,7 +219,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         return builder.done().claims(claimsSet).asJwt();
     }
 
-    private SignedJwt asymmetricSign(STSOpenIdConnectToken openIdConnectToken, JwsAlgorithm jwsAlgorithm,
+    private SignedJwt asymmetricSign(STSOpenIdConnectToken openIdConnectToken, JwsAlgorithm jwsAlgorithm,String kid,
                                      KeyPair keyPair, OpenIdConnectTokenPublicKeyReferenceType publicKeyReferenceType) throws TokenCreationException {
         if (!JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())&!JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
             throw new TokenCreationException(ResourceException.BAD_REQUEST, "Exception in " +
@@ -228,7 +228,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         }
         final SigningHandler signingHandler = JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())?new SigningManager().newRsaSigningHandler(keyPair.getPrivate()):new SigningManager().newEcdsaSigningHandler((ECPrivateKey)keyPair.getPrivate());
 
-        final JwsHeaderBuilder jwsHeaderBuilder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm);
+        final JwsHeaderBuilder jwsHeaderBuilder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm).kid(kid);
         final JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(openIdConnectToken.asMap()).build();
 
         return jwsHeaderBuilder.done().claims(claimsSet).asJwt();
