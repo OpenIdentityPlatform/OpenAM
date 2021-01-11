@@ -30,6 +30,9 @@
 package com.sun.identity.session.util;
 
 import static org.forgerock.openam.session.SessionConstants.*;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -55,9 +58,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.AccessController;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
@@ -168,6 +173,10 @@ public class SessionUtils {
         return trustedSources.contains(source);
     }
 
+    final static Cache<String, String> key2encrypt=CacheBuilder.newBuilder()
+    		.expireAfterAccess(Duration.ofMinutes(15))
+    		.maximumSize(64000)
+    		.build();
     /**
      * Helper method to get the encrypted session storage key
      * 
@@ -178,15 +187,17 @@ public class SessionUtils {
      *             if anything goes wrong
      */
     public static String getEncryptedStorageKey(SessionID sessionID) throws Exception {
-
-        String sKey = sessionID.getExtension().getStorageKey();
+        final String sKey = sessionID.getExtension().getStorageKey();
         if (sKey == null){
             throw new SessionException("SessionUtils.getEncryptedStorageKey: StorageKey is null");
         }
         if (SESSION_ENCRYPTION) {
-            String strEncrypted = AccessController.doPrivileged(
-                    new EncodeAction(sKey, Crypt.getHardcodedKeyEncryptor()));
-            return strEncrypted;
+        	return key2encrypt.get(sKey, new Callable<String>() {
+				@Override
+				public String call() throws Exception {
+					return AccessController.doPrivileged(new EncodeAction(sKey, Crypt.getEncryptor()));
+				}
+			});
         }
         return sKey;
     }
