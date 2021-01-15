@@ -69,7 +69,7 @@ public class Server implements Runnable, Closeable {
 	                cassandraDaemon.activate();
 	                startupLatch.countDown();
 	            }});
-	        if (!startupLatch.await(60, TimeUnit.SECONDS)) {
+	        if (!startupLatch.await(5, TimeUnit.MINUTES)) {
                 throw new AssertionError("Cassandra daemon did not start within timeout");
             }
 	        System.setProperty("datastax-java-driver.basic.contact-points.0",DatabaseDescriptor.getRpcAddress().getHostAddress()+":"+DatabaseDescriptor.getNativeTransportPort());

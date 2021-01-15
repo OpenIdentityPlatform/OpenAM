@@ -40,7 +40,6 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -100,8 +99,8 @@ public class SessionAdapterTest {
         token.setUserId(mockUserId);
         token.setExpiryTimestamp(now);
         token.setBlob(mockByteData);
-        //token.setAttribute(SessionTokenField.SESSION_ID.getField(), mockSessionId);
-        //token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), mockSessionHandle);
+        token.setAttribute(SessionTokenField.SESSION_ID.getField(), mockSessionId);
+        token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), mockSessionHandle);
         token.setAttribute(SessionTokenField.SESSION_STATE.getField(), "VALID");
         token.setAttribute(SessionTokenField.REALM.getField(), "PRETTY_REALM");
         SessionAdapter.setDateAttributeFromMillis(token, SessionTokenField.MAX_SESSION_EXPIRATION_TIME, 0);
@@ -173,7 +172,7 @@ public class SessionAdapterTest {
         assertThat(token.getExpiryTimestamp()).isNotNull();
     }
 
-    @Test @Ignore
+    @Test
     public void shouldAssignSessionIDToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();
@@ -187,7 +186,7 @@ public class SessionAdapterTest {
         assertThat(token.<String>getAttribute(SessionTokenField.SESSION_ID.getField())).isEqualTo(mockSessionID);
     }
 
-    @Test @Ignore
+    @Test
     public void shouldAssignSessionHandleToTokenAttribute() {
         // Given
         InternalSession mockSession = prototypeMockInternalSession();

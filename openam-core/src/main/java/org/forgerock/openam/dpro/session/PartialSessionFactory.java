@@ -34,6 +34,7 @@ import org.forgerock.openam.utils.TimeUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 
@@ -79,7 +80,7 @@ public class PartialSessionFactory {
             } else if (field.equals(SessionTokenField.REALM.getField())) {
                 builder.realm(partialToken.<String>getValue(SessionTokenField.REALM.getField()));
             } else if (field.equals(SessionTokenField.SESSION_HANDLE.getField())) {
-                builder.sessionHandle(partialToken.<String>getValue(SessionTokenField.SESSION_HANDLE.getField()));
+                builder.sessionHandle(SessionUtils.getDecrypted(partialToken.<String>getValue(SessionTokenField.SESSION_HANDLE.getField())));
             } else if (field.equals(SessionTokenField.LATEST_ACCESS_TIME.getField())) {
                 builder.latestAccessTime(DateUtils.toUTCDateFormat(TimeUtils.fromUnixTime(Long.valueOf(
                         partialToken.<String>getValue(SessionTokenField.LATEST_ACCESS_TIME.getField()))).getTime()));

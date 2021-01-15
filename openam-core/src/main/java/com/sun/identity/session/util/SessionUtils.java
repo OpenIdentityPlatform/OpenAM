@@ -48,6 +48,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -63,6 +64,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
@@ -177,30 +179,59 @@ public class SessionUtils {
     		.expireAfterAccess(Duration.ofMinutes(15))
     		.maximumSize(64000)
     		.build();
-    /**
-     * Helper method to get the encrypted session storage key
-     * 
-     * @param sessionID
-     *            SessionID
-     * @return encrypted session storage key
-     * @throws Exception
-     *             if anything goes wrong
-     */
-    public static String getEncryptedStorageKey(SessionID sessionID) throws Exception {
-        final String sKey = sessionID.getExtension().getStorageKey();
-        if (sKey == null){
+    final static Cache<String, String> encrypt2key=CacheBuilder.newBuilder()
+    		.expireAfterAccess(Duration.ofMinutes(15))
+    		.maximumSize(64000)
+    		.build();
+    
+    public static String getEncryptedStorageKey(SessionID clear) throws Exception {
+    	if (clear == null){
             throw new SessionException("SessionUtils.getEncryptedStorageKey: StorageKey is null");
         }
-        if (SESSION_ENCRYPTION) {
-        	return key2encrypt.get(sKey, new Callable<String>() {
-				@Override
-				public String call() throws Exception {
-					return AccessController.doPrivileged(new EncodeAction(sKey, Crypt.getEncryptor()));
-				}
-			});
-        }
-        return sKey;
+    	return  getEncrypted(clear.getExtension().getStorageKey());
     }
+    
+    public static String getEncrypted(String clear)  {
+    	if (clear==null) {
+    		return clear;
+    	}
+        if (SESSION_ENCRYPTION) {
+        	try {
+				return key2encrypt.get(clear, new Callable<String>() {
+					@Override
+					public String call() throws Exception {
+						final String encrypted=new EncodeAction(clear, Crypt.getEncryptor()).run();
+						encrypt2key.put(encrypted, clear);
+						return encrypted;
+					}
+				});
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+        }
+        return clear;
+    }
+
+    public static String getDecrypted(String encrypted)  {
+    	if (encrypted==null) {
+    		return encrypted;
+    	}
+    	if (SESSION_ENCRYPTION) {
+    		try {
+				return encrypt2key.get(encrypted, new Callable<String>() {
+					@Override
+					public String call() throws Exception {
+						final String clear=new DecodeAction(encrypted, Crypt.getEncryptor()).run();
+						key2encrypt.put(encrypted, clear);
+						return clear;
+					}
+				});
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+    	}
+		return encrypted;
+	}
 
 
     /**

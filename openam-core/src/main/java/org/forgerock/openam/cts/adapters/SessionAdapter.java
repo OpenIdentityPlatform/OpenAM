@@ -41,6 +41,7 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.session.util.SessionUtils;
 
 /**
  * SessionAdapter is responsible for providing conversions to and from InternalSession
@@ -94,7 +95,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @return Non null populated Token.
      */
     public Token toToken(InternalSession session) {
-        final String tokenId = tokenIdFactory.toSessionTokenId(session);
+        String tokenId = tokenIdFactory.toSessionTokenId(session);
         Token token = new Token(tokenId, TokenType.SESSION);
 
         // User Id
@@ -125,7 +126,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setAttribute(SessionTokenField.REALM.getField(), dnWrapper.orgNameToRealmName(session.getClientDomain()));
 
         // SessionID
-        //token.setAttribute(SessionTokenField.SESSION_ID.getField(), session.getID().toString());
+        token.setAttribute(SessionTokenField.SESSION_ID.getField(), SessionUtils.getEncrypted(session.getID().toString()));
 
         // Binary data
         String jsonBlob = serialisation.serialise(session);
@@ -142,7 +143,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         }
 
         // Session handle
-        //token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
+        token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), SessionUtils.getEncrypted(session.getSessionHandle()));
 
         return token;
     }
@@ -186,11 +187,11 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         }
 
         InternalSession session = serialisation.deserialise(jsonBlob, InternalSession.class);
-        //if (session.getSessionHandle() == null) {
+        if (session.getSessionHandle() == null) {
             //Originally the sessionHandle was stored in the serialize token, so if after the deserialization the
             //sessionHandle field is not set, then we should attempt to retrieve the value directly from the token.
-        //    session.setSessionHandle(token.<String>getAttribute(SessionTokenField.SESSION_HANDLE.getField()));
-        //}
+            session.setSessionHandle(SessionUtils.getDecrypted(token.<String>getAttribute(SessionTokenField.SESSION_HANDLE.getField())));
+        }
         return session;
     }
 
