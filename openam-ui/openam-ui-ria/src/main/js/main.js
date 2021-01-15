@@ -55,7 +55,7 @@ require.config({
         "form2js"          : "libs/form2js-2.0-769718a",
         "handlebars"       : "libs/handlebars-4.7.6",
         "i18next"          : "libs/i18next-1.7.3-min",
-        "jquery"           : "libs/jquery-2.1.1-min",
+        "jquery"           : "libs/jquery-3.5.1-min",
         "js2form"          : "libs/js2form-2.0-769718a",
         "jsonEditor"       : "libs/jsoneditor-0.7.23-custom",
         "lodash"           : "libs/lodash-3.10.1-min",

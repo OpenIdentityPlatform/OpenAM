@@ -366,7 +366,7 @@
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>jquery</artifactId>
-			              <version>2.1.1</version>
+			              <version>3.5.1</version>
 			              <packaging>js</packaging>
 			              <classifier>min</classifier>
 			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/jquery/{version}/{artifactId}.{classifier}.{packaging}</downloadUrl>
