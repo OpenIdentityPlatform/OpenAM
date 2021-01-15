@@ -43,6 +43,7 @@ import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Attribute;
 
 import com.iplanet.dpro.session.SessionID;
+import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.setup.SetupListener;
 import com.sun.identity.shared.debug.Debug;
 
@@ -93,8 +94,7 @@ public class SessionModificationWatcher implements SetupListener {
         @Override
         public void objectChanged(String tokenId, Map<String, Attribute> changeSet, ChangeType changeType) {
             if (changeType == ChangeType.DELETE) {
-                SessionID sessionID = new SessionID(
-                        changeSet.get(SessionTokenField.SESSION_ID.getField().toString()).firstValue().toString());
+                final SessionID sessionID = new SessionID(SessionUtils.getDecrypted(changeSet.get(SessionTokenField.SESSION_ID.getField().toString()).firstValue().toString()));
                 for (SessionModificationListener listener : listeners) {
                     listener.sessionChanged(sessionID);
                 }

@@ -66,6 +66,7 @@ import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
+import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -336,7 +337,7 @@ public class SessionPersistenceStore {
             Map<String, Long> sessions = new HashMap<String, Long>();
             for (PartialToken partialToken : partialTokens) {
                 // Session ID
-                String sessionId = partialToken.getValue(SessionTokenField.SESSION_ID.getField());
+                String sessionId = SessionUtils.getDecrypted(partialToken.getValue(SessionTokenField.SESSION_ID.getField()));
 
                 // Expiration Date converted to Unix Time
                 Calendar timestamp = partialToken.getValue(CoreTokenField.EXPIRY_DATE);
