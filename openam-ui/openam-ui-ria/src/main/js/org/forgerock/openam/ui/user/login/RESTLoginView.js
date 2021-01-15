@@ -55,15 +55,17 @@ define([
         var self = this;
 
         // self-service links should be shown only on the first stage of the username/password stages
-        this.data.firstUserNamePassStage = Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
+        this.data.firstUserNamePassStage =
+            Configuration.globalData.auth.currentStage === 1 && this.userNamePasswordStage;
         this.data.showForgotPassword = this.userNamePasswordStage && Configuration.globalData.forgotPassword === "true";
         this.data.showForgotUserName = this.userNamePasswordStage && Configuration.globalData.forgotUsername === "true";
         this.data.showForgotten = this.data.showForgotPassword || this.data.showForgotUserName;
-        this.data.showSelfRegistration = this.userNamePasswordStage && Configuration.globalData.selfRegistration === "true";
+        this.data.showSelfRegistration =
+            this.userNamePasswordStage && Configuration.globalData.selfRegistration === "true";
         this.data.showRememberLogin = this.userNamePasswordStage;
         // socialImplementations links should be shown only on the first stage of the username/password stages
         // and should not show on the upgrade session page
-        this.data.showSocialLogin = firstUserNamePassStage && !Configuration.loggedUser &&
+        this.data.showSocialLogin = this.data.firstUserNamePassStage && !Configuration.loggedUser &&
                                         !_.isEmpty(Configuration.globalData.socialImplementations);
 
         if (Configuration.backgroundLogin) {
