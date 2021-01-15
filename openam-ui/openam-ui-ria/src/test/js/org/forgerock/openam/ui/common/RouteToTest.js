@@ -124,22 +124,26 @@ define([
 
             context("when logout is successful", () => {
                 it("sends EVENT_AUTHENTICATION_DATA_CHANGED event", () => {
-                    promise.resolve();
+                    const p = promise.resolve();
 
-                    RouteTo.logout();
-
-                    expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
-                        anonymousMode: true
+                    return p.then(() => {
+                        RouteTo.logout().then(() => {
+                            expect(EventManager.sendEvent).to.be
+                                .calledWith(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                                    anonymousMode: true
+                                });
+                        });
                     });
                 });
 
                 it("sends EVENT_CHANGE_VIEW event", () => {
-                    promise.resolve();
-
-                    RouteTo.logout();
-
-                    expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_CHANGE_VIEW, {
-                        route: Router.configuration.routes.login
+                    const p = promise.resolve();
+                    return p.then(() => {
+                        return RouteTo.logout().then(() => {
+                            expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_CHANGE_VIEW, {
+                                route: Router.configuration.routes.login
+                            });
+                        });
                     });
                 });
             });
