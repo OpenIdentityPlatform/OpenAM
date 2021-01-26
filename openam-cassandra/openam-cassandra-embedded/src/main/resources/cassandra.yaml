@@ -20,6 +20,9 @@ cluster_name: 'Test Cluster'
 # Specifying initial_token will override this setting on the node's initial start,
 # on subsequent starts, this setting will apply even if initial token is set.
 #
+# See https://cassandra.apache.org/doc/latest/getting_started/production.html#tokens for
+# best practice information about num_tokens.
+#
 num_tokens: 256
 
 # Triggers automatic allocation of num_tokens tokens for this node. The allocation
@@ -37,7 +40,7 @@ num_tokens: 256
 
 # Replica factor is explicitly set, regardless of keyspace or datacenter.
 # This is the replica factor within the datacenter, like NTS.
-# allocate_tokens_for_local_replication_factor: 3
+allocate_tokens_for_local_replication_factor: 3
 
 # initial_token allows you to specify tokens manually.  While you can use it with
 # vnodes (num_tokens > 1, above) -- in which case you should provide a 
@@ -699,10 +702,6 @@ native_transport_port: 9042
 # you may want to adjust max_value_size_in_mb accordingly. This should be positive and less than 2048.
 # native_transport_max_frame_size_in_mb: 256
 
-# If checksumming is enabled as a protocol option, denotes the size of the chunks into which frame
-# are bodies will be broken and checksummed.
-# native_transport_frame_block_size_in_kb: 32
-
 # The maximum number of concurrent client connections.
 # The default is -1, which means unlimited.
 # native_transport_max_concurrent_connections: -1
@@ -790,6 +789,13 @@ snapshot_before_compaction: false
 # should be used to provide data safety. If you set this flag to false, you will
 # lose data on truncation or drop.
 auto_snapshot: true
+
+# The act of creating or clearing a snapshot involves creating or removing
+# potentially tens of thousands of links, which can cause significant performance
+# impact, especially on consumer grade SSDs. A non-zero value here can
+# be used to throttle these links to avoid negative performance impact of
+# taking and clearing snapshots
+snapshot_links_per_second: 0
 
 # Granularity of the collation index of rows within a partition.
 # Increase if your rows are large, or if you have a very large
@@ -917,6 +923,10 @@ request_timeout_in_ms: 10000
 # (it takes much longer than 30s) as of Linux 4.12. If you want something that high set this to 0
 # which picks up the OS default and configure the net.ipv4.tcp_retries2 sysctl to be ~8.
 # internode_tcp_user_timeout_in_ms = 30000
+
+# The amount of time unacknowledged data is allowed on a streaming connection.
+# The default is 5 minutes. Increase it or set it to 0 in order to increase the timeout.
+# internode_streaming_tcp_user_timeout_in_ms = 300000
 
 # The maximum continuous period a connection may be unwritable in application space
 # internode_application_timeout_in_ms = 30000
@@ -1055,7 +1065,7 @@ dynamic_snitch_reset_interval_in_ms: 600000
 # expressed as a double which represents a percentage.  Thus, a value of
 # 0.2 means Cassandra would continue to prefer the static snitch values
 # until the pinned host was 20% worse than the fastest.
-dynamic_snitch_badness_threshold: 0.1
+dynamic_snitch_badness_threshold: 1.0
 
 # Configure server-to-server internode encryption
 #
@@ -1095,7 +1105,7 @@ server_encryption_options:
     # during upgrade to 4.0; otherwise, set to false.
     enable_legacy_ssl_storage_port: false
     # Set to a valid keystore if internode_encryption is dc, rack or all
-    keystore: target/embedded_keystore
+    keystore: conf/.keystore
     keystore_password: cassandra
     # Verify peer server certificates
     require_client_auth: false
@@ -1128,13 +1138,13 @@ server_encryption_options:
 # auth set require_client_auth=true. Restart all nodes
 client_encryption_options:
     # Enable client-to-server encryption
-    enabled: true
+    enabled: false
     # When set to true, encrypted and unencrypted connections are allowed on the native_transport_port
     # This should _only be true_ while in unencrypted or transitional operation
     # optional defaults to true when enabled is false, and false when enabled is true.
     # optional: true
     # Set keystore and keystore_password to valid keystores if enabled is true
-    keystore: target/embedded_keystore
+    keystore: conf/.keystore
     keystore_password: cassandra
     # Verify client certificates
     require_client_auth: false
@@ -1217,7 +1227,7 @@ transparent_data_encryption_options:
     key_provider:
       - class_name: org.apache.cassandra.security.JKSKeyProvider
         parameters:
-          - keystore: target/embedded_keystore
+          - keystore: conf/.keystore
             keystore_password: cassandra
             store_type: JCEKS
             key_password: cassandra
@@ -1396,6 +1406,12 @@ repaired_data_tracking_for_partition_reads_enabled: false
 # mismatches will also be recorded. This is to avoid potential signal:noise issues are unconfirmed
 # mismatches are less actionable than confirmed ones.
 report_unconfirmed_repaired_data_mismatches: false
+
+# Having many tables and/or keyspaces negatively affects performance of many operations in the
+# cluster. When the number of tables/keyspaces in the cluster exceeds the following thresholds
+# a client warning will be sent back to the user when creating a table or keyspace.
+# table_count_warn_threshold: 150
+# keyspace_count_warn_threshold: 40
 
 #########################
 # EXPERIMENTAL FEATURES #
