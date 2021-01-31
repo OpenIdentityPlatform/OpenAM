@@ -64,7 +64,7 @@
         </init-param>
         <init-param>
             <param-name>excludes</param-name>
-            <param-value>/oauth2/connect/checkSession</param-value>
+            <param-value>/connect/checkSession</param-value>
         </init-param>
     </filter>
     <filter>

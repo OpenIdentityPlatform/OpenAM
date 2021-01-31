@@ -41,7 +41,6 @@ public class SetHeadersFilter implements Filter {
     private static final String EXCLUDES = "excludes";
     private final Map<String, String> headerKeyValues = new HashMap<String, String>();
     private final Set<String> excludes = new HashSet<String>();
-    private int contextPathLength = 0;
 
     /**
      * Initializes the filter based on the {@link FilterConfig}.
@@ -54,7 +53,6 @@ public class SetHeadersFilter implements Filter {
     @Override
     public void init(FilterConfig config) throws ServletException {
         if (config != null) {
-            contextPathLength = config.getServletContext().getContextPath().length();
             Enumeration<String> initParams = config.getInitParameterNames();
             while (initParams.hasMoreElements()) {
                 String key = initParams.nextElement();
@@ -70,7 +68,7 @@ public class SetHeadersFilter implements Filter {
 
     /**
      * Set HTTP Headers based on the values in the filterConfig init-parameters.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -79,7 +77,7 @@ public class SetHeadersFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        if (!excludes.contains(httpServletRequest.getRequestURI().substring(contextPathLength))) {
+        if (excludes.stream().noneMatch(s -> (httpServletRequest.getRequestURI() != null && httpServletRequest.getRequestURI().endsWith(s)))) {
             for (Map.Entry<String, String> entry : headerKeyValues.entrySet()) {
                 httpServletResponse.addHeader(entry.getKey(), entry.getValue());
             }
