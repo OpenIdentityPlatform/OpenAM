@@ -467,7 +467,7 @@
 	   <dependency>
     	<groupId>org.openidentityplatform.opendj</groupId>
 		<artifactId>opendj-parent</artifactId>
-		<version>4.4.10-SNAPSHOT</version>
+		<version>4.4.10</version>
     	<type>pom</type>
     	<scope>import</scope>
       </dependency>
