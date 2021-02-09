@@ -263,6 +263,10 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
+      <filter-name>DisableSameSiteCookiesFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>CacheForFiveMinutes</filter-name>
         <url-pattern>/XUI/index.html</url-pattern>
     </filter-mapping>
