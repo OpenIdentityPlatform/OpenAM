@@ -34,7 +34,7 @@ import java.util.Set;
  * Translates from a source to a map of attributes.
  * @param <T> The type of source.
  *
- * @supported.all.api
+ * 
  */
 public interface AttributeMapper<T> {
 

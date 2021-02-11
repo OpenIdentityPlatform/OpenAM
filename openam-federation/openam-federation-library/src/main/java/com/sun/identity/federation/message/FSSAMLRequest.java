@@ -54,7 +54,7 @@ import com.sun.identity.federation.common.*;
  * object from a Document Element and to create Request message
  * from this object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

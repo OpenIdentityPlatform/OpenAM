@@ -36,7 +36,7 @@ import com.iplanet.services.ldap.AttrSet;
  * 
  * @see com.iplanet.ums.TemplateManager
  *
- * @supported.api
+ * 
  */
 public interface IClassResolver {
     /**
@@ -50,7 +50,7 @@ public interface IClassResolver {
      * @return a class for a corresponding object, or <code>null</code> if no
      *         class could be resolved
      *
-     * @supported.api
+     * 
      */
     public Class resolve(String id, AttrSet set);
 }

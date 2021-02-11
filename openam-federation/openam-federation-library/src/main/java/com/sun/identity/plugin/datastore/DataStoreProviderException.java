@@ -33,7 +33,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
 /**
  * This class is to handle DataStoreProvider related exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class DataStoreProviderException extends L10NMessageImpl {
 

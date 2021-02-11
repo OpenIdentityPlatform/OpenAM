@@ -21,7 +21,7 @@ package com.sun.identity.idm;
  * An exception type thrown when an {@link com.sun.identity.idm.IdRepo} is asked to
  * create an object with a name that is already used.
  *
- * @supported.all.api
+ * 
  */
 public class IdRepoDuplicateObjectException extends IdRepoException {
 

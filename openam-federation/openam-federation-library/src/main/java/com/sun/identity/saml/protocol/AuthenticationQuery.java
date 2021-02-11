@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * to the <code>&lt;samlp:AuthenticationQueryType&gt;</code> in the SAML
  * protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public class AuthenticationQuery extends SubjectQuery {
 

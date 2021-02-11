@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  * the confirmation key and confirmation obligation the proxy must posess and
  * demonstrate for authentication purpose.
  *
- * @supported.all.api
+ * 
  */
 public class ProxySubject extends Subject {
     

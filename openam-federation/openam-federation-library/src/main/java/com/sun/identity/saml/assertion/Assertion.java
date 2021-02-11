@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
  *package of information that supplies one or more <code>Statement</code> made 
  *by an issuer. There are three kinds of assertionsL Authentication, 
  *AuthorizationDecision and Attribute assertion.
- *@supported.all.api
+ *
  */
 public class Assertion extends AssertionBase {          
 

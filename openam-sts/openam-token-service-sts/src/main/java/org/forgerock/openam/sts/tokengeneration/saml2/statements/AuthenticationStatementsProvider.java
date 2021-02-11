@@ -27,7 +27,7 @@ import java.util.List;
  * custom interface implementation is specified in the SAML2Config, then the DefaultAuthenticationStatementsProvider will
  * be used.
  *
- * @supported.all.api
+ * 
  */
 public interface AuthenticationStatementsProvider {
 

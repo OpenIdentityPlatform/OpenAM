@@ -17,6 +17,6 @@
 /**
  * Contains self service configuration beans.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.selfservice.config.beans;

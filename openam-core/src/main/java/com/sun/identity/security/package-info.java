@@ -30,7 +30,7 @@
 /**
  * Provides the classes to be used for performing privileged operations (like
  * getting the OpenAM administrator's DN and password).
- * @supported.api
+ * 
  */
 
 package com.sun.identity.security;

@@ -83,7 +83,7 @@ public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionM
     /**
      * Returns the provider of {@link org.forgerock.openam.sm.datalayer.api.ConnectionFactory}. The default is to use
      * {@link org.forgerock.openam.sm.datalayer.providers.DataLayerConnectionFactoryCache}.
-     * @return
+     * @return Returns the provider of {@link org.forgerock.openam.sm.datalayer.api.ConnectionFactory}.
      */
     protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
         return DataLayerConnectionFactoryCache.class;

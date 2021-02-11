@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The <code>StatusCode</code> element is a container of 
  * one or more <code>Status</code>s issuded by authorization authority.
- * @supported.all.api
+ * 
  * <p/>
  *  Schema:
  * <pre>

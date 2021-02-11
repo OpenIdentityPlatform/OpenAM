@@ -41,7 +41,7 @@ import com.sun.identity.liberty.ws.soapbinding.Message;
  * The <code>AuthnSvcClient</code> class provides web service clients with
  * a method to <code>SASL</code> request to the Authentication Service and
  * receive <code>SASL</code> response.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

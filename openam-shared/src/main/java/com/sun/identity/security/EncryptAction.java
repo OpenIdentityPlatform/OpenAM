@@ -59,7 +59,7 @@ import com.iplanet.am.util.AMPasswordUtil;
  * 
  * </PRE>
  *
- * @supported.all.api
+ * 
  */
 public class EncryptAction implements PrivilegedAction {
     protected String value;

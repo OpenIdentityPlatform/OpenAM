@@ -29,6 +29,6 @@
 /**
  * Defines WS-Federation Plugin SPIs 
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wsfederation.plugins;

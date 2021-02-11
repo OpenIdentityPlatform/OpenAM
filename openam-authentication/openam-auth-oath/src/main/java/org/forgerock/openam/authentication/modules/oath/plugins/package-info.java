@@ -16,7 +16,7 @@
 
 /**
  * Classes in this package provide plugin functionality for the oath module.
- * @supported.api
+ * 
  */
 package org.forgerock.openam.authentication.modules.oath.plugins;
 

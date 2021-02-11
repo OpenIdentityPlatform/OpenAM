@@ -29,7 +29,7 @@
 /**
  * Defines Federation Common Utils.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.federation.common;

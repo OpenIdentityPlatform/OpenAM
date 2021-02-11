@@ -33,7 +33,7 @@ import com.sun.identity.cot.COTConstants;
 /**
  * This interface represents a collection of common constants used by
  * the classes in Federation Service.  
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

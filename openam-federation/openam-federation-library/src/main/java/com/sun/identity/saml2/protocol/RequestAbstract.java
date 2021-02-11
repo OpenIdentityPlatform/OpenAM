@@ -40,7 +40,7 @@ import java.util.Set;
  * This interface defines methods for setting and retrieving attributes and 
  * elements associated with a SAML request message used in SAML protocols.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS)

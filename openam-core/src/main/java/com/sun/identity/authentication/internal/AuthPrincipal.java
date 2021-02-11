@@ -44,7 +44,7 @@ import com.sun.identity.authentication.internal.server.AuthSPrincipal;
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  *
- * @supported.api
+ * 
  */
 public class AuthPrincipal extends AuthSPrincipal {
 
@@ -56,7 +56,7 @@ public class AuthPrincipal extends AuthSPrincipal {
      * @exception NullPointerException
      *                if the <code>name</code> is <code>null</code>.
      *
-     * @supported.api
+     * 
      */
     public AuthPrincipal(String name) {
         super(name);
@@ -67,7 +67,7 @@ public class AuthPrincipal extends AuthSPrincipal {
      * 
      * @return the user name for this <code>AuthPrincipal</code>
      *
-     * @supported.api
+     * 
      */
     public String getName() {
         return name;
@@ -97,7 +97,7 @@ public class AuthPrincipal extends AuthSPrincipal {
      * 
      * @return a string representation of this <code>AuthPrincipal</code>.
      *
-     * @supported.api
+     * 
      */
     public String toString() {
         return ("AuthPrincipal:  " + name);
@@ -115,7 +115,7 @@ public class AuthPrincipal extends AuthSPrincipal {
      * @return true if the specified Object is equal to this
      *         <code>AuthPrincipal</code>.
      *
-     * @supported.api
+     * 
      */
     public boolean equals(Object o) {
         if (o == null)
@@ -141,7 +141,7 @@ public class AuthPrincipal extends AuthSPrincipal {
      * 
      * @return a hash code for this <code>AuthPrincipal</code>.
      *
-     * @supported.api
+     * 
      */
     public int hashCode() {
         return name.hashCode();

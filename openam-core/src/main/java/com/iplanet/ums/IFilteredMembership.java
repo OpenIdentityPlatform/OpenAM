@@ -32,7 +32,7 @@ package com.iplanet.ums;
  * Interface that would be implemented by roles that control membership based on
  * a filter.
  *
- * @supported.all.api
+ * 
  */
 public interface IFilteredMembership extends IMembership {
     /**

@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  * From this class, the original <code>PAOSRequest</code> object could obtained
  * to correlate with this response.
  *
- * @supported.all.api
+ * 
  */
 public class PAOSResponse {
     

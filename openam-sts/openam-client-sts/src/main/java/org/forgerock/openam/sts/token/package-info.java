@@ -17,6 +17,6 @@
 /**
  * This package contains classes pertaining to STS tokens.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts.token;

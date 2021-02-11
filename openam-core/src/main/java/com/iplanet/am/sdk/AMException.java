@@ -42,7 +42,7 @@ import org.forgerock.opendj.ldap.LdapException;
  * while performing an operation on the data store.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public class AMException extends Exception implements L10NMessage {
 

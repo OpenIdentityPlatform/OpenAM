@@ -35,7 +35,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 /**
  * The <code>AudienceRestriction</code> specifies that the assertion
  * is addressed to one or more specific <code>Audience</code>s.
- * @supported.all.api
+ * 
  */
 public interface AudienceRestriction extends ConditionAbstract {
 

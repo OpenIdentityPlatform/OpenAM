@@ -37,7 +37,7 @@ import com.iplanet.sso.SSOException;
  * The <code>AMGroup</code> interface provides methods to manage group
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 abstract public interface AMGroup extends AMObject {
     /**

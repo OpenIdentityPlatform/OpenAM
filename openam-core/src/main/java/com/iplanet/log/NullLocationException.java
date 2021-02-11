@@ -30,7 +30,7 @@ package com.iplanet.log;
 
 /**
  * Log Exception thrown when the logging location is null.
- * @supported.all.api
+ * 
  */
 public class NullLocationException extends LogException {
 

@@ -28,7 +28,7 @@
 
 /**
  * Contains session SPI.
- * @supported.api
+ * 
  */
 package com.sun.identity.plugin.session;
 

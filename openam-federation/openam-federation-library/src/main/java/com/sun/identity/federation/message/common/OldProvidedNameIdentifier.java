@@ -40,7 +40,7 @@ import com.sun.identity.saml.common.SAMLException;
  * This class has methods to create the original <code>NameIdentifier</code>
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

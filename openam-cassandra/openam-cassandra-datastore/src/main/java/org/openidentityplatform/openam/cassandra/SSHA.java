@@ -50,23 +50,17 @@ public final class SSHA {
 
 
 	/**
-	 * <p>
 	 * Creates an RFC 2307-compliant salted, hashed password with the SHA1
 	 * MessageDigest algorithm. After the password is digested, the first 20
 	 * bytes of the digest will be the actual password hash; the remaining bytes
 	 * will be a randomly generated salt of length {@link #DEFAULT_SALT_SIZE},
 	 * for example: <blockquote>
 	 * <code>{SSHA}3cGWem65NCEkF5Ew5AEk45ak8LHUWAwPVXAyyw==</code></blockquote>
-	 * </p>
-	 * <p>
 	 * In layman's terms, the formula is
 	 * <code>digest( secret + salt ) + salt</code>. The resulting digest is
 	 * Base64-encoded.
-	 * </p>
-	 * <p>
 	 * Note that successive invocations of this method with the same password
 	 * will result in different hashes! (This, of course, is exactly the point.)
-	 * </p>
 	 * 
 	 * @param password
 	 *            the password to be digested
@@ -141,10 +135,6 @@ public final class SSHA {
 	 * @param entry
 	 *            The password entry, typically starting with {SSHA}.
 	 * @return True, if the password matches.
-	 * @throws NoSuchAlgorithmException
-	 *             If there is no SHA available.
-	 * @throws UnsupportedEncodingException
-	 *             If no UTF-8 encoding is available
 	 */
 	public static boolean verifySaltedPassword(byte[] password, String entry) {
 		try{

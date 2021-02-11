@@ -325,7 +325,7 @@ public class SiteConfiguration extends ConfigurationBase {
     public static boolean validateUrl(String siteURL) {
         try {
             FQDNUrl test = new FQDNUrl(siteURL.trim());
-            if (!test.isFullyQualified() ||
+            if (//!test.isFullyQualified() ||
                 (test.getPort().length() == 0) ||
                 (test.getURI().length() == 0)) {
                 String[] param = {siteURL};

@@ -31,7 +31,7 @@
  * representing a SSOToken(Single Sign On) which contains the information
  * related to session.
  *
- * @supported.api
+ * 
  */
 
 package com.iplanet.sso;

@@ -30,7 +30,7 @@ package com.sun.identity.idm;
 
 /**
  *
- * @supported.all.api
+ * 
  */
 public interface IdConstants {
 

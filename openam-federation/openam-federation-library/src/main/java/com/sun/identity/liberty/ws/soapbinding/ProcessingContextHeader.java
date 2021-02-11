@@ -38,7 +38,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * The <code>ProcessingContextHeader</code> class represents
  * <code>ProcessingContext</code> element defined in SOAP binding schema.
  * 
- * @supported.all.api
+ * 
  */
 public class ProcessingContextHeader {   
 

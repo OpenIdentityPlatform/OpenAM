@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
  * The class <code>FSNameIdentifierMappingResponse</code> is used to
  * create , parse the <code>NameIdentifierMappingResponse</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

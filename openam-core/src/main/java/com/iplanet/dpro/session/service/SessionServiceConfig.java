@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2020 Open Identity Platform Community.
  */
 
 package com.iplanet.dpro.session.service;
@@ -85,7 +86,9 @@ public class SessionServiceConfig {
      * System Properties
      */
 
-    private static final int DEFAULT_MAX_SESSION_CACHE_SIZE = 5000;
+    private static final int DEFAULT_MAX_SESSION_CACHE_SIZE = 64000;
+    
+    private static final long DEFAULT_MAX_SESSION_CACHE_TIME = 1;
 
     private static final String LOGSTATUS_ACTIVE = "ACTIVE";
     private final boolean logStatus;
@@ -422,10 +425,19 @@ public class SessionServiceConfig {
     /**
      * The maximum number of sessions to cache in the internal session cache.
      *
-     * @return SystemProperty "org.forgerock.openam.session.service.access.persistence.caching.maxsize". Default 5000.
+     * @return SystemProperty "org.forgerock.openam.session.service.access.persistence.caching.maxsize". Default 64000.
      */
     public int getMaxSessionCacheSize() {
         return SystemProperties.getAsInt(AM_SESSION_MAX_CACHE_SIZE, DEFAULT_MAX_SESSION_CACHE_SIZE);
+    }
+    
+    /**
+     * The maximum number of sessions to cache in the internal session cache.
+     *
+     * @return SystemProperty "org.forgerock.openam.session.service.access.persistence.caching.maxsize". Default 64000.
+     */
+    public long getMaxSessionCacheTime() {
+        return SystemProperties.getAsLong(AM_SESSION_MAX_CACHE_TIME, DEFAULT_MAX_SESSION_CACHE_TIME);
     }
 
     /**

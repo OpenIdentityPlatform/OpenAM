@@ -40,7 +40,7 @@ import org.forgerock.opendj.ldap.ResultCode;
  * <code>CONFIG_PROBLEM</code> or <code>LDAP_OP_FAILED</code> (typically a
  * bug).
  *
- * @supported.all.api
+ * 
  */
 public class IdRepoFatalException extends IdRepoException {
 

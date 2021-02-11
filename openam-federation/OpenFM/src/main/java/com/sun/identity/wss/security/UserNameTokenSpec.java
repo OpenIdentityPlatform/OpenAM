@@ -35,7 +35,7 @@ package com.sun.identity.wss.security;
  * tokens.
  * It implements <code>SecurityTokenSpec</code> interface.
  * 
- * @supported.all.api
+ * 
  */ 
 public class UserNameTokenSpec implements SecurityTokenSpec {
 

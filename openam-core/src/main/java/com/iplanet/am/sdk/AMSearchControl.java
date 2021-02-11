@@ -39,7 +39,7 @@ import com.iplanet.ums.SearchControl;
  * <code>AMSearchControl</code>.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public class AMSearchControl {
 

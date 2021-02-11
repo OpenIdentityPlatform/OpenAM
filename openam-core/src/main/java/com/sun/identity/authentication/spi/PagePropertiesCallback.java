@@ -32,6 +32,7 @@
 
 package com.sun.identity.authentication.spi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -43,7 +44,7 @@ import javax.security.auth.callback.Callback;
  * whether a template is an error page, page header, image name , page timeout
  * value, name of module.
  *
- * @supported.all.api
+ * 
  */
 public class PagePropertiesCallback implements Callback {
     private String image=null;
@@ -52,9 +53,9 @@ public class PagePropertiesCallback implements Callback {
     private String moduleName=null;
     private String header=null;
     private boolean error=false;
-    private List attribute;
-    private List require;
-    private List<String> infoText;
+    private List attribute=new ArrayList<String>(0);
+    private List require=new ArrayList<String>(0);
+    private List<String> infoText=new ArrayList<String>(0);
     private String page_state=null;
     
     /**

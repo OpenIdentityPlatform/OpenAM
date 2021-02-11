@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  * Liberty Response. This class extends the <code>SAML</code>
  * <code>Response</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

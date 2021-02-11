@@ -81,7 +81,7 @@ import javax.xml.soap.SOAPException;
  * <code>AssertionArtifact</code>, and to obtain decision from an 
  * <code>Query</code>.
  *
- * @supported.api
+ * 
  */
 public final class SecurityTokenManagerClient {
 
@@ -273,7 +273,7 @@ public final class SecurityTokenManagerClient {
      * @throws SecurityTokenException if certificate for the
      *            <code>certAlias</code> could not be found in key store.
      * 
-     * @supported.api
+     * 
      */
     public void setCertAlias(java.lang.String certAlias)
         throws SecurityTokenException {

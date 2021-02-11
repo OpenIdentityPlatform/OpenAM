@@ -18,41 +18,88 @@ package org.openidentityplatform.openam.cassandra.embedded;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import org.cassandraunit.CQLDataLoader;
-import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
-import org.cassandraunit.dataset.cql.FileCQLDataSet;
-import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
+import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.iplanet.am.util.SystemProperties;
 
 public class Server implements Runnable, Closeable {
-	Session session=null;
+	final private ExecutorService executor = Executors.newSingleThreadExecutor();
+	private CassandraDaemon cassandraDaemon;
+	    
 	public void run() {
 		try {
-			if (System.getProperty("cassandra.native_transport_port")==null)
-				System.setProperty("cassandra.native_transport_port","9042");
-			EmbeddedCassandraServerHelper.startEmbeddedCassandra();//EmbeddedCassandraServerHelper.DEFAULT_CASSANDRA_YML_FILE,System.getProperty("java.io.tmpdir")+"/embeddedCassandra");
-			session = new Cluster.Builder().withPort(EmbeddedCassandraServerHelper.getNativeTransportPort()).addContactPoints("127.0.0.1").build().connect();
-			CQLDataLoader dataLoader = new CQLDataLoader(session);
-			String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","test.cql");
-			dataLoader.load(new File(dataSetLocation).exists()?new FileCQLDataSet(dataSetLocation): new ClassPathCQLDataSet(dataSetLocation));
+			//check for external cassandra settings
+			if (SystemProperties.get("datastax-java-driver.basic.load-balancing-policy.local-datacenter")!=null || SystemProperties.get("datastax-java-driver.basic.contact-points.0")!=null) {
+				return;
+			}
+			
+			//config
+			final File path=new File(System.getProperty("cassandra.storagedir",System.getProperty("java.io.tmpdir")+File.separator+"embeddedCassandra"));
+			path.mkdirs();
+	        System.setProperty("cassandra-foreground", "true");
+	        System.setProperty("cassandra.storagedir", path.getPath());
+	        //prepare default keystore
+	        if (!Files.exists(Paths.get("target"))) {
+	        	Files.createDirectory(Paths.get("target"));
+	        }
+	        if (!Files.exists(Paths.get("target"+File.separator+"embedded_keystore"))) {
+	        	Files.copy(this.getClass().getResourceAsStream("/embedded_keystore"),Paths.get("target"+File.separator+"embedded_keystore"),StandardCopyOption.REPLACE_EXISTING);
+	        }
+	        
+	        //start
+	        final CountDownLatch startupLatch = new CountDownLatch(1) ;
+	        executor.execute( new Runnable(){
+	            @Override
+	            public void run() {
+	                cassandraDaemon = new CassandraDaemon();
+	                cassandraDaemon.activate();
+	                startupLatch.countDown();
+	            }});
+	        if (!startupLatch.await(5, TimeUnit.MINUTES)) {
+                throw new AssertionError("Cassandra daemon did not start within timeout");
+            }
+	        System.setProperty("datastax-java-driver.basic.contact-points.0",DatabaseDescriptor.getRpcAddress().getHostAddress()+":"+DatabaseDescriptor.getNativeTransportPort());
+	        System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", DatabaseDescriptor.getLocalDataCenter());
+	        
+	        //load
+	        final String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
+	        final InputStream inputStream=this.getClass().getResourceAsStream("/" + dataSetLocation);
+	        if (inputStream==null) {
+	        	throw new AssertionError("cannot get resource"+dataSetLocation);
+	        }
+	        final CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build();
+	        Arrays.stream(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";")).map(statement -> StringUtils.normalizeSpace(statement) + ";").forEach(session::execute);
+	        session.close();
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-            		close();
+            	close();
             }
         });
 	}
 
 	public void close() {
-		EmbeddedCassandraServerHelper.stopEmbeddedCassandra();
-		if (session!=null)
-			session.close();
+		if (cassandraDaemon!=null) {
+			cassandraDaemon.stop();
+			cassandraDaemon=null;
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -60,7 +107,6 @@ public class Server implements Runnable, Closeable {
 		s.run();
 		s.close();
 		System.exit(0);
-		Thread.currentThread().interrupt();
 	}
 
 }

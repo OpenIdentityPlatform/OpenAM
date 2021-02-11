@@ -44,7 +44,7 @@ import javax.crypto.SecretKey;
  * user data store.  
  * <p>
  *
- * @supported.all.api
+ * 
  */
 
 public interface KeyProvider {

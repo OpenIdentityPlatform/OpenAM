@@ -59,7 +59,7 @@ import org.w3c.dom.Element;
  *This class is an abstract base class for all Assertion implementations and
  *encapsulates common functionality.
  *
- *@supported.all.api
+ *
  */
 public abstract class AssertionBase {           
     protected static SAMLConstants sc;

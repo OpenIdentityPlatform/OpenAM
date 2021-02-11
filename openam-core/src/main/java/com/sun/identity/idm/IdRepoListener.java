@@ -58,7 +58,7 @@ import com.sun.identity.sm.ServiceManager;
  * Additionally, this class maintains the configuration data for the IdRepo
  * plugin and also to store the SMS Service attributes for the organization.
  *
- * @supported.all.api
+ * 
  */
 public final class IdRepoListener {
 

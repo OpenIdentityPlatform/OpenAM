@@ -49,7 +49,7 @@ import java.util.List;
  *    &lt;xs:sequence>
  * &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public interface Environment {
 

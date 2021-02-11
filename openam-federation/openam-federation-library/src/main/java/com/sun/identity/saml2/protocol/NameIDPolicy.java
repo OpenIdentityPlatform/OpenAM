@@ -38,7 +38,7 @@ import com.sun.identity.saml2.protocol.impl.NameIDPolicyImpl;
  * This interface defines methods to retrieve name identifier related 
  * properties.
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

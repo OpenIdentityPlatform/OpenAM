@@ -38,7 +38,7 @@ import com.sun.identity.common.SystemConfigurationUtil;
 
 /**
  * This is a singleton class used to manage DataStore providers.
- * @supported.all.api
+ * 
  */
 public final class DataStoreProviderManager {
     

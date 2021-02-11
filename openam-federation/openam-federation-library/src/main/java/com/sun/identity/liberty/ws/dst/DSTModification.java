@@ -76,7 +76,7 @@ import com.sun.identity.shared.DateUtils;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class DSTModification {
     private String id;

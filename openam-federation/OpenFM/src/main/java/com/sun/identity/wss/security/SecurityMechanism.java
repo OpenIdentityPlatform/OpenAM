@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * This class exposes the <code>SecurityMechanism</code>s used in the Web 
  * Services Security. 
- * @supported.all.api
+ * 
  */
 public class SecurityMechanism {
 

@@ -33,7 +33,7 @@ import org.forgerock.opendj.ldap.DN;
 
 /**
  *
- * @supported.all.api
+ * 
  */
 public class DNValidator implements IValidator {
 

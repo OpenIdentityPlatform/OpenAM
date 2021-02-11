@@ -34,7 +34,7 @@ import com.sun.identity.liberty.ws.soapbinding.ServiceInstanceUpdateHeader;
  * This class <code>ServiceInstanceUpdate</code> is an interface to include the 
  * SOAP  Header namely <code>ServiceInstanceUpdateHeader</code> when sending
  * a SOAP Response while processing the service request.
- * @supported.all.api
+ * 
  */ 
 public interface ServiceInstanceUpdate {
 

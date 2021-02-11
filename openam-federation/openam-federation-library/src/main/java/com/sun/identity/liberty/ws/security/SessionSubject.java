@@ -47,7 +47,7 @@ import com.sun.identity.saml.assertion.NameIdentifier;
  * The <code>SessionSubject</code> class represents a liberty subject
  * with associated session status.
  *
- * @supported.all.api
+ * 
  */
 public class SessionSubject extends FSSubject {
     

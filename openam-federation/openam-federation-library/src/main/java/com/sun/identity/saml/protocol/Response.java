@@ -68,7 +68,7 @@ import org.w3c.dom.NodeList;
  * This <code>Response</code> class represents a Response XML document.
  * The schema of Response is defined as the following:
  *
- * @supported.all.api
+ * 
  */
 public class Response extends AbstractResponse {
 

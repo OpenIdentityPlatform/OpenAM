@@ -20,7 +20,7 @@ package com.iplanet.sso;
  * {@link SSOToken#addSSOTokenListener(SSOTokenListener)} on an <code>SSOToken</code>
  * type that does not generate lifecycle events.
  *
- * @supported.all.api
+ * 
  */
 public class SSOTokenListenersUnsupportedException extends SSOException {
 

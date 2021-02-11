@@ -13,4 +13,6 @@
   <logger name="com.datastax.driver.core.CodecRegistry" level="debug" />
    <logger name="com.datastax.driver.core.Session" level="OFF" />
     <logger name="com.datastax.driver.core.policies.LatencyAwarePolicy" level="INFO" />
+     <logger name="org.apache.cassandra.gms.Gossiper" level="INFO" />
+     <logger name="org.apache.cassandra.net.RequestCallbacks" level="INFO" />
 </configuration>

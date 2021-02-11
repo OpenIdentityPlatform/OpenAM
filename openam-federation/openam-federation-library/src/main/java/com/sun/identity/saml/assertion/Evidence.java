@@ -38,7 +38,7 @@ import java.util.Set;
  *the assertion's  <code>AssertionIDReference</code> element.
  *An assertion is specified by value by including the entire 
  *<code>Assertion</code> object 
- *@supported.all.api
+ *
  */
 
 public class Evidence extends EvidenceBase {

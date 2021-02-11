@@ -29,7 +29,7 @@
 /**
  * Provides interface for Web Service Security X.509 Certificate Token Profile.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.common.wsse;
 

@@ -32,7 +32,7 @@ package com.sun.identity.policy;
 /**
  * Exception thrown if any configured limit is exceeded
  *
- * @supported.all.api
+ * 
  */
 public class LimitExceededException extends PolicyException {
 

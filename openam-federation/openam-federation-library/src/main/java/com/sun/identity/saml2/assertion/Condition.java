@@ -33,7 +33,7 @@ package com.sun.identity.saml2.assertion;
 /**
  * The <code>Condition</code> serves as an extension point for new 
  * conditions. 
- * @supported.all.api
+ * 
  */
 public interface Condition extends ConditionAbstract {
 

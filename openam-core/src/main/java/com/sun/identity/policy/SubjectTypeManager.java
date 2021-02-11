@@ -46,7 +46,7 @@ import org.forgerock.openam.ldap.LDAPUtils;
  * methods to get a list of configured <code>Subject
  * </code> objects, and to obtain a factory object for it.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

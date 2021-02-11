@@ -85,7 +85,7 @@ import java.util.Collections;
  * @see java.security.ProtectionDomain
  * <p>
  *
- * @supported.all.api
+ * 
  */
 public class ISPermission extends Permission {
     private Subject subject;

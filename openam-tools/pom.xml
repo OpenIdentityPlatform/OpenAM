@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -62,7 +62,7 @@
 			                <artifactId>cddl-license</artifactId>
 			                <version>1.0.0</version>
 			                <packaging>txt</packaging>
-							<downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
+							<downloadUrl>https://raw.githubusercontent.com/OpenIdentityPlatform/OpenAM/master/LICENSE.md</downloadUrl>
                         	</artifactItem>
  					</artifactItems>
 				</configuration>

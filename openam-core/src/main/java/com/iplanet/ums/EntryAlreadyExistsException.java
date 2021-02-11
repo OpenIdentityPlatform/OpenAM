@@ -35,7 +35,7 @@ package com.iplanet.ums;
  * If LDAP is the underlying persistent storage, this exception is thrown upon
  * receiving the LDAP exception with the error code for "ENTRY_ALREADY_EXISTS".
  * 
- * @supported.all.api
+ * 
  */
 public class EntryAlreadyExistsException extends UMSException {
 

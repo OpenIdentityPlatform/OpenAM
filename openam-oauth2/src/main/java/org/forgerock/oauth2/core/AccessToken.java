@@ -23,7 +23,7 @@ import org.forgerock.json.JsonValue;
 /**
  * Models an OAuth2 access token.
  *
- * @supported.all.api
+ * 
  */
 public interface AccessToken extends IntrospectableToken {
 

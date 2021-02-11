@@ -33,7 +33,7 @@ package com.iplanet.ums;
  * IMembership by adding support for adding and removing members.
  * 
  * @see com.iplanet.ums.IMembership
- * @supported.all.api
+ * 
  */
 public interface IAssignableMembership extends IMembership {
 

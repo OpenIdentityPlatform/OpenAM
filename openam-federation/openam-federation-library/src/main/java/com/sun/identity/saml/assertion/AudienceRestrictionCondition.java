@@ -46,7 +46,7 @@ import java.util.Iterator;
  *This is an implementation of the abstract <code>Condition</code> class, which
  *specifes that the assertion this AuthenticationCondition is part of, is 
  *addressed to one or more specific audience.
- *@supported.all.api
+ *
  */
 
 public class AudienceRestrictionCondition extends Condition {

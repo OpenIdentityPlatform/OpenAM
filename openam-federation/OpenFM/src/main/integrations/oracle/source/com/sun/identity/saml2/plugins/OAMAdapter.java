@@ -54,7 +54,7 @@ import com.oblix.access.*;
  * A singleton instance of this <code>SAML2ServiceProviderAdapter</code>
  * class will be used per Service Provider during runtime, so make sure 
  * implementation of the methods are thread safe. 
- * @supported.all.api
+ * 
  */
 
 public class OAMAdapter extends SAML2ServiceProviderAdapter {

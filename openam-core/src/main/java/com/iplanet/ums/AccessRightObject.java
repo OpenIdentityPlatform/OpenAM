@@ -35,7 +35,7 @@ import java.util.Iterator;
 /**
  * Represents the attribute access rights associated with a user or role.
  * 
- * @supported.api
+ * 
  */
 public class AccessRightObject {
     // readable attributes
@@ -47,7 +47,7 @@ public class AccessRightObject {
     /**
      * Default constructor
      *
-     * @supported.api
+     * 
      */
     public AccessRightObject() {
     }
@@ -62,7 +62,7 @@ public class AccessRightObject {
      *            Collection of writable attribute names
      *           
      *
-     * @supported.api
+     * 
      */
     public AccessRightObject(Collection readableAttributeNames,
             Collection writableAttributeNames) {
@@ -90,7 +90,7 @@ public class AccessRightObject {
      *            A collection of attribute names to which read permission will
      *            be granted.
      * 
-     * @supported.api
+     * 
      */
     public void grantReadPermission(Collection attributeNames) {
         // need to convert all attribute names to lower case
@@ -110,7 +110,7 @@ public class AccessRightObject {
      *            A collection of attribute names to which write permission will
      *            be granted.
      * 
-     * @supported.api
+     * 
      */
     public void grantWritePermission(Collection attributeNames) {
         // need to convert all attribute names to lower case
@@ -130,7 +130,7 @@ public class AccessRightObject {
      *            A collection of attribute names on which read permission will
      *            be revoked.
      * 
-     * @supported.api
+     * 
      */
     public void revokeReadPermission(Collection attributeNames) {
         // need to convert all attribute names to lower case
@@ -150,7 +150,7 @@ public class AccessRightObject {
      *            A collection of attribute names on which write permission will
      *            be revoked.
      * 
-     * @supported.api
+     * 
      */
     public void revokeWritePermission(Collection attributeNames) {
         // need to convert all attribute names to lower case
@@ -168,7 +168,7 @@ public class AccessRightObject {
      * 
      * @return Collection of all the readable attribute names
      * 
-     * @supported.api
+     * 
      */
     public Collection getReadableAttributeNames() {
         return (Collection) readables.clone();
@@ -179,7 +179,7 @@ public class AccessRightObject {
      * 
      * @return Collection of all the writable attribute names
      * 
-     * @supported.api
+     * 
      */
     public Collection getWritableAttributeNames() {
         return (Collection) writables.clone();
@@ -193,7 +193,7 @@ public class AccessRightObject {
      * @return <code>boolean; </code> true if this attribute is readable, false
      *         otherwise
      * 
-     * @supported.api
+     * 
      */
     public boolean isReadable(String attributeName) {
         if (readables.contains(attributeName.toLowerCase()))
@@ -210,7 +210,7 @@ public class AccessRightObject {
      * @return <code>boolean;</code> true if this attribute is writable, false
      *         otherwise
      * 
-     * @supported.api
+     * 
      */
     public boolean isWritable(String attributeName) {
         if (writables.contains(attributeName.toLowerCase()))

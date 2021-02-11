@@ -19,15 +19,15 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
     <artifactId>openam-soap-sts</artifactId>
     <packaging>pom</packaging>
     <name>OpenAM SOAP STS</name>
 	<repositories>
 	     <repository>
-       		<id>mvnrepository.com</id>
-       		<url>https://repo.boundlessgeo.com/main</url>
+       		<id>maven-restlet</id>
+       		<url>https://maven.restlet.talend.com</url>
        </repository>
 	</repositories>
     <modules>

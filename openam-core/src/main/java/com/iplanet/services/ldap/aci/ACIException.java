@@ -30,7 +30,7 @@ package com.iplanet.services.ldap.aci;
 
 /**
  * Base class of all ACI specific exceptions
- * @supported.all.api
+ * 
  */
 public class ACIException extends Exception {
 

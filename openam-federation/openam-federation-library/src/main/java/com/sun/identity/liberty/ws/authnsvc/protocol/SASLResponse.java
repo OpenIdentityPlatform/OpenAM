@@ -53,7 +53,7 @@ import com.sun.identity.liberty.ws.soapbinding.Utils;
  * The <code>SASLResponse</code> class represents <code>SASLResponse</code>
  * element defined in Authentication Service schema.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

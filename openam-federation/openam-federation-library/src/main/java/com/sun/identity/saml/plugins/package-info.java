@@ -29,6 +29,6 @@
 /**
  * SAML 1.x Plugins. 
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml.plugins;

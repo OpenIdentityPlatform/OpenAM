@@ -42,7 +42,7 @@ import org.w3c.dom.*;
  * The <code>PolicyDecision</code> class represents the result of a policy
  * evaluation. 
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -62,7 +62,7 @@ public class PolicyDecision {
 
     /**
      * Default constructor.
-     * @supported.api
+     * 
      */
     public PolicyDecision() {
     }
@@ -77,7 +77,7 @@ public class PolicyDecision {
      *         with this policy decision. The 
      *         action name is the key to the Map. The value for each key is an 
      *         <code>ActionDecision</code>.
-     * @supported.api
+     * 
      */
     public Map getActionDecisions() {
         return actionDecisions;
@@ -201,7 +201,7 @@ public class PolicyDecision {
      * changing the time to live for the decision appropriately.
      *
      * @param actionDecision action decision to be added
-     * @supported.api
+     * 
      */
     public void addActionDecision(ActionDecision actionDecision) {
         ActionDecision oldDecision =
@@ -232,7 +232,7 @@ public class PolicyDecision {
      * Gets a String representation of this <code>PolicyDecision</code>
      * @return a String representation of this <code>PolicyDecision</code>
      *
-     * @supported.api
+     * 
      */
      public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -261,7 +261,7 @@ public class PolicyDecision {
      * Gets an XML representation of this object
      * @return an XML representation of this object
      *
-     * @supported.api
+     * 
      */
      public String toXML() {
         StringBuilder sb  = new StringBuilder(300);

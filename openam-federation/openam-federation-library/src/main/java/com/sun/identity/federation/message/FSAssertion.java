@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
  * <code>Assertion</code> during the Single Sign-On process.
  * This class extends from SAML Assertion.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

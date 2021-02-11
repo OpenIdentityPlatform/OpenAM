@@ -50,7 +50,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
  * Discovery Service query and modify.
  * Note: Current implementation uses <code>JAXB</code> objects and no wrapper
  * classes are used.
- * @supported.all.api
+ * 
  */
 public class DiscoveryClient {
 

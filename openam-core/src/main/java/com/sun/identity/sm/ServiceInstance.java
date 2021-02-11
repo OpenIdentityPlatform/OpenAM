@@ -43,7 +43,7 @@ import com.iplanet.ums.IUMSConstants;
  * The class <code>ServiceInstance</code> provides methods to manage service's
  * instance variables.
  *
- * @supported.all.api
+ * 
  */
 public class ServiceInstance {
     // InstanceVariables

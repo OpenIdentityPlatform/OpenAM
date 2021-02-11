@@ -40,7 +40,7 @@ import com.sun.identity.saml.common.SAMLException;
  *specified resource has resulted in the specified decision on the basis of 
  *some optionally specified evidence. 
  *
- *@supported.all.api
+ *
  */
 public class AuthorizationDecisionStatement 
     extends AuthorizationDecisionStatementBase {

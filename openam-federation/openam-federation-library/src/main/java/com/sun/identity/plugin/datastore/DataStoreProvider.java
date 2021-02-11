@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * Interface used for storing & retrieving information. Also used to search
  * user.
- * @supported.all.api
+ * 
  */
 public interface DataStoreProvider {
     

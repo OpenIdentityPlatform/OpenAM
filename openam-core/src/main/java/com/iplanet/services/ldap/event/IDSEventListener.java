@@ -37,14 +37,14 @@ import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 /**
  * The purpose of this interface is to allow classes that implement this
  * interface to listen to Directory Server Events.
- * @supported.api
+ * 
  */
 public interface IDSEventListener extends EventListener {
 
     /**
      * This callback method is called by the EventService when the Directory
      * Server triggers a PersistentSearch notification
-     * @supported.api
+     * 
      */
     public void entryChanged(DSEvent e);
 
@@ -52,7 +52,7 @@ public interface IDSEventListener extends EventListener {
      * This callback method is called by the EventService when an error is
      * encountered after setting a Persistent Search request in the Directory
      * Server
-     * @supported.api
+     * 
      */
     public void eventError(String err);
 

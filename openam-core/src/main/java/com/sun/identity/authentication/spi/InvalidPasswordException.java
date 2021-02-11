@@ -37,7 +37,7 @@ package com.sun.identity.authentication.spi;
  * so that subsequent calls to <code>getUserTokenId</code> will return correct
  * <code>userTokenId</code> that will be use to lock out the user.
  *
- * @supported.all.api
+ * 
  */
 public class InvalidPasswordException extends AuthLoginException {
 

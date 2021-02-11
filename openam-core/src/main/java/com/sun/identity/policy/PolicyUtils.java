@@ -921,10 +921,10 @@ public class PolicyUtils {
          * Given a value of cn=Accounting Managers,ou=groups,dc=iplanet,dc=com,
          * this method returns com > iplanet > groups > Accounting Managers
          */
-        DN dn = DN.valueOf(strDN);
         if (!LDAPUtils.isDN(strDN)) {
             displayString = strDN;
         } else {
+            DN dn = DN.valueOf(strDN);
             List<RDN> rdns = new ArrayList<>();
             for (RDN rdn : dn) {
                 rdns.add(0, rdn);

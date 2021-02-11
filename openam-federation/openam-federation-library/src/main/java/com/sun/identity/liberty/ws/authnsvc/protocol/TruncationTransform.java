@@ -39,7 +39,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * <code>Transform</code> that remove all subsequent characters after a given
  * number of characters have been obtained.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

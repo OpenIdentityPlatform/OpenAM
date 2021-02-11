@@ -107,7 +107,7 @@ import java.util.Vector;
  * to an authentication service/framework. (See documentation to configure
  * in either of the modes).
  *
- * @supported.api
+ * 
  */
 public class AuthContext extends Object implements java.io.Serializable {
 
@@ -201,7 +201,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      * 
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName) throws AuthLoginException {
         organizationName = orgName;
@@ -229,7 +229,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      *
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName, URL url) throws AuthLoginException {
         organizationName = orgName;
@@ -261,7 +261,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      *
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName, String nickName)
             throws AuthLoginException {
@@ -297,7 +297,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      *
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName, String nickName, URL url)
             throws AuthLoginException {
@@ -332,7 +332,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      *
-     * @supported.api
+     * 
      */
     public AuthContext(SSOToken ssoToken) throws AuthLoginException {
         this.ssoToken = ssoToken;
@@ -367,7 +367,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @throws AuthLoginException if <code>AuthContext</code> creation fails.
      *         This exception is kept for backward compatibility only.
      *
-     * @supported.api
+     * 
      */
     public AuthContext(SSOToken ssoToken, boolean forceAuth) throws 
         AuthLoginException {
@@ -380,7 +380,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @exception AuthLoginException if an error occurred during login.
      *
-     * @supported.api
+     * 
      */
     public void login() throws AuthLoginException {
         login(null, null, null, null, null, null);
@@ -393,7 +393,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @param response The corresponding HttpServletResponse for the HttpServletRequest.
      * @throws AuthLoginException If an error occurred during login.
      *
-     * @supported.api
+     * 
      */
     public void login(HttpServletRequest request, HttpServletResponse response) throws AuthLoginException {
         login(null, null, null, null, request, response);
@@ -411,7 +411,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @param indexName Authentication index name.
      * @exception AuthLoginException if an error occurred during login.
      *
-     * @supported.api
+     * 
      */
     public void login(IndexType type, String indexName)
             throws AuthLoginException {
@@ -522,7 +522,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *        supported.
      * @exception AuthLoginException if an error occurred during login.
      *
-     * @supported.api
+     * 
      */
     public void login(IndexType indexType, String indexName, String[] params)
             throws AuthLoginException {
@@ -564,7 +564,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *        when the indexTye is <code>AuthContext.IndexType.RESOURCE</code>.
      * @exception AuthLoginException if an error occurred during login.
      *
-     * @supported.api
+     * 
      */
     public void login(IndexType indexType, String indexName, 
         String[] params, Map envMap)
@@ -1051,7 +1051,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *         If the authentication fails or the authentication is in process,
      *         this will return <code>null</code>.
      *
-     * @supported.api
+     * 
      */
     public Subject getSubject() {
         if (localFlag) {
@@ -1089,7 +1089,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @return <code>true</code> if more credentials are required from the user.
      *
-     * @supported.api
+     * 
      */
     public boolean hasMoreRequirements() {
         if (localFlag) {
@@ -1117,7 +1117,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *        <code>PagePropertiesCallback</code>.
      * @return <code>true</code> if more credentials are required from the user.
      *
-     * @supported.api
+     * 
      */
     public boolean hasMoreRequirements(boolean noFilter) {
         if (localFlag) {
@@ -1141,7 +1141,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @return an array of <code>Callback</code> objects requesting credentials
      *         from user
      *
-     * @supported.api
+     * 
      */
     public Callback[] getRequirements() {
         if (localFlag) {
@@ -1171,7 +1171,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @return an array of <code>Callback</code> objects requesting credentials
      * from user
      *
-     * @supported.api
+     * 
      */
     public Callback[] getRequirements(boolean noFilter) {
         if (localFlag) {
@@ -1212,7 +1212,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @param info Array of <code>Callback</code> objects.
      *
-     * @supported.api
+     * 
      */
     public void submitRequirements(Callback[] info) {
         submitRequirements(info, null, null);
@@ -1329,7 +1329,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @throws AuthLoginException if an error occurred during logout.
      *
-     * @supported.api
+     * 
      */
     public void logout() throws AuthLoginException {
         if (localFlag) {
@@ -1374,7 +1374,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @throws AuthLoginException if an error occurred during logout.
      *
-     * @supported.api
+     * 
      */
     public void logoutUsingTokenID()
     throws AuthLoginException {
@@ -1433,7 +1433,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * Typically set when the login fails.
      *
      * @return login exception.
-     * @supported.api
+     * 
      */
     public AuthLoginException getLoginException() {
         if (localFlag) {
@@ -1454,7 +1454,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *         authentication.
      * @throws L10NMessageImpl if the user is not authenticated or an error is
      *         encountered in retrieving the user's single sign on token.
-     * @supported.api
+     * 
      */
     public SSOToken getSSOToken() throws L10NMessageImpl {
         if (localFlag) {
@@ -1493,7 +1493,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @return <code>Status</code> of the authentication process.
      *
-     * @supported.api
+     * 
      */
     public Status getStatus() {
         if (localFlag) {
@@ -1585,7 +1585,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @return Organization name in the <code>AuthContext</code>.
      *
-     * @supported.api
+     * 
      */
     public String getOrganizationName() {
         return (this.organizationName);
@@ -1599,7 +1599,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @return Set of Module instance names.
      *
-     * @supported.api
+     * 
      */
     public Set getModuleInstanceNames() {
         if (authURL != null) {
@@ -1651,7 +1651,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @exception AuthLoginException if an error occurred during abort.
      *
-     * @supported.api
+     * 
      */
     public void abort() throws AuthLoginException {
         if (localFlag) {
@@ -1697,7 +1697,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @param password Password for the certificate database.
      *
-     * @supported.api
+     * 
      */
     public static void setCertDBPassword(String password) {
         try {
@@ -1810,7 +1810,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @param hostname hostname or ip address
      *
-     * @supported.api
+     * 
      */
     public void setClientHostName(String hostname) {
         this.hostName = hostname;
@@ -1822,7 +1822,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * 
      * @return hostname/IP address
      *
-     * @supported.api
+     * 
      */
     public String getClientHostName() {
         return (hostName);
@@ -2145,7 +2145,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * The class <code>Status</code> defines the possible
      * authentication states during the login process.
      *
-     * @supported.all.api
+     * 
      */
     public static class Status extends Object {
         
@@ -2235,7 +2235,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * The class <code>IndexType</code> defines the possible kinds of "objects"
      * or "resources" for which an authentication can be performed.
      *
-     * @supported.all.api
+     * 
      */
     public static class IndexType extends Object {
         

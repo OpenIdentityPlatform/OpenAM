@@ -34,7 +34,7 @@ package com.sun.identity.plugin.configuration;
  * The method <code>configChanged()</code> is invoked
  * when the component configuration data has been changed.
  *
- * @supported.all.api
+ * 
  */
 
 public interface ConfigurationListener {  

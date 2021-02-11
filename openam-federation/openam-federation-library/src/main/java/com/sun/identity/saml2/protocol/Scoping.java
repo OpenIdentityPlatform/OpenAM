@@ -40,7 +40,7 @@ import java.util.List;
  * This interface defines methods to retrieve Identity Providers and
  * context/limitations related to proxying of the request message.
  *
- * @supported.all.api
+ * 
  */
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
         defaultImpl = ScopingImpl.class)

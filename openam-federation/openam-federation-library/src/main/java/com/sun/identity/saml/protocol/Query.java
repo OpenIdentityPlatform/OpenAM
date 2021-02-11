@@ -33,7 +33,7 @@ package com.sun.identity.saml.protocol;
  * This is an abstract base class for SAML query. It corresponds to the
  * <code>&lt;samlp:QueryAbstractType&gt;</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public abstract class Query {
 

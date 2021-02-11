@@ -16,6 +16,6 @@
 /**
  * Defines classes to handle entitlements.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.entitlement;

@@ -35,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * This class is an extension point for all SAML related exceptions.
  * It also handles message localization in SAML exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class SAMLException extends L10NMessageImpl {
 

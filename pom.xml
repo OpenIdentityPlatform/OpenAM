@@ -21,7 +21,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>14.4.3-SNAPSHOT</version>
+  <version>14.6.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -54,6 +54,16 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+   	<developer>
+   		<id>Open Identity Platform Community</id>
+   		<name>Open Identity Platform Community</name>
+   		<email>open-identity-platform@googlegroups.com</email>
+   		<organization>Open Identity Platform Community</organization>
+   		<organizationUrl>https://www.openidentityplatform.org/</organizationUrl>
+   		<url>https://github.com/OpenIdentityPlatform/commons</url>
+   	</developer>
+   </developers>
   <!-- Component Properties -->
   <properties>
     <!-- **************************************************************** -->
@@ -71,21 +81,19 @@
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
-    <restlet.version>2.3.4</restlet.version>
+    <restlet.version>2.4.0</restlet.version>
     <powermock.version>2.0.0-RC.4</powermock.version>
 <!--     <slf4j.version>1.7.25</slf4j.version> -->
-    <santuario.xmlsec.version>2.1.4</santuario.xmlsec.version>
     <click.version>2.3.0</click.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-digester.version>2.1</commons-digester.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
-    <commons-io.version>2.3</commons-io.version>
+    <commons-io.version>2.8.0</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <commons-logging.version>1.1.3</commons-logging.version>
     <commons-logging-api.version>1.1</commons-logging-api.version>
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
-    <esapiport.version>2.2.0.0</esapiport.version>
     <geoip.version>2.0.0</geoip.version>
     <groovy.version>2.5.8</groovy.version>
     <groovy-sandbox.version>1.19</groovy-sandbox.version>
@@ -101,7 +109,7 @@
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7.11</rhino.version>
+    <rhino.version>1.7.12</rhino.version>
     <saaj-api.version>1.3.4</saaj-api.version>
     <saaj-impl.version>1.3.19</saaj-impl.version>
     <jsp-api.version>2.1</jsp-api.version>
@@ -111,7 +119,7 @@
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.19</freemarker.version>
-    <java-ipv6.version>0.14</java-ipv6.version>
+    <java-ipv6.version>0.17</java-ipv6.version>
     <json.version>20090211</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>1.4.188</h2database.version>
@@ -269,10 +277,40 @@
         <!-- Disable Doclint on JDK8+ -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
         <!-- Surefire Argument Line -->
-        <java.surefire.options>-Xms256m -Xmx256m</java.surefire.options>
+        <java.surefire.options>-Xmx1g</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
       </properties>
+    </profile>
+   	<profile>
+        <id>release-sign-artifacts</id>
+        <activation>
+            <property>
+		        <name>gpg.passphrase</name>
+		    </property>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-gpg-plugin</artifactId>
+			      <version>1.6</version>
+			      <configuration>
+                     	<passphrase>${gpg.passphrase}</passphrase>
+                       <useAgent>true</useAgent>
+                     </configuration>
+			      <executions>
+			        <execution>
+			          <id>sign-artifacts</id>
+			          <phase>verify</phase>
+			          <goals>
+			            <goal>sign</goal>
+			          </goals>
+			        </execution>
+			      </executions>
+			    </plugin>
+            </plugins>
+        </build>
     </profile>
   </profiles>
   <!-- OpenAM Child Modules -->
@@ -374,11 +412,11 @@
   </mailingLists>
   <!-- Maven Repositories -->
   	<repositories>
-<!-- 		<repository> -->
-<!-- 			<id>ossrh-releases</id> -->
-<!-- 			<name>Sonatype OSS</name> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
-<!-- 		</repository> -->
+		<repository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
 		<repository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -389,11 +427,11 @@
 		</repository>
 	</repositories>
 	<pluginRepositories>
-<!-- 		<pluginRepository> -->
-<!-- 			<id>ossrh-releases</id> -->
-<!-- 			<name>Sonatype OSS</name> -->
-<!-- 			<url>https://oss.sonatype.org/content/repositories/releases/</url> -->
-<!-- 		</pluginRepository> -->
+		<pluginRepository>
+			<id>ossrh-releases</id>
+			<name>Sonatype OSS</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</pluginRepository>
 		<pluginRepository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -427,11 +465,11 @@
   <dependencyManagement>
     <dependencies>
 	   <dependency>
-    		<groupId>org.openidentityplatform.opendj</groupId>
-		    <artifactId>opendj-parent</artifactId>
-			<version>4.4.4-SNAPSHOT</version>
-    		<type>pom</type>
-    		<scope>import</scope>
+    	<groupId>org.openidentityplatform.opendj</groupId>
+		<artifactId>opendj-parent</artifactId>
+		<version>4.4.10</version>
+    	<type>pom</type>
+    	<scope>import</scope>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
@@ -661,6 +699,11 @@
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-webauthn</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-auth-qr</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -973,6 +1016,12 @@
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-console</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-clientsdk</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1109,11 +1158,19 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>${esapiport.version}</version>
+        <version>2.2.0.0</version>
         <exclusions>
         	<exclusion>
         		<groupId>org.apache.httpcomponents</groupId>
         		<artifactId>httpclient</artifactId>
+        	</exclusion>
+        	<exclusion>
+        		<groupId>log4j</groupId>
+        		<artifactId>log4j</artifactId>
+        	</exclusion>
+        	<exclusion>
+        		<groupId>commons-beanutils</groupId>
+        		<artifactId>commons-beanutils</artifactId>
         	</exclusion>
         </exclusions>
       </dependency>
@@ -1141,7 +1198,7 @@
       <dependency>
         <groupId>org.glassfish.metro</groupId>
         <artifactId>wsit-impl</artifactId>
-        <version>2.4.0</version>
+        <version>2.4.3</version>
       </dependency>
       <dependency>
         <groupId>javax.xml</groupId>
@@ -1165,11 +1222,11 @@
         <artifactId>jdom</artifactId>
         <version>${jdom.version}</version>
       </dependency>
-		<dependency>
-		    <groupId>org.glassfish.jersey.bundles</groupId>
-		    <artifactId>jaxrs-ri</artifactId>
-		    <version>2.28</version>
-		</dependency>
+	<dependency>
+	    <groupId>org.glassfish.jersey.bundles</groupId>
+	    <artifactId>jaxrs-ri</artifactId>
+	    <version>2.32</version>
+	</dependency>
       <dependency>
         <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
@@ -1368,11 +1425,11 @@
         <artifactId>authapi</artifactId>
         <version>${authapi.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.external</groupId>
-        <artifactId>jdmkrt</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+	  <dependency>
+	    <groupId>org.opendaylight.cardinal</groupId>
+	    <artifactId>jdmk</artifactId>
+	    <version>0.3.3</version>
+	  </dependency>
       <dependency>
         <groupId>external</groupId>
         <artifactId>jdmktk</artifactId>
@@ -1397,6 +1454,10 @@
           <exclusion>
             <groupId>javax.xml.stream</groupId>
             <artifactId>stax-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1533,7 +1594,7 @@
       <dependency>
         <groupId>org.asciidoctor</groupId>
         <artifactId>asciidoctorj</artifactId>
-        <version>2.1.0</version>
+        <version>2.4.1</version>
         <exclusions>
           <exclusion>
             <groupId>com.beust</groupId>
@@ -1547,7 +1608,7 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>${santuario.xmlsec.version}</version>
+        <version>2.1.5</version>
       </dependency>
       <!-- Test dependency -->
       <dependency>
@@ -1720,15 +1781,25 @@
 		    <version>5.4.3.Final</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-core-asl</artifactId>
-		    <version>1.9.13.redhat-4</version>
+   			<groupId>com.fasterxml.woodstox</groupId>
+   			<artifactId>woodstox-core</artifactId>
+   			<version>5.3.0</version>
+   		</dependency>
+		<dependency>
+		    <groupId>org.yaml</groupId>
+		    <artifactId>snakeyaml</artifactId>
+		    <version>1.27</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-mapper-asl</artifactId>
-		    <version>1.9.13.redhat-4</version>
-		</dependency>
+			<groupId>org.owasp.antisamy</groupId>
+			<artifactId>antisamy</artifactId>
+			<version>1.5.10</version>
+		 </dependency>	
+		 <dependency>
+  			<groupId>io.netty</groupId>
+  			<artifactId>netty-handler</artifactId>
+  			<version>4.1.54.Final</version>
+  		</dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
@@ -1757,7 +1828,7 @@
 					<artifactId>cddl-license</artifactId>
 					<version>1.0.0</version>
 					<packaging>txt</packaging>
-					<downloadUrl>https://oss.oracle.com/licenses/CDDL-1.1</downloadUrl>
+					<downloadUrl>https://raw.githubusercontent.com/OpenIdentityPlatform/OpenAM/master/LICENSE.md</downloadUrl>
 					<deploy>false</deploy>
 				</artifactItem>
 				<artifactItem>
@@ -1766,7 +1837,7 @@
 					<version>${project.version}</version>
 					<packaging>jar</packaging>
 					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
-					<deploy>true</deploy>
+					<deploy>false</deploy>
 				</artifactItem>
 				<artifactItem>
                 	<groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
@@ -1774,15 +1845,8 @@
                 	<version>${project.version}</version>
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
-                	<deploy>true</deploy>
-              	</artifactItem>
-              	<artifactItem>
-                	<groupId>org.openidentityplatform.external</groupId>
-                	<artifactId>jdmkrt</artifactId>
-                	<version>${project.version}</version>
-                	<packaging>jar</packaging>
-                	<downloadUrl>${basedir}/extlib/jdmkrt-2007-01-10.jar</downloadUrl>
-                	<deploy>true</deploy>
+                	<deploy>false</deploy>
+                	<force>true</force>
               	</artifactItem>
 			</artifactItems>
 		</configuration>
@@ -1842,6 +1906,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
+        <version>3.0.0-M1</version>
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <updateBranchVersions>true</updateBranchVersions>
@@ -1947,44 +2012,34 @@
           </delimiters>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <inherited>false</inherited>
-        <configuration>
-          <charset>utf-8</charset>
-          <encoding>utf-8</encoding>
-          <source>${maven.compiler.source}</source>
-          <additionalJOption>${javadoc.options}</additionalJOption>
-          <additionalparam>${javadoc.opts}</additionalparam>
-          <detectLinks>true</detectLinks>
-          <taglets>
-            <taglet>
-              <tagletClass>com.sun.identity.tools.javadocs.SupportedAPITaglet</tagletClass>
-            </taglet>
-            <taglet>
-              <tagletClass>com.sun.identity.tools.javadocs.SupportedAllAPITaglet</tagletClass>
-            </taglet>
-          </taglets>
-          <tagletArtifact>
-            <groupId>org.openidentityplatform.openam</groupId>
-            <artifactId>javadoc-utils</artifactId>
-            <version>${javadoc-utils.version}</version>
-          </tagletArtifact>
-          <doctitle>OpenAM ${project.version} Public API Javadoc</doctitle>
-          <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
-          <finalName>openam-${project.version}-public</finalName>
-          <subpackages>
-                                com.iplanet.am.sdk:com.iplanet.am.util:com.iplanet.dpro.parser:com.iplanet.dpro.session.service:com.iplanet.log:com.iplanet.services.cdm:com.iplanet.services.ldap:com.iplanet.services.util:com.iplanet.sso:com.iplanet.ums:com.sun.identity.authentication:com.sun.identity.entitlement:com.sun.identity.federation.accountmgmt:com.sun.identity.federation.common:com.sun.identity.federation.message:com.sun.identity.federation.message.common:com.sun.identity.federation.plugins:com.sun.identity.federation.services:com.sun.identity.idm:com.sun.identity.jaxrpc:com.sun.identity.liberty.ws.authnsvc:com.sun.identity.liberty.ws.authnsvc.mechanism:com.sun.identity.liberty.ws.authnsvc.protocol:com.sun.identity.liberty.ws.common:com.sun.identity.liberty.ws.common.wsse:com.sun.identity.liberty.ws.disco:com.sun.identity.liberty.ws.disco.plugins:com.sun.identity.liberty.ws.dst:com.sun.identity.liberty.ws.dst.service:com.sun.identity.liberty.ws.idpp.common:com.sun.identity.liberty.ws.idpp.plugin:com.sun.identity.liberty.ws.interaction:com.sun.identity.liberty.ws.interfaces:com.sun.identity.liberty.ws.paos:com.sun.identity.liberty.ws.security:com.sun.identity.liberty.ws.soapbinding:com.sun.identity.log:com.sun.identity.plugin.configuration:com.sun.identity.plugin.datastore:com.sun.identity.plugin.log:com.sun.identity.plugin.session:com.sun.identity.policy:com.sun.identity.sae.api:com.sun.identity.saml:com.sun.identity.saml2.assertion:com.sun.identity.saml2.common:com.sun.identity.saml2.ecp:com.sun.identity.saml2.plugins:com.sun.identity.saml2.profile:com.sun.identity.saml2.protocol:com.sun.identity.security:com.sun.identity.shared.debug:com.sun.identity.shared.jaxrpc:com.sun.identity.shared.locale:com.sun.identity.shared.stats:com.sun.identity.shared.whitelist:com.sun.identity.sm:com.sun.identity.wsfederation.common:com.sun.identity.wsfederation.plugins:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.security.handler:com.sun.identity.wss.sts:com.sun.identity.xacml.client:com.sun.identity.xacml.common:com.sun.identity.xacml.context:com.sun.identity.xacml.context.impl:com.sun.identity.xacml.policy:com.sun.identity.xacml.policy.impl:com.sun.identity.xacml.saml2:com.sun.identity.xacml.saml2.impl:com.sun.liberty:org.forgerock.openam.authentication.modules.oath.plugins:org.forgerock.oauth2.core:org.forgerock.openam.authentication.service:org.forgerock.openam.entitlement:org.forgerock.openam.ldap:org.forgerock.openam.oauth2.provider:org.forgerock.openam.session.service:org.forgerock.openam.upgrade:org.forgerock.openam.authentication.modules.common.mapping:org.forgerock.openam.services.email:org.forgerock.openam.selfservice.config:org.forgerock.openam.selfservice.config.beans:org.forgerock.openam.sts.tokengeneration.saml2.statements:org.forgerock.openam.sts.config.user:org.forgerock.openam.sts.token:org.forgerock.openam.sts.user.invocation:org.forgerock.openam.sts:org.forgerock.openam.sts.rest.token.validator:org.forgerock.openam.sts.tokengeneration.oidc
-                            </subpackages>
-          <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
-          <docletArtifact>
-            <groupId>org.openidentityplatform.openam</groupId>
-            <artifactId>javadoc-utils</artifactId>
-            <version>${javadoc-utils.version}</version>
-          </docletArtifact>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+		          <execution>
+		            <id>attach-sources</id>
+		            <phase>verify</phase>
+		            <goals>
+		              <goal>jar-no-fork</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+            </plugin>
+            <plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-javadoc-plugin</artifactId>
+			  <executions>
+			    <execution>
+			      <id>attach-javadocs</id>
+			      <goals>
+			        <goal>jar</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			  <configuration>
+			  	<doclint>none</doclint>
+			  </configuration>
+			</plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -2046,19 +2101,20 @@
           <quiet>true</quiet>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+		<plugin>
+	      <groupId>org.sonatype.plugins</groupId>
+	      <artifactId>nexus-staging-maven-plugin</artifactId>
+	      <version>1.6.7</version>
+	      <extensions>true</extensions>
+	      <configuration>
+	        <serverId>ossrh</serverId>
+	        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+	        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+	        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+	        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
+	        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+	      </configuration>
+	    </plugin>
     </plugins>
 	<pluginManagement>
 		<plugins>
@@ -2131,14 +2187,6 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
-				<configuration>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.2.0</version>
 				<executions>
@@ -2147,6 +2195,13 @@
 							<goal>jar</goal>
 						</goals>
 					</execution>
+					<execution>
+			            <id>attach-sources</id>
+			            <phase>verify</phase>
+			            <goals>
+			              <goal>jar-no-fork</goal>
+			            </goals>
+			          </execution>
 				</executions>
 			</plugin>
 

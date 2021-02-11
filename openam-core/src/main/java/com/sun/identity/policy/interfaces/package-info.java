@@ -31,7 +31,7 @@
 /**
  * Deprecated interfaces for writing custom Policy plugins for Conditions,
  * Subjects, Referrals, ResponseProviders and Resources.
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.policy.interfaces;

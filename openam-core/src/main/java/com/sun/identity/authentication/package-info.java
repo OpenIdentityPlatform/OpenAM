@@ -34,7 +34,7 @@
  * to OpenAM's list of supported authentication
  * modules/types or pure JAAS modules.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.authentication;
 

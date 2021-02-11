@@ -39,7 +39,7 @@ import com.sun.identity.saml.common.SAMLException;
  * without affecting either the semantics or validity. Advice elements MAY
  * be specified in  an extension schema. 
  *
- * @supported.all.api
+ * 
  */
 public class Advice extends AdviceBase {
     

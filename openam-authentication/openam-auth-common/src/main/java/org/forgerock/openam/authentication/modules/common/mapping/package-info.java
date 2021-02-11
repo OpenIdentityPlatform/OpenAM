@@ -17,6 +17,6 @@
  * This package contains the mapping interfaces and default implementations that are common for use by all
  * authentication modules.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.authentication.modules.common.mapping;

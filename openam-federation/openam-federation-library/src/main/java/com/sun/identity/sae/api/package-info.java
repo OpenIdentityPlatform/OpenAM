@@ -29,6 +29,6 @@
 /**
  * Defines Secure Attribute Exchange (SAE) APIs.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.sae.api;

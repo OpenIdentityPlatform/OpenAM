@@ -34,7 +34,7 @@ import com.sun.identity.liberty.ws.soapbinding.SOAPFaultException;
  * in case of any SOAP fault while handling interaction for the
  * <code>WSP</code>.
  *
- * @supported.all.api 
+ *  
  */
 public class InteractionSOAPFaultException 
         extends InteractionException {
@@ -46,7 +46,7 @@ public class InteractionSOAPFaultException
      * @param soapFaultException <code>SOAPFaultException</code> that contains
      *        the SOAP fault
      *
-     * @supported.api
+     * 
      */
     public InteractionSOAPFaultException(
            Throwable soapFaultException) {
@@ -58,7 +58,7 @@ public class InteractionSOAPFaultException
      * Gets the <code>SOAPFaultException</code> that contains SOAP fault
      * @return <code>SOAPFaultException</code> that contains SOAP fault
      *
-     * @supported.api
+     * 
      */
     public SOAPFaultException getSOAPFaultException() {
         return soapFaultException;

@@ -37,7 +37,7 @@ import com.sun.identity.authentication.service.AuthException;
  *
  * @see AMAuthCallBack
  *
- * @supported.all.api
+ * 
  */
 public class AMAuthCallBackException extends AuthException {
     /**

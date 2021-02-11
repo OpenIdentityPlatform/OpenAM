@@ -48,7 +48,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
  * <code>AuthenticationStatementType</code>, which extends the
  * <code>SubjectStatementAbstractType</code> with the additional element and
  * attributes.
- * @supported.all.api
+ * 
  */
 public class AuthenticationStatement extends SubjectStatement {
     //The AuthenticationMethod attribute specifies the type of Authentication

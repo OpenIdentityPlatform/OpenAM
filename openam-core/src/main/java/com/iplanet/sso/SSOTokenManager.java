@@ -80,7 +80,7 @@ import com.sun.identity.shared.debug.Debug;
  * given the <code>SSOTokenID</code> in string format, and to validate
  * <code>SSOToken</code>s.
  *
- * @supported.api
+ * 
  */
 public class SSOTokenManager {
 
@@ -127,7 +127,7 @@ public class SSOTokenManager {
      * @throws SSOException
      *             if unable to get the singleton <code>SSOTokenManager</code>
      *             instance.
-     * @supported.api
+     * 
      */
     public static SSOTokenManager getInstance() throws SSOException {
 
@@ -286,7 +286,7 @@ public class SSOTokenManager {
      *                if the single sign on token cannot be created.
      * @exception UnsupportedOperationException
      *                if this is an unsupported operation.
-     * @supported.api
+     * 
      */
     public SSOToken createSSOToken(
             javax.servlet.http.HttpServletRequest request)
@@ -360,7 +360,7 @@ public class SSOTokenManager {
      * @exception SSOException
      *                if the single sign on token cannot be created.
      * @exception UnsupportedOperationException
-     * @supported.api
+     * 
      */
     public SSOToken createSSOToken(String tokenId)
             throws UnsupportedOperationException, SSOException {
@@ -390,7 +390,7 @@ public class SSOTokenManager {
      * @exception SSOException
      *                if the single sign on token cannot be created.
      * @exception UnsupportedOperationException
-     * @supported.api
+     * 
      */
     public SSOToken createSSOToken(String tokenId, String clientIP)
             throws UnsupportedOperationException, SSOException {
@@ -437,7 +437,7 @@ public class SSOTokenManager {
      * @param token
      *            The single sign on token object to be validated.
      * @return true if the single sign on token is valid.
-     * @supported.api
+     * 
      */
     public boolean isValidToken(SSOToken token) {
         return isValidToken(token, true);
@@ -450,7 +450,7 @@ public class SSOTokenManager {
      * @param token The single sign on token object to be validated.
      *
      * @return true if the single sign on token is valid.
-     * @supported.api
+     * 
      * @since 12.0.0
      */
     public boolean isValidToken(SSOToken token, boolean resetIdleTime) {
@@ -469,7 +469,7 @@ public class SSOTokenManager {
      *            The single sign on token object to be validated.
      * @exception SSOException
      *                if the single sign on token is not valid.
-     * @supported.api
+     * 
      */
     public void validateToken(SSOToken token) throws SSOException {
         getProvider(token).validateToken(token);
@@ -484,7 +484,7 @@ public class SSOTokenManager {
      *                if there was an error while destroying the token, or the
      *                corresponding session reached its maximum session/idle
      *                time, or the session was destroyed.
-     * @supported.api
+     * 
      */
     public void destroyToken(SSOToken token) throws SSOException {
         getProvider(token).destroyToken(token);
@@ -504,7 +504,7 @@ public class SSOTokenManager {
      *                if the session reached its maximum session time, or the
      *                session was destroyed, or there was an error while
      *                refreshing the session.
-     * @supported.api
+     * 
      */
     public void refreshSession(SSOToken token) throws SSOException {
         try {
@@ -546,7 +546,7 @@ public class SSOTokenManager {
      * @throws SSOException
      *             if the there was an error during communication with session
      *             service.
-     * @supported.api
+     * 
      */
     public void destroyToken(SSOToken destroyer, SSOToken destroyed)
             throws SSOException {
@@ -568,7 +568,7 @@ public class SSOTokenManager {
      * @throws SSOException
      *             if the there was an error during communication with session
      *             service.
-     * @supported.api
+     * 
      */
     public Set getValidSessions(SSOToken requester, String server)
             throws SSOException {

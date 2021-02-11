@@ -21,7 +21,7 @@ import org.forgerock.json.resource.ResourceException;
 /**
  * An instance of this exception is thrown for errors encountered during token creation.
  *
- * @supported.all.api
+ * 
  */
 public class TokenCreationException extends ResourceException {
     /**

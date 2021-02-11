@@ -34,7 +34,7 @@ import java.util.Collection;
  * Class that wraps a collection and a boolean flag Used to represent ACI target
  * attributes and ACI permissions. The boolean flag indicates whether the target
  * attributes ( or the permissions ) are exclusive or inclusive
- * @supported.api
+ * 
  */
 public class QualifiedCollection {
 
@@ -50,7 +50,7 @@ public class QualifiedCollection {
      * @param exclusive
      *            the boolean flag indicating whether the values are excluisive
      *            or inclusive.
-     * @supported.api
+     * 
      */
     public QualifiedCollection(Collection collection, boolean exclusive) {
         _collection = collection;
@@ -66,7 +66,7 @@ public class QualifiedCollection {
      *            the object that is to be compared for equality
      * @return <code>true</code> if the passed object is equal to this object,
      *         <code>false</code> otherwise
-     * @supported.api
+     * 
      */
     public boolean equals(Object object) {
         boolean objectsEqual = false;
@@ -86,7 +86,7 @@ public class QualifiedCollection {
      * Clones this object
      * 
      * @return the cloned object
-     * @supported.api
+     * 
      */
     public Object clone() {
         QualifiedCollection theClone = null;
@@ -106,7 +106,7 @@ public class QualifiedCollection {
      * 
      * @param collection
      *            the collection of values
-     * @supported.api
+     * 
      */
     public void setCollection(Collection collection) {
         _collection = collection;
@@ -116,7 +116,7 @@ public class QualifiedCollection {
      * Gets the collection of values
      * 
      * @return the collection of values
-     * @supported.api
+     * 
      */
     public Collection getCollection() {
         return _collection;
@@ -127,7 +127,7 @@ public class QualifiedCollection {
      * 
      * @param exclusive
      *            value of exclusive flag
-     * @supported.api
+     * 
      */
     public void setExclusive(boolean exclusive) {
         _exclusive = exclusive;
@@ -137,7 +137,7 @@ public class QualifiedCollection {
      * Gets the value of the exclusive flag
      * 
      * @return the value of the exclusive flag
-     * @supported.api
+     * 
      */
     public boolean isExclusive() {
         return _exclusive;

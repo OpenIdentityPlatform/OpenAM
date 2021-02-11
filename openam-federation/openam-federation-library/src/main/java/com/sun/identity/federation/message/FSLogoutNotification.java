@@ -66,7 +66,7 @@ import org.w3c.dom.Document;
  * This class contains methods to construct a <code>LogoutRequest</code>
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

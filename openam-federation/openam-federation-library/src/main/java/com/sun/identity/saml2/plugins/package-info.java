@@ -29,6 +29,6 @@
 /**
  * Defines SAMLv2 Plugin SPIs.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml2.plugins;

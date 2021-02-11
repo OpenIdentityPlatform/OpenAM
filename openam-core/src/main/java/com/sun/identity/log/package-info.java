@@ -28,7 +28,7 @@
 
 /**
  * Provides the classes and interfaces of core logging and auditing facilities. 
- * @supported.api
+ * 
  */
 package com.sun.identity.log;
 

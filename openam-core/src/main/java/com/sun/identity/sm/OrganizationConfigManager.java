@@ -72,7 +72,7 @@ import com.sun.identity.shared.Constants;
  * would represent a "c" sub-organization within "b" which would be a
  * sub-organization of "a".
  *
- * @supported.all.api
+ * 
  */
 public class OrganizationConfigManager {
 

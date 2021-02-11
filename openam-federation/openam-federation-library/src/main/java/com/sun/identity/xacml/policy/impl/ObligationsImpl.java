@@ -53,7 +53,7 @@ import org.w3c.dom.NodeList;
  * The <code>Obligations</code> element is a container of 
  * one or more <code>Obligation</code>s issuded by 
  * authorization authority.
- * @supported.all.api
+ * 
  */
 public class ObligationsImpl implements Obligations {
 

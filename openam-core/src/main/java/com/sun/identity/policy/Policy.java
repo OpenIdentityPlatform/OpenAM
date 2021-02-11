@@ -63,7 +63,7 @@ import org.w3c.dom.Node;
  * The <code>Policy</code> object is accessible to policy evaluation and 
  * enforcement points only after it is saved in data store. 
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -136,7 +136,7 @@ public class Policy implements Cloneable {
      *
      * @exception InvalidNameException if policy name is not valid
      *
-     * @supported.api
+     * 
      *
      */
     public Policy(String policyName) throws InvalidNameException {
@@ -167,7 +167,7 @@ public class Policy implements Cloneable {
      *
      * @exception InvalidNameException if policy name is not valid
      *
-     * @supported.api
+     * 
      *
      */
     public Policy(String policyName, String description)
@@ -191,7 +191,7 @@ public class Policy implements Cloneable {
      *
      * @exception InvalidNameException if policy name is not valid
      *
-     * @supported.api
+     * 
      *
      */
     public Policy(String policyName, String description, 
@@ -215,7 +215,7 @@ public class Policy implements Cloneable {
      *
      * @exception InvalidNameException if policy name is not valid
      *
-     * @supported.api
+     * 
      *
      */
     public Policy(String policyName, String description, 
@@ -375,7 +375,7 @@ public class Policy implements Cloneable {
      *
      * @return name of the policy
      *
-     * @supported.api
+     * 
      *
      */
     public String getName() {
@@ -389,7 +389,7 @@ public class Policy implements Cloneable {
      * @exception InvalidNameException if <code>policyName</code> is an invalid
      * name.
      *
-     * @supported.api
+     * 
      *
      */
     public void setName(String policyName) throws InvalidNameException {
@@ -435,7 +435,7 @@ public class Policy implements Cloneable {
      *
      * @return the organization name under which the policy is created
      *
-     * @supported.api
+     * 
      *
      */
     public String getOrganizationName() {
@@ -457,7 +457,7 @@ public class Policy implements Cloneable {
      *
      * @return description of the policy
      *
-     * @supported.api
+     * 
      *
      */
     public String getDescription() {
@@ -470,7 +470,7 @@ public class Policy implements Cloneable {
      * @param description description for the policy
      * @exception InvalidNameException if the description is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void setDescription(String description)
@@ -489,7 +489,7 @@ public class Policy implements Cloneable {
      * @return <code>true</code> if this is a referral policy.
      *         Otherwise returns <code>false</code>
      *
-     * @supported.api
+     * 
      *
      */
     public boolean isReferralPolicy() {
@@ -503,7 +503,7 @@ public class Policy implements Cloneable {
      * @return <code>true</code> if this is an active policy.
      *         Otherwise returns <code>false</code>
      *
-     * @supported.api
+     * 
      *
      */
     public boolean isActive() {
@@ -515,7 +515,7 @@ public class Policy implements Cloneable {
      * An inactive policy is not used to make policy evaluations.
      * @param active <code>boolean</code> representing active or inactive.
      *
-     * @supported.api
+     * 
      *
      */
     public void setActive(boolean active) {
@@ -545,7 +545,7 @@ public class Policy implements Cloneable {
      *
      * @return <code>Set</code> of rule names
      *
-     * @supported.api
+     * 
      *
      */
     public Set getRuleNames() {
@@ -561,7 +561,7 @@ public class Policy implements Cloneable {
      *
      * @exception NameNotFoundException if a <code>Rule</code> with the given 
      *            name does not exist
-     * @supported.api
+     * 
      *
      */
     public Rule getRule(String ruleName) throws NameNotFoundException {
@@ -581,7 +581,7 @@ public class Policy implements Cloneable {
      *            already exists
      * @exception InvalidNameException if the rule name is invalid
      *            same service name as the policy
-     * @supported.api
+     * 
      *
      */
     public void addRule(Rule rule) throws NameAlreadyExistsException ,
@@ -616,7 +616,7 @@ public class Policy implements Cloneable {
      *
      * @exception InvalidNameException if <code>Rule</code> name is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void replaceRule(Rule rule) throws InvalidNameException {
@@ -637,7 +637,7 @@ public class Policy implements Cloneable {
      * @return returns the <code>Rule</code> object being removed;
      *         if not present returns <code>null</code>
      *
-     * @supported.api
+     * 
      *
      */
     public Rule removeRule(String ruleName) {
@@ -660,7 +660,7 @@ public class Policy implements Cloneable {
      *
      * @return <code>Set</code> of String objects representing subject names
      *
-     * @supported.api
+     * 
      *
      */
     public Set getSubjectNames() {
@@ -677,7 +677,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Subject with the given name
      * does not exist
      *
-     * @supported.api
+     * 
      *
      */
     public Subject getSubject(String subjectName) throws NameNotFoundException {
@@ -699,7 +699,7 @@ public class Policy implements Cloneable {
      *          already exists
      * @exception InvalidNameException if the subject name is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void addSubject(String name, Subject subject) 
@@ -723,7 +723,7 @@ public class Policy implements Cloneable {
      * @exception PolicyException if the subject could not be added 
      *               for any other reason
      *
-     * @supported.api
+     * 
      *
      */
     public void addRealmSubject(SSOToken token, String subjectName, 
@@ -753,7 +753,7 @@ public class Policy implements Cloneable {
      * @exception PolicyException if the subject could not be added 
      *               for any other reason
      *
-     * @supported.api
+     * 
      *
      */
     public void addRealmSubject(String subjectName, SubjectTypeManager stm,
@@ -813,7 +813,7 @@ public class Policy implements Cloneable {
      *          already exists
      * @exception InvalidNameException if the subject name is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void addSubject(String name, Subject subject, boolean exclusive) 
@@ -838,7 +838,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Subject instance
      *        with the given name is not present
      *
-     * @supported.api
+     * 
      *
      */
     public void replaceSubject(String name, Subject subject) 
@@ -866,7 +866,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Subject instance
      *        with the given name is not present
      *
-     * @supported.api
+     * 
      *
      */
     public void replaceSubject(String name, Subject subject, boolean exclusive) 
@@ -882,7 +882,7 @@ public class Policy implements Cloneable {
      * @return returns the Subject object being removed.
      *         if not present returns <code>null</code>
      *
-     * @supported.api
+     * 
      *
      */
     public Subject removeSubject(String subjectName) {
@@ -897,7 +897,7 @@ public class Policy implements Cloneable {
      * @param subject Subject object that
      *        will be removed from the user collection
      *
-     * @supported.api
+     * 
      *
      */
     public void removeSubject(Subject subject) {
@@ -922,7 +922,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if the subject with the given
      *         <code>subjectName</code> does not exist in the policy.
      *
-     * @supported.api
+     * 
      *
      */
     public boolean isSubjectExclusive(String subjectName) 
@@ -941,7 +941,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if the subject with the given
      *         <code>subjectName</code> does not exist in the policy.
      *
-     * @supported.api
+     * 
      *
      */
     public boolean isRealmSubject(String subjectName) 
@@ -965,7 +965,7 @@ public class Policy implements Cloneable {
      *
      * @return <code>Set</code> of referral names
      *
-     * @supported.api
+     * 
      *
      */
     public Set getReferralNames() {
@@ -982,7 +982,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Referral with the given name
      * does not exist
      *
-     * @supported.api
+     * 
      *
      */
     public Referral getReferral(String referralName) throws 
@@ -1001,7 +1001,7 @@ public class Policy implements Cloneable {
      *            already exists
      * @exception InvalidNameException if the referral name is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void addReferral(String name, Referral referral) 
@@ -1021,7 +1021,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Referral instance
      *            with the given name is not present
      *
-     * @supported.api
+     * 
      *
      */
     public void replaceReferral(String name, Referral referral) 
@@ -1037,7 +1037,7 @@ public class Policy implements Cloneable {
      * @return returns the <code>Referral</code> object being removed;
      *         if not present returns <code>null</code>
      *
-     * @supported.api
+     * 
      *
      */
     public Referral removeReferral(String referralName) {
@@ -1050,7 +1050,7 @@ public class Policy implements Cloneable {
      *
      * @param referral Referral object that will be removed 
      *
-     * @supported.api
+     * 
      *
      */
     public void removeReferral(Referral referral) {
@@ -1077,7 +1077,7 @@ public class Policy implements Cloneable {
      *
      * @return <code>Set</code> of condition names
      *
-     * @supported.api
+     * 
      *
      */
     public Set getConditionNames() {
@@ -1094,7 +1094,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Condition with the given name
      * does not exist.
      *
-     * @supported.api
+     * 
      *
      */
     public Condition getCondition(String condition) throws 
@@ -1113,7 +1113,7 @@ public class Policy implements Cloneable {
      *            already exists
      * @exception InvalidNameException if the condition name is invalid
      *
-     * @supported.api
+     * 
      *
      */
     public void addCondition(String name, Condition condition) 
@@ -1133,7 +1133,7 @@ public class Policy implements Cloneable {
      * @exception NameNotFoundException if a Condition instance
      *            with the given name is not present
      *
-     * @supported.api
+     * 
      *
      */
     public void replaceCondition(String name, Condition condition) 
@@ -1149,7 +1149,7 @@ public class Policy implements Cloneable {
      * @return returns the Condition object being removed;
      *         if not present returns <code>null</code>
      *
-     * @supported.api
+     * 
      *
      */
     public Condition removeCondition(String condition) {
@@ -1163,7 +1163,7 @@ public class Policy implements Cloneable {
      *
      * @param condition Condition object that will be removed 
      *
-     * @supported.api
+     * 
      *
      */
     public void removeCondition(Condition condition) {
@@ -1318,7 +1318,7 @@ public class Policy implements Cloneable {
      *
      * @exception PolicyException for any other abnormal condition
      *
-     * @supported.api
+     * 
      *
      */
     public void store(SSOToken token, String name) throws SSOException,
@@ -1404,7 +1404,7 @@ public class Policy implements Cloneable {
      * Returns the serialized policy in XML 
      * @return serialized policy in XML
      *
-     * @supported.api
+     * 
      *
      */
     public String toXML() {
@@ -1496,7 +1496,7 @@ public class Policy implements Cloneable {
      *
      * @return XML string representation of the policy object
      *
-     * @supported.api
+     * 
      */
     public String toString() {
         return (toXML());

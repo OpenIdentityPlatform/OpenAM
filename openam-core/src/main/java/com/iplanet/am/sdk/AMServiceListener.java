@@ -35,7 +35,7 @@ package com.iplanet.am.sdk;
  * or a service configuration data has been changed.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public interface AMServiceListener {
     /**

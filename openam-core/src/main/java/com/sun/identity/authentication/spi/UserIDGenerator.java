@@ -43,7 +43,7 @@ import java.util.Set;
  * is not valid, the module then can display a list of alternate user IDs
  * that the end-user could be used to complete the registration.
  *
- * @supported.all.api
+ * 
  */
 public interface UserIDGenerator {
     /**

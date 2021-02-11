@@ -39,7 +39,7 @@ import java.util.List;
  *  The interface <code>Extensions</code> defines methods for
  *  adding protcol message extension elements.
  *
- *  @supported.all.api
+ *  
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

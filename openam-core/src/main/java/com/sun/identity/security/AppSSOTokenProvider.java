@@ -37,7 +37,7 @@ import com.iplanet.sso.SSOToken;
  * implementation of this interface to construct an instance of
  * <code>com.sun.identity.policy.client.PolicyEvaluator</code>.
  *
- * @supported.all.api
+ * 
  */
 public interface AppSSOTokenProvider {
     /**

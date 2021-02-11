@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Represents common console configuration used by all self services.
  *
- * @supported.all.api
+ * 
  * @since 13.0.0
  */
 abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
@@ -126,7 +126,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
      *
      * @return corresponding string value
      *
-     * @supported.api
+     * 
      */
     public final String getAttributeAsString(String key) {
         Set<String> attribute = attributes.get(key);
@@ -141,7 +141,7 @@ abstract class CommonConsoleConfig implements SelfServiceConsoleConfig {
      *
      * @return corresponding set value
      *
-     * @supported.api
+     * 
      */
     public final Set<String> getAttributeAsSet(String key) {
         return attributes.get(key);

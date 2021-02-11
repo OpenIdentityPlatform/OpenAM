@@ -46,7 +46,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * that supplies one or more <code>Statement</code> made by an issuer. 
  * There are three kinds of assertions: Authentication, Authorization Decision,
  * and Attribute assertions.
- * @supported.all.api
+ * 
  */
 @JsonDeserialize(as=AssertionImpl.class)
 public interface Assertion {

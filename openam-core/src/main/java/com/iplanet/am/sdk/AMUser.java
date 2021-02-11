@@ -44,7 +44,7 @@ import com.iplanet.sso.SSOException;
  * 
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public interface AMUser extends AMObject {
 

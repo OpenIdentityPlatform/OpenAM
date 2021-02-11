@@ -40,7 +40,7 @@ import com.sun.identity.shared.encode.Base64;
  * SAML protocol schema. Current implementation supports TYPE 1 artifact only.
  * Other type of artifact can be supported by extending this class.
  *
- * @supported.all.api
+ * 
  */
 public class AssertionArtifact {
 

@@ -36,7 +36,7 @@ package com.iplanet.log;
  * the applications' request or for some other reasons. This 
  * LogException class provides the method for detecting such errors.
  *
- * @supported.all.api
+ * 
  */
 public class LogException extends Exception {
 

@@ -33,7 +33,7 @@ package com.sun.identity.liberty.ws.dst;
  * The <code>DSTException</code> class represents a error while
  * processing <code>DST</code> query/modify requests.
  *
- * @supported.all.api
+ * 
  */
 
 public class DSTException extends Exception {

@@ -32,7 +32,7 @@ import com.iplanet.ums.UMSException;
 
 /**
  * The exception thrown by COS Manager if a COS object is not found.
- * @supported.api
+ * 
  */
 public class COSNotFoundException extends UMSException {
 

@@ -31,7 +31,7 @@ package com.iplanet.services.ldap.aci;
 /**
  * Exception thrown to indicate problems while converting an ACI object to text
  * value to be stored as a value of aci attribute in directory server
- * @supported.all.api
+ * 
  */
 public class ACIComposeException extends ACIException {
 

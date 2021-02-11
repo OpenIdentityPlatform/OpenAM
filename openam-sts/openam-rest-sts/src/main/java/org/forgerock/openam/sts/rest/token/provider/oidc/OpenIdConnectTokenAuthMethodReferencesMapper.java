@@ -25,7 +25,7 @@ import java.util.Set;
  * An interface which allows soap-sts publishers to generate the amr claim for issued OpenIdConnect tokens on the basis
  * of the validated input token. See the amr claim here: http://openid.net/specs/openid-connect-core-1_0.html#IDToken.
  *
- * @supported.all.api
+ * 
  */
 public interface OpenIdConnectTokenAuthMethodReferencesMapper {
     /**

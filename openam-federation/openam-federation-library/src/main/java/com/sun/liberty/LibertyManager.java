@@ -87,7 +87,7 @@ import org.w3c.dom.*;
  * <code>LibertyManager</code> forms the basis of the Public APIs. It has all
  * the methods which the JSPs etc.  need to use for
  * federation/termination/logout etc. 
- * @supported.all.api
+ * 
  */
 public class LibertyManager {
     

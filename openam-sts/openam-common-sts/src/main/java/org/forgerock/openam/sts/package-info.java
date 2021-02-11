@@ -17,6 +17,6 @@
 /**
  * Base package for classes shared between the SOAP and REST STS.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.sts;

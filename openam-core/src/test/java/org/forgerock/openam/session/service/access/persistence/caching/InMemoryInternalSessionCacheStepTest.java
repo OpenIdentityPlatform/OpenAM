@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * 
+ * Portions Copyrighted 2020 Open Identity Platform Community.
  */
 
 package org.forgerock.openam.session.service.access.persistence.caching;
@@ -41,6 +43,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
@@ -50,6 +53,7 @@ import com.sun.identity.shared.debug.Debug;
 
 public class InMemoryInternalSessionCacheStepTest {
     private static final int MAX_SESSIONS = 42;
+    private static final long MAX_TIME = 1;
     private static final SessionID SESSION_ID = new SessionID("test");
 
     @Mock
@@ -74,6 +78,7 @@ public class InMemoryInternalSessionCacheStepTest {
     public void createTestCache() throws Exception {
         MockitoAnnotations.initMocks(this);
         given(mockSessionConfig.getMaxSessionCacheSize()).willReturn(MAX_SESSIONS);
+        given(mockSessionConfig.getMaxSessionCacheTime()).willReturn(MAX_TIME);
         given(mockSession.getID()).willReturn(SESSION_ID);
 
         setupMockCTSToCaptureQueryListener(mockSessionModificationWatcher);

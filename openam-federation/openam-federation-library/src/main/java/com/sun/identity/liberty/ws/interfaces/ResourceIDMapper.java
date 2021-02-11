@@ -41,7 +41,7 @@ import com.sun.identity.liberty.ws.soapbinding.Message;
  * that hosts discovery service. The mapping between the <code>providerID</code>
  * and the implementation class can be configured through the
  * <code>Class for ResourceID Mapper Plugin</code> field in Discovery service.
- * @supported.all.api 
+ *  
  */
 public interface ResourceIDMapper {
 

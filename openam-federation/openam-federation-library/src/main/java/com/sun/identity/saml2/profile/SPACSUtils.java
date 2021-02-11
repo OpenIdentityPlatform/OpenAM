@@ -124,7 +124,7 @@ import org.w3c.dom.Element;
  * This class is used by a service provider (SP) to process the response from  
  * an identity provider for the SP's Assertion Consumer Service.
  *
- * @supported.api
+ * 
  */
 public class SPACSUtils {
 
@@ -1909,7 +1909,7 @@ public class SPACSUtils {
      * @throws SessionException if the processing failed due to session error.
      * @throws ServletException if the processing failed due to request error.
      *
-     * @supported.api
+     * 
      */  
     public static Map processResponseForFedlet (HttpServletRequest request,
         HttpServletResponse response, PrintWriter out) throws SAML2Exception, IOException,

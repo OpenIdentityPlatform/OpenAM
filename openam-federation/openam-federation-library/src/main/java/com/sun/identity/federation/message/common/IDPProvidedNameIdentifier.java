@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  * This class has methods to create the <code>NameIdentifier</code>
  * object provided by the Identity Provider.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

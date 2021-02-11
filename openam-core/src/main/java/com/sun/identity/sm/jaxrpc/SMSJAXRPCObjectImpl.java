@@ -132,7 +132,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                 try {
                     cacheSize = Integer.parseInt(cacheSizeStr);
                     if (cacheSize < 0) {
-                        cacheSize = 30;
+                        cacheSize = 10;
                     }
                 } catch (NumberFormatException e) {
                     //do nothing

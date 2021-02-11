@@ -35,6 +35,6 @@
  * serving multiple clients may provide access to OpenAM's services.
  * Through the implementation, OpenAM determines the client from
  * which the request has originated.
- * @supported.api
+ * 
  */
 package com.iplanet.services.cdm;

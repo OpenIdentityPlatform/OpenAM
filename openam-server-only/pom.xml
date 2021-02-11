@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -820,6 +820,11 @@
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-auth-webauthn</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-auth-qr</artifactId>
         </dependency>
 
 		<dependency>

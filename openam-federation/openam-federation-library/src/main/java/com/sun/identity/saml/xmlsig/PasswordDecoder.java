@@ -31,7 +31,7 @@ package com.sun.identity.saml.xmlsig;
 /**
  * The class <code>PasswordDecoder</code> is an interface
  * that is implemented to decode password.
- * @supported.all.api
+ * 
  */
 
 public interface PasswordDecoder {

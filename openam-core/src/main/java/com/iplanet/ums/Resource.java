@@ -41,7 +41,7 @@ import org.forgerock.opendj.ldap.SearchScope;
 /**
  * Represents a user entry in UMS.
  *
- * @supported.api
+ * 
  */
 public class Resource extends PersistentObject {
 
@@ -98,7 +98,7 @@ public class Resource extends PersistentObject {
      * @param attrSet
      *            attribute/value set
      * 
-     * @supported.api
+     * 
      */
     public Resource(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -113,7 +113,7 @@ public class Resource extends PersistentObject {
      *            Search template
      * @return attribute set with attribute names defined in the template
      * 
-     * @supported.api
+     * 
      */
     public AttrSet getAttributes(SearchTemplate template) throws UMSException {
         AttrSet attrSet = new AttrSet();
@@ -135,7 +135,7 @@ public class Resource extends PersistentObject {
      *            The starting location of the role (rights) aggregation.
      * @return AccessRightObject associated with the user
      * 
-     * @supported.api
+     * 
      */
     public AccessRightObject getAccessRight(Guid guid) throws UMSException,
             com.iplanet.services.ldap.aci.ACIParseException {

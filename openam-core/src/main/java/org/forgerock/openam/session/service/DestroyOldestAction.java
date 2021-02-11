@@ -20,25 +20,13 @@
  */
 package org.forgerock.openam.session.service;
 
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.QuotaExhaustionAction;
-import com.sun.identity.shared.debug.Debug;
-
-import java.util.Date;
+import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
 import java.util.Map;
-import javax.inject.Inject;
-
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
-import org.forgerock.openam.utils.TimeUtils;
 
 
 /**
@@ -48,27 +36,14 @@ import org.forgerock.openam.utils.TimeUtils;
  *
  * @author Peter Major
  */
-public class DestroyOldestAction implements QuotaExhaustionAction {
+public class DestroyOldestAction extends QuotaExhaustionActionImpl {
 
-    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
-
-    private final SessionCache sessionCache;
-
-    public DestroyOldestAction() {
-        this.sessionCache = InjectorHolder.getInstance(SessionCache.class);
-    }
-
-    @Inject
-    public DestroyOldestAction(SessionCache sessionCache) {
-        this.sessionCache = sessionCache;
-    }
-
-    @Override
+	@Override
     public boolean action(InternalSession is, Map<String, Long> sessions) {
         long smallestExpTime = Long.MAX_VALUE;
         String oldestSessionID = null;
         for (Map.Entry<String, Long> entry : sessions.entrySet()) 
-	        	if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
+        	if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
 	            try {
 	                Session session = new Session(new SessionID(entry.getKey()));
 	                session.refresh(false);
@@ -77,23 +52,11 @@ public class DestroyOldestAction implements QuotaExhaustionAction {
 	                    smallestExpTime = expTime;
 	                    oldestSessionID = entry.getKey();
 	                }
-	            } catch (SessionException ssoe) {
-	                if (debug.warningEnabled()) {
-	                    debug.warning("Failed to create SSOToken", ssoe);
-	                }
-	            }
+	            } catch (SessionException ssoe) {}
 	        }
-
-        if (oldestSessionID != null) 
-            try {
-            		Session s=sessionCache.getSession(new SessionID(oldestSessionID), true, false);
-            		s.destroySession(s);
-                debug.error("{} {} {} {} getTimeLeft={}", this.getClass().getSimpleName(), oldestSessionID,is.getClientID(),sessions.size()+1, new Date(TimeUtils.fromUnixTime(smallestExpTime).getTimeInMillis()));
-            } catch (SessionException e) {
-            		debug.error("{} {} {} {} expire={} {}", this.getClass().getSimpleName(), oldestSessionID,is.getClientID(),sessions.size()+1, new Date(TimeUtils.fromUnixTime(smallestExpTime).getTimeInMillis()),e.toString());
-            }finally {
-            		sessions.remove(oldestSessionID);
-			}
+        if (oldestSessionID != null) { 
+        	destroy(oldestSessionID,sessions);
+		}
         return false;
     }
 }

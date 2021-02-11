@@ -34,7 +34,7 @@ package com.sun.identity.wss.security;
  * exceptions during failures for generating or handing Web Services 
  * Security classes or functionalities.
  * 
- * @supported.all.api
+ * 
  */
 
 public class SecurityException extends Exception {

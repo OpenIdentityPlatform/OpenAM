@@ -20,50 +20,25 @@
    <parent>
        <groupId>org.openidentityplatform.openam</groupId>
        <artifactId>openam-cassandra</artifactId>
-       <version>14.4.3-SNAPSHOT</version>
+       <version>14.6.3-SNAPSHOT</version>
    </parent>
 
   <artifactId>openam-cassandra-embedded</artifactId>
-  <name>OpenAM Embedded Cassandra</name>
+  <name>OpenAM Cassandra Embedded</name>
   <description>OpenAM Embedded Cassandra</description>
   <dependencies>
 		<dependency>
-			<groupId>org.cassandraunit</groupId>
-			<artifactId>cassandra-unit</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-core-asl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-mapper-asl</artifactId>
-				</exclusion>
-			</exclusions>
+		    <groupId>com.datastax.oss</groupId>
+		    <artifactId>java-driver-core</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-core-asl</artifactId>
-		    <version>1.9.13</version>
+		    <groupId>org.apache.cassandra</groupId>
+		    <artifactId>cassandra-all</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-mapper-asl</artifactId>
-		    <version>1.9.13</version>
-		</dependency>
-		<dependency>
-		  <groupId>com.datastax.cassandra</groupId>
-		  <artifactId>cassandra-driver-core</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>org.hectorclient</groupId>
-		    <artifactId>hector-core</artifactId>
-		    <version>2.0-0</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -31,7 +31,7 @@ package com.sun.identity.liberty.ws.idpp.plugin;
 /**
  * Class <code>AttributeMapper</code> is an interface for mapping a
  * between a Personal Profile Attribute to an LDAP Attribute.
- * @supported.all.api 
+ *  
  */
 public interface AttributeMapper {
 

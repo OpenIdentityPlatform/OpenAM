@@ -32,7 +32,7 @@ package com.iplanet.services.cdm;
  * The <code>ClientDetectionException</code> class is used to throw exceptions
  * whenever an error is encountered in detecting client type. This includes
  * errors while reading the client data.
- * @supported.all.api
+ * 
  */
 public class ClientDetectionException extends Exception {
     /**

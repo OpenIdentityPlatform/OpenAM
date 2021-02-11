@@ -12,10 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * 
+ * Portions Copyrighted 2020 Open Identity Platform Community.
  */
 
 package org.forgerock.openam.session.service.access.persistence.caching;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +34,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.base.Throwables;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheStats;
-import com.google.common.cache.Weigher;
-import com.google.common.collect.ImmutableMap;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStoreStep;
@@ -46,6 +43,12 @@ import org.forgerock.openam.session.service.access.persistence.watchers.SessionM
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
+import com.google.common.base.Throwables;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.Weigher;
+import com.google.common.collect.ImmutableMap;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
@@ -70,8 +73,9 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                                      @Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
                                      SessionModificationWatcher watcher) {
         final int maxCacheSize = sessionConfig.getMaxSessionCacheSize();
+        final long maxCacheTime = sessionConfig.getMaxSessionCacheTime();
         this.sessionConfig = sessionConfig;
-        this.cache = new AtomicStampedReference<>(buildCache(maxCacheSize), maxCacheSize);
+        this.cache = new AtomicStampedReference<>(buildCache(maxCacheSize, maxCacheTime), maxCacheSize);
         this.debug = sessionDebug;
 
         watcher.addListener(new SessionModificationListener() {
@@ -222,7 +226,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         if (oldCacheSize != newCacheSize) {
             debug.message("InMemoryInternalSessionCacheStep: Detected change in cache size configuration (old: {}, " +
                     "new: {}). Rebuilding cache", oldCacheSize, newCacheSize);
-            final Cache<String, InternalSession> newCache = buildCache(newCacheSize);
+            final Cache<String, InternalSession> newCache = buildCache(newCacheSize, sessionConfig.getMaxSessionCacheTime());
             if (this.cache.compareAndSet(currentCache, newCache, oldCacheSize, newCacheSize)) {
                 newCache.putAll(currentCache.asMap());
                 currentCache.invalidateAll();
@@ -238,7 +242,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         return currentCache;
     }
 
-    private static Cache<String, InternalSession> buildCache(final int maxCacheSize) {
+    private static Cache<String, InternalSession> buildCache(final int maxCacheSize, final long maxCacheTime) {
         if (maxCacheSize <= 0) {
             return EmptyCache.INSTANCE;
         }
@@ -246,7 +250,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .concurrencyLevel(16)
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
-                    .softValues()
+                    .expireAfterWrite(Duration.ofMinutes(maxCacheTime))
                     .build();
     }
 
@@ -270,7 +274,11 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
      * for this key".
      */
     private static class NullResultException extends Exception {
-        private static final NullResultException INSTANCE = new NullResultException();
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private static final NullResultException INSTANCE = new NullResultException();
 
         private NullResultException() {
             // Private constructor

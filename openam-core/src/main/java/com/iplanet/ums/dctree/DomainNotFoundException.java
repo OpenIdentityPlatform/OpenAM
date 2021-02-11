@@ -33,7 +33,7 @@ import com.iplanet.ums.UMSException;
 /**
  * Exception occurs when specified domain is not found in the dctree.
  *
- * @supported.all.api
+ * 
  */
 public class DomainNotFoundException extends UMSException {
 

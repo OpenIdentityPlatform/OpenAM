@@ -29,6 +29,6 @@
 /**
  * Defines common XACML Utilities and Constants
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.common;

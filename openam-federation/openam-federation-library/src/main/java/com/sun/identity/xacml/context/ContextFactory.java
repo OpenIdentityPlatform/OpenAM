@@ -59,7 +59,7 @@ import com.sun.identity.xacml.saml2.impl.XACMLAuthzDecisionStatementImpl;
  * There are three ways to obtain an instance of a object type:
  * with no parameters, with a DOM tree element, or with an XML String.
  *
- * @supported.all.api
+ * 
  */
 public class ContextFactory {
 

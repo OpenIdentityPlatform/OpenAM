@@ -55,7 +55,7 @@ import org.w3c.dom.NodeList;
  * schema information of a service. The schema for a service can be one of the
  * following types: GLOBAL, ORGANIZATION, DYNAMIC, USER, and POLICY.
  *
- * @supported.all.api
+ * 
  */
 public class ServiceSchema {
 

@@ -100,8 +100,6 @@ public class CoreServicesWrapper {
     /**
      * Gets a ServiceConfigManager instance.
      *
-     * {@link com.sun.identity.sm.ServiceConfigManager(String, com.iplanet.sso.SSOToken)}
-     *
      * @param serviceName The service name.
      * @param token The SSOToken.
      * @return A ServiceConfigManager instance.
@@ -181,8 +179,6 @@ public class CoreServicesWrapper {
     /**
      * This method determines the organization parameter and determines the organization DN based on query parameters.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils#getDomainNameByRequest(HttpServletRequest,
-     *          Hashtable)}
      *
      * @param request The HTTP Servlet Request.
      * @return Organization DN.

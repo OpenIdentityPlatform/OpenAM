@@ -49,7 +49,7 @@ import javax.servlet.http.HttpServletResponse;
  * A singleton instance of this <code>FederationSPAdapter</code> will be used 
  * during runtime, so make sure implementation of the federation 
  * processing methods (except initialize() method) are thread safe. 
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

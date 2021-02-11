@@ -64,7 +64,7 @@ import org.w3c.dom.Element;
  * &lt;/element>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 public class DSTQueryItem {
 

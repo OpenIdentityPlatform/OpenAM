@@ -16,6 +16,6 @@
 /**
  * Defines debug logging classes.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.shared.debug;

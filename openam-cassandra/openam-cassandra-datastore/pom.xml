@@ -20,7 +20,7 @@
    <parent>
        <groupId>org.openidentityplatform.openam</groupId>
        <artifactId>openam-cassandra</artifactId>
-       <version>14.4.3-SNAPSHOT</version>
+       <version>14.6.3-SNAPSHOT</version>
    </parent>
 
   <artifactId>openam-cassandra-datastore</artifactId>
@@ -29,38 +29,24 @@
   		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.9</version>
 		</dependency>
 		<dependency>
-		  <groupId>com.datastax.cassandra</groupId>
-		  <artifactId>cassandra-driver-core</artifactId>
+		    <groupId>com.datastax.oss</groupId>
+		    <artifactId>java-driver-core</artifactId>
+		</dependency>
+		<dependency>
+			  <groupId>com.datastax.oss</groupId>
+			  <artifactId>java-driver-query-builder</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>	
 			<artifactId>openam-cassandra-embedded</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-core-asl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.codehaus.jackson</groupId>
-					<artifactId>jackson-mapper-asl</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-core-asl</artifactId>
-		    <version>1.9.13</version>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.codehaus.jackson</groupId>
-		    <artifactId>jackson-mapper-asl</artifactId>
-		    <version>1.9.13</version>
-		    <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
   </dependencies>
 </project>

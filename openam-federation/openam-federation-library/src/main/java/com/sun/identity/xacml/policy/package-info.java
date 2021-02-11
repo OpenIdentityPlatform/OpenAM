@@ -16,6 +16,6 @@
 /**
  * Defines XACML Policy classes.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.policy;

@@ -63,7 +63,7 @@ import org.w3c.dom.NodeList;
  * The class <code>FSNameIdentifierMappingRequest</code> is used to
  * create or parse <code>NameIdentifierMappingRequest<code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

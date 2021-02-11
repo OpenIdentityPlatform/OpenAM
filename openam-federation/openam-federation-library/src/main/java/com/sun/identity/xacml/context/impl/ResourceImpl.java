@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
  *    &lt;xs:sequence>
  *  &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public class ResourceImpl implements Resource {
     private List  attributes;

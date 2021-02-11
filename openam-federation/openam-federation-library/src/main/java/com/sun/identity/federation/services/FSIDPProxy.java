@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This interface <code>FSIDPProxy</code> is used to find a preferred Identity
  * Authenticating provider to proxy the authentication request.
- * @supported.all.api
+ * 
  * @deprecated This SPI is deprecated.
  * @see com.sun.identity.federation.services.FSRealmIDPProxy
  */ 

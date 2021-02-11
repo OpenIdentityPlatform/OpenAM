@@ -65,7 +65,7 @@ import com.sun.identity.saml2.protocol.impl.LogoutResponseImpl;
  * &lt;/complexType>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

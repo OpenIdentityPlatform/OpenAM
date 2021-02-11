@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * This interface <code>IDPECPSessionMapper</code> is used to find a valid
  * session from HTTP servlet request on IDP with ECP profile.
  *
- * @supported.all.api
+ * 
  */ 
 public interface IDPECPSessionMapper {
 

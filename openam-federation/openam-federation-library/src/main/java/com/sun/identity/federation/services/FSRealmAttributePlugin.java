@@ -38,7 +38,7 @@ import java.util.List;
  * during the Single Sign-on process. The implementation of this plugin
  * must return list of SAML <code>AttributeStatement</code>s.
  * </p>
- * @supported.all.api
+ * 
  */ 
 public interface FSRealmAttributePlugin {
 

@@ -40,13 +40,13 @@ import com.iplanet.services.ldap.AttrSet;
  * 
  * @see Template
  * @see CreationTemplate
- * @supported.api
+ * 
  */
 public class SearchTemplate extends Template {
     /**
      * Default constructor for deserialization
      * 
-     * @supported.api
+     * 
      */
     public SearchTemplate() {
         super();
@@ -84,7 +84,7 @@ public class SearchTemplate extends Template {
      * @param filter
      *            search filter
      * 
-     * @supported.api
+     * 
      */
     public SearchTemplate(String name, String[] attributeNames, String filter) {
         super(name);
@@ -100,7 +100,7 @@ public class SearchTemplate extends Template {
      * @param filter
      *            A UMS search expression (LDAP syntax)
      * 
-     * @supported.api
+     * 
      */
     public void setSearchFilter(String filter) {
         m_searchFilter = (filter != null) ? filter : "objectclass=*";
@@ -111,7 +111,7 @@ public class SearchTemplate extends Template {
      * 
      * @return a UMS search expression (LDAP syntax)
      * 
-     * @supported.api
+     * 
      */
     public String getSearchFilter() {
         return m_searchFilter;
@@ -123,7 +123,7 @@ public class SearchTemplate extends Template {
      * @param attributeNames
      *            The attribute names to be returned
      * 
-     * @supported.api
+     * 
      */
     public void setAttributeNames(String[] attributeNames) {
         if (attributeNames != null) {
@@ -139,7 +139,7 @@ public class SearchTemplate extends Template {
      * @param attributeName
      *            The attribute name to be added
      * 
-     * @supported.api
+     * 
      */
     public void addAttributeName(String attributeName) {
         if (attributeName != null) {
@@ -157,7 +157,7 @@ public class SearchTemplate extends Template {
      * @param attributeNames
      *            The attribute names to be added
      * 
-     * @supported.api
+     * 
      */
     public void addAttributeNames(String[] attributeNames) {
         if (attributeNames != null) {
@@ -174,7 +174,7 @@ public class SearchTemplate extends Template {
      * @param attributeName
      *            The attribute name to be removed
      * 
-     * @supported.api
+     * 
      */
     public void removeAttributeName(String attributeName) {
         if (attributeName != null && m_attrSet != null) {
@@ -189,7 +189,7 @@ public class SearchTemplate extends Template {
      * @param attributeNames
      *            The attribute names to be removed
      * 
-     * @supported.api
+     * 
      */
     public void removeAttributeNames(String[] attributeNames) {
         if (attributeNames != null && m_attrSet != null) {
@@ -204,7 +204,7 @@ public class SearchTemplate extends Template {
      * 
      * @return Names of all attributes defined
      * 
-     * @supported.api
+     * 
      */
     public String[] getAttributeNames() {
         return (m_attrSet == null) ? new String[0] : m_attrSet
@@ -236,7 +236,7 @@ public class SearchTemplate extends Template {
      * 
      * @return A copy of the Template
      * 
-     * @supported.api
+     * 
      */
     public Object clone() {
         SearchTemplate t = (SearchTemplate) super.clone();
@@ -254,7 +254,7 @@ public class SearchTemplate extends Template {
      * 
      * @return The object in printable form
      * 
-     * @supported.api
+     * 
      */
     public String toString() {
         return "SearchTemplate: " + getName() + " { " + m_attrSet + " }";

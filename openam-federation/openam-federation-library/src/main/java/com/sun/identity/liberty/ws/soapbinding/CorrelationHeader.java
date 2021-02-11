@@ -50,7 +50,7 @@ import com.sun.identity.saml.common.SAMLUtils;
  * required attribute and will be generated automatically when a constructor
  * is called.
  *
- * @supported.all.api
+ * 
  */
 
 public class CorrelationHeader {   

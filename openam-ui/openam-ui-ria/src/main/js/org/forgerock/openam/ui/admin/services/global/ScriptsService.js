@@ -35,7 +35,7 @@ define([
         getAllDefault (subSchemaType) {
             return obj.serviceCall({
                 url: fetchUrl.default("/scripts?_pageSize=10&_sortKeys=name&_queryFilter=default eq true and context " +
-                    `eq "${subSchemaType}"&_pagedResultsOffset=0`, { realm: false }),
+                    `eq %22${subSchemaType}%22&_pagedResultsOffset=0`, { realm: false }),
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).then((response) => _.sortBy(response.result, "name"));
         },

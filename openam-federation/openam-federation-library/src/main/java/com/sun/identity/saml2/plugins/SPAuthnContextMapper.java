@@ -44,7 +44,7 @@ import java.util.Map;
  * <code>RequestedAuthnContext</code> to set in the <code>AuthnRequest</code>
  * and the Authentication Level of an Authentication Context.
  *
- * @supported.all.api
+ * 
  */
 
 public interface SPAuthnContextMapper {

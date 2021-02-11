@@ -33,7 +33,7 @@ package com.sun.identity.policy;
  * Exception thrown if a name of an object such as policy, rule or 
  * referral is invalid 
  *
- * @supported.all.api
+ * 
  */
 public class InvalidNameException extends PolicyException {
 

@@ -129,7 +129,8 @@ public class SSOTokenContext extends AbstractContext implements SubjectContext {
                 return ssoTokenContext.getCallerSSOToken();
             }
         }
-        return SSOTokenManager.getInstance().createSSOToken(RestUtils.getCookieFromServerContext(securityContext));
+        final String token=RestUtils.getCookieFromServerContext(securityContext);
+        return (token==null)?null:SSOTokenManager.getInstance().createSSOToken(token);
     }
 
     @Override

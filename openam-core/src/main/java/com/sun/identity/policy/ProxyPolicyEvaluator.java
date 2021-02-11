@@ -50,7 +50,7 @@ import org.forgerock.opendj.ldap.DN;
  * result for any other user, they would get a <code>PolicyException</code>.
  * This class can be used only within the web container running policy server.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

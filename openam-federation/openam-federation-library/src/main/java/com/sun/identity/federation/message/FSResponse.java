@@ -60,7 +60,7 @@ import com.sun.identity.federation.common.IFSConstants;
 /**
  * This class contains methods for creating a Liberty <code>Response</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

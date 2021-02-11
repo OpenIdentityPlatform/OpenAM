@@ -29,6 +29,6 @@
 /**
  * SAML 1.x Protocol Classes.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml.protocol;

@@ -25,7 +25,7 @@ import org.forgerock.services.context.Context;
  * @param <C>
  *         the console configuration type
  *
- * @supported.all.api
+ * 
  * @since 13.0.0
  */
 public interface ServiceConfigProvider<C extends SelfServiceConsoleConfig> {

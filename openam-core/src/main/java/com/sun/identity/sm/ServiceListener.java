@@ -39,7 +39,7 @@ import org.forgerock.openam.ldap.PersistentSearchChangeType;
  * <code>organizationConfigChanged()</code> are invoked when the service
  * configuration data has been changed.
  *
- * @supported.all.api
+ * 
  */
 public interface ServiceListener {
 

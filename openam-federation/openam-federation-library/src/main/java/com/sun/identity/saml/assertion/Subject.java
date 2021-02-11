@@ -51,7 +51,7 @@ import org.w3c.dom.Node;
  *are present, the issuer is asserting that the statement is true of both  
  *subjects being identified. A <code>Subject</code> element SHOULD NOT identify
  *more than one principal.
- *@supported.all.api 
+ * 
  */
 
 

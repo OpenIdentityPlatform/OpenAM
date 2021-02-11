@@ -58,7 +58,7 @@ import com.sun.identity.xmlenc.*;
  * &lt;/complexType>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 public class EncryptedResourceID {
 

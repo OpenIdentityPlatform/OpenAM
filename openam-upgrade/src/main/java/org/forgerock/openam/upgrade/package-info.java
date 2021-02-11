@@ -16,6 +16,6 @@
 /**
  * Defines interfaces and classes to perform OpenAM system upgrade.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.upgrade;

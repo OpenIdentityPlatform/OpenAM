@@ -48,7 +48,7 @@ import java.util.Set;
  * plugin by adding attribute-values which can be either OR'ed or AND'ed to the
  * basic search.
  * 
- * @supported.all.api
+ * 
  */
 public final class IdSearchControl {
     private Set returnAttributes = null;

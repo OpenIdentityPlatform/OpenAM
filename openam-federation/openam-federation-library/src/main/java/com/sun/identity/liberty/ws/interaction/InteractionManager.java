@@ -80,7 +80,7 @@ import org.w3c.dom.Element;
  *  resource owner interaction.  <code>WSC</code> and <code>WSP</code> would
  *  collaborate with the singleton object instance of this class to provide
  *  and use resource owner interaction.  
- *  @supported.api
+ *  
  */
 public class InteractionManager {
 
@@ -90,7 +90,7 @@ public class InteractionManager {
      * <code>returnToURL</code>, while redirecting user agent to
      * <code>WSP</code>.
      *
-     * @supported.all.api
+     * 
      */
     public static final String RETURN_TO_URL = "ReturnToURL";
 
@@ -99,7 +99,7 @@ public class InteractionManager {
      * to include an ID to refer to request message that led to user agent
      * redirect.
      *
-     * @supported.api
+     * 
      */
     public static final String REQUEST_ID = "RequestID";
 
@@ -108,7 +108,7 @@ public class InteractionManager {
      * <code>providerID</code> of <code>IDP</code>, that was used to
      * authenticate user.
      *
-     * @supported.api
+     * 
      */
     public static final String IDP = "IDP";
 
@@ -117,13 +117,13 @@ public class InteractionManager {
      * an ID to indicate that user agent is redirected back to
      * <code>WSC</code> from <code>WSP</code>
      *
-     * @supported.api
+     * 
      */
     public static final String RESEND_MESSAGE = "ResendMessage";
 
     /**
      * Name space URI of interaction service 
-     * @supported.api
+     * 
      */
     public static final String INTERACTION_NAMESPACE 
             = "urn:liberty:is:2003-08"; 
@@ -217,7 +217,7 @@ public class InteractionManager {
      * Gets singleton object instance of <code>InteractionManager</code>
      * @return singleton object instance of <code>InteractionManager</code>
      *
-     * @supported.api
+     * 
      */
     synchronized public static InteractionManager getInstance() {
         if (interactionManager == null) {
@@ -255,7 +255,7 @@ public class InteractionManager {
      * @throws SOAPBindingException  for generic SOAP binding errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
-     * @supported.api
+     * 
      */
     public Message sendRequest(Message requestMessage, 
             String connectTo,
@@ -372,7 +372,7 @@ public class InteractionManager {
      *
      * @see #REQUEST_ID
      *
-     * @supported.api
+     * 
      */
     public Message resendRequest(String returnToURL,
             HttpServletRequest httpRequest,  
@@ -400,7 +400,7 @@ public class InteractionManager {
      * @throws SOAPBindingException  for generic SOAP errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
-     * @supported.api
+     * 
      */
     public Message resendRequest(String returnToURL,
             HttpServletRequest httpRequest,  
@@ -650,7 +650,7 @@ public class InteractionManager {
      *         has to be returned  to <code>WSC</code>
      * @throws SOAPFaultException if the response message has SOAP fault
      *
-     * @supported.api
+     * 
      */
     public Message handleInteraction(Message requestMessage,
            InquiryElement inquiryElement, String language)
@@ -844,7 +844,7 @@ public class InteractionManager {
      *
      * @throws InteractionException for interaction error
      *
-     * @supported.api
+     * 
      */
     public InteractionResponseElement getInteractionResponseElement(
             Message requestMessage) 

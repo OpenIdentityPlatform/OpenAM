@@ -35,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * This class is an extension point for all Discovery Service related 
  * exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class DiscoveryException extends L10NMessageImpl {
 

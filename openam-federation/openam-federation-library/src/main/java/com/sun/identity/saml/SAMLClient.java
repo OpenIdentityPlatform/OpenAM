@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
  * The class <code>SAMLClient</code> provides interfaces
  * to do Web and POST profile as specified by SAML specification. It
  * also provides methods to get Assertions based on Artifacts.
- * @supported.api
+ * 
  */
 
 public class SAMLClient {   
@@ -133,7 +133,7 @@ public class SAMLClient {
      * @exception IOException if an input or output exception occurs when
      *     redirecting to service <code>URL</code>
      * @exception SAMLException if SAML error occurs during the process 
-     * @supported.api
+     * 
      */
     public static void doWebArtifact(HttpServletRequest request, 
                                      HttpServletResponse response, 
@@ -154,7 +154,7 @@ public class SAMLClient {
      * @exception IOException if an input or output exception occurs when
      *     redirecting to service <code>URL</code>
      * @exception SAMLException if SAML error occurs during the process 
-     * @supported.api
+     * 
      */
     public static void doWebPOST(HttpServletRequest request,
                                  HttpServletResponse response, 
@@ -175,7 +175,7 @@ public class SAMLClient {
      * @exception IOException if an input or output exception occurs when
      *     connecting to SAML service <code>URL</code>
      * @exception SAMLException if SAML error occurs during the process 
-     * @supported.api
+     * 
      */
     public static Assertion getAssertionByArtifact(AssertionArtifact artifact)
         throws IOException, SAMLException {          
@@ -193,7 +193,7 @@ public class SAMLClient {
      * @exception IOException if an input or output exception occurs when
      *     connecting to SAML service <code>URL</code>
      * @exception SAMLException if SAML error occurs during the process
-     * @supported.api
+     * 
      */
     public static Assertion getAssertionByArtifact(String artifact)
         throws IOException, SAMLException {

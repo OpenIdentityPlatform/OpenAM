@@ -41,7 +41,7 @@ import java.util.Set;
  * between <code>AuthnContextClassRef</code> and the actual 
  * authentication mechanism at the Identity Provider. 
  *
- * @supported.all.api
+ * 
  */ 
 
 public class IDPAuthnContextInfo {

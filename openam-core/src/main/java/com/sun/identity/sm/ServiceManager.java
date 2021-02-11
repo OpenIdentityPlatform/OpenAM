@@ -66,7 +66,7 @@ import org.w3c.dom.NodeList;
  * to obtain an instance of <code>ServiceSchemaManager</code> and an instance
  * of <code>ServiceConfigManager</code>.
  *
- * @supported.api
+ * 
  */
 public class ServiceManager {
 
@@ -152,7 +152,7 @@ public class ServiceManager {
      * @throws SMSException
      *             if an error occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceManager(SSOToken token) throws SSOException, SMSException {
         // Initilaize the static variables and caches
@@ -178,7 +178,7 @@ public class ServiceManager {
      * @throws SMSException
      *             if an error occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceSchemaManager getSchemaManager(String serviceName,
             String version) throws SMSException, SSOException {
@@ -200,7 +200,7 @@ public class ServiceManager {
      * @throws SMSException
      *             if an error occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public ServiceConfigManager getConfigManager(String serviceName,
             String version) throws SMSException, SSOException {
@@ -237,7 +237,7 @@ public class ServiceManager {
      * @throws SMSException
      *             if an error occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public Set<String> getServiceNames() throws SMSException {
         try {
@@ -365,7 +365,7 @@ public class ServiceManager {
      * @throws SMSException
      *             if an error occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public Set getServiceVersions(String serviceName) throws SMSException {
         try {
@@ -388,7 +388,7 @@ public class ServiceManager {
      * @throws SSOException if the user's single sign on token is invalid or 
      *         expired.
      *
-     * @supported.api
+     * 
      */
     public Set registerServices(InputStream xmlServiceSchema)
         throws SMSException, SSOException {
@@ -722,7 +722,7 @@ public class ServiceManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void removeService(String serviceName, String version)
             throws SMSException, SSOException {
@@ -901,7 +901,7 @@ public class ServiceManager {
      * only in this JVM instance. If multiple instances (of JVM) are running
      * this method must be called within each instance.
      *
-     * @supported.api
+     * 
      */
     public synchronized void clearCache() {
         // Clear the local caches
@@ -972,7 +972,7 @@ public class ServiceManager {
      * @return <code>true</code> is realm model is used for storing
      *         configuration data; <code>false</code> otherwise.
      *
-     * @supported.api
+     * 
      */
     public static boolean isRealmEnabled() {
         if (!initialized) {

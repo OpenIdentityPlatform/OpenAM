@@ -16,6 +16,6 @@
 /**
  * Defines classes to handle JAX-RPC.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.jaxrpc;

@@ -31,7 +31,7 @@ package com.iplanet.ums;
 /**
  * Represents a container interface common to groups and roles.
  *
- * @supported.all.api
+ * 
  */
 public interface IMembership {
     /**

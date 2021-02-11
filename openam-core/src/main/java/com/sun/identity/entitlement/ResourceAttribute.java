@@ -40,7 +40,7 @@ import javax.security.auth.Subject;
  * For example, these may be statically defined ({@link com.sun.identity.entitlement.StaticAttributes})
  * or derived from the {@link Subject}'s account details ({@link com.sun.identity.entitlement.UserAttributes}).
  *
- * @supported.all.api
+ * 
  */
 public interface ResourceAttribute {
 

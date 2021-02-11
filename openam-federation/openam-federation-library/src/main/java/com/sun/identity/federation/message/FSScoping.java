@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  * This class <code>FSScoping</code> creates scoping element for the
  * authentication request.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

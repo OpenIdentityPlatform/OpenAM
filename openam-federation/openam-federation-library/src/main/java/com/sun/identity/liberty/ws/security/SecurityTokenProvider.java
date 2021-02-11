@@ -42,7 +42,7 @@ import java.security.cert.X509Certificate;
  * The class <code>SecurityTokenProvider</code> is a provider interface 
  * for managing <code>WSS</code> security tokens.
  *
- * @supported.all.api
+ * 
  */
 
 public interface SecurityTokenProvider {

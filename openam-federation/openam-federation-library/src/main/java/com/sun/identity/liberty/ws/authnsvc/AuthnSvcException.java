@@ -36,7 +36,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * This class is an extension point for all Authentication Service related 
  * exceptions.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

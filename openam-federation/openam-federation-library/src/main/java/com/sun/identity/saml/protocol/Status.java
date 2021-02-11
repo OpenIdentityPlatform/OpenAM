@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * This class represents the Status element. It corresponds to 
  * <code>&lt;samlp:StatusType&gt;</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public class Status {
 

@@ -82,7 +82,7 @@ import com.sun.identity.shared.locale.Locale;
  * <p>
  * It should be serializable as a requirement to be stored in HttpSession.
  *
- * @supported.api
+ * 
  */
 public final class AuthContextLocal extends Object
     implements java.io.Serializable {
@@ -170,7 +170,7 @@ public final class AuthContextLocal extends Object
      *
      * @param orgName name of the user's organization.
      *
-     * @supported.api
+     * 
      */
     public AuthContextLocal(String orgName) {
         authDebug.message("AuthContextLocal() constructor called");
@@ -191,7 +191,7 @@ public final class AuthContextLocal extends Object
      * @return authentication module/s instances (or plugins).
      * @throws UnsupportedOperationException if an error occurred.
      *
-     * @supported.api
+     * 
      */
     public Set getModuleInstanceNames() {
         moduleInstanceNames = amlc.getModuleInstanceNames();
@@ -204,7 +204,7 @@ public final class AuthContextLocal extends Object
      * object.
      *
      * @exception AuthLoginException if an error occurred during login.
-     * @supported.api
+     * 
      */
     public void login() throws AuthLoginException {
         login(null);
@@ -221,7 +221,7 @@ public final class AuthContextLocal extends Object
      * @param password password for the user.
      * @throws AuthLoginException if an error occurred 
      *            during login.
-     * @supported.api
+     * 
      */
     public void login(Principal principal, char[] password) 
         throws AuthLoginException {
@@ -252,7 +252,7 @@ public final class AuthContextLocal extends Object
      * @param indexName authentication index name.
      * @throws AuthLoginException if an error occurred
      *            during login.
-     * @supported.api
+     * 
      */
     public void login(AuthContext.IndexType type, String indexName)
         throws AuthLoginException {
@@ -272,7 +272,7 @@ public final class AuthContextLocal extends Object
      * @param subject <code>Subject</code> of the user to be authenticated.
      * @throws AuthLoginException if an error occurred
      *            during login.
-     * @supported.api
+     * 
      */
     public void login(Subject subject) throws AuthLoginException {
         login(null, null, null, null, subject);
@@ -467,7 +467,7 @@ public final class AuthContextLocal extends Object
      * this will return <code>null</code>.
      *
      * @return The set of Principals the user has been authenticated as.
-     * @supported.api
+     * 
      */
     public Subject getSubject() {
         if (!loginStatus.equals(AuthContext.Status.SUCCESS)) {
@@ -485,7 +485,7 @@ public final class AuthContextLocal extends Object
      *
      * @return <code>true</code> if more credentials are required
      *         from the user.
-     * @supported.api
+     * 
      */
     public boolean hasMoreRequirements() {
         authDebug.message("AuthContextLocal::hasMoreRequirements()");
@@ -529,7 +529,7 @@ public final class AuthContextLocal extends Object
      *
      * @return an array of <code>Callback</code> objects requesting credentials
      *         from user.
-     * @supported.api
+     * 
      */
     public Callback[] getRequirements() {
         authDebug.message("AuthContextLocal::getRequirements()");
@@ -553,7 +553,7 @@ public final class AuthContextLocal extends Object
      * @param noFilter flag to indicate if there is a Filter
      * @return an array of <code>Callback</code> objects requesting credentials
      *         from user.
-     * @supported.api
+     * 
      */
     public Callback[] getRequirements(boolean noFilter) {
         authDebug.message("AuthContextLocal::getRequirements()");
@@ -574,7 +574,7 @@ public final class AuthContextLocal extends Object
      * user's response to these requests.
      *
      * @param info array of <code>Callback</code> objects
-     * @supported.api
+     * 
      */
     public void submitRequirements(Callback[] info) {
         authDebug.message("AuthContextLocal::submitRequirements()");
@@ -605,7 +605,7 @@ public final class AuthContextLocal extends Object
      * associated with this <code>AuthContextLocal</code>.
      *
      * @throws AuthLoginException if an error occurred during logout
-     * @supported.api
+     * 
      */
     public void logout() throws AuthLoginException {
         authDebug.message("AuthContextLocal::logout()");
@@ -631,7 +631,7 @@ public final class AuthContextLocal extends Object
      * fails.
      *
      * @return login exception.
-     * @supported.api
+     * 
      */
     public AuthLoginException getLoginException() {
         authDebug.message("AuthContextLocal::getLoginException()");
@@ -652,7 +652,7 @@ public final class AuthContextLocal extends Object
      * Returns the current status of the authentication process.
      *
      * @return the current status of the authentication process.
-     * @supported.api
+     * 
      */
     public AuthContext.Status getStatus() {
         authDebug.message("AuthContextLocal::getStatus()");
@@ -698,7 +698,7 @@ public final class AuthContextLocal extends Object
      * user.Single-Sign-On token can be used as the authenticated token.
      *
      * @return single-sign-on token
-     * @supported.api
+     * 
      */
     public SSOToken getSSOToken() {
         ssoToken = amlc.getSSOToken();
@@ -729,7 +729,7 @@ public final class AuthContextLocal extends Object
      *
      * @return Organization name.
      *
-     * @supported.api
+     * 
      */
     public String getOrganizationName() {
         return (amlc.getOrganizationName());
@@ -740,7 +740,7 @@ public final class AuthContextLocal extends Object
      *
      * @throws AuthLoginException if an error occurred during abort.
      *
-     * @supported.api
+     * 
      */
     public void abort() throws AuthLoginException {
         authDebug.message("AuthContextLocal::abort()");

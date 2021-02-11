@@ -44,7 +44,7 @@ import java.util.List;
  * &lt;element name="RequestedAuthnContext" type="{urn:oasis:names:tc:SAML:2.0:protocol}RequestedAuthnContextType"/>
  * </pre>
  * 
- * @supported.all.api
+ * 
  */
 
 @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,

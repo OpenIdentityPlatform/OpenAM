@@ -76,7 +76,7 @@ public class CsvAuditEventHandlerFactory implements AuditEventHandlerFactory {
         csvHandlerConfiguration.getFileRotation().setMaxFileSize(maxFileSize);
         String filePrefix = getMapAttr(attributes, "rotationFilePrefix", "");
         csvHandlerConfiguration.getFileRotation().setRotationFilePrefix(filePrefix);
-        String fileSuffix = getMapAttr(attributes, "rotationFileSuffix", "-yyyy.MM.dd-HH.mm.ss");
+        String fileSuffix = getMapAttr(attributes, "rotationFileSuffix", "-yyyy.MM.dd-HH.mm.ss.gz");
         csvHandlerConfiguration.getFileRotation().setRotationFileSuffix(fileSuffix);
         String interval = getMapAttr(attributes, "rotationInterval", "-1");
         try {

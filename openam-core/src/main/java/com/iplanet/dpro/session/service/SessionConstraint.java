@@ -137,7 +137,7 @@ public class SessionConstraint {
         // time) of all sessions for the given user from all
         // AM servers and/or session repository
         try {
-            final Map sessions = getSessionQueryManager().getAllSessionsByUUID(internalSession.getUUID());
+            final Map<String,Long> sessions = getSessionQueryManager().getAllSessionsByUUID(internalSession.getUUID());
          // Step 3: checking the constraints
             if (sessions != null && SystemProperties.getAsBoolean("org.openidentityplatform.openam.cts.quota.exhaustion.enabled", true)) {
             		sessions.remove(internalSession.getSessionID().toString());

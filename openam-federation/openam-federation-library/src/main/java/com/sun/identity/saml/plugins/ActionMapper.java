@@ -46,7 +46,7 @@ import java.util.Set;
  * class are configured at the <code>Trusted Partner Sites</code> field
  * in SAML service.
  *
- * @supported.all.api
+ * 
  */
 public interface ActionMapper {
 

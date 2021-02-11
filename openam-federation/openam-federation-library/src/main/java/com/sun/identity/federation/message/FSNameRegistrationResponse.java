@@ -59,7 +59,7 @@ import org.w3c.dom.NodeList;
  * This class has methods to create <code>NameRegistrationResponse</code>
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

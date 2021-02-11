@@ -34,7 +34,7 @@ package com.sun.identity.saml.assertion;
  *object.  Extension elements based on this class MUST use xsi:type attribute 
  *to indicate the derived type.
  *
- *@supported.all.api
+ *
  */
 
 public abstract class Condition {

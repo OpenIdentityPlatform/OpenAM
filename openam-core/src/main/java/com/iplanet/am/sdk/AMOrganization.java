@@ -49,7 +49,7 @@ import com.iplanet.sso.SSOException;
  * </PRE>
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 
 public interface AMOrganization extends AMObject {

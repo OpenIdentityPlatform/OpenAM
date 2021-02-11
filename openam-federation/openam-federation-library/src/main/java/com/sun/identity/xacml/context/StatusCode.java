@@ -34,7 +34,7 @@ import com.sun.identity.xacml.common.XACMLException;
 /**
  * The <code>StatusCode</code> element is a container of 
  * one or more <code>StatusCode</code>s issuded by authorization authority.
- * @supported.all.api
+ * 
  * <p/>
  * <pre>
  *

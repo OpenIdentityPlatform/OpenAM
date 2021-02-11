@@ -57,7 +57,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * &lt;/complexType>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 public interface Evidence {
 

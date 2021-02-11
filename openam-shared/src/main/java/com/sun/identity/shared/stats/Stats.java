@@ -102,7 +102,7 @@ import java.util.ResourceBundle;
  * <code>warning()</code> methods to avoid unnecessary argument evaluation and
  * to maximize application performance.
  * </p>
- * @supported.all.api
+ * 
  */
 public class Stats implements ShutdownListener {
     /** flags the disabled stats state. */

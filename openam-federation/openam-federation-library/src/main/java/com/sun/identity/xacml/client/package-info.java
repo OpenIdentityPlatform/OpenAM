@@ -16,6 +16,6 @@
 /**
  * Defines classes to handle XACML requests.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.client;

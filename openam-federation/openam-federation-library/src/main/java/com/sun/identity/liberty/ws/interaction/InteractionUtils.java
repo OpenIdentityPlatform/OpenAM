@@ -42,7 +42,7 @@ import java.util.Iterator;
  * Class that provides some utility methods that work with objects 
  * related to interaction
  *
- * @supported.all.api
+ * 
  */
 public class InteractionUtils {
  

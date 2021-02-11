@@ -54,7 +54,7 @@ import com.iplanet.sso.SSOToken;
  * The post processing class implementation can be configured per ORGANIZATION
  * or SERVICE or ROLE
  *
- * @supported.all.api
+ * 
  */
 public interface AMPostAuthProcessInterface {
 

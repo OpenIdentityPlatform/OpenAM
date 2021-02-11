@@ -76,7 +76,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * id attribute in the top element. The constuctor will take a SAML assertion
  * or cert alias in order to sign.
  * 
- * @supported.all.api
+ * 
  */
 public class Message {
 

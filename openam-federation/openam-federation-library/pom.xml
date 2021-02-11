@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-federation</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -160,11 +160,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.santuario</groupId>
-       	    <artifactId>xmlsec</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging-api</artifactId>
         </dependency>
@@ -226,5 +221,14 @@
             <artifactId>openam-audit-core</artifactId>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+    	<dependencies>
+    		<dependency>
+    			<groupId>com.fasterxml.woodstox</groupId>
+    			<artifactId>woodstox-core</artifactId>
+    			<version>5.3.0</version>
+    		</dependency>
+    	</dependencies>
+    </dependencyManagement>
 </project>
 

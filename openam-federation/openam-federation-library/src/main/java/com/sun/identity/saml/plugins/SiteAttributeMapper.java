@@ -48,7 +48,7 @@ import java.util.List;
  * @see PartnerSiteAttributeMapper
  *
  *
- * @supported.all.api
+ * 
  */
 public interface SiteAttributeMapper {
 

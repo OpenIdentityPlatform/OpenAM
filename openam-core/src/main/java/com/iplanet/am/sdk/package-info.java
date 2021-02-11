@@ -30,6 +30,6 @@
  * This package contains interfaces and implementation for User/Identity
  * Management.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.am.sdk;

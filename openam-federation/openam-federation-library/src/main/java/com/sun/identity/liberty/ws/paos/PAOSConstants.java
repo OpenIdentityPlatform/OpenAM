@@ -30,7 +30,7 @@ package com.sun.identity.liberty.ws.paos;
 /**
  * This interface defines constants common to all PAOS elements.
  *
- * @supported.all.api
+ * 
  */
 public interface PAOSConstants {
 

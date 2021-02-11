@@ -36,7 +36,7 @@ import com.iplanet.ums.UMSException;
  * specific to the validator classes and this exception is thrown when it
  * doesnot satify those rules.
  *
- * @supported.all.api
+ * 
  */
 public class DataConstraintException extends UMSException {
 

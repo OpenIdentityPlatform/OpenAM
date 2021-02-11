@@ -30,7 +30,7 @@
 /**
  * Provides means for plugging in support for authorization and other security
  * related aspects of logging.
- * @supported.api
+ * 
  */
 package com.sun.identity.log.spi;
 

@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.Client;
+import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -52,6 +53,7 @@ public class SharedGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
         bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
         bind(KeyPairProviderFactory.class).to(KeyPairProviderFactoryImpl.class);
+        bind(HttpClientHandler.class).toProvider(CloseableHttpClientHandlerProvider.class).in(Scopes.SINGLETON);
         bind(Client.class).toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
     }
 

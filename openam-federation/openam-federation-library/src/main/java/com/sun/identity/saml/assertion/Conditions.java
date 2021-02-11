@@ -48,7 +48,7 @@ import java.text.ParseException;
  *<code>Conditions</code>. Each <code>Condition</code> evaluates to a value 
  *that is Valid, Invalid or Indeterminate. 
  *
- *@supported.all.api
+ *
  */
 public class Conditions {
 

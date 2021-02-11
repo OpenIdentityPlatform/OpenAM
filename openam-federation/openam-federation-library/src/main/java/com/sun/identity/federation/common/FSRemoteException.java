@@ -30,7 +30,7 @@ package com.sun.identity.federation.common;
 
 /**
  * This class is an extension point for IDFF related exceptions.
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -39,7 +39,7 @@ import org.forgerock.opendj.ldap.ByteString;
 
 /**
  * Represents a set of attributes
- * @supported.api
+ * 
  */
 public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
 
@@ -47,13 +47,13 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
 
     /**
      * Empty Attribute Set.
-     * @supported.api
+     * 
      */
     public static final AttrSet EMPTY_ATTR_SET = new AttrSet();
 
     /**
      * No argument constructor
-     * @supported.api
+     * 
      */
     public AttrSet() {
     }
@@ -63,7 +63,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param attrs
      *            array of attributes to be defined in the attribute set
-     * @supported.api
+     * 
      */
     public AttrSet(Attr[] attrs) {
         int size = attrs.length;
@@ -78,7 +78,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param attr
      *            attribute to be defined in the attribute set
-     * @supported.api
+     * 
      */
     public AttrSet(Attr attr) {
         add(attr);
@@ -109,7 +109,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param attr
      *            attribute to be added to the set
-     * @supported.api
+     * 
      */
     public void add(Attr attr) {
         if (attr == null)
@@ -130,7 +130,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param attr
      *            attribute to be added to the set
-     * @supported.api
+     * 
      */
     public void addBinaryAttr(Attr attr) {
         Attr attr1 = findAttribute(attr.getName());
@@ -148,7 +148,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param name
      *            attribute to be removed
-     * @supported.api
+     * 
      */
     public void remove(String name) {
         int index = indexOf(name);
@@ -165,7 +165,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      *            attribute name to be looked up
      * @param delValue
      *            value to be deleted for the specified attribute
-     * @supported.api
+     * 
      */
     public void remove(String attrName, String delValue) {
         int index = indexOf(attrName);
@@ -183,7 +183,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @param attr
      *            attribute to be replaced
-     * @supported.api
+     * 
      */
     public void replace(Attr attr) {
         int index = indexOf(attr.getName());
@@ -198,7 +198,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * Get names of attributes.
      * 
      * @return Names of attributes in the set
-     * @supported.api
+     * 
      */
     public String[] getAttributeNames() {
         int size = size();
@@ -216,7 +216,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * @param name
      *            name of the attribute to get
      * @return attribute found
-     * @supported.api
+     * 
      */
     public Attr getAttribute(String name) {
         // We may probably want to clone. Not cloning now.
@@ -228,7 +228,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * set
      * 
      * @return enmeration of attributes in the set
-     * @supported.api
+     * 
      */
     public Enumeration getAttributes() {
         // iterator would be preferred; returning Enumeration for backward
@@ -243,7 +243,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * @param attrName
      *            name of the attribute to be queried in the set
      * @return the first string value found
-     * @supported.api
+     * 
      */
     public String getValue(String attrName) {
         String value = null;
@@ -260,7 +260,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * @param attrName
      *            name of the attribute to be checked against the set
      * @return true if found and false otherwise
-     * @supported.api
+     * 
      */
     public boolean contains(String attrName) {
         boolean containsTheValue = false;
@@ -280,7 +280,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * @param value
      *            value of the attribute the attribute should contain
      * @return true if found and false otherwise
-     * @supported.api
+     * 
      */
     public boolean contains(String attrName, String value) {
         boolean containsTheValue = false;
@@ -295,7 +295,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * Get the number of attributes in the Attribute Set
      * 
      * @return number of attributes in the set
-     * @supported.api
+     * 
      */
     public int size() {
         return _attrs.size();
@@ -354,7 +354,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * Return a copy of the object
      * 
      * @return A copy of the object
-     * @supported.api
+     * 
      */
     public Object clone() {
         AttrSet attrSet = new AttrSet();
@@ -386,7 +386,7 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * Retrieves the string representation of an AttrSet
      * 
      * @return string representation of the AttrSet.
-     * @supported.api
+     * 
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("AttrSet: ");

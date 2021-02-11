@@ -48,7 +48,7 @@ import org.forgerock.openam.audit.context.AuditRequestContextPropagatingRunnable
  * tasks until the number of un-executed tasks is less than the threshold value.
  * This guarantees the thread pool will not use up the system resources under
  * heavy load.
- * @supported.all.api
+ * 
  */
 public class ThreadPool {
 

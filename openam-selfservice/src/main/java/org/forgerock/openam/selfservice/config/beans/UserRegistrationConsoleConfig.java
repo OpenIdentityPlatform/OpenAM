@@ -27,7 +27,7 @@ import org.forgerock.util.Reject;
 /**
  * Represents forgotten password console configuration.
  *
- * @supported.all.api
+ * 
  * @since 13.0.0
  */
 public final class UserRegistrationConsoleConfig extends CommonConsoleConfig {

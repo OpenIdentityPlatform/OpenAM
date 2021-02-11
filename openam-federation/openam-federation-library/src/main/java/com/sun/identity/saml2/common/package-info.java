@@ -29,6 +29,6 @@
 /**
  * Defines common SAMLv2 utilities and constants.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml2.common;

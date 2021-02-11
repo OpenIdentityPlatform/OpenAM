@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * Class to represent {@link EntitlementSubject} evaluation match result and - if applicable - its advices.
  *
- * @supported.all.api
+ * 
  */
 public class SubjectDecision {
 

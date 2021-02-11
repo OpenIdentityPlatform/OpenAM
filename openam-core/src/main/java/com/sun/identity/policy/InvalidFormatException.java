@@ -34,7 +34,7 @@ package com.sun.identity.policy;
  * Exception thrown if a name of an object such as policy, rule or 
  * referral has invalid format
  *
- * @supported.all.api
+ * 
  */
 public class InvalidFormatException extends PolicyException {
 

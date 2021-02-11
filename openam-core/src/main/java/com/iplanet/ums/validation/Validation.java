@@ -51,7 +51,7 @@ import org.forgerock.opendj.ldap.ModificationType;
  * problems DataConstraintException is thrown when the attributes fail to
  * validations.
  *
- * @supported.all.api
+ * 
  */
 public class Validation {
 

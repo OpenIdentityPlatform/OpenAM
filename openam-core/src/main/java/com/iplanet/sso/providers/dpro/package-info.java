@@ -31,6 +31,6 @@
 /**
  * This package contains classes that represent SSOProvider 
  *
- * @supported.api
+ * 
  */
 package com.iplanet.sso.providers.dpro;

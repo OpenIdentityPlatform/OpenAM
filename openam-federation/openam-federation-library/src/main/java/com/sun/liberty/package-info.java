@@ -28,7 +28,7 @@
 
 /**
  * Provides interfaces for Liberty federation framework.
- * @supported.api
+ * 
  */
 package com.sun.liberty;
 

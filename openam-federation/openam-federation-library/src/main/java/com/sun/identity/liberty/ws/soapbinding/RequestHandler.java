@@ -36,7 +36,7 @@ package com.sun.identity.liberty.ws.soapbinding;
  * the SOAP Binding Service so SOAP layer could forward incoming WSC
  * requests to your handler.
  *
- * @supported.all.api
+ * 
  */
 
 public interface RequestHandler {

@@ -38,7 +38,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * The <code>ProviderHeader</code> class represents 'Provider' element defined
  * in SOAP binding schema.
  *
- * @supported.all.api
+ * 
  */
 
 public class ProviderHeader {

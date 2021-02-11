@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  * HTTP server side to construct a <code>PAOS</code> request message and send
  * it via an HTTP response to the user agent side.
  *
- * @supported.all.api
+ * 
  */
 public class PAOSRequest {
 

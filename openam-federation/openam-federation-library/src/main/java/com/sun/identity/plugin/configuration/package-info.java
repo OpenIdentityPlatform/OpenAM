@@ -28,7 +28,7 @@
 
 /**
  * Contains configuration SPI.
- * @supported.api
+ * 
  */
 package com.sun.identity.plugin.configuration;
 

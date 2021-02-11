@@ -34,7 +34,7 @@ import com.sun.identity.shared.encode.Base64;
  * This class <code>HexToBase64</code> is used to convert Hex encoded
  * SAML source ID to Base64 encoded ID. 
  *
- * @supported.all.api
+ * 
  */
 public class HexToBase64 {
 

@@ -41,7 +41,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * &lt;element name="EncryptedAttribute" 
  * type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
  * </pre>
- * @supported.all.api
+ * 
  */
 public interface EncryptedAttribute extends EncryptedElement {
 

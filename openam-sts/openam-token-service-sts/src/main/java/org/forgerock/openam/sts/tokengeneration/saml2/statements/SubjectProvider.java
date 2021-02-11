@@ -28,7 +28,7 @@ import java.util.Date;
  * Defines the concerns of providing the Subject to be included in the generated SAML2 assertion. If no custom class
  * name is specified in the SAML2Config, then the DefaultSubjectProvider will be used.
  *
- * @supported.all.api
+ * 
  */
 public interface SubjectProvider {
     /**

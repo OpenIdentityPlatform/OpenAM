@@ -35,7 +35,7 @@ import java.util.List;
  * consulted to determine the proper formatting and character escaping in the String returned from toXMLString in the
  * AuthzDecisionStatement implementations.
  * @see com.sun.identity.saml2.assertion.AuthzDecisionStatement
- * @supported.all.api
+ * 
  */
 public interface AuthzDecisionStatementsProvider {
     /**

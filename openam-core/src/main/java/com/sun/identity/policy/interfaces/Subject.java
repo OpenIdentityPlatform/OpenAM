@@ -56,7 +56,7 @@ import com.sun.identity.policy.ValidValues;
  * <code>Subject</code> object and the evaluation interfaces will be used by the
  * {@link com.sun.identity.policy.PolicyEvaluator PolicyEvaluator}.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.EntitlementSubject}
  */
 @Deprecated

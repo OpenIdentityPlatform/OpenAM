@@ -21,7 +21,7 @@ import org.forgerock.json.resource.ResourceException;
 /**
  * An instance of this exception is thrown for all errors related to token validation.
  *
- * @supported.all.api
+ * 
  */
 public class TokenValidationException extends ResourceException {
 

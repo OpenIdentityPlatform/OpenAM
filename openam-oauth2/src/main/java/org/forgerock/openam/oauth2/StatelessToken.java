@@ -17,15 +17,16 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
-import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUDIT_TRACKING_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_GRANT_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.AUTH_TIME;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.SCOPE;
+import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.CLAIMS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.blacklist.BlacklistException;
-import org.forgerock.openam.blacklist.Blacklistable;
 
 public class StatelessToken {
 
@@ -71,8 +70,10 @@ public class StatelessToken {
         Object scope = jwt.getClaimsSet().getClaim(SCOPE);
         if (scope instanceof List) {
             return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, List.class));
-        } else {
+        } else if  (scope instanceof Set) {
             return new HashSet<>(jwt.getClaimsSet().getClaim(SCOPE, Set.class));
+        } else {
+        	return new HashSet<>(Arrays.asList(jwt.getClaimsSet().getClaim(SCOPE, String.class).split(" ")));
         }
     }
 

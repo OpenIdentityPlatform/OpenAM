@@ -75,7 +75,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 /**
  * This class contains utility methods.
  *
- * @supported.api
+ * 
  */
 
 public class Utils {
@@ -243,7 +243,7 @@ public class Utils {
      * is the prefix.
      *
      * @return a Map of JAXB namespace prefix mapping
-     * @supported.api
+     * 
      */
     static public Map getNamespacePrefixMapping() {
         return nsPrefix;
@@ -253,7 +253,7 @@ public class Utils {
      * Returns a String of JAXB packages seperated by ":".
      *
      * @return a String of JAXB packages seperated by ":".
-     * @supported.api
+     * 
      */
     public static String getJAXBPackages() {
         return jaxbPackages;
@@ -266,7 +266,7 @@ public class Utils {
      * @return SOAPMessage
      * @throws SOAPBindingException if an error occurs while converting
      *         the document
-     * @supported.api
+     * 
      */
     public static SOAPMessage DocumentToSOAPMessage(Document doc)
     throws SOAPBindingException {
@@ -299,7 +299,7 @@ public class Utils {
      * @return a list of <code>org.w3c.dom.Element</code>
      * @throws JAXBException if an error occurs while converting JAXB objects.
      *
-     * @supported.api
+     * 
      */
     public static List convertJAXBToElement(List jaxbObjs) 
                                             throws JAXBException{
@@ -319,7 +319,7 @@ public class Utils {
      * @param jaxbObj a JAXB object
      * @return a <code>org.w3c.dom.Element</code>
      * @throws JAXBException if an error occurs while converting JAXB object.
-     * @supported.api
+     * 
      */
     public static Element convertJAXBToElement(Object jaxbObj)
                           throws JAXBException {
@@ -346,7 +346,7 @@ public class Utils {
      * @param jaxbObj a JAXB object
      * @return a <code>org.w3c.dom.Element</code>
      * @throws JAXBException if an error occurs while converting JAXB object.
-     * @supported.api
+     * 
      */
     public static Element convertJAXBToElement(Object jaxbObj,
             boolean checkIdref) throws JAXBException {
@@ -389,7 +389,7 @@ public class Utils {
      * @return a list of JAXB objects
      * @throws JAXBException if an error occurs while converting
      *                          <code>org.w3c.dom.Element</code>.
-     * @supported.api
+     * 
      */
     public static List convertElementToJAXB(List elements) 
                                             throws JAXBException{
@@ -410,7 +410,7 @@ public class Utils {
      * @return a JAXB object
      * @throws JAXBException if an error occurs while converting
      *                          <code>org.w3c.dom.Element</code>
-     * @supported.api
+     * 
      */
     public static Object convertElementToJAXB(Element element)
                          throws JAXBException {
@@ -424,7 +424,7 @@ public class Utils {
      * @param str a value of XML boolean type
      * @return a Boolean object
      * @throws Exception if there is a syntax error
-     * @supported.api
+     * 
      */
     public static Boolean StringToBoolean(String str) throws Exception {
         if (str == null) {
@@ -447,7 +447,7 @@ public class Utils {
      *
      * @param bool a Boolean object.
      * @return a String representing the boolean value.
-     * @supported.api
+     * 
      */
     public static String BooleanToString(Boolean bool) {
         if (bool == null) {
@@ -464,7 +464,7 @@ public class Utils {
      * @param str the String to be converted.
      * @param element the Element object.
      * @return the QName Object.
-     * @supported.api
+     * 
      */
     public static QName convertStringToQName(String str,Element element) {
         if (str == null) {
@@ -843,7 +843,7 @@ public class Utils {
      * @param key a key to a resource bundle
      * @param params parameters to MessageFormat
      * @return a localized string.
-     * @supported.api
+     * 
      */
     public static String getString(String key, Object[] params) {
         return MessageFormat.format(bundle.getString(key), params);

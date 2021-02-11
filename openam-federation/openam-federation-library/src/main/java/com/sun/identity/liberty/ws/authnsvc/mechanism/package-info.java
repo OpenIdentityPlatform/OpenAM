@@ -29,7 +29,7 @@
 /**
  * Defines interface to handle different SASL mechanisms.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.liberty.ws.authnsvc.mechanism;

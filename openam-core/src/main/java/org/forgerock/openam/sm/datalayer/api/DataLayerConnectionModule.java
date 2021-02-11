@@ -102,7 +102,6 @@ public abstract class DataLayerConnectionModule extends PrivateModule {
      * <p>
      * If the task executor is a {@link org.forgerock.openam.sm.datalayer.impl.SeriesTaskExecutor}, a
      * {@link org.forgerock.openam.sm.datalayer.api.QueueConfiguration} will also need to be bound.
-     * @return Whether a task executor was configured. If true, an instance of {@link TaskFactory} will be bound.
      * @param binder The module's binder.
      */
     protected void configureTaskExecutor(PrivateBinder binder) {

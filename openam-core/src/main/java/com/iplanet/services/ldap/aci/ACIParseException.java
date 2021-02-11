@@ -31,7 +31,7 @@ package com.iplanet.services.ldap.aci;
 /**
  * Exception thrown to indicate problems while parsing value of aci attribute
  * read from directory to ACI object
- * @supported.all.api
+ * 
  */
 public class ACIParseException extends ACIException {
 

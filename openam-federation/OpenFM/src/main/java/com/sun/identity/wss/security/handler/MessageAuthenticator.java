@@ -40,7 +40,7 @@ import com.sun.identity.wss.provider.ProviderConfig;
 /**
  * This interface provides a pluggable authenticator for the webservices
  * to authenticate their clients using various security mechanisms. 
- * @supported.all.api
+ * 
  */ 
 public interface MessageAuthenticator {
 

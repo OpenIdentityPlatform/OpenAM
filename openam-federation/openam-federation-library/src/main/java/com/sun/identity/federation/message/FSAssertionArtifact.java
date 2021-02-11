@@ -43,7 +43,7 @@ import com.sun.identity.shared.encode.Base64;
  * TYPE 1 artifact only. Other type of artifact can be supported by
  * extending this class.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

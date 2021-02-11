@@ -38,7 +38,7 @@ import java.util.Set;
  * The interface <code>ServiceAttributeValidator</code> should be implemented
  * by the services/applications if validator plugins are required.
  *
- * @supported.all.api
+ * 
  */
 public interface ServiceAttributeValidator {
 

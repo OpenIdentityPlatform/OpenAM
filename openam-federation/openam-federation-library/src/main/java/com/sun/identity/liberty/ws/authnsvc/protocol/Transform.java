@@ -51,7 +51,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * The <code>Transform</code> class represents 'Transform' element in
  * 'PasswordTransforms' element defined in Authentication Service schema.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -22,7 +22,7 @@
     <Service name="RestSecurityTokenService" version="1.0">
         <Schema
                 serviceHierarchy="/DSAMEConfig/RestSecurityTokenService"
-                i18nFileName="restSTS" revisionNumber="1"
+                i18nFileName="restSTS" revisionNumber="2"
                 i18nKey="rest_security_token_service_description"
                 propertiesViewBeanURL="../sts/RestSTSEdit">
 
@@ -219,6 +219,11 @@ provided for required attributes upon service registration.
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
                         <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_384">RS384</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_512">RS512</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_256">ES256</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_384">ES384</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_512">ES512</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>RSA</Value>
@@ -446,6 +451,11 @@ provided for required attributes upon service registration.
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
                             <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_384">RS384</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_512">RS512</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_256">ES256</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_384">ES384</ChoiceValue>
+	                        <ChoiceValue i18nKey="oidc_signature_algorithm_ecdsa_sha_512">ES512</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>RSA</Value>

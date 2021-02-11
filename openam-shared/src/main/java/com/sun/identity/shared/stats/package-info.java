@@ -16,6 +16,6 @@
 /**
  * Defines classes to interact with statistics.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.shared.stats;

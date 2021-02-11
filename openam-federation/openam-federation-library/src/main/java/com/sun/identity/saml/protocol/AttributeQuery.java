@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
  * It represents the query for an attribute assertion. It corresponds
  * to the <code>samlp:AttributeQueryType</code> in the SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public class AttributeQuery extends SubjectQuery {
 

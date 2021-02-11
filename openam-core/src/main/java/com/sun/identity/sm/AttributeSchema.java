@@ -52,7 +52,7 @@ import com.sun.identity.security.EncodeAction;
  * schema of a configuration parameter. Also, it provides methods to set default
  * and choice values.
  *
- * @supported.all.api
+ * 
  */
 public class AttributeSchema {
     // Debug

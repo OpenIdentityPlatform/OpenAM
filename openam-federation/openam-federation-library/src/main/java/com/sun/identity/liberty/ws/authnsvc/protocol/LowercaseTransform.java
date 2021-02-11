@@ -35,7 +35,7 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * <code>Transform</code> that replaces all upprtcase characters with
  * lowercase characters.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

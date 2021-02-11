@@ -35,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * The <code>PAOSException</code> class represents a error while
  * processing SOAP request and response.
  *
- * @supported.all.api
+ * 
  */
 public class PAOSException extends L10NMessageImpl {
     

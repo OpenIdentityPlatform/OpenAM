@@ -16,6 +16,6 @@
 /**
  * Defines classes for SAMLv2 ECP profile.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml2.ecp;

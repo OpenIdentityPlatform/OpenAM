@@ -39,7 +39,7 @@ package com.iplanet.am.sdk;
  * default behavior of the method is not desired.
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public interface AMEventListener extends java.util.EventListener {
     /**

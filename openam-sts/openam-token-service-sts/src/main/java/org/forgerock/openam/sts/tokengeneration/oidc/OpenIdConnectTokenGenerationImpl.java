@@ -18,17 +18,15 @@ package org.forgerock.openam.sts.tokengeneration.oidc;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.sm.DNMapper;
 
-import org.apache.commons.collections.MapUtils;
 import com.google.common.collect.Lists;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
-import org.forgerock.json.jose.jwk.KeyUse;
-import org.forgerock.json.jose.jwk.RsaJWK;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SignedJwt;
@@ -55,8 +53,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyPair;
-import java.security.interfaces.RSAPublicKey;
-import java.text.ParseException;
+import java.security.interfaces.ECPrivateKey;
 import java.util.Map;
 import java.util.UUID;
 
@@ -82,7 +79,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         this.logger = logger;
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public String generate(SSOToken subjectToken, STSInstanceState stsInstanceState,
                            TokenGenerationServiceInvocationState invocationState) throws TokenCreationException {
 
@@ -100,8 +98,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         if (JwsAlgorithmType.HMAC.equals(jwsAlgorithmType)) {
             final SignedJwt signedJwt = symmetricSign(openIdConnectToken, jwsAlgorithm, tokenConfig.getClientSecret());
             tokenString = signedJwt.build();
-        } else if (JwsAlgorithmType.RSA.equals(jwsAlgorithmType)) {
-            final SignedJwt signedJwt = asymmetricSign(openIdConnectToken, jwsAlgorithm, getKeyPair(stsInstanceState.getOpenIdConnectTokenPKIProvider(),
+        } else if (JwsAlgorithmType.RSA.equals(jwsAlgorithmType)||JwsAlgorithmType.ECDSA.equals(jwsAlgorithmType)) {
+            final SignedJwt signedJwt = asymmetricSign(openIdConnectToken, jwsAlgorithm,tokenConfig.getSignatureKeyAlias(), getKeyPair(stsInstanceState.getOpenIdConnectTokenPKIProvider(),
                     tokenConfig.getSignatureKeyAlias(), tokenConfig.getSignatureKeyPassword()), determinePublicKeyReferenceType(tokenConfig));
             tokenString = signedJwt.build();
         } else {
@@ -173,7 +171,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
 		        openIdConnectToken.put("auth:module", subjectToken.getProperty("AuthType", true));
 		        openIdConnectToken.put("auth:level", subjectToken.getProperty("AuthLevel", true));
 		        openIdConnectToken.put("auth:time:max:idle", currentTimeMillis()/1000+subjectToken.getMaxIdleTime()*60);
-		        openIdConnectToken.put("auth:time:max", currentTimeMillis()/1000+subjectToken.getTimeLeft()*60);
+		        openIdConnectToken.put("auth:time:max", currentTimeMillis()/1000+subjectToken.getTimeLeft());
+		        openIdConnectToken.put("auth:token:encrypt", Crypt.encrypt(subjectToken.getTokenID().toString()));
 	        }catch (SSOException e) {
 				throw new TokenCreationException(1,"token expired",e);
 			}
@@ -183,18 +182,17 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
     }
 
     private void handleClaims(SSOToken subjectToken, STSOpenIdConnectToken openIdConnectToken, OpenIdConnectTokenConfig tokenConfig) throws TokenCreationException {
-        if (!MapUtils.isEmpty(tokenConfig.getClaimMap())) {
-            Map<String, String> mappedClaims =
-                    openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
-            //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
+        final Map<String, String> mappedClaims = openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
+        //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
+        if (logger.isDebugEnabled()) {
             for (String key : mappedClaims.keySet()) {
                 if (openIdConnectToken.isDefined(key)) {
-                    logger.warn("In generating an OpenIdConnect token, the claim map for claim " + key +
+                    logger.debug("In generating an OpenIdConnect token, the claim map for claim " + key +
                             " will over-write an existing claim.");
                 }
             }
-            openIdConnectToken.setClaims(mappedClaims);
         }
+        openIdConnectToken.setClaims(mappedClaims);
     }
 
     private KeyPair getKeyPair(OpenIdConnectTokenPKIProvider cryptoProvider, String signatureKeyAlias, byte[] signatureKeyPassword)
@@ -221,26 +219,18 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         return builder.done().claims(claimsSet).asJwt();
     }
 
-    private SignedJwt asymmetricSign(STSOpenIdConnectToken openIdConnectToken, JwsAlgorithm jwsAlgorithm,
+    private SignedJwt asymmetricSign(STSOpenIdConnectToken openIdConnectToken, JwsAlgorithm jwsAlgorithm,String kid,
                                      KeyPair keyPair, OpenIdConnectTokenPublicKeyReferenceType publicKeyReferenceType) throws TokenCreationException {
-        if (!JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+        if (!JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())&!JwsAlgorithmType.ECDSA.equals(jwsAlgorithm.getAlgorithmType())) {
             throw new TokenCreationException(ResourceException.BAD_REQUEST, "Exception in " +
                     "OpenIdConnectTokenGenerationImpl#symmetricSign: algorithm type not RSA but "
                     + jwsAlgorithm.getAlgorithmType());
         }
-        final SigningHandler signingHandler = new SigningManager().newRsaSigningHandler(keyPair.getPrivate());
+        final SigningHandler signingHandler = JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())?new SigningManager().newRsaSigningHandler(keyPair.getPrivate()):new SigningManager().newEcdsaSigningHandler((ECPrivateKey)keyPair.getPrivate());
 
-        JwsHeaderBuilder jwsHeaderBuilder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm);
-        JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(openIdConnectToken.asMap()).build();
-        RSAPublicKey rsaPublicKey;
-        try {
-            rsaPublicKey = (RSAPublicKey)keyPair.getPublic();
-        } catch (ClassCastException e) {
-            throw new TokenCreationException(ResourceException.BAD_REQUEST, "Could not sign jwt with algorithm "
-                    + jwsAlgorithm + " because the PublicKey not of type RSAPublicKey but rather "
-                    + (keyPair.getPublic() != null ? keyPair.getPublic().getClass().getCanonicalName() : null));
-        }
-        handleKeyIdentification(jwsHeaderBuilder, publicKeyReferenceType, rsaPublicKey, jwsAlgorithm);
+        final JwsHeaderBuilder jwsHeaderBuilder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm).kid(kid);
+        final JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(openIdConnectToken.asMap()).build();
+
         return jwsHeaderBuilder.done().claims(claimsSet).asJwt();
     }
 
@@ -256,21 +246,4 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         return publicKeyReferenceType;
     }
 
-    private void handleKeyIdentification(JwsHeaderBuilder jwsHeaderBuilder, OpenIdConnectTokenPublicKeyReferenceType publicKeyReferenceType,
-                                         RSAPublicKey rsaPublicKey, JwsAlgorithm jwsAlgorithm) throws TokenCreationException {
-        switch (publicKeyReferenceType) {
-            case NONE:
-                return;
-            case JWK:
-                jwsHeaderBuilder.jwk(buildRSAJWKForPublicKey(rsaPublicKey, jwsAlgorithm));
-                return;
-            default:
-                throw new TokenCreationException(ResourceException.BAD_REQUEST, "Unsupported public key identification " +
-                        "scheme encountered during OpenIdConnect token generation: " + publicKeyReferenceType);
-        }
-    }
-
-    private RsaJWK buildRSAJWKForPublicKey(RSAPublicKey rsaPublicKey, JwsAlgorithm jwsAlgorithm) {
-        return new RsaJWK(rsaPublicKey, KeyUse.SIG, jwsAlgorithm.name(), null, null, null, null);
-    }
 }

@@ -33,7 +33,7 @@ package com.sun.identity.liberty.ws.security;
  * This class is an extension point for all security authority related
  * exceptions.
  *
- * @supported.all.api
+ * 
  */
 public class SecurityTokenException extends Exception {
 

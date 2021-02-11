@@ -42,7 +42,7 @@ import com.sun.identity.federation.common.IFSConstants;
  * This class defines methods to set/retrieve single identity provider
  * information trusted by the request issuer to authenticate the presenter.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

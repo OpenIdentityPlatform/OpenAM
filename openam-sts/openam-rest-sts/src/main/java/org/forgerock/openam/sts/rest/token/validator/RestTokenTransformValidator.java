@@ -27,7 +27,7 @@ import org.forgerock.openam.sts.TokenValidationException;
  * OpenAMSessionToken, OpenIdConnectIdToken.
  * 3. JsonValue, which is the type common to all custom token validators.
  *
- * @supported.all.api
+ * 
  */
 public interface RestTokenTransformValidator<T> {
 

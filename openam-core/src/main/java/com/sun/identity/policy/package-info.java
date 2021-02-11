@@ -30,6 +30,6 @@
 /**
  * Provides classes for policy administration and evaluation.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.policy;

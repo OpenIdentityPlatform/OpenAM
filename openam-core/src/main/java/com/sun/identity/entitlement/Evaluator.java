@@ -60,7 +60,7 @@ import org.forgerock.openam.entitlement.monitoring.PolicyMonitoringType;
  * Additionally, the evaluation will also take into account the name of the policy set (a.k.a. application) used when
  * creating the Evaluator instance.
  *
- * @supported.api
+ * 
  */
 public class Evaluator {
 
@@ -139,7 +139,7 @@ public class Evaluator {
      * @return a list of entitlements for a given subject, resource name and environment.
      * @throws EntitlementException if the result cannot be determined.
      *
-     * @supported.api
+     * 
      */
     public List<Entitlement> evaluate(
         String realm,
@@ -175,7 +175,7 @@ public class Evaluator {
      * @return a list of entitlements for a given subject, resource name and environment.
      * @throws EntitlementException if the result cannot be determined.
      *
-     * @supported.api
+     * 
      */
     public List<Entitlement> evaluate(
             String realm,

@@ -58,7 +58,7 @@ import com.iplanet.am.util.AdminUtils;
  * 
  * </PRE>
  * 
- * @supported.all.api
+ * 
  */
 public class AdminDNAction implements PrivilegedAction {
 

@@ -107,7 +107,7 @@ import com.sun.identity.shared.debug.impl.DebugProviderImpl;
  * performance.
  * </p>
  *
- * @supported.all.api
+ * 
  */
 public class Debug {
 

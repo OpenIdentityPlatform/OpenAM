@@ -34,7 +34,7 @@ import com.iplanet.services.util.Crypt;
  * This class <code>PasswordCredential</code> is a place holder for the
  * username/password object. 
  * 
- * @supported.all.api
+ * 
  */
 public class PasswordCredential {
 

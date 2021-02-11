@@ -29,7 +29,7 @@ import java.util.Map;
  * and the attributeMap specification will be pulled from the SAML2Config associated with the STS instance currently
  * consuming the TokenGenerationService.
  *
- * @supported.all.api
+ * 
  */
 public interface AttributeMapper {
     /**

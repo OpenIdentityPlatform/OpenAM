@@ -45,7 +45,7 @@ import com.sun.identity.federation.common.IFSConstants;
 /**
  * This class defines methods to set/retrieve multiple Identity Providers.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

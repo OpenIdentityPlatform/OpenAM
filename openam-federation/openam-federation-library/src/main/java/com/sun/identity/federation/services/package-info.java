@@ -28,7 +28,7 @@
 
 /**
  * Handles <code>ID-FF</code> federation profiles.
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.federation.services;

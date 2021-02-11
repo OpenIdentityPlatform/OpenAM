@@ -16,6 +16,6 @@
 /**
  * Defines classes to handle WS-Security requests.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.wss.security.handler;

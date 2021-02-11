@@ -37,7 +37,7 @@ import java.util.Vector;
 /**
  * Validates domain
  *
- * @supported.all.api
+ * 
  */
 public class DomainValidator implements IValidator {
 

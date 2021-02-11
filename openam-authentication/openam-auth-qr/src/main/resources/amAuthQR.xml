@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+    <Service name="sunAMAuthQRService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthQRService"
+            i18nFileName="amAuthQR"
+            revisionNumber="12"
+            i18nKey="org.openidentityplatform.openam.authentication.modules.QR.description"
+            resourceName="recaptcha">
+
+            <Organization>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.QR.authlevel"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.QR.authlevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime"
+                    type="single"
+                    syntax="number_range" rangeStart="5" rangeEnd="60"
+                    i18nKey="org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime">
+                    <DefaultValues>
+                        <Value>20</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                    <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.QR.authlevel"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="org.openidentityplatform.openam.authentication.modules.QR.authlevel">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime"
+	                    type="single"
+	                    syntax="number_range" rangeStart="5" rangeEnd="60"
+	                    i18nKey="org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime">
+	                    <DefaultValues>
+	                        <Value>20</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+                  </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

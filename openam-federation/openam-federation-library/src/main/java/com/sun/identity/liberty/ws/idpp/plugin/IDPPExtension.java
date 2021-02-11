@@ -39,7 +39,7 @@ import java.util.List;
  * to any attributes that are not defined by the liberty personal profile
  * service by implementing this interface. Each container extension plugin
  * can be configurable from the service configuration.
- * @supported.all.api
+ * 
  */ 
 
 public interface IDPPExtension {

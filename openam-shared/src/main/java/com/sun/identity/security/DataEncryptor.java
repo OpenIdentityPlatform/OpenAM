@@ -48,7 +48,7 @@ import com.sun.identity.shared.encode.Base64;
 /**
  * This class <code>DataEncryptor</code> is used to encrypt the data
  * with symmetric and asymmetric keys.
- * @supported.all.api
+ * 
  */
 public class DataEncryptor {
 

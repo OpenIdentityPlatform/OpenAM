@@ -69,7 +69,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * <code>ProcessingContextHeader</code>. It also provides generic methods to
  * get and set other children.
  *
- * @supported.all.api
+ * 
  */
 public class SOAPFaultDetail {
     public static final QName BOGUS_ACTOR =

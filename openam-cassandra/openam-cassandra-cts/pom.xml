@@ -20,18 +20,12 @@
    <parent>
        <groupId>org.openidentityplatform.openam</groupId>
        <artifactId>openam-cassandra</artifactId>
-       <version>14.4.3-SNAPSHOT</version>
+       <version>14.6.3-SNAPSHOT</version>
    </parent>
    
 	<artifactId>openam-cassandra-cts</artifactId>
 	<name>OpenAM Cassandra Core Token Service</name>
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>
 			<artifactId>openam-core</artifactId>
@@ -45,6 +39,16 @@
 		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>
 			<artifactId>openam-cassandra-datastore</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openidentityplatform.openam</groupId>	
+			<artifactId>openam-cassandra-embedded</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -60,8 +64,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>

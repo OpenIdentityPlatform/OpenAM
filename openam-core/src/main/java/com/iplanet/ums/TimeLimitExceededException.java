@@ -30,7 +30,7 @@ package com.iplanet.ums;
 
 /**
  * Exception on search when time limit is exceeded.
- * @supported.all.api
+ * 
  */
 public class TimeLimitExceededException extends UMSException {
     /**

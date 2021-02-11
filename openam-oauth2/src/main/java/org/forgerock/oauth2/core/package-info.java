@@ -16,7 +16,7 @@
 /**
  * Defines the core classes to implement OAuth2 for OpenAM.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.oauth2.core;
 

@@ -33,7 +33,7 @@ package com.sun.identity.saml.common;
  * This exception is thrown when the request could not be performed due to
  * an error in the sender or in the request.
  *
- * @supported.all.api
+ * 
  */
 public class SAMLRequesterException extends SAMLException {
 

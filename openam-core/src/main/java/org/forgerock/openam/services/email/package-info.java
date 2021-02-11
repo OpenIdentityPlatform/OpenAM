@@ -17,6 +17,6 @@
 /**
  * Service interface for sending email messages and default implementation.
  *
- * @supported.api
+ * 
  */
 package org.forgerock.openam.services.email;

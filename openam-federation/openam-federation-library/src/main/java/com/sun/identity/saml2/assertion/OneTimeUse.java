@@ -33,7 +33,7 @@ package com.sun.identity.saml2.assertion;
  * The <code>OneTimeUse</code> indicates that the assertion should be
  * used immediately by the relying party and must not be retained for
  * future use. 
- * @supported.all.api
+ * 
  */
 
 public interface OneTimeUse extends ConditionAbstract {

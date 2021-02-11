@@ -34,7 +34,7 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  * An <code>ConfigurationException</code> is thrown when there are
  * errors related to service configuration operations. 
  * 
- * @supported.all.api
+ * 
  */
 public class ConfigurationException extends L10NMessageImpl {   
 

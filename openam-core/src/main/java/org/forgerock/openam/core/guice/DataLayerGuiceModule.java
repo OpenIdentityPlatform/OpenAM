@@ -48,7 +48,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
  * each {@link ConnectionType} can have different bindings, allowing different backend databases.
  * <p>
  * ConnectionFactory and TaskExecutor instances will be available outside the private binder using the
- * @{@link DataLayer} annotation with the desired {@link ConnectionType}.
+ * {@link DataLayer} annotation with the desired {@link ConnectionType}.
  */
 @GuiceModule
 public class DataLayerGuiceModule extends AbstractModule {

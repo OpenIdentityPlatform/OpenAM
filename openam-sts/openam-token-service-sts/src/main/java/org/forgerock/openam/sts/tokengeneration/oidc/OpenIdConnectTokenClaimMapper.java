@@ -26,7 +26,7 @@ import java.util.Map;
  * STS instances will be published with state which will allow users to specify their own implementation of this
  * interface, and if so, an instance of the user-specified class will be consulted to perform the attribute mapping.
  *
- * @supported.all.api
+ * 
  */
 public interface OpenIdConnectTokenClaimMapper {
     /**

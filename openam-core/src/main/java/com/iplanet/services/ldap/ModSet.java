@@ -38,7 +38,7 @@ import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Represents a set of modification on attributes
- * @supported.api
+ * 
  */
 public class ModSet implements java.io.Serializable {
     // TODO: This is an incomplete implementation. Currently subclass from

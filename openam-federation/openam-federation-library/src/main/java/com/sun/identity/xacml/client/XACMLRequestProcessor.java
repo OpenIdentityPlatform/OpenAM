@@ -61,7 +61,7 @@ import com.sun.identity.xacml.saml2.XACMLAuthzDecisionStatement;
  * XACML context Response includes the xacml context Result with 
  * the XACML context authorization Decision
  *
- * @supported.all.api
+ * 
  *
  */
 public class XACMLRequestProcessor {

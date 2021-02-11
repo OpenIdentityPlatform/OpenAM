@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
  * preferred Identity Authenticating providers to service the authentication
  * request.
  *
- * @supported.all.api
+ * 
  */ 
 public interface SAML2IDPFinder {
 

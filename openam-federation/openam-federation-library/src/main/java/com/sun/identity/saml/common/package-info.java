@@ -29,7 +29,7 @@
 /**
  * Defines common SAML 1.x utilities and constants.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml.common;
 

@@ -34,7 +34,7 @@ package com.sun.identity.idm;
  * implement and register with the AMIdentityRepository to receive
  * notifications.
  *
- * @supported.all.api
+ * 
  */
 public interface IdEventListener {
     /**

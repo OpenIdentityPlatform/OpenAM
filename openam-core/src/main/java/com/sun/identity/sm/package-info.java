@@ -28,7 +28,7 @@
 
 /**
  * Provides classes for accessing the Service Management Service (SMS).
- * @supported.api
+ * 
  */
 
 package com.sun.identity.sm;

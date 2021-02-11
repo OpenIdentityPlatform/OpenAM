@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  *In another word, such an assertion is meant only for "one-time" use by the
  *relying party.
  *
- * @supported.all.api
+ * 
  */
 public class DoNotCacheCondition extends Condition {
     private SAMLConstants sc;

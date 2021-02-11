@@ -43,7 +43,7 @@ import org.w3c.dom.*;
  * policy evaluation. It has action values for a given <code>action</code> and 
  * <code>advice</code>. 
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated
@@ -85,7 +85,7 @@ public class ActionDecision {
      * @param actionName name of the action.
      * @param values a <code>Set></code> of <code>String</code> values for the 
      * action
-     * @supported.api
+     * 
      */
     public ActionDecision(String actionName, Set values) {
         this.actionName = actionName;
@@ -105,7 +105,7 @@ public class ActionDecision {
      *       when this object is to  be treated as expired. 
      *       That is the action values would likely be different
      *       after that time.
-     * @supported.api
+     * 
      */
     public ActionDecision(String actionName, Set values, Map advices,
         long timeToLive
@@ -120,7 +120,7 @@ public class ActionDecision {
      * Gets the name of the action
      *
      * @return name of the action
-     * @supported.api
+     * 
      */
     public String getActionName() {
         return actionName;
@@ -130,7 +130,7 @@ public class ActionDecision {
      * Sets the action values for the action.  
      *
      * @param values a <code>Set</code> of String values
-     * @supported.api
+     * 
      */
     public void setValues(Set values) {
         this.values = values;
@@ -140,7 +140,7 @@ public class ActionDecision {
      * Gets the action values for the action.  
      *
      * @return a <code>Set>/code> of String values
-     * @supported.api
+     * 
      */
     public Set getValues() {
         return values;
@@ -154,7 +154,7 @@ public class ActionDecision {
      * specified in the Policy definition. 
      *
      * @return long represeting the time to live for this object.
-     * @supported.api
+     * 
      */
     public long getTimeToLive() {
         return timeToLive;
@@ -168,7 +168,7 @@ public class ActionDecision {
      * specified in the Policy definition. 
      *
      * @param timeToLive time to live
-     * @supported.api
+     * 
      */
     public void setTimeToLive(long timeToLive) {
         this.timeToLive = timeToLive;
@@ -185,7 +185,7 @@ public class ActionDecision {
      * <code>AuthLevel</code> are integer valued.
      *
      * @param advices map of advices
-     * @supported.api
+     * 
      */
     public void setAdvices(Map advices) {
         this.advices = advices;
@@ -202,7 +202,7 @@ public class ActionDecision {
      * <code>AuthLevel</code> are integer valued.
      *
      * @return advices associated with this <code>ActionDecision</code>.
-     * @supported.api
+     * 
      */
     public Map getAdvices() {
         return advices;
@@ -212,7 +212,7 @@ public class ActionDecision {
      * Gets a String representation of this object
      *
      * @return a String representation of this object
-     * @supported.api
+     * 
      */
     public String toString() {
         return actionName + "=" + values;
@@ -222,7 +222,7 @@ public class ActionDecision {
      * Gets an XML representation of this object
      *
      * @return XML representation of this object
-     * @supported.api
+     * 
      */
      public String toXML() {
         StringBuilder sb  = new StringBuilder(300);

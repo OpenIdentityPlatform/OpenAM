@@ -37,7 +37,7 @@ import com.iplanet.services.ldap.LDAPServiceException;
  * Exception occurs while setting an event request or when trigering the
  * "entryChanged()" method after a persistent search results are received from
  * the Directory Server.
- * @supported.api
+ * 
  */
 public class EventException extends LDAPServiceException {
 
@@ -56,7 +56,7 @@ public class EventException extends LDAPServiceException {
      * 
      * @param msg
      *            Message string for the exception 
-     * @supported.api
+     * 
      */
     public EventException(String msg) {
         super(msg);
@@ -71,7 +71,7 @@ public class EventException extends LDAPServiceException {
      *            Message string
      * @param t
      *            The embedded exception 
-     * @supported.api
+     * 
      */
     public EventException(String msg, Throwable t) {
         super(msg, t);
@@ -84,7 +84,7 @@ public class EventException extends LDAPServiceException {
      * 
      * @return a string representation of this EventException, including its
      *         detail message, if present.
-     * @supported.api
+     * 
      */
     public String toString() {
         return super.toString()
@@ -97,7 +97,7 @@ public class EventException extends LDAPServiceException {
      * 
      * @return a string representation of the detailed message, if present.
      *        
-     * @supported.api
+     * 
      */
     public String getMessage() {
         return _message;
@@ -106,7 +106,7 @@ public class EventException extends LDAPServiceException {
     /**
      * Prints a stack trace for this EventException to System.out;
      *
-     * @supported.api
+     * 
      */
     public void printStackTrace() {
         super.printStackTrace();
@@ -118,7 +118,7 @@ public class EventException extends LDAPServiceException {
      * @param printStream
      *            a PrintStream to print the stack trace out to.
      *           
-     * @supported.api
+     * 
      */
     public void printStackTrace(PrintStream printStream) {
         super.printStackTrace(printStream);
@@ -130,7 +130,7 @@ public class EventException extends LDAPServiceException {
      * @param printWriter
      *            a PrintWriter to print the stack trace out to.
      *           
-     * @supported.api
+     * 
      */
     public void printStackTrace(PrintWriter printWriter) {
         super.printStackTrace(printWriter);

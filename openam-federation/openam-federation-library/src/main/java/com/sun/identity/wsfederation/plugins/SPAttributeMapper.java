@@ -47,7 +47,7 @@ import com.sun.identity.wsfederation.common.WSFederationException;
  * or the <code>FederationManager</code>.
  * @see com.sun.identity.wsfederation.plugins.IDPAttributeMapper
  *
- * @supported.all.api
+ * 
  */
 
 public interface SPAttributeMapper {

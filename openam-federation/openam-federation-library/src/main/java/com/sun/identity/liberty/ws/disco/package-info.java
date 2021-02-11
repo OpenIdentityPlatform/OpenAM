@@ -29,7 +29,7 @@
 /**
  * Provides interface to manage liberty discovery service.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.liberty.ws.disco;
 

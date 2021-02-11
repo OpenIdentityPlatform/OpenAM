@@ -62,7 +62,7 @@ import org.w3c.dom.NodeList;
  * The class <code>FSAuthnRequest</code> is used to create , parse
  * <code>AuthnRequest</code> object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

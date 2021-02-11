@@ -57,7 +57,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * </PRE>
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public final class AMEntityType {
 

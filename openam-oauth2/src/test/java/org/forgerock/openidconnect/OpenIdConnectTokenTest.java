@@ -107,6 +107,10 @@ public class OpenIdConnectTokenTest {
         switch (algorithm) {
             case RS256:
                 return rsaKeyPair;
+            case RS384:
+                return rsaKeyPair;
+            case RS512:
+                return rsaKeyPair;
             case ES256:
                 return p256KeyPair;
             case ES384:

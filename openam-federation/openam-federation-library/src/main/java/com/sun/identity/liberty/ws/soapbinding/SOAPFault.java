@@ -52,7 +52,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 /**
  * The <code>SOAPFault</code> class represents a SOAP Fault element.
  *
- * @supported.all.api
+ * 
  */
 
 public class SOAPFault {

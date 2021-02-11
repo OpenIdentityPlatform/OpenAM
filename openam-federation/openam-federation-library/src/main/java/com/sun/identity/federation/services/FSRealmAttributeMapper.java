@@ -42,7 +42,7 @@ import java.util.Map;
  * service will populate these attributes to the application via the
  * single sign-on token.
  * </p>
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

@@ -36,7 +36,7 @@ package com.sun.identity.policy;
  * In other words, provides access to a set of finite values and enforces 
  * new values can not be created by users
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

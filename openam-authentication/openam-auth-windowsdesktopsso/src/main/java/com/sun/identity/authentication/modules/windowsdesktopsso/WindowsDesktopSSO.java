@@ -29,6 +29,7 @@
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -128,6 +129,10 @@ public class WindowsDesktopSSO extends AMLoginModule {
      */
     public void init(Subject subject, Map sharedState, Map options) {
         this.options = options;
+        HttpServletRequest request = getHttpServletRequest();
+        if (request == null || "true".equals(request.getParameter("skipKerberos"))) {
+        	setSharedStateEnabled(true);
+        }
     }
 
     /**
@@ -153,7 +158,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         // Check to see if the Rest Auth Endpoint has signified that IWA has failed.
         HttpServletRequest request = getHttpServletRequest();
-        if (request != null && hasWDSSOFailed(request)) {
+        if (request == null  
+        		|| hasWDSSOFailed(request) 
+        		|| "true".equals(request.getParameter("skipKerberos"))) {
             return ISAuthConstants.LOGIN_IGNORE;
         }
 
@@ -716,7 +723,6 @@ public class WindowsDesktopSSO extends AMLoginModule {
         IdSearchControl searchControl = new IdSearchControl();
         searchControl.setMaxResults(1);
         searchControl.setTimeOut(3000);
-
         searchControl.setSearchModifiers(IdSearchOpModifier.OR, buildSearchControl(attributeValue));
         searchControl.setAllReturnAttributes(false);
 

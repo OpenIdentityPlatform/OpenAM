@@ -40,7 +40,7 @@ import com.sun.identity.policy.PolicyEvent;
  *
  * @see 
  * com.sun.identity.policy.PolicyEvaluator#addPolicyListener(PolicyListener)
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

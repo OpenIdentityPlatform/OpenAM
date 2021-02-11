@@ -49,7 +49,7 @@ import org.w3c.dom.Element;
  *    &lt;xs:sequence>
  *  &lt;xs:complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public interface Resource {
 

@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
@@ -29,7 +29,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codemirror.version>4.10</codemirror.version>
-        <handlebars.version>4.4.2</handlebars.version>
+        <handlebars.version>4.7.6</handlebars.version>
         <node.install.directory>${project.basedir}</node.install.directory>
     </properties>
 
@@ -331,8 +331,8 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v10.16.3</nodeVersion>
-                            <npmVersion>6.12.0</npmVersion>
+                            <nodeVersion>v12.19.0</nodeVersion>
+                            <npmVersion>6.14.8</npmVersion>
 <!--                             <downloadRoot>http://maven.forgerock.org/repo/forgerock-third-party-virtual/</downloadRoot> -->
 <!--                             <npmDownloadRoot>http://maven.forgerock.org/repo/api/npm/npm-virtual/npm/-/</npmDownloadRoot> -->
                         </configuration>

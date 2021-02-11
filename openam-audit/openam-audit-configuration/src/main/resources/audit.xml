@@ -94,7 +94,7 @@
                                      i18nKey="audit.handlers.file.rotationFileSuffix" order="900">
                         <IsOptional/>
                         <DefaultValues>
-                            <Value>-yyyy.MM.dd-HH.mm.ss</Value>
+                            <Value>-yyyy.MM.dd-HH.mm.ss.gz</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single"
@@ -834,7 +834,7 @@
                                      i18nKey="audit.handlers.file.rotationFileSuffix" order="900">
                         <IsOptional/>
                         <DefaultValues>
-                            <Value>-yyyy.MM.dd-HH.mm.ss</Value>
+                            <Value>-yyyy.MM.dd-HH.mm.ss.gz</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationInterval" type="single"

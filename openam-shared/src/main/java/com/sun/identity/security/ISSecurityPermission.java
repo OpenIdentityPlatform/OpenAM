@@ -57,7 +57,7 @@ import java.util.StringTokenizer;
  * should be set to true in <code>AMConfig.properties</code> file to enable the
  * Java security permissions check.
  *
- * @supported.all.api
+ * 
  */
 public class ISSecurityPermission extends Permission {
     private static Random rnd = new Random();

@@ -34,7 +34,7 @@ import com.sun.identity.federation.common.FSException;
  * This exception is thrown when there are failures
  * during the federation of an identity.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

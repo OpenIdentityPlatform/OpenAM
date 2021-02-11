@@ -37,7 +37,7 @@ import  java.security.Principal;
  * It implements <code>Principal</code> and <code>Serializable</code>
  * interfaces.
  * 
- * @supported.all.api
+ * 
  */
 public class SecurityPrincipal implements Principal, Serializable {
 

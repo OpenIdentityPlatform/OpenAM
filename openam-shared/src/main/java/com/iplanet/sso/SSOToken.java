@@ -41,7 +41,7 @@ package com.iplanet.sso;
  * session-related information such as maximum session time, maximum session
  * idle time and session idle time.
  *
- * @supported.all.api
+ * 
  */
 public interface SSOToken {
 

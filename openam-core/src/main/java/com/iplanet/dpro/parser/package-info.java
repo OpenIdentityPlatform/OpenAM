@@ -16,6 +16,6 @@
 /**
  * XML parsing utility.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.dpro.parser;

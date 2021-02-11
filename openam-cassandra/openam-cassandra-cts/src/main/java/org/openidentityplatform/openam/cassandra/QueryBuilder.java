@@ -18,10 +18,10 @@
 package org.openidentityplatform.openam.cassandra;
 
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,42 +34,39 @@ import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.tokens.CoreTokenField;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Select.Where;
-import com.google.common.primitives.Ints;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.sun.identity.shared.debug.Debug;
+import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import com.datastax.oss.driver.api.querybuilder.select.Select;
 
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
 
-public class QueryBuilder extends org.forgerock.openam.sm.datalayer.api.query.QueryBuilder<Session, Filter> {
 
-	private DataLayerConfiguration cfg;
-    private ConnectionFactory<Session> connectionFactory;
+public class QueryBuilder extends org.forgerock.openam.sm.datalayer.api.query.QueryBuilder<CqlSession, Filter> {
+
+    
+	private ConnectionFactory<CqlSession> connectionFactory;
 
     /**
      * Default constructor ensures the Object Class is defined.
      *
-     * @param dataLayerConfiguration Required for data store dataLayerConfiguration.
      * @param debug To debug writer for this class.
-     * @param connectionFactoryProvider A producer of factories used to communicate down to the data layer with.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Inject
-    public QueryBuilder(DataLayerConfiguration cfg, 
-                            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
-                            ConnectionFactory connectionFactory
+    public QueryBuilder(    @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
+                            ConnectionFactory connectionFactoryProvider
                             ) {
         super(debug);
-        this.cfg=cfg;
-        this.connectionFactory = connectionFactory;
+        this.connectionFactory = connectionFactoryProvider;
     }
 
     /**
@@ -79,47 +76,52 @@ public class QueryBuilder extends org.forgerock.openam.sm.datalayer.api.query.Qu
      * @return A non null but possibly empty collection.
      */
     @SuppressWarnings("unchecked")
-	public <T> Iterator<Collection<T>> executeRawResults(Session connection, Class<T> returnType) {
-    		debug.message("executeRawResults {}",this);
-    		try {
-    			Set<String> requestedAttributes=new HashSet<String>(Arrays.asList(this.requestedAttributes));
-    			requestedAttributes.add("coreTokenId");
-    			final Set<CoreTokenField> requestedCoreTokenFields=new HashSet<CoreTokenField>(requestedAttributes.size());
-    			for (String requestedAttribute : requestedAttributes) 
-    				requestedCoreTokenFields.add(CoreTokenField.fromLDAPAttribute(requestedAttribute));
-	    		Where where=com.datastax.driver.core.querybuilder.QueryBuilder
-	    			.select(requestedAttributes.toArray(new String[0]))
-	    			.from(cfg.getKeySpace(), this.filter.getTable())
-	    			.where();
-	    		for(Clause clause : this.filter.clauses)
-	    			where=where.and(clause);
-	    		Select select=where.allowFiltering();
-	    		if (this.sizeLimit>0)
-	    			select=select.limit(this.sizeLimit);
-	    		if (this.pageSize>0)
-	    			select=(Select)select.setFetchSize(this.pageSize);
-	    		if (this.timeLimit.getValue()>0 && this.timeLimit.to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE)
-	    			select=(Select)select.setReadTimeoutMillis(Ints.checkedCast(this.timeLimit.to(TimeUnit.MILLISECONDS)));
-	    		//final ResultSet rc = new ExecuteCallback(connectionFactory.create(),select).execute();
-	    		//final Iterator<Row> iterator=rc.iterator();
-	    		final Iterator<Row> iterator=Collections.EMPTY_LIST.iterator(); //disable long query
-	    		return new Iterator<Collection<T>>() {
-	  				@Override
-					public boolean hasNext() {
-						return iterator.hasNext();
+	public <T> Iterator<Collection<T>> executeRawResults(CqlSession connection, Class<T> returnType) {
+		debug.message("executeRawResults {}",this);
+		try {
+			final Set<String> requestedAttributes=new HashSet<String>(Arrays.asList(this.requestedAttributes));
+			requestedAttributes.add("coreTokenId");
+			final Set<CoreTokenField> requestedCoreTokenFields=new HashSet<CoreTokenField>(requestedAttributes.size());
+			for (String requestedAttribute : requestedAttributes) {
+				requestedCoreTokenFields.add(CoreTokenField.fromLDAPAttribute(requestedAttribute));
+			}
+			Select select=selectFrom(this.filter.getTable())
+					.columns(requestedAttributes.toArray(new String[0]));
+			for(Relation relation : this.filter.clauses) {
+				select=select.where(relation);
+			}
+			select=select.allowFiltering();
+    		if (this.sizeLimit>0) {
+    			select=select.limit(this.sizeLimit);
+    		}
+    		final SimpleStatement statement=select.build();
+    		if (this.pageSize>0) {
+    			statement.setPageSize(this.pageSize);
+    		}
+    		if (this.timeLimit.getValue()>0 && this.timeLimit.to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE) {
+    			statement.setTimeout(Duration.ofMillis(this.timeLimit.to(TimeUnit.MILLISECONDS)));
+    		}
+    		final ResultSet rc = new ExecuteCallback(ConnectionFactoryProvider.profile,connectionFactory.create(),statement).execute();
+    		final Iterator<Row> iterator=rc.iterator();
+    		//final Iterator<Row> iterator=Collections.EMPTY_LIST.iterator(); //disable long query
+    		return new Iterator<Collection<T>>() {
+  				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+				@Override
+				public Collection<T> next() {
+					final Row row=iterator.next();
+					List<T> res=new ArrayList<T>(1);
+					if (row!=null) {
+						res.add((T)TokenStorageAdapter.Row2ParitalToken(requestedCoreTokenFields, row));
 					}
-					@Override
-					public Collection<T> next() {
-						final Row row=iterator.next();
-						List<T> res=new ArrayList<T>(1);
-						if (row!=null)
-							res.add((T)TokenStorageAdapter.Row2ParitalToken(requestedCoreTokenFields, row));
-						return res;
-					}
-					@Override
-					public void remove() {}
-				};
-    		}catch (Exception e) {
+					return res;
+				}
+				@Override
+				public void remove() {}
+			};
+		}catch (Exception e) {
 			throw new RuntimeException(e);
 		}
     }

@@ -49,7 +49,7 @@ import com.iplanet.services.util.I18n;
  *               uid=joe    
  * </pre>
  *
- * @supported.api
+ * 
  */
 public class Organization extends PersistentObject {
 
@@ -100,7 +100,7 @@ public class Organization extends PersistentObject {
      *            template for the organization
      * @param attrSet
      *            attribute/value set
-     * @supported.api
+     * 
      */
     public Organization(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -118,7 +118,7 @@ public class Organization extends PersistentObject {
      *                if the entry already exists
      * @exception UMSException
      *                Fail to add the object
-     * @supported.api
+     * 
      */
     public void addChild(PersistentObject object) throws AccessRightsException,
             EntryAlreadyExistsException, UMSException {
@@ -163,7 +163,7 @@ public class Organization extends PersistentObject {
      *                if the entry is not found
      * @exception UMSException
      *                Fail to remove the object
-     * @supported.api
+     * 
      */
     public void removeChild(PersistentObject object)
             throws AccessRightsException, EntryNotFoundException, UMSException {
@@ -176,7 +176,7 @@ public class Organization extends PersistentObject {
      * Returns the name of the organization.
      * 
      * @return name of the organization
-     * @supported.api
+     * 
      */
     public String getName() throws UMSException {
         return getAttribute(getNamingAttribute()).getValue();
@@ -210,7 +210,7 @@ public class Organization extends PersistentObject {
      * @return guids identifying People Containers under the organization
      * @exception UMSException
      *                Failure
-     * @supported.api
+     * 
      */
     public Collection getPeopleContainerGuids() throws UMSException {
         Collection pcs = new ArrayList();
@@ -260,7 +260,7 @@ public class Organization extends PersistentObject {
      *            guid of the People Container to which the rule is applied.
      * @exception UMSException
      *                Failure
-     * @supported.api
+     * 
      */
     public void addPeopleContainerRule(Guid guid, String filter)
             throws UMSException {
@@ -278,7 +278,7 @@ public class Organization extends PersistentObject {
      *            guid of which the rule applies to
      * @exception UMSException
      *                Failure 
-     * @supported.api
+     * 
      */
     public void removePeopleContainerRule(Guid guid, String filter)
             throws UMSException {
@@ -294,7 +294,7 @@ public class Organization extends PersistentObject {
      *            guid of the default People Container
      * @exception UMSException
      *                Failure
-     * @supported.api
+     * 
      */
     public void setDefaultPeopleContainer(Guid guid) throws UMSException {
         PCMappingTable mt = PCMappingTable.getPCMappingTable(this);

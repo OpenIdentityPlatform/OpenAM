@@ -55,7 +55,7 @@ import org.w3c.dom.NodeList;
  * corresponds to the <code>&lt;samlp:AuthorizationDecisionQueryType&gt;</code>
  * in the SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public class AuthorizationDecisionQuery extends SubjectQuery {
 

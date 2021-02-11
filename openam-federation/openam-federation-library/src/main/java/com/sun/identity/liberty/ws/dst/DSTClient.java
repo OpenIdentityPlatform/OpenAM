@@ -59,7 +59,7 @@ import javax.servlet.http.HttpServletResponse;
  * The class <code>DSTClient</code> provides methods for Liberty
  * Data Service Template.
  *
- * @supported.all.api
+ * 
  */
 public class DSTClient {
 

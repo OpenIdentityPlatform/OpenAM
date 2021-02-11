@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
  * The <code>ResourceAccessStatement</code> class conveys information regarding
  * the accessing entities and the resource for which access is being attempted.
  *
- * @supported.all.api
+ * 
  */
 public class ResourceAccessStatement extends SubjectStatement {
     /**

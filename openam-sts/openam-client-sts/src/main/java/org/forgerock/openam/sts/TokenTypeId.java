@@ -22,7 +22,7 @@ package org.forgerock.openam.sts;
  * An extensible means of identifying tokens types is necessary to support end-user-provided JsonTokenValidators and
  * JsonTokenProviders.
  *
- * @supported.all.api
+ * 
  */
 public interface TokenTypeId {
 

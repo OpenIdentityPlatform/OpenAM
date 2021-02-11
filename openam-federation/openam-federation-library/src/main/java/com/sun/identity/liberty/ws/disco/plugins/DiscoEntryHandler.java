@@ -41,7 +41,7 @@ import java.util.List;
  * interface and set the implementing class to
  * <code>DiscoEntryHandler Plugins Class</code> field in Discovery Service.
  *
- * @supported.all.api
+ * 
  */
 public interface DiscoEntryHandler {
 

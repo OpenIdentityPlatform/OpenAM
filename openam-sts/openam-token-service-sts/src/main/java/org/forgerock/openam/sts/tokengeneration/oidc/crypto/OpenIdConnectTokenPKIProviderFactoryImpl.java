@@ -50,6 +50,6 @@ public class OpenIdConnectTokenPKIProviderFactoryImpl implements OpenIdConnectTo
      */
     private boolean realProviderRequired(OpenIdConnectTokenConfig tokenConfig) {
         return (tokenConfig != null) &&
-                (JwsAlgorithmType.RSA.equals(tokenConfig.getSignatureAlgorithm().getAlgorithmType()));
+                (JwsAlgorithmType.RSA.equals(tokenConfig.getSignatureAlgorithm().getAlgorithmType()) || JwsAlgorithmType.ECDSA.equals(tokenConfig.getSignatureAlgorithm().getAlgorithmType()));
     }
 }

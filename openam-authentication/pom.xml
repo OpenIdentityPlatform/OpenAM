@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -61,6 +61,7 @@
         <module>openam-auth-securid</module>
         <module>openam-auth-recaptcha</module>
         <module>openam-auth-webauthn</module>
+        <module>openam-auth-qr</module>
     </modules>
 
     <dependencies>

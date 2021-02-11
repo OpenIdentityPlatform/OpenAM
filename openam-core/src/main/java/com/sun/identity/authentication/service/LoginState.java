@@ -2477,9 +2477,17 @@ public class LoginState {
                     (isApplicationModule(indexName) && LazyConfig.AUTHD.isSuperAdmin(userDN))) {
                 if (LazyConfig.AUTHD.isSuperAdmin(userDN)) {
                     amIdentityUser = LazyConfig.AUTHD.getIdentity(IdType.USER, userDN, getOrgDN());
+                } else if(LDAPUtils.isDN(userDN)) { 
+                	amIdentityUser = new AMIdentity(null, userDN);
+                	
+                	//set org match identity
+                    if(!amIdentityUser.getRealm().equals(qualifiedOrgDN)) {
+                    	orgDN = amIdentityUser.getRealm();
+                    	qualifiedOrgDN = orgDN;
+                    }
+                    
                 } else {
-                    amIdentityUser =
-                            new AMIdentity(null, userDN, IdType.USER, getOrgDN(), null);
+                    amIdentityUser = new AMIdentity(null, userDN, IdType.USER, getOrgDN(), null);
                 }
                 userDN = getUserDN(amIdentityUser);
                 populateDefaultUserAttributes();
@@ -4581,8 +4589,10 @@ public class LoginState {
         } else {
             upgradeAuthLevel = Integer.toString(authLevel);
         }
-
-        if ((qualifiedOrgDN != null) && (qualifiedOrgDN.length() != 0)) {
+        
+        String sessionOrgDN = oldSession.getProperty(ISAuthConstants.ORGANIZATION);
+        boolean appendOrgDN = !StringUtils.equals(sessionOrgDN, qualifiedOrgDN) && (qualifiedOrgDN != null) && (qualifiedOrgDN.length() != 0);
+        if (appendOrgDN) {
             upgradeAuthLevel = AMAuthUtils.toRealmQualifiedAuthnData(
                     DNMapper.orgNameToRealmName(qualifiedOrgDN),
                     upgradeAuthLevel);
@@ -4594,8 +4604,7 @@ public class LoginState {
         newServiceName = getAuthConfigName(indexType, indexName);
 
         if ((newServiceName != null) && (newServiceName.length() != 0)) {
-            if ((qualifiedOrgDN != null)
-                    && (qualifiedOrgDN.length() != 0)) {
+            if (appendOrgDN) {
                 newServiceName = AMAuthUtils.toRealmQualifiedAuthnData(
                         DNMapper.orgNameToRealmName(qualifiedOrgDN),
                         newServiceName);
@@ -4629,7 +4638,7 @@ public class LoginState {
         // update auth meth name
 
         String newModuleList = authMethName;
-        if ((qualifiedOrgDN != null) && (qualifiedOrgDN.length() != 0)) {
+        if (appendOrgDN) {
             newModuleList = getRealmQualifiedModulesList(
                     DNMapper.orgNameToRealmName(qualifiedOrgDN), authMethName);
         }

@@ -60,7 +60,8 @@ public abstract class STSInstanceModelBase extends AMServiceProfileModelImpl imp
     private static final String REST_STS_PUBLISH_SERVICE_VERSION = "protocol=1.0, resource=1.0";
     private static final String SOAP_STS_PUBLISH_SERVICE_VERSION = "protocol=1.0, resource=1.0";
 
-    public STSInstanceModelBase(HttpServletRequest req, String serviceName, Map map) throws AMConsoleException {
+    @SuppressWarnings("rawtypes")
+	public STSInstanceModelBase(HttpServletRequest req, String serviceName, Map map) throws AMConsoleException {
         super(req, serviceName, map);
     }
 
@@ -84,7 +85,7 @@ public abstract class STSInstanceModelBase extends AMServiceProfileModelImpl imp
             if (baseService != null) {
                 return baseService.getSubConfigNames();
             } else {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
         } catch (SMSException | SSOException e) {
             throw new AMConsoleException(e);
@@ -145,10 +146,10 @@ public abstract class STSInstanceModelBase extends AMServiceProfileModelImpl imp
                 if (serviceConfig != null) {
                     return serviceConfig.getAttributes();
                 } else {
-                    return Collections.EMPTY_MAP;
+                    return Collections.emptyMap();
                 }
             } else {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
         } catch (SMSException | SSOException e) {
             throw new AMConsoleException(e);
@@ -250,14 +251,11 @@ public abstract class STSInstanceModelBase extends AMServiceProfileModelImpl imp
             return STSInstanceModelResponse.failure(getLocalizedString("sts.validation.oidc.token.lifetime.message"));
         }
 
-        boolean rsaSignature = false;
         if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM))) {
             return STSInstanceModelResponse.failure(getLocalizedString("sts.validation.oidc.signature.algorithm.message"));
-        } else {
-            rsaSignature = rsaSignatureForOIDC(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM));
         }
 
-        if (rsaSignature) {
+        if (rsaSignatureForOIDC(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM)) || ecdsaSignatureForOIDC(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM))) {
             if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_KEYSTORE_LOCATION))) {
                 return STSInstanceModelResponse.failure(getLocalizedString("sts.validation.oidc.keystore.location.message"));
             }
@@ -302,6 +300,9 @@ public abstract class STSInstanceModelBase extends AMServiceProfileModelImpl imp
 
     private boolean rsaSignatureForOIDC(String algorithm) {
         return algorithm.startsWith("RS");
+    }
+    private boolean ecdsaSignatureForOIDC(String algorithm) {
+        return algorithm.startsWith("ES");
     }
 
     /*

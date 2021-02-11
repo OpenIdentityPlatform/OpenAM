@@ -46,7 +46,7 @@ import java.util.List;
  * A singleton instance of this <code>FedletAdapter</code>
  * class will be used per Service Provider during runtime, so make sure 
  * implementation of the methods are thread safe. 
- * @supported.all.api
+ * 
  */
 
 public abstract class FedletAdapter {

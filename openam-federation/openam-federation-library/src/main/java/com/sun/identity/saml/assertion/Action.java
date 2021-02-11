@@ -41,7 +41,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  *This class is designed for <code>Action</code> element in SAML core 
  *assertion. This element specifies an action on specified resource for
  *which permission is sought. 
- *@supported.all.api
+ *
  */
 public class Action {
     //An action sought to be performed on the specified resource 

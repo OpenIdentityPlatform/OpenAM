@@ -16,6 +16,6 @@
 /**
  * Classes to handle policies remotely.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.policy.remote;

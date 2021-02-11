@@ -80,7 +80,7 @@ import com.sun.identity.xacml.context.Request;
  *  &lt;complexType>
  * </pre>
  *
- *@supported.all.api
+ *
  */
 public interface XACMLAuthzDecisionQuery extends RequestAbstract {
 

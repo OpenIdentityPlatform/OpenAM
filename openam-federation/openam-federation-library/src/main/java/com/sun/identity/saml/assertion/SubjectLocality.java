@@ -38,7 +38,7 @@ import com.sun.identity.saml.common.SAMLRequesterException;
  *The <code>SubjectLocality</code> element specifies the DNS domain name 
  *and IP address for the system entity that performed the authentication. 
  *It exists as part of <code>AuthenticationStatement</code> element.
- *@supported.all.api
+ *
  */
 public class SubjectLocality {
     static SAMLConstants sc;

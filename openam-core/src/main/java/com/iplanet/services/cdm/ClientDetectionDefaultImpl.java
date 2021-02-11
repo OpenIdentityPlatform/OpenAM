@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
  * by services and applications serving multiple clients, to determine the
  * client from which the request has originated. This interface detects the
  * client type from the client request.
- * @supported.all.api
+ * 
  */
 public class ClientDetectionDefaultImpl implements ClientDetectionInterface {
 

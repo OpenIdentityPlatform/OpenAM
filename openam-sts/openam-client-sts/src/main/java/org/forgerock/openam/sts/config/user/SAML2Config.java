@@ -45,7 +45,7 @@ import static org.forgerock.json.JsonValue.object;
  * The signatureAlias corresponds to the IDP's signing key, and the encryptionKeyAlias could correspond to the SP's
  * public key corresponding to the key used to encrypt the symmetric key used to encrypt assertion elements.
  *
- * @supported.all.api
+ * 
  */
 public class SAML2Config {
 
@@ -63,7 +63,7 @@ public class SAML2Config {
     /**
      * Builder used to programmatically create {@linkplain SAML2Config} objects
      *
-     * @supported.all.api
+     * 
      */
     public static class SAML2ConfigBuilder {
         private String idpId;

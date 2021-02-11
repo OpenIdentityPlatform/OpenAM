@@ -42,7 +42,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  issue an assertion that itself violates the restrictions specified 
  *  in this condition on the basis of an assertion containing such
  *  a condition.
- *  @supported.all.api
+ *  
  */
 public interface ProxyRestriction extends ConditionAbstract {
 

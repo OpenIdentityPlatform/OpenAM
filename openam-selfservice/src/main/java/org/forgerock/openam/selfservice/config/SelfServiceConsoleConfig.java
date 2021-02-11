@@ -19,7 +19,7 @@ package org.forgerock.openam.selfservice.config;
 /**
  * Defines the bases for which all self service console configuration should be built on.
  *
- * @supported.api
+ * 
  * @since 13.0.0
  */
 public interface SelfServiceConsoleConfig {

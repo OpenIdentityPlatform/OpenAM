@@ -34,7 +34,7 @@ package com.sun.identity.saml.common;
  * because the version was too high. It extends from 
  * <code>SAMLVersionMismatchException</code>.
  *
- * @supported.all.api
+ * 
  */
 public class SAMLRequestVersionTooHighException extends
                                                 SAMLVersionMismatchException {

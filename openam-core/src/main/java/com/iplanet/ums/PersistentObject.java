@@ -65,7 +65,7 @@ import org.forgerock.opendj.ldap.SearchScope;
  * Represents a persistent object in UMS. This is the base class for all objects
  * that Object Management Module (OMM) manages in UMS.
  *
- * @supported.api
+ * 
  */
 public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
@@ -142,7 +142,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *             for failure to construct the object. The given attrSet needs
      *             to provide the required attribute(s) defined in template
      *
-     * @supported.api
+     * 
      */
     public PersistentObject(CreationTemplate template, AttrSet attrSet)
             throws UMSException {
@@ -198,7 +198,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *            Name of the attribute to be queried
      * @return Attribute value
      *
-     * @supported.api
+     * 
      */
     public Attr getAttribute(String attrName) {
         Attr attr = getAttributeFromCache(attrName);
@@ -228,7 +228,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *         provided
      * @see com.iplanet.ums.PersistentObject#getAttribute(String)
      *
-     * @supported.api
+     * 
      */
     public Attr getAttribute(String attrName, Locale locale)
             throws UMSException {
@@ -248,7 +248,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @return attribute value set for the return values
      * @see #getAttribute(String)
      *
-     * @supported.api
+     * 
      */
     public AttrSet getAttributes(String[] attrs) throws UMSException {
         return getAttributes(attrs, false);
@@ -265,7 +265,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @return attribute value set for the return values
      * @see #getAttribute(String)
      *
-     * @supported.api
+     * 
      */
     public AttrSet getAttributes(String[] attrs, boolean cacheOnly)
             throws UMSException {
@@ -300,7 +300,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *         unfound locale. No fallback mechanism is provided.
      * @see #getAttribute(String)
      *
-     * @supported.api
+     * 
      */
     public AttrSet getAttributes(String attrNames[], Locale locale)
             throws UMSException {
@@ -326,7 +326,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param attr
      *            Attribute and value
      *
-     * @supported.api
+     * 
      */
     public void setAttribute(Attr attr) {
 
@@ -359,7 +359,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param locale
      *            Intended locale of the attribute to be set
      *
-     * @supported.api
+     * 
      */
     public void setAttribute(Attr attr, Locale locale) {
 
@@ -404,7 +404,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param attr
      *            Attribute to be removed
      *
-     * @supported.api
+     * 
      */
     public void removeAttribute(Attr attr) {
         checkCache();
@@ -420,7 +420,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @return Array of strings representing attribute names
      * 
-     * @supported.api
+     * 
      */
     public String[] getAttributeNames() {
         if (m_principal != null && m_guid != null && m_attrSet == null) {
@@ -453,7 +453,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *            Set of modification of attributes
      * @see ModSet
      *
-     * @supported.api
+     * 
      */
     public void modify(Collection<Modification> modSet) {
         checkCache();
@@ -512,7 +512,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @see ModSet
      *
-     * @supported.api
+     * 
      */
     public void modify(Attr attr, ModificationType modificationType) {
         Modification modification = new Modification(modificationType, attr.toLDAPAttribute());
@@ -540,7 +540,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *                   ModificationType.INCREMENT
      * </pre>
      * 
-     * @supported.api
+     * 
      */
     public void modify(String attrName, String value, ModificationType modificationType) {
         modify(new Attr(attrName, value), modificationType);
@@ -551,7 +551,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @return the GUID.
      *
-     * @supported.api
+     * 
      */
     public Guid getGuid() {
         return m_guid;
@@ -574,7 +574,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure to save to persistent storage
      *
-     * @supported.api
+     * 
      */
     public void rename(String newRDN, boolean deleteOldName)
             throws AccessRightsException, EntryNotFoundException, UMSException {
@@ -631,7 +631,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure to save to persistent storage
      *
-     * @supported.api
+     * 
      */
     public void save() throws AccessRightsException, EntryNotFoundException,
             UMSException {
@@ -674,7 +674,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @return Attribute name for identification
      *
-     * @supported.api
+     * 
      */
     public String getNamingAttribute() {
 
@@ -696,7 +696,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure instantiating the parent object
      *
-     * @supported.api
+     * 
      */
     public PersistentObject getParentObject() throws UMSException {
 
@@ -731,7 +731,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *         <code>EntryAlreadyExists</code>, <code>AccessRights</code>
      *         violation.
      *
-     * @supported.api
+     * 
      */
     public void addChild(PersistentObject object) throws AccessRightsException,
             EntryAlreadyExistsException, UMSException {
@@ -808,7 +808,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException if fail to remove the child object. Possible causes
      *         includes EntryNotFount, AccessRights violation etc.
      *
-     * @supported.api
+     * 
      */
     public void removeChild(PersistentObject object)
             throws AccessRightsException, EntryNotFoundException, UMSException {
@@ -877,7 +877,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *         store. Possible causes include AccessRights violation,
      *         EntryNotFound etc.
      *
-     * @supported.api
+     * 
      */
     public void removeChild(Guid childGuid) throws AccessRightsException,
             EntryNotFoundException, UMSException {
@@ -907,7 +907,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             from UMSSession.removeObject( principal, guid)
      *
-     * @supported.api
+     * 
      */
     public void remove() throws AccessRightsException, EntryNotFoundException,
             UMSException {
@@ -939,7 +939,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @return String representation of the object
      *
-     * @supported.api
+     * 
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -987,7 +987,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on searching for immediate children in the container
      *
-     * @supported.api
+     * 
      */
     public SearchResults getChildren(String filter, SearchControl searchControl)
             throws InvalidSearchFilterException, UMSException {
@@ -1019,7 +1019,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure with searhing
      * 
-     * @supported.api
+     * 
      */
     public SearchResults getChildren(String filter,
             String[] resultAttributeNames, SearchControl searchControl)
@@ -1056,7 +1056,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure with searching
      *
-     * @supported.api
+     * 
      */
     public SearchResults getChildren(SearchTemplate template,
             SearchControl searchControl) throws UMSException {
@@ -1077,7 +1077,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure with searching
      *
-     * @supported.api
+     * 
      */
     public SearchResults search(String filter, SearchControl searchControl)
             throws InvalidSearchFilterException, UMSException {
@@ -1112,7 +1112,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *             on failure with searching
      * 
      *
-     * @supported.api
+     * 
      */
     public SearchResults search(String filter, String[] resultAttributeNames,
             SearchControl searchControl) throws InvalidSearchFilterException,
@@ -1145,7 +1145,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             on failure to search
      *
-     * @supported.api
+     * 
      */
     public SearchResults search(SearchTemplate template,
             SearchControl searchControl) throws UMSException {
@@ -1350,7 +1350,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             propagates any exception from the datalayer
      *
-     * @supported.api
+     * 
      */
     public boolean isMemberOf(IMembership im) throws UMSException {
         return im.hasMember(getGuid());
@@ -1363,7 +1363,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws UMSException
      *             propagates any exception from the datalayer
      *
-     * @supported.api
+     * 
      */
     public Collection getRoles() throws UMSException {
         ArrayList roleList = new ArrayList();
@@ -1380,7 +1380,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @return collecion of ACIs of this object.
      * @throws ACIParseException if any error
      *
-     * @supported.api
+     * 
      */
     public Collection getACI() throws ACIParseException, UMSException {
         Collection acis = new ArrayList();
@@ -1402,7 +1402,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @return collecion of ACIs of this object.
      * @throws ACIParseException in case of any error
      *
-     * @supported.api
+     * 
      */
     public Collection getACI(String name) throws ACIParseException,
             UMSException {
@@ -1428,7 +1428,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws AccessRightsException if an access rights exception occurs.
      * @throws UMSException if any error
      *
-     * @supported.api
+     * 
      */
     public void addACI(ACI aci) throws AccessRightsException, UMSException {
         Attr attr = new Attr(ACI.ACI, aci.toString());
@@ -1443,7 +1443,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws AccessRightsException if an access rights exception occurs.
      * @throws UMSException if any error.
      *
-     * @supported.api
+     * 
      */
     public void deleteACI(ACI aci) throws AccessRightsException, UMSException {
         Attr attr = new Attr(ACI.ACI, aci.getACIText());
@@ -1459,7 +1459,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @throws AccessRightsException if an access rights exception occurs.
      * @throws UMSException if any error.
      *
-     * @supported.api
+     * 
      */
     public void replaceACI(ACI oldACI, ACI newACI)
             throws AccessRightsException, UMSException {
@@ -1480,7 +1480,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param value Value to be added to the attribute.
      * @throws UMSException if any exception from the data layer.
      *
-     * @supported.api
+     * 
      */
     public static void addAttributeValue(
         SSOToken token,
@@ -1526,7 +1526,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param value Value to be removed from the attribute.
      * @throws UMSException if any exception from the data layer.
      *
-     * @supported.api
+     * 
      */
     public static void removeAttributeValue(SSOToken token, Guid guid,
             String name, String value) throws UMSException {

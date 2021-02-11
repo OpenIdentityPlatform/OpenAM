@@ -29,6 +29,6 @@
 /**
  * Defines SAMLv2 assertion.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml2.assertion;

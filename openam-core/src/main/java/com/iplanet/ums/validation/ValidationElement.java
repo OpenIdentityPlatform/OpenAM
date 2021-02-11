@@ -34,7 +34,7 @@ import java.io.Serializable;
  * Represents a validator/rule pair. A validator/rule pair is required to
  * represent a complete validation rountine.
  *
- * @supported.all.api
+ * 
  */
 public class ValidationElement implements Serializable {
 

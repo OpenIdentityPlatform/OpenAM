@@ -34,7 +34,7 @@ package com.sun.identity.saml.common;
  * because the version was deprecated. It extends from 
  * <code>SAMLVersionMismatchException</code>.
  *
- * @supported.all.api
+ * 
  */
 public class SAMLRequestVersionDeprecatedException
     extends SAMLVersionMismatchException

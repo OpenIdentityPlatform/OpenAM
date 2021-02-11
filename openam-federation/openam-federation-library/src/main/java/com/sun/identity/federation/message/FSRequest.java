@@ -65,7 +65,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This class represents a Liberty <code>Request</code>.
  * It extends from the abstract base class <code>AbstractRequest</code>.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

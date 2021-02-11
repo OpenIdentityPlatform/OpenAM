@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder to construct the config object represented by {@link C}.
+ * Builder to construct the config object represented.
  * <p/>
  * The builder needs to declare which service configuration sources to pull on using
  * {@link ConfigSource} and each setter needs to declare which attribute to be
@@ -34,12 +34,12 @@ import java.util.Set;
 public interface ConsoleConfigBuilder<C> {
 
     /**
-     * Builds a new instance of {@link C}.
+     * Builds a new instance .
      *
      * @param attributes
      *         all retrieved attributes
      *
-     * @return new instance of {@link C}
+     * @return new instance
      */
     C build(Map<String, Set<String>> attributes);
 

@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * This is a common class defining some constants common to all SAML elements.
  *
- * @supported.api
+ * 
  */
 public final class SAMLConstants 
 {
@@ -89,14 +89,14 @@ public final class SAMLConstants
     /**
      * SAML assertion namespace URI.
      *
-     * @supported.api
+     * 
      */
     public static final String assertionSAMLNameSpaceURI = 
                 "urn:oasis:names:tc:SAML:1.0:assertion";
     /**
      * SOAP 1.1 namespace URI.
      *
-     * @supported.api
+     * 
      */
     public static final String SOAP_URI =
                 "http://schemas.xmlsoap.org/soap/envelope/";
@@ -104,7 +104,7 @@ public final class SAMLConstants
     /**
      * SOAP 1.2 namespace URI.
      *
-     * @supported.api
+     * 
      */
     public static final String SOAP12_URI =
                 "http://www.w3.org/2003/05/soap-envelope";
@@ -116,7 +116,7 @@ public final class SAMLConstants
     /**
      * SAML request-response protocol namespace URI.
      *
-     * @supported.api
+     * 
      */
     public static final String PROTOCOL_NAMESPACE_URI =
                         "urn:oasis:names:tc:SAML:1.0:protocol";
@@ -124,7 +124,7 @@ public final class SAMLConstants
     /**
      * XML Digital Signature namespace.
      *
-     * @supported.api
+     * 
      */
     public static final String XMLSIG_NAMESPACE_URI =
                         "http://www.w3.org/2000/09/xmldsig#";
@@ -177,7 +177,7 @@ public final class SAMLConstants
      *     policy for the resource.</li>
      * </ul>
      *
-     * @supported.api
+     * 
      */
     public static final String ACTION_NAMESPACE = 
         "urn:oasis:names:tc:SAML:1.0:action:rwedc";
@@ -206,7 +206,7 @@ public final class SAMLConstants
      * </ul>
      * An application MUST NOT authorize both an action and its negated form.
      *
-     * @supported.api
+     * 
      */
     public static final String ACTION_NAMESPACE_NEGATION = 
                 "urn:oasis:names:tc:SAML:1.0:action:rwedc-negation";
@@ -227,7 +227,7 @@ public final class SAMLConstants
      * modification to a resource other than the one specified in the request. 
      * For this reason a separate Action URI specifier is provided. 
      *
-     * @supported.api
+     * 
      */
     public static final String ACTION_NAMESPACE_GHPP = 
                 "urn:oasis:names:tc:SAML:1.0:ghpp";
@@ -252,7 +252,7 @@ public final class SAMLConstants
      * For example 0754 denotes the UNIX file access permission: user read,
      * write and execute, group read and execute and world read. 
      *
-     * @supported.api
+     * 
      */
     public static final String ACTION_NAMESPACE_UNIX = 
                 "urn:oasis:names:tc:SAML:1.0:action:unix";
@@ -347,7 +347,7 @@ public final class SAMLConstants
     /**
      * SAML artifact confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static String CONFIRMATION_METHOD_ARTIFACT =
                 "urn:oasis:names:tc:SAML:1.0:cm:artifact";
@@ -355,7 +355,7 @@ public final class SAMLConstants
     /**
      * Deprecated SAML Artifact confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static final String DEPRECATED_CONFIRMATION_METHOD_ARTIFACT =
                 "urn:oasis:names:tc:SAML:1.0:cm:artifact-01";
@@ -363,7 +363,7 @@ public final class SAMLConstants
     /**
      * OpenAM confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static final String CONFIRMATION_METHOD_IS =
                 "urn:com:sun:identity";
@@ -371,7 +371,7 @@ public final class SAMLConstants
     /**
      * SAML Bearer confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static final String CONFIRMATION_METHOD_BEARER =
                 "urn:oasis:names:tc:SAML:1.0:cm:bearer";
@@ -379,7 +379,7 @@ public final class SAMLConstants
     /**
      * SAML "Holder of Key" confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static final String CONFIRMATION_METHOD_HOLDEROFKEY =
                 "urn:oasis:names:tc:SAML:1.0:cm:holder-of-key";
@@ -387,7 +387,7 @@ public final class SAMLConstants
     /**
      * SAML "Sender Vouches" confirmation method identifier URI.
      *
-     * @supported.api
+     * 
      */
     public static final String CONFIRMATION_METHOD_SENDERVOUCHES =
                 "urn:oasis:names:tc:SAML:1.0:cm:sender-vouches";
@@ -552,7 +552,7 @@ public final class SAMLConstants
     /**
      * Default SAML artifact name.
      *
-     * @supported.api
+     * 
      */
     public static final String ARTIFACT_NAME_DEFAULT = "SAMLart" ;
 
@@ -605,7 +605,7 @@ public final class SAMLConstants
      * A SAML service attribute parameter. The 20-byte sequence defined as in
      * the SiteID and Issuer name.
      *
-     * @supported.api
+     * 
      */
     public static final String SOURCEID = "SOURCEID"; 
 
@@ -622,7 +622,7 @@ public final class SAMLConstants
      * Web-browser SSO with Artifact profile defined in the OASIS-SAML
      * Bindings and Profiles specification.
      *
-     * @supported.api
+     * 
      */
     public static final String SOAPUrl = "SOAPURL"; 
 
@@ -637,7 +637,7 @@ public final class SAMLConstants
      * If BASICAUTH or SSLWITHBASICAUTH is specified, the User parameter is
      * require and the SOAPUrl should be HTTPS. 
      *
-     * @supported.api
+     * 
      */
     public static final String AUTHTYPE = "AUTHTYPE"; 
 
@@ -645,7 +645,7 @@ public final class SAMLConstants
      * A SAML service attribute parameter that defines the uid of the partner
      * which is used to protect the partner's SOAP Receiver
      *
-     * @supported.api
+     * 
      */
     public static final String UID = "USER"; 
 
@@ -653,7 +653,7 @@ public final class SAMLConstants
      * A SAML service attribute parameter that defines the user id of the
      * partner which is used for Basic Authentication.
      *
-     * @supported.api
+     * 
      */
     public static final String AUTH_UID = "AUTHUSER"; 
 
@@ -661,7 +661,7 @@ public final class SAMLConstants
      * A SAML service attribute parameter that defines the password of the
      * partner which is used for Basic Authentication.
      *
-     * @supported.api
+     * 
      */
     public static final String AUTH_PASSWORD = "AUTHPASSWORD"; 
 
@@ -671,7 +671,7 @@ public final class SAMLConstants
      * at the destination site. By default, it is:
      *     com.sun.identity.saml.plugins.DefaultAccountMapper
      *
-     * @supported.api
+     * 
      */
     public static final String ACCOUNTMAPPER = "ACCOUNTMAPPER";
 
@@ -681,7 +681,7 @@ public final class SAMLConstants
      * at the destination site and a target URL. By default, it is:
      *     com.sun.identity.saml.plugins.DefaultPartnerAccountMapper
      *
-     * @supported.api
+     * 
      */
     public static final String PARTNERACCOUNTMAPPER = "PARTNERACCOUNTMAPPER";
 
@@ -692,7 +692,7 @@ public final class SAMLConstants
      * assertion during SSO. If no siteAttributeMapper is found, then no
      * attributes will be included in the assertion during SSO. 
      *
-     * @supported.api
+     * 
      */
     public static final String SITEATTRIBUTEMAPPER = "siteattributemapper";
     public static final String SITEATTRIBUTEMAPPERDEFAULT =
@@ -706,7 +706,7 @@ public final class SAMLConstants
      * partnerSiteAttributeMapper is found, then no attributes will be included
      * in the assertion during SSO. 
      *
-     * @supported.api
+     * 
      */
     public static final String PARTNERSITEATTRIBUTEMAPPER =
                                 "partnersiteattributemapper";
@@ -719,7 +719,7 @@ public final class SAMLConstants
      * assertion during SSO. If no nameIdentifierMapper is found, then a
      * default implementation will be used.
      *
-     * @supported.api
+     * 
      */
     public static final String NAMEIDENTIFIERMAPPER = "nameidentifiermapper";
 
@@ -729,21 +729,21 @@ public final class SAMLConstants
      * that can send requests to this site. This ensures that the requester is
      * indeed the intended receiver for the SAML artifact. 
      *
-     * @supported.api
+     * 
      */
     public static final String HOST_LIST = "hostlist";
 
     /**
      * A POST attribute name that specifies an assertion.
      *
-     * @supported.api
+     * 
      */
     public static final String POST_ASSERTION_NAME = "ASSERTION";
 
     /**
      * A POST attribute name that specifies attribute names of an assertion.
      *
-     * @supported.api
+     * 
      */
     public static final String POST_ATTR_NAMES = "ATTRIBUTENAMES";
 
@@ -753,7 +753,7 @@ public final class SAMLConstants
      * signed by a partner and the certificate of the partner can not be found
      * in the KeyInfo portion of the signed assertion.
      *
-     * @supported.api
+     * 
      */
     public static final String CERTALIAS = "CERTALIAS";
 
@@ -762,7 +762,7 @@ public final class SAMLConstants
      * assertion generated within OpenAM. The syntax is
      * hostname:port.
      *
-     * @supported.api
+     * 
      */
     public static final String ISSUER = "ISSUER";
 
@@ -774,7 +774,7 @@ public final class SAMLConstants
      * used to retrieve the attributes for the subject. If no attributeMapper
      * is specified, DefaultAttributeMapper will be used. 
      *
-     * @supported.api
+     * 
      */
     public static final String ATTRIBUTEMAPPER = "ATTRIBUTEMAPPER";
 
@@ -787,14 +787,14 @@ public final class SAMLConstants
      * query. If no actionMapper is specified, DefaultActionMapper will be
      * used. 
      *
-     * @supported.api
+     * 
      */
     public static final String ACTIONMAPPER = "ACTIONMAPPER";
 
     /**
      * A SAML service attribute parameter that specifies SAML version
      *
-     * @supported.api
+     * 
      */
     public static final String VERSION = "VERSION";
 
@@ -891,7 +891,7 @@ public final class SAMLConstants
     /**
      * A SAML authentication type that uses HTTP protocol and username/password
      *
-     * @supported.api
+     * 
      */
     public static final String BASICAUTH= "BASICAUTH";
 
@@ -899,21 +899,21 @@ public final class SAMLConstants
      * A SAML authentication type that uses HTTPS protocol and
      * username/password
      *
-     * @supported.api
+     * 
      */
     public static final String SSLWITHBASICAUTH = "SSLWITHBASICAUTH"; 
 
     /**
      * A SAML authentication type that uses HTTP protocol
      *
-     * @supported.api
+     * 
      */
     public static final String NOAUTH = "NOAUTH";
 
     /**
      * A SAML authentication type that uses HTTPS protocol
      *
-     * @supported.api
+     * 
      */
     public static final String SSL = "SSL"; 
 
@@ -1013,7 +1013,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-SHA1 URI - Required.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_SHA1 = 
                                 "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
@@ -1021,7 +1021,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm DSAwithSHA1 URI - Required.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_DSA =
                                 "http://www.w3.org/2000/09/xmldsig#dsa-sha1";
@@ -1029,14 +1029,14 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSAwithSHA1 URI - Recommended.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA = 
                                 "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
     /**
      * Signature Algorithm RSAwithSHA1 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA_SHA1 =
                                 "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
@@ -1044,7 +1044,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSA-MD5 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_NOT_RECOMMENDED_RSA_MD5 =
                               "http://www.w3.org/2001/04/xmldsig-more#rsa-md5";
@@ -1052,7 +1052,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSA-RIPEMD160 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA_RIPEMD160 = 
                         "http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160";
@@ -1060,7 +1060,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSA-SHA256 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA_SHA256 =
                         "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
@@ -1068,7 +1068,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSA-SHA384 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA_SHA384 = 
                         "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
@@ -1076,7 +1076,7 @@ public final class SAMLConstants
     /**
      * Signature Algorithm RSA-SHA512 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_SIGNATURE_RSA_SHA512 = 
                         "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
@@ -1084,7 +1084,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-MD5 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5 = 
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
@@ -1092,7 +1092,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-RIPEMD160 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_RIPEMD160 = 
                        "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160";
@@ -1100,7 +1100,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-SHA256 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_SHA256 = 
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
@@ -1108,7 +1108,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-SHA384 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_SHA384 =
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
@@ -1116,7 +1116,7 @@ public final class SAMLConstants
     /**
      * MAC Algorithm HMAC-SHA512 URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_MAC_HMAC_SHA512 = 
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
@@ -1164,7 +1164,7 @@ public final class SAMLConstants
     /**
      * XML canonicalization Algorithm URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_C14N_OMIT_COMMENTS =
                         "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
@@ -1172,7 +1172,7 @@ public final class SAMLConstants
     /**
      * XML canonicalization with comments Algorithm URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_C14N_WITH_COMMENTS =
                         ALGO_ID_C14N_OMIT_COMMENTS + "#WithComments";
@@ -1180,7 +1180,7 @@ public final class SAMLConstants
     /**
      * Exclusive XML canonicalization Algorithm URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_C14N_EXCL_OMIT_COMMENTS =
                         "http://www.w3.org/2001/10/xml-exc-c14n#";
@@ -1188,7 +1188,7 @@ public final class SAMLConstants
     /**
      * Exclusive XML canonicalization with comments Algorithm URI.
      *
-     * @supported.api
+     * 
      */
     public static final String ALGO_ID_C14N_EXCL_WITH_COMMENTS =
                         ALGO_ID_C14N_EXCL_OMIT_COMMENTS + "WithComments";
@@ -1199,7 +1199,7 @@ public final class SAMLConstants
     /**
      * XML canonicalization Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_C14N_OMIT_COMMENTS =
                         ALGO_ID_C14N_OMIT_COMMENTS;
@@ -1207,7 +1207,7 @@ public final class SAMLConstants
     /**
      * XML canonicalization with comments Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_C14N_WITH_COMMENTS =
                          ALGO_ID_C14N_WITH_COMMENTS;
@@ -1215,7 +1215,7 @@ public final class SAMLConstants
     /**
      * Exclusive XML canonicalization Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_C14N_EXCL_OMIT_COMMENTS =
                          ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
@@ -1223,7 +1223,7 @@ public final class SAMLConstants
     /**
      * Exclusive XML canonicalization with comments Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_C14N_EXCL_WITH_COMMENTS =
                          ALGO_ID_C14N_EXCL_WITH_COMMENTS;
@@ -1231,7 +1231,7 @@ public final class SAMLConstants
     /**
      * XSLT Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XSLT =
                          "http://www.w3.org/TR/1999/REC-xslt-19991116";
@@ -1239,7 +1239,7 @@ public final class SAMLConstants
     /**
      * Base64 decoding Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_BASE64_DECODE =
                          XMLSIG_NAMESPACE_URI + "base64";
@@ -1247,7 +1247,7 @@ public final class SAMLConstants
     /**
      * XPath Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XPATH =
                          "http://www.w3.org/TR/1999/REC-xpath-19991116";
@@ -1255,7 +1255,7 @@ public final class SAMLConstants
     /**
      * Enveloped Signature Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_ENVELOPED_SIGNATURE =
                          XMLSIG_NAMESPACE_URI + "enveloped-signature";
@@ -1263,7 +1263,7 @@ public final class SAMLConstants
     /**
      * XPointer Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XPOINTER =
                          "http://www.w3.org/TR/2001/WD-xptr-20010108";
@@ -1271,7 +1271,7 @@ public final class SAMLConstants
     /**
      * XPath Filter v2.0 Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XPATH2FILTER04 =
                          "http://www.w3.org/2002/04/xmldsig-filter2";
@@ -1279,7 +1279,7 @@ public final class SAMLConstants
     /**
      * XPath Filter v2.0 Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XPATH2FILTER =
                          "http://www.w3.org/2002/06/xmldsig-filter2";
@@ -1287,7 +1287,7 @@ public final class SAMLConstants
     /**
      * XPath Filter v2.0 CHGP Transform URI.
      *
-     * @supported.api
+     * 
      */
     public static final String TRANSFORM_XPATHFILTERCHGP =
           "http://www.nue.et-inf.uni-siegen.de/~geuer-pollmann/#xpathFilter";
@@ -1295,21 +1295,21 @@ public final class SAMLConstants
     /**
      * XML schema namespace.
      *
-     * @supported.api
+     * 
      */
     public static final String NS_XMLNS = "http://www.w3.org/2000/xmlns/";
 
     /**
      * SOAP security namespace.
      *
-     * @supported.api
+     * 
      */
     public static final String NS_SEC = "urn:liberty:sec:2003-08";
 
     /**
      * SOAP utility namespace.
      *
-     * @supported.api
+     * 
      */
     public static final String NS_WSSE =
                          "http://schemas.xmlsoap.org/ws/2003/06/secext";
@@ -1317,7 +1317,7 @@ public final class SAMLConstants
     /**
      * Liberty security namespace.
      *
-     * @supported.api
+     * 
      */
     public static final String NS_WSU =
                         "http://schemas.xmlsoap.org/ws/2003/06/utility";

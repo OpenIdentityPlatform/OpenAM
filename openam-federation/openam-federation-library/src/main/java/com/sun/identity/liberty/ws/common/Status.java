@@ -50,7 +50,7 @@ import javax.xml.namespace.QName;
  * &lt;/complexType>
  * </pre>
  *
- * @supported.all.api
+ * 
  */
 public class Status {
 

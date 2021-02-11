@@ -29,7 +29,7 @@
 /**
  * Package that handles SAML v2 profiles.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.saml2.profile;
 

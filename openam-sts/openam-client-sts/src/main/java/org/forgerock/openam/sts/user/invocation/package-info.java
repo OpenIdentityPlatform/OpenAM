@@ -26,6 +26,6 @@
  * I want to limit the dependencies between the sts constituent components, so the classes used to invoke the various services,
  * if shared between services, should be located in this package.
  *
- *  @supported.api
+ *  
  */
 package org.forgerock.openam.sts.user.invocation;

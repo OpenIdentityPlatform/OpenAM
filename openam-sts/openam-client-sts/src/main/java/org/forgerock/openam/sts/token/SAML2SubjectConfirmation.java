@@ -19,7 +19,7 @@ package org.forgerock.openam.sts.token;
 /**
  * Enum defining the SAML2 SubjectConfirmation values used in the REST-STS and the TokenGenerationService.
  *
- * @supported.all.api
+ * 
  */
 public enum SAML2SubjectConfirmation {
     BEARER, SENDER_VOUCHES, HOLDER_OF_KEY

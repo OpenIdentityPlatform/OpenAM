@@ -35,7 +35,7 @@ import java.util.Set;
  * The implementation <strong>must</strong> provide a constructor taking a single String argument, which is the name
  * of the realm that service is being constructed for.
  *
- * @supported.all.api
+ * 
  */
 public interface MailServer {
 

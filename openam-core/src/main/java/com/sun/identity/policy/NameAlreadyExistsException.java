@@ -33,7 +33,7 @@ package com.sun.identity.policy;
  * Exception thrown if a name of an object such as policy, rule or 
  * referral already exists (used by another object of the same type)
  *
- * @supported.all.api
+ * 
  */
 public class NameAlreadyExistsException extends PolicyException {
 

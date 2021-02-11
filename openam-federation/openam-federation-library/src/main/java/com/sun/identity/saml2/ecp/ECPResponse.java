@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *  The <code>ECPResponse</code> interface defines methods for properties
  *  required by an ECP response.
  *
- *  @supported.all.api
+ *  
  */
 public interface ECPResponse {
     

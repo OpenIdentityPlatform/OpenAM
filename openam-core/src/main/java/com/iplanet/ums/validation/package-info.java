@@ -16,6 +16,6 @@
 /**
  * Deprecated validator classes for UMS.
  *
- * @supported.api
+ * 
  */
 package com.iplanet.ums.validation;

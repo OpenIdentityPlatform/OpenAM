@@ -86,7 +86,7 @@ import com.sun.identity.saml2.protocol.StatusCode;
  * This class provides methods to send or process
  * <code>AssertionIDRequest</code>.
  *
- * @supported.api
+ * 
  */
 public class AssertionIDRequestUtil {
 
@@ -115,7 +115,7 @@ public class AssertionIDRequestUtil {
      * @return the <code>Response</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     public static Response sendAssertionIDRequest(
         AssertionIDRequest assertionIDRequest, String samlAuthorityEntityID,
@@ -151,7 +151,7 @@ public class AssertionIDRequestUtil {
      * @return the <code>Assertion</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @supported.api
+     * 
      */
     public static Assertion sendAssertionIDRequestURI(
         String assertionID, String samlAuthorityEntityID,

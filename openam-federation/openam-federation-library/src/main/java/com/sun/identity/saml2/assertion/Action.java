@@ -44,7 +44,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- *@supported.all.api
+ *
  */
 public interface Action {
 

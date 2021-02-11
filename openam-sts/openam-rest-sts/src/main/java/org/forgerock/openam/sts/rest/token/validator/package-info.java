@@ -48,7 +48,7 @@
  *
  * The classes in this package are the interfaces and implementations specific to the rest-sts context.
  *
- * @supported.api
+ * 
  */
 
 package org.forgerock.openam.sts.rest.token.validator;

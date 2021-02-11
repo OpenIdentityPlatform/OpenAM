@@ -47,7 +47,7 @@ import org.forgerock.openam.ldap.PersistentSearchChangeType;
  * </ul>
  *
  * @deprecated  As of Sun Java System Access Manager 7.1.
- * @supported.all.api
+ * 
  */
 public class AMEvent extends EventObject {
 

@@ -56,7 +56,7 @@ import org.w3c.dom.NodeList;
  * service. It manages configuration data only for GLOBAL and ORGANIZATION
  * types.
  *
- * @supported.api
+ * 
  */
 public class ServiceConfigManager {
     // Instance variables
@@ -114,7 +114,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceConfigManager(SSOToken token, String serviceName,
             String version) throws SMSException, SSOException {
@@ -138,7 +138,7 @@ public class ServiceConfigManager {
      * 
      * @return the name of the service
      *
-     * @supported.api
+     * 
      */
     public String getName() {
         return (serviceName);
@@ -149,7 +149,7 @@ public class ServiceConfigManager {
      * 
      * @return the version of the service
      *
-     * @supported.api
+     * 
      */
     public String getVersion() {
         return (version);
@@ -162,7 +162,7 @@ public class ServiceConfigManager {
      * @throws SMSException
      *             if an error has occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public Set getInstanceNames() throws SMSException {
         try {
@@ -182,7 +182,7 @@ public class ServiceConfigManager {
      * @throws SMSException
      *             if an error has occurred while performing the operation
      *
-     * @supported.api
+     * 
      */
     public Set getGroupNames() throws SMSException {
         try {
@@ -206,7 +206,7 @@ public class ServiceConfigManager {
      *             if an error has occurred while performing the operation
      * @throws SSOException
      *
-     * @supported.api
+     * 
      *             if the user's single sign on token is invalid or expired
      */
     public ServiceInstance getInstance(String instanceName)
@@ -226,7 +226,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void removeInstance(String instanceName) throws SMSException,
             SSOException {
@@ -245,7 +245,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceConfig getGlobalConfig(String instanceName)
             throws SMSException, SSOException {
@@ -268,7 +268,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceConfig getOrganizationConfig(String orgName,
             String instanceName) throws SMSException, SSOException {
@@ -290,7 +290,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceConfig createGlobalConfig(Map attrs) throws SMSException,
             SSOException {
@@ -328,7 +328,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public ServiceConfig createOrganizationConfig(String orgName, Map attrs)
             throws SMSException, SSOException {
@@ -386,7 +386,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void addConfiguration(InputStream in) throws SMSException,
             SSOException {
@@ -423,7 +423,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void removeGlobalConfiguration(String groupName)
             throws SMSException, SSOException {
@@ -462,7 +462,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void deleteOrganizationConfig(String orgName) throws SMSException,
             SSOException {
@@ -482,7 +482,7 @@ public class ServiceConfigManager {
      * @throws SSOException
      *             if the user's single sign on token is invalid or expired
      *
-     * @supported.api
+     * 
      */
     public void removeOrganizationConfiguration(String orgName,
             String groupName) throws SMSException, SSOException {
@@ -591,7 +591,7 @@ public class ServiceConfigManager {
      *            callback object that will be invoked when schema changes.
      * @return an ID of the registered listener.
      *
-     * @supported.api
+     * 
      */
     public String addListener(ServiceListener listener) {
         try {
@@ -611,7 +611,7 @@ public class ServiceConfigManager {
      * @param listenerID
      *            the listener ID issued when the listener was registered
      *
-     * @supported.api
+     * 
      */
     public void removeListener(String listenerID) {
         if (scm != null) {
@@ -650,7 +650,7 @@ public class ServiceConfigManager {
      *            object for comparison.
      * @return true if objects are equals.
      *
-     * @supported.api
+     * 
      */
     public boolean equals(Object o) {
         if (o instanceof ServiceConfigManager) {
@@ -670,7 +670,7 @@ public class ServiceConfigManager {
      * @return String representation of the service's configuration data, along
      *         with instances and groups.
      *
-     * @supported.api
+     * 
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();

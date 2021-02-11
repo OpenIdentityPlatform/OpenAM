@@ -36,7 +36,7 @@ package com.iplanet.ums.validation;
  * default constructor and validate function is used to validate telephone
  * number passing the telephone number as argument to the function. Upon
  * validation the validate function returns boolean value.
- * @supported.all.api
+ * 
  */
 public class TelephoneValidator implements IValidator {
 

@@ -42,7 +42,7 @@ import java.util.Map;
  * Thread Safety: The implementation does not have to be implemented in a thread-safe manner, each OTP code will be sent
  * using a new instance of the gateway implementation.
  *
- * @supported.all.api
+ * 
  */
 public interface SMSGateway {
 

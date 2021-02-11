@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * Interface to define the resulting behavior when the session quota is exhausted.
  *
- * @supported.all.api
+ * 
  */
 public interface QuotaExhaustionAction {
 
@@ -48,4 +48,5 @@ public interface QuotaExhaustionAction {
      * @return <code>true</code> if the session activation request should be rejected, <code>false</code> otherwise
      */
     public boolean action(InternalSession is, Map<String, Long> existingSessions);
+    
 }

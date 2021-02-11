@@ -103,7 +103,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 /**
  * This class contains some utility methods for processing SAML protocols.
  *
- * @supported.api
+ * 
  */
 public class SAMLUtils  extends SAMLUtilsCommon {
 

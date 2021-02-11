@@ -16,6 +16,6 @@
 /**
  * Defines XACML Context implementations.
  *
- * @supported.api
+ * 
  */
 package com.sun.identity.xacml.context.impl;

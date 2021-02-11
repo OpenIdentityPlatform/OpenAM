@@ -40,7 +40,7 @@ import com.sun.identity.sm.SMSException;
  * some special processing for client management. The implementation module is
  * pluggable and is configurable via <code>AMConfig.properties</code>. The
  * property to set is <code>com.iplanet.ClientTypesManagerImpl</code>.
- * @supported.all.api
+ * 
  */
 public interface ClientTypesManager {
 

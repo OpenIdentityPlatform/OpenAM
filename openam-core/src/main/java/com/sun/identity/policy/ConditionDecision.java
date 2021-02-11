@@ -38,7 +38,7 @@ import java.util.HashMap;
  * The <code>ConditionDecision</code> class represents the result of  
  * the evaluation of a condition. 
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

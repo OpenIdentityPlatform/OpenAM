@@ -78,7 +78,7 @@ import org.forgerock.opendj.ldap.DN;
  * Subject</code> for the user; if not successfully
  * authenticated, the caller obtains the LoginException.
  *
- * @supported.api
+ * 
  */
 public final class AuthContext extends Object {
 
@@ -87,7 +87,7 @@ public final class AuthContext extends Object {
      * has not started yet. Basically, it means that the method
      * <code>startLogin</code> has not been called.
      *
-     * @supported.api
+     * 
      */
     public static final int AUTH_NOT_STARTED = 1;
 
@@ -97,7 +97,7 @@ public final class AuthContext extends Object {
      * method has been called and that this object is waiting for the user to
      * send authentication information.
      *
-     * @supported.api
+     * 
      */
     public static final int AUTH_IN_PROGRESS = 2;
 
@@ -105,7 +105,7 @@ public final class AuthContext extends Object {
      * This login status indicates that the login process
      * has succeeded.
      *
-     * @supported.api
+     * 
      */
     public static final int AUTH_SUCCESS = 3;
 
@@ -113,7 +113,7 @@ public final class AuthContext extends Object {
      * This login status indicates that the login process
      * has failed.
      *
-     * @supported.api
+     * 
      */
     public static final int AUTH_FAILED = 4;
 
@@ -121,7 +121,7 @@ public final class AuthContext extends Object {
      * This login status indicates that the user has been
      * successfully logged out.
      *
-     * @supported.api
+     * 
      */
     public static final int AUTH_COMPLETED = 5;
 
@@ -175,7 +175,7 @@ public final class AuthContext extends Object {
      *
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public AuthContext() throws LoginException {
         // initialize
@@ -194,7 +194,7 @@ public final class AuthContext extends Object {
      *            password for the user
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public AuthContext(Principal principal, char[] password)
             throws LoginException {
@@ -226,7 +226,7 @@ public final class AuthContext extends Object {
      *            password for the user
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName, Principal principal, char[] password)
             throws LoginException {
@@ -436,7 +436,7 @@ public final class AuthContext extends Object {
      * @param orgName organization name.
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public AuthContext(String orgName) throws LoginException {
         this(orgName, null);
@@ -519,7 +519,7 @@ public final class AuthContext extends Object {
      *
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public void startLogin() throws LoginException {
 
@@ -557,7 +557,7 @@ public final class AuthContext extends Object {
      * @return true if the login process requires more information from the user
      *         to complete the authentication.
      *
-     * @supported.api
+     * 
      */
     public boolean hasMoreRequirements() {
         authDebug.message("AuthContext::requiresMoreInformation()");
@@ -578,7 +578,7 @@ public final class AuthContext extends Object {
      * @return an array of <code>Callback</code> objects that must be
      *         populated by the user and returned back.
      *
-     * @supported.api
+     * 
      */
     public Callback[] getRequirements() {
         authDebug.message("AuthContext::getInformationRequired()");
@@ -628,7 +628,7 @@ public final class AuthContext extends Object {
      * @param info
      *            array of <code>Callback</code> objects.
      *
-     * @supported.api
+     * 
      */
     public void submitRequiredInformation(Callback[] info) {
         authDebug.message("AuthContext::submitRequestedInformation()");
@@ -649,7 +649,7 @@ public final class AuthContext extends Object {
      *
      * @throws LoginException
      *
-     * @supported.api
+     * 
      */
     public void logout() throws LoginException {
         authDebug.message("AuthContext::logout()");
@@ -665,7 +665,7 @@ public final class AuthContext extends Object {
      *
      * @return login exception.
      *
-     * @supported.api
+     * 
      */
     public LoginException getLoginException() {
         authDebug.message("AuthContext::getLoginException()");
@@ -678,7 +678,7 @@ public final class AuthContext extends Object {
      *
      * @return the current state of the login process.
      *
-     * @supported.api
+     * 
      */
     public int getLoginStatus() {
         authDebug.message("AuthContext::getLoginStatus()");
@@ -702,7 +702,7 @@ public final class AuthContext extends Object {
      * @return the (first) <code>AuthPrincipal</code> in the
      *         <code>Subject</code>.
      *
-     * @supported.api
+     * 
      */
     public Principal getPrincipal() {
         Set sop = getSubject().getPrincipals();
@@ -751,7 +751,7 @@ public final class AuthContext extends Object {
      * @return organization name; <code>null</code> if it was not initialized
      *         during construction of this instance
      *
-     * @supported.api
+     * 
      */
     public String getOrganizationName() {
         if (organizationName == null) {
@@ -775,7 +775,7 @@ public final class AuthContext extends Object {
      * @return single-sign-on token.
      * @throws InvalidAuthContextException
      *
-     * @supported.api
+     * 
      */
     public SSOToken getSSOToken() throws InvalidAuthContextException {
         if (token != null) {

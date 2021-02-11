@@ -33,7 +33,7 @@ package com.sun.identity.wss.security;
  * This class defines the specification for generating the X509 security tokens.
  * It implements <code>SecurityTokenSpec</code> interface.
  * 
- * @supported.all.api
+ * 
  */ 
 public class X509TokenSpec implements SecurityTokenSpec {
 

@@ -36,7 +36,7 @@ package com.sun.identity.policy;
  * Exception thrown to indicate that an object you are trying to
  * remove is in use and therefore can not be removed.
  *
- * @supported.all.api
+ * 
  */
 public class ObjectInUseException extends PolicyException {
 

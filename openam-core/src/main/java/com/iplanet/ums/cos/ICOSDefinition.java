@@ -34,7 +34,7 @@ import com.iplanet.ums.UMSException;
  * This interface provides method signatures which will be implemented for COS
  * definitions. Each of the COS definition classes implement this interface, and
  * provide implementations for these methods.
- * @supported.api
+ * 
  */
 public interface ICOSDefinition {
     /**
@@ -42,7 +42,7 @@ public interface ICOSDefinition {
      * 
      * @param name
      *            the name of this COS definition.
-     * @supported.api
+     * 
      */
     public void setName(String name);
 
@@ -50,7 +50,7 @@ public interface ICOSDefinition {
      * This method returns the name of the COS definition.
      * 
      * @return the name of the COS definition.
-     * @supported.api
+     * 
      */
     public String getName();
 
@@ -65,7 +65,7 @@ public interface ICOSDefinition {
      *            (merge-schemes).
      * @throws UMSException
      *             if an exception occurs.
-     * @supported.api
+     * 
      */
     public void addCOSAttribute(String attrName, int qualifier)
             throws UMSException;
@@ -75,7 +75,7 @@ public interface ICOSDefinition {
      * 
      * @param attrName
      *            The name of the COS attribute to be removed.
-     * @supported.api
+     * 
      */
     public void removeCOSAttribute(String attrName);
 
@@ -92,42 +92,42 @@ public interface ICOSDefinition {
     /**
      * This field represents the default naming attribute for COS definitions.
      *
-     * @supported.api
+     * 
      */
     public static final String DEFAULT_NAMING_ATTR = "cn";
 
     /**
      * This field represents a keyword used in COS definitions.
      *
-     * @supported.api
+     * 
      */
     public static final String COSTEMPLATEDN = "cosTemplateDn";
 
     /**
      * This field represents a keyword used in COS definitions.
      *
-     * @supported.api
+     * 
      */
     public static final String COSSPECIFIER = "cosSpecifier";
 
     /**
      * This field represents a keyword used in COS definitions.
      *
-     * @supported.api
+     * 
      */
     public static final String ICOSSPECIFIER = "cosIndirectSpecifier";
 
     /**
      * This field represents a keyword used in COS definitions.
      *
-     * @supported.api
+     * 
      */
     public static final String COSATTRIBUTE = "cosAttribute";
 
     /**
      * This field represents an LDAP search filter used for searching for COS
      * definitions by name.
-     * @supported.api
+     * 
      */
     public static final String COSSUPERDEF_NAME_SEARCH = 
         "(&(objectclass=ldapsubentry)(objectclass=cossuperdefinition)("
@@ -136,7 +136,7 @@ public interface ICOSDefinition {
     /**
      * This field represents an LDAP search filter used for searching for COS
      * definitions.
-     * @supported.api
+     * 
      */
     public static final String COSSUPERDEF_SEARCH = 
         "&(objectclass=ldapsubentry)(objectclass=cossuperdefinition)";
@@ -145,7 +145,7 @@ public interface ICOSDefinition {
     /**
      * This field represents a keyword used in Directory Server 4.x COS
      * implementations.
-     * @supported.api
+     * 
      */
     public static final String COSTARGETTREE = "cosTargetTree";
 
@@ -155,42 +155,42 @@ public interface ICOSDefinition {
     /**
      * This field represents the minimum value a COS attribute qualifier may
      * have.
-     * @supported.api
+     * 
      */
     public static final int minQualifier = 0;
 
     /**
      * This field represents the maximum value a COS attribute qualifier may
      * have.
-     * @supported.api
+     * 
      */
     public static final int maxQualifier = 2;
 
     /**
      * This field represents the numeric qualifier constant for "default".
      *
-     * @supported.api
+     * 
      */
     public static final int DEFAULT = 0;
 
     /**
      * This field represents the numeric qualifier constant for "override".
      *
-     * @supported.api
+     * 
      */
     public static final int OVERRIDE = 1;
 
     /**
      * This field represents the numeric qualifier constant for "operational".
      *
-     * @supported.api
+     * 
      */
     public static final int OPERATIONAL = 2;
 
     /**
      * This field represents the numeric qualifier constant for "merge-schemes".
      *
-     * @supported.api
+     * 
      */
     public static final int MERGE_SCHEMES = 3;
 
@@ -198,7 +198,7 @@ public interface ICOSDefinition {
      * This represents a string array of COS attribute qualifiers. The valid
      * values are "default", "override", "operational", and "merge-schemes".
      *
-     * @supported.api
+     * 
      */
     public static final String[] qualifiers = { "default", "override",
             "operational", "merge-schemes" };

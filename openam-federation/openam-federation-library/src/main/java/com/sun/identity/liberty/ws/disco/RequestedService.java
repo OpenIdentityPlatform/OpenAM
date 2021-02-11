@@ -64,7 +64,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * When the List of options is not empty,
  *        Options element with child Option element(s) will be created.
  * </pre>
- * @supported.all.api
+ * 
  */
 public class RequestedService {
 

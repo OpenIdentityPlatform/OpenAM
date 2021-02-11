@@ -35,7 +35,7 @@ import java.util.Set;
  * Implementations of this interface provide the means to search for and create users given a map of attributes.
  * @see org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider
  *
- * @supported.all.api
+ * 
  */
 public interface AccountProvider {
 

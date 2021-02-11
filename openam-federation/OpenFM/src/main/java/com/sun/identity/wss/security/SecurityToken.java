@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * <p> Each Security Token must need to implement this interface along with
  * <code>SecurityTokenSpec</code> for generating the Security Tokens. 
  * 
- * @supported.all.api
+ * 
  */
 public interface SecurityToken {
       

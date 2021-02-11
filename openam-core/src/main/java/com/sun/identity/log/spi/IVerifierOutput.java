@@ -35,7 +35,7 @@ package com.sun.identity.log.spi;
  * Provides an interface to define the actions that need to be taken
  * depending on the return value of the Log Verification process.
  *
- * @supported.all.api
+ * 
  */
 public interface IVerifierOutput {
     /**

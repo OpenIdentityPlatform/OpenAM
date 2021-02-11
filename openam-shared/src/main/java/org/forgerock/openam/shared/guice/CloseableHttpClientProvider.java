@@ -16,18 +16,11 @@
 
 package org.forgerock.openam.shared.guice;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
-
 import org.forgerock.http.Client;
-import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.HttpClientHandler;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
 
 import com.google.inject.Provider;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class provides Guice with instances of Client that contain a HttpClientHandler. The underlying HttpClientHandler
@@ -36,19 +29,12 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class CloseableHttpClientProvider implements Provider<Client> {
 
-    /** Debug instance for general utility classes. */
-    public static final Debug DEBUG = Debug.getInstance("amUtil");
+    /** The commons HttpClientHandler. */
+    private final HttpClientHandler httpClientHandler;
 
-    /** The commons ShutdownManager. */
-    private ShutdownManager shutdownManager;
-
-    /**
-     * Uses the shutdown manager supplied to register all created Client objects for shutdown.
-     * @param shutdownManager The commons shutdown manager implementation.
-     */
     @Inject
-    public CloseableHttpClientProvider(ShutdownManager shutdownManager) {
-        this.shutdownManager = shutdownManager;
+    public CloseableHttpClientProvider(HttpClientHandler httpClientHandler) {
+        this.httpClientHandler = httpClientHandler;
     }
 
     /**
@@ -57,27 +43,6 @@ public class CloseableHttpClientProvider implements Provider<Client> {
      */
     @Override
     public Client get() {
-        try {
-            final HttpClientHandler httpClientHandler = new HttpClientHandler();
-
-            // Let the underlying HttpClientHandler clean up it's threads upon shutdown
-            shutdownManager.addShutdownListener(new ShutdownListener() {
-                @Override
-                public void shutdown() {
-                    try {
-                        httpClientHandler.close();
-                    } catch (IOException e) {
-                        // Abandon attempt to close the connection
-                        DEBUG.message("Unable to close the HttpClientHandler", e);
-                    }
-                }
-            });
-
-            return new Client(httpClientHandler);
-        } catch (HttpApplicationException e) {
-            // Whether this ultimately results in an error is in the hands of the caller
-            DEBUG.message("Unable to create HttpClientHandler", e);
-            return null;
-        }
+        return new Client(httpClientHandler);
     }
 }

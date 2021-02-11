@@ -71,7 +71,7 @@ import org.forgerock.openam.utils.CrestQuery;
  *
  * </PRE>
  *
- * @supported.api
+ * 
  */
 public class AMIdentityRepository {
     private SSOToken token;
@@ -86,7 +86,7 @@ public class AMIdentityRepository {
     private RepoAuditorFactory auditorFactory;
 
     /**
-     * @supported.api
+     * 
      *
      * Constructor for the <code>AMIdentityRepository</code> object. If a null
      * is passed for the organization identifier <code>realmName</code>, then
@@ -107,7 +107,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Constructor for the {@code AMIdentityRepository} object. If a {@code null} is passed for
      * the organization identifier {@code realmName}, then the "root" realm is assumed.
@@ -153,7 +153,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Returns the set of supported object types <code>IdType</code> for this
      * deployment. This is not realm specific.
@@ -172,7 +172,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Returns the set of Operations for a given <code>IdType</code>,
      * <code>IdOperations</code> that can be performed on an Identity. This
@@ -288,7 +288,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Searches for identities of certain types from each plugin and returns a
      * combined result.
@@ -391,7 +391,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Returns a handle of the Identity object representing this
      * realm for services related operations only. This <code> AMIdentity
@@ -430,7 +430,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Creates a single object of a type. The object is
      * created in all the plugins that support creation of this type of object.
@@ -478,7 +478,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Creates multiple objects of the same type. The objects are created in all
      * the <code>IdRepo</code> plugins that support creation of these objects.
@@ -530,7 +530,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Deletes identities. The Set passed is a set of <code>AMIdentity</code>
      * objects.
@@ -555,7 +555,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Deletes identities. The Set passed is a set of <code>AMIdentity</code>
      * objects.
@@ -633,7 +633,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Adds a listener, which should receive notifications for all changes that
      * occurred in this organization.
@@ -657,7 +657,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Removes listener as the application is no longer interested in receiving
      * notifications.
@@ -675,7 +675,7 @@ public class AMIdentityRepository {
     }
 
     /**
-     * @supported.api
+     * 
      *
      * Clears the cache.
      */

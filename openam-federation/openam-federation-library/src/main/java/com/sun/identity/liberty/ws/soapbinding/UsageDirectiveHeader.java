@@ -47,7 +47,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * The <code>UsageDirectiveHeader</code> class represents 'UsageDirective'
  * element defined in SOAP binding schema.
  *
- * @supported.all.api
+ * 
  */
 public class UsageDirectiveHeader {   
 

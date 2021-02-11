@@ -33,7 +33,7 @@ import com.sun.identity.cot.COTConstants;
 /**
  * This interface defines constants common to all SAMLv2 elements.
  *
- * @supported.all.api
+ * 
  */
 public interface SAML2Constants {
 

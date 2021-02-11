@@ -32,7 +32,7 @@ package com.iplanet.ums;
  * This exception will be thrown if invalid LDAP search filters are used during
  * search operations.
  *
- * @supported.api
+ * 
  */
 public class InvalidSearchFilterException extends UMSException {
     /**

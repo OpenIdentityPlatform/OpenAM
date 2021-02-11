@@ -64,7 +64,7 @@ import org.w3c.dom.Document;
  * This class contains methods to create <code>NameRegistrationRequest</code>
  * object.
  *
- * @supported.all.api
+ * 
  * @deprecated since 12.0.0
  */
 @Deprecated

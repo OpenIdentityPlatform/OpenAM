@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>14.4.3-SNAPSHOT</version>
+        <version>14.6.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-oauth2-saml2</artifactId>
@@ -30,8 +30,8 @@
 	
 	<repositories>
 	     <repository>
-       		<id>mvnrepository.com</id>
-       		<url>https://repo.boundlessgeo.com/main</url>
+       		<id>maven-restlet</id>
+       		<url>https://maven.restlet.talend.com</url>
        </repository>
 	</repositories>
     <dependencies>

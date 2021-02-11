@@ -40,7 +40,7 @@ import java.util.Vector;
  * rules The passed mail address is validated for authenticity and boolean value
  * is returned accordingly.
  *
- * @supported.all.api
+ * 
  */
 public class MailAddressValidator implements IValidator {
 

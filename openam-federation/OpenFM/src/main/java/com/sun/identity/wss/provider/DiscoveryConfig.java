@@ -64,7 +64,7 @@ import com.sun.identity.wss.security.SecurityMechanism;
  * <p>This class also provides methods for registering and un-registering
  * with the discovery service. All the static methods in this class are for 
  * the persistent operations.
- * @supported.all.api
+ * 
  */
 
 public abstract class DiscoveryConfig extends TrustAuthorityConfig {

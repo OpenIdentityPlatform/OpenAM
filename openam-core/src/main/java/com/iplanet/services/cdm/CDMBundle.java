@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 /**
  * Provides methods to get the Locale values from resource bundle for
  * <code>ClientDetection</code> class.
- * @supported.all.api
+ * 
  */
 public class CDMBundle {
 

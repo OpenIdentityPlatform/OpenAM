@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  * SAML Request in <code>samlp</code> namespace. It corresponds to
  * <code>RequestAbstractType</code> in SAML protocol schema.
  *
- * @supported.all.api
+ * 
  */
 public abstract class AbstractRequest {
 

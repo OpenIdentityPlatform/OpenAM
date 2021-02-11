@@ -40,7 +40,7 @@ import java.util.Set;
  * This class <code>IdSearchResults</code> provides to obtain the search
  * results.
  *
- * @supported.all.api
+ * 
  */
 public class IdSearchResults {
 

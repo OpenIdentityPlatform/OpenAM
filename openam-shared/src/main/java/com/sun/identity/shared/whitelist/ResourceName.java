@@ -45,7 +45,7 @@ import java.util.Set;
  * determine its hierarchy during policy evaluation and
  * also its display in the GUI. A class that implements
  * this interface must have a empty constructor.
- * @supported.all.api
+ * 
  */
 public interface ResourceName extends BaseResourceName<ResourceMatch, MalformedURLException> {
 

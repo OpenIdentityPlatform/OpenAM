@@ -29,7 +29,7 @@
 /**
  * Provides classes to manage liberty authentication service.
  *
- * @supported.api
+ * 
  * @deprecated since 12.0.0
  */
 package com.sun.identity.liberty.ws.authnsvc;

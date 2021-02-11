@@ -33,7 +33,7 @@ package com.sun.identity.policy;
  * Exception thrown if a policy operation attempted could not be 
  * done due to insufficient permissions
  *
- * @supported.all.api
+ * 
  */
 public class NoPermissionException extends PolicyException {
 
