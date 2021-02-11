@@ -65,7 +65,7 @@ public class OAuth2Representation {
      * @param dataModel The data model to display on the page.
      * @return A representation of the page to send to the user agent.
      */
-    Representation getRepresentation(Context context, OAuth2Request request, String templateName,
+    public Representation getRepresentation(Context context, OAuth2Request request, String templateName,
             Map<String, Object> dataModel) {
 
         final String display = request.getParameter("display");

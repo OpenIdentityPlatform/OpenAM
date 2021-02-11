@@ -52,6 +52,7 @@ import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
 import org.forgerock.openidconnect.restlet.IdTokenInfo;
+import org.forgerock.openidconnect.restlet.OpenIDConnectCheckSessionEndpoint;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
@@ -117,6 +118,7 @@ public class OAuth2RouterProvider implements Provider<Router> {
                 jacksonAuditor(CLIENT_ID, CLIENT_NAME.getType(), APPLICATION_TYPE.getType(), REDIRECT_URIS.getType())));
         router.attach("/userinfo", auditWithOAuthFilter(wrap(UserInfo.class)));
         router.attach("/idtokeninfo", auditWithOAuthFilter(wrap(IdTokenInfo.class)));
+        router.attach("/connect/checkSession", auditWithOAuthFilter(wrap(OpenIDConnectCheckSessionEndpoint.class)));
         router.attach("/connect/endSession", auditWithOAuthFilter(wrap(EndSession.class)));
         router.attach("/connect/jwk_uri", auditWithOAuthFilter(wrap(OpenIDConnectJWKEndpoint.class)));
 
