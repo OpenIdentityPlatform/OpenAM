@@ -1,4 +1,4 @@
-FROM tomcat:8.5-jre8
+FROM tomcat:8.5-jdk8
 
 MAINTAINER Open Identity Platform Community <open-identity-platform-openam@googlegroups.com>
 
@@ -16,7 +16,11 @@ ENV VERSION @project_version@
 
 ENV CATALINA_OPTS="-Xmx2048m -server -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
-RUN apt-get install -y wget unzip
+RUN apt-get update; \
+    apt-get install -y \
+       wget \
+       unzip \
+       ;
 
 RUN wget --show-progress --progress=bar:force:noscroll --quiet https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/OpenAM-$VERSION.war
 
