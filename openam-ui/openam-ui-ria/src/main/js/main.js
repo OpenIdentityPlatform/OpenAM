@@ -62,7 +62,7 @@ require.config({
         "microplugin"      : "libs/microplugin-0.0.3",
         "moment"           : "libs/moment-2.28.0-min",
         "popoverclickaway" : "libs/popover-clickaway",
-        "qrcode"           : "libs/qrcode-1.0.0-min",
+        "qrcode"           : "libs/qrcode-1.4.4-min",
         "react-bootstrap"  : "libs/react-bootstrap-0.30.1-min",
         "react-dom"        : "libs/react-dom-15.2.1-min",
         "react"            : "libs/react-15.2.1-min",
