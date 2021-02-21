@@ -84,7 +84,7 @@
 						<artifactItem>
 							<groupId>org.openidentityplatform.commons.ui.libs</groupId>
 							<artifactId>qrcode</artifactId>
-							<version>1.0.0</version>
+							<version>1.4.4</version>
 							<packaging>js</packaging>
 							<classifier>min</classifier>
 							<downloadUrl>
