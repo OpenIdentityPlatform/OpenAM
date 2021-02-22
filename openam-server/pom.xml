@@ -74,7 +74,7 @@
                         </manifest>
                     </archive>
                     <container>
-	                    <containerId>tomcat8x</containerId>
+	                    <containerId>tomcat9x</containerId>
 <!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
 	                    <systemProperties>
 	                    	<file.encoding>UTF-8</file.encoding>
