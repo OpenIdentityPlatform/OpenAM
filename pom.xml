@@ -413,11 +413,6 @@
   <!-- Maven Repositories -->
   	<repositories>
 		<repository>
-			<id>ossrh-releases</id>
-			<name>Sonatype OSS</name>
-			<url>https://oss.sonatype.org/content/repositories/releases/</url>
-		</repository>
-		<repository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -427,11 +422,6 @@
 		</repository>
 	</repositories>
 	<pluginRepositories>
-		<pluginRepository>
-			<id>ossrh-releases</id>
-			<name>Sonatype OSS</name>
-			<url>https://oss.sonatype.org/content/repositories/releases/</url>
-		</pluginRepository>
 		<pluginRepository>
 			<id>ossrh-snapshots</id>
 			<name>Sonatype OSS Repository</name>
@@ -467,7 +457,7 @@
 	   <dependency>
     	<groupId>org.openidentityplatform.opendj</groupId>
 		<artifactId>opendj-parent</artifactId>
-		<version>4.4.10</version>
+		<version>4.4.11-SNAPSHOT</version>
     	<type>pom</type>
     	<scope>import</scope>
       </dependency>
@@ -2104,7 +2094,7 @@
 		<plugin>
 	      <groupId>org.sonatype.plugins</groupId>
 	      <artifactId>nexus-staging-maven-plugin</artifactId>
-	      <version>1.6.7</version>
+	      <version>1.6.8</version>
 	      <extensions>true</extensions>
 	      <configuration>
 	        <serverId>ossrh</serverId>
