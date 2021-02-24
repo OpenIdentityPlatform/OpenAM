@@ -206,8 +206,9 @@ public class Repo extends IdRepo {
 			final Set<String> fields=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 			if (attrNames!=null && !attrNames.isEmpty()) {
 				select=select.whereColumn("field").in(bindMarker("fields"));
-				for (String field : attrNames)
+				for (String field : attrNames) {
 					fields.add(field.toLowerCase());
+				}
 			}
 			final SimpleStatement statement=select.builder()
 				.addNamedValue("type", type.getName())
@@ -219,12 +220,16 @@ public class Repo extends IdRepo {
 				final String field=row.getString("field");
 				final Set<String> values=attr.getOrDefault(field, new LinkedHashSet<String>(1));
 				values.add(row.getString("value"));
-				if (!attr.containsKey(field))
+				if (!attr.containsKey(field)) {
 					attr.put(field, values);
+				}
 			}
 		}catch(Throwable e){
 			logger.error("getAttributes {} {} {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
+		}
+		if (!attr.isEmpty() && ((attrNames==null || attrNames.isEmpty()) || attrNames.contains("uid"))){
+			attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {name})));
 		}
 		return attr;
 	}
@@ -255,7 +260,7 @@ public class Repo extends IdRepo {
 		validate(type, IdOperation.EDIT);
 		try{
 			final boolean async=(attributes.remove(asyncField)!=null);
-					
+			attributes.remove("uid");		
 			if (isAdd && !attributes.containsKey(activeAttr))
 				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
 			
@@ -370,6 +375,13 @@ public class Repo extends IdRepo {
 					attrNames.add(field.toLowerCase());
 				}
 			}
+			//move uid avPairs to pattern
+			if (avPairs!=null && avPairs.containsKey("uid")) {
+				if (!avPairs.get("uid").isEmpty()) {
+					pattern=avPairs.get("uid").iterator().next();
+				}
+				avPairs.remove("uid");
+			}
 			
 			Map<String, Map<String,Set<String>>> result=new HashMap<String, Map<String,Set<String>>>();
 			
@@ -401,6 +413,10 @@ public class Repo extends IdRepo {
 					if (values==null) {
 						values=new LinkedHashSet<String>(1);
 						attr.put(field, values);
+					}
+					//uid 
+					if (returnAttrs.contains("uid")) {
+						attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {pattern})));
 					}
 					values.add(row.getString("value"));
 				}
@@ -436,6 +452,10 @@ public class Repo extends IdRepo {
 						if (values==null) {
 							values=new LinkedHashSet<String>(1);
 							attr.put(field, values);
+						}
+						//uid 
+						if (returnAttrs.contains("uid")) {
+							attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {uid})));
 						}
 						values.add(row.getString("value"));
 					}

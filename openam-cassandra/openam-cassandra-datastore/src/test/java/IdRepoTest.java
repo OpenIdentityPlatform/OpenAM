@@ -164,7 +164,7 @@ public class IdRepoTest {
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
 		
-		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000001"})));
+		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000002"})));
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==0);
 		
 		param.clear();
@@ -209,6 +209,10 @@ public class IdRepoTest {
 		Set<String> fields=new HashSet<String>(Arrays.asList(new String[]{"CN","sdfsdf","o"}));
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000"));
+		for (String field : param.keySet()) {
+			assertTrue(field,repo.getAttributes(null, IdType.USER, "9170000000").containsKey(field));
+		}
+		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000").containsKey("uid"));
 		
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("DISPLAYNAME", new HashSet<String>(Arrays.asList(new String[] {"explicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly casts"})));
