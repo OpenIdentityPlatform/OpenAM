@@ -134,10 +134,15 @@ public class CoreTokenServiceGuiceModule extends PrivateModule {
 
         expose(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG));
         expose(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_ASYNC_DEBUG));
+        expose(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG));
+        
         expose(new TypeLiteral<Map<Option<?>, LdapOptionFunction>>() {});
         expose(CoreTokenConfig.class);
         expose(CTSPersistentStore.class);
         expose(CTSConnectionMonitoringStore.class);
+        expose(CTSOperationsMonitoringStore.class);
+        expose(CTSReaperMonitoringStore.class);
+        
         expose(ExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL));
         expose(ObjectMapper.class).annotatedWith(Names.named(CoreTokenConstants.OBJECT_MAPPER));
         expose(ResultHandlerFactory.class);
