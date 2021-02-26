@@ -426,7 +426,7 @@ public class Repo extends IdRepo {
 			if (avPairs!=null) {
 				for (final Entry<String, Set<String>> filterEntry : avPairs.entrySet()){
 					final Map<String, Map<String,Set<String>>> users2attr=new HashMap<String, Map<String,Set<String>>>();
-					Select select=selectFrom("\"ix_".concat(filterEntry.getKey().toLowerCase())+"\"").columns("uid","field","value")
+					Select select=selectFrom("ix_".concat(filterEntry.getKey().toLowerCase()).replaceAll("-", "_")).columns("uid","field","value")
 							.whereColumn("type").isEqualTo(bindMarker("type"))
 							.whereColumn("field").isEqualTo(bindMarker("field"))
 							.whereColumn("value").in(bindMarker("value"));

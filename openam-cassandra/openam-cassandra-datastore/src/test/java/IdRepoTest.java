@@ -157,7 +157,12 @@ public class IdRepoTest {
 		param.clear();
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss2"})));
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
+		param.put("iplanet-am-user-alias-list", new HashSet<String>(Arrays.asList(new String[] {"iplanet-am-user-alias-list"})));
 		repo.create(null, IdType.USER, "9170000001",param);
+		
+		param.clear();
+		param.put("iplanet-am-user-alias-list", new HashSet<String>(Arrays.asList(new String[] {"iplanet-am-user-alias-list"})));
+		assertTrue(repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
 		
 		param.clear();
 		param.put("UID", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
