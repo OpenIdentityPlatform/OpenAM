@@ -35,9 +35,7 @@ git config --system core.longpaths true
 ```
 
 ```bash
-git clone --recursive  https://github.com/OpenIdentityPlatform/OpenAM.git
-#mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ/forgerock-parent
-#mvn -DskipTests -Dmaven.javadoc.skip=true install -f OpenAM/OpenDJ
+git clone https://github.com/OpenIdentityPlatform/OpenAM.git
 mvn install -f OpenAM
 ```
 
