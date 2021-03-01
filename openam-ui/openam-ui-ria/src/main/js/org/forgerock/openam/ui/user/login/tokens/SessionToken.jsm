@@ -34,8 +34,12 @@ function secureCookie () {
     return Configuration.globalData.secureCookie;
 }
 
+function cookieSameSite () {
+    return Configuration.globalData.auth.cookieSameSite;
+}
+
 export function set (token) {
-    return CookieHelper.setCookie(cookieName(), token, "", "/", cookieDomains(), secureCookie());
+    return CookieHelper.setCookie(cookieName(), token, "", "/", cookieDomains(), secureCookie(), cookieSameSite());
 }
 
 export function get () {
