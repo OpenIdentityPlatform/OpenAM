@@ -100,7 +100,7 @@ public class IdRepoTest {
 		param.put("uid", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
 		assertTrue(repo.search(null, IdType.USER, "*", 0, 2, new HashSet<String>(Arrays.asList(new String[] {"uid"})), true, Repo.AND_MOD, param, false).getSearchResults().size()==1);
-		
+		assertTrue(repo.search(null, IdType.USER, "9170000000", 0, 2, new HashSet<String>(Arrays.asList(new String[] {"uid"})), false, Repo.AND_MOD, null, false).getSearchResults().size()==1);
 		//not found by secondary index
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("Cn", new HashSet<String>(Arrays.asList(new String[] {"BAD"})));
@@ -217,12 +217,19 @@ public class IdRepoTest {
 		for (String field : param.keySet()) {
 			assertTrue(field,repo.getAttributes(null, IdType.USER, "9170000000").containsKey(field));
 		}
-		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000").containsKey("uid"));
+		assertEquals("9170000000",repo.getAttributes(null, IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[]{"uid"}))).get("uid").iterator().next());
+		assertEquals("9170000000",repo.getAttributes(null, IdType.USER, "9170000000").get("uid").iterator().next());
+		
 		
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("DISPLAYNAME", new HashSet<String>(Arrays.asList(new String[] {"explicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly casts"})));
 		repo.setAttributes(null, IdType.USER, "9170000000", param, false);
+		
+		param.put("DISPLAYNAME", new HashSet<String>(Arrays.asList(new String[] {"explicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitlyexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly castsexplicitly casts"})));
+		repo.setAttributes(null, IdType.USER, "9170000000", param, false);
+		
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000"));
+		assertEquals(1,repo.getAttributes(null, IdType.USER, "9170000000",param.keySet()).get("displayname").size());
 		
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));

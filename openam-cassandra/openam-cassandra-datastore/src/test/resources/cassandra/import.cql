@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS values (type text, uid text, field text,value text,ch
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_servicename AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='servicename' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_cn AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='cn' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_sn AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='sn' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
-CREATE MATERIALIZED VIEW IF NOT EXISTS ix_givenName AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='givenName' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
+CREATE MATERIALIZED VIEW IF NOT EXISTS ix_givenname AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='givenname' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_mail AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='mail' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_memberof AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='memberof' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_manager AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='manager' and value IS NOT NULL PRIMARY KEY (type,field,value,uid);

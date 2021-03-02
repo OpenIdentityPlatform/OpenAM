@@ -198,12 +198,13 @@ public class Repo extends IdRepo {
 	@Override
 	public Map<String, Set<String>> getAttributes(SSOToken token, IdType type,String name, Set<String> attrNames) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
+		final Boolean addUID=(attrNames!=null) && attrNames.remove("uid");
 		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		try{
 			Select select=selectFrom("values").columns("field","value")
 					.whereColumn("type").isEqualTo(bindMarker("type"))
 					.whereColumn("uid").isEqualTo(bindMarker("uid"));
-			final Set<String> fields=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+			final Set<String> fields=new HashSet<String>();
 			if (attrNames!=null && !attrNames.isEmpty()) {
 				select=select.whereColumn("field").in(bindMarker("fields"));
 				for (String field : attrNames) {
@@ -228,7 +229,7 @@ public class Repo extends IdRepo {
 			logger.error("getAttributes {} {} {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
-		if (!attr.isEmpty() && ((attrNames==null || attrNames.isEmpty()) || attrNames.contains("uid"))){
+		if (!attr.isEmpty() && (attrNames==null || attrNames.isEmpty() || addUID)){
 			attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {name})));
 		}
 		return attr;
@@ -263,7 +264,9 @@ public class Repo extends IdRepo {
 			attributes.remove("uid");		
 			if (isAdd && !attributes.containsKey(activeAttr))
 				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
-			
+			if (isAdd) {
+				delete(token, type, name);
+			}
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				if (!isAdd) {//remove old values
 					final Delete delete=deleteFrom("values")
@@ -275,10 +278,7 @@ public class Repo extends IdRepo {
 							.addNamedValue("uid", name)
 							.addNamedValue("field", entry.getKey().toLowerCase())
 							.build();
-					if (async)
-						new ExecuteCallback(profile,session, statement).executeAsync();
-					else
-						new ExecuteCallback(profile,session, statement).execute();
+					new ExecuteCallback(profile,session, statement).execute();
 				}
 				final Integer ttl=getTTL(type, entry.getKey());
 				Insert insert=insertInto("values")
@@ -364,6 +364,9 @@ public class Repo extends IdRepo {
 		try{
 		//read returnFields
 			final Set<String> attrNames=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+			if (returnAttrs!=null) {
+				returnAttrs.remove("uid");
+			}
 			if (!returnAllAttrs || returnAttrs==null || returnAttrs.isEmpty()){
 				if (returnAttrs==null) {
 					returnAttrs=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
@@ -415,9 +418,7 @@ public class Repo extends IdRepo {
 						attr.put(field, values);
 					}
 					//uid 
-					if (returnAttrs.contains("uid")) {
-						attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {pattern})));
-					}
+					attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {row.getString("uid")})));
 					values.add(row.getString("value"));
 				}
 			}
@@ -454,9 +455,7 @@ public class Repo extends IdRepo {
 							attr.put(field, values);
 						}
 						//uid 
-						if (returnAttrs.contains("uid")) {
-							attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {uid})));
-						}
+						attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {uid})));
 						values.add(row.getString("value"));
 					}
 
