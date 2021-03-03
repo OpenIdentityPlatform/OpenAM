@@ -170,7 +170,7 @@ class SessionExpiryBatchHandler {
         @Override
         public void processResults(PartialToken result) {
             try {
-                if (!result.canConvertToToken()) {
+                if (result==null || !result.canConvertToToken()) {
                     debug.message("Failed to delete token. Already deleted.");
                     return;
                 }
