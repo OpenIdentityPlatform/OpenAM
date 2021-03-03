@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -101,9 +102,9 @@ public class QueryBuilder extends org.forgerock.openam.sm.datalayer.api.query.Qu
     		if (this.timeLimit.getValue()>0 && this.timeLimit.to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE) {
     			statement.setTimeout(Duration.ofMillis(this.timeLimit.to(TimeUnit.MILLISECONDS)));
     		}
-    		final ResultSet rc = new ExecuteCallback(ConnectionFactoryProvider.profile,connectionFactory.create(),statement).execute();
-    		final Iterator<Row> iterator=rc.iterator();
-    		//final Iterator<Row> iterator=Collections.EMPTY_LIST.iterator(); //disable long query
+//    		final ResultSet rc = new ExecuteCallback(ConnectionFactoryProvider.profile,connectionFactory.create(),statement).execute();
+//    		final Iterator<Row> iterator=rc.iterator();
+    		final Iterator<Row> iterator=Collections.EMPTY_LIST.iterator(); //disable long query
     		return new Iterator<Collection<T>>() {
   				@Override
 				public boolean hasNext() {
