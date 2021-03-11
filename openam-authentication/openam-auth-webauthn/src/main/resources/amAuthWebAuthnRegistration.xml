@@ -9,7 +9,7 @@
             i18nFileName="amAuthWebAuthn"
             revisionNumber="1"
             i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.description"
-            resourceName="webauthn">
+            resourceName="webauthnreg">
 
             <Organization>
                 <AttributeSchema name="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authlevel"
