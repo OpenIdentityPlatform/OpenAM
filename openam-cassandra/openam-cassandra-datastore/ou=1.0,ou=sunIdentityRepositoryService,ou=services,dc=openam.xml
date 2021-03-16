@@ -66,6 +66,15 @@
 							<Value>group:attr3=86400</Value>
 						</DefaultValues>
 					</AttributeSchema>
+					<AttributeSchema cosQualifier="default" i18nKey="Disable-Case-Sensitive"
+						isSearchable="no" name="disable-case-sensitive"
+						syntax="string" type="list">
+						<DefaultValues>
+							<Value>uid</Value>
+							<Value>mail</Value>
+							<Value>iplanet-am-user-alias-list</Value>
+						</DefaultValues>
+					</AttributeSchema>
 					<AttributeSchema cosQualifier="default" i18nKey="a20172"
 						isSearchable="no" name="sun-idrepo-ldapv3-config-isactive" syntax="string"
 						type="single">

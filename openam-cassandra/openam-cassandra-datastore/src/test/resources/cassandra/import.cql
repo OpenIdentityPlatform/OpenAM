@@ -4,6 +4,7 @@ use realm_name;
 CREATE TABLE IF NOT EXISTS values (type text, uid text, field text,value text,change timestamp, PRIMARY KEY ((type,uid),field,value));
 
 /*---indexes for search:----*/
+CREATE MATERIALIZED VIEW IF NOT EXISTS ix_uid AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='uid' and value IS NOT NULL PRIMARY KEY ((type,field,value),uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_servicename AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='servicename' and value IS NOT NULL PRIMARY KEY ((type,field,value),uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_cn AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='cn' and value IS NOT NULL PRIMARY KEY ((type,field,value),uid);
 CREATE MATERIALIZED VIEW IF NOT EXISTS ix_sn AS SELECT * FROM values WHERE type IS NOT NULL and uid IS NOT NULL and field='sn' and value IS NOT NULL PRIMARY KEY ((type,field,value),uid);
