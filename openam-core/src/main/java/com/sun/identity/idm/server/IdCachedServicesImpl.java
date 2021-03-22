@@ -53,7 +53,10 @@ import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerIdRepoSvcImpl;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.ServiceManager;
+
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -552,7 +555,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         dirtyCache(dn);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String orgName,
                                   CrestQuery crestQuery)
             throws IdRepoException, SSOException {
@@ -615,6 +619,23 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                             throw (ide);
                         }
                     }
+                }else {
+                	final AMIdentity tokenId = IdUtils.getIdentity(token);
+                	final String principalDN = IdUtils.getUniversalId(tokenId);
+                	final IdSearchResults res=super.search(token, type, ctrl, orgName, crestQuery);
+                	try {
+	                	for (AMIdentity idm : (Set<AMIdentity>)res.getSearchResults()) {
+							final AMHashMap attributes=(AMHashMap)res.getResultAttributes().get(idm);
+	                		@SuppressWarnings("rawtypes")
+							final Set missAttrNames = ctrl.getReturnAttributes()==null?Collections.emptySet():attributes.getMissingAndEmptyKeys(ctrl.getReturnAttributes());
+	                        cb = new IdCacheBlock(universalID, true);
+	                        cb.putAttributes(principalDN, attributes, missAttrNames, false,false);
+	                        idRepoCache.put(universalID, cb);
+						}
+                	}catch (Throwable e) {
+						DEBUG.error("cache error", e); 
+					}
+                	return res;
                 }
             }
         }
