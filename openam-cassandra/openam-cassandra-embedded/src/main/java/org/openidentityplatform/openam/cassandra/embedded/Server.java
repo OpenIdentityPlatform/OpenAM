@@ -32,11 +32,15 @@ import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.iplanet.am.util.SystemProperties;
 
 public class Server implements Runnable, Closeable {
+	final static Logger logger=LoggerFactory.getLogger(Server.class.getName());
+	
 	final private ExecutorService executor = Executors.newSingleThreadExecutor();
 	private CassandraDaemon cassandraDaemon;
 	    
@@ -81,9 +85,18 @@ public class Server implements Runnable, Closeable {
 	        if (inputStream==null) {
 	        	throw new AssertionError("cannot get resource"+dataSetLocation);
 	        }
-	        final CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build();
-	        Arrays.stream(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";")).map(statement -> StringUtils.normalizeSpace(statement) + ";").forEach(session::execute);
-	        session.close();
+	        try (CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build()){
+	        	for (String statement : Arrays.asList(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";"))) {
+		        	try {
+		        		session.execute(StringUtils.normalizeSpace(statement));
+		        		logger.info("{}",StringUtils.normalizeSpace(statement));
+		        	}catch (Exception e) {
+						logger.error("{}: {}",StringUtils.normalizeSpace(statement),e.getMessage());
+						assert false : "error in import.cql";
+					}
+				} 
+	        	session.close();
+	        };
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
