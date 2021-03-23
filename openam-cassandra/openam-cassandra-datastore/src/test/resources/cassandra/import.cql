@@ -1,3 +1,4 @@
+DROP KEYSPACE IF EXISTS realm_name; 
 CREATE KEYSPACE IF NOT EXISTS realm_name WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'} ;
 use realm_name;
 

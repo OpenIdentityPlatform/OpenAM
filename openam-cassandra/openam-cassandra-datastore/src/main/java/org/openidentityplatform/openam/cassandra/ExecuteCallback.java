@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ExecutionInfo;
+import com.datastax.oss.driver.api.core.cql.QueryTrace;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.cql.Statement;
 
 
@@ -35,10 +37,9 @@ public class ExecuteCallback {
 	final Statement<?> statement;
 	Long start;
 	
-	public ExecuteCallback(String profile,CqlSession session,Statement<?> statement){
+	public ExecuteCallback(String profile,CqlSession session,Statement<?>  statement){
 		this.session=session;
-		this.statement=statement;
-		this.statement.setExecutionProfileName(profile);
+		this.statement=statement.setExecutionProfileName(profile).setTracing(logger.isTraceEnabled());
 	}
 	
 	public ResultSet execute(){
@@ -60,9 +61,8 @@ public class ExecuteCallback {
 		sessionStage.whenComplete(
 		    (version, error) -> {
 		        if (error != null) {
-		          System.out.printf("Failed to retrieve the version: %s%n", error.getMessage());
+		          onFailure(error);
 		        } else {
-		          System.out.printf("Server version: %s%n", version);
 		          onSuccess(version.getExecutionInfo());
 		        }
 		      });
@@ -71,20 +71,19 @@ public class ExecuteCallback {
 
 
 	public void onSuccess(ExecutionInfo result) {
-		if (logger.isTraceEnabled())
-			logger.trace("{} ms {} {} ({}) ->{} {}"
-					,System.currentTimeMillis()-start
-					,statement
-					,statement.getConsistencyLevel()
-					,result.getCoordinator() 
-					//,result.getQueryTrace()
-			);
+		if (logger.isTraceEnabled() && result.getTracingId()!=null) { 
+			final QueryTrace trace=result.getQueryTrace();
+			logger.trace("{}μs {} {}",trace.getDurationMicros(),trace.getParameters(),trace.getCoordinatorAddress());
+		}
 	}
 	
 	public void onFailure(Throwable t) {
-		logger.warn("{} ms {} {}: {} {}"
+		logger.warn("{} {} ms {}: {} {} {}: {}"
+				,statement.getExecutionProfileName()
 				,System.currentTimeMillis()-start
-				,statement
+				,statement.getKeyspace()==null?session.getKeyspace():statement.getKeyspace()
+				,statement instanceof SimpleStatement ? ((SimpleStatement)statement).getQuery():statement
+				,statement instanceof SimpleStatement ? ((SimpleStatement)statement).getNamedValues():null
 				,statement.getConsistencyLevel()
 				,t.getMessage()
 		);

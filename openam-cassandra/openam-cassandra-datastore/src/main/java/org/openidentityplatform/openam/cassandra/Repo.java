@@ -18,6 +18,7 @@ package org.openidentityplatform.openam.cassandra;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -39,15 +41,12 @@ import org.slf4j.LoggerFactory;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
-import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
+
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
-import com.datastax.oss.driver.api.querybuilder.delete.Delete;
-import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 
-import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -145,7 +144,6 @@ public class Repo extends IdRepo {
 			logger.info("create session {}/{}",username,servers);
 			CqlSessionBuilder builder=CqlSession.builder()
 					.withApplicationName("OpenAM datastore: "+keyspace)
-					.withConfigLoader(DriverConfigLoader.fromClasspath("/application.conf",this.getClass().getClassLoader()))
 					.withKeyspace(keyspace);
 			if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
 				builder=builder.withAuthCredentials(username, password);
@@ -160,11 +158,25 @@ public class Repo extends IdRepo {
 				}
 			}
 			session=builder.build();
+			statement_select_by_type=session.prepare("select uid,field,value from values where type=:type limit 64000 allow filtering");
+			statement_select_by_uid=session.prepare("select uid,field,value from values where type=:type and uid=:uid");
+			statement_select_by_fields=session.prepare("select uid,field,value from values where type=:type and uid=:uid and field in :fields limit 64000");
+			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
+			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
+			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
+			statement_add_value_ttl=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
 		}catch(Exception e){
 			logger.error("error",e);
 			throw new RuntimeException(e);
 		}
 	}
+	PreparedStatement statement_select_by_type;
+	PreparedStatement statement_select_by_uid;
+	PreparedStatement statement_select_by_fields;
+	PreparedStatement statement_delete_by_uid;
+	PreparedStatement statement_delete_by_fields;
+	PreparedStatement statement_add_value;
+	PreparedStatement statement_add_value_ttl;
 	
 	@Override
 	public void shutdown() {
@@ -188,7 +200,7 @@ public class Repo extends IdRepo {
 	@Override
 	public boolean isExists(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
-		Map<String, Set<String>> attr=getAttributes(token, type, name,null);
+		Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{"uid"})));
 		return attr!=null && (attr.size()!=0);
 	}
 
@@ -216,24 +228,21 @@ public class Repo extends IdRepo {
 	@Override
 	public Map<String, Set<String>> getAttributes(SSOToken token, IdType type,String name, Set<String> attrNames) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
-		final Boolean addUID=(attrNames!=null) && attrNames.remove("uid");
+//		final Boolean addUID=(attrNames!=null) && attrNames.remove("uid");
 		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		try{
-			Select select=selectFrom("values").columns("field","value")
-					.whereColumn("type").isEqualTo(bindMarker("type"))
-					.whereColumn("uid").isEqualTo(bindMarker("uid"));
 			final Set<String> fields=new HashSet<String>();
 			if (attrNames!=null && !attrNames.isEmpty()) {
-				select=select.whereColumn("field").in(bindMarker("fields"));
 				for (String field : attrNames) {
 					fields.add(field.toLowerCase());
 				}
 			}
-			final SimpleStatement statement=select.builder()
-				.addNamedValue("type", type.getName())
-				.addNamedValue("uid", name)
-				.addNamedValue("fields", fields)
-				.build();
+			BoundStatement statement=((fields.isEmpty())?statement_select_by_uid:statement_select_by_fields).bind()
+					.setString("type", type.getName())
+					.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+			if (!fields.isEmpty()) {
+				statement=statement.setList("fields",new ArrayList<String>(fields),String.class);
+			}
 			final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 			for (Row row : rc){
 				final String field=row.getString("field");
@@ -246,9 +255,6 @@ public class Repo extends IdRepo {
 		}catch(Throwable e){
 			logger.error("getAttributes {} {} {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
-		}
-		if (!attr.isEmpty() && (attrNames==null || attrNames.isEmpty() || addUID)){
-			attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {name})));
 		}
 		return attr;
 	}
@@ -274,53 +280,49 @@ public class Repo extends IdRepo {
 	}
 
 	final static String asyncField="save.async";
+	
+	
 	@Override
 	public void setAttributes(SSOToken token, IdType type, String name, Map<String, Set<String>> attributes, boolean isAdd) throws IdRepoException, SSOException {
 		validate(type, IdOperation.EDIT);
 		try{
 			final boolean async=(attributes.remove(asyncField)!=null);
-			if (isAdd || attributes.containsKey("uid")) { //allways create uid field 
+			if (isAdd && !attributes.containsKey("uid")) { //allways create uid field 
 				attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
 			}
-			if (isAdd && !attributes.containsKey(activeAttr))
+			if (isAdd && !attributes.containsKey(activeAttr)) {
 				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
+			}
+			final ArrayList<BoundStatement> statements=new ArrayList<BoundStatement>();
 			if (isAdd) {
-				delete(token, type, name);
+				final BoundStatement statement=statement_delete_by_uid.bind()
+					.setString("type", type.getName())
+					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+				statements.add(statement);
 			}
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				if (!isAdd) {//remove old values
-					final Delete delete=deleteFrom("values")
-							.whereColumn("type").isEqualTo(bindMarker("type"))
-							.whereColumn("uid").isEqualTo(bindMarker("uid"))
-							.whereColumn("field").isEqualTo(bindMarker("field"));
-					final SimpleStatement statement=delete.builder()
-							.addNamedValue("type", type.getName())
-							.addNamedValue("uid", name)
-							.addNamedValue("field", entry.getKey().toLowerCase())
-							.build();
-					new ExecuteCallback(profile,session, statement).execute();
+					final BoundStatement statement=statement_delete_by_fields.bind()
+						.setString("type", type.getName())
+						.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+						.setList("fields",Arrays.asList(new String[] {entry.getKey().toLowerCase()}),String.class);
+					statements.add(statement);
 				}
 				final Integer ttl=getTTL(type, entry.getKey());
-				Insert insert=insertInto("values")
-						.value("change",function("toTimestamp", function("now")))
-						.value("type",bindMarker("type"))
-						.value("uid",bindMarker("uid"))
-						.value("field",bindMarker("field"))
-						.value("value",bindMarker("value"));
-				if (ttl!=null && ttl>0)
-					insert=insert.usingTtl(ttl);
 				for (final String  value: convert(entry.getKey(),entry.getValue())) {
-					final SimpleStatement statement=insert.builder()
-							.addNamedValue("type", type.getName())
-							.addNamedValue("uid", name)
-							.addNamedValue("field", entry.getKey().toLowerCase())
-							.addNamedValue("value", disableCaseSensitive.contains(entry.getKey())? value.toLowerCase() : value)
-							.build();
-					if (async)
-						new ExecuteCallback(profile,session, statement).executeAsync();
-					else
-						new ExecuteCallback(profile,session, statement).execute();
+					final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl:statement_add_value).bind()
+							.setString("type", type.getName())
+							.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+							.setString("field", entry.getKey().toLowerCase())
+							.setString("value", disableCaseSensitive.contains(entry.getKey())? value.toLowerCase() : value);
+					statements.add((ttl!=null && ttl>0)?statement.setInt("ttl", ttl):statement);
 				}
+			}
+			for (BoundStatement statement : statements) {
+				if (async)
+					new ExecuteCallback(profile,session, statement).executeAsync();
+				else
+					new ExecuteCallback(profile,session, statement).execute();
 			}
 		}catch(Throwable e){
 			logger.error("setAttributes {} {} {} {}",type,name,attributes,isAdd,e.getMessage());
@@ -342,21 +344,17 @@ public class Repo extends IdRepo {
 			final boolean async=(attrNames!=null && attrNames.remove(asyncField));
 			
 			final Set<String> deleteColums=new HashSet<String>();
-			if (attrNames!=null)
+			if (attrNames!=null) {
 				for (String field : attrNames){ 
 					deleteColums.add(field.toLowerCase());
 				}
-			Delete delete=deleteFrom("values")
-					.whereColumn("type").isEqualTo(bindMarker("type"))
-					.whereColumn("uid").isEqualTo(bindMarker("uid"));
-			if (!deleteColums.isEmpty())
-				delete=delete.whereColumn("field").in(bindMarker("fields"));
-			
-			final SimpleStatement statement=delete.builder()
-					.addNamedValue("type", type.getName())
-					.addNamedValue("uid", name)
-					.addNamedValue("fields", deleteColums)
-					.build();
+			}
+			BoundStatement statement=((deleteColums.isEmpty())?statement_delete_by_uid:statement_delete_by_fields).bind()
+					.setString("type", type.getName())
+					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+			if (!deleteColums.isEmpty()) {
+				statement=statement.setList("fields",new ArrayList<String>(deleteColums),String.class);
+			}
 			if (async)
 				new ExecuteCallback(profile,session, statement).executeAsync();
 			else
@@ -378,6 +376,28 @@ public class Repo extends IdRepo {
 	     throw new IdRepoException("FilesRepo.search does not support queryFilter searches");
 	}
 	
+	ConcurrentHashMap<String, PreparedStatement> indexByValue=new ConcurrentHashMap<String, PreparedStatement>();
+	PreparedStatement getIndexByValue(String field) {
+		final String table="ix_".concat(field.toLowerCase()).replaceAll("-", "_");
+		PreparedStatement res=indexByValue.get(table);
+		if (res==null) {
+			res=session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values limit 64000");
+			indexByValue.put(table, res);
+		}
+		return res;
+	}
+	
+	ConcurrentHashMap<String, PreparedStatement> indexByValueAndUID=new ConcurrentHashMap<String, PreparedStatement>();
+	PreparedStatement getIndexByValueAndUID(String field) {
+		final String table="ix_".concat(field.toLowerCase()).replaceAll("-", "_");
+		PreparedStatement res=indexByValueAndUID.get(table);
+		if (res==null) {
+			res=session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values and uid=:uid limit 64000");
+			indexByValueAndUID.put(table, res);
+		}
+		return res;
+	}
+	
 	public RepoSearchResults search(SSOToken token, IdType type, String pattern, int maxTime, int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,Map<String, Set<String>> avPairs, boolean recursive) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
 		try{
@@ -388,9 +408,6 @@ public class Repo extends IdRepo {
 				for (final String field : returnAttrs) { 
 					returnAttrsNames.add(field.toLowerCase());
 				}
-			}
-			if (returnAttrsNames.contains("uid")) {
-				returnAttrsNames.clear();
 			}
 			//avPairs
 			final Map<String, Set<String>> filterFields=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER); 
@@ -405,19 +422,18 @@ public class Repo extends IdRepo {
 			
 			//search by pattern/username without filter
 			if  (filterFields.isEmpty()) {
-				Select select=selectFrom("values").columns("uid","field","value")
-						.whereColumn("type").isEqualTo(bindMarker("type"));
-				if (!StringUtils.equals(filterUID, "*")){
-					select=select.whereColumn("uid").isEqualTo(bindMarker("uid"));
+				BoundStatement statement;
+				if (StringUtils.equals(filterUID, "*")){
+					statement=statement_select_by_type.bind()
+							.setString("type", type.getName());
+				}else {
+					statement=((returnAttrsNames.isEmpty())?statement_select_by_uid:statement_select_by_fields).bind()
+							.setString("type", type.getName())
+							.setString("uid", disableCaseSensitive.contains("uid")?filterUID.toLowerCase():filterUID);
+					if (!returnAttrsNames.isEmpty()) {
+						statement=statement.setList("fields",new ArrayList<String>(returnAttrsNames),String.class);
+					}
 				}
-				if (!returnAttrsNames.isEmpty())  {
-					select=select.whereColumn("field").in(bindMarker("fields"));
-				}
-				final SimpleStatement statement=select.limit(32000).allowFiltering().builder()
-						.addNamedValue("type", type.getName())
-						.addNamedValue("uid", filterUID)
-						.addNamedValue("fields", returnAttrsNames)
-						.build();
 				final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 				for (Row row : rc){
 					final String uid=row.getString("uid");
@@ -432,32 +448,24 @@ public class Repo extends IdRepo {
 						values=new LinkedHashSet<String>(1);
 						attr.put(field, values);
 					}
-					//uid 
-					attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {row.getString("uid")})));
 					values.add(row.getString("value"));
 				}
 			}else{ //search by filters
 				for (final Entry<String, Set<String>> filterEntry : filterFields.entrySet()){
 					final Map<String, Map<String,Set<String>>> users2attr=new HashMap<String, Map<String,Set<String>>>();
-					Select select=selectFrom("ix_".concat(filterEntry.getKey().toLowerCase()).replaceAll("-", "_")).columns("uid","field","value")
-							.whereColumn("type").isEqualTo(bindMarker("type"))
-							.whereColumn("field").isEqualTo(bindMarker("field"))
-							.whereColumn("value").in(bindMarker("value"));
-					if (!StringUtils.equals(filterUID, "*")) {
-						select=select.whereColumn("uid").isEqualTo(bindMarker("uid"));
-					}
 					final Set<String> valuesLowerCase=new LinkedHashSet<String>(filterEntry.getValue().size());
 					if (disableCaseSensitive.contains(filterEntry.getKey())) {
 						for (String string : filterEntry.getValue()) {
 							valuesLowerCase.add(string.toLowerCase());
 						}
 					}
-					final SimpleStatement statement=select.limit(32000).builder()
-							.addNamedValue("type", type.getName())
-							.addNamedValue("field", filterEntry.getKey().toLowerCase())
-							.addNamedValue("value", disableCaseSensitive.contains(filterEntry.getKey())?valuesLowerCase:filterEntry.getValue())
-							.addNamedValue("uid", filterUID)
-							.build();
+					BoundStatement statement=(StringUtils.equals(filterUID, "*")?getIndexByValue(filterEntry.getKey()):getIndexByValueAndUID(filterEntry.getKey())).bind()
+						.setString("type", type.getName())
+						.setString("field", filterEntry.getKey().toLowerCase())
+						.setList("values",new ArrayList<String>(disableCaseSensitive.contains(filterEntry.getKey())?valuesLowerCase:filterEntry.getValue()),String.class);
+					if (!StringUtils.equals(filterUID, "*")) {
+						statement=statement.setString("uid", disableCaseSensitive.contains("uid")?filterUID.toLowerCase():filterUID);
+					}
 					final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 					for (Row row : rc){
 						final String uid=row.getString("uid");
@@ -472,8 +480,6 @@ public class Repo extends IdRepo {
 							values=new LinkedHashSet<String>(1);
 							attr.put(field, values);
 						}
-						//uid 
-						attr.put("uid", new HashSet<String>(Arrays.asList(new String[] {uid})));
 						values.add(row.getString("value"));
 					}
 

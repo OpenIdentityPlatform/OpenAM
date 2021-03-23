@@ -1,3 +1,4 @@
+package org.openidentityplatform.openam.cassandra;
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -29,7 +30,6 @@ import javax.security.auth.callback.PasswordCallback;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openidentityplatform.openam.cassandra.Repo;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;

@@ -37,6 +37,10 @@
 			<version>3.19.0-GA</version>
 		</dependency>
 		<dependency>
+			  <groupId>com.datastax.oss</groupId>
+			  <artifactId>java-driver-query-builder</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.openidentityplatform.openam</groupId>
 			<artifactId>openam-cassandra-datastore</artifactId>
 		</dependency>
