@@ -32,6 +32,7 @@ package com.sun.identity.monitoring;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.agent.SnmpMib;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.net.MalformedURLException;
@@ -126,6 +127,8 @@ public class SsoServerTopologyImpl extends SsoServerTopology {
                 if ((server != null) && (svrName != null)) {
                     server.registerMBean(ssrv, svrName);
                 }
+            } catch (InstanceAlreadyExistsException ex) {
+            	debug.message(classModule + svrURL, ex);
             } catch (Exception ex) {
                 debug.error(classModule + svrURL, ex);
             }

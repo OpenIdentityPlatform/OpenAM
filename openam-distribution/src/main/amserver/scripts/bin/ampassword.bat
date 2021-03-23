@@ -39,7 +39,7 @@ goto WHILE
 :WEND
 
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;${windows.setup.classpath}"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%\lib\*"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/resources"
 
 "\@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" com.iplanet.services.ldap.ServerConfigMgr %PARAMS%

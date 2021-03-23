@@ -1287,6 +1287,8 @@ public class Agent {
                     if ((server != null) && (stName != null)) {
                         server.registerMBean(ssse, stName);
                     }
+                } catch(InstanceAlreadyExistsException ex) {
+                	debug.message(classMethod + siteId, ex);
                 } catch (Exception ex) {
                     debug.error(classMethod + siteId, ex);
                 }
