@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -4972,7 +4973,7 @@ public class LoginState {
      * Note that as a side effect, this sets the post auth process instance property on the session.
      */
     private Set<AMPostAuthProcessInterface> getPostLoginInstances(Set<String> postLoginClassSet) {
-        Set<AMPostAuthProcessInterface> postLoginInstanceSet = new HashSet<>();
+        Set<AMPostAuthProcessInterface> postLoginInstanceSet = new LinkedHashSet<>();
         if ((postLoginClassSet != null) && (!postLoginClassSet.isEmpty())) {
             StringBuilder sb = new StringBuilder();
             for (String postLoginClassName : postLoginClassSet) {
