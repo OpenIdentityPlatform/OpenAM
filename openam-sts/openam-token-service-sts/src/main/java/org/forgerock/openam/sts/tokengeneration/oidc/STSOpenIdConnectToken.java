@@ -153,7 +153,7 @@ class STSOpenIdConnectToken extends JsonValue {
      * @param id The jwt id.
      */
     STSOpenIdConnectToken setId(String id) {
-        set(JwtClaimsSetKey.JTI.name(), id);
+        set(JwtClaimsSetKey.JTI.name().toLowerCase(), id);
         return this;
     }
 

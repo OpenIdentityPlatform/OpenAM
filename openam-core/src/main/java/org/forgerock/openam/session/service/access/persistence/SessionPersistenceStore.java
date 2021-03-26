@@ -319,6 +319,7 @@ public class SessionPersistenceStore {
             TokenFilter filter = new TokenFilterBuilder()
                     .returnAttribute(SessionTokenField.SESSION_ID.getField())
                     .returnAttribute(CoreTokenField.EXPIRY_DATE)
+                    .returnAttribute(CoreTokenField.TOKEN_TYPE)
                     .and()
                     .withAttribute(CoreTokenField.USER_ID, uuid)
                     .build();
@@ -336,6 +337,9 @@ public class SessionPersistenceStore {
             // Populate the return Map from the query results.
             Map<String, Long> sessions = new HashMap<String, Long>();
             for (PartialToken partialToken : partialTokens) {
+            	if (!"SESSION".equals(partialToken.getValue(CoreTokenField.TOKEN_TYPE))) {
+            		continue;
+            	}
                 // Session ID
                 String sessionId = SessionUtils.getDecrypted(partialToken.getValue(SessionTokenField.SESSION_ID.getField()));
 

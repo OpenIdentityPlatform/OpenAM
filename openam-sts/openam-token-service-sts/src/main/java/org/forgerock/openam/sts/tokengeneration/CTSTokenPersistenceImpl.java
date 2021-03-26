@@ -43,8 +43,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * @see CTSTokenPersistence
@@ -61,12 +59,12 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
     }
 
     @Override
-    public void persistToken(String stsId, TokenType tokenType, String tokenString, String subjectId,
+    public void persistToken(String stsId, TokenType tokenType, String tokenString, String subjectId,String jti,
                              long issueInstantMillis, long tokenLifetimeSeconds) throws CTSTokenPersistenceException {
         try {
             final String tokenId = ctsTokenIdGenerator.generateTokenId(tokenType, tokenString);
             final Token ctsToken = generateToken(stsId, tokenString.getBytes(AMSTSConstants.UTF_8_CHARSET_ID),
-                    tokenId, subjectId, issueInstantMillis, tokenLifetimeSeconds, tokenType);
+                    tokenId, subjectId,jti, issueInstantMillis, tokenLifetimeSeconds, tokenType);
             ctsPersistentStore.create(ctsToken);
         } catch (TokenIdGenerationException e) {
             throw new CTSTokenPersistenceException(e.getCode(), "Exception caught generating id for CTS-persisted " +
@@ -123,15 +121,18 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
         return issuedTokens;
     }
 
-    private Token generateToken(String stsId, byte[] tokenBytes, String tokenId, String subjectId, long issueInstantMillis,
+    private Token generateToken(String stsId, byte[] tokenBytes, String tokenId, String subjectId,String jti, long issueInstantMillis,
                                 long tokenLifetimeSeconds, TokenType tokenType) {
         final Token ctsToken = new Token(tokenId, org.forgerock.openam.tokens.TokenType.STS);
         ctsToken.setAttribute(CoreTokenField.BLOB, tokenBytes);
         ctsToken.setAttribute(CoreTokenField.USER_ID, subjectId);
         ctsToken.setAttribute(CoreTokenField.EXPIRY_DATE,
                 timeOf(issueInstantMillis + (tokenLifetimeSeconds * 1000)));
-        ctsToken.setAttribute(CTS_TOKEN_FIELD_STS_ID, stsId);
+        //ctsToken.setAttribute(CTS_TOKEN_FIELD_STS_ID, stsId);
         ctsToken.setAttribute(CTS_TOKEN_FIELD_STS_TOKEN_TYPE, tokenType.name());
+        if (jti!=null) {
+        	ctsToken.setAttribute(CoreTokenField.STRING_ONE, jti);
+        }
         return ctsToken;
     }
 
@@ -155,9 +156,10 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
         return new TokenFilterBuilder()
                 .returnAttribute(CoreTokenField.TOKEN_ID)
                 .returnAttribute(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_TOKEN_TYPE)
-                .returnAttribute(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID)
+                //.returnAttribute(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID)
                 .returnAttribute(CoreTokenField.EXPIRY_DATE)
-                .returnAttribute(CoreTokenField.USER_ID);
+                .returnAttribute(CoreTokenField.USER_ID)
+        		.returnAttribute(CoreTokenField.STRING_ONE);
     }
 
     private STSIssuedTokenState marshalIssuedTokenState(PartialToken partialToken) throws CTSTokenPersistenceException {

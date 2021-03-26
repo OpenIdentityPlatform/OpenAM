@@ -108,7 +108,7 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         if (stsInstanceState.getConfig().persistIssuedTokensInCTS()) {
             try {
                 ctsTokenPersistence.persistToken(invocationState.getStsInstanceId(), TokenType.OPENIDCONNECT,
-                        tokenString, subject, issueInstant, tokenConfig.getTokenLifetimeInSeconds());
+                        tokenString, subject,openIdConnectToken.get("jti").asString(), issueInstant, tokenConfig.getTokenLifetimeInSeconds());
             } catch (CTSTokenPersistenceException e) {
                 throw new TokenCreationException(e.getCode(), e.getMessage(), e);
             }

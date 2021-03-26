@@ -29,7 +29,7 @@ import java.util.List;
  * (performed during token validate), and of removing persisted instances (performed during token cancellation).
  */
 public interface CTSTokenPersistence {
-    CoreTokenField CTS_TOKEN_FIELD_STS_ID = CoreTokenField.STRING_ONE;
+    CoreTokenField CTS_TOKEN_FIELD_STS_ID = CoreTokenField.TOKEN_ID;
     CoreTokenField CTS_TOKEN_FIELD_STS_TOKEN_TYPE = CoreTokenField.STRING_TWO;
     /**
      * @param stsId The id of the sts instance persisting the token. Will be used to query for issued tokens later.
@@ -41,7 +41,7 @@ public interface CTSTokenPersistence {
      * @throws CTSTokenPersistenceException thrown if the underlying CTSPersistentStore throws a CoreTokenException during
      * the presistence operation
      */
-    void persistToken(String stsId, TokenType tokenType, String tokenString, String subjectId, long issueInstantMillis,
+    void persistToken(String stsId, TokenType tokenType, String tokenString, String subjectId,String jti, long issueInstantMillis,
                       long tokenLifetimeSeconds) throws CTSTokenPersistenceException;
 
     /**

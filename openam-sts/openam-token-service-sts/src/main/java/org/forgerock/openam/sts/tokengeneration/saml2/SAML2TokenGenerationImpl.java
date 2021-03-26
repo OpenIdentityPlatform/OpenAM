@@ -133,7 +133,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         if (stsInstanceState.getConfig().persistIssuedTokensInCTS()) {
             try {
                 ctsTokenPersistence.persistToken(invocationState.getStsInstanceId(), TokenType.SAML2, assertionString,
-                        subjectId, issueInstant.getTime(), saml2Config.getTokenLifetimeInSeconds());
+                        subjectId,null, issueInstant.getTime(), saml2Config.getTokenLifetimeInSeconds());
             } catch (CTSTokenPersistenceException e) {
                 throw new TokenCreationException(e.getCode(), e.getMessage(), e);
             }
