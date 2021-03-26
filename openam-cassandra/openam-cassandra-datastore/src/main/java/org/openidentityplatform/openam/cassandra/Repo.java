@@ -39,6 +39,7 @@ import org.forgerock.openam.utils.CrestQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 
@@ -144,6 +145,7 @@ public class Repo extends IdRepo {
 			logger.info("create session {}/{}",username,servers);
 			CqlSessionBuilder builder=CqlSession.builder()
 					.withApplicationName("OpenAM datastore: "+keyspace)
+					.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()))
 					.withKeyspace(keyspace);
 			if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
 				builder=builder.withAuthCredentials(username, password);

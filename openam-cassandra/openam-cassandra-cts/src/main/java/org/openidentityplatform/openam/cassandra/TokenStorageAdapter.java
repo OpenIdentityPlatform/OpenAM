@@ -193,7 +193,9 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
     		for(Relation clause : filter.clauses) { 
     			select=select.where(clause);
     		}
-    		//select=select.allowFiltering();
+    		if (filter.allowFilter()) {
+    			select=select.allowFiltering();
+    		}
     		if (query.getSizeLimit()>0)
     			select=select.limit(query.getSizeLimit());
     		final SimpleStatement statement=select.build();
@@ -232,7 +234,9 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
     		for(Relation clause : filter.clauses) { 
     			select=select.where(clause);
     		}
-    		//select=select.allowFiltering();
+    		if (filter.allowFilter()) {
+    			select=select.allowFiltering();
+    		}
     		if (query.getSizeLimit()>0)
     			select=select.limit(query.getSizeLimit());
     		final SimpleStatement statement=select.build();
@@ -283,9 +287,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		final Map<CoreTokenField, Object> res = new HashMap<CoreTokenField, Object>();
 		for (CoreTokenField field : fields) {
 			Object value = null;
-			if (CoreTokenField.TOKEN_TYPE.equals(field)) {
-				continue;
-			}else if (CoreTokenFieldTypes.isCalendar(field)) {
+			if (CoreTokenFieldTypes.isCalendar(field)) {
 				final Instant d = row.getInstant(field.toString());
 				if (d != null) {
 					value = Calendar.getInstance();

@@ -51,17 +51,18 @@ public class Filter {
 	public List<Relation> clauses=new ArrayList<Relation>();
 	public String getTable() {
 		for (String field: field2value.keySet()) {
-			if (StringUtils.equalsIgnoreCase("coreTokenString03",field)
-				||StringUtils.equalsIgnoreCase("coreTokenMultiString01",field)
+			if (StringUtils.equalsIgnoreCase("coreTokenMultiString01",field)
+				||StringUtils.equalsIgnoreCase("coreTokenString01",field)
 				||StringUtils.equalsIgnoreCase("coreTokenUserId",field)
-				||StringUtils.equalsIgnoreCase("coreTokenDate01",field)
-				||StringUtils.equalsIgnoreCase("coreTokenExpirationDate",field)
-				||StringUtils.equalsIgnoreCase("coreTokenDate02",field)
 				) {
 				return field;
 			}
 		}
 		return dataLayerConfiguration.getTableName();
+	}
+	
+	public Boolean allowFilter() {
+		return StringUtils.equalsIgnoreCase(getTable(), dataLayerConfiguration.getTableName());
 	}
 	
 	public static Filter and(List<Filter> filters) {

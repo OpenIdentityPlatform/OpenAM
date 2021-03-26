@@ -35,13 +35,11 @@ import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.tokens.CoreTokenField;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.sun.identity.shared.debug.Debug;
@@ -54,20 +52,19 @@ import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
 public class QueryBuilder extends org.forgerock.openam.sm.datalayer.api.query.QueryBuilder<CqlSession, Filter> {
 
     
-	private ConnectionFactory<CqlSession> connectionFactory;
+	//private ConnectionFactory<CqlSession> connectionFactory;
 
     /**
      * Default constructor ensures the Object Class is defined.
      *
      * @param debug To debug writer for this class.
      */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Inject
-    public QueryBuilder(    @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
-                            ConnectionFactory connectionFactoryProvider
+    public QueryBuilder(    @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug
+                            //,ConnectionFactory connectionFactoryProvider
                             ) {
         super(debug);
-        this.connectionFactory = connectionFactoryProvider;
+        //this.connectionFactory = connectionFactoryProvider;
     }
 
     /**

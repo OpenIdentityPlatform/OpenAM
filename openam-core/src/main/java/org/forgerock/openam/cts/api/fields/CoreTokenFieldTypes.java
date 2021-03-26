@@ -142,6 +142,7 @@ public class CoreTokenFieldTypes {
     public static boolean isString(CoreTokenField field) {
         switch (field) {
             case TOKEN_ID:
+            case TOKEN_TYPE:
             case USER_ID:
             case ETAG:
             case STRING_ONE:

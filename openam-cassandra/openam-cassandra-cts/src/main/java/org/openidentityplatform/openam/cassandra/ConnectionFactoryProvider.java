@@ -111,7 +111,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 					
 					CqlSessionBuilder builder=CqlSession.builder()
 							.withApplicationName("OpenAM CTS: "+keyspace)
-							.withConfigLoader(DriverConfigLoader.fromClasspath("/application.conf",this.getClass().getClassLoader()))
+							.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()))
 							.withKeyspace(keyspace);
 			//		if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
 			//			builder=builder.withAuthCredentials(username, password);
