@@ -337,7 +337,7 @@ public class SessionPersistenceStore {
             // Populate the return Map from the query results.
             Map<String, Long> sessions = new HashMap<String, Long>();
             for (PartialToken partialToken : partialTokens) {
-            	if (!"SESSION".equals(partialToken.getValue(CoreTokenField.TOKEN_TYPE))) {
+            	if (!"SESSION".equals(partialToken.getValue(CoreTokenField.TOKEN_TYPE).toString())) {
             		continue;
             	}
                 // Session ID
