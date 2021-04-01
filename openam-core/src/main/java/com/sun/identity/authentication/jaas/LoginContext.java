@@ -25,6 +25,7 @@
  * $Id: LoginContext.java,v 1.6 2008/09/22 23:19:42 manish_rustagi Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Identity Platform Community.
  */
 
 package com.sun.identity.authentication.jaas;
