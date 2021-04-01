@@ -25,6 +25,7 @@
  * $Id: LoginContext.java,v 1.6 2008/09/22 23:19:42 manish_rustagi Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Identity Platform Community.
  */
 
 package com.sun.identity.authentication.jaas;
@@ -428,6 +429,14 @@ public class LoginContext implements org.forgerock.openam.authentication.service
             throw new LoginException("Login Failure: all modules ignored");
         }
     }
+    
+	public LinkedList<ModuleInfo> getModuleStackQueue() {
+		return moduleStackQueue;
+	}
+
+	public void setModuleStackQueue(LinkedList<ModuleInfo> moduleStackQueue) {
+		this.moduleStackQueue = moduleStackQueue;
+	}
 
     // Exception holder class. Prompts InvalidPasswordExceptions above other LoginException types.
     private static class ExceptionHolder {
@@ -468,7 +477,7 @@ public class LoginContext implements org.forgerock.openam.authentication.service
      * LoginModule information -
      *      encapsulates Configuration info and actual module instances.
      */
-    static class ModuleInfo {
+    public static class ModuleInfo {
         private AppConfigurationEntry entry;
         private Object module;
 
@@ -481,4 +490,5 @@ public class LoginContext implements org.forgerock.openam.authentication.service
             return module;
         }
     }
+
 }
