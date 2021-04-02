@@ -25,6 +25,7 @@
  * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Identity Platform Community.
  */
 
 package com.sun.identity.idm.server;
@@ -1536,9 +1537,11 @@ public class IdServicesImpl implements IdServices {
            try {
                Map cMap = idRepo.getConfiguration();
                RepoSearchResults results;
-
+               
+               Map mappedAttributes = mapAttributeNames(avPairs, cMap);
+               
                results = idRepo.search(token, type, crestQuery, maxTime, maxResults, returnAttrs,
-                           returnAllAttrs, filterOp, avPairs, recursive);
+                           returnAllAttrs, filterOp, mappedAttributes, recursive);
 
                if (idRepo.getClass().getName()
                        .equals(IdConstants.AMSDK_PLUGIN)) {
