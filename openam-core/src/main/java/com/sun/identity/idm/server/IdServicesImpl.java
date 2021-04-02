@@ -1539,8 +1539,9 @@ public class IdServicesImpl implements IdServices {
                RepoSearchResults results;
                
                Map mappedAttributes = mapAttributeNames(avPairs, cMap);
+               Set mappedReturnAttrs = mapAttributeNames(returnAttrs, cMap);
                
-               results = idRepo.search(token, type, crestQuery, maxTime, maxResults, returnAttrs,
+               results = idRepo.search(token, type, crestQuery, maxTime, maxResults, mappedReturnAttrs,
                            returnAllAttrs, filterOp, mappedAttributes, recursive);
 
                if (idRepo.getClass().getName()
