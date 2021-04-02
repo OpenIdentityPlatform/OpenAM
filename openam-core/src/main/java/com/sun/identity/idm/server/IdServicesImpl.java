@@ -1543,7 +1543,7 @@ public class IdServicesImpl implements IdServices {
                
                results = idRepo.search(token, type, crestQuery, maxTime, maxResults, mappedReturnAttrs,
                            returnAllAttrs, filterOp, mappedAttributes, recursive);
-               
+
                if (idRepo.getClass().getName()
                        .equals(IdConstants.AMSDK_PLUGIN)) {
                    amsdkResults[0][0] = results;
