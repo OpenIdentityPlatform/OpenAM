@@ -26,7 +26,7 @@ require.config({
     paths: {
         "handlebars": "libs/handlebars-4.7.6",
         "i18next": "libs/i18next-1.7.3-min",
-        "jquery": "libs/jquery-3.5.1-min",
+        "jquery": "libs/jquery-2.1.1-min",
         "lodash": "libs/lodash-3.10.1-min",
         "redux": "libs/redux-3.5.2-min",
         "text": "libs/text-2.0.15"

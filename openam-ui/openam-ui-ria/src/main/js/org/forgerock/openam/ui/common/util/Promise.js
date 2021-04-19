@@ -33,9 +33,11 @@ define([
             if (promises.length) {
                 return $.when(...promises).then(function () {
                     const args = Array.prototype.slice.call(arguments);
+
                     if (args.length === 1 || promises.length !== 1) {
                         return args;
                     }
+
                     return [args];
                 });
             } else {
