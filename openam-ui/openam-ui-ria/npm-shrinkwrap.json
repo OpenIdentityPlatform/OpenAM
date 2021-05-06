@@ -4643,9 +4643,9 @@
       }
     },
     "lodash": {
-      "version": "4.17.13",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.13.tgz",
-      "integrity": "sha1-C9w6atyHPS9ODEusKF35G2T8e5M=",
+      "version": "4.17.21",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
+      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
       "dev": true
     },
     "lodash._arraycopy": {
