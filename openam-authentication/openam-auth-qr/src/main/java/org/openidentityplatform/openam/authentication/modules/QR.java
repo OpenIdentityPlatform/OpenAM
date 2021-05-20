@@ -83,7 +83,7 @@ public class QR extends AMLoginModule {
 				}else  {
 					final String secret=new String(((PasswordCallback)cb[0]).getPassword());
 					try {
-						Session pre_session=Session.getSession(new SessionID(Crypt.decode(secret)));
+						Session pre_session=Session.getSession(new SessionID(Crypt.decryptLocal(secret)));
 						if (pre_session!=null) {
 							pre_session.setProperty("am.protected.qr.uid",ls.getOldSession().getProperty("am.protected.oauth2.uid")!=null?ls.getOldSession().getProperty("am.protected.oauth2.uid"):ls.getOldSession().getProperty("sun.am.UniversalIdentifier"));
 							ls.setReceivedCallback_NoThread(null); //reset last received callback
@@ -126,7 +126,7 @@ public class QR extends AMLoginModule {
 		if (qr!=null)
 			return qr;
 		try {
-			final String secret=Crypt.encode(makeSecret());
+			final String secret=Crypt.encryptLocal(makeSecret());
 			final ByteArrayOutputStream out = new ByteArrayOutputStream();
 			MatrixToImageWriter.writeToStream(new MultiFormatWriter().encode(secret, BarcodeFormat.QR_CODE, 300, 300), "PNG", out);
 			qr=new Callback[]{
