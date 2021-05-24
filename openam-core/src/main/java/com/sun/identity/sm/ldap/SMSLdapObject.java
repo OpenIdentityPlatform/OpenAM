@@ -907,7 +907,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
          * Construct the filter here in SMSLdapObject or the plugin
          * implementation to support JDBC or other data store.
          */
-        String[] objs = {filter};
+        String[] objs = {LDAPUtils.escapeValue(filter)};
 
         String FILTER_PATTERN_ORG = "(&(objectclass="
                 + SMSEntry.OC_REALM_SERVICE + ")(" + SMSEntry.ORGANIZATION_RDN
