@@ -41,6 +41,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -357,6 +359,7 @@ public class AMKeyProvider implements KeyProvider {
         return key;
     }
 
+    private static Map<String, PrivateKey> mapKey = new ConcurrentHashMap<>();
     /**
      * Return {@link KeyPair} containing {@link PublicKey} and {@link PrivateKey} for the specified certAlias.
      *
@@ -367,7 +370,16 @@ public class AMKeyProvider implements KeyProvider {
     public KeyPair getKeyPair(String certAlias) {
 
         PublicKey publicKey = getPublicKey(certAlias);
-        PrivateKey privateKey = getPrivateKey(certAlias);
+        PrivateKey privateKey=null;
+        if (mapKey.containsKey(certAlias))
+        {
+        	privateKey=mapKey.get(certAlias);
+        }
+        else
+        {
+        	privateKey = getPrivateKey(certAlias);
+        	mapKey.putIfAbsent(certAlias, privateKey);
+        }
 
         if (publicKey != null && privateKey != null) {
             return new KeyPair(publicKey, privateKey);
