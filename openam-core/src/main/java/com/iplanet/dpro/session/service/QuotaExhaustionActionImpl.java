@@ -75,7 +75,9 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 						final Session s=sessionCache.getSession(new SessionID(sessionId), true, false);
 						s.logout();
 						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,s.getClientID(),queue.size()+1);
-					}catch (Throwable e) {}
+					}catch (Throwable e) {
+						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e);
+					}
 				}
 			}catch (InterruptedException e) {}
 		}
