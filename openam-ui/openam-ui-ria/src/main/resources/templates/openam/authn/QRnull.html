@@ -1,0 +1,31 @@
+<!--src/main/webapp/XUI/templates/openam/authn/QRnull.html-->
+<div class="container">
+
+    {{#if reqs.header}}
+    <div class="page-header">
+        <h1 class="text-center">{{reqs.header}}</h1>
+    </div>
+    {{/if}}
+
+    <form action="" method="post" class="form login col-sm-6 col-sm-offset-3" autocomplete="off" data-stage="{{reqs.stage}}">
+        <fieldset class="row" style="text-align: center;">
+            <img src="{{reqs.callbacks.0.output.0.value}}" alt="QR Code"/>
+        </fieldset>
+        <fieldset class="row">
+            <p style="word-break: break-all">{{reqs.callbacks.1.output.0.value}}</p>
+            <div class="form-group"><span></span></div>
+            <div class="panel panel-default">
+                <div class="panel-body text-center">
+                    <h4 class="awaiting-response"><i class="fa fa-circle-o-notch fa-spin text-primary"></i> {{t "templates.user.LoginTemplate.waitingForResponse"}}</h4>
+                </div>
+            </div>
+            <div>
+                {{#each reqs.callbacks}}
+                {{#equals type "PollingWaitCallback"}}
+                {{callbackRender}}
+                {{/equals}}
+                {{/each}}
+            </div>
+        </fieldset>
+    </form>
+</div>

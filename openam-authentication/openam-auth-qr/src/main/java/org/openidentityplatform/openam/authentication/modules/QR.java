@@ -12,6 +12,7 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.session.service.access.SessionQueryManager;
 
 import com.google.zxing.BarcodeFormat;
@@ -35,23 +36,23 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 
 public class QR extends AMLoginModule {
-	
-    private static Debug debug = Debug.getInstance("amAuthQR");
-	
+
+	private static Debug debug = Debug.getInstance("amAuthQR");
+
 	public QR() {
 		super();
 	}
 
 	public @SuppressWarnings("rawtypes") Map options;
 	public @SuppressWarnings("rawtypes") Map sharedState;
-	
+
 	@Override
-	@SuppressWarnings("rawtypes") 
+	@SuppressWarnings("rawtypes")
 	public void init(Subject subject, Map sharedState, Map options) {
-    	this.options=options;
-	    this.sharedState=sharedState;
+		this.options=options;
+		this.sharedState=sharedState;
 	}
-	
+
 	Principal principal=null;
 	@Override
 	public int process(Callback[] in_callbacks, int state) throws LoginException {
@@ -66,19 +67,19 @@ public class QR extends AMLoginModule {
 					final String uid=session.getProperty("am.protected.qr.uid");
 					if (uid!=null) {
 						try {
-			    			setAuthLevel(Integer.parseInt(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.QR.authlevel","0")));
-			    		} catch (Exception e) {
-			    			setAuthLevel(0);
-			    		}
+							setAuthLevel(Integer.parseInt(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.QR.authlevel","0")));
+						} catch (Exception e) {
+							setAuthLevel(0);
+						}
 						principal=new QRPrincipal(uid);
-						return ISAuthConstants.LOGIN_SUCCEED; 
+						return ISAuthConstants.LOGIN_SUCCEED;
 					}
 				}
 				getCallbackHandler().handle(getQR());
 			}else { //submit QR
 				if (cb==null || cb.length==0) {
 					getCallbackHandler().handle(
-						requestQR()
+							requestQR()
 					);
 				}else  {
 					final String secret=new String(((PasswordCallback)cb[0]).getPassword());
@@ -93,25 +94,25 @@ public class QR extends AMLoginModule {
 					throw new UserNamePasswordValidationException("Invalid token");
 				}
 			}
-        }catch (Exception e) {
-	        debug.warning("{}: {}",(e instanceof AuthLoginException)?((AuthLoginException)e).getMessage():"error",(e instanceof AuthLoginException) ? e.toString():e);
-	        throw (e instanceof AuthLoginException)?(AuthLoginException)e:new UserNamePasswordValidationException(e);
-       	}
-		return ISAuthConstants.LOGIN_IGNORE; 
+		}catch (Exception e) {
+			debug.warning("{}: {}",(e instanceof AuthLoginException)?((AuthLoginException)e).getMessage():"error",(e instanceof AuthLoginException) ? e.toString():e);
+			throw (e instanceof AuthLoginException)?(AuthLoginException)e:new UserNamePasswordValidationException(e);
+		}
+		return ISAuthConstants.LOGIN_IGNORE;
 	}
 
 	protected Callback[] sendOK() {
 		return new Callback[]{
 				new PagePropertiesCallback("QR", "QR code correct", null, 1*60, "Login.jsp", false, null)
 				,new TextOutputCallback(TextOutputCallback.INFORMATION,"OK")
-			};
+		};
 	}
 
 	protected Callback[] requestQR() {
 		return new Callback[]{
 				new PagePropertiesCallback("QR", "Please enter secret from QR code", null, 1*60, "Login.jsp", false, null)
 				,new PasswordCallback("Secret from QR", false)
-			};
+		};
 	}
 
 
@@ -119,8 +120,8 @@ public class QR extends AMLoginModule {
 	public Principal getPrincipal() {
 		return principal;
 	}
-	
-	
+
+
 	Callback[] qr=null;
 	protected Callback[] getQR() {
 		if (qr!=null)
@@ -133,13 +134,14 @@ public class QR extends AMLoginModule {
 					new PagePropertiesCallback("QR", "Please scan QR code", null, 1*60, "Login.jsp", false, null)
 					,new TextOutputCallback(TextOutputCallback.INFORMATION, "data:image/png;base64,".concat(Base64.getEncoder().encodeToString(out.toByteArray())))
 					,new TextOutputCallback(TextOutputCallback.INFORMATION,secret)
-				};
+					,new PollingWaitCallback("10000")
+			};
 		}catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		return qr;
 	}
-	
+
 	String makeSecret() throws AuthLoginException {
 		//make session
 		final LoginState ls=getLoginState(QR.class.getName());
@@ -150,13 +152,13 @@ public class QR extends AMLoginModule {
 		is.putProperty("sun.am.UniversalIdentifier",uid);
 		is.setMaxCachingTime(1);
 		is.setMaxIdleTime(2);
-		is.setMaxSessionTime(maxSecretTime());  
+		is.setMaxSessionTime(maxSecretTime());
 		is.setType(SessionType.USER);
 		is.activate(uid);
 		InjectorHolder.getInstance(AuthenticationSessionStore.class).promoteSession(is.getID());
 		return is.getSessionID().toString();
 	}
-	
+
 	protected long maxSecretTime() {
 		try {
 			return Long.parseLong(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.QR.maxSecretTime","20"));
