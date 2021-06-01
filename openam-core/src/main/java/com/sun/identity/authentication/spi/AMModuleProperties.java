@@ -168,7 +168,7 @@ class AMModuleProperties {
         AMModuleProperties prop = new AMModuleProperties(fileName,
                                             servletContext);
         propertiesList = prop.getCallbacks();
-        if (CollectionUtils.isEmpty(propertiesList)) {
+        if (propertiesList!=null) {
            synchronized(moduleProps) {
                 moduleProps.put(fileName, propertiesList);
            }
