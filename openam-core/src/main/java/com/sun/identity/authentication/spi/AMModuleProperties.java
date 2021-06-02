@@ -45,6 +45,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -77,38 +79,48 @@ class AMModuleProperties {
     private static final String amAuth = "amAuth";
     private static Debug debug = Debug.getInstance(amAuth);
 
+    static ConcurrentHashMap<String, Document> cacheDoc=new ConcurrentHashMap<String, Document>();
+    
     AMModuleProperties(
         String fileName,
         ServletContext servletContext
     ) throws AuthLoginException { 
-        InputStream in = null;
-        try {
-            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
-            if (servletContext != null) {
-                in = servletContext.getResourceAsStream(fileName);
-            }
-            if (in == null) {
-                in = Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(fileName.substring(1));
-                // remove leading '/' from fileName
-            }
-            Document doc = builder.parse(in);
-            in.close();
-            walk(doc);
-            for(int i=1; i<=rtable.size(); i++) {
-                Callback[] cb = (Callback[]) rtable.get(Integer.toString(i));
-                page.add(cb);
-            }
-        } catch(Exception e) {
-            debug.error("AMModuleProperties, parse file :" +fileName);
-            debug.error("AMModuleProperties, parser error :" , e);
-            throw new AuthLoginException(amAuth, "getModulePropertiesError", 
-                null);
-        } finally {
-            try {
-                in.close();
-            } catch (Exception ee) {
-            }
+    	Document doc = cacheDoc.get(fileName);
+    	if (doc==null) {
+    		synchronized (fileName) {
+    			if (doc==null) {
+    				InputStream in = null;
+    		        try {
+    		            final DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
+    		            if (servletContext != null) {
+    		                in = servletContext.getResourceAsStream(fileName);
+    		            }
+    		            if (in == null) {
+    		                in = Thread.currentThread().getContextClassLoader()
+    		                    .getResourceAsStream(fileName.substring(1));
+    		                // remove leading '/' from fileName
+    		            }
+    		            doc = builder.parse(in);
+    		            cacheDoc.put(fileName, doc);
+    		            in.close();
+    		        } catch(Exception e) {
+    		            debug.error("AMModuleProperties, parse file :" +fileName);
+    		            debug.error("AMModuleProperties, parser error :" , e);
+    		            throw new AuthLoginException(amAuth, "getModulePropertiesError", 
+    		                null);
+    		        } finally {
+    		            try {
+    		                in.close();
+    		            } catch (Exception ee) {
+    		            }
+    		        }
+    			}
+			}
+    	}
+    	walk(doc);
+        for(int i=1; i<=rtable.size(); i++) {
+            Callback[] cb = (Callback[]) rtable.get(Integer.toString(i));
+            page.add(cb);
         }
     }
    
@@ -168,7 +180,7 @@ class AMModuleProperties {
         AMModuleProperties prop = new AMModuleProperties(fileName,
                                             servletContext);
         propertiesList = prop.getCallbacks();
-        if (propertiesList!=null) {
+        if (CollectionUtils.isEmpty(propertiesList)) {
            synchronized(moduleProps) {
                 moduleProps.put(fileName, propertiesList);
            }
