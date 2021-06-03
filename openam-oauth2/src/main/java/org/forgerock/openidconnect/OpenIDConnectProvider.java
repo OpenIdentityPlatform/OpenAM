@@ -112,10 +112,10 @@ public class OpenIDConnectProvider {
                 tokenManager.destroyToken(token);
             }
         } catch (CoreTokenException e) {
-            logger.error("Unable to get id_token meta data", e);
+            logger.warn("Unable to get id_token meta data", e);
             throw new ServerException("Unable to get id_token meta data");
         } catch (Exception e) {
-            logger.error("Unable to get SsoTokenManager", e);
+            logger.warn("Unable to get SsoTokenManager", e);
             throw new ServerException("Unable to get SsoTokenManager");
         }
     }
