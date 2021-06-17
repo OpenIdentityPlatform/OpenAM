@@ -39,17 +39,22 @@
 			<dependency>
 			    <groupId>com.datastax.oss</groupId>
 			    <artifactId>java-driver-core</artifactId>
-			    <version>4.11.0</version>
+			    <version>4.12.0</version>
 			</dependency>
 			<dependency>
 			  <groupId>com.datastax.oss</groupId>
 			  <artifactId>java-driver-query-builder</artifactId>
-			  <version>4.11.0</version>
+			  <version>4.12.0</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.apache.cassandra</groupId>
 			    <artifactId>cassandra-all</artifactId>
-			    <version>4.0-beta4</version>
+			    <version>4.0-rc1</version>
+			</dependency>
+			<dependency>
+			    <groupId>com.google.guava</groupId>
+			    <artifactId>failureaccess</artifactId>
+			    <version>1.0.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
