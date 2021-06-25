@@ -1,7 +1,7 @@
 # How-to:
 Build docker image:
 
-    docker build . -t openidentityplatform/openam
+    docker build . -t openidentityplatform/openam --build-arg VERSION=OPENAM_RELEASE
 
 Run image
 
