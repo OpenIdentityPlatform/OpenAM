@@ -2275,8 +2275,8 @@
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<version>1.7.10</version>
+				<artifactId>cargo-maven3-plugin</artifactId>
+				<version>1.9.5</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
