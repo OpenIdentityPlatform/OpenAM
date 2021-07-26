@@ -1,0 +1,1 @@
+[How to Use Apache Cassandra as User DataStore in OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Use-Apache-Cassandra-as-User-DataStore-in-OpenAM)  

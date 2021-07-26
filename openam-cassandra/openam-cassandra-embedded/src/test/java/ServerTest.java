@@ -20,7 +20,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.IdRepoException;
 
 import org.openidentityplatform.openam.cassandra.embedded.Server;
@@ -30,16 +29,17 @@ public class ServerTest {
 	static Server cassandra;
 	
 	@BeforeClass
-	public static void init() throws SSOException, IdRepoException{
+	public static void init() throws  IdRepoException{
 	}
 	
 	@AfterClass
-	public static void destory() throws SSOException, IdRepoException{
+	public static void destory() throws  IdRepoException{
 	}
 	
 	@Test
-	public void start_test() throws SSOException, IdRepoException{
+	public void start_test() throws  IdRepoException{
 		cassandra=new Server();
 		cassandra.run();
+		cassandra.close();
 	}
 }

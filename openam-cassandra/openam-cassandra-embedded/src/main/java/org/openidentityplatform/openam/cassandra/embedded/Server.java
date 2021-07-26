@@ -92,7 +92,7 @@ public class Server implements Runnable, Closeable {
 		        		logger.info("{}",StringUtils.normalizeSpace(statement));
 		        	}catch (Exception e) {
 						logger.error("{}: {}",StringUtils.normalizeSpace(statement),e.getMessage());
-						assert false : "error in import.cql";
+						assert false : "error in import.cql"+e.getMessage();
 					}
 				} 
 	        	session.close();
