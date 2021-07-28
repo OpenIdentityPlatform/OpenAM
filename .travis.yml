@@ -53,12 +53,12 @@ jobs:
       - echo 'after_deploy'
       - echo 'build and push Docker'
       -   echo "$DOCKER_PASSWORD" | docker login -u "openidentityplatformcommunity" --password-stdin
-      -   docker build ./openam-distribution/openam-distribution-docker/target -t openidentityplatform/openam -t openidentityplatform/openam:$git_version
+      -   docker build ./openam-distribution/openam-distribution-docker/target -t openidentityplatform/openam -t openidentityplatform/openam:$git_version --build-arg VERSION=$git_version
       -   docker push openidentityplatform/openam:$git_version
       -   docker push openidentityplatform/openam
       - echo 'build and push Github Docker'
       -   echo "$GITHUBKEY" | docker login -u "Open Identity Platform Community" docker.pkg.github.com --password-stdin
-      -   docker build ./openam-distribution/openam-distribution-docker/target -t docker.pkg.github.com/openidentityplatform/openam/openam -t docker.pkg.github.com/openidentityplatform/openam/openam:$git_version
+      -   docker build ./openam-distribution/openam-distribution-docker/target -t docker.pkg.github.com/openidentityplatform/openam/openam -t docker.pkg.github.com/openidentityplatform/openam/openam:$git_version  --build-arg VERSION=$git_version
       -   docker push docker.pkg.github.com/openidentityplatform/openam/openam:$git_version
       -   docker push docker.pkg.github.com/openidentityplatform/openam/openam 
   - os: osx
