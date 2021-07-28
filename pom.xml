@@ -103,7 +103,6 @@
     <!--         <jaxrpc-impl.version>1.1.3_01-20160905</jaxrpc-impl.version> -->
     <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
     <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
-    <jdom.version>2.0.1</jdom.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
     <jstl.version>1.2.5</jstl.version>
     <mockito.version>2.23.4</mockito.version>
@@ -1207,11 +1206,6 @@
         <version>${jaxrpc-spi.version}</version>
       </dependency>
       <!-- TODO jmx -->
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom</artifactId>
-        <version>${jdom.version}</version>
-      </dependency>
 	<dependency>
 	    <groupId>org.glassfish.jersey.bundles</groupId>
 	    <artifactId>jaxrs-ri</artifactId>
