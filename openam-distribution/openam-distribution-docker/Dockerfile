@@ -3,9 +3,9 @@ FROM tomcat:8.5-jdk8
 MAINTAINER Open Identity Platform Community <open-identity-platform-openam@googlegroups.com>
 
 ENV CATALINA_HOME=/usr/local/tomcat \
-    PATH=$CATALINA_HOME/bin:$PATH \
     OPENAM_USER="openam" \
-    OPENAM_DATA_DIR="/usr/openam/config" \
+    OPENAM_DATA_DIR="/usr/openam/config"    
+ENV PATH=$CATALINA_HOME/bin:$PATH \
     CATALINA_OPTS="-Xmx2048m -server -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
 WORKDIR $CATALINA_HOME
