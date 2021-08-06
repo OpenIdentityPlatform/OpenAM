@@ -28,7 +28,12 @@ This project is licensed under the [Common Development and Distribution License 
 * [OpenAM Web Policy Agent Apache 2.4](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
 * [OpenAM Web Policy Agent (IIS  Windows x32/x64 ZIP)](https://ci.appveyor.com/api/buildjobs/cnebrw2f43my9vxr/artifacts/IIS_WINNT_4.1.0.zip)
 
+
+**[OpenAM Quick Start Guide](https://github.com/OpenIdentityPlatform/OpenAM/wiki/Quick-Start-Guide)**
+
 ## How-to build
+To build OpenAM from source you should use JDK 8
+
 For windows use:
 ```bash
 git config --system core.longpaths true
