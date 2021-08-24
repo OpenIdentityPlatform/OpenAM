@@ -766,15 +766,19 @@ public class Session implements Blacklistable, AMSession{
 	       info = operation.refresh(this, flag);
         }catch (SessionException e) {
         	//for remote session - try recover from remote server
-        	if (!InjectorHolder.getInstance(SessionServerConfig.class).isLocalServer(this.getSessionID().getExtension().getPrimaryID()) ) {
-        		 //sessionCache = SessionCache.getInstance();
-                 sessionCookies = SessionCookies.getInstance();
-                 sessionServiceURLService = SessionServiceURLService.getInstance();
-                 sessionOperationStrategy = new ClientSdkSessionOperationStrategy(new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), sessionServiceURLService));
-                 operation = sessionOperationStrategy.getOperation(this.getID());
-      	       	 info = operation.refresh(this, flag);
-			}
-			throw e;
+        	try{
+	        	if (!InjectorHolder.getInstance(SessionServerConfig.class).isLocalServer(this.getSessionID().getExtension().getPrimaryID()) ) {
+	        		 //sessionCache = SessionCache.getInstance();
+	                 sessionCookies = SessionCookies.getInstance();
+	                 sessionServiceURLService = SessionServiceURLService.getInstance();
+	                 sessionOperationStrategy = new ClientSdkSessionOperationStrategy(new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), sessionServiceURLService));
+	                 operation = sessionOperationStrategy.getOperation(this.getID());
+	      	       	 info = operation.refresh(this, flag);
+	        	}
+        	}catch (NoClassDefFoundError e2) {
+	    	   sessionDebug.warning("{}",e2.toString(),e2);
+	       }
+	       throw e;
 		}
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
