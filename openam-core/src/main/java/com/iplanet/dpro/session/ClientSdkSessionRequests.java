@@ -47,9 +47,9 @@ public class ClientSdkSessionRequests {
     private final Debug sessionDebug;
 
     public ClientSdkSessionRequests(final Debug debug, final SessionPLLSender pllSender) {
-        if (SystemProperties.isServerMode()) {
-            throw new IllegalStateException("Attempted to create ClientSdkSessionRequests in server mode");
-        }
+//        if (SystemProperties.isServerMode()) {
+//            throw new IllegalStateException("Attempted to create ClientSdkSessionRequests in server mode");
+//        }
         this.sessionDebug = debug;
         this.pllSender = pllSender;
     }

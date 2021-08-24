@@ -57,6 +57,7 @@ import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.operations.strategies.ClientSdkOperations;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.dpro.session.share.SessionBundle;
@@ -86,15 +87,15 @@ public class Session implements Blacklistable, AMSession{
     public static final String CACHED_BASE_POLLING_PROPERTY = "com.iplanet.am.session.client.polling.cacheBased";
     private static final Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
-    private final SessionCookies sessionCookies;
+    private SessionCookies sessionCookies;
     private final SessionCache sessionCache;
-    private final SessionServiceURLService sessionServiceURLService;
+    private SessionServiceURLService sessionServiceURLService;
 
     /*
      * Used instead of SessionService in order to avoid potential issues in the ClientSDK. Should eventually not be used
      * here.
      */
-    private final SessionOperationStrategy sessionOperationStrategy;
+    private SessionOperationStrategy sessionOperationStrategy;
 
     /**
      * Defines the type of Session that has been created.
@@ -758,10 +759,23 @@ public class Session implements Blacklistable, AMSession{
    private void doRefresh(boolean reset) throws SessionException {
         boolean flag = reset || needToReset;
         needToReset = false;
-
-       SessionOperations operation = sessionOperationStrategy.getOperation(this.getID());
-       SessionInfo info = operation.refresh(this, flag);
-
+        SessionOperations operation;
+        SessionInfo info;
+        try {
+	       operation = sessionOperationStrategy.getOperation(this.getID());
+	       info = operation.refresh(this, flag);
+        }catch (SessionException e) {
+        	//for remote session - try recover from remote server
+        	if (!InjectorHolder.getInstance(SessionServerConfig.class).isLocalServer(this.getSessionID().getSessionServerID()) ) {
+        		 //sessionCache = SessionCache.getInstance();
+                 sessionCookies = SessionCookies.getInstance();
+                 sessionServiceURLService = SessionServiceURLService.getInstance();
+                 sessionOperationStrategy = new ClientSdkSessionOperationStrategy(new ClientSdkOperations(sessionDebug, new SessionPLLSender(sessionCookies), sessionServiceURLService));
+                 operation = sessionOperationStrategy.getOperation(this.getID());
+      	       	 info = operation.refresh(this, flag);
+			}
+			throw e;
+		}
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
         long oldMaxSessionTime = maxSessionTime;
