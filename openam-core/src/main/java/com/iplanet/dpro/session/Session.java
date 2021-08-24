@@ -766,7 +766,7 @@ public class Session implements Blacklistable, AMSession{
 	       info = operation.refresh(this, flag);
         }catch (SessionException e) {
         	//for remote session - try recover from remote server
-        	if (!InjectorHolder.getInstance(SessionServerConfig.class).isLocalServer(this.getSessionID().getSessionServerID()) ) {
+        	if (!InjectorHolder.getInstance(SessionServerConfig.class).isLocalServer(this.getSessionID().getExtension().getPrimaryID()) ) {
         		 //sessionCache = SessionCache.getInstance();
                  sessionCookies = SessionCookies.getInstance();
                  sessionServiceURLService = SessionServiceURLService.getInstance();
