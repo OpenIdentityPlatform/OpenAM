@@ -100,12 +100,6 @@ public class Server implements Runnable, Closeable {
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-            	close();
-            }
-        });
 	}
 
 	public void close() {
