@@ -40,6 +40,5 @@ public class ServerTest {
 	public void start_test() throws  IdRepoException{
 		cassandra=new Server();
 		cassandra.run();
-		cassandra.close();
 	}
 }
