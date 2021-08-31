@@ -2489,6 +2489,7 @@
 					</execution>
 					<execution>
 						<id>install-jar-authapi</id>
+						<goals>
 							<goal>install-file</goal>
 						</goals>
 						<phase>validate</phase>
