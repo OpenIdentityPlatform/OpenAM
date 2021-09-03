@@ -1,0 +1,33 @@
+name: Build Maven
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Maven build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java: [ '8']
+        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Java ${{ matrix.Java }} (${{ matrix.os }})
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'adopt'
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+         path: ~/.m2/repository
+         key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
+         restore-keys: ${{ runner.os }}-m2-repository
+    - name: Build with Maven
+      env:
+        MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
+      run: mvn --batch-mode  --update-snapshots package --file pom.xml
