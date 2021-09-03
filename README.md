@@ -1,6 +1,7 @@
 ## <img alt="OpenAM Logo" src="https://github.com/OpenIdentityPlatform/OpenAM/raw/master/logo.png" width="300"/>
 [![Latest release](https://img.shields.io/github/release/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/releases)
-[![Build](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/maven.yml/badge.svg)](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/maven.yml)
+[![Build](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/build.yml/badge.svg)](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/build.yml)
+[![Deploy](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/deploy.yml/badge.svg)](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/deploy.yml)
 [![Issues](https://img.shields.io/github/issues/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/issues)
 [![Last commit](https://img.shields.io/github/last-commit/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/commits/master)
 [![License](https://img.shields.io/badge/license-CDDL-blue.svg)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md)
