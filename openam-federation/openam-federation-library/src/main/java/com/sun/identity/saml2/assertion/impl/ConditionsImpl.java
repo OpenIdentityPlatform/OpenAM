@@ -350,31 +350,45 @@ public class ConditionsImpl implements Conditions {
      * Return true if a specific Date falls within the validity 
      * interval of this set of conditions.
      *
-     * @param someTime Any time in milliseconds. 
+     * @param someTime Any time in milliseconds.
+     * @param skewSeconds Clock skew in seconds. 
      * @return true if <code>someTime</code> is within the valid 
      * interval of the <code>Conditions</code>.     
      */
-    public boolean checkDateValidity(long someTime) {
+    public boolean checkDateValidity(long someTime, int skewSeconds) {
+    	int skew = skewSeconds * 1000;
         if (notBefore == null ) {
             if (notOnOrAfter == null) {
                 return true;
             } else {
-                if (someTime < notOnOrAfter.getTime()) {
+                if (someTime < notOnOrAfter.getTime() + skew) {
                     return true;
                 }
             }
         } else if (notOnOrAfter == null ) {
-            if (someTime >= notBefore.getTime()) {
+            if (someTime >= notBefore.getTime() - skew) {
                 return true;
             }
-        } else if ((someTime >= notBefore.getTime()) && 
-            (someTime < notOnOrAfter.getTime()))
+        } else if ((someTime >= notBefore.getTime() - skew) && 
+            (someTime < notOnOrAfter.getTime() + skew))
         {
             return true; 
         }
         return false;
     }
 
+    /**
+     * Return true if a specific Date falls within the validity 
+     * interval of this set of conditions.
+     *
+     * @param someTime Any time in milliseconds. 
+     * @return true if <code>someTime</code> is within the valid 
+     * interval of the <code>Conditions</code>.     
+     */
+    public boolean checkDateValidity(long someTime) {
+    	return checkDateValidity(someTime, 0);
+    }
+    
    /**
     * Returns a String representation
     * @param includeNSPrefix Determines whether or not the namespace 

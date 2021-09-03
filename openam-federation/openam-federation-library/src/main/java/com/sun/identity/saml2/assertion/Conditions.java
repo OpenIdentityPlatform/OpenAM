@@ -149,6 +149,18 @@ public interface Conditions {
      */
     public boolean checkDateValidity(long someTime);
 
+    /**
+     * Return true if a specific Date falls within the validity 
+     * interval of this set of conditions.
+     *
+     * @param someTime a time in milliseconds.
+     * @param skew allowed clock skew in seconds.
+     *  
+     * @return true if <code>someTime</code> is within the valid 
+     * interval of the <code>Conditions</code>.     
+     */
+    boolean checkDateValidity(long someTime, int skew);
+    
    /**
     * Returns a String representation
     * @param includeNSPrefix Determines whether or not the namespace
