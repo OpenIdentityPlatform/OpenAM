@@ -1,3 +1,17 @@
+/**
+ * DO NOT ALTER OR REMOVE THIS HEADER.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ */
 package com.sun.identity.saml2.assertion.impl;
 
 import static org.testng.Assert.assertTrue;
@@ -25,12 +39,22 @@ public class ConditionsImplTest {
 	}
 
 	@Test
+	public void testSuccess() throws Exception {
+		Conditions conditions = new ConditionsImpl();
+		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
+		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
+
+		long instant = validFrom.plusSeconds(30).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant));
+	}
+
+	@Test
 	public void testTooEarly() throws Exception {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(30).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now));
+		long instant = validFrom.minusSeconds(30).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant));
 	}
 
 	@Test
@@ -38,8 +62,8 @@ public class ConditionsImplTest {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(30).toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validFrom.minusSeconds(30).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -47,8 +71,8 @@ public class ConditionsImplTest {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(80).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validFrom.minusSeconds(80).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -56,8 +80,8 @@ public class ConditionsImplTest {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(30).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now));
+		long instant = validTo.plusSeconds(30).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant));
 	}
 
 	@Test
@@ -65,8 +89,8 @@ public class ConditionsImplTest {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(30).toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validTo.plusSeconds(30).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -74,8 +98,8 @@ public class ConditionsImplTest {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(80).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validTo.plusSeconds(80).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 	
 	@Test
@@ -84,8 +108,8 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(30).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now));
+		long instant = validFrom.minusSeconds(30).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant));
 	}
 
 	@Test
@@ -94,8 +118,8 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(30).toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validFrom.minusSeconds(30).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -104,8 +128,8 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 
-		long now = new Date(validFrom.minusSeconds(80).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validFrom.minusSeconds(80).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -114,28 +138,28 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(30).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now));
+		long instant = validTo.plusSeconds(30).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant));
 	}
 
 	@Test
-	public void testNotTooLateWitkSkewForRange() throws Exception {
+	public void testNotTooLateWithSkewForRange() throws Exception {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(30).toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validTo.plusSeconds(30).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
-	public void testTooLateWitkSkewForRange() throws Exception {
+	public void testTooLateWithSkewForRange() throws Exception {
 		Conditions conditions = new ConditionsImpl();
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.plusSeconds(80).toEpochMilli()).getTime();
-		assertFalse(conditions.checkDateValidity(now, SKEW_60S));
+		long instant = validTo.plusSeconds(80).toEpochMilli();
+		assertFalse(conditions.checkDateValidity(instant, SKEW_60S));
 	}
 
 	@Test
@@ -144,8 +168,8 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validFrom.toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now));
+		long instant = validFrom.toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant));
 	}
 	
 	@Test
@@ -154,7 +178,7 @@ public class ConditionsImplTest {
 		conditions.setNotBefore(new Date(validFrom.toEpochMilli()));
 		conditions.setNotOnOrAfter(new Date(validTo.toEpochMilli()));
 		
-		long now = new Date(validTo.minusSeconds(1).toEpochMilli()).getTime();
-		assertTrue(conditions.checkDateValidity(now));
+		long instant = validTo.minusSeconds(1).toEpochMilli();
+		assertTrue(conditions.checkDateValidity(instant));
 	}
 }
