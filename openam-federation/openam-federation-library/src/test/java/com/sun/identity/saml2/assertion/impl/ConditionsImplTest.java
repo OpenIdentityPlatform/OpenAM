@@ -6,8 +6,7 @@
  * (the License). You may not use this file except in
  * compliance with the License.
  *
- * You can obtain a copy of the License at
- * https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md
+ * You can obtain a copy of the License at LICENSE.md
  * See the License for the specific language governing
  * permission and limitations under the License.
  *
