@@ -2,15 +2,14 @@ name: Deploy Maven
 
 on:
   workflow_run:
-    push:
-       branches: [ master ]
+    branches: [ master ]
     workflows: ["Build Maven"]
     types: [completed]
   workflow_dispatch:
 jobs:
   deploy:
     name: Maven deploy
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == '' }}
+    if: ${{ github.event.workflow_run.conclusion.event=="push" && (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == '') }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
