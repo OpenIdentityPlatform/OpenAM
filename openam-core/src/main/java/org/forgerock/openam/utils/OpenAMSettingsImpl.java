@@ -124,7 +124,7 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
             String alias = getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
             return getServerKeyPair(realm, alias);
         } else if (JwsAlgorithmType.ECDSA.equals(algorithm.getAlgorithmType())) {
-            Set<String> algorithmAliases = getSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_RSA_KEYSTORE_ALIAS);
+            Set<String> algorithmAliases = getSetting(realm, OAuth2Constants.OAuth2ProviderService.TOKEN_SIGNING_ECDSA_KEYSTORE_ALIAS);
             for (String algorithmAlias : algorithmAliases) {
                 if (StringUtils.isEmpty(algorithmAlias)) {
                     logger.warning("Empty signing key alias");
