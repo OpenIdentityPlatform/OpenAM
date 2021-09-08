@@ -495,6 +495,21 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message(method + "wantAssertionsSigned is :" + wantAssertionsSigned);
         }
 
+        // in seconds
+        int timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
+        String timeskewStr = getAttributeValueFromSPSSOConfig(
+                spConfig,
+                SAML2Constants.ASSERTION_TIME_SKEW);
+        if (timeskewStr != null && timeskewStr.trim().length() > 0) {
+            timeskew = Integer.parseInt(timeskewStr);
+            if (timeskew < 0) {
+                timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
+            }
+        }
+        if (debug.messageEnabled()) {
+            debug.message(method + "timeskew (s) = " + timeskew);
+        }
+
         // validate the assertions
         Map smap = null;
         Map bearerMap = null;
@@ -566,8 +581,8 @@ public class SAML2Utils extends SAML2SDKUtils {
                 bearerMap = isBearerSubjectConfirmation(subjectConfirms,
                         inRespToResp,
                         spDesc,
-                        spConfig,
-                        assertionID);
+                        assertionID,
+                        timeskew);
 
                 if (!((Boolean) bearerMap.get(SAML2Constants.IS_BEARER))) {
                     continue;
@@ -597,7 +612,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 checkAudience(assertion.getConditions(),
                         hostEntityId,
                         assertionID);
-                checkConditions(assertion.getConditions(), hostEntityId, assertionID);
+                checkConditions(assertion.getConditions(), hostEntityId, assertionID, timeskew);
                 if (smap == null) {
                     smap = fillMap(authnStmts,
                             subject,
@@ -657,8 +672,8 @@ public class SAML2Utils extends SAML2SDKUtils {
     private static Map isBearerSubjectConfirmation(final List subjectConfirms,
                                                    final String inRespToResponse,
                                                    final SPSSODescriptorElement spDesc,
-                                                   final SPSSOConfigElement spConfig,
-                                                   final String assertionID)
+                                                   final String assertionID,
+                                                   int timeskew)
             throws SAML2Exception {
         String method = "SAML2Utils.isBearerSubjectConfirmation:";
         Map retMap = new HashMap();
@@ -689,21 +704,6 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
 
             validateRecipient(spDesc, assertionID, subjectConfData);
-
-            // in seconds
-            int timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
-            String timeskewStr = getAttributeValueFromSPSSOConfig(
-                    spConfig,
-                    SAML2Constants.ASSERTION_TIME_SKEW);
-            if (timeskewStr != null && timeskewStr.trim().length() > 0) {
-                timeskew = Integer.parseInt(timeskewStr);
-                if (timeskew < 0) {
-                    timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
-                }
-            }
-            if (debug.messageEnabled()) {
-                debug.message(method + "timeskew = " + timeskew);
-            }
 
             Date notOnOrAfter = subjectConfData.getNotOnOrAfter();
             if (notOnOrAfter == null ||
@@ -871,7 +871,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
     }
 
-    private static void checkConditions(Conditions conditions, String hostEntityId, String assertionID) throws SAML2Exception {
+    private static void checkConditions(Conditions conditions, String hostEntityId, String assertionID, int timeskew) throws SAML2Exception {
         String method = "SAML2Utils.checkConditions: ";
         if (conditions == null) {
             debug.message("{}Conditions is missing from Assertion", method);
@@ -898,7 +898,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
         }
         
-        if (!conditions.checkDateValidity(currentTimeMillis())) {
+        if (!conditions.checkDateValidity(currentTimeMillis(), timeskew)) {
             debug.message("{}The assertion does not meet NotOnOrAfter or NotBefore condition.", method);
             String[] data = {assertionID};
             LogUtil.error(Level.INFO, LogUtil.DATE_CONDITION_NOT_MET, data, null);
