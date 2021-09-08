@@ -1114,7 +1114,7 @@ public interface SAML2Constants {
      */
     public String SP_AUTHCONTEXT_COMPARISON = "AuthComparison";
 
-    // Time Skew for Assertion NotOnOrAfter. In seconds.
+    // Time Skew for Assertion NotOnOrAfter and Condition NotBefore, NotOnOrAfter. In seconds.
     public String ASSERTION_TIME_SKEW = "assertionTimeSkew";
     public int ASSERTION_TIME_SKEW_DEFAULT = 300;
 
