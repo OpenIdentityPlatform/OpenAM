@@ -725,19 +725,15 @@ public class SAML2Utils extends SAML2SDKUtils {
 
             Date notBefore = subjectConfData.getNotBefore();
             if (notBefore != null) {
-                if ((notBefore.getTime() + timeskew * 1000) >
-                        currentTimeMillis()) {
-                    if (debug.messageEnabled()) {
-                        debug.message(method + "SubjectConfirmationData included "
-                                + "NotBefore.");
-                    }
-                    String[] data = {assertionID};
-                    LogUtil.error(Level.INFO, LogUtil.CONTAINED_NOT_BEFORE, data, null);
-                    throw new SAML2Exception(bundle.getString(
-                            "containedNotBefore"));
+                if (debug.messageEnabled()) {
+                    debug.message(method + "SubjectConfirmationData included "
+                            + "NotBefore.");
                 }
+                String[] data = {assertionID};
+                LogUtil.error(Level.INFO, LogUtil.CONTAINED_NOT_BEFORE, data, null);
+                throw new SAML2Exception(bundle.getString(
+                        "containedNotBefore"));
             }
-            retMap.put(SAML2Constants.NOTBEFORE, notBefore);
 
             String inRespTo = subjectConfData.getInResponseTo();
             if (inRespTo != null && inRespTo.length() != 0) {
