@@ -656,6 +656,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
 
                 if (!retryErrorCodes.contains(errorCode) || retry >= connNumRetry) {
                     debug.warning("SMSLdapObject.search(): LDAP exception in search for filter match: {}", filter, e);
+                    conn.close(); // Be a good citizen and release the connection
                     throw new SMSException(e, "sms-error-in-searching");
                 }
                 retry++;
