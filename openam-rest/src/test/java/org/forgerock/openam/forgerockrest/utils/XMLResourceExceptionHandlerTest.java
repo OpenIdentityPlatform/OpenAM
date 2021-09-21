@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.AbstractMap;
 
+import com.google.common.html.HtmlEscapers;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageContext;
@@ -45,7 +46,7 @@ public class XMLResourceExceptionHandlerTest {
         doReturn(mockAudit).when(context).getAuditTrail();
         doReturn(response).when(context).getResponse();
 
-        String message = "I don't know where it is";
+        String message = "I dont know where it is";
         ResourceException ex = new NotFoundException(message);
         AuthenticationException ex2 = new AuthenticationException(ex);
 
@@ -63,7 +64,7 @@ public class XMLResourceExceptionHandlerTest {
     @Test
     public void testAsXMLDOM() throws Exception {
         //given
-        ResourceException ex = new NotFoundException("I don't know where it is");
+        ResourceException ex = new NotFoundException("I dont know where it is");
         AbstractMap.SimpleEntry<String, Object> entry = new AbstractMap.SimpleEntry<String, Object>("a", 1);
         ex.setDetail(new JsonValue(JsonValue.array(new JsonValue(JsonValue.object(entry)))));
 
@@ -71,7 +72,7 @@ public class XMLResourceExceptionHandlerTest {
         String text = XMLUtils.print(handler.asXMLDOM(ex.toJsonValue().asMap()).getDocumentElement());
 
         //then
-        assertThat(text).contains("<message>I don't know where it is</message>");
+        assertThat(text).contains("<message>I dont know where it is</message>");
         assertThat(text).contains("<code>404</code>");
         assertThat(text).contains("<detail><entry><a>1</a></entry></detail>");
     }
