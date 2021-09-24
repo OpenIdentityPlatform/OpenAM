@@ -35,6 +35,8 @@ import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.operation.translate.TokenTransform;
 import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactoryImpl;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactory;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactoryImpl;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
@@ -90,6 +92,7 @@ public class TokenTransformFactoryImplTest {
             bindConstant().annotatedWith(Names.named(AMSTSConstants.AM_SESSION_COOKIE_NAME)).to("faux_cookie_name");
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
+            bind(IssuedTokenValidatorFactory.class).to(IssuedTokenValidatorFactoryImpl.class);
             bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
             bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
             bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken>>(){})

@@ -16,8 +16,13 @@
 
 package org.forgerock.openam.sts.rest.token.validator;
 
+import com.iplanet.services.util.Crypt;
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactory;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
@@ -33,24 +38,50 @@ public class OpenIdConnectIdTokenTransformValidator implements RestTokenTransfor
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final ValidationInvocationContext validationInvocationContext;
+    private final IssuedTokenValidatorFactory  issuedTokenValidatorFactory;
     private final boolean invalidateAMSession;
-
     public OpenIdConnectIdTokenTransformValidator(AuthenticationHandler<OpenIdConnectIdToken> authenticationHandler,
                                                   ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                                   PrincipalFromSession principalFromSession,
                                                   ValidationInvocationContext validationInvocationContext,
+                                                  IssuedTokenValidatorFactory issuedTokenValidatorFactory,
                                                   boolean invalidateAMSession) {
         this.authenticationHandler = authenticationHandler;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.validationInvocationContext = validationInvocationContext;
+        this.issuedTokenValidatorFactory = issuedTokenValidatorFactory;
         this.invalidateAMSession = invalidateAMSession;
     }
 
     @Override
     public RestTokenTransformValidatorResult validateToken(RestTokenTransformValidatorParameters<OpenIdConnectIdToken> tokenParameters) throws TokenValidationException {
+        RestTokenTransformValidatorResult result = validateInternal(tokenParameters);
+        if(result != null) {
+            return result;
+        }
         final String sessionId = authenticationHandler.authenticate(tokenParameters.getInputToken(), TokenType.OPENIDCONNECT);
         threadLocalAMTokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateAMSession);
         return new RestTokenTransformValidatorResult(principalFromSession.getPrincipalFromSession(sessionId), sessionId);
+    }
+
+    private RestTokenTransformValidatorResult validateInternal(RestTokenTransformValidatorParameters<OpenIdConnectIdToken> tokenParameters) {
+          try {
+            RestIssuedTokenValidatorParameters<OpenIdConnectIdToken> issuedTokenParams = () -> tokenParameters.getInputToken();
+            RestIssuedTokenValidator issuedTokenValidator = issuedTokenValidatorFactory.getTokenValidator(TokenType.OPENIDCONNECT);
+            boolean openamTokenValid = issuedTokenValidator.validateToken(issuedTokenParams);
+            if(openamTokenValid) {
+                JwtReconstruction jwtReconstruction = new JwtReconstruction();
+                SignedJwt signedJwt = jwtReconstruction.reconstructJwt(tokenParameters.getInputToken().getTokenValue(), SignedJwt.class);
+                JwtClaimsSet claims = signedJwt.getClaimsSet();
+                if (claims.isDefined("auth:token:encrypt")) {
+                    String encryptedToken = claims.getClaim("auth:token:encrypt", String.class);
+                    String sessionId = Crypt.decryptLocal(encryptedToken);
+                    threadLocalAMTokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateAMSession);
+                    return new RestTokenTransformValidatorResult(principalFromSession.getPrincipalFromSession(sessionId), sessionId);
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 }
