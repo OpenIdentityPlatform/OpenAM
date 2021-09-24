@@ -27,6 +27,7 @@ import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactory;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthnContextMapper;
@@ -86,6 +87,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper;
     private final Set<CustomTokenOperation> customTokenValidators;
     private final Set<CustomTokenOperation> customTokenProviders;
+    private final IssuedTokenValidatorFactory issuedTokenValidatorFactory;
 
     private final Logger logger;
 
@@ -111,6 +113,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper,
             @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS) Set<CustomTokenOperation> customTokenValidators,
             @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS) Set<CustomTokenOperation> customTokenProviders,
+            IssuedTokenValidatorFactory issuedTokenValidatorFactory,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -133,6 +136,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.oidcAuthModeReferencesMapper = oidcAuthModeReferencesMapper;
         this.customTokenValidators = customTokenValidators;
         this.customTokenProviders = customTokenProviders;
+        this.issuedTokenValidatorFactory = issuedTokenValidatorFactory;
         this.logger = logger;
     }
 
@@ -173,7 +177,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private RestTokenTransformValidator<OpenIdConnectIdToken> buildOpenIdConnectValidator(boolean invalidateAMSession) {
         return new OpenIdConnectIdTokenTransformValidator(openIdConnectIdTokenAuthenticationHandler,
                 threadLocalAMTokenCache, principalFromSession, ValidationInvocationContext.REST_TOKEN_TRANSFORMATION,
-                invalidateAMSession);
+                issuedTokenValidatorFactory, invalidateAMSession);
     }
 
     private RestTokenTransformValidator<X509Certificate[]> buildX509TokenValidator(boolean invalidateAMSession) {
