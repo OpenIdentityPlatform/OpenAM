@@ -68,6 +68,7 @@ namespace Sun.Identity.Saml2
             try
             {
                 this.xml = new XmlDocument();
+                this.xml.XmlResolver = null;
                 this.xml.PreserveWhitespace = true;
                 this.xml.LoadXml(samlResponse);
 
