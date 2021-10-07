@@ -18,8 +18,10 @@ package org.openidentityplatform.openam.cassandra;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -160,9 +162,9 @@ public class Repo extends IdRepo {
 				}
 			}
 			session=builder.build();
-			statement_select_by_type=session.prepare("select uid,field,value from values where type=:type limit 64000 allow filtering");
-			statement_select_by_uid=session.prepare("select uid,field,value from values where type=:type and uid=:uid");
-			statement_select_by_fields=session.prepare("select uid,field,value from values where type=:type and uid=:uid and field in :fields limit 64000");
+			statement_select_by_type=session.prepare("select uid,field,value,change from values where type=:type limit 64000 allow filtering");
+			statement_select_by_uid=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid");
+			statement_select_by_fields=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid and field in :fields limit 64000");
 			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
 			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
 			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
@@ -236,7 +238,7 @@ public class Repo extends IdRepo {
 			final Set<String> fields=new HashSet<String>();
 			if (attrNames!=null && !attrNames.isEmpty()) {
 				for (String field : attrNames) {
-					fields.add(field.toLowerCase());
+					fields.add(field.toLowerCase().replace("update-", ""));
 				}
 			}
 			BoundStatement statement=((fields.isEmpty())?statement_select_by_uid:statement_select_by_fields).bind()
@@ -252,10 +254,13 @@ public class Repo extends IdRepo {
 				values.add(row.getString("value"));
 				if (!attr.containsKey(field)) {
 					attr.put(field, values);
+					if (attrNames!=null && attrNames.contains("update-"+field)) {
+						attr.put("update-"+field,  new LinkedHashSet<String>(Arrays.asList(new String[] {new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("change")))})));
+					}
 				}
 			}
 		}catch(Throwable e){
-			logger.error("getAttributes {} {} {}",type,name,attrNames,e.getMessage());
+			logger.error("getAttributes {} {}",type,name,attrNames,e);
 			throw new IdRepoException(e.getMessage());
 		}
 		return attr;
