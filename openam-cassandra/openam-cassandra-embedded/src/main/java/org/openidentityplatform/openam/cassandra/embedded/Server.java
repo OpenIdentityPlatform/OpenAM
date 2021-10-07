@@ -80,10 +80,10 @@ public class Server implements Runnable, Closeable {
 	        System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", DatabaseDescriptor.getLocalDataCenter());
 	        
 	        //load
-	        final String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
-	        final InputStream inputStream=this.getClass().getResourceAsStream("/" + dataSetLocation);
+	        String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
+	        InputStream inputStream=this.getClass().getResourceAsStream("/" + dataSetLocation);
 	        if (inputStream==null) {
-	        	throw new AssertionError("cannot get resource"+dataSetLocation);
+	        	throw new AssertionError("cannot get resource "+dataSetLocation);
 	        }
 	        try (CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build()){
 	        	for (String statement : Arrays.asList(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";"))) {
@@ -97,6 +97,27 @@ public class Server implements Runnable, Closeable {
 				} 
 	        	session.close();
 	        };
+	        
+	        //load test
+	        dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import.test");
+	        if (dataSetLocation!=null) {
+		        inputStream=this.getClass().getResourceAsStream("/" + dataSetLocation);
+		        if (inputStream==null) {
+		        	throw new AssertionError("cannot get resource "+dataSetLocation);
+		        }
+		        try (CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build()){
+		        	for (String statement : Arrays.asList(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";"))) {
+			        	try {
+			        		session.execute(StringUtils.normalizeSpace(statement));
+			        		logger.info("{}",StringUtils.normalizeSpace(statement));
+			        	}catch (Exception e) {
+							logger.error("{}: {}",StringUtils.normalizeSpace(statement),e.getMessage());
+							assert false : "error in import.cql"+e.getMessage();
+						}
+					} 
+		        	session.close();
+		        };
+	        }
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
