@@ -4,7 +4,7 @@
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</Pattern>
     </layout>
   </appender>
-  <root level="trace">
+  <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>
   <logger name="org.apache.hadoop.ipc.RpcClient" level="info" />

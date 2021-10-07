@@ -60,7 +60,10 @@ public class IdRepoTest {
 	
 	@AfterClass
 	public static void destory() throws SSOException, IdRepoException{
-		repo.shutdown();
+		if (repo!=null) {
+			repo.shutdown();
+			repo=null;
+		}
 	}
 	
 	@Test 
@@ -302,5 +305,26 @@ public class IdRepoTest {
 //			repo.create(null, IdType.USER, "9170000000",param);
 //			fail("exists ?");
 //		}catch (IdRepoException e) {}
+	}
+	
+	@Test 
+	public void update_field_test() throws SSOException, IdRepoException{
+		Map<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		
+		repo.delete(null, IdType.USER, "9170000000");
+		
+		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		//param.put("inetuserstatus", "qqqqq");
+		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss"})));
+		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
+		param.put("userPassword", new HashSet<String>(Arrays.asList(new String[] {"{CLEAR}5155"})));
+		repo.create(null, IdType.USER, "9170000000",param);
+		
+		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
+		
+		Set<String> fields=new HashSet<String>(Arrays.asList(new String[]{"update-uid","update-sunidentitymsisdnnumber"}));
+		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("update-sunidentitymsisdnnumber"));
+		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("update-uid"));
+		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 	}
 }
