@@ -32,6 +32,8 @@ package com.sun.identity.authentication.modules.msisdn;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Map;
+import java.util.Set;
+
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -64,8 +66,7 @@ public class MSISDNValidation {
                     AMResourceBundleCache.getInstance();
 
     private String userSearchAttr;
-    private String serverHost;  
-    private int serverPort = 389;
+    private Set<String> serverHosts;
     private String startSearchLoc;  
     private String principalUser;  
     private String principalPasswd;  
@@ -138,24 +139,16 @@ public class MSISDNValidation {
                 options, PRINCIPAL_PASSWD);
             useSSL = Boolean.valueOf(CollectionHelper.getMapAttr(
                 options, USE_SSL, ISAuthConstants.FALSE_VALUE)).booleanValue();
-            serverHost = CollectionHelper.getServerMapAttr(options, LDAP_URL);
+            serverHosts = CollectionHelper.getServerMapAttrs(options, LDAP_URL);
             userNamingAttr = CollectionHelper.getMapAttr(
                 options, USER_NAMING_ATTR,DEFAULT_USER_NAMING_ATTR);
             returnUserDN = CollectionHelper.getMapAttr(
                 options, RETURN_USER_DN, ISAuthConstants.TRUE_VALUE);
 
-            if (serverHost == null) {
+            if ( serverHosts == null) {
                 debug.error("Fatal error: LDAP Server and Port misconfigured");
                 errorMsgKey = "wrongLDAPServer";
             } else {
-                String port = null;
-                // set LDAP Parameters
-                int index = serverHost.indexOf(':');
-                if (index != -1) { 
-                    port = serverHost.substring(index+1);
-                    serverPort = Integer.parseInt(port);
-                    serverHost = serverHost.substring(0, index); 
-                }
                 startSearchLoc = CollectionHelper.getServerMapAttr(
                     options, START_SEARCH_DN);
                 if (startSearchLoc == null) {
@@ -166,12 +159,11 @@ public class MSISDNValidation {
             }
 
             if (debug.messageEnabled()) {
-                debug.message("\n ldapProviderUrl="+ serverHost +
-                    "\n\t serverPort = " + serverPort +
+                debug.message("\n ldapProviderUrl="+ serverHosts +
                     "\n\t startSearchLoc=" + startSearchLoc +
                     "\n\t userSearchAttr=" + userSearchAttr +
                     "\n\t principalUser=" + principalUser +
-                    "\n\t serverHost =" + serverHost +
+                    "\n\t serverHosts =" + String.join( ",", serverHosts ) +
                     "\n\t userNamingAttr =" + userNamingAttr +
                     "\n\t returnUserDN =" + returnUserDN +
                     "\n\t useSSL=" + useSSL);
@@ -195,11 +187,11 @@ public class MSISDNValidation {
     protected String getUserId(String msisdnNumber) throws AuthLoginException {
         String validatedUserID = null;
         try {
-            LDAPAuthUtils ldapUtil =
-                new LDAPAuthUtils(serverHost, serverPort, Collections.<String>emptySet(),
+            final LDAPAuthUtils ldapUtil =
+                new LDAPAuthUtils( serverHosts, Collections.<String>emptySet(),
                         useSSL, AMResourceBundleCache.getInstance().getResBundle(amAuthMSISDN, locale), startSearchLoc,
                         debug);
-            String searchFilter = new StringBuffer(250).append("(")
+            String searchFilter = new StringBuilder(250).append("(")
                 .append(userSearchAttr).append("=")
                 .append(msisdnNumber).append(")").toString();
 
