@@ -2,7 +2,7 @@
 #
 # Converts LDIF data to CASSANDRA CQL
 #
-# /opt/opendj/bin/ldapsearch -p 1389 -b ou=users,dc=am,dc=domain,dc=com -D "cn=Directory manager" -w password "(uid=*)" > export.ldif
+# /opt/opendj/bin/ldapsearch -p 1389 -b ou=users,dc=am,dc=domain,dc=com -D "cn=Directory manager" -w password "(|(objectclass=person)(objectclass=groupofuniquenames))" > export.ldif
 # cat export.ldif | keyspace=realm_test bash ldif2cassandra.sh > import.cql
 # cat import.cql | /opt/cassandra/bin/cqlsh
 
@@ -51,7 +51,7 @@ while read line; do
 				elif [[ $line =~ ^uid: ]] ; then
 					continue
                 elif [[ ! $line =~ ^\s*$ ]] ; then
-                    if [[ $line == *::* ]]
+                    if [[ $line == *::* ]] && [[ $line != *:*::* ]];
                     then
                         attr=${line%%:*}
                         value=`echo ${line#*: } | base64 --decode`
