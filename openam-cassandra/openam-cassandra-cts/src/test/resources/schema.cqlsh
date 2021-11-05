@@ -1,6 +1,8 @@
 /*---СTS----*/
 
 CREATE KEYSPACE IF NOT EXISTS cts WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+GRANT SELECT ON KEYSPACE cts TO cassandra;
+GRANT MODIFY ON KEYSPACE cts TO cassandra;
 
 USE cts;
 

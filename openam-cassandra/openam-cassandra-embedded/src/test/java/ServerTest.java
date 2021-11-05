@@ -30,6 +30,9 @@ public class ServerTest {
 	
 	@BeforeClass
 	public static void init() throws  IdRepoException{
+		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");
 	}
 	
 	@AfterClass
@@ -38,6 +41,7 @@ public class ServerTest {
 	
 	@Test
 	public void start_test() throws  IdRepoException{
+		
 		cassandra=new Server();
 		cassandra.run();
 	}
