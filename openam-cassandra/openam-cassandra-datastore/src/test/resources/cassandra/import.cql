@@ -1,5 +1,7 @@
 DROP KEYSPACE IF EXISTS realm_name; 
 CREATE KEYSPACE IF NOT EXISTS realm_name WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'} ;
+GRANT SELECT ON KEYSPACE realm_name TO cassandra;
+GRANT MODIFY ON KEYSPACE realm_name TO cassandra;
 use realm_name;
 
 CREATE TABLE IF NOT EXISTS values (type text, uid text, field text,value text,change timestamp, PRIMARY KEY ((type,uid),field,value));

@@ -45,6 +45,10 @@ public class IdRepoTest {
 	
 	@BeforeClass
 	public static void init() throws SSOException, IdRepoException{
+		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");
+		
 		cassandra=new Server();
 		cassandra.run();
 		

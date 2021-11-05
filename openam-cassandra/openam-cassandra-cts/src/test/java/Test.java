@@ -36,6 +36,9 @@ public class Test {
 	
 	@org.junit.Test
 	public void start_test() throws SSOException, IdRepoException{
+		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
+		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");
 		System.setProperty(Server.class.getPackage().getName()+".import","schema.cqlsh");
 		cassandra=new Server();
 		cassandra.run();

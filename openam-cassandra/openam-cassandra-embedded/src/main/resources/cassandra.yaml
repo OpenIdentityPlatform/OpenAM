@@ -106,7 +106,7 @@ batchlog_replay_throttle_in_kb: 1024
 #   users. It keeps usernames and hashed passwords in system_auth.roles table.
 #   Please increase system_auth keyspace replication factor if you use this authenticator.
 #   If using PasswordAuthenticator, CassandraRoleManager must also be used (see below)
-authenticator: AllowAllAuthenticator
+authenticator: PasswordAuthenticator
 
 # Authorization backend, implementing IAuthorizer; used to limit access/provide permissions
 # Out of the box, Cassandra provides org.apache.cassandra.auth.{AllowAllAuthorizer,
@@ -115,7 +115,7 @@ authenticator: AllowAllAuthenticator
 # - AllowAllAuthorizer allows any action to any user - set it to disable authorization.
 # - CassandraAuthorizer stores permissions in system_auth.role_permissions table. Please
 #   increase system_auth keyspace replication factor if you use this authorizer.
-authorizer: AllowAllAuthorizer
+authorizer: CassandraAuthorizer
 
 # Part of the Authentication & Authorization backend, implementing IRoleManager; used
 # to maintain grants and memberships between roles.
