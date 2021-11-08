@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.oss.driver.api.core.AllNodesFailedException;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.iplanet.am.util.SystemProperties;
 
@@ -78,13 +79,25 @@ public class Server implements Runnable, Closeable {
             }
 	        System.setProperty("datastax-java-driver.basic.contact-points.0",DatabaseDescriptor.getRpcAddress().getHostAddress()+":"+DatabaseDescriptor.getNativeTransportPort());
 	        System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", DatabaseDescriptor.getLocalDataCenter());
-	        
+
+	        //fix wait  Created default superuser role 'cassandra'
+	        if ("cassandra".equalsIgnoreCase(System.getProperty("datastax-java-driver.advanced.auth-provider.username"))) {
+	        	while (true) {
+	        		try (CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build()){
+	        			break;
+	        		}catch (AllNodesFailedException e) {
+	        			logger.info("wait: Created default superuser role 'cassandra'");
+	        			Thread.sleep(1000);
+					}
+	        	}
+	        }
 	        //load
 	        String dataSetLocation=System.getProperty(Server.class.getPackage().getName()+".import","cassandra/import.cql");
 	        InputStream inputStream=this.getClass().getResourceAsStream("/" + dataSetLocation);
 	        if (inputStream==null) {
 	        	throw new AssertionError("cannot get resource "+dataSetLocation);
 	        }
+	        
 	        try (CqlSession session = CqlSession.builder().withApplicationName("OpenAM Embedded").build()){
 	        	for (String statement : Arrays.asList(StringUtils.normalizeSpace(IOUtils.toString(inputStream,"UTF-8")).split(";"))) {
 		        	try {
