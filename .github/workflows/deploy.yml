@@ -1,6 +1,7 @@
 name: Deploy Maven
 
 on:
+  workflow_dispatch:
   workflow_run:
     branches: [ master ]
     workflows: ["Build Maven"]
