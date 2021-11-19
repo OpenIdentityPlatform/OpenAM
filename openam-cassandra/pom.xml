@@ -66,6 +66,28 @@
 			    <artifactId>failureaccess</artifactId>
 			    <version>1.0.1</version>
 			</dependency>
+
+			<!--update transitive deps-->
+			<dependency>
+				<groupId>com.github.ben-manes.caffeine</groupId>
+				<artifactId>caffeine</artifactId>
+				<version>2.9.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jnr</groupId>
+				<artifactId>jnr-posix</artifactId>
+				<version>3.1.11</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>4.1.70.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-handler</artifactId>
+				<version>4.1.70.Final</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
