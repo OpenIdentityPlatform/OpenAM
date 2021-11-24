@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.utils.CrestQuery;
 
 /**
  * Allows a client and resource owner's identity to be retrieved.
@@ -82,7 +83,8 @@ public class IdentityManager {
             // search for the identity
             final Set<AMIdentity> results = new HashSet<AMIdentity>();
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, idsc);
+            CrestQuery crestQuery = new CrestQuery(username, null, null, true);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, crestQuery, idsc);
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results.addAll(searchResults.getSearchResults());
             } else {

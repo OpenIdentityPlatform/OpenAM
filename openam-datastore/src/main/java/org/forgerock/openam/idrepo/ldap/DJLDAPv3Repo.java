@@ -1151,8 +1151,16 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Filter first = null;
 
         if (crestQuery.hasQueryId()) {
-        	if(!"*".equals(crestQuery.getQueryId()) || avPairs == null  || avPairs.size() == 0) {
-        		first = Filter.valueOf(searchAttr + "=" + crestQuery.getQueryId());
+        	if(!"*".equals(crestQuery.getQueryId())
+                    || avPairs == null
+                    || avPairs.size() == 0
+                    || crestQuery.isEscapeQueryId()) {
+
+        		String pattern = crestQuery.getQueryId();
+                if (crestQuery.isEscapeQueryId()) {
+                    pattern =  Filter.escapeAssertionValue(pattern);
+                }
+                first = Filter.valueOf(searchAttr + "=" + pattern);
         	}
         } else {
             first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
