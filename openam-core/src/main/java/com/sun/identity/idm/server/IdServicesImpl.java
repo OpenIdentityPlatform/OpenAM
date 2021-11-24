@@ -1667,7 +1667,7 @@ public class IdServicesImpl implements IdServices {
                for (Iterator items = repos.iterator(); items.hasNext();) {
                    IdRepo repo = (IdRepo) items.next();
                    if (repo instanceof SpecialRepo) {
-                       CrestQuery crestQuery = new CrestQuery("*");
+                       CrestQuery crestQuery = new CrestQuery("*", null, null, false);
                        RepoSearchResults res = repo.search(token, type, crestQuery,
                            0, 0, Collections.EMPTY_SET, false,
                            0, Collections.EMPTY_MAP, false);

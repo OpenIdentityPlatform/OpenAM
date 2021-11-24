@@ -32,7 +32,7 @@ public class CrestQuery {
     private final String queryId;
     private final QueryFilter<JsonPointer> queryFilter;
     private final List<JsonPointer> fields;
-    private boolean escapeQueryId = false;
+    private boolean escapeQueryId = true;
 
     /**
      * Constructs a new CrestQuery instance with the specified query id.
@@ -148,6 +148,7 @@ public class CrestQuery {
                 + "queryId='" + queryId + '\''
                 + ", queryFilter=" + queryFilter
                 + ", fields=" + fields
+                + ", escapeQueryId=" + escapeQueryId
                 + '}';
     }
 }

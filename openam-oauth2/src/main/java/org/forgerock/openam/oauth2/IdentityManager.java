@@ -83,7 +83,7 @@ public class IdentityManager {
             // search for the identity
             final Set<AMIdentity> results = new HashSet<AMIdentity>();
             idsc.setMaxResults(0);
-            CrestQuery crestQuery = new CrestQuery(username, null, null, true);
+            CrestQuery crestQuery = new CrestQuery(username);
             IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, crestQuery, idsc);
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results.addAll(searchResults.getSearchResults());
