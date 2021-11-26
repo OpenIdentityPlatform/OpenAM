@@ -64,6 +64,8 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.utils.CrestQuery;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -191,8 +193,8 @@ public class EntitiesModelImpl
 
             AMIdentityRepository repo = new AMIdentityRepository(
                 getUserSSOToken(), realmName);
-            IdSearchResults results = repo.searchIdentities(
-                ltype, pattern, idsc);
+            CrestQuery crestQuery = new CrestQuery(pattern, null, null, false);
+            IdSearchResults results = repo.searchIdentities(ltype, crestQuery, idsc);
 
             logEvent("SUCCEED_SEARCH_IDENTITY", params);
             return results;

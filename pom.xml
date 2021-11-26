@@ -96,7 +96,7 @@
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
     <geoip.version>2.0.0</geoip.version>
     <groovy.version>2.5.8</groovy.version>
-    <groovy-sandbox.version>1.19</groovy-sandbox.version>
+    <groovy-sandbox.version>1.27</groovy-sandbox.version>
     <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
@@ -117,7 +117,7 @@
     <FastInfoset.version>2006-26-09</FastInfoset.version>
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
-    <freemarker.version>2.3.19</freemarker.version>
+    <freemarker.version>2.3.31</freemarker.version>
     <java-ipv6.version>0.17</java-ipv6.version>
     <json.version>20090211</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
@@ -1153,7 +1153,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.2.0.0</version>
+        <version>2.2.3.1</version>
         <exclusions>
         	<exclusion>
         		<groupId>org.apache.httpcomponents</groupId>
@@ -1782,7 +1782,7 @@
 		 <dependency>
   			<groupId>io.netty</groupId>
   			<artifactId>netty-handler</artifactId>
-  			<version>4.1.54.Final</version>
+  			<version>4.1.69.Final</version>
   		</dependency>
     </dependencies>
   </dependencyManagement>

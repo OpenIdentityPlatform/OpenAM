@@ -32,6 +32,7 @@ public class CrestQuery {
     private final String queryId;
     private final QueryFilter<JsonPointer> queryFilter;
     private final List<JsonPointer> fields;
+    private boolean escapeQueryId = true;
 
     /**
      * Constructs a new CrestQuery instance with the specified query id.
@@ -62,6 +63,21 @@ public class CrestQuery {
         this.queryId = queryId;
         this.queryFilter = queryFilter;
         this.fields = fields;
+    }
+
+    /**
+     * Constructs a new CrestQuery instance with the specified query filter.
+     *
+     * @param queryId The query ID.
+     * @param queryFilter The query filter.
+     * @param fields The fields to return in the query results.
+     * @param escapeQueryId escapes queryId to prevent LDAP injection
+     */
+    public CrestQuery(String queryId, QueryFilter<JsonPointer> queryFilter, List<JsonPointer> fields, boolean escapeQueryId) {
+        this.queryId = queryId;
+        this.queryFilter = queryFilter;
+        this.fields = fields;
+        this.escapeQueryId = escapeQueryId;
     }
 
     /**
@@ -113,6 +129,14 @@ public class CrestQuery {
     }
 
     /**
+     * Determines if queryId for the CREST should be escaped
+     *
+     * @return true queryId for the CREST should be escaped
+     */
+    public boolean isEscapeQueryId() {
+        return escapeQueryId;
+    }
+    /**
      * This is mainly for debugging purposes so you can say "this is a rough idea of the CrestQuery object I've
      * been handed".
      *
@@ -124,6 +148,7 @@ public class CrestQuery {
                 + "queryId='" + queryId + '\''
                 + ", queryFilter=" + queryFilter
                 + ", fields=" + fields
+                + ", escapeQueryId=" + escapeQueryId
                 + '}';
     }
 }

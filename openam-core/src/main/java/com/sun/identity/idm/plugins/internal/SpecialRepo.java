@@ -83,6 +83,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.opendj.ldap.Filter;
 
 public class SpecialRepo extends IdRepo implements ServiceListener {
 
@@ -563,6 +564,9 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                     Set uidVals = (Set) avPairs.get("uid");
                     if (uidVals != null && !uidVals.isEmpty()) {
                         pattern = (String) uidVals.iterator().next();
+                        if (crestQuery.isEscapeQueryId()) {
+                            pattern =  Filter.escapeAssertionValue(pattern);
+                        }
                     } else {
                         // pattern is "*" and avPairs is not empty, so return
                         // empty results
@@ -574,6 +578,9 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
 
                 // If wild card is used for pattern, do a search else a lookup
                 if (pattern.indexOf('*') != -1) {
+                    if (crestQuery.isEscapeQueryId()) {
+                        pattern =  Filter.escapeAssertionValue(pattern);
+                    }
                     userRes = userConfig.getSubConfigNames(pattern);
                 } else {
                     for (Iterator items = userConfig.getSubConfigNames()
