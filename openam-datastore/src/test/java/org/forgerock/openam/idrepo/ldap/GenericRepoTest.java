@@ -350,7 +350,7 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void searchReturnsMatchesForSearchAttribute() throws Exception {
-        CrestQuery crestQuery = new CrestQuery("searchTester*");
+        CrestQuery crestQuery = new CrestQuery("searchTester*", null, null, false);
         RepoSearchResults results =
                 idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
@@ -380,7 +380,7 @@ public class GenericRepoTest extends IdRepoTestBase {
         Map<String, Set<String>> avPairs = new HashMap<String, Set<String>>();
         avPairs.put("objectclass", asSet("inetorgperson"));
         avPairs.put("sn", asSet("hellNo"));
-        CrestQuery crestQuery = new CrestQuery("*");
+        CrestQuery crestQuery = new CrestQuery("*", null, null, false);
         RepoSearchResults results =
                 idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, avPairs, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
