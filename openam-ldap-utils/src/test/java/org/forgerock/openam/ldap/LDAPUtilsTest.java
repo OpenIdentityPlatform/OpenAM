@@ -50,4 +50,15 @@ public final class LDAPUtilsTest {
         assertThat(validationResult).isFalse();
     }
 
+    @Test
+    public void testIsDNInvalid2() throws Exception {
+        // Given
+        String candidateDN = "app_1@app.test.ru@e.s.GqF55GZjM6dzAE1u3r6w\\=\\=,dc=am,dc=com";
+
+        // When
+        boolean validationResult = LDAPUtils.isDN(candidateDN);
+
+        // Then
+        assertThat(validationResult).isFalse();
+    }
 }
