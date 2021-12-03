@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import javax.naming.InvalidNameException;
 
@@ -559,7 +560,7 @@ public final class LDAPUtils {
         try {
             return newDN(candidateDN).size() > minNumComponent;
         } catch (LocalizedIllegalArgumentException e) {
-            DEBUG.error("LDAPUtils.isDN: Invalid DN", e);
+        	DEBUG.error("LDAPUtils.isDN: Invalid DN", e);
         }
         return false;
     }
@@ -621,8 +622,9 @@ public final class LDAPUtils {
      * @param orgName The DN string.
      * @return A DN.
      */
+    final static Pattern dnRule=Pattern.compile("^(?:[A-Za-z][\\w-]*|\\d+(?:\\.\\d+)*)=(?:#(?:[\\dA-Fa-f]{2})+|(?:[^,=\\+<>#;\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*|\"(?:[^\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*\")(?:\\+(?:[A-Za-z][\\w-]*|\\d+(?:\\.\\d+)*)=(?:#(?:[\\dA-Fa-f]{2})+|(?:[^,=\\+<>#;\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*|\"(?:[^\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*\"))*(?:,(?:[A-Za-z][\\w-]*|\\d+(?:\\.\\d+)*)=(?:#(?:[\\dA-Fa-f]{2})+|(?:[^,=\\+<>#;\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*|\"(?:[^\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*\")(?:\\+(?:[A-Za-z][\\w-]*|\\d+(?:\\.\\d+)*)=(?:#(?:[\\dA-Fa-f]{2})+|(?:[^,=\\+<>#;\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*|\"(?:[^\\\\\"]|\\\\[,=\\+<>#;\\\\\"]|\\\\[\\dA-Fa-f]{2})*\"))*)*$");
     public static DN newDN(String orgName) {
-        if (orgName == null || orgName.startsWith("/") || !orgName.contains("=")) {
+        if (orgName == null || orgName.startsWith("/") || !dnRule.matcher(orgName).matches()) {
             return DN.rootDN();
         } else {
             return DN.valueOf(orgName);
