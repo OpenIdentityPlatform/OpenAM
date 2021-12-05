@@ -44,12 +44,12 @@ import org.slf4j.LoggerFactory;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
-
+import com.datastax.oss.driver.api.core.cql.BatchStatement;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.DefaultBatchType;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -167,6 +167,7 @@ public class Repo extends IdRepo {
 			statement_select_by_fields=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid and field in :fields limit 64000");
 			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
 			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
+			statement_delete_by_field_value=session.prepare("delete from values where type=:type and uid=:uid and field=:field and value=:value");
 			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
 			statement_add_value_ttl=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
 		}catch(Exception e){
@@ -179,6 +180,7 @@ public class Repo extends IdRepo {
 	PreparedStatement statement_select_by_fields;
 	PreparedStatement statement_delete_by_uid;
 	PreparedStatement statement_delete_by_fields;
+	PreparedStatement statement_delete_by_field_value;
 	PreparedStatement statement_add_value;
 	PreparedStatement statement_add_value_ttl;
 	
@@ -300,37 +302,60 @@ public class Repo extends IdRepo {
 			if (isAdd && !attributes.containsKey(activeAttr)) {
 				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
 			}
-			final ArrayList<BoundStatement> statements=new ArrayList<BoundStatement>();
 			if (isAdd) {
 				final BoundStatement statement=statement_delete_by_uid.bind()
 					.setString("type", type.getName())
-					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name);
-				statements.add(statement);
+					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+					;
+				new ExecuteCallback(profile,session, statement).execute();
 			}
+			
+			BatchStatement statements=BatchStatement.newInstance(DefaultBatchType.LOGGED); 
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
-				if (!isAdd) {//remove old values
-					final BoundStatement statement=statement_delete_by_fields.bind()
-						.setString("type", type.getName())
-						.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
-						.setList("fields",Arrays.asList(new String[] {entry.getKey().toLowerCase()}),String.class);
-					statements.add(statement);
+				final Set<String> oldValues=new HashSet<String>();
+				if (!isAdd) {//get old values
+					BoundStatement statement=statement_select_by_fields.bind()
+							.setString("type", type.getName())
+							.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+							.setList("fields",Arrays.asList(new String[] {entry.getKey().toLowerCase()}),String.class);
+					final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
+					for (Row row : rc){
+						oldValues.add(row.getString("value"));
+					}
 				}
 				final Integer ttl=getTTL(type, entry.getKey());
-				for (final String  value: convert(entry.getKey(),entry.getValue())) {
+				final Set<String> values=convert(entry.getKey(),entry.getValue());
+				for (String  value: values) {
+					if (disableCaseSensitive.contains(entry.getKey())) {
+						value=value.toLowerCase();
+					}
+					if (!isAdd) { //remove re-write value from delete
+						oldValues.remove(value);
+					}
 					final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl:statement_add_value).bind()
 							.setString("type", type.getName())
 							.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
 							.setString("field", entry.getKey().toLowerCase())
-							.setString("value", disableCaseSensitive.contains(entry.getKey())? value.toLowerCase() : value);
-					statements.add((ttl!=null && ttl>0)?statement.setInt("ttl", ttl):statement);
+							.setString("value", value)
+							;
+					statements=statements.add((ttl!=null && ttl>0)?statement.setInt("ttl", ttl):statement);
+				}
+				if (!isAdd) {//remove old values
+					for (String value : oldValues) { 
+						final BoundStatement statement=statement_delete_by_field_value.bind()
+								.setString("type", type.getName())
+								.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+								.setString("field", entry.getKey().toLowerCase())
+								.setString("value", value)
+								;
+						statements=statements.add(statement);
+					}
 				}
 			}
-			for (BoundStatement statement : statements) {
-				if (async)
-					new ExecuteCallback(profile,session, statement).executeAsync();
-				else
-					new ExecuteCallback(profile,session, statement).execute();
-			}
+			if (async)
+				new ExecuteCallback(profile,session, statements).executeAsync();
+			else
+				new ExecuteCallback(profile,session, statements).execute();
 		}catch(Throwable e){
 			logger.error("setAttributes {} {} {} {}",type,name,attributes,isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
@@ -358,7 +383,8 @@ public class Repo extends IdRepo {
 			}
 			BoundStatement statement=((deleteColums.isEmpty())?statement_delete_by_uid:statement_delete_by_fields).bind()
 					.setString("type", type.getName())
-					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+					;
 			if (!deleteColums.isEmpty()) {
 				statement=statement.setList("fields",new ArrayList<String>(deleteColums),String.class);
 			}
