@@ -56,6 +56,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
@@ -170,6 +171,9 @@ public class Repo extends IdRepo {
 			statement_delete_by_field_value=session.prepare("delete from values where type=:type and uid=:uid and field=:field and value=:value");
 			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
 			statement_add_value_ttl=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
+			
+			statement_add_value_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS");
+			statement_add_value_ttl_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS using ttl :ttl");
 		}catch(Exception e){
 			logger.error("error",e);
 			throw new RuntimeException(e);
@@ -183,6 +187,8 @@ public class Repo extends IdRepo {
 	PreparedStatement statement_delete_by_field_value;
 	PreparedStatement statement_add_value;
 	PreparedStatement statement_add_value_ttl;
+	PreparedStatement statement_add_value_exist;
+	PreparedStatement statement_add_value_ttl_exist;
 	
 	@Override
 	public void shutdown() {
@@ -302,18 +308,26 @@ public class Repo extends IdRepo {
 			if (isAdd && !attributes.containsKey(activeAttr)) {
 				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
 			}
-			if (isAdd) {
-				final BoundStatement statement=statement_delete_by_uid.bind()
-					.setString("type", type.getName())
-					.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
-					;
-				new ExecuteCallback(profile,session, statement).execute();
+			if (isAdd) { //test if exist
+				final Integer ttl=getTTL(type, "uid");
+				final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl_exist:statement_add_value_exist).bind()
+						.setString("type", type.getName())
+						.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+						.setString("field", "uid")
+						.setString("value", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
+						;
+				final ResultSet rc=new ExecuteCallback(profile,session, (ttl!=null && ttl>0)?statement.setInt("ttl", ttl):statement).execute();
+				for (Row row : rc){
+					if (!row.getBoolean("[applied]")) {
+						throw IdRepoDuplicateObjectException.nameAlreadyExists(name);
+					}
+				}
+				attributes.remove("uid");
 			}
-			
 			BatchStatement statements=BatchStatement.newInstance(DefaultBatchType.LOGGED); 
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				final Set<String> oldValues=new HashSet<String>();
-				if (!isAdd) {//get old values
+				if (!isAdd) { //get old values
 					BoundStatement statement=statement_select_by_fields.bind()
 							.setString("type", type.getName())
 							.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name)
@@ -356,6 +370,8 @@ public class Repo extends IdRepo {
 				new ExecuteCallback(profile,session, statements).executeAsync();
 			else
 				new ExecuteCallback(profile,session, statements).execute();
+		}catch (IdRepoException e) {
+			throw e;
 		}catch(Throwable e){
 			logger.error("setAttributes {} {} {} {}",type,name,attributes,isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
