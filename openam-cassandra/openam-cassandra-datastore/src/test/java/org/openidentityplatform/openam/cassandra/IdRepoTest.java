@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 
@@ -68,6 +69,17 @@ public class IdRepoTest {
 			repo.shutdown();
 			repo=null;
 		}
+	}
+	
+	@Test 
+	public void create_test() throws SSOException, IdRepoException{
+		repo.delete(null, IdType.USER, "9170000000");
+		final Map<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		repo.create(null,  IdType.USER, "9170000000", param);
+		try {
+			repo.create(null,  IdType.USER, "9170000000", param);
+			assertFalse("need throw IdRepoDuplicateObjectException",true);
+		}catch (IdRepoDuplicateObjectException e) {}
 	}
 	
 	@Test 
