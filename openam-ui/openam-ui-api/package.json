@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "swagger-ui-dist": ">=3.24.0",
-    "swagger-ui-themes": "3.0.0"
+    "swagger-ui-themes": "3.0.0",
+    "swagger-ui": ">=4.1.3"
   }
 }
