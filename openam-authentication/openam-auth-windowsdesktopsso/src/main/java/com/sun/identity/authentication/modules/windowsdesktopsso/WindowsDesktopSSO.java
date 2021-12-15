@@ -63,6 +63,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.utils.CrestQuery;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -728,8 +730,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         try {
             AMIdentityRepository amirepo = new AMIdentityRepository(getSSOSession(), organization);
-
-            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, "*", searchControl);
+            CrestQuery crestQuery = new CrestQuery("*", null, null, false);
+            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, crestQuery, searchControl);
             if (searchResults.getErrorCode() == IdSearchResults.SUCCESS && searchResults != null) {
                 Set<AMIdentity> results = searchResults.getSearchResults();
                 if (!results.isEmpty()) {
