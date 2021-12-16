@@ -37,6 +37,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
 import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
 import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
@@ -1147,31 +1149,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         SearchScope scope = defaultScope;
 
         String searchAttr = getSearchAttribute(type);
+
         String[] attrs;
-        Filter first = null;
 
-        if (crestQuery.hasQueryId()) {
-        	if(!"*".equals(crestQuery.getQueryId())
-                    || avPairs == null
-                    || avPairs.size() == 0
-                    || crestQuery.isEscapeQueryId()) {
+        Filter filter = getFilter(type, crestQuery, filterOp, avPairs);
 
-        		String pattern = crestQuery.getQueryId();
-                if (crestQuery.isEscapeQueryId()) {
-                    pattern =  Filter.escapeAssertionValue(pattern);
-                }
-                first = Filter.valueOf(searchAttr + "=" + pattern);
-        	}
-        } else {
-            first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
-        }
-
-        Filter filter = (first != null ?  Filter.and(first, getObjectClassFilter(type)) : getObjectClassFilter(type));
-        
-        Filter tempFilter = constructFilter(filterOp, avPairs);
-        if (tempFilter != null) {
-            filter = Filter.and(tempFilter, filter);
-        }
         if (returnAllAttrs || (returnAttrs != null && returnAttrs.contains("*"))) {
             Set<String> predefinedAttrs = getDefinedAttributes(type);
             predefinedAttrs.add(searchAttr);
@@ -1245,6 +1227,34 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             IOUtils.closeIfNotNull(conn);
         }
         return new RepoSearchResults(names, errorCode, entries, type);
+    }
+
+    protected Filter getFilter(IdType type, CrestQuery crestQuery, int filterOp, Map<String, Set<String>> avPairs) {
+        Filter first = null;
+        String searchAttr = getSearchAttribute(type);
+
+        if (crestQuery.hasQueryId()) {
+        	if((!"*".equals(crestQuery.getQueryId())
+                    || MapUtils.isEmpty(avPairs)
+                    || crestQuery.isEscapeQueryId()) && MapUtils.getObject(avPairs, searchAttr) == null) {
+
+        		String pattern = crestQuery.getQueryId();
+                if (crestQuery.isEscapeQueryId()) {
+                    pattern =  Filter.escapeAssertionValue(pattern);
+                }
+                first = Filter.valueOf(searchAttr + "=" + pattern);
+        	}
+        } else {
+            first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
+        }
+
+        Filter filter = (first != null ?  Filter.and(first, getObjectClassFilter(type)) : getObjectClassFilter(type));
+
+        Filter tempFilter = constructFilter(filterOp, avPairs);
+        if (tempFilter != null) {
+            filter = Filter.and(tempFilter, filter);
+        }
+        return filter;
     }
 
     /**
