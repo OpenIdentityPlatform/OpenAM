@@ -131,7 +131,7 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
         //ctsToken.setAttribute(CTS_TOKEN_FIELD_STS_ID, stsId);
         ctsToken.setAttribute(CTS_TOKEN_FIELD_STS_TOKEN_TYPE, tokenType.name());
         if (jti!=null) {
-        	ctsToken.setAttribute(CoreTokenField.STRING_ONE, jti);
+        	ctsToken.setAttribute(CoreTokenField.STRING_FIFTEEN, jti);
         }
         return ctsToken;
     }
@@ -159,7 +159,7 @@ public class CTSTokenPersistenceImpl implements CTSTokenPersistence {
                 //.returnAttribute(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID)
                 .returnAttribute(CoreTokenField.EXPIRY_DATE)
                 .returnAttribute(CoreTokenField.USER_ID)
-        		.returnAttribute(CoreTokenField.STRING_ONE);
+        		.returnAttribute(CoreTokenField.STRING_FIFTEEN);
     }
 
     private STSIssuedTokenState marshalIssuedTokenState(PartialToken partialToken) throws CTSTokenPersistenceException {

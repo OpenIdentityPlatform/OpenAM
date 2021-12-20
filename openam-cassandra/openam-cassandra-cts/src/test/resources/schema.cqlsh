@@ -70,10 +70,7 @@ DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger07;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger08;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger09;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger10;         
-CREATE MATERIALIZED VIEW IF NOT EXISTS coreTokenString01 AS SELECT * FROM cts.tokens WHERE coreTokenId IS NOT NULL and coreTokenString01 IS NOT NULL PRIMARY KEY ((coreTokenString01), coreTokenId) WITH 
-    	gc_grace_seconds = 1
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '1', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+DROP MATERIALIZED VIEW IF EXISTS coreTokenString01
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString02; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString03; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString04; 
@@ -87,7 +84,11 @@ DROP MATERIALIZED VIEW IF EXISTS coreTokenString11;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString12; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString13; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenString14; 
-DROP MATERIALIZED VIEW IF EXISTS coreTokenString15; 
+CREATE MATERIALIZED VIEW IF NOT EXISTS coreTokenString15 AS SELECT * FROM cts.tokens WHERE coreTokenId IS NOT NULL and coreTokenString15 IS NOT NULL PRIMARY KEY ((coreTokenString15), coreTokenId) WITH 
+    	gc_grace_seconds = 1
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '1', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
+ 
 CREATE MATERIALIZED VIEW IF NOT EXISTS coreTokenMultiString01 AS SELECT * FROM cts.tokens WHERE coreTokenId IS NOT NULL and coreTokenMultiString01 IS NOT NULL PRIMARY KEY ((coreTokenMultiString01), coreTokenId) WITH 
     	gc_grace_seconds = 1
     AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
