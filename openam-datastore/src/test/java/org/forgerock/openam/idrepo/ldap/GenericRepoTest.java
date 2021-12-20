@@ -393,6 +393,29 @@ public class GenericRepoTest extends IdRepoTestBase {
                 "searchTester4");
     }
 
+    @Test
+    public void getSearchFilter()  {
+        Map<String, Set<String>> avPairs = new HashMap<>();
+        avPairs.put("objectclass", asSet("inetorgperson"));
+        avPairs.put("sn", asSet("hellNo"));
+        CrestQuery crestQuery = new CrestQuery("*");
+        Filter filter = idrepo.getFilter(IdType.USER, crestQuery, IdRepo.AND_MOD, avPairs);
+        assertThat(filter.toString()).isEqualTo("(&(&(sn=hellNo)(objectclass=inetorgperson))(&(uid=\\2A)(objectclass=inetorgperson)))");
+
+        avPairs = new HashMap<>();
+        crestQuery = new CrestQuery("*", null, null, false);
+        filter = idrepo.getFilter(IdType.USER, crestQuery, IdRepo.AND_MOD, avPairs);
+        assertThat(filter.toString()).isEqualTo("(&(uid=*)(objectclass=inetorgperson))");
+
+        avPairs = new HashMap<>();
+        avPairs.put("objectclass", asSet("inetorgperson"));
+        avPairs.put("uid", asSet("searchTester1"));
+        crestQuery = new CrestQuery("*");
+        filter = idrepo.getFilter(IdType.USER, crestQuery, IdRepo.AND_MOD, avPairs);
+        assertThat(filter.toString()).isEqualTo("(&(&(uid=searchTester1)(objectclass=inetorgperson))(objectclass=inetorgperson))");
+    }
+
+
     @Test(enabled = false)
     public void searchReturnsEarlyIfMaxResultsReached() throws Exception {
         CrestQuery crestQuery = new CrestQuery("*");
