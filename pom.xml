@@ -1760,11 +1760,6 @@
 		    <version>0.14.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-validator</artifactId>
-		    <version>5.4.3.Final</version>
-		</dependency>
-		<dependency>
    			<groupId>com.fasterxml.woodstox</groupId>
    			<artifactId>woodstox-core</artifactId>
    			<version>5.3.0</version>
@@ -1782,7 +1777,7 @@
 		 <dependency>
   			<groupId>io.netty</groupId>
   			<artifactId>netty-handler</artifactId>
-  			<version>4.1.70.Final</version>
+  			<version>4.1.72.Final</version>
   		</dependency>
         <dependency>
             <groupId>com.github.jnr</groupId>
