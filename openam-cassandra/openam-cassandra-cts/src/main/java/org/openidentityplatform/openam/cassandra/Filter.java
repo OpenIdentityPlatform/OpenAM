@@ -52,7 +52,7 @@ public class Filter {
 	public String getTable() {
 		for (String field: field2value.keySet()) {
 			if (StringUtils.equalsIgnoreCase("coreTokenMultiString01",field)
-				||StringUtils.equalsIgnoreCase("coreTokenString01",field)
+				||StringUtils.equalsIgnoreCase("coreTokenString15",field)
 				||StringUtils.equalsIgnoreCase("coreTokenUserId",field)
 				) {
 				return field;
