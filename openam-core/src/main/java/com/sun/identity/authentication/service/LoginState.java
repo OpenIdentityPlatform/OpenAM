@@ -4858,10 +4858,6 @@ public class LoginState {
      */
     private void executePostProcessSPI(AMPostAuthProcessInterface postProcessInstance,
                                PostProcessEvent type) {
-        /* Reset Post Process URLs in servletRequest so
-        * that plugin can set new values (just a safety measure) */
-        AuthUtils.resetPostProcessURLs(servletRequest);
-
         if (requestMap.isEmpty() && (servletRequest != null)) {
             @SuppressWarnings("unchecked")
             Map<String, String[]> map = servletRequest.getParameterMap();
