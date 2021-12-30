@@ -786,6 +786,11 @@ public class Repo extends IdRepo {
 	}
 
 	@Override
+	public boolean supportsAuthentication() {
+		return true;
+	}
+	
+	@Override
 	public boolean authenticate(Callback[] credentials) throws IdRepoException, AuthLoginException {
         logger.trace("authenticate invoked");
         String userName = null;
