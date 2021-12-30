@@ -40,6 +40,7 @@ import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.ServiceConfig;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -146,7 +147,7 @@ public class DataStore extends AMLoginModule {
 
                 AMIdentityRepository idrepo = getAMIdentityRepository(
                     getRequestOrg());
-                boolean success = idrepo.authenticate(idCallbacks);
+                boolean success = idrepo.authenticate(IdType.USER,idCallbacks);
                 if (success) {
                     retVal=ISAuthConstants.LOGIN_SUCCEED;
                     validatedUserID = userName;
