@@ -406,7 +406,6 @@ public class LoginContext implements org.forgerock.openam.authentication.service
                     optionalExceptionHolder.setException(le);
                 } else {
                     requiredExceptionHolder.setException(le);
-
                     if (controlFlag == LoginModuleControlFlag.REQUISITE &&
                             (methodName.equals(LOGIN_METHOD) || methodName.equals(COMMIT_METHOD))) {
                         // if REQUISITE, then immediately throw an exception
@@ -428,6 +427,14 @@ public class LoginContext implements org.forgerock.openam.authentication.service
             // no module succeeded -- all modules were IGNORED
             throw new LoginException("Login Failure: all modules ignored");
         }
+    }
+    
+    public LoginException getRequiredException() {
+    	return requiredExceptionHolder.getException();
+    }
+    
+    public LoginException getOptionalException() {
+    	return optionalExceptionHolder.getException();
     }
     
 	public LinkedList<ModuleInfo> getModuleStackQueue() {
