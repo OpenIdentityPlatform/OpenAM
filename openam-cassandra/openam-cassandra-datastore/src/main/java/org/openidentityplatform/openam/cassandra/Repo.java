@@ -137,7 +137,7 @@ public class Repo extends IdRepo {
 					disableCaseSensitive.add(str);
 				}
 			}else {
-				disableCaseSensitive.addAll(Arrays.asList(new String[]{"uid","mail","iplanet-am-user-alias-list","cn"}));
+				disableCaseSensitive.addAll(Arrays.asList(new String[]{"uid","mail","iplanet-am-user-alias-list"}));
 			}
 				
 			final String keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
