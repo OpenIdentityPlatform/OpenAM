@@ -396,6 +396,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("An error occurred while trying to authenticate a user: " + ere.toString());
             }
+            if (!resultCode.equals(ResultCode.INVALID_CREDENTIALS)){
+            	DEBUG.warning("{}: {} {} {}",conn,userName,resultCode,ere.toString());
+            }
             if (resultCode.equals(ResultCode.INVALID_CREDENTIALS)) {
                 throw new InvalidPasswordException(AM_AUTH, "InvalidUP", null, userName, null);
             } else if (resultCode.equals(ResultCode.UNWILLING_TO_PERFORM)
