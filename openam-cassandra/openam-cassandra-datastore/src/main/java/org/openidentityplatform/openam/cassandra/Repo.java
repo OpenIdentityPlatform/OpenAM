@@ -212,7 +212,7 @@ public class Repo extends IdRepo {
 	@Override
 	public boolean isExists(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
-		Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{"uid"})));
+		Map<String, Set<String>> attr=getAttributes(token, type, name);
 		return attr!=null && (attr.size()!=0);
 	}
 
