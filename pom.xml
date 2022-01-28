@@ -78,6 +78,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
+    <opendj.version>4.4.12-SNAPSHOT</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
@@ -462,9 +463,24 @@
 	   <dependency>
     	<groupId>org.openidentityplatform.opendj</groupId>
 		<artifactId>opendj-parent</artifactId>
-		<version>4.4.12-SNAPSHOT</version>
+		<version>${opendj.version}</version>
     	<type>pom</type>
     	<scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.opendj</groupId>
+        <artifactId>opendj-core</artifactId>
+        <version>${opendj.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-fips</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
