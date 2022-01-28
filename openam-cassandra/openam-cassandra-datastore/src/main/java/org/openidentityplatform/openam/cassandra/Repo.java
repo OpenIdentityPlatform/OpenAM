@@ -211,16 +211,18 @@ public class Repo extends IdRepo {
 	
 	@Override
 	public boolean isExists(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
-		validate(type, IdOperation.READ);
-		Map<String, Set<String>> attr=getAttributes(token, type, name);
-		return attr!=null && (attr.size()!=0);
+		final Map<String, Set<String>> attr=getAttributes(token, type, name);
+		return attr!=null && attr.size()!=0;
 	}
 
 	@Override
 	public boolean isActive(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
-		Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{activeAttr})));
-		Set<String> value=attr.get(activeAttr);
-		return value!=null && (value.size()==0||value.contains(activeValue));
+		final Map<String, Set<String>> attr=getAttributes(token, type, name);
+		if (attr!=null && attr.size()!=0) {
+			final Set<String> value=attr.get(activeAttr);
+			return (value==null || value.size()==0 || value.contains(activeValue));
+		}
+		return false;
 	}
 	
 	@Override
@@ -302,7 +304,8 @@ public class Repo extends IdRepo {
 		validate(type, IdOperation.EDIT);
 		try{
 			final boolean async=(attributes.remove(asyncField)!=null);
-			if (isAdd && !attributes.containsKey("uid")) { //allways create uid field 
+			
+			if (isAdd && !attributes.containsKey("uid")) { //Always create uid field 
 				attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
 			}
 			if (isAdd && !attributes.containsKey(activeAttr)) {
