@@ -268,7 +268,7 @@ public class RestAuthenticationHandler {
                     }
                     e.getJsonResponse().put(AUTH_ID, authId);
                     AuditRequestContext.putProperty(AUTH_ID, authId);
-                    addAuthIdCookie(authId, request, response);
+                    authIdHelper.addAuthIdCookie(authId, request, response);
                     throw e;
                 }
 
@@ -278,7 +278,7 @@ public class RestAuthenticationHandler {
                     if(authId == null && !jsonValue.get(AUTH_ID).isNull()) {
                         authId = jsonValue.get(AUTH_ID).asString();
                     }
-                    addAuthIdCookie(authId, request, response);
+                    authIdHelper.addAuthIdCookie(authId, request, response);
                     return jsonValue;
                 } else {
                     loginProcess = loginProcess.next(callbacks);
@@ -326,20 +326,6 @@ public class RestAuthenticationHandler {
 
         // This should never happen
         throw new RestAuthException(ResourceException.INTERNAL_ERROR, "Unknown Authentication State!");
-    }
-
-    private void addAuthIdCookie(String authId, HttpServletRequest request, HttpServletResponse response) {
-        Set<String> domains = getCookieDomainsForRequest(request);
-        if (!domains.isEmpty()) {
-            for (Iterator it = domains.iterator(); it.hasNext(); ) {
-                String domain = (String)it.next();
-                Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, domain);
-                CookieUtils.addCookieToResponse(response, cookie);
-            }
-        } else {
-            Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, null);
-            CookieUtils.addCookieToResponse(response, cookie);
-        }
     }
 
     private JsonValue handleCallbacks(HttpServletRequest request, HttpServletResponse response,

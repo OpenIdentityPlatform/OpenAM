@@ -211,6 +211,7 @@ public class RestAuthenticationHandlerTest {
                 .willReturn(jsonCallbacks);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
+        doNothing().when(authIdHelper).addAuthIdCookie(anyString(), eq(request), eq(httpResponse));
 
         //When
         JsonValue response = restAuthenticationHandler.initiateAuthentication(request, httpResponse,

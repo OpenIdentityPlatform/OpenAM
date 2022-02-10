@@ -16,12 +16,16 @@
 
 package org.forgerock.openam.core.rest.authn;
 
+import static com.sun.identity.authentication.client.AuthClientUtils.getCookieDomainsForRequest;
+import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.AUTH_ID;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.SESSION_ID;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -30,11 +34,16 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -196,6 +205,20 @@ public class AuthIdHelper {
         } catch (JwtRuntimeException e) {
             throw new RestAuthException(ResourceException.BAD_REQUEST, "Failed to parse JWT, "
                     + e.getLocalizedMessage(), e);
+        }
+    }
+
+    public void addAuthIdCookie(String authId, HttpServletRequest request, HttpServletResponse response) {
+        Set<String> domains = getCookieDomainsForRequest(request);
+        if (!domains.isEmpty()) {
+            for (Iterator it = domains.iterator(); it.hasNext(); ) {
+                String domain = (String)it.next();
+                Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, domain);
+                CookieUtils.addCookieToResponse(response, cookie);
+            }
+        } else {
+            Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, null);
+            CookieUtils.addCookieToResponse(response, cookie);
         }
     }
 }
