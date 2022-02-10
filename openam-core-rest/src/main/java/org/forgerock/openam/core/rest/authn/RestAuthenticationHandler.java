@@ -21,13 +21,17 @@
 
 package org.forgerock.openam.core.rest.authn;
 
+import static com.sun.identity.authentication.client.AuthClientUtils.getCookieDomainsForRequest;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.SignatureException;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -35,6 +39,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
@@ -263,18 +268,25 @@ public class RestAuthenticationHandler {
                     }
                     e.getJsonResponse().put(AUTH_ID, authId);
                     AuditRequestContext.putProperty(AUTH_ID, authId);
+                    addAuthIdCookie(authId, request, response);
                     throw e;
                 }
 
                 if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
                     JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
                             jsonCallbacks);
+                    if(authId == null && !jsonValue.get(AUTH_ID).isNull()) {
+                        authId = jsonValue.get(AUTH_ID).asString();
+                    }
+                    addAuthIdCookie(authId, request, response);
                     return jsonValue;
                 } else {
                     loginProcess = loginProcess.next(callbacks);
                     return processAuthentication(request, response, null, authId,
                             loginProcess, loginConfiguration);
                 }
+
+
             }
             case COMPLETE: {
                 loginProcess.cleanup();
@@ -314,6 +326,20 @@ public class RestAuthenticationHandler {
 
         // This should never happen
         throw new RestAuthException(ResourceException.INTERNAL_ERROR, "Unknown Authentication State!");
+    }
+
+    private void addAuthIdCookie(String authId, HttpServletRequest request, HttpServletResponse response) {
+        Set<String> domains = getCookieDomainsForRequest(request);
+        if (!domains.isEmpty()) {
+            for (Iterator it = domains.iterator(); it.hasNext(); ) {
+                String domain = (String)it.next();
+                Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, domain);
+                CookieUtils.addCookieToResponse(response, cookie);
+            }
+        } else {
+            Cookie cookie = AuthUtils.createCookie(AUTH_ID, authId, -1, null);
+            CookieUtils.addCookieToResponse(response, cookie);
+        }
     }
 
     private JsonValue handleCallbacks(HttpServletRequest request, HttpServletResponse response,
