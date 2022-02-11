@@ -211,16 +211,18 @@ public class Repo extends IdRepo {
 	
 	@Override
 	public boolean isExists(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
-		final Map<String, Set<String>> attr=getAttributes(token, type, name);
+		final Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{"uid"})));
 		return attr!=null && attr.size()!=0;
 	}
 
 	@Override
 	public boolean isActive(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
-		final Map<String, Set<String>> attr=getAttributes(token, type, name);
-		if (attr!=null && attr.size()!=0) {
-			final Set<String> value=attr.get(activeAttr);
-			return (value==null || value.size()==0 || value.contains(activeValue));
+		final Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{activeAttr})));
+		final Set<String> value=attr.get(activeAttr);
+		if (value!=null && !value.isEmpty() && value.contains(activeValue)) { //activeAttr is set and activeAttr==activeValue
+			return true; 
+		}else if ((value==null || value.isEmpty()) && isExists(token, type, name)){ //activeAttr is not set and isExists==true
+			return true; 
 		}
 		return false;
 	}
@@ -300,16 +302,25 @@ public class Repo extends IdRepo {
 	
 	
 	@Override
-	public void setAttributes(SSOToken token, IdType type, String name, Map<String, Set<String>> attributes, boolean isAdd) throws IdRepoException, SSOException {
+	public void setAttributes(SSOToken token, IdType type, String name, Map<String, Set<String>> attributes_in, boolean isAdd) throws IdRepoException, SSOException {
 		validate(type, IdOperation.EDIT);
 		try{
+			final Map<String, Set<String>> attributes=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+			if (attributes_in!=null) {
+				attributes.putAll(attributes_in);
+			}
+			
 			final boolean async=(attributes.remove(asyncField)!=null);
 			
-			if (isAdd && !attributes.containsKey("uid")) { //Always create uid field 
-				attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
+			if (!attributes.containsKey("uid")) { //Always create uid field 
+				if (isAdd || !isExists(token, type, name)) {
+					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
+				}
 			}
-			if (isAdd && !attributes.containsKey(activeAttr)) {
-				attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
+			if (!attributes.containsKey(activeAttr)) {
+				if (isAdd || !isExists(token, type, name)) {
+					attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
+				}
 			}
 			if (isAdd) { //test if exist
 				final Integer ttl=getTTL(type, "uid");
@@ -346,8 +357,12 @@ public class Repo extends IdRepo {
 					if (disableCaseSensitive.contains(entry.getKey())) {
 						value=value.toLowerCase();
 					}
-					if (!isAdd) { //remove re-write value from delete
-						oldValues.remove(value);
+					if (!isAdd) { 
+						if (oldValues.remove(value)) {//remove re-write value from delete
+							if (!(ttl!=null && ttl>0)) { //Don't rewrite persistent value (without ttl)
+								continue;
+							}
+						}
 					}
 					final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl:statement_add_value).bind()
 							.setString("type", type.getName())
@@ -369,14 +384,16 @@ public class Repo extends IdRepo {
 					}
 				}
 			}
-			if (async)
-				new ExecuteCallback(profile,session, statements).executeAsync();
-			else
-				new ExecuteCallback(profile,session, statements).execute();
+			if (statements.size()>0) {
+				if (async)
+					new ExecuteCallback(profile,session, statements).executeAsync();
+				else
+					new ExecuteCallback(profile,session, statements).execute();
+			}
 		}catch (IdRepoException e) {
 			throw e;
 		}catch(Throwable e){
-			logger.error("setAttributes {} {} {} {}",type,name,attributes,isAdd,e.getMessage());
+			logger.error("setAttributes {} {} {} {}",type,name,attributes_in,isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}

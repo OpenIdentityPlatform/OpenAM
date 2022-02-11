@@ -343,4 +343,28 @@ public class IdRepoTest {
 		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("update-uid"));
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 	}
+	
+	@Test
+	public void test_isAdd_false() throws SSOException, IdRepoException {
+		repo.delete(null,IdType.USER, "9170000000");
+		
+		TreeMap<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		param.put("xxx", new HashSet<String>(Arrays.asList(new String[] {"9170000000+"})));
+		
+		repo.setAttributes(null,IdType.USER, "9170000000", param, false);
+		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
+		assertTrue(repo.isActive(null, IdType.USER, "9170000000"));
+		
+		repo.removeAttributes(null,IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[] {"inetuserstatus"})));
+		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
+		assertTrue(repo.isActive(null, IdType.USER, "9170000000"));
+		
+		repo.removeAttributes(null,IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[] {"uid"})));
+		assertFalse(repo.isExists(null, IdType.USER, "9170000000"));
+		assertFalse(repo.isActive(null, IdType.USER, "9170000000"));
+		
+		repo.setAttributes(null,IdType.USER, "9170000000", param, false);
+		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
+		assertTrue(repo.isActive(null, IdType.USER, "9170000000"));
+	}
 }
