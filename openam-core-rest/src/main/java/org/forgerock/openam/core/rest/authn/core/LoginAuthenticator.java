@@ -37,6 +37,8 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.util.annotations.VisibleForTesting;
 
+import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.SESSION_ID;
+
 /**
  * This class is responsible for starting or continuing a login process.
  */
@@ -153,6 +155,7 @@ public class LoginAuthenticator {
         try {
             HttpServletResponse response = loginConfiguration.getHttpResponse();
             coreServicesWrapper.setLbCookie(authContext.getAuthContext(), request, response);
+            coreServicesWrapper.setAuthCookie(authContext.getAuthContext(), request, response);
         } catch (AuthException e) {
             throw new AuthLoginException(e);
         }
