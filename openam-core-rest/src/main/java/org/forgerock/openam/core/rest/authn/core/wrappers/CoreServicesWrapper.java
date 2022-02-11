@@ -16,16 +16,22 @@
 
 package org.forgerock.openam.core.rest.authn.core.wrappers;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
+import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A wrapper class around core static class and methods.
@@ -83,5 +89,19 @@ public class CoreServicesWrapper extends org.forgerock.openam.core.CoreServicesW
      */
     public int getCompositeAdviceType(AuthenticationContext authContext) {
         return AuthUtils.getCompositeAdviceType(authContext.getAuthContext());
+    }
+
+    public void setAuthCookie(AuthContextLocal ac, HttpServletRequest request, HttpServletResponse response) {
+        Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
+        if (!domains.isEmpty()) {
+            for (Iterator it = domains.iterator(); it.hasNext(); ) {
+                String domain = (String)it.next();
+                Cookie cookie = AuthUtils.getCookieString(ac, domain);
+                CookieUtils.addCookieToResponse(response, cookie);
+            }
+        } else {
+            Cookie cookie = AuthUtils.getCookieString(ac, null);
+            CookieUtils.addCookieToResponse(response, cookie);
+        }
     }
 }

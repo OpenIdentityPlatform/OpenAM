@@ -16,12 +16,6 @@
  */
 package org.forgerock.openam.core.rest.authn.core;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -36,6 +30,12 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrappe
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.util.annotations.VisibleForTesting;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is responsible for starting or continuing a login process.
@@ -153,6 +153,7 @@ public class LoginAuthenticator {
         try {
             HttpServletResponse response = loginConfiguration.getHttpResponse();
             coreServicesWrapper.setLbCookie(authContext.getAuthContext(), request, response);
+            coreServicesWrapper.setAuthCookie(authContext.getAuthContext(), request, response);
         } catch (AuthException e) {
             throw new AuthLoginException(e);
         }
