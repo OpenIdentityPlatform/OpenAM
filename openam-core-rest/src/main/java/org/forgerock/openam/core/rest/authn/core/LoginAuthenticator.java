@@ -16,12 +16,6 @@
  */
 package org.forgerock.openam.core.rest.authn.core;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -37,7 +31,11 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.SESSION_ID;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is responsible for starting or continuing a login process.
