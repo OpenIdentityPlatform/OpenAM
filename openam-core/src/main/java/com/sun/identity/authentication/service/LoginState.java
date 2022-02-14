@@ -2294,7 +2294,7 @@ public class LoginState {
                     Set<String> tmpIdentityTypes = new HashSet<String>(identityTypes);
                     if (identityTypes.contains("user")) {
                         tmpIdentityTypes.remove("user");
-                        searchResults = searchIdentity(IdUtils.getType("user"), userTokenID, populate);
+                        searchResults = searchIdentity(IdUtils.getType("user"), userTokenID);
                         if (searchResults != null) {
                             amIdentitySet = searchResults.getSearchResults();
                         }
@@ -2302,7 +2302,7 @@ public class LoginState {
                     if (amIdentitySet.isEmpty()) {
                         for (final String strIdType : tmpIdentityTypes) {
                             // Get identity by searching
-                            searchResults = searchIdentity(IdUtils.getType(strIdType), userTokenID, populate);
+                            searchResults = searchIdentity(IdUtils.getType(strIdType), userTokenID);
                             if (searchResults != null) {
                                 amIdentitySet = searchResults.getSearchResults();
                             }
@@ -2342,11 +2342,26 @@ public class LoginState {
             if (populate) {
                 Map basicAttrs = null;
                 Map serviceAttrs = null;
-                if (searchResults != null) {
-                    basicAttrs = (Map) searchResults.getResultAttributes().get(amIdentityUser);
-                } else {
-                    basicAttrs = amIdentityUser.getAttributes();
-                }
+                final Set<String> attrs=new HashSet<String>(Arrays.asList(new String[] {
+            			ISAuthConstants.AUTHCONFIG_USER,
+            			ISAuthConstants.USER_FAILURE_URL,
+            			ISAuthConstants.LOGIN_FAILURE_URL,
+            			ISAuthConstants.MAX_SESSION_TIME,
+            	        ISAuthConstants.SESS_MAX_IDLE_TIME,
+            	        ISAuthConstants.SESS_MAX_CACHING_TIME,
+            	        ISAuthConstants.INETUSER_STATUS,
+            	        ISAuthConstants.LOGIN_STATUS,
+            	        ISAuthConstants.NSACCOUNT_LOCK,
+            	        ISAuthConstants.PREFERRED_LOCALE,
+            	        ISAuthConstants.USER_ALIAS_ATTR,
+            	        ISAuthConstants.ACCOUNT_LIFE,
+            	        ISAuthConstants.USER_SUCCESS_URL,
+            	        ISAuthConstants.LOGIN_SUCCESS_URL}));
+            	final Set<String> attrs_alias=amIdentityUser.getAttribute(ISAuthConstants.USER_ALIAS_ATTR);
+            	if (attrs_alias!=null) {
+            		attrs.addAll(attrs_alias);
+            	}
+                basicAttrs = amIdentityUser.getAttributes(attrs);
 
                 if (amIdentityRole != null) {
                     // role based auth. the specified role takes preference.
@@ -2821,10 +2836,9 @@ public class LoginState {
                 } else if (!LDAPUtils.isDN(token) && userDN == null) {
                     userDN = token;
                 }
-            }
-
-            if (!tokenSet.contains(token)) {
-                tokenSet.add(token);
+                if (!tokenSet.contains(token)) {
+                    tokenSet.add(token);
+                }
             }
 
             if (DEBUG.messageEnabled()) {
@@ -5680,7 +5694,7 @@ public class LoginState {
      * @throws IdRepoException if it fails to search user
      * @throws SSOException    if <code>SSOToken</code> is not valid
      */
-    private IdSearchResults searchIdentity(IdType idType, String userTokenID, boolean populate)
+    private IdSearchResults searchIdentity(IdType idType, String userTokenID)
             throws IdRepoException, SSOException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("In searchAutehnticatedUser: idType " + idType);
@@ -5698,11 +5712,7 @@ public class LoginState {
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(isRecursive);
         idsc.setTimeOut(maxTime);
-        if (populate) {
-            idsc.setAllReturnAttributes(true);
-        } else {
-            idsc.setReturnAttributes(returnSet);
-        }
+        idsc.setAllReturnAttributes(false);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("alias attr=" + aliasAttrNames +

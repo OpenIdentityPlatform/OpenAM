@@ -145,7 +145,7 @@ public class UserDevicesDao {
         final AMIdentityRepository amIdRepo = AuthD.getAuth().getAMIdentityRepository(realm);
 
         final IdSearchControl idsc = new IdSearchControl();
-        idsc.setAllReturnAttributes(true);
+        idsc.setAllReturnAttributes(false);
 
         Set<AMIdentity> results = Collections.emptySet();
 

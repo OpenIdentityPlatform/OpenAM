@@ -32,6 +32,7 @@
 package com.sun.identity.idm;
 
 import java.util.HashSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,10 +52,10 @@ import java.util.Set;
  * 
  */
 public final class IdSearchControl {
-    private Set returnAttributes = null;
+    private Set returnAttributes = new HashSet<String>(Arrays.asList(new String[] {"cn"}));
 
     // Disabled by default
-    private boolean getAllAttributesEnabled;
+    private boolean getAllAttributesEnabled=false;
 
     private int timeOut = 0;
 
@@ -91,7 +92,8 @@ public final class IdSearchControl {
      */
     public void setReturnAttributes(Set attributeNames) {
         if (attributeNames != null && !attributeNames.isEmpty()) {
-            returnAttributes = new HashSet(attributeNames);
+        	returnAttributes.clear();
+            returnAttributes.addAll(attributeNames);
         }
     }
 

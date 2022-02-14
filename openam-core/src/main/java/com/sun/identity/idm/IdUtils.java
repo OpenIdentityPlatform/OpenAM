@@ -31,6 +31,7 @@
 package com.sun.identity.idm;
 
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -635,7 +636,8 @@ public final class IdUtils {
 
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(true);
-        idsc.setAllReturnAttributes(true);
+        idsc.setAllReturnAttributes(false);
+
         // search for the identity
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
