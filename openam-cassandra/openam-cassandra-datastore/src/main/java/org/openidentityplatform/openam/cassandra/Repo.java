@@ -244,7 +244,12 @@ public class Repo extends IdRepo {
 	@Override
 	public Map<String, Set<String>> getAttributes(SSOToken token, IdType type,String name, Set<String> attrNames) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
-//		final Boolean addUID=(attrNames!=null) && attrNames.remove("uid");
+		if (attrNames==null || attrNames.isEmpty()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("overhead: please set attrNames",new IllegalArgumentException());
+			}
+			assert (token==null): "overhead: please set attrNames";
+		}
 		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		try{
 			final Set<String> fields=new HashSet<String>();
@@ -501,6 +506,11 @@ public class Repo extends IdRepo {
 							.setString("uid", disableCaseSensitive.contains("uid")?filterUID.toLowerCase():filterUID);
 					if (!returnAttrsNames.isEmpty()) {
 						statement=statement.setList("fields",new ArrayList<String>(returnAttrsNames),String.class);
+					}else{
+						if (logger.isDebugEnabled()) {
+							logger.debug("overhead: please set attrNames",new IllegalArgumentException());
+						}
+						assert (token==null): "overhead: please set attrNames";
 					}
 				}
 				final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
