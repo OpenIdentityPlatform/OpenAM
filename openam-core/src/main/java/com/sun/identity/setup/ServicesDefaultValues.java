@@ -514,21 +514,22 @@ public class ServicesDefaultValues {
                     String normalized = DNUtils.normalizeDN(value);
                     String tmp = normalized.replaceAll(",", "^");
                     tmp = (bXML) ? XMLUtils.escapeSpecialCharacters(tmp) :
-                        tmp ;
+                        tmp;
                     orig = orig.replaceAll(
-                        "@" + SetupConstants.SM_ROOT_SUFFIX_HAT + "@", tmp);
+                            "@" + SetupConstants.SM_ROOT_SUFFIX_HAT + "@", tmp);
 
                     String rfced = DN.valueOf(value).toString();
                     tmp = (bXML) ? XMLUtils.escapeSpecialCharacters(rfced) :
-                        rfced;
+                            rfced;
                     orig = orig.replaceAll(
-                        "@" + SetupConstants.CONFIG_VAR_ROOT_SUFFIX + "@",
-                        tmp);
+                            "@" + SetupConstants.CONFIG_VAR_ROOT_SUFFIX + "@",
+                            tmp);
+                } else if(key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT_SLASH)) {
+                    orig = orig.replace("@" + key + "@", value);
                 } else if (
                     key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT) ||
                     key.equals(SetupConstants.NORMALIZED_RS) ||
                     key.equals(SetupConstants.NORMALIZED_ORG_BASE) ||
-                    key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT) ||
                     key.equals(SetupConstants.CONFIG_VAR_SESSION_ROOT_SUFFIX) ||
                     key.equals(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE)
                 ) {
