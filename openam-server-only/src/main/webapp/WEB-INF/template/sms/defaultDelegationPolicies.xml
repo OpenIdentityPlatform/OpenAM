@@ -190,7 +190,7 @@ End of comment for "notAttributes" AttributeValuePair -->
     </Subjects>
 </Policy>
 
-<Policy name="@SM_ROOT_SUFFIX_HAT@^^AgentLogging" referralPolicy="false" active="true" >
+<Policy name="@SM_ROOT_SUFFIX_HAT_SLASH@^^AgentLogging" referralPolicy="false" active="true" >
     <Rule name="delegation-rule1">
         <ServiceName name="sunAMDelegationService" />
         <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/iPlanetAMLoggingService/1.0/application/*" />
@@ -205,7 +205,7 @@ End of comment for "notAttributes" AttributeValuePair -->
     </Subjects>
 </Policy>
 
-<Policy name="@SM_ROOT_SUFFIX_HAT@^^EntitlementEval" referralPolicy="false" active="true" >
+<Policy name="@SM_ROOT_SUFFIX_HAT_SLASH@^^EntitlementEval" referralPolicy="false" active="true" >
     <Rule name="delegation-rule1">
         <ServiceName name="sunAMDelegationService" />
         <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/decision" />

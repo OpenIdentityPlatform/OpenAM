@@ -497,6 +497,12 @@ public interface SetupConstants {
     static final String SM_ROOT_SUFFIX_HAT = "SM_ROOT_SUFFIX_HAT";
 
     /**
+     * Configuration Variable for service management root suffix with carat and escaped equal
+     * suffix.
+     */
+    static final String SM_ROOT_SUFFIX_HAT_SLASH = "SM_ROOT_SUFFIX_HAT_SLASH";
+
+    /**
      * Variable for default organization base suffix for service management 
      * node.
      */

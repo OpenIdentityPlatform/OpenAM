@@ -154,6 +154,9 @@ public class AMSetupDSConfig {
                 replaceDNDelimiter(peopleNMDN, "_"));
             map.put(SetupConstants.SM_ROOT_SUFFIX_HAT, 
                 replaceDNDelimiter(escapedDN, "^"));
+            map.put(SetupConstants.SM_ROOT_SUFFIX_HAT_SLASH,
+                    replaceDNDelimiter(escapedDN, "^")
+                            .replace("=", "\\="));
             map.put(SetupConstants.NORMALIZED_RS, escapedDN); 
             map.put(SetupConstants.NORMALIZED_ORG_BASE, escapedDN); 
             map.put(SetupConstants.ORG_ROOT_SUFFIX, suffix); 
