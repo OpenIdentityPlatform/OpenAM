@@ -27,7 +27,14 @@ jobs:
          path: ~/.m2/repository
          key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
          restore-keys: ${{ runner.os }}-m2-repository
+    - name: Set Integration Test Environment
+      if: matrix.os == 'ubuntu-latest'
+      run: > 
+        echo '::set-output name=MAVEN_PROFILE_FLAG::-P integration-test' 
+        && echo '::set-output name=MAVEN_VERIFY_STAGE::verify' 
+        && echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
+      id: maven-profile-flag
     - name: Build with Maven
       env:
         MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
-      run: mvn --batch-mode  --update-snapshots package --file pom.xml
+      run: mvn --batch-mode --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
