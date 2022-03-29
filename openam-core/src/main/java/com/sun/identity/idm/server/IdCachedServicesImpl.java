@@ -85,6 +85,9 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     // Class Private
     private Cache<String, IdCacheBlock> idRepoCache;
+    
+    private Cache<String, Boolean> idRepoExists;
+    private Cache<String, Boolean> idRepoActive;
 
     private IdCacheStats cacheStats;
 
@@ -123,6 +126,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     private void initializeCache() {
         idRepoCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
+        idRepoExists = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
+        idRepoActive = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
     }
 
     private void resetCache(int maxCacheSize) {
@@ -226,6 +231,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
      */
     public synchronized void clearCache() {
         idRepoCache.invalidateAll();
+        idRepoExists.invalidateAll();
+        idRepoActive.invalidateAll();
         initializeCache();
     }
 
@@ -257,6 +264,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String originalDN = dn;
         dn = DNUtils.normalizeDN(dn);
         String cachedID = getCacheId(dn);
+        idRepoExists.invalidate(cachedID);
+        idRepoActive.invalidate(cachedID);
         switch (eventType) {
         case AMEvent.OBJECT_ADDED:
             cb = getFromCache(dn);
@@ -328,6 +337,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     private void dirtyCache(String dn) {
         String key = DNUtils.normalizeDN(dn);
        	idRepoCache.invalidate(key);
+       	idRepoExists.invalidate(key);
+        idRepoActive.invalidate(key);
     }
 
     public Map getAttributes(SSOToken token, IdType type, String name,
@@ -434,6 +445,28 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         return attributes;
     }
 
+    @Override
+	public boolean isExists(SSOToken token, IdType type, String name, String amOrgName) throws SSOException, IdRepoException {
+    	final String key=new AMIdentity(token, name, type, amOrgName, null).getUniversalId().toLowerCase();
+		Boolean res=idRepoExists.getIfPresent(key);
+		if (res==null) {
+			res=super.isExists(token, type, name, amOrgName);
+			idRepoExists.put(key, res);
+		}
+		return res;
+	}
+
+	@Override
+	public boolean isActive(SSOToken token, IdType type, String name, String amOrgName, String amsdkDN) throws SSOException, IdRepoException {
+		final String key=new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId().toLowerCase();
+		Boolean res=idRepoActive.getIfPresent(key);
+		if (res==null) {
+			res=super.isActive(token, type, name, amOrgName, amsdkDN);
+			idRepoActive.put(key, res);
+		}
+		return res;
+	}
+	
     public Map getAttributes(SSOToken token, IdType type, String name,
         String amOrgName, String amsdkDN)
         throws IdRepoException, SSOException {
