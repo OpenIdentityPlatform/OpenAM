@@ -18,12 +18,14 @@ package org.forgerock.openam.sts.tokengeneration.oidc;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.sm.DNMapper;
-
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -56,6 +58,9 @@ import java.security.KeyPair;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration
@@ -79,6 +84,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         this.logger = logger;
     }
 
+    String stsInstanceId=null;
+    
     @SuppressWarnings("rawtypes")
 	@Override
     public String generate(SSOToken subjectToken, STSInstanceState stsInstanceState,
@@ -87,7 +94,8 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         final OpenIdConnectTokenConfig tokenConfig = stsInstanceState.getConfig().getOpenIdConnectTokenConfig();
         final long issueInstant = currentTimeMillis();
         final String subject = ssoTokenIdentity.validateAndGetTokenPrincipal(subjectToken);
-
+        stsInstanceId=invocationState.getStsInstanceId();
+        
         STSOpenIdConnectToken openIdConnectToken = buildToken(subjectToken, tokenConfig,
                 invocationState.getOpenIdConnectTokenGenerationState(), issueInstant / 1000, subject);
 
@@ -181,18 +189,30 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
         return openIdConnectToken;
     }
 
+    static Cache<String, Map<String, String>> token2claims=CacheBuilder.newBuilder()
+    		.maximumSize(SystemProperties.getAsInt("org.openidentityplatform.sts.cache.maxSize", 64000))
+    		.expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.sts.cache.maxTime", 1), TimeUnit.SECONDS).build();
+    
     private void handleClaims(SSOToken subjectToken, STSOpenIdConnectToken openIdConnectToken, OpenIdConnectTokenConfig tokenConfig) throws TokenCreationException {
-        final Map<String, String> mappedClaims = openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
-        //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
-        if (logger.isDebugEnabled()) {
-            for (String key : mappedClaims.keySet()) {
-                if (openIdConnectToken.isDefined(key)) {
-                    logger.debug("In generating an OpenIdConnect token, the claim map for claim " + key +
-                            " will over-write an existing claim.");
-                }
-            }
-        }
-        openIdConnectToken.setClaims(mappedClaims);
+    	try {
+			openIdConnectToken.setClaims(token2claims.get(stsInstanceId+":"+subjectToken.getTokenID().toString(), new Callable<Map<String,String>>() {
+				@Override
+				public Map<String, String> call() throws Exception {
+					final Map<String, String> mappedClaims = openIdConnectTokenClaimMapperProvider.getClaimMapper(tokenConfig).getCustomClaims(subjectToken, tokenConfig.getClaimMap());
+			        //processing to log a warning if any of the values corresponding to the custom clams will over-write an existing claim
+			        if (logger.isDebugEnabled()) {
+			            for (String key : mappedClaims.keySet()) {
+			                if (openIdConnectToken.isDefined(key)) {
+			                    logger.debug("In generating an OpenIdConnect token, the claim map for claim " + key +" will over-write an existing claim.");
+			                }
+			            }
+			        }
+				    return mappedClaims;
+				}
+			}));
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
     }
 
     private KeyPair getKeyPair(OpenIdConnectTokenPKIProvider cryptoProvider, String signatureKeyAlias, byte[] signatureKeyPassword)
