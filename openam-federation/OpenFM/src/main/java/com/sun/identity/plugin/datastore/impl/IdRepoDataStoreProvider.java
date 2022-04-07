@@ -52,6 +52,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.CrestQuery;
 
 /**
  * The <code>IdRepoDataStoreProvider</code> is an implementation of 
@@ -274,7 +275,8 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         try {
             IdSearchControl searchControl = getIdSearchControl(avPairs, IdSearchOpModifier.AND);
             AMIdentityRepository idRepo = getAMIdentityRepository(orgDN);
-            IdSearchResults searchResults = idRepo.searchIdentities(IdType.USER, "*", searchControl);
+            CrestQuery pattern = new CrestQuery("*", null, null, false);
+            IdSearchResults searchResults = idRepo.searchIdentities(IdType.USER, pattern, searchControl);
             amIdSet = searchResults.getSearchResults();
         } catch (IdRepoException ame) {
             debug.error("IdRepoDataStoreProvider.getUserID(): IdRepoException",
