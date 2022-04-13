@@ -30,7 +30,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -50,6 +52,8 @@ import com.datastax.oss.driver.api.core.cql.DefaultBatchType;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -450,26 +454,33 @@ public class Repo extends IdRepo {
 	     throw new IdRepoException("FilesRepo.search does not support queryFilter searches");
 	}
 	
-	ConcurrentHashMap<String, PreparedStatement> indexByValue=new ConcurrentHashMap<String, PreparedStatement>();
-	PreparedStatement getIndexByValue(String field) {
+	final Cache<String, PreparedStatement> indexByValue=CacheBuilder.newBuilder()
+			.maximumSize(2048)
+			.expireAfterAccess(5,TimeUnit.MINUTES)
+			.build();
+	PreparedStatement getIndexByValue(String field) throws ExecutionException {
 		final String table="ix_".concat(field.toLowerCase()).replaceAll("-", "_");
-		PreparedStatement res=indexByValue.get(table);
-		if (res==null) {
-			res=session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values limit 64000");
-			indexByValue.put(table, res);
-		}
-		return res;
+		return indexByValue.get(table,new Callable<PreparedStatement>() {
+			@Override
+			public PreparedStatement call() throws Exception {
+				// TODO Auto-generated method stub
+				return session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values limit 64000");
+			}
+		});
 	}
 	
-	ConcurrentHashMap<String, PreparedStatement> indexByValueAndUID=new ConcurrentHashMap<String, PreparedStatement>();
-	PreparedStatement getIndexByValueAndUID(String field) {
+	final Cache<String, PreparedStatement> indexByValueAndUID=CacheBuilder.newBuilder()
+			.maximumSize(2048)
+			.expireAfterAccess(5,TimeUnit.MINUTES)
+			.build();
+	PreparedStatement getIndexByValueAndUID(String field) throws ExecutionException {
 		final String table="ix_".concat(field.toLowerCase()).replaceAll("-", "_");
-		PreparedStatement res=indexByValueAndUID.get(table);
-		if (res==null) {
-			res=session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values and uid=:uid limit 64000");
-			indexByValueAndUID.put(table, res);
-		}
-		return res;
+		return indexByValueAndUID.get(table,new Callable<PreparedStatement>() {
+			@Override
+			public PreparedStatement call() throws Exception {
+				return session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values and uid=:uid limit 64000");
+			}
+		});
 	}
 	
 	public RepoSearchResults search(SSOToken token, IdType type, String pattern, int maxTime, int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,Map<String, Set<String>> avPairs, boolean recursive) throws IdRepoException, SSOException {
