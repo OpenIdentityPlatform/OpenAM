@@ -32,6 +32,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
@@ -145,6 +146,12 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         // Session handle
         token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), SessionUtils.getEncrypted(session.getSessionHandle()));
 
+        //"am.protected.oauth2.uid"
+        final String tokenUid=session.getProperty("am.protected.oauth2.uid");
+        if (tokenUid!=null) {
+        	token.setAttribute(CoreTokenField.STRING_FIFTEEN, tokenUid);
+        }
+        
         return token;
     }
 

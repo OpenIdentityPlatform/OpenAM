@@ -25,8 +25,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -66,6 +68,7 @@ import com.iplanet.dpro.session.service.InternalSessionEventBroker;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.dpro.session.service.SessionState;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.session.util.SessionUtilsWrapper;
 import com.sun.identity.shared.Constants;
@@ -383,5 +386,42 @@ public class SessionPersistenceStore {
             results.add(getInternalSessionFromToken(token));
         }
         return results;
+    }
+    
+    public Set<String> getAccessTokens(AMIdentity idm) throws CoreTokenException {
+    	try {
+    		final TokenFilter filter = new TokenFilterBuilder()
+                    .returnAttribute(SessionTokenField.SESSION_ID.getField())
+                    .returnAttribute(CoreTokenField.TOKEN_TYPE)
+                    .and()
+                    .withAttribute(CoreTokenField.STRING_FIFTEEN, idm.getUniversalId())
+                    .build();
+            final Collection<PartialToken> partialTokens = coreTokenService.attributeQuery(filter);
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        "getAccessTokens query success:\n" +
+                                "Query: {0}\n" +
+                                "Count: {1}",
+                        filter,
+                        partialTokens.size()));
+            }
+
+            final Set<String> sessions = new HashSet<String>();
+            for (PartialToken partialToken : partialTokens) {
+            	if ("SESSION".equals(partialToken.getValue(CoreTokenField.TOKEN_TYPE).toString())) {
+            		sessions.add(SessionUtils.getDecrypted(partialToken.getValue(SessionTokenField.SESSION_ID.getField())));
+            	}
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format("getAccessTokens query results: {0}", sessions));
+            }
+
+            return sessions;
+        } catch (CoreTokenException e) {
+            debug.error("getAccessTokens: Session repository is not available", e);
+            throw e;
+        }
     }
 }
