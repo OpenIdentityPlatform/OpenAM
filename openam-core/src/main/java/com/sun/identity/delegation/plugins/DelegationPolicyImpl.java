@@ -251,24 +251,25 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                  * DN format, the special char ',' is replaced to avoid
                  * saving problem.
                  */
-                String prefix = null;
-                if (orgName != null) {
-                    prefix = orgName.toLowerCase() + NAME_DELIMITER;
-                    prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
-                } else {
-                    prefix = NAME_DELIMITER;
-                }
+                String prefix = getPolicyPrefixByOrgName(orgName);
                 int prefixLength = prefix.length();
                 Iterator it = pnames.iterator();
                 while (it.hasNext()) {
                     String pname = (String)it.next();
-                    if (pname.toLowerCase().startsWith(prefix)) {
-                        Policy p = pm.getPolicy(pname);
+                    String pnameEscaped = LDAPUtils.escapeValue(pname);
+                    if (pname.toLowerCase().startsWith(prefix)
+                            || pnameEscaped.toLowerCase().startsWith(prefix)) {
+                        String validPolicyName = pname;
+                        if (pnameEscaped.toLowerCase().startsWith(prefix)) {
+                            validPolicyName = pnameEscaped;
+                        }
+                        Policy p = pm.getPolicy(validPolicyName);
+
                         // converts the policy to its corresponding
                         // delegation privilege
                         DelegationPrivilege dp = policyToPrivilege(p);
                         if (dp != null) {
-                            dp.setName(pname.substring(prefixLength));
+                            dp.setName(validPolicyName.substring(prefixLength));
                             privileges.add(dp);
                         }
                     }
@@ -280,6 +281,18 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                 "unable to get privileges from realm " + orgName);
             throw new DelegationException(e);
         }
+    }
+
+    private String getPolicyPrefixByOrgName(String orgName) {
+        String prefix;
+        if (orgName != null) {
+            prefix = orgName.toLowerCase() + NAME_DELIMITER;
+            prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
+            prefix = LDAPUtils.escapeValue(prefix);
+        } else {
+            prefix = NAME_DELIMITER;
+        }
+        return prefix;
     }
 
     /**
@@ -359,20 +372,9 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             }
             PolicyManager pm = new PolicyManager(token,
                                     POLICY_REPOSITORY_REALM);
-            String prefix = null;
-            if (orgName != null) {
-                /* the name of the policy is in the form of
-                 * orgName^^privilegeName, the privilegeName is the
-                 * name of the delegation privilege that the policy
-                 * is corresponding to. In case the orgName is in a
-                 * DN format, the special char ',' is replaced to
-                 * avoid saving problem.
-                 */
-                 prefix = orgName.toLowerCase() + NAME_DELIMITER;
-                 prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
-            } else {
-                prefix = NAME_DELIMITER;
-            }
+
+            String prefix = getPolicyPrefixByOrgName(orgName);
+
             pm.removePolicy(prefix + privilegeName);
         } catch (Exception e) {
             throw new DelegationException(e);
@@ -792,13 +794,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
              * DN format, the special char ',' is replaced to
              * avoid saving problem.
              */
-            String prefix = null;
-            if (orgName != null) {
-                prefix = orgName.toLowerCase() + NAME_DELIMITER;
-                prefix = prefix.replace(',', REPLACEMENT_FOR_COMMA);
-            } else {
-                prefix = NAME_DELIMITER;
-            }
+            String prefix = getPolicyPrefixByOrgName(orgName);
             String name = prefix + priv.getName();
             Policy policy = new Policy(name);
 
