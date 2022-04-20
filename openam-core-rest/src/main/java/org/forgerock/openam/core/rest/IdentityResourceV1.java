@@ -1214,7 +1214,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             if (queryId == null || queryId.isEmpty()) {
                 queryId = "*";
             }
-            List<String> users = identityServices.search(new CrestQuery(queryId),
+            List<String> users = identityServices.search(new CrestQuery(queryId, null, null, false),
                                                          getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.queryCollection :: QUERY performed on realm={}  by principalName={}", realm,
