@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS tokens (
     AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
     AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '1', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'}
  ;
- 
+DROP MATERIALIZED VIEW IF EXISTS coreTokenType;  
 DROP MATERIALIZED VIEW IF EXISTS coreTokenDate01; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenDate02; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenDate03; 

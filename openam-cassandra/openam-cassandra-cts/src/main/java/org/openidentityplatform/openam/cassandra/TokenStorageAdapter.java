@@ -27,6 +27,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,31 +61,50 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter {
 	final static Logger logger = LoggerFactory.getLogger(TokenStorageAdapter.class);
 
 	private final DataLayerConfiguration cfg;
-	private final ConnectionFactory<CqlSession> connectionFactory;
+	static ConnectionFactory<CqlSession> connectionFactory;
 
-	final PreparedStatement statement_read;
-	final PreparedStatement statement_delete;
-	final PreparedStatement statement_update;
+	static PreparedStatement static_statement_read;
+	static PreparedStatement static_statement_delete;
+	static PreparedStatement static_statement_update;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Inject
-	public TokenStorageAdapter(DataLayerConfiguration dataLayerConfiguration,ConnectionFactory connectionFactory) throws DataLayerException {
+	public TokenStorageAdapter(DataLayerConfiguration dataLayerConfiguration,ConnectionFactory connectionFactoryIn) throws DataLayerException {
 		this.cfg = dataLayerConfiguration;
-		this.connectionFactory = connectionFactory;
-		
-		statement_read=getSession().prepare("select * from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId limit 1");
-		statement_delete=getSession().prepare("delete from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId");
-		statement_update=getSession().prepare("update "+cfg.getTableName()+" using ttl :ttl set coreTokenDate01=:coreTokenDate01,coreTokenDate02=:coreTokenDate02,coreTokenDate03=:coreTokenDate03,coreTokenDate04=:coreTokenDate04,coreTokenDate05=:coreTokenDate05,coreTokenExpirationDate=:coreTokenExpirationDate,coreTokenInteger01=:coreTokenInteger01,coreTokenInteger02=:coreTokenInteger02,coreTokenInteger03=:coreTokenInteger03,coreTokenInteger04=:coreTokenInteger04,coreTokenInteger05=:coreTokenInteger05,coreTokenInteger06=:coreTokenInteger06,coreTokenInteger07=:coreTokenInteger07,coreTokenInteger08=:coreTokenInteger08,coreTokenInteger09=:coreTokenInteger09,coreTokenInteger10=:coreTokenInteger10,coreTokenObject=:coreTokenObject,coreTokenString01=:coreTokenString01,coreTokenString02=:coreTokenString02,coreTokenString03=:coreTokenString03,coreTokenString04=:coreTokenString04,coreTokenString05=:coreTokenString05,coreTokenString06=:coreTokenString06,coreTokenString07=:coreTokenString07,coreTokenString08=:coreTokenString08,coreTokenString09=:coreTokenString09,coreTokenString10=:coreTokenString10,coreTokenString11=:coreTokenString11,coreTokenString12=:coreTokenString12,coreTokenString13=:coreTokenString13,coreTokenString14=:coreTokenString14,coreTokenString15=:coreTokenString15,coreTokenMultiString01=:coreTokenMultiString01,coreTokenMultiString02=:coreTokenMultiString02,coreTokenMultiString03=:coreTokenMultiString03,coreTokenType=:coreTokenType,coreTokenUserId=:coreTokenUserId,etag=:etag,createTimestamp=:createTimestamp where coreTokenId=:coreTokenId");
+		connectionFactory = connectionFactoryIn;
 	}
 
+	PreparedStatement get_statement_read() throws DataLayerException {
+		if (static_statement_read==null) {
+			static_statement_read=getSession().prepare("select * from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId limit 1");
+		}
+		return static_statement_read;
+	}
+	
+	PreparedStatement get_statement_delete() throws DataLayerException {
+		if (static_statement_delete==null) {
+			static_statement_delete=getSession().prepare("delete from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId");
+		}
+		return static_statement_delete;
+	}
+	
+	PreparedStatement get_statement_update() throws DataLayerException {
+		if (static_statement_update==null) {
+			static_statement_update=getSession().prepare("update "+cfg.getTableName()+" using ttl :ttl set coreTokenDate01=:coreTokenDate01,coreTokenDate02=:coreTokenDate02,coreTokenDate03=:coreTokenDate03,coreTokenDate04=:coreTokenDate04,coreTokenDate05=:coreTokenDate05,coreTokenExpirationDate=:coreTokenExpirationDate,coreTokenInteger01=:coreTokenInteger01,coreTokenInteger02=:coreTokenInteger02,coreTokenInteger03=:coreTokenInteger03,coreTokenInteger04=:coreTokenInteger04,coreTokenInteger05=:coreTokenInteger05,coreTokenInteger06=:coreTokenInteger06,coreTokenInteger07=:coreTokenInteger07,coreTokenInteger08=:coreTokenInteger08,coreTokenInteger09=:coreTokenInteger09,coreTokenInteger10=:coreTokenInteger10,coreTokenObject=:coreTokenObject,coreTokenString01=:coreTokenString01,coreTokenString02=:coreTokenString02,coreTokenString03=:coreTokenString03,coreTokenString04=:coreTokenString04,coreTokenString05=:coreTokenString05,coreTokenString06=:coreTokenString06,coreTokenString07=:coreTokenString07,coreTokenString08=:coreTokenString08,coreTokenString09=:coreTokenString09,coreTokenString10=:coreTokenString10,coreTokenString11=:coreTokenString11,coreTokenString12=:coreTokenString12,coreTokenString13=:coreTokenString13,coreTokenString14=:coreTokenString14,coreTokenString15=:coreTokenString15,coreTokenMultiString01=:coreTokenMultiString01,coreTokenMultiString02=:coreTokenMultiString02,coreTokenMultiString03=:coreTokenMultiString03,coreTokenType=:coreTokenType,coreTokenUserId=:coreTokenUserId,etag=:etag,createTimestamp=:createTimestamp where coreTokenId=:coreTokenId");
+		}
+		return static_statement_update;
+	}
+	
 	public Token update(Token token, boolean ifExists) throws DataLayerException {
 		try {
-			BoundStatement statement=statement_update.bind().setInt("ttl", new Long(Math.min(((token.getExpiryTimestamp().getTimeInMillis() - System.currentTimeMillis()) / 1000)+5*60,24*60*60)).intValue());
+			BoundStatement statement=get_statement_update().bind().setInt("ttl", new Long(Math.min(((token.getExpiryTimestamp().getTimeInMillis() - System.currentTimeMillis()) / 1000)+5*60,24*60*60)).intValue());
 			for (CoreTokenField field : CoreTokenField.values()) {
 				Object value = null;
 				try {
@@ -142,7 +164,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
      */
     public Token read(String tokenId, Options options) throws DataLayerException {
 		try{
-			final Row row=new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),statement_read.bind().setString(CoreTokenField.TOKEN_ID.toString(), tokenId)).execute().one();
+			final Row row=new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),get_statement_read().bind().setString(CoreTokenField.TOKEN_ID.toString(), tokenId)).execute().one();
 			return row==null?null:Row2Token(row);
 	    }catch(Throwable e){
 			throw new DataLayerException("read", e);
@@ -163,7 +185,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		try {
 			Token token = read(tokenId,options);
 			if (token != null) {
-				new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),statement_delete.bind().setString(CoreTokenField.TOKEN_ID.toString(), tokenId)).execute();
+				new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),get_statement_delete().bind().setString(CoreTokenField.TOKEN_ID.toString(), tokenId)).execute();
 				
 				final Map<CoreTokenField, Object> entry=new HashMap<CoreTokenField, Object>();
 				entry.put(CoreTokenField.TOKEN_ID, token.getAttribute(CoreTokenField.TOKEN_ID));
@@ -175,7 +197,23 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		return ptoken;
 	}
 
-
+	static Cache<String, PreparedStatement> preparedCache=CacheBuilder.newBuilder()
+			.expireAfterAccess(15, TimeUnit.MINUTES)
+			.maximumSize(1024*10)
+			.build();
+	
+	PreparedStatement getPreparedStatement(SimpleStatement statement) throws ExecutionException {
+		return preparedCache.get(statement.getQuery(), 
+    			new Callable<PreparedStatement>() {
+					@Override
+					public PreparedStatement call() throws Exception {
+						logger.debug("add prepared: {}",statement.getQuery());
+						return getSession().prepare(statement);
+					}
+				}
+    		);
+	}
+	
     /**
      * Performs a full-token query using the provided filter.
      *
@@ -194,11 +232,29 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
     		if (filter.allowFilter()) {
     			select=select.allowFiltering();
     		}
-    		if (query.getSizeLimit()>0)
+    		if (query.getSizeLimit()>0) {
     			select=select.limit(query.getSizeLimit());
-    		final SimpleStatement statement=select.build();
-    		if (query.getTimeLimit().getValue()>0 && query.getTimeLimit().to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE)
-    			statement.setTimeout(Duration.ofMillis(query.getTimeLimit().to(TimeUnit.MILLISECONDS)));
+    		}
+    		BoundStatement statement=getPreparedStatement(select.build()).bind();
+    		for (Entry<String, Object> field2value : filter.field2value.entrySet()) {
+    			final Object value=field2value.getValue();
+    			if (value!=null) {
+					if (value instanceof TokenType) {
+						statement=statement.setString(field2value.getKey(), value.toString());
+					}else if (value instanceof Calendar) {
+						statement=statement.setInstant(field2value.getKey(), ((Calendar) value).toInstant());
+					}else if (value instanceof byte[]) {
+						statement=statement.setByteBuffer(field2value.getKey(), ByteBuffer.wrap((byte[]) value));
+					}else if (value instanceof String) {
+						statement=statement.setString(field2value.getKey(), (String)value);
+					}else if (value instanceof Integer) {
+						statement=statement.setInt(field2value.getKey(), (Integer)value);
+					}
+				}
+			}
+    		if (query.getTimeLimit().getValue()>0 && query.getTimeLimit().to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE) {
+    			statement=statement.setTimeout(Duration.ofMillis(query.getTimeLimit().to(TimeUnit.MILLISECONDS)));
+    		}
     		for(final Row row: new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),statement).execute()) {
     			res.add(Row2Token(row));
     		}
@@ -235,11 +291,26 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
     		if (filter.allowFilter()) {
     			select=select.allowFiltering();
     		}
-    		if (query.getSizeLimit()>0)
-    			select=select.limit(query.getSizeLimit());
-    		final SimpleStatement statement=select.build();
-    		if (query.getTimeLimit().getValue()>0 && query.getTimeLimit().to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE)
-    			statement.setTimeout(Duration.ofMillis(query.getTimeLimit().to(TimeUnit.MILLISECONDS)));
+    		BoundStatement statement=getPreparedStatement(select.build()).bind();
+    		for (Entry<String, Object> field2value : filter.field2value.entrySet()) {
+    			final Object value=field2value.getValue();
+    			if (value!=null) {
+					if (value instanceof TokenType) {
+						statement=statement.setString(field2value.getKey(), value.toString());
+					}else if (value instanceof Calendar) {
+						statement=statement.setInstant(field2value.getKey(), ((Calendar) value).toInstant());
+					}else if (value instanceof byte[]) {
+						statement=statement.setByteBuffer(field2value.getKey(), ByteBuffer.wrap((byte[]) value));
+					}else if (value instanceof String) {
+						statement=statement.setString(field2value.getKey(), (String)value);
+					}else if (value instanceof Integer) {
+						statement=statement.setInt(field2value.getKey(), (Integer)value);
+					}
+				}
+			}
+    		if (query.getTimeLimit().getValue()>0 && query.getTimeLimit().to(TimeUnit.MILLISECONDS)<=Integer.MAX_VALUE) {
+    			statement=statement.setTimeout(Duration.ofMillis(query.getTimeLimit().to(TimeUnit.MILLISECONDS)));
+    		}
     		for(final Row row: new ExecuteCallback(ConnectionFactoryProvider.profile,getSession(),statement).execute()) {
     			res.add(Row2ParitalToken(requestedCoreTokenFields,row));
     		}
