@@ -77,35 +77,35 @@ public class Filter {
 	public static Filter equality(String name, Object value) {
 		final Filter res=InjectorHolder.getInstance(Filter.class); 
 		res.field2value.put(name, value);
-		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("=", literal(value))); 
+		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("=", bindMarker(name))); 
 		return res; 
 	}
 	
 	public static Filter greaterThan(String name, Object value) {
 		final Filter res=InjectorHolder.getInstance(Filter.class);
 		res.field2value.put(name, value);
-		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build(">", literal(value))); 
+		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build(">", bindMarker(name))); 
 		return res;
 	}
 	
 	public static Filter greaterOrEqual(String name, Object value) {
 		final Filter res=InjectorHolder.getInstance(Filter.class);
 		res.field2value.put(name, value);
-		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build(">=", literal(value))); 
+		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build(">=", bindMarker(name))); 
 		return res;
 	}
 	
 	public static Filter lessThan(String name, Object value) {
 		final Filter res=InjectorHolder.getInstance(Filter.class);
 		res.field2value.put(name, value);
-		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("<", literal(value))); 
+		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("<", bindMarker(name))); 
 		return res;
 	}
 	
 	public static Filter lessOrEqual(String name, Object value) {
 		final Filter res=InjectorHolder.getInstance(Filter.class);
 		res.field2value.put(name, value);
-		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("<=", literal(value))); 
+		res.clauses.add(new DefaultColumnRelationBuilder(CqlIdentifier.fromCql(name)).build("<=", bindMarker(name))); 
 		return res;
 	}
 }
