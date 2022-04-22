@@ -52,6 +52,7 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerIdRepoSvcImpl;
 import com.sun.identity.shared.stats.Stats;
+import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
 
 import java.util.Collections;
@@ -59,6 +60,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -128,6 +130,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         idRepoCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
         idRepoExists = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
         idRepoActive = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
+        idCacheServiceAttributes= CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.service.cache.maxTime", 300), TimeUnit.SECONDS).build();
     }
 
     private void resetCache(int maxCacheSize) {
@@ -233,6 +236,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         idRepoCache.invalidateAll();
         idRepoExists.invalidateAll();
         idRepoActive.invalidateAll();
+        idCacheServiceAttributes.invalidateAll();
         initializeCache();
     }
 
@@ -444,7 +448,29 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         }
         return attributes;
     }
+    
 
+	@SuppressWarnings("rawtypes")
+	Cache<String,Map> idCacheServiceAttributes;
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Map getServiceAttributes(SSOToken token, IdType type, String name, String serviceName, Set attrNames,String amOrgName, String amsdkDN, boolean isString) throws IdRepoException, SSOException {
+		final String cacheKey=amOrgName.concat(":"+type).concat(":").concat(serviceName);
+    	Map res=idCacheServiceAttributes.getIfPresent(cacheKey);
+		if (res==null) {
+			res=super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString);
+			idCacheServiceAttributes.put(cacheKey, res);
+		}
+		return res;
+	}
+
+	@Override
+	public void modifyService(SSOToken token, IdType type, String name, String serviceName, SchemaType stype,Map attrMap, String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
+		final String cacheKey=amOrgName.concat(":"+type).concat(":").concat(serviceName);
+		super.modifyService(token, type, name, serviceName, stype, attrMap, amOrgName, amsdkDN);
+		idCacheServiceAttributes.invalidate(cacheKey);
+	}
+	
     @Override
 	public boolean isExists(SSOToken token, IdType type, String name, String amOrgName) throws SSOException, IdRepoException {
     	final String key=new AMIdentity(token, name, type, amOrgName, null).getUniversalId().toLowerCase();
