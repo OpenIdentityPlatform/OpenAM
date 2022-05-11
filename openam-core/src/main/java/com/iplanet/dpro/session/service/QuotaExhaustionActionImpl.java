@@ -2,16 +2,12 @@ package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Key;
@@ -29,22 +25,17 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 
     	final private static long serialVersionUID = 1L;
 
-		final private Set<T> set = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
 		public SetBlockingQueue(int capacity) {
 			super(capacity);
 		}
 
 	    @Override
 	    public synchronized boolean add(T t) {
-	        if (set.contains(t)) {
+	        if (contains(t)) {
 	            return false;
 	        } else {
 	            try {
 	            	final Boolean res=super.add(t);
-	            	if (res) {
-	            		set.add(t);
-	            	}
 	            	return res;
 	            }catch (IllegalStateException e) {
 	            	return false;
@@ -52,18 +43,11 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 	        }
 	    }
 
-	    @Override
-	    public T take() throws InterruptedException {
-	        final T t = super.take();
-	        set.remove(t);
-	        return t;
-	    }
     }
     
-    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 64000));
-
+    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 32000));
+    
     static class Task implements Runnable {
-    	final static  SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
     	final static  Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
 		
     	@Override
@@ -71,12 +55,15 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 			String sessionId;
 			try {
 				while ((sessionId=queue.take())!=null) {
+					final SessionID sid=new SessionID(sessionId);
 					try {
-						final Session s=sessionCache.getSession(new SessionID(sessionId), true, false);
-						s.logout();
+						final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
+						s.destroySession(s);
 						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,s.getClientID(),queue.size()+1);
 					}catch (Throwable e) {
-						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e);
+						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e.toString());
+					}finally {
+						queue.remove(sessionId);
 					}
 				}
 			}catch (InterruptedException e) {}
