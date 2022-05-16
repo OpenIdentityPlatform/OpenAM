@@ -6,6 +6,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.Test;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 
 @PrepareForTest({ SystemProperties.class, WebtopNaming.class })
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class SessionServerConfigTest extends PowerMockTestCase {
 
     @Test

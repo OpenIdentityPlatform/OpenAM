@@ -30,11 +30,11 @@ package com.sun.identity.classloader;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.io.IOException;
 import java.net.URL;
 import java.net.MalformedURLException;
-import sun.misc.CompoundEnumeration;
 
 /**
  * {@link ClassLoader} that masks a specified set of classes
@@ -251,5 +251,38 @@ public class MaskingClassLoader extends ClassLoader {
     public synchronized String toString() {
         return "com.sun.identity.classloader.MaskingClassLoader : Super is : " 
             + super.toString();
+    }
+
+    static class CompoundEnumeration<E> implements Enumeration<E> {
+        private final Enumeration<E>[] enums;
+        private int index;
+
+        public CompoundEnumeration(Enumeration<E>[] enums) {
+            this.enums = enums;
+        }
+
+        private boolean next() {
+            while(this.index < this.enums.length) {
+                if (this.enums[this.index] != null && this.enums[this.index].hasMoreElements()) {
+                    return true;
+                }
+
+                ++this.index;
+            }
+
+            return false;
+        }
+
+        public boolean hasMoreElements() {
+            return this.next();
+        }
+
+        public E nextElement() {
+            if (!this.next()) {
+                throw new NoSuchElementException();
+            } else {
+                return this.enums[this.index].nextElement();
+            }
+        }
     }
 }

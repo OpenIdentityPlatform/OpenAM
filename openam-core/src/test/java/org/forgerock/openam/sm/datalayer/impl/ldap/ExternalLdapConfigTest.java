@@ -31,6 +31,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.BeforeMethod;
@@ -41,6 +42,7 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.debug.Debug;
 
 @PrepareForTest({ SystemProperties.class, WebtopNaming.class })
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class ExternalLdapConfigTest extends PowerMockTestCase {
 
     private Debug debug;

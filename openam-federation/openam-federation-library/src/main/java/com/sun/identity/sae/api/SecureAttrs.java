@@ -37,7 +37,6 @@ import java.io.*;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import sun.misc.CharacterEncoder;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.security.DataEncryptor;
 import java.security.*;
