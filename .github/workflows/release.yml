@@ -78,7 +78,6 @@ jobs:
             openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
             openam-distribution/openam-distribution-docker/target/Dockerfile*
   release-docker:
-    name: Docker release
     runs-on: 'ubuntu-latest'
     needs:
       - release
@@ -126,7 +125,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   release-docker-alpine:
-    name: Docker release
     runs-on: 'ubuntu-latest'
     needs:
       - release

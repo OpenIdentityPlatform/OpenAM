@@ -57,7 +57,6 @@ jobs:
           openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
           openam-distribution/openam-distribution-docker/target/Dockerfile*
   build-docker:
-    name: Docker build
     runs-on: 'ubuntu-latest'
     services:
       registry:
@@ -108,9 +107,7 @@ jobs:
           echo "last release: ${{ env.release_version }}, docker image: ${docker_image}"
           docker run --rm -it -d --name=test ${docker_image}
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
-          docker stop test || true
   build-docker-alpine:
-    name: Docker build
     runs-on: 'ubuntu-latest'
     services:
       registry:
@@ -161,4 +158,3 @@ jobs:
           echo "last release: ${{ env.release_version }}, docker image: ${docker_image}"
           docker run --rm -it -d --name=test ${docker_image}
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
-          docker stop test || true
