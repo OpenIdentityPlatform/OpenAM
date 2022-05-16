@@ -1,4 +1,4 @@
-name: Release Maven
+name: Release 
 
 on:
   workflow_dispatch:
@@ -12,8 +12,7 @@ on:
         required: true
         default: "X.Y.Z-SNAPSHOT"
 jobs:
-  release:
-    name: Maven release
+  release-maven:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
@@ -80,7 +79,7 @@ jobs:
   release-docker:
     runs-on: 'ubuntu-latest'
     needs:
-      - release
+      - release-maven
     steps:
       - uses: actions/checkout@v3
         with:
@@ -127,7 +126,7 @@ jobs:
   release-docker-alpine:
     runs-on: 'ubuntu-latest'
     needs:
-      - release
+      - release-maven
     steps:
       - uses: actions/checkout@v3
         with:
