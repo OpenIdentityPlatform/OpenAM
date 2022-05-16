@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   workflow_run:
     branches: [ master ]
-    workflows: ["Build Maven"]
+    workflows: ["Build"]
     types: [completed]
 jobs:
   deploy-maven:
