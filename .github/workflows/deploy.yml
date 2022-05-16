@@ -1,29 +1,24 @@
-name: Deploy Maven
+name: Package/Deploy 
 
 on:
   workflow_dispatch:
   workflow_run:
     branches: [ master ]
-    workflows: ["Build Maven"]
+    workflows: ["Build"]
     types: [completed]
 jobs:
-  deploy:
-    name: Maven deploy
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event=='push' }}
+  deploy-maven:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Install gpg secret key
-        env:
-           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        if: ${{ env.GPG_PRIVATE_KEY!=''}}
-        run: |
-           cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
-           gpg --list-secret-keys --keyid-format LONG
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
       - name: Set up Java for publishing to Maven Central Repository OSS
         uses: actions/setup-java@v2
         with:
@@ -38,10 +33,62 @@ jobs:
          path: ~/.m2/repository
          key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
          restore-keys: ${{ runner.os }}-m2-repository
+      - name: Install gpg secret key
+        env:
+           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        if: ${{ env.GPG_PRIVATE_KEY!=''}}
+        run: |
+           cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
+           gpg --list-secret-keys --keyid-format LONG
+      - name: Build package local
+        env:
+          MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
+        if: ${{ !(github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='')}}
+        run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} package --file pom.xml
       - name: Publish to the Maven Central Repository
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
-        if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!=''}}
-        run: mvn --batch-mode --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} deploy --file pom.xml
+        if: ${{ github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!=''}}
+        run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} deploy --file pom.xml
+      - name: Upload artifacts OpenAM Distribution Kit, containing all distributable artifacts
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Distribution Kit, containing all distributable artifacts
+         path: openam-distribution/openam-distribution-kit/target/*.zip
+      - name: Upload artifacts OpenAM Distribution SSO Configurator Tools Kit
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Distribution SSO Configurator Tools Kit
+         path: openam-distribution/openam-distribution-ssoconfiguratortools/target/*.zip        
+      - name: Upload artifacts OpenAM Distribution Fedlet UnConfigured zip
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Distribution Fedlet UnConfigured zip
+         path: openam-distribution/openam-distribution-fedlet-unconfigured/target/*.zip         
+      - name: Upload artifacts OpenAM Distribution SSO Admin Tools Kit
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Distribution SSO Admin Tools Kit
+         path: openam-distribution/openam-distribution-ssoadmintools/target/*.zip                    
+      - name: Upload artifacts OpenAM Admin Console
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Admin Console
+         path: openam-console/target/*.war               
+      - name: Upload artifacts OpenAM Server Component
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Server Component
+         path: openam-server/target/*.war          
+      - name: Upload artifacts OpenAM Server Only Component
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Server Only Component
+         path: openam-server-only/target/*.war         
+      - name: Upload artifacts OpenAM Dockerfile
+        uses: actions/upload-artifact@v3
+        with:
+         name: OpenAM Dockerfile
+         path: openam-distribution/openam-distribution-docker/Dockerfile*           

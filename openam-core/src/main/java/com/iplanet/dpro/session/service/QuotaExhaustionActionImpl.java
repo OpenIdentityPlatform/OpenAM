@@ -30,22 +30,18 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 		}
 
 	    @Override
-	    public synchronized boolean add(T t) {
-	        if (contains(t)) {
-	            return false;
-	        } else {
-	            try {
-	            	final Boolean res=super.add(t);
-	            	return res;
-	            }catch (IllegalStateException e) {
-	            	return false;
-	            }
-	        }
+	    public boolean add(T t) {
+            try {
+            	final Boolean res=!contains(t) && super.add(t);
+            	return res;
+            }catch (IllegalStateException e) {
+            	return false;
+            }
 	    }
 
     }
     
-    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 32000));
+    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 64000));
     
     static class Task implements Runnable {
     	final static  Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
@@ -60,7 +56,7 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 						final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
 						s.destroySession(s);
 						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,s.getClientID(),queue.size()+1);
-					}catch (Throwable e) {
+					}catch (Exception e) {
 						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e.toString());
 					}finally {
 						queue.remove(sessionId);
@@ -70,17 +66,22 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 		}
     }
     
-    final static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1,new ThreadFactoryBuilder().setNameFormat("QuotaExhaustionAction-%d").build());
+    final static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+	    		SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.pool", 3),
+	    		new ThreadFactoryBuilder().setNameFormat("QuotaExhaustionAction-%d")
+	    		.build()
+    		);
+    
     static {
-    	final Integer poolSize=SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.pool", 1);
-    	executor.setMaximumPoolSize(poolSize);
-    	executor.setCorePoolSize(poolSize);
-    	for(int i=1;i<=poolSize;i++) {
+    	for(int i=1;i<=executor.getMaximumPoolSize();i++) {
     		executor.submit(new Task());
     	}
     }
     protected void destroy(String sessionId,Map<String, Long> sessions) {
-    	queue.add(sessionId);
-    	sessions.remove(sessionId);
+    	try {
+    		queue.add(sessionId);
+    	}finally {
+    		sessions.remove(sessionId);
+		}
     }
 }
