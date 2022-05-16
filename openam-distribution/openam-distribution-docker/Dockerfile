@@ -1,4 +1,4 @@
-FROM tomcat:9.0-jre8-openjdk-slim
+FROM tomcat:9.0-jre8-openjdk
 
 MAINTAINER Open Identity Platform Community <open-identity-platform-openam@googlegroups.com>
 
