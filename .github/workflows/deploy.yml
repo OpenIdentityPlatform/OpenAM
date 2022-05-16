@@ -42,6 +42,8 @@ jobs:
            gpg --list-secret-keys --keyid-format LONG
       - name: Build package local
         env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ !(github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='')}}
         run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} package --file pom.xml
