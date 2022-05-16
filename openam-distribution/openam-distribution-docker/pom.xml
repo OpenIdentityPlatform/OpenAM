@@ -50,12 +50,9 @@
 				          <tasks>
 				          	<copy todir="${project.build.directory}">
     							<fileset dir="${basedir}">
-        							<include name="Dockerfile" />  <!--NOTE DIFFERENCE HERE-->
+        							<include name="Dockerfile*" />  <!--NOTE DIFFERENCE HERE-->
     							</fileset>
 							</copy>
-				            <replace token="@project_version@" value="${project.version}" dir="target/">                                 
-				              <include name="Dockerfile" />
-				            </replace>
 				          </tasks>
 				        </configuration>
 				        <goals>
