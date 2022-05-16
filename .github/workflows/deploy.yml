@@ -66,9 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
          name: OpenAM Distribution Fedlet UnConfigured zip
-         path:  | 
-           openam-distribution/openam-distribution-fedlet-unconfigured/target/*.zip         
-           openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
+         path: openam-distribution/openam-distribution-fedlet-unconfigured/target/*.zip         
       - name: Upload artifacts OpenAM Distribution SSO Admin Tools Kit
         uses: actions/upload-artifact@v3
         with:
@@ -93,4 +91,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
          name: OpenAM Dockerfile
-         path: openam-distribution/openam-distribution-docker/target/Dockerfile*           
+         path: openam-distribution/openam-distribution-docker/Dockerfile*           
