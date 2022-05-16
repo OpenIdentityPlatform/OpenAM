@@ -18,6 +18,7 @@ package org.forgerock.openam.cts.impl;
 import com.iplanet.am.util.SystemProperties;
 import org.forgerock.opendj.ldap.DN;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.BeforeMethod;
@@ -33,6 +34,7 @@ import static org.testng.Assert.assertNotEquals;
  * @author robert.wapshott@forgerock.com
  */
 @PrepareForTest(SystemProperties.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class LDAPConfigTest extends PowerMockTestCase {
 
     private LDAPConfig config;

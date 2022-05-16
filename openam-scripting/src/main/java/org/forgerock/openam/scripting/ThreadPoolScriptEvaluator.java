@@ -172,8 +172,8 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
                                 newConfiguration.getThreadPoolIdleTimeoutSeconds());
                     }
 
-                    delegateConfigurator.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
                     delegateConfigurator.setMaximumPoolSize(newConfiguration.getThreadPoolMaxSize());
+                    delegateConfigurator.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
                     delegateConfigurator.setKeepAliveTime(newConfiguration.getThreadPoolIdleTimeoutSeconds(), TimeUnit.SECONDS);
                 }
 

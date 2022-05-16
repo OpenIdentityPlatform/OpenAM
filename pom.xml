@@ -181,6 +181,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <inherited>false</inherited>
             <configuration>
+              <source>8</source>
               <charset>utf-8</charset>
               <encoding>utf-8</encoding>
               <source>${maven.compiler.source}</source>
@@ -271,13 +272,27 @@
     <profile>
       <id>jdk8.options</id>
       <activation>
-        <jdk>[1.8,)</jdk>
+        <jdk>1.8</jdk>
       </activation>
       <properties>
         <!-- Disable Doclint on JDK8+ -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xmx1g</java.surefire.options>
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk11.options</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <properties>
+        <!-- Disable Doclint on JDK8+ -->
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
+        <!-- Surefire Argument Line -->
+        <java.surefire.options>-Xmx1g --add-exports java.base/jdk.internal.ref=ALL-UNNAMED</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
       </properties>
@@ -2037,6 +2052,7 @@
 			    </execution>
 			  </executions>
 			  <configuration>
+                <source>8</source>
 			  	<doclint>none</doclint>
 			  </configuration>
 			</plugin>

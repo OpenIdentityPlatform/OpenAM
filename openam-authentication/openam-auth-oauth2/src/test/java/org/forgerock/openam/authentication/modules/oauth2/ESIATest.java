@@ -12,11 +12,13 @@ import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrl
 import org.forgerock.openam.authentication.modules.oauth2.service.esia.Signer;
 import org.mockito.Matchers;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.Test;
 
 @PrepareForTest(HttpRequestContent.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class ESIATest extends PowerMockTestCase {
 
 	@Test
