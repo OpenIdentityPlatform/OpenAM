@@ -35,6 +35,6 @@ USER $OPENAM_USER
 
 EXPOSE 8080 
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=1s --retries=3 CMD curl -v -L --fail http://localhost:8080/$OPENAM_PATH/isAlive.jsp || exit 1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=1s --retries=3 CMD curl -v -L --fail http://localhost:8080/$OPENAM_PATH/isAlive000.jsp || exit 1
 
 CMD ["/usr/local/tomcat/bin/catalina.sh", "run"]
