@@ -15,16 +15,8 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
-import static org.forgerock.openam.sm.datalayer.api.ConnectionType.CTS_EXPIRY_DATE_WORKER;
-import static org.forgerock.openam.utils.Time.getCalendarInstance;
-
-import javax.inject.Inject;
-import java.util.Calendar;
-import java.util.List;
-
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
@@ -32,7 +24,12 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
+
+import javax.inject.Inject;
+import java.util.Calendar;
+
+import static org.forgerock.openam.sm.datalayer.api.ConnectionType.CTS_EXPIRY_DATE_WORKER;
+import static org.forgerock.openam.utils.Time.getCalendarInstance;
 
 /**
  * A query that selects all CTS tokens whose expiry date field is prior to the current timestamp (e.g. who have
@@ -61,11 +58,8 @@ public class CTSWorkerPastExpiryDateQuery<C> extends CTSWorkerBaseQuery {
 
         QueryFilter<CoreTokenField> filter = QueryFilter.lessThan(CoreTokenField.EXPIRY_DATE, now);
 
-        QueryFilterVisitor<Filter, Void, CoreTokenField> fc = queryFactory.createFilterConverter();
-
-        Filter accepted = filter.accept(fc, null);
         return queryFactory.createInstance()
-                .withFilter(accepted)
+                .withFilter( filter.accept(queryFactory.createFilterConverter(), null))
                 .pageResultsBy(pageSize)
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID);
     }
