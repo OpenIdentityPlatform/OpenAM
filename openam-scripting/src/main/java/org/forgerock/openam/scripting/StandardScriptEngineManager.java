@@ -71,7 +71,7 @@ public final class StandardScriptEngineManager extends ScriptEngineManager {
      */
     @Inject
     public StandardScriptEngineManager() {
-
+    	super(null);
         // Configure Rhino JS and Groovy script engine factories with sandboxing
         final RhinoScriptEngineFactory rhino = new RhinoScriptEngineFactory(new ObservedContextFactory(this));
         rhino.setOptimisationLevel(RhinoScriptEngineFactory.INTERPRETED);
