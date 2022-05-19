@@ -96,8 +96,6 @@
     <commons-logging-api.version>1.1</commons-logging-api.version>
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
     <geoip.version>2.0.0</geoip.version>
-    <groovy.version>2.5.8</groovy.version>
-    <groovy-sandbox.version>1.27</groovy-sandbox.version>
     <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
@@ -1160,19 +1158,19 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-jsr223</artifactId>
-        <version>${groovy.version}</version>
+        <version>3.0.10</version>
       </dependency>
       <!-- Groovy JSON parsing support -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-json</artifactId>
-        <version>${groovy.version}</version>
+        <version>3.0.10</version>
       </dependency>
       <dependency>
         <!-- MIT licensed: http://groovy-sandbox.kohsuke.org/license.html -->
         <groupId>org.kohsuke</groupId>
         <artifactId>groovy-sandbox</artifactId>
-        <version>${groovy-sandbox.version}</version>
+        <version>1.27</version>
         <!-- Groovy-sandbox depends on Groovy 1.8.5, so ignore that in favour of our version. -->
         <exclusions>
           <exclusion>
