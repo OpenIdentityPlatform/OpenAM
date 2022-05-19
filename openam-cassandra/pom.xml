@@ -39,17 +39,17 @@
 			<dependency>
 			    <groupId>com.datastax.oss</groupId>
 			    <artifactId>java-driver-core</artifactId>
-			    <version>4.14.0</version>
+			    <version>4.14.1</version>
 			</dependency>
 			<dependency>
 			  <groupId>com.datastax.oss</groupId>
 			  <artifactId>java-driver-query-builder</artifactId>
-			  <version>4.14.0</version>
+			  <version>4.14.1</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.apache.cassandra</groupId>
 			    <artifactId>cassandra-all</artifactId>
-			    <version>4.0.3</version>
+			    <version>4.0.4</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.lz4</groupId>
@@ -76,12 +76,12 @@
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-all</artifactId>
-				<version>4.1.76.Final</version>
+				<version>4.1.77.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-handler</artifactId>
-				<version>4.1.76.Final</version>
+				<version>4.1.77.Final</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
