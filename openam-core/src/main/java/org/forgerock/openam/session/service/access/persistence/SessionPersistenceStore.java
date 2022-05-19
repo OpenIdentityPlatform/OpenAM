@@ -394,7 +394,7 @@ public class SessionPersistenceStore {
                     .returnAttribute(SessionTokenField.SESSION_ID.getField())
                     .returnAttribute(CoreTokenField.TOKEN_TYPE)
                     .and()
-                    .withAttribute(CoreTokenField.STRING_FIFTEEN, idm.getUniversalId())
+                    .withAttribute(CoreTokenField.STRING_FOURTEEN, idm.getUniversalId())
                     .build();
             final Collection<PartialToken> partialTokens = coreTokenService.attributeQuery(filter);
 
