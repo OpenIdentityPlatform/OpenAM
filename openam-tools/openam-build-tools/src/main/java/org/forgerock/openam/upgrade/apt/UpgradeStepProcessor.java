@@ -45,7 +45,7 @@ import org.forgerock.openam.utils.IOUtils;
  *
  * @author Peter Major
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("org.forgerock.openam.upgrade.UpgradeStepInfo")
 public class UpgradeStepProcessor extends AbstractProcessor {
 
