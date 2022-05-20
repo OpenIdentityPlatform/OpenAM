@@ -53,18 +53,14 @@ public class IdRepoTest {
 		cassandra=new Server();
 		cassandra.run();
 
-		while (true) {
-
-		}
-		
-//		HashMap<String, Set<String>> configParams=new HashMap<String, Set<String>>();
-//		//System.setProperty("DC", "DC1");
-//		configParams.put("sun-idrepo-ldapv3-config-organization_name", new HashSet<String>(Arrays.asList(new String[] {"realm_name"})));
-//		configParams.put("sun-idrepo-ldapv3-config-ldap-server", new HashSet<String>(Arrays.asList(new String[] {"localhost"})));
-//		configParams.put("sun-idrepo-ldapv3-config-authid", new HashSet<String>(Arrays.asList(new String[] {"cassandra"})));
-//		configParams.put("sun-idrepo-ldapv3-config-user-attributes", new HashSet<String>(Arrays.asList(new String[] {"user:SunidentitymsisdnnumbeR=600","user:userPassword=700","user:cn=700"})));
-//		repo=new Repo();
-//		repo.initialize(configParams);
+		HashMap<String, Set<String>> configParams=new HashMap<String, Set<String>>();
+		//System.setProperty("DC", "DC1");
+		configParams.put("sun-idrepo-ldapv3-config-organization_name", new HashSet<String>(Arrays.asList(new String[] {"realm_name"})));
+		configParams.put("sun-idrepo-ldapv3-config-ldap-server", new HashSet<String>(Arrays.asList(new String[] {"localhost"})));
+		configParams.put("sun-idrepo-ldapv3-config-authid", new HashSet<String>(Arrays.asList(new String[] {"cassandra"})));
+		configParams.put("sun-idrepo-ldapv3-config-user-attributes", new HashSet<String>(Arrays.asList(new String[] {"user:SunidentitymsisdnnumbeR=600","user:userPassword=700","user:cn=700"})));
+		repo=new Repo();
+		repo.initialize(configParams);
 	}
 	
 	@AfterClass
