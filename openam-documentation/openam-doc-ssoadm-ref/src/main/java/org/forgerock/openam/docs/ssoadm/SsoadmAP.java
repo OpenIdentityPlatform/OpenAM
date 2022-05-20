@@ -56,7 +56,6 @@ import javax.lang.model.element.TypeElement;
  * The ssoadm &lt;refentry&gt; incorporates a sorted list of subcommands and
  * their options.
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
 @SupportedAnnotationTypes("*")
 public class SsoadmAP extends AbstractProcessor {
     // Macro content kept keyed by name to be mixed into SubCommandInfos
