@@ -45,7 +45,7 @@ public class TestSetupHelper {
             Files.createDirectories(destinationDirectory);
         }
 
-        try (java.nio.file.FileSystem zipFileSystem = FileSystems.newFileSystem(zipFile.toPath(), null)) {
+        try (java.nio.file.FileSystem zipFileSystem = FileSystems.newFileSystem(zipFile.toPath(), (ClassLoader)null)) {
             Path root = zipFileSystem.getPath("/");
             Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
                 @Override
