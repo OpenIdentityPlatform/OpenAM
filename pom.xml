@@ -321,13 +321,13 @@
           --add-exports java.base/sun.nio.ch=ALL-UNNAMED
           --add-exports java.base/sun.security.util=ALL-UNNAMED
           --add-exports java.base/sun.security.jca=ALL-UNNAMED
+          --add-exports java.base/sun.security.x509=ALL-UNNAMED
           --add-exports java.base/jdk.internal.util.random=ALL-UNNAMED
           --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED
           --add-exports java.management.rmi/com.sun.jmx.remote.internal.rmi=ALL-UNNAMED
           --add-exports java.rmi/sun.rmi.registry=ALL-UNNAMED
           --add-exports java.rmi/sun.rmi.server=ALL-UNNAMED
           --add-exports java.sql/java.sql=ALL-UNNAMED
-
         </java.surefire.options>
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
