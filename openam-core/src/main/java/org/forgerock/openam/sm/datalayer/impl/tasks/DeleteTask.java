@@ -16,9 +16,7 @@
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 
-import org.forgerock.openam.cts.api.CTSOptions;
 import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
@@ -54,7 +52,9 @@ public class DeleteTask extends AbstractTask<PartialToken> {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
+    	sid2token.invalidate(tokenId);
         PartialToken token = adapter.delete(tokenId, options);
+        sid2token.invalidate(tokenId);
         handler.processResults(token);
     }
 

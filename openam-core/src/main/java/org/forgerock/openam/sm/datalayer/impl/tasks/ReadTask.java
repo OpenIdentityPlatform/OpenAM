@@ -55,8 +55,14 @@ public class ReadTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        Token token = adapter.read(tokenId, options);
-        handler.processResults(token);
+    	Token token = sid2token.getIfPresent(tokenId);
+    	if (token==null) {
+    		token=adapter.read(tokenId, options);
+    	}
+    	if (token!=null) {
+    		sid2token.put(tokenId, token);
+    	}
+		handler.processResults(token);
     }
 
     @Override
