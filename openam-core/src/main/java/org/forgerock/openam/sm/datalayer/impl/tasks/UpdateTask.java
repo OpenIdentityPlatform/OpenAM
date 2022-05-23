@@ -54,12 +54,21 @@ public class UpdateTask extends AbstractTask {
      */
     @Override
     public void performTask(TokenStorageAdapter adapter) throws DataLayerException {
-        Token previous = adapter.read(token.getTokenId(), options);
-        Token updated;
+    	Token previous =null; 
+    	if (token.getTokenId()!=null) {
+    		previous=sid2token.getIfPresent(token.getTokenId());
+    	}
+    	if (previous==null) {
+    		previous=adapter.read(token.getTokenId(), options);
+    	}
+    	final Token updated;
         if (previous == null) {
             updated = adapter.create(token, options);
         } else {
             updated = adapter.update(previous, token, options);
+        }
+        if (token.getTokenId()!=null) {
+        	sid2token.put(token.getTokenId(), updated==null?token:updated);
         }
         handler.processResults(updated);
     }

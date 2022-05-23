@@ -23,6 +23,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.UUID;
+
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LdapAdapter;
@@ -41,7 +43,7 @@ public class ReadTaskTest {
 
     @BeforeMethod
     public void setup() {
-        tokenId = "badger";
+        tokenId = UUID.randomUUID().toString();
         mockAdapter = mock(LdapAdapter.class);
         options = Options.defaultOptions();
         mockResultHandler = mock(ResultHandler.class);
