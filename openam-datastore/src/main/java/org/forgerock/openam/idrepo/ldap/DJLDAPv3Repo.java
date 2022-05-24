@@ -221,6 +221,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         ldapServers = LDAPUtils.prioritizeServers(configParams.get(LDAP_SERVER_LIST), hostServerId, hostSiteId);
 
+        if (ldapServers.isEmpty()) {
+        	throw new IdRepoException("server list is empty");
+        }
         defaultSizeLimit = CollectionHelper.getIntMapAttr(configParams, LDAP_MAX_RESULTS, 100, DEBUG);
         defaultTimeLimit = CollectionHelper.getIntMapAttr(configParams, LDAP_TIME_LIMIT, 5, DEBUG);
         int maxPoolSize = CollectionHelper.getIntMapAttr(configParams, LDAP_CONNECTION_POOL_MAX_SIZE, 10, DEBUG);
