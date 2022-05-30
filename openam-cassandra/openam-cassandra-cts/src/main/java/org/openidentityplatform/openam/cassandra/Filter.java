@@ -51,10 +51,7 @@ public class Filter {
 	public List<Relation> clauses=new ArrayList<Relation>();
 	public String getTable() {
 		for (String field: field2value.keySet()) {
-			if (StringUtils.equalsIgnoreCase("coreTokenMultiString01",field)
-				||StringUtils.equalsIgnoreCase("coreTokenString15",field)
-				||StringUtils.equalsIgnoreCase("coreTokenUserId",field)
-				) {
+			if (!StringUtils.equalsIgnoreCase("coreTokenId",field)) {
 				return field;
 			}
 		}
