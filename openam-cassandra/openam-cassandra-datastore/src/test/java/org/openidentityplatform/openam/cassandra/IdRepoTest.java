@@ -52,7 +52,7 @@ public class IdRepoTest {
 		
 		cassandra=new Server();
 		cassandra.run();
-		
+
 		HashMap<String, Set<String>> configParams=new HashMap<String, Set<String>>();
 		//System.setProperty("DC", "DC1");
 		configParams.put("sun-idrepo-ldapv3-config-organization_name", new HashSet<String>(Arrays.asList(new String[] {"realm_name"})));

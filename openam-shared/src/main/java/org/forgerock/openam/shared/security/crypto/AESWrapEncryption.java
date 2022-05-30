@@ -66,7 +66,11 @@ public class AESWrapEncryption implements AMEncryption, ConfigurableKey {
     private static final int AESWRAP_BLOCK_SIZE = 8;
 
     private static final int CACHE_SIZE = Integer.getInteger("amCryptoCacheSize", 500);
-    private static final CipherProvider CIPHER_PROVIDER = Providers.cipherProvider("AESWrap", null, CACHE_SIZE);
+
+    private static final String CIPHER_PROVIDER_ALGORITHM
+            = Double.parseDouble(System.getProperty("java.specification.version")) >= 17 ? "AESWrapPad" : "AESWrap";
+
+    private static final CipherProvider CIPHER_PROVIDER = Providers.cipherProvider(CIPHER_PROVIDER_ALGORITHM, null, CACHE_SIZE);
 
     private static final int KEY_SIZE = Integer.getInteger("org.forgerock.openam.encryption.key.size", 128);
 

@@ -110,7 +110,7 @@
 				    	<properties>
 				        	<cargo.rmi.port>8206</cargo.rmi.port>
 				        	<cargo.servlet.port>8207</cargo.servlet.port>
-    			        	<cargo.jvmargs>-Xms4g -Xmx4g</cargo.jvmargs>
+    			        	<cargo.jvmargs>${java.surefire.options} -Xms4g -Xmx4g</cargo.jvmargs>
 				        </properties>
 				    </configuration>
                 </configuration>

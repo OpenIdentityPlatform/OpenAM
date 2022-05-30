@@ -64,6 +64,7 @@ import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
 
+import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.CertificateExtensions;
@@ -574,7 +575,7 @@ public class Cert extends AMLoginModule {
                     (SubjectAlternativeNameExtension.SUBJECT_NAME);
         
                 GeneralName generalname = null;  
-                ObjectIdentifier upnoid = new ObjectIdentifier(UPNOID); 
+                ObjectIdentifier upnoid = new ObjectIdentifier(new DerInputStream(UPNOID.getBytes()));
                 Iterator itr = (Iterator) names.iterator();
                 while ((userTokenId == null) && itr.hasNext()) {
                     generalname = (GeneralName) itr.next(); 
