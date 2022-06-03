@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>14.6.5</version>
+        <version>14.6.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-oauth2-saml2</artifactId>
