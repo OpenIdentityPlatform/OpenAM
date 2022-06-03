@@ -61,7 +61,7 @@
    		<email>open-identity-platform@googlegroups.com</email>
    		<organization>Open Identity Platform Community</organization>
    		<organizationUrl>https://www.openidentityplatform.org/</organizationUrl>
-   		<url>https://github.com/OpenIdentityPlatform/commons</url>
+   		<url>https://github.com/OpenIdentityPlatform/OpenAM</url>
    	</developer>
    </developers>
   <!-- Component Properties -->
@@ -504,7 +504,7 @@
   <!-- Source Control -->
   <scm>
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:OpenIdentityPlatform/OpenAM.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</developerConnection>
     <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
     <tag>HEAD</tag>
   </scm>
