@@ -1291,12 +1291,12 @@
       <dependency>
         <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
-        <version>${project.version}</version>
+        <version>2005-05-04</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
         <artifactId>cc</artifactId>
-        <version>${project.version}</version>
+        <version>2008-08-08</version>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
@@ -1841,11 +1841,6 @@
 			<artifactId>antisamy</artifactId>
 			<version>1.6.7</version>
 		 </dependency>	
-		 <dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-handler</artifactId>
-  			<version>4.1.74.Final</version>
-  		</dependency>
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-posix</artifactId>
@@ -1885,7 +1880,7 @@
 				<artifactItem>
 					<groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
 					<artifactId>jato</artifactId>
-					<version>${project.version}</version>
+					<version>2005-05-04</version>
 					<packaging>jar</packaging>
 					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
 					<deploy>false</deploy>
@@ -1893,7 +1888,7 @@
 				<artifactItem>
                 	<groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
                 	<artifactId>cc</artifactId>
-                	<version>${project.version}</version>
+                	<version>2008-08-08</version>
                 	<packaging>jar</packaging>
                 	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
                 	<deploy>false</deploy>
