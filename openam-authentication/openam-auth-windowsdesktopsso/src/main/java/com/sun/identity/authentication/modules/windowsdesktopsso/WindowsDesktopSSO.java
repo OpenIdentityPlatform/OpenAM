@@ -65,6 +65,7 @@ import javax.security.auth.login.LoginContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.StringUtils;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -438,7 +439,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
             String spnegoTokenStr =
                 ((HttpCallback)callbacks[0]).getAuthorization();
             try {
-                spnegoToken = Base64.decode(spnegoTokenStr);
+                if(StringUtils.isNotBlank(spnegoTokenStr)) {
+                    spnegoToken = Base64.decode(spnegoTokenStr);
+                }
             } catch (Exception e) {
                 debug.error("Decoding token error.");
                 if (debug.messageEnabled()) {
