@@ -35,7 +35,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/CodeMirror-${codemirror.version}.0</directory>
+            <directory>${project.build.directory}/codemirror5-${codemirror.version}.0</directory>
             <outputDirectory>/css/codemirror</outputDirectory>
             <includes>
                 <include>lib/codemirror.css</include>
@@ -43,7 +43,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
+            <directory>${project.build.directory}/codemirror5-${codemirror.version}.0</directory>
             <outputDirectory>/libs/codemirror</outputDirectory>
             <includes>
                 <include>lib/codemirror.js</include>
@@ -53,7 +53,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
+            <directory>${project.build.directory}/codemirror5-${codemirror.version}.0</directory>
             <outputDirectory>/css/codemirror</outputDirectory>
             <includes>
                 <include>lib/codemirror.css</include>
