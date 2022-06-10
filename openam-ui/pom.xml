@@ -524,7 +524,7 @@
 				              <artifactId>CodeMirror</artifactId>
 				              <version>4.10</version>
 				              <packaging>zip</packaging>
-				              <downloadUrl>https://github.com/codemirror/{artifactId}/archive/{version}.0.{packaging}</downloadUrl>
+				              <downloadUrl>https://github.com/codemirror/{artifactId}5/archive/{version}.0.{packaging}</downloadUrl>
 				            </artifactItem>
 				            <artifactItem>
 				              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
