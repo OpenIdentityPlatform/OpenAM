@@ -575,7 +575,6 @@ public class Cert extends AMLoginModule {
                     (SubjectAlternativeNameExtension.SUBJECT_NAME);
         
                 GeneralName generalname = null;  
-                ObjectIdentifier upnoid = new ObjectIdentifier(new DerInputStream(UPNOID.getBytes()));
                 Iterator itr = (Iterator) names.iterator();
                 while ((userTokenId == null) && itr.hasNext()) {
                     generalname = (GeneralName) itr.next(); 
@@ -586,7 +585,7 @@ public class Cert extends AMLoginModule {
                 	        GeneralNameInterface.NAME_ANY)) {
                             OtherName othername = 
                                 (OtherName)generalname.getName(); 
-                            if (upnoid.equals((Object)(othername.getOID()))) {
+                            if (UPNOID.equals(othername.getOID().toString())) {
                                 byte[] nval = othername.getNameValue(); 
                                 DerValue derValue = new DerValue(nval); 
                                 userTokenId = 
