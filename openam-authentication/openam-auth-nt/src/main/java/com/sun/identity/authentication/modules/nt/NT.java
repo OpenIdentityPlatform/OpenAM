@@ -32,25 +32,28 @@
 package com.sun.identity.authentication.modules.nt;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import org.apache.commons.text.translate.AggregateTranslator;
+import org.apache.commons.text.translate.EntityArrays;
+import org.apache.commons.text.translate.LookupTranslator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.security.Principal;
-import java.util.ResourceBundle;
-import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class NT extends AMLoginModule {
     private static boolean hasInitialized = false;
@@ -75,7 +78,7 @@ public class NT extends AMLoginModule {
 
     public NT() {
     }
- 
+
     /**
      * TODO-JAVADOC
      */
@@ -125,6 +128,17 @@ public class NT extends AMLoginModule {
              hasInitialized = false;
         }
         hasInitialized = true;
+    }
+
+    private static final AggregateTranslator translator;
+    static {
+        translator = new AggregateTranslator(
+                new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE)
+        );
+    }
+
+    String escapeSpecial(String src) {
+        return translator.translate(src);
     }
 
     /**
@@ -180,6 +194,8 @@ public class NT extends AMLoginModule {
                 throw new AuthLoginException(amAuthNT, "Passworderror", null);
             }
         }
+        //prevent replace samba username attack
+        userPassword = escapeSpecial(userPassword);
 
         // store username, password both in success and failure case        
         storeUsernamePasswd(userName, userPassword);
@@ -221,7 +237,7 @@ public class NT extends AMLoginModule {
             // Create the tmpFile
             tmpFile = File.createTempFile(userName,"pwd");
             FileOutputStream fw = new FileOutputStream(tmpFile);
-            OutputStreamWriter dos = new OutputStreamWriter(fw, "ISO-8859-1");
+            OutputStreamWriter dos = new OutputStreamWriter(fw, "UTF-8");
             dos.write("username = " + userName + "\n");
             dos.write("password = " + userPassword);
             dos.flush();
