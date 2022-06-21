@@ -3,17 +3,14 @@ package com.sun.identity.authentication.modules.nt;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.service.AuthD;
 import org.forgerock.guice.core.InjectorHolder;
-import org.mockito.Mockito;
-import org.opends.quicksetup.installer.AuthenticationData;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.powermock.api.mockito.PowerMockito;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 @PrepareForTest({ SystemProperties.class, AuthD.class, InjectorHolder.class})
 @PowerMockIgnore({"jdk.internal.reflect.*", "javax.servlet.*"})
