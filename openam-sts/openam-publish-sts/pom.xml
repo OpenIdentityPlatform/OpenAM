@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>14.6.6</version>
+        <version>14.6.7-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM STS Publish Service</name>
