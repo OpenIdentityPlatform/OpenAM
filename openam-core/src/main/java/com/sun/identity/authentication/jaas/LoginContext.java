@@ -210,6 +210,9 @@ public class LoginContext implements org.forgerock.openam.authentication.service
     		ModuleInfo info = moduleStack[i];
     		
     		if(i >= moduleIndex) {
+    			if (info.getModule() instanceof AMLoginModule) {
+    				((AMLoginModule)info.getModule()).resetCurrentState();
+    			}
     			moduleStackQueue.add(info);
     		}
     	}
