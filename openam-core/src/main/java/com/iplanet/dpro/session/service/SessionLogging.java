@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.iplanet.dpro.session.service;
@@ -113,6 +114,9 @@ public class SessionLogging implements InternalSessionListener {
                 break;
             case PROPERTY_CHANGED:
                 logEvent(sessionInfo, "SESSION_PROPERTY_CHANGED", timestamp);
+                break;
+            case EVENT_URL_ADDED:
+                logEvent(sessionInfo, "SESSION_EVENT_URL_ADDED", timestamp);
                 break;
             case QUOTA_EXHAUSTED:
                 logEvent(sessionInfo, "SESSION_QUOTA_EXHAUSTED", timestamp);

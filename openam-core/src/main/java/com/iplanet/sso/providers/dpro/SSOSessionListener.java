@@ -25,6 +25,7 @@
  * $Id: SSOSessionListener.java,v 1.2 2008/06/25 05:41:43 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.iplanet.sso.providers.dpro;
@@ -60,6 +61,7 @@ public class SSOSessionListener implements SessionListener {
         case LOGOUT:
         case DESTROY:
         case PROPERTY_CHANGED:
+        case EVENT_URL_ADDED:
             tryToPropagateEventToTokenListeners(sessionEvent);
             break;
         default:

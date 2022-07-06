@@ -305,6 +305,15 @@ class SessionResponseParser {
             }
         }
 
+        NodeList sessionEventUrls = sess.getElementsByTagName("SessionEventUrl");
+        // parse all session event urls
+        for (int i = 0; i < sessionEventUrls.getLength(); i++) {
+            String sessionEventUrl = sessionEventUrls.item(i).getTextContent();
+            if (sessionEventUrl != null) {
+                sessionInfo.getSessionEventUrls().add(sessionEventUrl);
+            }
+        }
+
         return sessionInfo;
     }
 }

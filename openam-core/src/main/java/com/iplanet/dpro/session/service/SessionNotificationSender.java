@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.iplanet.dpro.session.service;
@@ -107,6 +108,7 @@ public class SessionNotificationSender implements InternalSessionListener {
             case LOGOUT:
             case DESTROY:
             case PROPERTY_CHANGED:
+            case EVENT_URL_ADDED:
                 sendEvent(event);
                 break;
             default:

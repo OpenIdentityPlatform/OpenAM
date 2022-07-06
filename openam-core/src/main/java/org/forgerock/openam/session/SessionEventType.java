@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package org.forgerock.openam.session;
@@ -65,9 +66,14 @@ public enum SessionEventType {
     /**
      * Session property protected against change
      */
-    PROTECTED_PROPERTY(8);
+    PROTECTED_PROPERTY(8),
 
     // code = 9 is skipped as it used to be mapped to SESSION_MAX_LIMIT_REACHED (an event which is no longer possible)
+
+    /**
+     * Session event url added
+     */
+    EVENT_URL_ADDED(10);
 
     private final int code;
 

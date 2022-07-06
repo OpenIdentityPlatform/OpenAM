@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 package org.forgerock.openam.audit;
 
@@ -46,6 +47,8 @@ public final class AuditConstants {
         AM_SESSION_DESTROYED("AM-SESSION-DESTROYED"),
         /** Session property changed audit event name. */
         AM_SESSION_PROPERTY_CHANGED("AM-SESSION-PROPERTY_CHANGED"),
+        /** Session event url changed audit event name. */
+        AM_SESSION_EVENT_URL_ADDED("AM-SESSION-EVENT_URL_ADDED"),
         /** Event for auth process module completion. */
         AM_LOGIN_MODULE_COMPLETED("AM-LOGIN-MODULE-COMPLETED"),
         /** Event for auth login process completion. */

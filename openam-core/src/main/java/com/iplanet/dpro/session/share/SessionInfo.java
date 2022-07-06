@@ -25,6 +25,7 @@
  * $Id: SessionInfo.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 package com.iplanet.dpro.session.share;
 
@@ -33,7 +34,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -61,6 +64,7 @@ public class SessionInfo {
     private long lastActivityTimeSeconds;
     private String state = "valid";
     private Hashtable<String, String> properties = new Hashtable<>();
+    private Set<String> sessionEventUrls = new HashSet<>();
 
     /**
      * Constructs <code> SessionInfo </code>
@@ -105,6 +109,14 @@ public class SessionInfo {
                         .append(NL);
             }
         }
+        if(sessionEventUrls != null) {
+            for(String eventUrl : sessionEventUrls) {
+                xml.append("<SessionEventUrl>")
+                        .append(XMLUtils.escapeSpecialCharacters(eventUrl))
+                        .append("</SessionEventUrl>").append(NL);
+            }
+        }
+
         xml.append("</Session>");
         return xml.toString();
     }
@@ -304,6 +316,16 @@ public class SessionInfo {
         this.properties = properties;
     }
 
+    @JsonIgnore
+    public Set<String> getSessionEventUrls() {
+        return sessionEventUrls;
+    }
+
+    public void setSessionEventUrls(final Set<String> sessionEventUrls) {
+        this.sessionEventUrls = sessionEventUrls;
+    }
+
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -321,6 +343,7 @@ public class SessionInfo {
                 && !(cdomain != null ? !cdomain.equals(that.cdomain) : that.cdomain != null)
                 && !(cid != null ? !cid.equals(that.cid) : that.cid != null)
                 && !(properties != null ? !properties.equals(that.properties) : that.properties != null)
+                && !(sessionEventUrls != null ? !sessionEventUrls.equals(that.sessionEventUrls) : that.sessionEventUrls != null)
                 && !(secret != null ? !secret.equals(that.secret) : that.secret != null)
                 && !(sid != null ? !sid.equals(that.sid) : that.sid != null)
                 && !(state != null ? !state.equals(that.state) : that.state != null)
@@ -342,6 +365,7 @@ public class SessionInfo {
         result = 31 * result + (int) (expiryTimeSeconds ^ (expiryTimeSeconds >>> 32));
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        result = 31 * result + (sessionEventUrls != null ? sessionEventUrls.hashCode() : 0);
         return result;
     }
 
@@ -361,6 +385,7 @@ public class SessionInfo {
                 ", lastActivityTime=" + lastActivityTimeSeconds +
                 ", state='" + state + '\'' +
                 ", properties=" + properties +
+                ", sessionEventUrls=" + sessionEventUrls +
                 '}';
     }
 }

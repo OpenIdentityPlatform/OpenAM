@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 package com.iplanet.dpro.session.service;
 
@@ -31,8 +32,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
-import org.forgerock.openam.audit.AuditConstants;
-import org.forgerock.openam.audit.AuditConstants.*;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
@@ -42,7 +41,6 @@ import org.forgerock.openam.session.SessionEventType;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.DNMapper;
 
 /**
  * Responsible for publishing audit activity for changes to {@link SessionInfo} objects.
@@ -100,6 +98,9 @@ public class SessionAuditor implements InternalSessionListener {
                 break;
             case PROPERTY_CHANGED:
                 auditActivity(sessionInfo, AM_SESSION_PROPERTY_CHANGED, UPDATE, timestamp);
+                break;
+            case EVENT_URL_ADDED:
+                auditActivity(sessionInfo, AM_SESSION_EVENT_URL_ADDED, UPDATE, timestamp);
                 break;
             default:
                 // ignore other session events
