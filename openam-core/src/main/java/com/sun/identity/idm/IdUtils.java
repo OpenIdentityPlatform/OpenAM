@@ -630,19 +630,21 @@ public final class IdUtils {
      * @return The AMIdentity of user with username equal to uName.
      */
     public static AMIdentity getIdentity(String uName, String realm) {
-        AMIdentity theID = null;
-
-        AMIdentityRepository amIdRepo = getAMIdentityRepository(DNMapper.orgNameToDN(realm));
-
-        IdSearchControl idsc = new IdSearchControl();
-        idsc.setRecursive(true);
-        idsc.setAllReturnAttributes(false);
-
-        // search for the identity
+    	AMIdentity theID = null;
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
+        	if (uName.toLowerCase().startsWith("id=")) {
+        		return new AMIdentity(null, uName);
+        	}
+        	
+            
+            AMIdentityRepository amIdRepo = getAMIdentityRepository(DNMapper.orgNameToDN(realm));
+
+            IdSearchControl idsc = new IdSearchControl();
+            idsc.setRecursive(true);
+            idsc.setAllReturnAttributes(false);
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc); 
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
