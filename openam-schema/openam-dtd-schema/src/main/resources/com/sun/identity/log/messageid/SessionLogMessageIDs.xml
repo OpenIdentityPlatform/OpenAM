@@ -175,4 +175,15 @@
         </triggers>
         <actions />
     </logmessage>
+	<logmessage name="SESSION_EVENT_URL_ADDED" id="14"
+				loglevel="LL_INFO"
+				description="Session notification event URL added.">
+		<datainfo>
+			<item>User ID</item>
+		</datainfo>
+		<triggers>
+			<item>Session notification event URL added.</item>
+		</triggers>
+		<actions />
+	</logmessage>
 </logmessages>

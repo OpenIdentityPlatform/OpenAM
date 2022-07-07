@@ -240,6 +240,19 @@ public class SessionAuditorTest {
     }
 
     @Test
+    public void shouldAuditSessionEventUrlAdded() {
+        // Given
+        given(auditEventPublisher.isAuditing(FAKE_REALM_NAME, ACTIVITY_TOPIC, AM_SESSION_EVENT_URL_ADDED)).willReturn(true);
+
+        // When
+        JsonValue auditEvent = fireSessionEvent(SessionEventType.EVENT_URL_ADDED);
+
+        // Then
+        assertThat(auditEvent).stringAt("eventName").isEqualTo("AM-SESSION-EVENT_URL_ADDED");
+        assertThat(auditEvent).stringAt("operation").isEqualTo("UPDATE");
+    }
+
+    @Test
     public void shouldIgnoreQuotaExhaustedEvent() {
         // Given
 
