@@ -25,6 +25,7 @@
  * $Id: AMModelBase.java,v 1.18 2009/12/11 23:25:19 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.sun.identity.console.base.model;
