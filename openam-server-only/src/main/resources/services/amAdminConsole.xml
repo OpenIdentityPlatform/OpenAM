@@ -440,7 +440,13 @@
                     order="1500">
                     <DefaultValues>
                         <Value>cn</Value>
-		    </DefaultValues>
+		            </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openidentityplatform-am-admin-console-user-attrs-search-key"
+                     type="list"
+                     syntax="string"
+                     i18nKey="d115"
+                     order="1510">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-admin-console-user-return-attribute"
                     type="single"

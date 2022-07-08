@@ -327,6 +327,12 @@ public interface AMAdminConstants {
         "iplanet-am-admin-console-user-search-key";
 
     /**
+     * User Search attributes key
+     */
+    String CONSOLE_USER_ATTRS_SEARCH_KEY =
+            "openidentityplatform-am-admin-console-user-attrs-search-key";
+
+    /**
       * Enable password reset service.
       */
      String ATTR_USER_OLD_PASSWORD =

@@ -352,6 +352,23 @@ public class AMModelBase
     }
 
     /**
+     * Returns the attribute name that is used when performing searches
+     * on user entries. This attribute is defined in the administration
+     * service in <code>User Search Key</code>.
+     *
+     * @return attribute name for user searches.
+     */
+    public Set<String> getUserAdditionalSearchAttributes() {
+        Set<String> searchAttributes = new HashSet<>();
+        Map attributes = getConsoleAttributes();
+        Set values = (Set)attributes.get(CONSOLE_USER_ATTRS_SEARCH_KEY);
+        if ((values != null) && !values.isEmpty()) {
+            searchAttributes.addAll(values);
+        }
+        return searchAttributes;
+    }
+
+    /**
      * Returns DN of currently logged in user.
      *
      * @return DN of currently logged in user.

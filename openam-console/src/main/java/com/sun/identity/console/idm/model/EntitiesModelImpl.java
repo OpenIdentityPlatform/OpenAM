@@ -171,10 +171,14 @@ public class EntitiesModelImpl
             */
             IdType ltype = IdUtils.getType(strType);
             if (ltype.equals(IdType.USER) && !pattern.equals("*")) {
-                Map searchMap = new HashMap(2);
+                Set<String> additionalSearchAttributes = getUserAdditionalSearchAttributes();
+                Map searchMap = new HashMap(2 + additionalSearchAttributes.size());
                 Set patternSet = new HashSet(2);
                 patternSet.add(pattern);
                 searchMap.put(getUserSearchAttribute(), patternSet);
+                for(String additionalAttribute: additionalSearchAttributes) {
+                    searchMap.put(additionalAttribute, patternSet);
+                }
                 
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchMap);
                 
