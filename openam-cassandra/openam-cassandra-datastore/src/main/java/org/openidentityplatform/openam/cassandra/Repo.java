@@ -814,15 +814,20 @@ public class Repo extends IdRepo {
 	}
 	
 	Set<String> convert(String name, Set<String> values){
-		if (StringUtils.containsIgnoreCase(name, "userpassword"))
-			for (Object value : values.toArray()) 
-				if (!value.toString().matches("\\{.+\\}.+"))
+		if (StringUtils.containsIgnoreCase(name, "userpassword")) {
+			for (Object value : values.toArray()) {
+				if (!value.toString().matches("\\{.+\\}.+")) {
 					try {
-						values.add(SSHA.getSaltedPassword(value.toString().getBytes()));
-						values.remove(value);
+						final Set<String> res=new HashSet<String>(values);
+						res.remove(value);
+						res.add(SSHA.getSaltedPassword(value.toString().getBytes()));
+						return res;
 					} catch (NoSuchAlgorithmException e) {
 						logger.error("convert",e);
 					}
+				}
+			}
+		}
 		return values;
 	}
 
