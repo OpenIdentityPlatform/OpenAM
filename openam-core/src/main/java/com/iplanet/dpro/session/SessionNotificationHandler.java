@@ -30,8 +30,6 @@
  */
 package com.iplanet.dpro.session;
 
-import java.util.Vector;
-
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionNotification;
@@ -42,6 +40,8 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
+
+import java.util.Vector;
 
 /**
  * <code>SessionNotificationHandler</code> implements
@@ -87,7 +87,13 @@ public class SessionNotificationHandler implements NotificationHandler {
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
         if (!info.getState().equals("valid")) {
-            sessionCache.removeSID(new SessionID(info.getSessionID()));
+            SessionID sid = new SessionID(info.getSessionID());
+            sessionCache.removeSID(sid);
+            SessionAccessManager sessionAccessManager = InjectorHolder.getInstance(SessionAccessManager.class);
+            InternalSession internalSession = sessionAccessManager.getInternalSession(sid);
+            if(internalSession != null) { //if InternalSession session exists in current CTS cluster or cache, remove it
+                sessionAccessManager.removeInternalSession(internalSession);
+            }
             return;
         }
 
