@@ -25,6 +25,7 @@
  * $Id: AMModelBase.java,v 1.18 2009/12/11 23:25:19 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.sun.identity.console.base.model;
@@ -349,6 +350,23 @@ public class AMModelBase
         }
  
         return searchAttribute;
+    }
+
+    /**
+     * Returns the attribute name that is used when performing searches
+     * on user entries. This attribute is defined in the administration
+     * service in <code>User Search Key</code>.
+     *
+     * @return attribute name for user searches.
+     */
+    public Set<String> getUserAdditionalSearchAttributes() {
+        Set<String> searchAttributes = new HashSet<>();
+        Map attributes = getConsoleAttributes();
+        Set values = (Set)attributes.get(CONSOLE_USER_ATTRS_SEARCH_KEY);
+        if ((values != null) && !values.isEmpty()) {
+            searchAttributes.addAll(values);
+        }
+        return searchAttributes;
     }
 
     /**

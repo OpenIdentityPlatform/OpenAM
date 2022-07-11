@@ -25,6 +25,7 @@
  * $Id: AMAdminConstants.java,v 1.11 2009/09/28 19:01:24 babysunil Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package com.sun.identity.console.base.model;
@@ -325,6 +326,12 @@ public interface AMAdminConstants {
      */
     String CONSOLE_USER_SEARCH_KEY =
         "iplanet-am-admin-console-user-search-key";
+
+    /**
+     * User Search attributes key
+     */
+    String CONSOLE_USER_ATTRS_SEARCH_KEY =
+            "openidentityplatform-am-admin-console-user-attrs-search-key";
 
     /**
       * Enable password reset service.
