@@ -149,7 +149,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         //"am.protected.oauth2.uid"
         final String tokenUid=session.getProperty("am.protected.oauth2.uid");
         if (tokenUid!=null) {
-        	token.setAttribute(CoreTokenField.STRING_FOURTEEN, tokenUid);
+        	token.setAttribute(CoreTokenField.STRING_FOURTEEN, tokenUid.toLowerCase());
         }
         
         return token;
