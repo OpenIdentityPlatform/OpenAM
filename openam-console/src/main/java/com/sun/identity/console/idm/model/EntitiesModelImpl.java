@@ -25,6 +25,7 @@
  * $Id: EntitiesModelImpl.java,v 1.17 2009/09/05 01:30:46 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 package com.sun.identity.console.idm.model;
 
@@ -171,10 +172,14 @@ public class EntitiesModelImpl
             */
             IdType ltype = IdUtils.getType(strType);
             if (ltype.equals(IdType.USER) && !pattern.equals("*")) {
-                Map searchMap = new HashMap(2);
+                Set<String> additionalSearchAttributes = getUserAdditionalSearchAttributes();
+                Map searchMap = new HashMap(2 + additionalSearchAttributes.size());
                 Set patternSet = new HashSet(2);
                 patternSet.add(pattern);
                 searchMap.put(getUserSearchAttribute(), patternSet);
+                for(String additionalAttribute: additionalSearchAttributes) {
+                    searchMap.put(additionalAttribute, patternSet);
+                }
                 
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchMap);
                 
