@@ -828,6 +828,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
         info.setState(sessionState.name().toLowerCase());
         info.setProperties((Hashtable<String, String>) sessionProperties.clone());
+        info.setSessionEventUrls(new HashSet<>(sessionEventURLs.keySet()));
         if (withIds && sessionHandle != null) {
             //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
             info.getProperties().put(SESSION_HANDLE_PROP, sessionHandle);
@@ -867,7 +868,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * restricted token ids.
      * @return Map of session event URLs and their associated SessionIDs.
      */
-    Map<String, Set<SessionID>> getSessionEventURLs() {
+    public Map<String, Set<SessionID>> getSessionEventURLs() {
         Map<String, Set<SessionID>> urls = new HashMap<>();
         for (Map.Entry<String,Set<SessionID>> entry : sessionEventURLs.entrySet()) {
             Set<SessionID> sessionIDs = urls.get(entry.getKey());
@@ -898,6 +899,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
         if (sids.add(sid))  {
             notifyPersistenceManager();
+            fireSessionEvent(SessionEventType.EVENT_URL_ADDED);
         }
     }
 

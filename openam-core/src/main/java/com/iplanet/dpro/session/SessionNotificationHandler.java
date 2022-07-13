@@ -26,18 +26,22 @@
  *
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 package com.iplanet.dpro.session;
 
-import java.util.Vector;
-
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionNotification;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionEventType;
+import org.forgerock.openam.session.service.SessionAccessManager;
+
+import java.util.Vector;
 
 /**
  * <code>SessionNotificationHandler</code> implements
@@ -83,7 +87,13 @@ public class SessionNotificationHandler implements NotificationHandler {
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
         if (!info.getState().equals("valid")) {
-            sessionCache.removeSID(new SessionID(info.getSessionID()));
+            SessionID sid = new SessionID(info.getSessionID());
+            sessionCache.removeSID(sid);
+            SessionAccessManager sessionAccessManager = InjectorHolder.getInstance(SessionAccessManager.class);
+            InternalSession internalSession = sessionAccessManager.getInternalSession(sid);
+            if(internalSession != null) { //if InternalSession session exists in current CTS cluster or cache, remove it
+                sessionAccessManager.removeInternalSession(internalSession);
+            }
             return;
         }
 
@@ -104,6 +114,17 @@ public class SessionNotificationHandler implements NotificationHandler {
         SessionEventType sessionEventType = SessionEventType.fromCode(notification.getNotificationType());
         SessionEvent evt = new SessionEvent(session, sessionEventType, notification.getNotificationTime());
         Session.invokeListeners(evt);
+
+        //remote session
+        if(sessionEventType.equals(SessionEventType.EVENT_URL_ADDED) && session.getLocalSessionEventListeners().size() == 0) { //remote session
+            SessionAccessManager sessionAccessManager = InjectorHolder.getInstance(SessionAccessManager.class);
+            InternalSession internalSession = sessionAccessManager.getInternalSession(session.getSessionID());
+            if(internalSession != null) {
+                for (String url : info.getSessionEventUrls()) {
+                    internalSession.addSessionEventURL(url, internalSession.getSessionID());
+                }
+            }
+        }
     }
 
 }

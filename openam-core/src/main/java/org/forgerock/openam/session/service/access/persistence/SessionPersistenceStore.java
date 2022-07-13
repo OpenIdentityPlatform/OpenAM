@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2022 Open Identity Platform Community
  */
 
 package org.forgerock.openam.session.service.access.persistence;
@@ -35,6 +36,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
+import com.iplanet.services.naming.URLNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -246,6 +249,13 @@ public class SessionPersistenceStore {
                 InjectorHolder.getInstance(SessionUtilsWrapper.class),
                 InjectorHolder.getInstance(SessionConstraint.class),
                 debug);
+        try {
+            String notificationUrl = WebtopNaming.getNotificationURL().toString();
+            if(!session.getSessionEventURLs().containsKey(notificationUrl)) {
+                session.addSessionEventURL(notificationUrl, session.getSessionID());
+            }
+        } catch (URLNotFoundException ignored) {}
+
         return session;
     }
 
