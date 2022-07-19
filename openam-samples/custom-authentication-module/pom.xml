@@ -18,40 +18,29 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam</artifactId>
+        <version>14.6.7-SNAPSHOT</version>
+    </parent>
     <groupId>org.openidentityplatform.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OpenAM Custom Authentication Module</name>
 
     <properties>
-        <openam.version>14.0.0-SNAPSHOT</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-<!--      <repositories> -->
-<!--         <repository> -->
-<!--             <id>forgerock-releases</id> -->
-<!--             <url>http://maven.forgerock.org/repo/releases</url> -->
-<!--         </repository> -->
-<!--         <repository> -->
-<!--             <id>forgerock-snapshots</id> -->
-<!--             <url>http://maven.forgerock.org/repo/snapshots</url> -->
-<!--         </repository> -->
-<!--     </repositories> -->
 
     <dependencies>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-core</artifactId>
-            <version>${openam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>${openam.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -60,18 +49,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+ </project>
