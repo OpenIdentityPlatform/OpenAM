@@ -32,8 +32,10 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 	    @Override
 	    public boolean add(T t) {
             try {
-            	final Boolean res=!contains(t) && super.add(t);
-            	return res;
+            	if (contains(t)) {
+            		return false;
+            	}
+            	return super.add(t);
             }catch (IllegalStateException e) {
             	return false;
             }
@@ -52,10 +54,12 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 			try {
 				while ((sessionId=queue.take())!=null) {
 					final SessionID sid=new SessionID(sessionId);
+					final String uid;
 					try {
 						final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
+						uid=s.getClientID();
 						s.destroySession(s);
-						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,s.getClientID(),queue.size()+1);
+						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,uid,queue.size()+1);
 					}catch (Exception e) {
 						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e.toString());
 					}finally {

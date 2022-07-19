@@ -333,6 +333,7 @@ public class SessionPersistenceStore {
                     .returnAttribute(SessionTokenField.SESSION_ID.getField())
                     .returnAttribute(CoreTokenField.EXPIRY_DATE)
                     .returnAttribute(CoreTokenField.TOKEN_TYPE)
+                    .returnAttribute(CoreTokenField.STRING_THIRTEEN)
                     .and()
                     .withAttribute(CoreTokenField.USER_ID, uuid)
                     .build();
@@ -353,12 +354,15 @@ public class SessionPersistenceStore {
             	if (!"SESSION".equals(partialToken.getValue(CoreTokenField.TOKEN_TYPE).toString())) {
             		continue;
             	}
+            	if (!"VALID".equals(partialToken.getValue(CoreTokenField.STRING_THIRTEEN).toString())) {
+            		continue;
+            	}
                 // Session ID
-                String sessionId = SessionUtils.getDecrypted(partialToken.getValue(SessionTokenField.SESSION_ID.getField()));
+                final String sessionId = SessionUtils.getDecrypted(partialToken.getValue(SessionTokenField.SESSION_ID.getField()));
 
                 // Expiration Date converted to Unix Time
-                Calendar timestamp = partialToken.getValue(CoreTokenField.EXPIRY_DATE);
-                long unixTime = TimeUtils.toUnixTime(timestamp);
+                final Calendar timestamp = partialToken.getValue(CoreTokenField.EXPIRY_DATE);
+                final long unixTime = TimeUtils.toUnixTime(timestamp);
 
                 sessions.put(sessionId, unixTime);
             }
