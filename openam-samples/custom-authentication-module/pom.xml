@@ -27,7 +27,7 @@
     <name>OpenAM Custom Authentication Module</name>
 
     <properties>
-        <openam.version>14.0.0-SNAPSHOT</openam.version>
+        <openam.version>14.6.6</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
