@@ -62,7 +62,10 @@ DROP MATERIALIZED VIEW IF EXISTS coreTokenDate05;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenExpirationDate; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger01; 
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger02;
-DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger03;
+CREATE MATERIALIZED VIEW IF NOT EXISTS coreTokenString03 AS SELECT * FROM cts.tokens WHERE coreTokenId IS NOT NULL and coreTokenString03 IS NOT NULL PRIMARY KEY ((coreTokenString03), coreTokenId) WITH 
+    	gc_grace_seconds = 1
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '1', 'compaction_window_unit': 'MINUTES', 'max_threshold': '32', 'min_threshold': '2'};
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger04;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger05;
 DROP MATERIALIZED VIEW IF EXISTS coreTokenInteger06;
