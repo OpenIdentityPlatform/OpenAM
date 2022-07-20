@@ -450,12 +450,19 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     }
     
 
+    final String getCacheKeyForService(IdType type, String name, String serviceName, String amOrgName) {
+    	if (IdType.REALM.equals(type)) {
+    		return type.toString().concat("::").concat(amOrgName).concat("::").concat(serviceName);
+    	}
+    	return type.toString().concat("::").concat(amOrgName).concat("::").concat(name).concat("::").concat(serviceName);
+    }
+    
 	@SuppressWarnings("rawtypes")
 	Cache<String,Map> idCacheServiceAttributes;
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Map getServiceAttributes(SSOToken token, IdType type, String name, String serviceName, Set attrNames,String amOrgName, String amsdkDN, boolean isString) throws IdRepoException, SSOException {
-		final String cacheKey=amOrgName.concat(":"+type).concat(":").concat(serviceName);
+		final String cacheKey=getCacheKeyForService(type, name, serviceName,  amOrgName);
     	Map res=idCacheServiceAttributes.getIfPresent(cacheKey);
 		if (res==null) {
 			res=super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString);
@@ -466,7 +473,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
 	@Override
 	public void modifyService(SSOToken token, IdType type, String name, String serviceName, SchemaType stype,Map attrMap, String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
-		final String cacheKey=amOrgName.concat(":"+type).concat(":").concat(serviceName);
+		final String cacheKey=getCacheKeyForService(type, name, serviceName,  amOrgName);
 		super.modifyService(token, type, name, serviceName, stype, attrMap, amOrgName, amsdkDN);
 		idCacheServiceAttributes.invalidate(cacheKey);
 	}
