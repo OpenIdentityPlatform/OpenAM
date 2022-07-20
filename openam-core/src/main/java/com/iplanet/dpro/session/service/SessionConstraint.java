@@ -130,9 +130,12 @@ public class SessionConstraint {
         int quota = getSessionQuota(internalSession);
         internalSession.putProperty("am.protected.sfo.quota", ""+quota);
 
-        if (quota<1)
-        		return false;
-        
+        if (debug.messageEnabled()) {
+            debug.message("SessionConstraint quota "+internalSession.getClientID()+": "+quota);
+        }
+        if (quota<1) {
+        	return false;
+        }
         // Step 2: get the information (session id and expiration
         // time) of all sessions for the given user from all
         // AM servers and/or session repository
@@ -197,11 +200,9 @@ public class SessionConstraint {
                 quota = (Integer.valueOf(attr)).intValue();
             }
         } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Failed to get the session quota via the "
+        	debug.error("Failed to get the session quota via the "
                         + "IDRepo interfaces, => Use the default "
                         + "value from the dynamic schema instead.", e);
-            }
         }
         return quota;
     }
@@ -219,11 +220,9 @@ public class SessionConstraint {
             Map attrs = schema.getAttributeDefaults();
             quota = CollectionHelper.getIntMapAttr(attrs, SESSION_QUOTA_ATTR_NAME, DEFAULT_QUOTA, debug);
         } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Failed to get the default session quota "
-                        + "setting. => Set user session quota to "
-                        + "Integer.MAX_VALUE.", e);
-            }
+            debug.error("Failed to get the default session quota "
+                    + "setting. => Set user session quota to "
+                    + "Integer.MAX_VALUE.", e);
         }
         return quota;
     }
