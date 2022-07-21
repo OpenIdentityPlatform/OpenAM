@@ -56,16 +56,15 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
 
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -464,11 +463,18 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 	public Map getServiceAttributes(SSOToken token, IdType type, String name, String serviceName, Set attrNames,String amOrgName, String amsdkDN, boolean isString) throws IdRepoException, SSOException {
 		final String cacheKey=getCacheKeyForService(type, name, serviceName,  amOrgName);
     	Map res=idCacheServiceAttributes.getIfPresent(cacheKey);
-		if (res==null) {
+    	if (res==null) { //add to cache
 			res=super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString);
 			idCacheServiceAttributes.put(cacheKey, res);
+		}else if (!res.keySet().containsAll(attrNames)) { //add unknown/new fields
+			res.putAll(super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString));
 		}
-		return res;
+    	for (String attrName : (Set<String>)attrNames) {
+			if (!res.containsKey(attrName)) {
+				res.put(attrName, new LinkedHashSet<String>(0));
+			}
+		}
+		return res; 
 	}
 
 	@Override
