@@ -231,6 +231,13 @@ public class IdRepoTest {
 	}
 	
 	@Test 
+	public void unknown_index_test() throws SSOException, IdRepoException{
+		Map<String, Set<String>> param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		param.put("bad_field", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
+		assertEquals(0, repo.search(null, IdType.USER, "*", 5, 2, null, true, Repo.AND_MOD, param, false).getSearchResults().size());
+	}
+	
+	@Test 
 	public void members_test() throws SSOException, IdRepoException{
 		repo.delete(null, IdType.GROUP, "group");
 		repo.delete(null, IdType.USER, "user");
