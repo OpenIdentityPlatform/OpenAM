@@ -2604,18 +2604,11 @@ public class IdServicesImpl implements IdServices {
            Iterator it = attrMap.keySet().iterator();
            while (it.hasNext()) {
                String curr = (String) it.next();
+               resultMap.put(curr, attrMap.get(curr));
                if (reverseMap.containsKey(curr)) {
                    resultMap.put((String) reverseMap.get(curr), attrMap
                            .get(curr));
-               } else {
-                   // Only add unmapped attributes to resultMap
-                   // if there wasn't an attribute mapped with the same name already
-                   if (!resultMap.containsKey(curr)) {
-                       DEBUG.message("IdServicesImpl.reverseMapAttributeNames(): "
-                               + "adding unmapped attribute " + curr);
-                       resultMap.put(curr, attrMap.get(curr));
-                   }
-               }
+               } 
            }
        }
        return resultMap;
