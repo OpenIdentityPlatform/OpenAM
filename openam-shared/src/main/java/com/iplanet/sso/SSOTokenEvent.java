@@ -65,6 +65,11 @@ public interface SSOTokenEvent {
     int SSO_TOKEN_PROPERTY_CHANGED = 4;
 
     /**
+     * SSO Token url added event.
+     */
+    int SSO_TOKEN_URL_EVENT_ADDED = 5;
+
+    /**
      * Returns the <code>SSOToken</code> associated with the SSO Token event.
      * 
      * @return <code>SSOToken</code>
