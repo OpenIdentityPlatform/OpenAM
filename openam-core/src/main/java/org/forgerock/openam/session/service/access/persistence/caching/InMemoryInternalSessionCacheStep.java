@@ -193,25 +193,25 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
     private InternalSession getFromCacheOrFind(final String key, final Callable<InternalSession> sessionFinder)
             throws SessionPersistenceException {
         try {
-            return getCache().get(key, new Callable<InternalSession>() {
-                @Override
-                public InternalSession call() throws Exception {
-                    InternalSession result = sessionFinder.call();
-                    if (result == null) {
-                        throw NullResultException.INSTANCE;
-                    }
-                    return result;
+            InternalSession internalSession = getCache().getIfPresent(key);
+            if(internalSession == null) {
+                internalSession = sessionFinder.call();
+                if (internalSession == null) {
+                    throw NullResultException.INSTANCE;
                 }
-            });
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof NullResultException) {
+            }
+            getCache().put(key, internalSession);
+            return internalSession;
+
+        } catch (Exception e) {
+            if (e instanceof NullResultException) {
                 // There was no result - return back into a null here
                 return null;
             }
             // Rethrow any Error/RuntimeException/SessionPersistenceException
-            Throwables.propagateIfPossible(e.getCause(), SessionPersistenceException.class);
+            Throwables.propagateIfPossible(e, SessionPersistenceException.class);
             // Wrap anything else as a new SessionPersistenceException
-            throw new SessionPersistenceException(e.getMessage(), e.getCause());
+            throw new SessionPersistenceException(e.getMessage(), e);
         }
     }
 
