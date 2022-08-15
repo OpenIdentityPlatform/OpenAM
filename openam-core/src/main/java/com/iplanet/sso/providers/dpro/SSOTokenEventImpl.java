@@ -89,6 +89,8 @@ class SSOTokenEventImpl implements SSOTokenEvent {
             return SSOTokenEvent.SSO_TOKEN_DESTROY;
         case PROPERTY_CHANGED:
             return SSOTokenEvent.SSO_TOKEN_PROPERTY_CHANGED;
+        case EVENT_URL_ADDED:
+            return SSOTokenEvent.SSO_TOKEN_URL_EVENT_ADDED;
         }
         throw new SSOException(SSOProviderBundle.rbName, "invalidevent", null);
     }
