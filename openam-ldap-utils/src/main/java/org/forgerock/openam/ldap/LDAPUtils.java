@@ -321,7 +321,13 @@ public final class LDAPUtils {
         //be at the beginning of the list and towards the end of the list are the possibly most remote servers.
         ldapServers.addAll(serverDefined);
         ldapServers.addAll(siteDefined);
-        ldapServers.addAll(nonMatchingServers);
+        if (nonMatchingServers.size()>1) {
+        	final List<LDAPURL> sortedRandom=new ArrayList<LDAPURL>(nonMatchingServers);
+        	Collections.shuffle(sortedRandom);
+        	ldapServers.addAll(sortedRandom);
+        }else {
+        	ldapServers.addAll(nonMatchingServers);
+        }
         return ldapServers;
     }
 
