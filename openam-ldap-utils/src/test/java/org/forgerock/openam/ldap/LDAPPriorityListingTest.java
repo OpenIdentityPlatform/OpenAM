@@ -20,6 +20,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.testng.Assert.assertEquals;
+
 import org.testng.annotations.Test;
 
 @Test
@@ -39,33 +41,40 @@ public class LDAPPriorityListingTest {
     public void nonMatchingServerIsAtTheEndOfTheList() {
         Set<LDAPURL> list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:389|03", "test2.com|02", "test3.com|01"), "01", "02");
-        assertThat(list.toArray()).isEqualTo(urls("test3.com", "test1.com", "test2.com").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test3.com", "test1.com", "test2.com").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test3.com"));
     }
 
     public void matchingServersAreFirst() {
         Set<LDAPURL> list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01"), "01", "02");
-        assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test2.com:50389", "test1.com:1389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test2.com:50389", "test1.com:1389").toArray());
+        assertEquals(list.toArray()[2], LDAPURL.valueOf("test1.com:1389"));
         list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "03", "01");
-        assertThat(list.toArray()).isEqualTo(urls("test1.com:1389", "test3.com:2389", "test2.com:50389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test1.com:1389", "test3.com:2389", "test2.com:50389").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test1.com:1389"));
         list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03", "test3.com:2389|02", "test2.com:50389|01"), "02", "04");
-        assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test1.com:1389", "test2.com:50389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test3.com:2389", "test1.com:1389", "test2.com:50389").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test3.com:2389"));
         list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03", "test3.com:2389|04", "test2.com:50389|01|02"), "05", "02");
-        assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test2.com:50389"));
     }
 
     public void matchingSitesFirstIfNoServerMatching() {
         Set<LDAPURL> list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03", "test3.com:2389|01", "test2.com:50389|01|02"), "04", "02");
-        assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test3.com:2389").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test2.com:50389"));
         list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:1389|03|02", "test2.com:50389|01|05"), "04", "02");
         assertThat(list.toArray()).isEqualTo(urls("test1.com:1389", "test2.com:50389").toArray());
         list = LDAPUtils.prioritizeServers(
                 asOrderedSet("test1.com:1389|03|02", "test2.com:50389|01|05", "test4.com:389"), "01", "05");
-        assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test4.com:389").toArray());
+        //assertThat(list.toArray()).isEqualTo(urls("test2.com:50389", "test1.com:1389", "test4.com:389").toArray());
+        assertEquals(list.toArray()[0], LDAPURL.valueOf("test2.com:50389"));
     }
 
     private Set<LDAPURL> urls(String... urls) {
