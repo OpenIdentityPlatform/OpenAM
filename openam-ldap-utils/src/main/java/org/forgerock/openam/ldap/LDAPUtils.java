@@ -23,6 +23,7 @@ import com.sun.identity.shared.debug.Debug;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -319,18 +320,21 @@ public final class LDAPUtils {
         }
         //Let's add them in the order of priority to the ldapServers set, this way the most appropriate servers should
         //be at the beginning of the list and towards the end of the list are the possibly most remote servers.
-        ldapServers.addAll(serverDefined);
-        ldapServers.addAll(siteDefined);
-        if (nonMatchingServers.size()>1) {
-        	final List<LDAPURL> sortedRandom=new ArrayList<LDAPURL>(nonMatchingServers);
-        	Collections.shuffle(sortedRandom);
-        	ldapServers.addAll(sortedRandom);
-        }else {
-        	ldapServers.addAll(nonMatchingServers);
-        }
+        ldapServers.addAll(shuffle(serverDefined));
+        ldapServers.addAll(shuffle(siteDefined));
+       	ldapServers.addAll(shuffle(nonMatchingServers));
         return ldapServers;
     }
-
+    
+    static Collection<LDAPURL> shuffle(Set<LDAPURL> servers) {
+    	if (servers.size()>1) {
+        	final List<LDAPURL> sortedRandom=new ArrayList<LDAPURL>(servers);
+        	Collections.shuffle(sortedRandom);
+        	return sortedRandom;
+        }
+    	return servers;
+    }
+    
     /**
      * Converts string representation of scope (as defined in the configuration) to the corresponding
      * {@link SearchScope} object.
