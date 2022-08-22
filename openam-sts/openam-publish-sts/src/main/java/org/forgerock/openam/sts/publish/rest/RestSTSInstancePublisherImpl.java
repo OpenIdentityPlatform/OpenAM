@@ -290,7 +290,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
                 Injector instanceInjector;
                 try {
                     instanceInjector = Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.error("Exception caught creating the guice injector in republish corresponding to rest sts " +
                             "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
                     continue;
@@ -298,7 +298,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
                 try {
                     publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), true);
                     logger.info("Republished Rest STS instance corresponding to config " + instanceConfig.toJson());
-                } catch (STSPublishException e) {
+                } catch (Throwable e) {
                     logger.error("Exception caught publishing rest sts " +
                             "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
                     continue;
