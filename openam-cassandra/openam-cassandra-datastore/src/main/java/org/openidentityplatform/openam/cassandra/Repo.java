@@ -19,17 +19,8 @@ package org.openidentityplatform.openam.cassandra;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -73,32 +64,36 @@ import com.sun.identity.sm.SchemaType;
 
 public class Repo extends IdRepo {
 	final static Logger logger=LoggerFactory.getLogger(Repo.class.getName());
-	
+
 	final static Logger stat=LoggerFactory.getLogger(Repo.class.getName()+".stat");
-	
+
 	final Map<IdType,Set<IdOperation>> supportedOps = new HashMap<IdType,Set<IdOperation>>();
 	final Map<IdType,String> type2table=new HashMap<IdType, String>();
 	final Map<IdType,Map<String,Integer>> type2attr2ttl=new HashMap<IdType, Map<String,Integer>>();
 	final Set<String> disableCaseSensitive=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-	
+
 	final String profile="repo";
 	public CqlSession session=null;
 	String activeAttr="inetuserstatus";
 	String activeValue="Active";
 	String memberOf="memberOf";
 	final String uniqueMember="uniqueMember";
+
+	final static String created = "_created";
+	final static String updated = "_updated";
+
 	@Override
 	public void initialize(Map<String, Set<String>> configParams) throws IdRepoException  {
 		super.initialize(configParams);
-		
+
 		try{
 			activeAttr=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-isactive","inetuserstatus");
 			activeValue=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-active","Active");
 			memberOf=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-memberof","memberOf");
-	//		sunIdRepoSupportedOperations=[realm=read,create,edit,delete,service, user=read,create,edit,delete,service, group=read,create,edit,delete],
+			//		sunIdRepoSupportedOperations=[realm=read,create,edit,delete,service, user=read,create,edit,delete,service, group=read,create,edit,delete],
 			supportedOps.clear();
 			Set<String> sunIdRepoSupportedOperations=((Map<String, Set<String>>)configParams).get("sunIdRepoSupportedOperations");
-			for (String str : sunIdRepoSupportedOperations!=null?sunIdRepoSupportedOperations:new HashSet<String>(Arrays.asList(new String[]{"group=read,create,edit,delete","realm=read,create,edit,delete,service","user=read,create,edit,delete,service"}))){ 
+			for (String str : sunIdRepoSupportedOperations!=null?sunIdRepoSupportedOperations:new HashSet<String>(Arrays.asList(new String[]{"group=read,create,edit,delete","realm=read,create,edit,delete,service","user=read,create,edit,delete,service"}))){
 				String[] split=str.split("\\=");
 				if (split.length>1){
 					IdType idType=String2IdType(split[0]);
@@ -110,21 +105,21 @@ public class Repo extends IdRepo {
 					}
 				}
 			}
-			
-	//		sunIdRepoAttributeMapping=[user=user, group=group, realm=realm], 
+
+			//		sunIdRepoAttributeMapping=[user=user, group=group, realm=realm],
 			type2table.clear();
 			Set<String> sunIdRepoAttributeMapping=((Map<String, Set<String>>)configParams).get("sunIdRepoAttributeMapping");
-			for (String str : sunIdRepoAttributeMapping!=null?sunIdRepoAttributeMapping:new HashSet<String>(Arrays.asList(new String[]{"group=group","realm=realm","user=user"}))){ 
+			for (String str : sunIdRepoAttributeMapping!=null?sunIdRepoAttributeMapping:new HashSet<String>(Arrays.asList(new String[]{"group=group","realm=realm","user=user"}))){
 				String[] split=str.split("\\=");
 				if (split.length>1) {
 					type2table.put(String2IdType(split[0]), split[1]);
 				}
 			}
-			
-	//		sun-idrepo-ldapv3-config-user-attributes=[group:attr3=86400, realm:attr1=86400, user:attr2=86400], 
+
+			//		sun-idrepo-ldapv3-config-user-attributes=[group:attr3=86400, realm:attr1=86400, user:attr2=86400],
 			type2attr2ttl.clear();
 			if (configParams.get("sun-idrepo-ldapv3-config-user-attributes")!=null)
-				for (String str : ((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-user-attributes")){ 
+				for (String str : ((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-user-attributes")){
 					String[] split=str.split("\\=");
 					if (split.length>1){
 						String[] split2=split[0].split(":");
@@ -138,18 +133,18 @@ public class Repo extends IdRepo {
 			//disable-case-sensitive=mail,iplanet-am-user-alias-list
 			disableCaseSensitive.clear();
 			if (configParams.get("disable-case-sensitive")!=null) {
-				for (String str : ((Map<String, Set<String>>)configParams).get("disable-case-sensitive")){ 
+				for (String str : ((Map<String, Set<String>>)configParams).get("disable-case-sensitive")){
 					disableCaseSensitive.add(str);
 				}
 			}else {
 				disableCaseSensitive.addAll(Arrays.asList(new String[]{"uid","mail","iplanet-am-user-alias-list"}));
 			}
-				
+
 			final String keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
 			final String[] servers=((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-ldap-server").toArray(new String[0]);
 			final String username=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authid",null);
 			final String password=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authpw",null);
-			
+
 			logger.info("create session {}/{}",username,servers);
 			CqlSessionBuilder builder=CqlSession.builder()
 					.withApplicationName("OpenAM datastore: "+keyspace)
@@ -170,13 +165,14 @@ public class Repo extends IdRepo {
 			session=builder.build();
 			statement_select_by_type=session.prepare("select uid,field,value,change from values where type=:type limit 64000 allow filtering");
 			statement_select_by_uid=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid");
+			statement_select_created_updated_by_uid=session.prepare("select max(change) as updated, min(change) as created from values where type=:type and uid=:uid");
 			statement_select_by_fields=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid and field in :fields limit 64000");
 			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
 			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
 			statement_delete_by_field_value=session.prepare("delete from values where type=:type and uid=:uid and field=:field and value=:value");
 			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
 			statement_add_value_ttl=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
-			
+
 			statement_add_value_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS");
 			statement_add_value_ttl_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS using ttl :ttl");
 		}catch(Exception e){
@@ -186,6 +182,7 @@ public class Repo extends IdRepo {
 	}
 	PreparedStatement statement_select_by_type;
 	PreparedStatement statement_select_by_uid;
+	PreparedStatement statement_select_created_updated_by_uid;
 	PreparedStatement statement_select_by_fields;
 	PreparedStatement statement_delete_by_uid;
 	PreparedStatement statement_delete_by_fields;
@@ -194,7 +191,7 @@ public class Repo extends IdRepo {
 	PreparedStatement statement_add_value_ttl;
 	PreparedStatement statement_add_value_exist;
 	PreparedStatement statement_add_value_ttl_exist;
-	
+
 	@Override
 	public void shutdown() {
 		super.shutdown();
@@ -203,7 +200,7 @@ public class Repo extends IdRepo {
 		}
 		session=null;
 	}
-	
+
 	@Override
 	public Set<IdOperation> getSupportedOperations(IdType type) {
 		return (Set<IdOperation>) supportedOps.get(type);
@@ -213,7 +210,7 @@ public class Repo extends IdRepo {
 	public Set<IdType> getSupportedTypes() {
 		return supportedOps.keySet();
 	}
-	
+
 	@Override
 	public boolean isExists(SSOToken token, IdType type, String name) throws IdRepoException, SSOException {
 		final Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{"uid"})));
@@ -225,13 +222,13 @@ public class Repo extends IdRepo {
 		final Map<String, Set<String>> attr=getAttributes(token, type, name,new HashSet<String>(Arrays.asList(new String[]{activeAttr})));
 		final Set<String> value=attr.get(activeAttr);
 		if (value!=null && !value.isEmpty() && value.contains(activeValue)) { //activeAttr is set and activeAttr==activeValue
-			return true; 
+			return true;
 		}else if ((value==null || value.isEmpty()) && isExists(token, type, name)){ //activeAttr is not set and isExists==true
-			return true; 
+			return true;
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void setActiveStatus(SSOToken token, IdType type, String name,boolean active) throws IdRepoException, SSOException {
 		validate(type, IdOperation.EDIT);
@@ -255,14 +252,23 @@ public class Repo extends IdRepo {
 			}
 			assert (token==null): "overhead: please set attrNames";
 		}
-		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		final Map<String, Set<String>> attr= new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 		try{
-			final Set<String> fields=new HashSet<String>();
+			boolean requestCreatedUpdatedAttrs = false;
+			final Set<String> fields = new HashSet<>();
 			if (attrNames!=null && !attrNames.isEmpty()) {
 				for (String field : attrNames) {
+					if(field.equals(created) || field.equals(updated)) { //ignore _created and _updated attrs, fetch later
+						requestCreatedUpdatedAttrs = true;
+						continue;
+					}
 					fields.add(field.toLowerCase().replace("update-", ""));
 				}
 			}
+			if(requestCreatedUpdatedAttrs) {
+				attr.putAll(getCreatedUpdatedAttributes(type, name, attrNames));
+			}
+
 			BoundStatement statement=((fields.isEmpty())?statement_select_by_uid:statement_select_by_fields).bind()
 					.setString("type", type.getName())
 					.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name);
@@ -288,6 +294,26 @@ public class Repo extends IdRepo {
 		return attr;
 	}
 
+	private Map<String, Set<String>> getCreatedUpdatedAttributes(IdType type,String name, Set<String> attrNames) {
+		final Map<String, Set<String>> attr = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+		if(!attrNames.contains(created) && !attrNames.contains(updated)) {
+			return attr;
+		}
+		BoundStatement statement=statement_select_created_updated_by_uid.bind()
+				.setString("type", type.getName())
+				.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+		final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
+		for (Row row : rc) {
+			if(attrNames.contains(created) && row.getInstant("created") != null) {
+				attr.put(created, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("created")))));
+			}
+			if(attrNames.contains(updated)  && row.getInstant("updated") != null) {
+				attr.put(updated, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("updated")))));
+			}
+		}
+		return attr;
+	}
+
 	@Override
 	public Map<String, byte[][]> getBinaryAttributes(SSOToken token, IdType type, String name, Set<String> attrNames) throws IdRepoException, SSOException {
 		//validate(type, IdOperation.READ);
@@ -309,8 +335,8 @@ public class Repo extends IdRepo {
 	}
 
 	final static String asyncField="save.async";
-	
-	
+
+
 	@Override
 	public void setAttributes(SSOToken token, IdType type, String name, Map<String, Set<String>> attributes_in, boolean isAdd) throws IdRepoException, SSOException {
 		validate(type, IdOperation.EDIT);
@@ -319,12 +345,12 @@ public class Repo extends IdRepo {
 			if (attributes_in!=null) {
 				attributes.putAll(attributes_in);
 			}
-			
+
 			final boolean async=(attributes.remove(asyncField)!=null);
-			
+
 			if (!attributes.containsKey("uid")) { //Always create uid field 
 				if (isAdd || !isExists(token, type, name)) {
-					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
+					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));
 				}
 			}
 			if (!attributes.containsKey(activeAttr)) {
@@ -348,7 +374,7 @@ public class Repo extends IdRepo {
 				}
 				attributes.remove("uid");
 			}
-			BatchStatement statements=BatchStatement.newInstance(DefaultBatchType.LOGGED); 
+			BatchStatement statements=BatchStatement.newInstance(DefaultBatchType.LOGGED);
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				final Set<String> oldValues=new HashSet<String>();
 				if (!isAdd) { //get old values
@@ -367,7 +393,7 @@ public class Repo extends IdRepo {
 					if (disableCaseSensitive.contains(entry.getKey())) {
 						value=value.toLowerCase();
 					}
-					if (!isAdd) { 
+					if (!isAdd) {
 						if (oldValues.remove(value)) {//remove re-write value from delete
 							if (!(ttl!=null && ttl>0)) { //Don't rewrite persistent value (without ttl)
 								continue;
@@ -383,7 +409,7 @@ public class Repo extends IdRepo {
 					statements=statements.add((ttl!=null && ttl>0)?statement.setInt("ttl", ttl):statement);
 				}
 				if (!isAdd) {//remove old values
-					for (String value : oldValues) { 
+					for (String value : oldValues) {
 						final BoundStatement statement=statement_delete_by_field_value.bind()
 								.setString("type", type.getName())
 								.setString("uid", disableCaseSensitive.contains("uid")?name.toLowerCase():name)
@@ -420,10 +446,10 @@ public class Repo extends IdRepo {
 		validate(type, IdOperation.EDIT);
 		try{
 			final boolean async=(attrNames!=null && attrNames.remove(asyncField));
-			
+
 			final Set<String> deleteColums=new HashSet<String>();
 			if (attrNames!=null) {
-				for (String field : attrNames){ 
+				for (String field : attrNames){
 					deleteColums.add(field.toLowerCase());
 				}
 			}
@@ -447,9 +473,9 @@ public class Repo extends IdRepo {
 
 	@Override
 	public  RepoSearchResults search(SSOToken token, IdType type,
-             CrestQuery crestQuery, int maxTime, int maxResults,
-             Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-             Map<String, Set<String>> avPairs, boolean recursive) throws SSOException, IdRepoException {
+									 CrestQuery crestQuery, int maxTime, int maxResults,
+									 Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
+									 Map<String, Set<String>> avPairs, boolean recursive) throws SSOException, IdRepoException {
 		if (!crestQuery.hasQueryId() && !crestQuery.hasQueryFilter()) {
 			throw new IdRepoException("CassandraRepo.search does not support an empty search");
 		}
@@ -462,12 +488,12 @@ public class Repo extends IdRepo {
 		}
 		return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,returnAllAttrs, filterOp, avPairs, recursive);
 	}
-	
+
 	final String getIndexName(String field) {
 		final String table="ix_".concat(field.toLowerCase()).replaceAll("-", "_");
 		return table;
 	}
-	
+
 	final Cache<String, PreparedStatement> indexByValue=CacheBuilder.newBuilder()
 			.maximumSize(2048)
 			.expireAfterAccess(5,TimeUnit.MINUTES)
@@ -481,7 +507,7 @@ public class Repo extends IdRepo {
 			}
 		});
 	}
-	
+
 	final Cache<String, PreparedStatement> indexByValueAndUID=CacheBuilder.newBuilder()
 			.maximumSize(2048)
 			.expireAfterAccess(5,TimeUnit.MINUTES)
@@ -495,7 +521,7 @@ public class Repo extends IdRepo {
 			}
 		});
 	}
-	
+
 	public RepoSearchResults search(SSOToken token, IdType type, String pattern, int maxTime, int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,Map<String, Set<String>> avPairs, boolean recursive) throws IdRepoException, SSOException {
 		validate(type, IdOperation.READ);
 		try{
@@ -503,7 +529,7 @@ public class Repo extends IdRepo {
 			//returnFields
 			final Set<String> returnAttrsNames=new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 			if (!returnAllAttrs && returnAttrs!=null){
-				for (final String field : returnAttrs) { 
+				for (final String field : returnAttrs) {
 					returnAttrsNames.add(field.toLowerCase());
 				}
 			}
@@ -515,9 +541,9 @@ public class Repo extends IdRepo {
 				}
 			}
 
-			
+
 			Map<String, Map<String,Set<String>>> result= new HashMap<>();
-			
+
 			//search by pattern/username without filter
 			if  (filterFields.isEmpty()) {
 				BoundStatement statement;
@@ -562,24 +588,24 @@ public class Repo extends IdRepo {
 							valuesLowerCase.add(string.toLowerCase());
 						}
 					}
-          try {
-            BoundStatement statement=((StringUtils.equals(filterUID, "*") || filterUID == null)
-                ? getIndexByValue(filterEntry.getKey())
-                : getIndexByValueAndUID(filterEntry.getKey())).bind()
-                  .setString("type", type.getName())
-                  .setString("field", filterEntry.getKey().toLowerCase())
-                  .setList("values", new ArrayList<>(
-                      disableCaseSensitive.contains(filterEntry.getKey()) ? valuesLowerCase : filterEntry.getValue()),String.class);
-            if (!StringUtils.equals(filterUID, "*") && filterUID != null) {
-              statement=statement.setString("uid", disableCaseSensitive.contains("uid")?filterUID.toLowerCase():filterUID);
-            }
-            final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
-            for (Row row : rc){
-              final String uid=row.getString("uid");
-              Map<String, Set<String>> attr=users2attr.get(uid);
-              if (attr==null) {
-                attr= new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-                users2attr.put(uid,attr);
+					try {
+						BoundStatement statement=((StringUtils.equals(filterUID, "*") || filterUID == null)
+								? getIndexByValue(filterEntry.getKey())
+								: getIndexByValueAndUID(filterEntry.getKey())).bind()
+								.setString("type", type.getName())
+								.setString("field", filterEntry.getKey().toLowerCase())
+								.setList("values", new ArrayList<>(
+										disableCaseSensitive.contains(filterEntry.getKey()) ? valuesLowerCase : filterEntry.getValue()),String.class);
+						if (!StringUtils.equals(filterUID, "*") && filterUID != null) {
+							statement=statement.setString("uid", disableCaseSensitive.contains("uid")?filterUID.toLowerCase():filterUID);
+						}
+						final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
+						for (Row row : rc){
+							final String uid=row.getString("uid");
+							Map<String, Set<String>> attr=users2attr.get(uid);
+							if (attr==null) {
+								attr= new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+								users2attr.put(uid,attr);
 							}
 							final String field=row.getString("field");
 							Set<String> values=attr.get(field);
@@ -635,7 +661,7 @@ public class Repo extends IdRepo {
 		validate(type, IdOperation.EDIT);
 		//check group
 		final Boolean groupExist=isExists(token,type,name);
-		
+
 		if (ADDMEMBER==operation) {
 			if (!groupExist) {
 				throw new IdRepoException("group not exist");
@@ -758,7 +784,7 @@ public class Repo extends IdRepo {
 		logger.warn("unsupported getBinaryServiceAttributes {} {} {} {}",type,name,serviceName,attrNames);
 		throw new IdRepoUnsupportedOpException("unsupported getBinaryServiceAttributes");
 	}
-	
+
 	@Override
 	public void modifyService(SSOToken token, IdType type, String name, String serviceName, SchemaType sType, Map<String, Set<String>> attrMap) throws IdRepoException,	SSOException {
 		validate(type, IdOperation.SERVICE);
@@ -784,18 +810,18 @@ public class Repo extends IdRepo {
 	public void removeListener() {
 
 	}
-	
-///////////////////////////////////////////////////////////////////////////	
+
+	///////////////////////////////////////////////////////////////////////////
 	void validate(IdType type,IdOperation service) throws IdRepoUnsupportedOpException{
 		if (!supportedOps.containsKey(type)||!supportedOps.get(type).contains(service))
 			throw new IdRepoUnsupportedOpException("operation "+service.getName()+" not supported for "+type.getName());
 	}
-	
+
 	Integer getTTL(IdType type,String name){
 		Map<String, Integer> attr2ttl=type2attr2ttl.get(type);
 		return (attr2ttl==null)?null:attr2ttl.get(name);
 	}
-	
+
 
 	IdType String2IdType(String str){
 		if (StringUtils.equalsIgnoreCase(IdType.USER.getName(),str))
@@ -817,7 +843,7 @@ public class Repo extends IdRepo {
 		else
 			throw new IllegalArgumentException("unknown IdType="+str);
 	}
-	
+
 	IdOperation String2IdOperation(String str){
 		if (StringUtils.equalsIgnoreCase(IdOperation.CREATE.getName(),str))
 			return IdOperation.CREATE;
@@ -832,7 +858,7 @@ public class Repo extends IdRepo {
 		else
 			throw new IllegalArgumentException("unknown IdOperation="+str);
 	}
-	
+
 	Set<String> convert(String name, Set<String> values){
 		if (StringUtils.containsIgnoreCase(name, "userpassword")) {
 			for (Object value : values.toArray()) {
@@ -855,32 +881,32 @@ public class Repo extends IdRepo {
 	public boolean supportsAuthentication() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean authenticate(Callback[] credentials) throws IdRepoException, AuthLoginException {
-        logger.trace("authenticate invoked");
-        String userName = null;
-        String password = null;
-        for (Callback callback : credentials) {
-            if (callback instanceof NameCallback) {
-                userName = ((NameCallback) callback).getName();
-            } else if (callback instanceof PasswordCallback) {
-                password = new String(((PasswordCallback) callback).getPassword());
-            }
-        }
-        if (userName == null || password == null) {
-            throw new IdRepoException(IdRepoErrorCode.UNABLE_TO_AUTHENTICATE,Repo.class.getName());
-        }
-        try {
-        	Map<String, Set<String>> res=getAttributes(null, IdType.USER, userName, new HashSet<String>(Arrays.asList(new String[] {"userpassword"})));
-        	if (res!=null && res.containsKey("userpassword") && res.get("userpassword").size()>0) {
-        		final String storedHash=res.get("userpassword").iterator().next();
-        		if (storedHash.startsWith("{SSHA}")){
-        			return SSHA.verifySaltedPassword(password.getBytes(), storedHash);
-            	}else {
-            		return (storedHash.replace("{CLEAR}", "").equals(password));
-            	}
-        	}
+		logger.trace("authenticate invoked");
+		String userName = null;
+		String password = null;
+		for (Callback callback : credentials) {
+			if (callback instanceof NameCallback) {
+				userName = ((NameCallback) callback).getName();
+			} else if (callback instanceof PasswordCallback) {
+				password = new String(((PasswordCallback) callback).getPassword());
+			}
+		}
+		if (userName == null || password == null) {
+			throw new IdRepoException(IdRepoErrorCode.UNABLE_TO_AUTHENTICATE,Repo.class.getName());
+		}
+		try {
+			Map<String, Set<String>> res=getAttributes(null, IdType.USER, userName, new HashSet<String>(Arrays.asList(new String[] {"userpassword"})));
+			if (res!=null && res.containsKey("userpassword") && res.get("userpassword").size()>0) {
+				final String storedHash=res.get("userpassword").iterator().next();
+				if (storedHash.startsWith("{SSHA}")){
+					return SSHA.verifySaltedPassword(password.getBytes(), storedHash);
+				}else {
+					return (storedHash.replace("{CLEAR}", "").equals(password));
+				}
+			}
 		} catch (SSOException e) {
 			throw new AuthLoginException(e);
 		}

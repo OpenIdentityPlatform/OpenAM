@@ -28,20 +28,14 @@ import static org.forgerock.util.promise.Promises.*;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.mail.MessagingException;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -1247,7 +1241,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         try {
             admin = getSSOToken(getCookieFromServerContext(context));
             if (!isIgnoredProfile(resourceId, admin, realm)) {
-                dtls = identityServices.read(resourceId, getIdentityServicesAttributes(realm), admin);
+                Map<String, Set<String>> attributes = getIdentityServicesAttributes(realm);
+                for(JsonPointer field : request.getFields()) {
+                    attributes.put(field.leaf(), new HashSet<>());
+                }
+                dtls = identityServices.read(resourceId, attributes, admin);
                 String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
                 if (debug.messageEnabled()) {
                     debug.message("IdentityResource.readInstance :: READ of resourceId={} in realm={} performed by " +
