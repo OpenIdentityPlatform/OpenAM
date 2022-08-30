@@ -31,6 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -43,6 +44,7 @@ import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
@@ -139,6 +141,10 @@ public final class CTSBlacklist<T extends Blacklistable> implements Blacklist<T>
 
     @Override
     public void subscribe(final Listener listener) {
+    	if (StringUtils.startsWith(SystemProperties.get("org.forgerock.openam.sm.datalayer.module.CTS_ASYNC"),"org.openidentityplatform.openam.cassandra")){
+    		DEBUG.message("CTSBlacklist: Blacklisting exclude by: {}", SystemProperties.get("org.forgerock.openam.sm.datalayer.module.CTS_ASYNC"));
+    		return;
+    	}
         pollTask.start();
         Reject.ifNull(listener);
         listeners.add(listener);
