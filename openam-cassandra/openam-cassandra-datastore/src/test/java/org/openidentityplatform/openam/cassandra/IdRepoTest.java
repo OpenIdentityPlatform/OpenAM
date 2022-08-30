@@ -374,4 +374,22 @@ public class IdRepoTest {
 		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
 		assertTrue(repo.isActive(null, IdType.USER, "9170000000"));
 	}
+
+	@Test
+	public void updated_created_fields_test() throws SSOException, IdRepoException{
+		repo.delete(null, IdType.USER, "9170000000");
+
+		Map<String, Set<String>> param = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+		param.put("CN", new HashSet<>(Arrays.asList("ssss")));
+		param.put("sunidentitymsisdnnumber", new HashSet<>(Arrays.asList("9170000000")));
+		param.put("userPassword", new HashSet<>(Arrays.asList("{CLEAR}5155")));
+		repo.create(null, IdType.USER, "9170000000",param);
+
+		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
+
+		Set<String> fields= new HashSet<>(Arrays.asList("_created", "_updated"));
+		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("_created"));
+		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("_updated"));
+		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
+	}
 }
