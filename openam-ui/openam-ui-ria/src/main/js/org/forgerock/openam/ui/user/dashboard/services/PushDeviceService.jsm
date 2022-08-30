@@ -21,7 +21,7 @@ import fetchUrl from "org/forgerock/openam/ui/common/services/fetchUrl";
 
 const delegate = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
 const getPath = function () {
-    return `/users/${Configuration.loggedUser.get("uid")}/devices/push/`;
+    return `/users/${encodeURIComponent(Configuration.loggedUser.get("username"))}/devices/push/`;
 };
 
 export function getAll () {

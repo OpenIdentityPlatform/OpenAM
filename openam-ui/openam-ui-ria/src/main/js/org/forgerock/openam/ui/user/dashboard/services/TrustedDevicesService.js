@@ -24,14 +24,16 @@ define([
 
     obj.getTrustedDevices = function () {
         return obj.serviceCall({
-            url: fetchUrl.default(`/users/${Configuration.loggedUser.get("uid")}/devices/trusted/?_queryId=*`),
+            url: fetchUrl.default(`/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))}/devices/trusted/?_queryId=*`),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
     };
 
     obj.deleteTrustedDevice = function (id) {
         return obj.serviceCall({
-            url: fetchUrl.default(`/users/${Configuration.loggedUser.get("uid")}/devices/trusted/${id}`),
+            url: fetchUrl.default(`/users/${
+                encodeURIComponent(Configuration.loggedUser.get("username"))}/devices/trusted/${id}`),
             type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
