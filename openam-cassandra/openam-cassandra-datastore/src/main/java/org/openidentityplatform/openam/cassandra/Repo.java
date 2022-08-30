@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +88,9 @@ public class Repo extends IdRepo {
 	String activeValue="Active";
 	String memberOf="memberOf";
 	final String uniqueMember="uniqueMember";
+	final static String created = "_created";
+	final static String updated = "_updated";
+
 	@Override
 	public void initialize(Map<String, Set<String>> configParams) throws IdRepoException  {
 		super.initialize(configParams);
@@ -171,6 +175,7 @@ public class Repo extends IdRepo {
 			statement_select_by_type=session.prepare("select uid,field,value,change from values where type=:type limit 64000 allow filtering");
 			statement_select_by_uid=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid");
 			statement_select_by_fields=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid and field in :fields limit 64000");
+			statement_select_created_updated_by_uid=session.prepare("select max(change) as updated, min(change) as created from values where type=:type and uid=:uid");
 			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
 			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
 			statement_delete_by_field_value=session.prepare("delete from values where type=:type and uid=:uid and field=:field and value=:value");
@@ -194,6 +199,7 @@ public class Repo extends IdRepo {
 	PreparedStatement statement_add_value_ttl;
 	PreparedStatement statement_add_value_exist;
 	PreparedStatement statement_add_value_ttl_exist;
+	PreparedStatement statement_select_created_updated_by_uid;
 	
 	@Override
 	public void shutdown() {
@@ -255,13 +261,21 @@ public class Repo extends IdRepo {
 			}
 			assert (token==null): "overhead: please set attrNames";
 		}
-		final Map<String, Set<String>> attr=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
+		final Map<String, Set<String>> attr= new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 		try{
-			final Set<String> fields=new HashSet<String>();
+			boolean requestCreatedUpdatedAttrs = false;
+			final Set<String> fields = new HashSet<>();
 			if (attrNames!=null && !attrNames.isEmpty()) {
 				for (String field : attrNames) {
+					if(field.equals(created) || field.equals(updated)) { //ignore _created and _updated attrs, fetch later
+						requestCreatedUpdatedAttrs = true;
+						continue;
+					}
 					fields.add(field.toLowerCase().replace("update-", ""));
 				}
+			}
+			if(requestCreatedUpdatedAttrs) {
+				attr.putAll(getCreatedUpdatedAttributes(type, name, attrNames));
 			}
 			BoundStatement statement=((fields.isEmpty())?statement_select_by_uid:statement_select_by_fields).bind()
 					.setString("type", type.getName())
@@ -284,6 +298,26 @@ public class Repo extends IdRepo {
 		}catch(Throwable e){
 			logger.error("getAttributes {} {}",type,name,attrNames,e);
 			throw new IdRepoException(e.getMessage());
+		}
+		return attr;
+	}
+
+	private Map<String, Set<String>> getCreatedUpdatedAttributes(IdType type,String name, Set<String> attrNames) {
+		final Map<String, Set<String>> attr = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+		if(!attrNames.contains(created) && !attrNames.contains(updated)) {
+			return attr;
+		}
+		BoundStatement statement=statement_select_created_updated_by_uid.bind()
+				.setString("type", type.getName())
+				.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name);
+		final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
+		for (Row row : rc) {
+			if(attrNames.contains(created) && row.getInstant("created") != null) {
+				attr.put(created, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("created")))));
+			}
+			if(attrNames.contains(updated)  && row.getInstant("updated") != null) {
+				attr.put(updated, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("updated")))));
+			}
 		}
 		return attr;
 	}
