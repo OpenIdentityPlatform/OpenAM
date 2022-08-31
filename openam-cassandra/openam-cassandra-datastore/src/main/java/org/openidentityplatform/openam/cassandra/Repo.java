@@ -491,8 +491,9 @@ public class Repo extends IdRepo {
 			if(avPairs == null) {
 				avPairs = new HashMap<>();
 			}
-			Map<String, Set<String>> filter = crestQuery.getQueryFilter().accept(new CassandraQueryFilterVisitor(), null);
-			avPairs.putAll(filter);
+			CassandraFilter cassandraFilter = crestQuery.getQueryFilter().accept(new CassandraQueryFilterVisitor(), null);
+            avPairs.putAll(cassandraFilter.getFilter());
+            filterOp = cassandraFilter.getFilterOp();
 		}
 		return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,returnAllAttrs, filterOp, avPairs, recursive);
 	}
