@@ -26,6 +26,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
@@ -68,6 +69,8 @@ public final class IdentityRestUtils {
     public static final String USERNAME = "username";
 
     private static final List<String> PASSWORD_ATTRIBUTES = Arrays.asList("userpassword", "unicodepwd");
+
+    private static final List<String> MEMBEROF_ATTRIBUTES = Arrays.asList("memberof");
     private static final Debug debug = Debug.getInstance("frRest");
 
     private static final IdentityResourceExceptionMappingHandler RESOURCE_MAPPING_HANDLER =
@@ -214,7 +217,12 @@ public final class IdentityRestUtils {
 
             try {
                 for (String s : jVal.keys()) {
-                    identityAttrList.put(s, identityAttributeJsonToSet(jVal.get(s)));
+                    Set<String> attrSet = identityAttributeJsonToSet(jVal.get(s));
+                    if(MEMBEROF_ATTRIBUTES.contains(s)) {
+                        identity.setGroupList(new ListWrapper(attrSet.toArray(new String[]{})));
+                    } else {
+                        identityAttrList.put(s, attrSet);
+                    }
                 }
             } catch (Exception e) {
                 debug.error("IdentityResource.jsonValueToIdentityDetails() :: Cannot Traverse JsonValue. ", e);
