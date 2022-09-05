@@ -597,6 +597,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 //        }
     }
 
+    @Override
+    public void modifyMemberShip(SSOToken token, IdType type, String name, Set members, IdType membersType, int operation, String amOrgName) throws IdRepoException, SSOException {
+        super.modifyMemberShip(token, type, name, members, membersType, operation, amOrgName);
+        for(String member: (Set<String>)members) {
+            AMIdentity identity = new AMIdentity(token, member, membersType, amOrgName, null);
+            String dn = IdUtils.getUniversalId(identity).toLowerCase();
+            dirtyCache(dn);
+        }
+    }
+
     public void delete(SSOToken token, IdType type, String name,
         String orgName, String amsdkDN) throws IdRepoException,
         SSOException {
