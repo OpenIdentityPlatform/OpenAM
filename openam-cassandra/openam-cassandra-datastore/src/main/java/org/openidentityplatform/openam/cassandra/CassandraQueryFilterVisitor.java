@@ -20,86 +20,88 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public class CassandraQueryFilterVisitor implements QueryFilterVisitor<Map<String, Set<String>>, Void, JsonPointer> {
+public class CassandraQueryFilterVisitor implements QueryFilterVisitor<CassandraFilter, Void, JsonPointer> {
 
-    final Map<String, Set<String>> filter = new HashMap<>();
+    CassandraFilter cassandraFilter = new CassandraFilter();
 
     @Override
-    public Map<String, Set<String>> visitAndFilter(Void unused, List<QueryFilter<JsonPointer>> list) {
+    public CassandraFilter visitAndFilter(Void unused, List<QueryFilter<JsonPointer>> list) {
         for (QueryFilter<JsonPointer> filter: list) {
             filter.accept(this, null);
         }
-        return this.filter;
+        return this.cassandraFilter;
     }
 
     @Override
-    public Map<String, Set<String>> visitBooleanLiteralFilter(Void unused, boolean b) {
+    public CassandraFilter visitBooleanLiteralFilter(Void unused, boolean b) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitContainsFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitContainsFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitEqualsFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitEqualsFilter(Void unused, JsonPointer strings, Object o) {
         for (String key : strings) {
-            Set<String> values = this.filter.getOrDefault(key, new HashSet<>());
+            Set<String> values = cassandraFilter.getFilter().getOrDefault(key, new HashSet<>());
             values.add(o.toString());
-            this.filter.put(key, values);
+            cassandraFilter.getFilter().put(key, values);
         }
-        return this.filter;
+        return cassandraFilter;
     }
 
     @Override
-    public Map<String, Set<String>> visitExtendedMatchFilter(Void unused, JsonPointer strings, String s, Object o) {
+    public CassandraFilter visitExtendedMatchFilter(Void unused, JsonPointer strings, String s, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitGreaterThanFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitGreaterThanFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitGreaterThanOrEqualToFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitGreaterThanOrEqualToFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitLessThanFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitLessThanFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitLessThanOrEqualToFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitLessThanOrEqualToFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitNotFilter(Void unused, QueryFilter<JsonPointer> queryFilter) {
+    public CassandraFilter visitNotFilter(Void unused, QueryFilter<JsonPointer> queryFilter) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitOrFilter(Void unused, List<QueryFilter<JsonPointer>> list) {
+    public CassandraFilter visitOrFilter(Void unused, List<QueryFilter<JsonPointer>> list) {
+        for (QueryFilter<JsonPointer> filter: list) {
+            filter.accept(this, null);
+        }
+        this.cassandraFilter.setFilterOp(Repo.OR_MOD);
+        return this.cassandraFilter;
+    }
+
+    @Override
+    public CassandraFilter visitPresentFilter(Void unused, JsonPointer strings) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<String, Set<String>> visitPresentFilter(Void unused, JsonPointer strings) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Map<String, Set<String>> visitStartsWithFilter(Void unused, JsonPointer strings, Object o) {
+    public CassandraFilter visitStartsWithFilter(Void unused, JsonPointer strings, Object o) {
         throw new UnsupportedOperationException();
     }
 }
