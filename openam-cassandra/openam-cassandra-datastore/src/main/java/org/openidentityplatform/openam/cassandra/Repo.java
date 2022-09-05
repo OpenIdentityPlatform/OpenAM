@@ -18,10 +18,9 @@ package org.openidentityplatform.openam.cassandra;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -291,7 +290,7 @@ public class Repo extends IdRepo {
 				if (!attr.containsKey(field)) {
 					attr.put(field, values);
 					if (attrNames!=null && attrNames.contains("update-"+field)) {
-						attr.put("update-"+field,  new LinkedHashSet<String>(Arrays.asList(new String[] {new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("change")))})));
+						attr.put("update-"+field, Collections.singleton(instantToString(row.getInstant("change"))));
 					}
 				}
 			}
@@ -301,6 +300,10 @@ public class Repo extends IdRepo {
 		}
 		return attr;
 	}
+
+    private String instantToString(Instant instant) {
+        return Long.toString(instant.toEpochMilli());
+    }
 
 	private Map<String, Set<String>> getCreatedUpdatedAttributes(IdType type,String name, Set<String> attrNames) {
 		final Map<String, Set<String>> attr = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -313,10 +316,10 @@ public class Repo extends IdRepo {
 		final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
 		for (Row row : rc) {
 			if(attrNames.contains(created) && row.getInstant("created") != null) {
-				attr.put(created, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("created")))));
+				attr.put(created, Collections.singleton(instantToString(row.getInstant("created"))));
 			}
 			if(attrNames.contains(updated)  && row.getInstant("updated") != null) {
-				attr.put(updated, Collections.singleton(new SimpleDateFormat("yyyyMMddHHmmssZ").format(Date.from(row.getInstant("updated")))));
+				attr.put(updated, Collections.singleton(instantToString(row.getInstant("updated"))));
 			}
 		}
 		return attr;
