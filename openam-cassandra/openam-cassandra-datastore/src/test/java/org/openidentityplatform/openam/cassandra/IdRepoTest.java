@@ -388,8 +388,15 @@ public class IdRepoTest {
 		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
 
 		Set<String> fields= new HashSet<>(Arrays.asList("_created", "_updated"));
-		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("_created"));
-		assertTrue(repo.getAttributes(null, IdType.USER, "9170000000",fields).containsKey("_updated"));
+		Map<String, Set<String>> fieldsValues = repo.getAttributes(null, IdType.USER, "9170000000", fields);
+		assertTrue(fieldsValues.containsKey("_created"));
+		assertTrue(fieldsValues.containsKey("_updated"));
+		long created = Long.parseLong(fieldsValues.get("_created").stream().findFirst().get());
+		long updated = Long.parseLong(fieldsValues.get("_updated").stream().findFirst().get());
+		assertTrue(created < updated);
+		assertEquals(System.currentTimeMillis() / 1000, created / 1000);
+		assertEquals(System.currentTimeMillis() / 1000, updated / 1000);
+
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 	}
 }
