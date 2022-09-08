@@ -921,6 +921,5 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-cassandra-cts</artifactId>
         </dependency>
-		        
     </dependencies>
 </project>
