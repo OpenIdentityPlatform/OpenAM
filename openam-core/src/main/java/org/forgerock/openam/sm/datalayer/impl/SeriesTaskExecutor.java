@@ -72,7 +72,7 @@ import com.sun.identity.shared.debug.Debug;
 public class SeriesTaskExecutor implements TaskExecutor {
     private static final Random random = new Random();
     private final Debug debug;
-    private BlockingQueue<Task>[] taskQueues;
+    static private BlockingQueue<Task> taskQueue=null;
     private int processors;
     private boolean initialised = false;
     private final SeriesTaskExecutorThreadFactory processorFactory;
@@ -127,13 +127,10 @@ public class SeriesTaskExecutor implements TaskExecutor {
             throw new RuntimeException(e);
         }
 
-        taskQueues = new BlockingQueue[processors];
+        taskQueue = new LinkedBlockingQueue<>(configuration.getQueueSize());
+        
         for (int ii = 0; ii < processors; ii++) {
-            taskQueues[ii] = new LinkedBlockingQueue<>(configuration.getQueueSize());
-        }
-
-        for (int ii = 0; ii < processors; ii++) {
-            SeriesTaskExecutorThread processor = processorFactory.create(taskQueues[ii]);
+            SeriesTaskExecutorThread processor = processorFactory.create(taskQueue);
             monitor.watchThread(poolService, processor);
         }
         debug("Created {0} Task Processors", processors);
@@ -145,8 +142,7 @@ public class SeriesTaskExecutor implements TaskExecutor {
      * @return Non null.
      */
     private BlockingQueue<Task> getQueueForQuery() {
-        String key = Integer.toString(random.nextInt());
-        return getQueue(key);
+        return taskQueue;
     }
 
     /**
@@ -161,9 +157,7 @@ public class SeriesTaskExecutor implements TaskExecutor {
         if (tokenId == null) {
             return getQueueForQuery();
         }
-        int select = QueueSelector.select(tokenId, processors);
-        debug("Select Queue: Token ID {0} - Queue {1}", tokenId, select);
-        return taskQueues[select];
+        return taskQueue;
     }
 
     /**

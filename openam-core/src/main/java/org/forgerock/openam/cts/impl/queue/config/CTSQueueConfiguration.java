@@ -40,7 +40,7 @@ import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 @Singleton
 public class CTSQueueConfiguration implements QueueConfiguration {
     public static final int DEFAULT_TIMEOUT = 15;
-    public static final int DEFAULT_QUEUE_SIZE = 5000;
+    public static final int DEFAULT_QUEUE_SIZE = 16000;
 
     private final ConnectionConfigFactory dataLayerConfig;
     private final Debug debug;
