@@ -162,7 +162,7 @@
 						<artifactItem>
 							<groupId>org.openidentityplatform.commons.ui.libs</groupId>
 							<artifactId>handlebars</artifactId>
-							<version>4.7.6</version>
+							<version>4.7.7</version>
 							<packaging>js</packaging>
 							<classifier>min</classifier>
 							<downloadUrl>
@@ -266,7 +266,7 @@
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>handlebars</artifactId>
-			              <version>4.7.6</version>
+			              <version>4.7.7</version>
 			              <packaging>js</packaging>
 			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/{version}/{artifactId}.{packaging}</downloadUrl>
 			            </artifactItem>

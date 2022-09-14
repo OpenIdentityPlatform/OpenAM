@@ -29,7 +29,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codemirror.version>4.10</codemirror.version>
-        <handlebars.version>4.7.6</handlebars.version>
+        <handlebars.version>4.7.7</handlebars.version>
         <node.install.directory>${project.basedir}</node.install.directory>
     </properties>
 
