@@ -53,7 +53,7 @@ require.config({
         "clockPicker"      : "libs/bootstrap-clockpicker-0.0.7-min",
         "doTimeout"        : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"          : "libs/form2js-2.0-769718a",
-        "handlebars"       : "libs/handlebars-4.7.6",
+        "handlebars"       : "libs/handlebars-4.7.7",
         "i18next"          : "libs/i18next-1.7.3-min",
         "jquery"           : "libs/jquery-2.1.1-min",
         "js2form"          : "libs/js2form-2.0-769718a",

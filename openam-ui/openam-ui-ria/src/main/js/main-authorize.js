@@ -32,7 +32,7 @@ require.config({
         }
     },
     paths: {
-        "handlebars": "libs/handlebars-4.7.6",
+        "handlebars": "libs/handlebars-4.7.7",
         "i18next": "libs/i18next-1.7.3-min",
         "jquery": "libs/jquery-2.1.1-min",
         "lodash": "libs/lodash-3.10.1-min",

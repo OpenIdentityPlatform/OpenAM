@@ -32,7 +32,7 @@
         paths: {
             "backbone": "/base/target/dependencies/libs/backbone-1.1.2-min",
             "chai": "/base/node_modules/chai/chai",
-            "handlebars": "/base/target/dependencies/libs/handlebars-4.7.6",
+            "handlebars": "/base/target/dependencies/libs/handlebars-4.7.7",
             "i18next": "/base/target/dependencies/libs/i18next-1.7.3-min",
             "jquery": "/base/target/dependencies/libs/jquery-2.1.1-min",
             "lodash": "/base/target/dependencies/libs/lodash-3.10.1-min",
