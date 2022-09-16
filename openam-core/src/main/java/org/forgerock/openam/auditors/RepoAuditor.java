@@ -119,6 +119,9 @@ public class RepoAuditor {
      */
     public void auditCreate(Map<String, Object> newState) {
         if (shouldAudit(ConfigOperation.CREATE)) {
+        	if(newState.containsKey("userpassword")) {
+        		newState.put("userpassword", "********");
+        	}
             JsonValue afterState = convertObjectToJsonValue(newState);
 
             AMConfigAuditEventBuilder builder = getBaseBuilder()
