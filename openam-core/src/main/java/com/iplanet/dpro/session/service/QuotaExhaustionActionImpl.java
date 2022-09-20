@@ -50,7 +50,7 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
             }catch (IllegalStateException e) {
             	set.remove(t);
             	debug.error("cts quota exhaustion destroy full: queue size {}", queue.size());
-            	return false;
+           		return false;
             }
 	    }
 
