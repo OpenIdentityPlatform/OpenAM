@@ -49,6 +49,7 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
             	return res;
             }catch (IllegalStateException e) {
             	set.remove(t);
+            	debug.error("cts quota exhaustion destroy full: queue size {}", queue.size());
             	return false;
             }
 	    }
@@ -68,16 +69,17 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 		public void run() {
 			String sessionId;
 			try {
-				while ((sessionId=queue.take())!=null) {
-					final SessionID sid=new SessionID(sessionId);
-					final String uid;
-					try {
-						final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
-						uid=s.getClientID();
-						s.destroySession(s);
-						debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,uid,queue.size()+1);
-					}catch (Exception e) {
-						debug.error("error cts quota exhaustion destroy {}: queue size {}", sessionId,queue.size()+1,e.toString());
+				while (true) {
+					while ((sessionId=queue.take())!=null) {
+						try {
+							final SessionID sid=new SessionID(sessionId);
+							final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
+							final String uid=s.getClientID();
+							s.destroySession(s);
+							debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,uid,queue.size()+1);
+						}catch (Throwable e) {
+							debug.error("error cts quota exhaustion destroy {}: queue size {} {}", sessionId,queue.size()+1,e.toString());
+						}
 					}
 				}
 			}catch (InterruptedException e) {}
@@ -92,14 +94,13 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
     
     static {
     	for(int i=1;i<=executor.getMaximumPoolSize();i++) {
-    		executor.submit(new Task());
+    		final Task task=new Task();
+    		executor.submit(task);
     	}
     }
     protected void destroy(String sessionId,Map<String, Long> sessions) {
     	try {
-    		if (!queue.add(sessionId)) {
-    			debug.error("cts quota exhaustion destroy full: queue size {}", queue.size());
-    		}
+    		queue.add(sessionId);
     	}finally {
     		sessions.remove(sessionId);
 		}
