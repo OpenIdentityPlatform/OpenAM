@@ -2,16 +2,16 @@ package com.iplanet.dpro.session.service;
 
 import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.forgerock.guice.core.InjectorHolder;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -29,26 +29,26 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 
     	final private static long serialVersionUID = 1L;
 
-    	private Set<T> set;
+    	final Cache<T, Boolean> cache;
+    	
 		public SetBlockingQueue(int capacity) {
 			super(capacity);
-			set = Collections.newSetFromMap(new ConcurrentHashMap<>(capacity));
+			cache = CacheBuilder.newBuilder()
+	    			.maximumSize(capacity)
+	    			.expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue.expire", 60), TimeUnit.SECONDS)
+	    			.build();
 		}
 		
 	    @Override
-	    public synchronized boolean add(T t) {
+	    public boolean add(T t) {
+	    	boolean res=false;
             try {
-            	if (set.contains(t)) {
-            		return false;
+            	if (cache.getIfPresent(t)==null) {
+            		res=super.add(t);
             	}
-            	set.add(t);
-            	final boolean res=super.add(t);
-            	if (!res) {
-            		set.remove(t);
-            	}
+            	cache.put(t,true);
             	return res;
             }catch (IllegalStateException e) {
-            	set.remove(t);
             	debug.error("cts quota exhaustion destroy full: queue size {}", queue.size());
            		return false;
             }
@@ -57,12 +57,11 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 	    @Override
 	    public T take() throws InterruptedException {
 	        T t = super.take();
-	        set.remove(t);
 	        return t;
 	    }
     }
     
-    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 64000));
+    final static SetBlockingQueue<String> queue=new SetBlockingQueue<String>(SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.queue", 32000));
     
     static class Task implements Runnable {
     	@Override
@@ -87,7 +86,7 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
     }
     
     final static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
-	    		SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.pool", 3),
+	    		SystemProperties.getAsInt("org.openidentityplatform.openam.cts.quota.exhaustion.pool", 6),
 	    		new ThreadFactoryBuilder().setNameFormat("QuotaExhaustionAction-%d")
 	    		.build()
     		);
