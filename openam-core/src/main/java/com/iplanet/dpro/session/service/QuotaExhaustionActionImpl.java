@@ -17,6 +17,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.shared.debug.Debug;
 
@@ -73,11 +74,13 @@ public abstract class QuotaExhaustionActionImpl implements QuotaExhaustionAction
 						try {
 							final SessionID sid=new SessionID(sessionId);
 							final Session s=org.forgerock.openam.session.SessionCache.getInstance().getSession(sid,true,false);
-							final String uid=s.getClientID();
+							final String uid=s.getPropertyWithoutValidation("sun.am.UniversalIdentifier");
 							s.destroySession(s);
 							debug.error("cts quota exhaustion destroy {} for {}: queue size {}", sessionId,uid,queue.size()+1);
+						}catch (SessionException e) {
+							debug.warning("error cts quota exhaustion destroy {}: queue size {} {}", sessionId,queue.size()+1,e.toString());
 						}catch (Throwable e) {
-							debug.error("error cts quota exhaustion destroy {}: queue size {} {}", sessionId,queue.size()+1,e.toString());
+							debug.error("error cts quota exhaustion destroy {}: queue size {} {}", sessionId,queue.size()+1,e.toString(),e);
 						}
 					}
 				}
