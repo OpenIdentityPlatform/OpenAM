@@ -608,14 +608,14 @@ public class WebtopNaming {
 
     /**
      * Returns the platform server list. Note: Calling this method would
-     * cause performance impact, as it involves xml request over the wire.
+     * dont cause performance impact, as it involves xml request over the wire.
      *
      * @return platform server list
      *
      * @throws Exception if an error occurs when updating the naming table
      */
     public static Set<String> getPlatformServerList() throws Exception {
-         return getPlatformServerList(true);
+         return getPlatformServerList(false);
     }
 
     /**
@@ -1143,11 +1143,11 @@ public class WebtopNaming {
             throw new URLNotFoundException(e.getMessage());
         }
     }
-
-    private synchronized static void getNamingProfile(boolean update)
+    
+    private static void getNamingProfile(boolean update)
             throws Exception {
         if (update || config == null) {
-            updateNamingTable();
+           	updateNamingTable();
         }
     }
 
