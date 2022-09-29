@@ -72,7 +72,7 @@ public class SessionNotificationHandler implements NotificationHandler {
     public void process(Vector<Notification> notifications) {
         for (int i = 0; i < notifications.size(); i++) {
             Notification notification = notifications.elementAt(i);
-            processNotification(SessionNotification.parseXML(notification.getContent()));
+            processNotification(SessionNotification.parseXML(notification.getContent()), true);
         }
     }
 
@@ -81,7 +81,7 @@ public class SessionNotificationHandler implements NotificationHandler {
      *
      * @param notification A SessionNotification object describing changes to the Session
      */
-    public void processNotification(SessionNotification notification) {
+    public void processNotification(SessionNotification notification, boolean remote) {
         SessionInfo info = notification.getSessionInfo();
 
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
@@ -116,7 +116,7 @@ public class SessionNotificationHandler implements NotificationHandler {
         Session.invokeListeners(evt);
 
         //remote session
-        if(sessionEventType.equals(SessionEventType.EVENT_URL_ADDED) && session.getLocalSessionEventListeners().size() == 0) { //remote session
+        if(sessionEventType.equals(SessionEventType.EVENT_URL_ADDED) && remote) { //remote session
             SessionAccessManager sessionAccessManager = InjectorHolder.getInstance(SessionAccessManager.class);
             InternalSession internalSession = sessionAccessManager.getInternalSession(session.getSessionID());
             if(internalSession != null) {

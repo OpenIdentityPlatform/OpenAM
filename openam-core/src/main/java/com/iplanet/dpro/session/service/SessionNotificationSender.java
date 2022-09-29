@@ -163,7 +163,7 @@ public class SessionNotificationSender implements InternalSessionListener {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(event.getInternalSession(), sid);
                                 SessionNotification notification =
                                         new SessionNotification(info, event.getType().getCode(), event.getTime());
-                                SessionNotificationHandler.handler.processNotification(notification);
+                                SessionNotificationHandler.handler.processNotification(notification, false);
                             }
                         } else {
                             // If the Global notification is for a remote URL, it should be handled from run()
