@@ -52,6 +52,7 @@ import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
 import org.forgerock.openam.core.rest.authn.core.LoginProcess;
 import org.forgerock.openam.core.rest.authn.core.LoginStage;
 import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrapper;
+import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
@@ -72,6 +73,8 @@ public class RestAuthenticationHandlerTest {
     private AuthIdHelper authIdHelper;
     private CoreWrapper coreWrapper;
 
+    private CoreServicesWrapper coreServicesWrapper;
+
     @BeforeMethod
     public void setUp() {
 
@@ -80,9 +83,10 @@ public class RestAuthenticationHandlerTest {
         amAuthErrorCodeResponseStatusMapping = mock(AMAuthErrorCodeResponseStatusMapping.class);
         authIdHelper = mock(AuthIdHelper.class);
         coreWrapper = mock(CoreWrapper.class);
+        coreServicesWrapper = mock(CoreServicesWrapper.class);
 
         restAuthenticationHandler = new RestAuthenticationHandler(loginAuthenticator, restAuthCallbackHandlerManager,
-                amAuthErrorCodeResponseStatusMapping, authIdHelper, coreWrapper);
+                amAuthErrorCodeResponseStatusMapping, authIdHelper, coreWrapper, coreServicesWrapper);
     }
 
     @Test
