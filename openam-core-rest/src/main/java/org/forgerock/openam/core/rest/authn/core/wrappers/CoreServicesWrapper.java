@@ -104,4 +104,14 @@ public class CoreServicesWrapper extends org.forgerock.openam.core.CoreServicesW
             CookieUtils.addCookieToResponse(response, cookie);
         }
     }
+
+    public void clearLbCookie(HttpServletRequest request, HttpServletResponse response) {
+        AuthClientUtils.clearlbCookie(request, response);
+    }
+
+    public void clearAuthCookie(HttpServletRequest request, HttpServletResponse response) {
+        AuthClientUtils.clearServerCookie(AuthUtils.getAuthCookieName(), request, response);
+    }
+
+
 }

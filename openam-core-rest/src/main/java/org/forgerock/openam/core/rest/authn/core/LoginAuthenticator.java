@@ -149,15 +149,6 @@ public class LoginAuthenticator {
             authContext.login();
         }
 
-        // When starting a new login process, add the load balancer cookies to the response.
-        try {
-            HttpServletResponse response = loginConfiguration.getHttpResponse();
-            coreServicesWrapper.setLbCookie(authContext.getAuthContext(), request, response);
-            coreServicesWrapper.setAuthCookie(authContext.getAuthContext(), request, response);
-        } catch (AuthException e) {
-            throw new AuthLoginException(e);
-        }
-
         return loginProcess;
     }
 

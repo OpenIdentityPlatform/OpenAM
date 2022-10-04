@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.SignatureException;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
@@ -48,6 +49,7 @@ import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
 import org.forgerock.openam.core.rest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
 import org.forgerock.openam.core.rest.authn.core.LoginProcess;
+import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
@@ -68,6 +70,8 @@ public class RestAuthenticationHandler {
     private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private final AuthIdHelper authIdHelper;
     private final CoreWrapper coreWrapper;
+
+    private final CoreServicesWrapper coreServicesWrapper;
     private final RedirectUrlValidator<String> urlValidator =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
@@ -84,12 +88,14 @@ public class RestAuthenticationHandler {
     public RestAuthenticationHandler(LoginAuthenticator loginAuthenticator,
             RestAuthCallbackHandlerManager restAuthCallbackHandlerManager,
             AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping, AuthIdHelper authIdHelper,
-            CoreWrapper coreWrapper) {
+            CoreWrapper coreWrapper,
+            CoreServicesWrapper coreServicesWrapper) {
         this.loginAuthenticator = loginAuthenticator;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
         this.amAuthErrorCodeResponseStatusMapping = amAuthErrorCodeResponseStatusMapping;
         this.authIdHelper = authIdHelper;
         this.coreWrapper = coreWrapper;
+        this.coreServicesWrapper = coreServicesWrapper;
     }
 
     /**
@@ -176,7 +182,9 @@ public class RestAuthenticationHandler {
 
             loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
-            return processAuthentication(request, response, postBody, authId, loginProcess, loginConfiguration);
+            JsonValue jsonValue = processAuthentication(request, response, postBody, authId, loginProcess, loginConfiguration);
+            setCookies(loginProcess, request, response);
+            return jsonValue;
 
         } catch (RestAuthException e) {
             if (loginProcess != null) {
@@ -373,6 +381,18 @@ public class RestAuthenticationHandler {
         } catch (IllegalArgumentException e) {
             DEBUG.message("Unknown Authentication Index Type, " + authIndexType);
             throw new RestAuthException(ResourceException.BAD_REQUEST, "Unknown Authentication Index Type");
+        }
+    }
+
+    private void setCookies(LoginProcess loginProcess, HttpServletRequest request, HttpServletResponse response) throws AuthException {
+        coreServicesWrapper.setAuthCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
+        coreServicesWrapper.setLbCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
+        switch (loginProcess.getLoginStage()) {
+            case REQUIREMENTS_WAITING:
+                break;
+            case COMPLETE:
+                coreServicesWrapper.clearAuthCookie(request, response);
+                break;
         }
     }
 }
