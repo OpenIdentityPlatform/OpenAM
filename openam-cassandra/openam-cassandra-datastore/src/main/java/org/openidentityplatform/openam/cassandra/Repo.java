@@ -749,7 +749,7 @@ public class Repo extends IdRepo {
 				attr.put("serviceName", new HashSet<String>(1));
 			attr.get("serviceName").add(serviceName);
 			attrMap.put("serviceName", attr.get("serviceName"));
-			setAttributes(token, type, name, attrMap, true);
+			setAttributes(token, type, name, attrMap, false);
 		}catch(Throwable e){
 			logger.error("assignService {} {} {} {}",type,name,serviceName,attrMap,e.getMessage());
 			throw new IdRepoException(e.getMessage());
@@ -806,7 +806,7 @@ public class Repo extends IdRepo {
 				attr.put("serviceName", new HashSet<String>(1));
 			attr.get("serviceName").add(serviceName);
 			attrMap.put("serviceName", attr.get("serviceName"));
-			setAttributes(token, type, name, attrMap, true);
+			setAttributes(token, type, name, attrMap, false);
 		}catch(Throwable e){
 			logger.error("modifyService {} {} {} {}",type,name,serviceName,attrMap,e.getMessage());
 			throw new IdRepoException(e.getMessage());
