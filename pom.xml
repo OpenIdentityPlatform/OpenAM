@@ -139,6 +139,7 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.2.3</logback.version>
+    <netty.version>4.1.84.Final</netty.version>
   </properties>
   <!-- Profiles -->
   <profiles>
@@ -1878,12 +1879,47 @@
         <dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.84.Final</version>
+			<version>${netty.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-handler</artifactId>
-			<version>4.1.84.Final</version>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+  			<groupId>io.netty</groupId>
+  			<artifactId>netty-transport-native-epoll</artifactId>
+  			<version>${netty.version}</version>
+  		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-http</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-socks</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler-proxy</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport-classes-epoll</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport-classes-kqueue</artifactId>
+			<version>${netty.version}</version>
 		</dependency>
     </dependencies>
   </dependencyManagement>
