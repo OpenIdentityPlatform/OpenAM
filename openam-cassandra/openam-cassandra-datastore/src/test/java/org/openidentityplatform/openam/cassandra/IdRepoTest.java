@@ -383,6 +383,7 @@ public class IdRepoTest {
 		param.put("CN", new HashSet<>(Arrays.asList("ssss")));
 		param.put("sunidentitymsisdnnumber", new HashSet<>(Arrays.asList("9170000000")));
 		param.put("userPassword", new HashSet<>(Arrays.asList("{CLEAR}5155")));
+		long create=System.currentTimeMillis() / 1000;
 		repo.create(null, IdType.USER, "9170000000",param);
 
 		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
@@ -394,8 +395,8 @@ public class IdRepoTest {
 		long created = Long.parseLong(fieldsValues.get("_created").stream().findFirst().get());
 		long updated = Long.parseLong(fieldsValues.get("_updated").stream().findFirst().get());
 		assertTrue(created < updated);
-		assertEquals(System.currentTimeMillis() / 1000, created / 1000);
-		assertEquals(System.currentTimeMillis() / 1000, updated / 1000);
+		assertEquals(create, created / 1000);
+		assertEquals(create, updated / 1000);
 
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 	}
