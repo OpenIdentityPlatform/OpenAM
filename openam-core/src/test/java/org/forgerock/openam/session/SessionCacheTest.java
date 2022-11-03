@@ -47,6 +47,21 @@ public class SessionCacheTest {
         session = spy(new Session(sessionID) {
 
             @Override
+			public long getLatestRefreshTime() {
+				return System.currentTimeMillis();
+			}
+
+			@Override
+			public long getMaxSessionTime() {
+				return 2;
+			}
+
+			@Override
+			public long getMaxIdleTime() {
+				return 1;
+			}
+
+			@Override
             public void refresh(boolean reset) throws SessionException {
                 if (reset) {
                     given(sessionInfo.getTimeIdle()).willReturn(0l);
