@@ -21,7 +21,6 @@ import static java.security.AccessController.*;
 import java.util.Date;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
@@ -44,7 +43,7 @@ public class SessionCuller extends GeneralTaskRunnable {
     private final SessionCache sessionCache;
     private SessionPollerSender sender = null;
     private SessionPollerPool sessionPollerPool;
-    private Session session;
+    Session session;
     private static Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     /**
@@ -62,6 +61,7 @@ public class SessionCuller extends GeneralTaskRunnable {
             sessionPollerPool = SessionPollerPool.getInstance();
             sessionCache = SessionCache.getInstance();
         }
+        scheduleToTimerPool();
     }
 
     @Override
@@ -98,9 +98,9 @@ public class SessionCuller extends GeneralTaskRunnable {
             }
             rescheduleIfWillTimeOutBeforeExecution(timeoutTime);
         } else {
-            if ((sessionPollerPool.isSessionCleanupEnabled()) && willExpire(session.getMaxSessionTime())) {
-                long timeoutTime = (session.getLatestRefreshTime() + (session.getMaxSessionTime() * 60)) * 1000;
-                rescheduleIfWillTimeOutBeforeExecution(timeoutTime);
+            if ((sessionPollerPool.isSessionCleanupEnabled()) && (willExpire(session.getMaxIdleTime())||willExpire(session.getMaxSessionTime()))) {
+                long timeoutTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime(),session.getMaxSessionTime()) * 60)) * 1000;
+                rescheduleIfWillTimeOutBeforeExecution(timeoutTime>System.currentTimeMillis()?timeoutTime:System.currentTimeMillis()+1000);
             }
         }
     }
@@ -183,17 +183,17 @@ public class SessionCuller extends GeneralTaskRunnable {
         } else {
             // schedule at the max session time
             long expectedTime = -1;
-            if (willExpire(session.getMaxSessionTime())) {
-                expectedTime = (session.getLatestRefreshTime() + (session.getMaxSessionTime() * 60)) * 1000;
+            if (willExpire(session.getMaxIdleTime())||willExpire(session.getMaxSessionTime())) {
+                expectedTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime(),session.getMaxSessionTime()) * 60)) * 1000;
             }
-            if (expectedTime > scheduledExecutionTime()) {
+            if (expectedTime>System.currentTimeMillis() && expectedTime > scheduledExecutionTime()) {
                 SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                 return;
             }
             try {
                 sessionCache.removeSID(session.getSessionID());
                 if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("Session Destroyed, Caching time exceeded the Max Session Time");
+                    sessionDebug.message("Session Destroyed, Caching time exceeded the Max Session Time {}",session);
                 }
             } catch (Exception ex) {
                 sessionDebug.error("Exception occurred while cleaning up Session Cache", ex);

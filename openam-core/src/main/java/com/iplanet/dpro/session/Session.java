@@ -950,4 +950,13 @@ public class Session implements Blacklistable, AMSession{
     public static Session getSession(SessionID sid) throws SessionException {
     		return org.forgerock.openam.session.SessionCache.getInstance().getSession(sid);
      }
+
+	@Override
+	public String toString() {
+		return "Session [clientID=" + clientID + ", maxSessionTime=" + maxSessionTime + ", maxIdleTime=" + maxIdleTime
+				+ ", maxCachingTime=" + maxCachingTime + ", sessionIdleTime=" + sessionIdleTime + ", sessionTimeLeft="
+				+ sessionTimeLeft + ", sessionExpiryTime=" + sessionExpiryTime + ", timedOutAt=" + timedOutAt
+				+ ", sessionID=" + sessionID + "]";
+	}
+
 }

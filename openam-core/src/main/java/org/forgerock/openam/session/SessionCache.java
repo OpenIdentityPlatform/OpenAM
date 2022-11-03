@@ -32,6 +32,9 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import javax.inject.Singleton;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.google.inject.name.Named;
 import com.iplanet.am.util.SystemProperties;
@@ -42,7 +45,6 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionBundle;
-import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.dpro.session.InvalidSessionIdException;
@@ -287,5 +289,23 @@ public class SessionCache {
                 sessionCuller.scheduleToTimerPool();
             }
         }
+    }
+    
+    final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    static {
+    	if (!getInstance().sessionPollerPool.isPollingEnabled()) {
+	    	scheduler.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					for (SessionCuller sessionCuller : getInstance().sessionCullerTable.values()) {
+						if (!sessionCuller.isScheduled()) {
+							getInstance().debug.error("session culler phantom {}",sessionCuller.session);
+							sessionCuller.run();
+						}
+					}
+					
+				}
+			}, 15, 15, TimeUnit.MINUTES);
+    	}
     }
 }
