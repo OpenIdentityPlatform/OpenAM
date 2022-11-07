@@ -26,6 +26,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.session.util.RestrictedTokenAction;
@@ -117,8 +118,8 @@ public class SessionCuller extends GeneralTaskRunnable {
     /**
      * Returns true if the provided time is less than Long.MAX_VALUE seconds.
      */
-    private boolean willExpire(long minutes) {
-        return minutes < Long.MAX_VALUE / 60;
+    boolean willExpire(long minutes) {
+        return minutes < InternalSession.NON_EXPIRING_SESSION_LENGTH_MINUTES;
     }
 
     /**

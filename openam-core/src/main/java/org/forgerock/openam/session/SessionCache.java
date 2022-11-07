@@ -298,7 +298,7 @@ public class SessionCache {
 				@Override
 				public void run() {
 					for (SessionCuller sessionCuller : getInstance().sessionCullerTable.values()) {
-						if (!sessionCuller.isScheduled()) {
+						if (!sessionCuller.isScheduled() && sessionCuller.willExpire(sessionCuller.session.getMaxSessionTime())) {
 							getInstance().debug.error("session culler phantom {}",sessionCuller.session);
 							sessionCuller.run();
 						}
