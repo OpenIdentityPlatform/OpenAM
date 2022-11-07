@@ -98,7 +98,7 @@ public class SessionCuller extends GeneralTaskRunnable {
             }
             rescheduleIfWillTimeOutBeforeExecution(timeoutTime);
         } else {
-            if ((sessionPollerPool.isSessionCleanupEnabled()) && (willExpire(session.getMaxIdleTime())||willExpire(session.getMaxSessionTime()))) {
+            if ((sessionPollerPool.isSessionCleanupEnabled()) && (willExpire(session.getMaxSessionTime()))) {
                 long timeoutTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime(),session.getMaxSessionTime()) * 60)) * 1000;
                 rescheduleIfWillTimeOutBeforeExecution(timeoutTime>System.currentTimeMillis()?timeoutTime:System.currentTimeMillis()+1000);
             }
@@ -183,7 +183,7 @@ public class SessionCuller extends GeneralTaskRunnable {
         } else {
             // schedule at the max session time
             long expectedTime = -1;
-            if (willExpire(session.getMaxIdleTime())||willExpire(session.getMaxSessionTime())) {
+            if (willExpire(session.getMaxSessionTime())) {
                 expectedTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime(),session.getMaxSessionTime()) * 60)) * 1000;
             }
             if (expectedTime>System.currentTimeMillis() && expectedTime > scheduledExecutionTime()) {
