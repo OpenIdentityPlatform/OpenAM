@@ -398,7 +398,7 @@ public class Session implements Blacklistable, AMSession{
     }
 
     /**
-     * Gets the time at which the Session was last refreshed from the master copy (in millis).
+     * Gets the time at which the Session was last refreshed from the master copy (in seconds).
      * @return The latest time at which the session was refreshed.
      */
     public long getLatestRefreshTime() {

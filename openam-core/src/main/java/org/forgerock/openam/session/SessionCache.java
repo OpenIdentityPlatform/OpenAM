@@ -61,9 +61,9 @@ public class SessionCache {
     /**
      * Maps stateful sessions, allowing their sessionId to be used as a lookup to the Session object.
      */
-    private final ConcurrentMap<SessionID, Session> sessionTable = new ConcurrentHashMap<SessionID, Session>();
+    private final ConcurrentHashMap<SessionID, Session> sessionTable = new ConcurrentHashMap<SessionID, Session>();
 
-    private final ConcurrentMap<SessionID, SessionCuller> sessionCullerTable = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SessionID, SessionCuller> sessionCullerTable = new ConcurrentHashMap<>();
 
     private final SessionPollerPool sessionPollerPool;
 
@@ -297,15 +297,16 @@ public class SessionCache {
 	    	scheduler.scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
-					for (SessionCuller sessionCuller : getInstance().sessionCullerTable.values()) {
+					final SessionCache cache=getInstance();
+					cache.debug.message("session culler {}",cache.sessionCullerTable.size());
+					cache.sessionCullerTable.forEachValue(Long.MAX_VALUE, sessionCuller-> {
 						if (!sessionCuller.isScheduled() && sessionCuller.willExpire(sessionCuller.session.getMaxSessionTime())) {
-							getInstance().debug.error("session culler phantom {}",sessionCuller.session);
+							cache.debug.error("session culler phantom {}",sessionCuller.session);
 							sessionCuller.run();
 						}
-					}
-					
+					});
 				}
-			}, 15, 15, TimeUnit.MINUTES);
+			}, 60, 60, TimeUnit.MINUTES);
     	}
     }
 }
