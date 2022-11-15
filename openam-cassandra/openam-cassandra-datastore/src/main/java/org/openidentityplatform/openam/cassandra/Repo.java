@@ -921,7 +921,7 @@ public class Repo extends IdRepo {
 	            	}else if (storedHash.startsWith("{SSHA}")){
             			result=SSHA.verifySaltedPassword(password.getBytes("UTF-8"), storedHash);
             			try {
-		            		if (result) {
+		            		if (result && SystemProperties.getAsBoolean("SSHA_SSHA256", false)) {
 		            			res.put("userpassword", new HashSet<String>(Arrays.asList(new String[] {SSHA256.getSaltedPassword(password.getBytes("UTF-8"))})));
 		            			setAttributes(null, IdType.USER, userName, res, false);
 		            		}
