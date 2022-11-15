@@ -33,6 +33,7 @@ import static org.forgerock.openam.session.SessionConstants.*;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.hash.Hashing;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -58,6 +59,7 @@ import org.forgerock.openam.utils.ClientUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.time.Duration;
 import java.util.HashSet;
@@ -96,6 +98,7 @@ public class SessionUtils {
             SystemProperties.get(Constants.SESSION_REPOSITORY_ENCRYPTION,
                     "false")).booleanValue();
 
+    private static final boolean SESSION_STORAGE_KEY_HASH = Boolean.valueOf(SystemProperties.get("com.sun.identity.session.repository.enableHash","false")).booleanValue();
     /**
      * Returns a SessionID string based on a HttpServletRequest object or null
      * if session id is not present or there was an error.
@@ -188,6 +191,9 @@ public class SessionUtils {
     	if (clear == null){
             throw new SessionException("SessionUtils.getEncryptedStorageKey: StorageKey is null");
         }
+    	if (SESSION_STORAGE_KEY_HASH) {
+    		return Hashing.sha256().hashString(clear.getExtension().getStorageKey(), StandardCharsets.UTF_8).toString();
+    	}
     	return  getEncrypted(clear.getExtension().getStorageKey());
     }
     
