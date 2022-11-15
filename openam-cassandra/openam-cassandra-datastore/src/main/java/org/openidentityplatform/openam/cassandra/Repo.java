@@ -16,6 +16,7 @@
 
 package org.openidentityplatform.openam.cassandra;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -878,7 +879,7 @@ public class Repo extends IdRepo {
 					try {
 						final Set<String> res=new HashSet<String>(values);
 						res.remove(value);
-						res.add(SSHA.getSaltedPassword(value.toString().getBytes()));
+						res.add(SSHA256.getSaltedPassword(value.toString().getBytes()));
 						return res;
 					} catch (NoSuchAlgorithmException e) {
 						logger.error("convert",e);
@@ -913,11 +914,23 @@ public class Repo extends IdRepo {
         	Map<String, Set<String>> res=getAttributes(null, IdType.USER, userName, new HashSet<String>(Arrays.asList(new String[] {"userpassword"})));
         	if (res!=null && res.containsKey("userpassword") && res.get("userpassword").size()>0) {
         		final String storedHash=res.get("userpassword").iterator().next();
-        		if (storedHash.startsWith("{SSHA}")){
-        			return SSHA.verifySaltedPassword(password.getBytes(), storedHash);
-            	}else {
-            		return (storedHash.replace("{CLEAR}", "").equals(password));
-            	}
+        		Boolean result=false;
+        		try {
+	        		if (storedHash.startsWith("{SSHA256}")){
+	        			result=SSHA256.verifySaltedPassword(password.getBytes("UTF-8"), storedHash);
+	            	}else if (storedHash.startsWith("{SSHA}")){
+            			result=SSHA.verifySaltedPassword(password.getBytes("UTF-8"), storedHash);
+            			try {
+		            		if (result) {
+		            			res.put("userpassword", new HashSet<String>(Arrays.asList(new String[] {SSHA256.getSaltedPassword(password.getBytes("UTF-8"))})));
+		            			setAttributes(null, IdType.USER, userName, res, false);
+		            		}
+            			}catch (Exception e) {}
+	            	}else {
+	            		result=(storedHash.replace("{CLEAR}", "").equals(password));
+	            	}
+            	}catch (UnsupportedEncodingException e) {}
+        		return result;
         	}
 		} catch (SSOException e) {
 			throw new AuthLoginException(e);

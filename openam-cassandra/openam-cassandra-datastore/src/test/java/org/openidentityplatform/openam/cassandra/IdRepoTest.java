@@ -38,9 +38,11 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 
 import org.openidentityplatform.openam.cassandra.embedded.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IdRepoTest {
-
+	static Logger logger=LoggerFactory.getLogger(IdRepoTest.class.getName());
 	static Repo repo=null;
 	static Server cassandra;
 	
@@ -99,13 +101,19 @@ public class IdRepoTest {
 		
 		param.put("CN", new HashSet<String>(Arrays.asList(new String[] {"ssss"})));
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000"})));
-		param.put("userPassword", new HashSet<String>(Arrays.asList(new String[] {"test"})));
+		param.put("userPassword", new HashSet<String>(Arrays.asList(new String[] {"{SSHA}LJW7JHR9RPsbSmUVFyVv/pCoZFiwUvAYTThVMw=="})));
 		repo.create(null, IdType.USER, "9170000000",param);
 		NameCallback user=new NameCallback("9170000000");
 		user.setName("9170000000");
 		PasswordCallback pass=new PasswordCallback("sss",false);
-		pass.setPassword("test".toCharArray());
-		assertTrue( repo.authenticate(new Callback[] {user,pass}));
+		pass.setPassword("5155".toCharArray());
+		assertTrue(repo.authenticate(new Callback[] {user,pass}));
+		//re-hash
+		Map<String, Set<String>> attrs=repo.getAttributes(null, IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[] {"userpassword"})));
+		logger.info("rehash: {}",attrs);
+		assertTrue(attrs.values().iterator().next().iterator().next().startsWith("{SSHA256}"));
+		assertTrue(repo.authenticate(new Callback[] {user,pass}));
+		
 		pass.setPassword("test2".toCharArray());
 		assertFalse( repo.authenticate(new Callback[] {user,pass}));
 		
