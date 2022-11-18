@@ -615,12 +615,44 @@ public class WindowsDesktopSSO extends AMLoginModule {
         configTable.put(confIndex, configMap);
     }
 
-    private synchronized void serviceLogin() throws AuthLoginException{
+
+    private void serviceLoginDynamic() throws AuthLoginException {
         if (debug.messageEnabled()){
-            debug.message("New Service Login ...");
+            debug.message("New Service Login Dynamic ...");
+        }
+        System.setProperty("java.security.auth.login.config", "/dev/null");
+
+        try {
+            final Configuration config = Configuration.getConfiguration();
+            final WindowsDesktopSSOConfig wtc = new WindowsDesktopSSOConfig(config);
+            wtc.setPrincipalName(servicePrincipalName);
+            wtc.setKeyTab(keyTabFile);
+            if(options.containsKey("debug")) {
+                wtc.setDebug(CollectionHelper.getMapAttr(options, "debug"));
+            }
+            // perform service authentication using JDK Kerberos module
+            LoginContext lc = new LoginContext(WindowsDesktopSSOConfig.defaultAppName, null, null, wtc);
+            lc.login();
+
+            serviceSubject = lc.getSubject();
+            if (debug.messageEnabled()){
+                debug.message("Service login succeeded.");
+            }
+        } catch (Exception e) {
+            debug.error("Service Login Error: ");
+            if (debug.messageEnabled()) {
+                debug.message("Stack trace: ", e);
+            }
+            throw new AuthLoginException(amAuthWindowsDesktopSSO, "serviceAuth", null, e);
+        }
+    }
+
+    private synchronized void serviceLoginStatic() throws AuthLoginException {
+        if (debug.messageEnabled()){
+            debug.message("New Service Login Static ...");
         }
         System.setProperty("java.security.krb5.realm", kdcRealm);
-        System.setProperty("java.security.krb5.kdc", kdcServer); 
+        System.setProperty("java.security.krb5.kdc", kdcServer);
         System.setProperty("java.security.auth.login.config", "/dev/null");
 
         try {
@@ -635,13 +667,13 @@ public class WindowsDesktopSSO extends AMLoginModule {
             wtc.setPrincipalName(servicePrincipalName);
             wtc.setKeyTab(keyTabFile);
             if(options.containsKey("debug")) {
-            	wtc.setDebug(CollectionHelper.getMapAttr(options, "debug"));
+                wtc.setDebug(CollectionHelper.getMapAttr(options, "debug"));
             }
             Configuration.setConfiguration(wtc);
 
             // perform service authentication using JDK Kerberos module
             LoginContext lc = new LoginContext(
-                WindowsDesktopSSOConfig.defaultAppName);
+                    WindowsDesktopSSOConfig.defaultAppName);
             lc.login();
 
             serviceSubject = lc.getSubject();
@@ -653,9 +685,21 @@ public class WindowsDesktopSSO extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("Stack trace: ", e);
             }
-            throw new AuthLoginException(amAuthWindowsDesktopSSO, 
-                "serviceAuth", null, e);
+            throw new AuthLoginException(amAuthWindowsDesktopSSO,
+                    "serviceAuth", null, e);
         }
+    }
+
+
+    private void serviceLogin() throws AuthLoginException{
+        if(SystemProperties.get("java.security.krb5.conf") != null) {
+            debug.message("java.security.krb5.conf set, using dynamic service login and config from krb5.conf file");
+            serviceLoginDynamic();
+        } else {
+            debug.message("java.security.krb5.conf not set, using static service login");
+            serviceLoginStatic();
+        }
+
     }        
 
     private String getMapAttr(Map options, int index) {
