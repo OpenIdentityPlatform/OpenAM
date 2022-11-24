@@ -111,6 +111,7 @@ public class WindowsDesktopSSOTest extends PowerMockTestCase {
                 "    kdc=sso2.openam.org\n" +
                 "}";
 
+
         File file = new File(System.getProperty("java.io.tmpdir")+File.separator+"krb5.conf");
         if(file.exists()) {
             file.delete();
@@ -119,7 +120,7 @@ public class WindowsDesktopSSOTest extends PowerMockTestCase {
         windowsDesktopSSO.createUpdateKrb5ConfigFile();
         file = new File(System.getProperty("java.security.krb5.conf"));
         assertTrue(file.exists());
-        String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim();
-        assertEquals(content, expected);
+        List<String> content = FileUtils.readLines(file, StandardCharsets.UTF_8);
+        assertEquals(content, Arrays.asList(expected.split("\n")));
     }
 }
