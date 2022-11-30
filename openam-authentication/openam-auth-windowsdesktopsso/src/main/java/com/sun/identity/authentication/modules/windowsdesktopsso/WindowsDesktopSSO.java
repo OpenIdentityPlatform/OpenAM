@@ -118,7 +118,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private static final String REALM_SEPARATOR = "@";
 
     private static final boolean USE_KRB5_CONF_FILE
-            = SystemProperties.getAsBoolean(WindowsDesktopSSO.class.getName().concat(".useKrb5ConfFile"), false);
+            = SystemProperties.getAsBoolean(WindowsDesktopSSO.class.getName().concat(".useKrb5ConfFile"), true);
 
     /**
      * Constructor
@@ -809,10 +809,14 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
     private void serviceLogin() throws AuthLoginException{
         if(USE_KRB5_CONF_FILE) {
-            debug.message("java.security.krb5.conf set, using dynamic service login and config from krb5.conf file");
+            if(debug.messageEnabled()) {
+                debug.message("java.security.krb5.conf set, using dynamic service login and config from krb5.conf file");
+            }
             serviceLoginDynamic();
         } else {
-            debug.message("java.security.krb5.conf not set, using static service login");
+            if(debug.messageEnabled()) {
+                debug.message("java.security.krb5.conf not set, using static service login");
+            }
             serviceLoginStatic();
         }
 
