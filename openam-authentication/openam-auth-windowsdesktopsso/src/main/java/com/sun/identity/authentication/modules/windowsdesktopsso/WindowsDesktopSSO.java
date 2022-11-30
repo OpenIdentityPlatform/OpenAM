@@ -31,14 +31,11 @@ package com.sun.identity.authentication.modules.windowsdesktopsso;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.util.DerValue;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -46,31 +43,34 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedActionException;
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.Configuration;
-import javax.security.auth.login.LoginContext;
-import javax.servlet.http.HttpServletRequest;
-
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.Configuration;
+import javax.security.auth.login.LoginContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WindowsDesktopSSO extends AMLoginModule {
     private static final String amAuthWindowsDesktopSSO = 
@@ -116,6 +116,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private Set<String> trustedKerberosRealms = Collections.EMPTY_SET;
     
     private static final String REALM_SEPARATOR = "@";
+
+    private static final boolean USE_KRB5_CONF_FILE
+            = SystemProperties.getAsBoolean(WindowsDesktopSSO.class.getName().concat(".useKrb5ConfFile"), true);
 
     /**
      * Constructor
@@ -621,6 +624,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
             debug.message("New Service Login Dynamic ...");
         }
         System.setProperty("java.security.auth.login.config", "/dev/null");
+        createUpdateKrb5ConfigFile();
 
         try {
             final Configuration config = Configuration.getConfiguration();
@@ -645,6 +649,118 @@ public class WindowsDesktopSSO extends AMLoginModule {
             }
             throw new AuthLoginException(amAuthWindowsDesktopSSO, "serviceAuth", null, e);
         }
+    }
+
+    @VisibleForTesting
+    protected void createUpdateKrb5ConfigFile() {
+
+        if(System.getProperty("java.security.krb5.conf") == null) {
+            System.setProperty("java.security.krb5.conf", System.getProperty("java.io.tmpdir")+File.separator+"krb5.conf");
+        }
+
+        final File file=new File(System.getProperty("java.security.krb5.conf"));
+
+        LinkedList<String> lines = new LinkedList<>();
+        if(file.exists()) {
+            try {
+                lines.addAll(Files.readAllLines(file.toPath()));
+            } catch (Exception e) {
+                debug.warning("error reading krb5.conf file", e);
+            }
+        }
+        List<String> newLines = getUpdatedKrb5ConfigLines(lines);
+        if(newLines != null) {
+            if(debug.messageEnabled()) {
+                debug.message("settings updated, need to update krb5.conf file in " + System.getProperty("java.security.krb5.conf"));
+                debug.message("new config: " + newLines);
+            }
+            synchronized (WindowsDesktopSSO.class) {
+
+                try (PrintWriter pw = new PrintWriter(new FileOutputStream(file, false))) {
+                    for (String newLine : newLines) {
+                        pw.println(newLine);
+                    }
+                } catch (Exception e) {
+                    debug.warning("error writing krb5.conf file", e);
+                }
+            }
+        }
+    }
+
+    private final static String REALM_REGEX = "^(\\S+)\\s*\\=\\s*\\{\\s*$";
+    private final static Pattern REALM_PATTERN = Pattern.compile(REALM_REGEX);
+    private final static String KDC_REGEX = "^kdc\\s*=\\s*(\\S*)\\s*$";
+    private final static Pattern KDC_PATTERN = Pattern.compile(KDC_REGEX);
+    @VisibleForTesting
+    protected List<String> getUpdatedKrb5ConfigLines(final List<String> lines) {
+        final LinkedList<String> linesToModify = new LinkedList<>(lines);
+        int realmsStartIndex = -1;
+        int realmStartIndex = -1;
+        int realmSize = -1;
+
+        Set<String> existingKDC = new HashSet<>();
+        for(int i = 0; i < linesToModify.size(); i++) {
+            final String currentLine = linesToModify.get(i).trim();
+            if(currentLine.equalsIgnoreCase("[realms]")) {
+                realmsStartIndex = i;
+                continue;
+            }
+            if(realmsStartIndex > -1 && currentLine.startsWith("[")) {
+                break;
+            }
+
+            final Matcher realmMatcher = REALM_PATTERN.matcher(currentLine);
+            if(realmMatcher.matches()) {
+                String realm = realmMatcher.group(1);
+                if(kdcRealm.equalsIgnoreCase(realm)) {
+                    realmStartIndex = i;
+                }
+            }
+            if(realmStartIndex > -1 && currentLine.startsWith("}")) {
+                realmSize = i - realmStartIndex;
+                break;
+            }
+
+            final Matcher kdcMatcher = KDC_PATTERN.matcher(currentLine);
+            if(realmsStartIndex < i) {
+                if(kdcMatcher.matches()) {
+                    String kdc = kdcMatcher.group(1);
+                    existingKDC.add(kdc);
+                }
+            }
+        }
+
+        List<String> kdcServers = Arrays.asList(kdcServer.split(":"));
+        boolean needUpdate = !new HashSet<>(kdcServers).containsAll(existingKDC)
+                || !existingKDC.containsAll(kdcServers)
+                || realmStartIndex == -1
+                || realmsStartIndex == -1;
+
+        if(!needUpdate) {
+            return null;
+        }
+
+        List<String> newLines = new ArrayList<>();
+        if(realmsStartIndex == -1) {
+            newLines.add("[realms]");
+        }
+        newLines.add("  ".concat(kdcRealm.toUpperCase()).concat("={"));
+
+        for(String kdc : kdcServers) {
+            newLines.add("    kdc=".concat(kdc));
+        }
+        newLines.add("}");
+
+        if(realmsStartIndex == -1 || realmStartIndex == -1) {
+            linesToModify.addAll(newLines);
+        }
+        else {
+            for (int i = 0; i <= realmSize; i++) {
+                linesToModify.remove(realmStartIndex);
+            }
+            linesToModify.addAll(realmStartIndex, newLines);
+        }
+        return linesToModify;
     }
 
     private synchronized void serviceLoginStatic() throws AuthLoginException {
@@ -692,11 +808,15 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
 
     private void serviceLogin() throws AuthLoginException{
-        if(SystemProperties.get("java.security.krb5.conf") != null) {
-            debug.message("java.security.krb5.conf set, using dynamic service login and config from krb5.conf file");
+        if(USE_KRB5_CONF_FILE) {
+            if(debug.messageEnabled()) {
+                debug.message("java.security.krb5.conf set, using dynamic service login and config from krb5.conf file");
+            }
             serviceLoginDynamic();
         } else {
-            debug.message("java.security.krb5.conf not set, using static service login");
+            if(debug.messageEnabled()) {
+                debug.message("java.security.krb5.conf not set, using static service login");
+            }
             serviceLoginStatic();
         }
 
