@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
       - name: Set up Java for publishing to Maven Central Repository OSS
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'temurin'
@@ -32,7 +32,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
          path: ~/.m2/repository
          key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
@@ -44,6 +44,7 @@ jobs:
         run: |
            cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
            gpg --list-secret-keys --keyid-format LONG
+           git config --global user.signingkey B02611B009E5302EB58D102D6C2EDF3C90D33841
       - name: Configure Git User
         run: |
           git config --global user.name "Open Identity Platform Community"
@@ -56,7 +57,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='' }}
-        run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare release:perform --file pom.xml
+        run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare release:perform --file pom.xml
       - name: Release on GitHub
         uses: softprops/action-gh-release@v1
         with:
@@ -101,12 +102,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Login to GHCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -148,12 +149,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Login to GHCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
