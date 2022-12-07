@@ -1226,13 +1226,13 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-jsr223</artifactId>
-        <version>3.0.10</version>
+        <version>3.0.13</version>
       </dependency>
       <!-- Groovy JSON parsing support -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-json</artifactId>
-        <version>3.0.10</version>
+        <version>3.0.13</version>
       </dependency>
       <dependency>
         <!-- MIT licensed: http://groovy-sandbox.kohsuke.org/license.html -->
