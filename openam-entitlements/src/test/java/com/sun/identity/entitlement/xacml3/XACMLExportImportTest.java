@@ -108,8 +108,8 @@ public class XACMLExportImportTest {
 
         // Given (shared test state)
 
-        given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(pm);
-        given(applicationServiceFactory.create(any(Subject.class), anyString())).willReturn(applicationService);
+        given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any())).willReturn(pm);
+        given(applicationServiceFactory.create(any(), anyString())).willReturn(applicationService);
         given(applicationService.getApplication(anyString())).willReturn(application);
         given(application.getResourceComparator()).willReturn(urlResourceName);
         given(urlResourceName.compare(anyString(), anyString(), anyBoolean())).willReturn(ResourceMatch.EXACT_MATCH);

@@ -79,7 +79,7 @@ public class ResourceTypeConfigurationTest {
         Map<String, Set<String>> attributes = new HashMap<>();
         attributes.put("name", names);
         when(subSubServiceConfig.getAttributes()).thenReturn(attributes);
-        when(resourceTypeServiceConfig.getOrgConfig(any(Subject.class), anyString())).thenReturn(serviceConfig);
+        when(resourceTypeServiceConfig.getOrgConfig(any(), anyString())).thenReturn(serviceConfig);
     }
 
 }
