@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [ '8', '11', '16','17','18' ]
+        java: [ '8', '11', '17', '19' ]
         os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
     steps:
     - uses: actions/checkout@v3
@@ -93,7 +93,7 @@ jobs:
           file: ./openam-distribution/openam-distribution-docker/Dockerfile
           build-args: |
             VERSION=${{ env.release_version }}
-          platforms: linux/amd64,linux/arm64/8
+          platforms: linux/amd64, linux/arm64/8, linux/arm/v7, linux/ppc64le
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
