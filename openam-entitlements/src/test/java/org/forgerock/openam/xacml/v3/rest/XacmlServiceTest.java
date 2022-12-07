@@ -227,7 +227,7 @@ public class XacmlServiceTest  {
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
         doReturn(Collections.emptyList()).
-                when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
+                when(importExport).importXacml(eq("/"), eq(is), any(), eq(false));
 
         try {
             //when
@@ -237,7 +237,7 @@ public class XacmlServiceTest  {
             fail("Expect exception");
         } catch (ResourceException e) {
             assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
-            assertThat(e.getMessage()).isEqualTo("No policies found in XACML document");
+            assertThat(e.getMessage()).startsWith("No policies found in XACML document");
         }
     }
 
@@ -248,7 +248,7 @@ public class XacmlServiceTest  {
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
         EntitlementException failure = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
-        doThrow(failure).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
+        doThrow(failure).when(importExport).importXacml(eq("/"), eq(is), any(), eq(false));
 
         try {
             //when
@@ -258,7 +258,7 @@ public class XacmlServiceTest  {
             fail("Expect exception");
         } catch (ResourceException e) {
             assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
-            assertThat(e.getMessage()).isEqualTo("JSON Exception.");
+            assertThat(e.getMessage()).startsWith("JSON Exception.");
         }
     }
 
@@ -337,7 +337,7 @@ public class XacmlServiceTest  {
     public void testExportXACMLEntitlementException() throws Exception {
         //given
         EntitlementException ee = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
-        doThrow(ee).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+        doThrow(ee).when(importExport).exportXACML(eq("/"), any(), any());
 
         try {
             //when
@@ -347,7 +347,7 @@ public class XacmlServiceTest  {
             fail("Expect exception");
         } catch (ResourceException e) {
             assertThat(e.getStatus().getCode()).isEqualTo(INTERNAL_ERROR);
-            assertThat(e.getMessage()).isEqualTo("JSON Exception.");
+            assertThat(e.getMessage()).startsWith("JSON Exception.");
         }
     }
 

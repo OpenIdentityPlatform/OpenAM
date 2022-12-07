@@ -102,7 +102,7 @@ public class ApplicationsResourceTest {
         debug = mock(Debug.class);
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
         applicationService = mock(ApplicationService.class);
-        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        when(applicationServiceFactory.create(any(), anyString())).thenReturn(applicationService);
         applicationTypeManagerWrapper = mock(ApplicationTypeManagerWrapper.class);
         applicationWrapper = mock(ApplicationWrapper.class);
         realmTestHelper = new RealmTestHelper();
@@ -215,7 +215,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(applicationWrapper.getName()).willReturn("newApplication");
-        doThrow(new EntitlementException(1)).when(applicationService).saveApplication(any(Application.class));
+        doThrow(new EntitlementException(1)).when(applicationService).saveApplication(any());
 
         //when
         Promise<ResourceResponse, ResourceException> result =
