@@ -71,6 +71,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.CrestQuery;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -436,8 +437,9 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         ctrl.setRecursive(true);
                         ctrl.setMaxResults(-1);
                         ctrl.setTimeOut(-1);
+                        CrestQuery crestQuery = new CrestQuery(pattern, null, null, false);
                         IdSearchResults idsr = idRepo.searchIdentities(
-                                                idType, pattern, ctrl);
+                                                idType, crestQuery, ctrl);
                         if (idsr != null) {
                             Set searchRes = idsr.getSearchResults();
                             if ((searchRes !=null) &&
