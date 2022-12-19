@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>14.7.0</version>
+        <version>14.7.1-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM ServletContext License Locator</name>
