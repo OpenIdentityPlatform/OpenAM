@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -879,11 +881,16 @@ public class Repo extends IdRepo {
 					try {
 						final Set<String> res=new HashSet<String>(values);
 						res.remove(value);
-						res.add(SSHA256.getSaltedPassword(value.toString().getBytes()));
+						res.add(SSHA256.getSaltedPassword(value.toString().getBytes()).replace("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}", ""));
 						return res;
 					} catch (NoSuchAlgorithmException e) {
 						logger.error("convert",e);
 					}
+				}else if (value.toString().startsWith("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}")) {
+					final Set<String> res=new HashSet<String>(values);
+					res.remove(value);
+					res.add(value.toString().replace("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}", ""));
+					return res;
 				}
 			}
 		}
@@ -894,6 +901,8 @@ public class Repo extends IdRepo {
 	public boolean supportsAuthentication() {
 		return true;
 	}
+	
+	final static Pattern hashTypePattern=Pattern.compile("^(\\{(?<type>.+)\\}){0,1}(?<hash>.+)$", Pattern.CASE_INSENSITIVE);
 	
 	@Override
 	public boolean authenticate(Callback[] credentials) throws IdRepoException, AuthLoginException {
@@ -915,21 +924,28 @@ public class Repo extends IdRepo {
         	if (res!=null && res.containsKey("userpassword") && res.get("userpassword").size()>0) {
         		final String storedHash=res.get("userpassword").iterator().next();
         		Boolean result=false;
-        		try {
-	        		if (storedHash.startsWith("{SSHA256}")){
-	        			result=SSHA256.verifySaltedPassword(password.getBytes("UTF-8"), storedHash);
-	            	}else if (storedHash.startsWith("{SSHA}")){
-            			result=SSHA.verifySaltedPassword(password.getBytes("UTF-8"), storedHash);
-            			try {
-		            		if (result && SystemProperties.getAsBoolean("SSHA_SSHA256", false)) {
-		            			res.put("userpassword", new HashSet<String>(Arrays.asList(new String[] {SSHA256.getSaltedPassword(password.getBytes("UTF-8"))})));
-		            			setAttributes(null, IdType.USER, userName, res, false);
-		            		}
-            			}catch (Exception e) {}
-	            	}else {
-	            		result=(storedHash.replace("{CLEAR}", "").equals(password));
-	            	}
-            	}catch (UnsupportedEncodingException e) {}
+        		if (StringUtils.isNotBlank(storedHash)) {
+        			final Matcher m=hashTypePattern.matcher(storedHash);
+        			if (m.matches()) {
+        				final String type=StringUtils.isNotBlank(m.group("type"))?m.group("type"):SystemProperties.get("org.openidentityplatform.default_hash","CLEAR");
+        				final String hash=m.group("hash");
+        				try {
+        	        		if (StringUtils.equalsAnyIgnoreCase(type,"SSHA256")){
+        	        			result=SSHA256.verifySaltedPassword(password.getBytes("UTF-8"),"{SSHA256}"+hash);
+        	            	}else if (StringUtils.equalsAnyIgnoreCase(type,"SSHA")){
+                    			result=SSHA.verifySaltedPassword(password.getBytes("UTF-8"), "{SSHA}"+hash);
+        	            	}else if (StringUtils.equalsAnyIgnoreCase(type,"CLEAR")){
+        	            		result=(hash.equals(password));
+        	            	}
+        	        		try {
+    		            		if (result && !StringUtils.equalsAnyIgnoreCase(type,"SSHA256") && SystemProperties.getAsBoolean("SSHA_SSHA256", false)) {
+    		            			res.put("userpassword", new HashSet<String>(Arrays.asList(new String[] {SSHA256.getSaltedPassword(password.getBytes("UTF-8"))})));
+    		            			setAttributes(null, IdType.USER, userName, res, false);
+    		            		}
+                			}catch (Exception e) {}
+                    	}catch (UnsupportedEncodingException e) {}
+        			}
+        		}
         		return result;
         	}
 		} catch (SSOException e) {
