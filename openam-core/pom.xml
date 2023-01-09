@@ -220,8 +220,8 @@
 
         <!-- View Dependencies -->
         <dependency>
-            <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
-            <artifactId>jato</artifactId>
+            <groupId>org.openidentityplatform.openam.shaded</groupId>
+            <artifactId>jato-shaded</artifactId>
         </dependency>
 
         <dependency>
