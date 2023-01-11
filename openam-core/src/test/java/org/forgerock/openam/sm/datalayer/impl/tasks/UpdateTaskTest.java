@@ -30,9 +30,7 @@ import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.util.Options;
-import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 public class UpdateTaskTest {
@@ -68,7 +66,7 @@ public class UpdateTaskTest {
     public void shouldCreateWhenNotPresent() throws Exception {
         given(mockAdapter.read(anyString(), eq(options))).willReturn(null);
         task.execute(mockAdapter);
-        verify(mockAdapter, Mockito.times(0)).create(eq(mockUpdated), eq(options));
+        verify(mockAdapter).create(eq(mockUpdated), eq(options));
     }
 
     @Test (expectedExceptions = DataLayerException.class)

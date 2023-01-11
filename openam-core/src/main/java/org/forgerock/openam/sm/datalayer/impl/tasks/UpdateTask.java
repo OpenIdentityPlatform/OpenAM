@@ -63,7 +63,7 @@ public class UpdateTask extends AbstractTask {
     	}
     	final Token updated;
         if (previous == null) {
-            updated = null;
+            updated = adapter.create(token, options);
         } else {
             updated = adapter.update(previous, token, options);
         }
