@@ -130,7 +130,12 @@ public class SessionAccessManager {
     public void persistInternalSession(InternalSession session) {
 
         try {
-            internalSessionStore.store(session);
+            if(internalSessionStore.getBySessionID(session.getID()) != null) {
+                internalSessionStore.update(session);
+            }
+            else  {
+                internalSessionStore.create(session);
+            }
         } catch (SessionPersistenceException e) {
             throw new RuntimeException(e);
         }

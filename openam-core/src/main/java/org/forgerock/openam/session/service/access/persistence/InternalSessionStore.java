@@ -60,7 +60,9 @@ public interface InternalSessionStore {
      * @param session Non null InternalSession to store.
      * @exception SessionPersistenceException If the storage operation failed.
      */
-    void store(InternalSession session) throws SessionPersistenceException;
+    void create(InternalSession session) throws SessionPersistenceException;
+
+    void update(InternalSession session) throws SessionPersistenceException;
 
     /**
      * Remove the Session from the cache.

@@ -55,10 +55,20 @@ public class InternalSessionPersistenceStore implements InternalSessionStore {
     }
 
     @Override
-    public void store(InternalSession session) throws SessionPersistenceException {
+    public void create(InternalSession session) throws SessionPersistenceException {
         Reject.ifNull(session);
         try {
-            sessionPersistenceStore.save(session);
+            sessionPersistenceStore.create(session);
+        } catch (CoreTokenException e) {
+            throw new SessionPersistenceException("Failed to save session", e);
+        }
+    }
+
+    @Override
+    public void update(InternalSession session) throws SessionPersistenceException {
+        Reject.ifNull(session);
+        try {
+            sessionPersistenceStore.update(session);
         } catch (CoreTokenException e) {
             throw new SessionPersistenceException("Failed to save session", e);
         }
