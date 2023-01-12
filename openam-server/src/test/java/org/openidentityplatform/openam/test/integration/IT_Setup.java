@@ -1,7 +1,10 @@
 package org.openidentityplatform.openam.test.integration;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,6 +19,8 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.List;
+
+import static org.testng.Assert.assertTrue;
 
 public class IT_Setup {
 
@@ -36,14 +41,13 @@ public class IT_Setup {
     }
 
     @Test
-    public void testSetup() throws Exception {
+    public void testSetup() {
         driver.get(OPENAM_URL);
 
         //wait for setup page is loaded
         waitForElement(By.id("pushConfigDialog_c"));
         WebElement createDefaultLink = driver.findElement(By.id("DemoConfiguration"));
         createDefaultLink.click();
-
 
         //wait for licence check
         waitForElementVisible(By.id("defaultSummary_c"));
@@ -67,14 +71,24 @@ public class IT_Setup {
         WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
         proceedToConsole.click();
 
-        //check login
+        waitForElement(By.id("IDToken1")).sendKeys("amadmin");
+        waitForElement(By.id("IDToken2")).sendKeys(AM_PASSWORD);
+        waitForElement(By.name("Login.Submit")).click();
+
+        waitForElementVisible(By.className("Tab1Div"));
+        waitForElement(By.name("Home.mhCommon.LogOutHREF")).click();
+        Alert alert = driver.switchTo().alert();
+        alert.accept(); // for OK
+        assertTrue(isTextPresent("You are logged out."));
+
+        //check XUI
+        driver.get(OPENAM_URL.concat("/XUI"));
         waitForElement(By.id("idToken1")).sendKeys("amadmin");
         waitForElement(By.id("idToken2")).sendKeys(AM_PASSWORD);
         waitForElement(By.id("loginButton_0")).click();
 
         //check console
         waitForElementVisible(By.id("mainNavBar"));
-
     }
 
     @AfterTest
@@ -106,5 +120,18 @@ public class IT_Setup {
                 return "visibility of any element " + locator;
             }
         };
+    }
+
+    public boolean isTextPresent(String str) {
+        Exception lastException = new Exception();
+        for(int i = 0; i < 3; i++) {
+            try {
+                WebElement bodyElement  = new WebDriverWait(driver,Duration.ofSeconds(20)).until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+                return StringUtils.containsIgnoreCase(bodyElement.getText(), str);
+            } catch (StaleElementReferenceException e) {
+                lastException = e;
+            }
+        }
+        throw new RuntimeException(lastException);
     }
 }
