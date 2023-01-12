@@ -51,8 +51,13 @@ public class InternalSessionStoreChain implements InternalSessionStore {
     }
 
     @Override
-    public void store(InternalSession session) throws SessionPersistenceException {
-        new ChainIterator().store(session);
+    public void create(InternalSession session) throws SessionPersistenceException {
+        new ChainIterator().create(session);
+    }
+
+    @Override
+    public void update(InternalSession session) throws SessionPersistenceException {
+        new ChainIterator().update(session);
     }
 
     @Override
@@ -92,11 +97,20 @@ public class InternalSessionStoreChain implements InternalSessionStore {
         }
 
         @Override
-        public void store(InternalSession session) throws SessionPersistenceException {
+        public void create(InternalSession session) throws SessionPersistenceException {
             if (iterator.hasNext()) {
-                iterator.next().store(session, this);
+                iterator.next().create(session, this);
             } else {
-                store.store(session);
+                store.create(session);
+            }
+        }
+
+        @Override
+        public void update(InternalSession session) throws SessionPersistenceException {
+            if (iterator.hasNext()) {
+                iterator.next().update(session, this);
+            } else {
+                store.update(session);
             }
         }
 

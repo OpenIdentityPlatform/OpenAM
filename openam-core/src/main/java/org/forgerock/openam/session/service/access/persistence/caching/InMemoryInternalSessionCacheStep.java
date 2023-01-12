@@ -120,12 +120,12 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
     }
 
     @Override
-    public void store(final InternalSession session, final InternalSessionStore next)
+    public void create(final InternalSession session, final InternalSessionStore next)
             throws SessionPersistenceException {
 
         // First, pass down to the underlying persistence to store it - if this throws an exception then we shouldn't
         // cache the session.
-        next.store(session);
+        next.create(session);
 
         // Collect all references to the session into a map
         final Map<String, InternalSession> toAdd = new TreeMap<>();
@@ -143,6 +143,11 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         // Add all references in a single go. While this is not atomic in the current Guava implementation (as far as
         // I can tell), it provides the opportunity for more sophisticated implementations to optimise the insert.
         getCache().putAll(toAdd);
+    }
+
+    @Override
+    public void update(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+        next.update(session);
     }
 
     @Override

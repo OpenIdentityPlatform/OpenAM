@@ -123,7 +123,11 @@ public class SessionPersistenceStore {
      * @param session The session to persist.
      * @throws CoreTokenException If the operation fails.
      */
-    public void save(InternalSession session) throws CoreTokenException {
+    public void create(InternalSession session) throws CoreTokenException {
+        coreTokenService.create(tokenAdapter.toToken(session));
+    }
+
+    public void update(InternalSession session) throws CoreTokenException {
         coreTokenService.update(tokenAdapter.toToken(session));
     }
 

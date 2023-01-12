@@ -55,9 +55,15 @@ public class SessionPersistenceManagerStep implements InternalSessionStoreStep, 
     }
 
     @Override
-    public void store(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+    public void create(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
         setPersistenceManager(session);
-        next.store(session);
+        next.create(session);
+    }
+
+    @Override
+    public void update(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+        setPersistenceManager(session);
+        next.update(session);
     }
 
     @Override
@@ -71,7 +77,7 @@ public class SessionPersistenceManagerStep implements InternalSessionStoreStep, 
         Reject.ifNull(internalSession);
         if (internalSession.isStored()) {
             try {
-                fullSessionStore.get().store(internalSession);
+                fullSessionStore.get().update(internalSession);
             } catch (SessionPersistenceException e) {
                 throw new RuntimeException(e);
             }

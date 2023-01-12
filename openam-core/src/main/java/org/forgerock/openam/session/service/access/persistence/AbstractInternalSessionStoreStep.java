@@ -42,8 +42,13 @@ public abstract class AbstractInternalSessionStoreStep implements InternalSessio
     }
 
     @Override
-    public void store(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
-        next.store(session);
+    public void create(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+        next.create(session);
+    }
+
+    @Override
+    public void update(InternalSession session, InternalSessionStore next) throws SessionPersistenceException {
+        next.update(session);
     }
 
     @Override

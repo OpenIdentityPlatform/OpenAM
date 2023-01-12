@@ -80,9 +80,9 @@ public class SessionPersistenceStoreTest extends GuiceTestCase {
 
     @Test
     public void savesToken() throws Exception {
-        sessionPersistenceStore.save(mockSession);
+        sessionPersistenceStore.create(mockSession);
 
-        verify(mockCoreTokenService).update(mockToken);
+        verify(mockCoreTokenService).create(mockToken);
     }
 
     @Test

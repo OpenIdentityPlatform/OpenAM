@@ -43,7 +43,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.SessionID;
@@ -93,14 +92,14 @@ public class InMemoryInternalSessionCacheStepTest {
 
     @Test
     public void shouldCacheSessionsWhenAsked() throws Exception {
-        testCache.store(mockSession, mockStore);
+        testCache.create(mockSession, mockStore);
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isEqualTo(mockSession);
     }
 
     @Test
     public void shouldTellLowerLayersToStoreSessionsWhenAsked() throws Exception {
-        testCache.store(mockSession, mockStore);
-        verify(mockStore).store(mockSession);
+        testCache.create(mockSession, mockStore);
+        verify(mockStore).create(mockSession);
     }
 
     @Test
@@ -115,7 +114,7 @@ public class InMemoryInternalSessionCacheStepTest {
     public void shouldCacheSessionsBySessionHandleWhenPresent() throws Exception {
         String sessionHandle = "handle";
         given(mockSession.getSessionHandle()).willReturn(sessionHandle);
-        testCache.store(mockSession, mockStore);
+        testCache.create(mockSession, mockStore);
         assertThat(testCache.getByHandle(sessionHandle, mockStore)).isEqualTo(mockSession);
     }
 
@@ -123,7 +122,7 @@ public class InMemoryInternalSessionCacheStepTest {
     public void shouldCacheSessionsByRestrictedTokensWhenPresent() throws Exception {
         Set<SessionID> restrictedTokens = CollectionUtils.asSet(new SessionID("one"), new SessionID("two"));
         given(mockSession.getRestrictedTokens()).willReturn(restrictedTokens);
-        testCache.store(mockSession, mockStore);
+        testCache.create(mockSession, mockStore);
         for (SessionID restrictedToken : restrictedTokens) {
             assertThat(testCache.getByRestrictedID(restrictedToken, mockStore)).isEqualTo(mockSession);
         }
@@ -131,14 +130,14 @@ public class InMemoryInternalSessionCacheStepTest {
 
     @Test
     public void shouldAllowRemoval() throws Exception {
-        testCache.store(mockSession, mockStore);
+        testCache.create(mockSession, mockStore);
         testCache.remove(mockSession, mockStore);
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
     }
 
     @Test
     public void shouldRemoveOnSessionChangedEvent() throws Exception {
-        testCache.store(mockSession, mockStore);
+        testCache.create(mockSession, mockStore);
 
         sessionModificationListener.sessionChanged(SESSION_ID);
         assertThat(testCache.getBySessionID(SESSION_ID, mockStore)).isNull();
@@ -148,7 +147,7 @@ public class InMemoryInternalSessionCacheStepTest {
     public void shouldRemoveAllReferencesToTheSessionWhenRemovingItByMasterSessionId() throws Exception {
         // Given
         InternalSession session = sessionWithHandleAndRestrictedTokens();
-        testCache.store(session, mockStore);
+        testCache.create(session, mockStore);
 
         // When
         testCache.remove(session, mockStore);
@@ -162,7 +161,7 @@ public class InMemoryInternalSessionCacheStepTest {
         for (int i = 0; i < MAX_SESSIONS * 2; ++i) {
             InternalSession session = mock(InternalSession.class);
             given(session.getID()).willReturn(new SessionID("Session" + i));
-            testCache.store(session, mockStore);
+            testCache.create(session, mockStore);
         }
 
         assertThat(testCache.size()).isLessThanOrEqualTo(MAX_SESSIONS);
@@ -173,7 +172,7 @@ public class InMemoryInternalSessionCacheStepTest {
         for (int i = 0; i < MAX_SESSIONS * 2; ++i) {
             InternalSession session = mock(InternalSession.class);
             given(session.getID()).willReturn(new SessionID("Session" + i));
-            testCache.store(session, mockStore);
+            testCache.create(session, mockStore);
         }
 
         assertThat(testCache.size()).as("Cache size before reconfiguration").isLessThanOrEqualTo(MAX_SESSIONS);
@@ -185,7 +184,7 @@ public class InMemoryInternalSessionCacheStepTest {
         for (int i = MAX_SESSIONS; i < MAX_SESSIONS * 2; ++i) {
             InternalSession session = mock(InternalSession.class);
             given(session.getID()).willReturn(new SessionID("Session" + i));
-            testCache.store(session, mockStore);
+            testCache.create(session, mockStore);
         }
         assertThat(testCache.size()).as("Cache size after reconfiguration").isLessThanOrEqualTo(MAX_SESSIONS * 2);
     }
