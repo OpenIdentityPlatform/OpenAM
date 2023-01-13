@@ -31,7 +31,7 @@ RUN rm -rf  $CATALINA_HOME/webapps/* \
  && chown -R $OPENAM_USER:root $CATALINA_HOME
 
 RUN  apt-get remove -y --purge unzip \
- && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/lib/apt/lists/*
  
 USER $OPENAM_USER
 
