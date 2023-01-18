@@ -881,7 +881,11 @@ public class Repo extends IdRepo {
 					try {
 						final Set<String> res=new HashSet<String>(values);
 						res.remove(value);
-						res.add(SSHA256.getSaltedPassword(value.toString().getBytes()).replace("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}", ""));
+						if ("SSHA".equals(SystemProperties.get("org.openidentityplatform.default_schema","SSHA256"))) {
+							res.add(SSHA.getSaltedPassword(value.toString().getBytes()).replace("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}", ""));
+						}else {
+							res.add(SSHA256.getSaltedPassword(value.toString().getBytes()).replace("{"+SystemProperties.get("org.openidentityplatform.default_hash","CLEAR")+"}", ""));
+						}
 						return res;
 					} catch (NoSuchAlgorithmException e) {
 						logger.error("convert",e);
