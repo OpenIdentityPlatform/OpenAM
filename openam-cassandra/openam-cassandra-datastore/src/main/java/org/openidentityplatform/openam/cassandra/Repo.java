@@ -949,6 +949,9 @@ public class Repo extends IdRepo {
                 			}catch (Exception e) {}
                     	}catch (UnsupportedEncodingException e) {}
         			}
+        			if (!result) {
+        				throw new com.sun.identity.authentication.spi.InvalidPasswordException("invalid password",userName);
+        			}
         		}
         		return result;
         	}

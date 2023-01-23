@@ -116,7 +116,10 @@ public class IdRepoTest {
 		assertTrue(repo.authenticate(new Callback[] {user,pass}));
 		
 		pass.setPassword("test2".toCharArray());
-		assertFalse( repo.authenticate(new Callback[] {user,pass}));
+		try {
+			repo.authenticate(new Callback[] {user,pass});
+			throw new RuntimeException("need error");
+		}catch (AuthLoginException e) {}
 		
 		param=new TreeMap<String, Set<String>>(String.CASE_INSENSITIVE_ORDER);
 		param.put("sunidentitymsisdnnumber", new HashSet<String>(Arrays.asList(new String[] {"9170000000+"})));
