@@ -1,0 +1,132 @@
+[
+	uuid(12345778-1234-abcd-ef00-0123456789ab),
+	version(0.0)
+]
+interface lsarpc
+{
+	import "../rpc.idl";
+
+	typedef struct {
+		uint32_t length;
+		uint16_t impersonation_level;
+		uint8_t context_mode;
+		uint8_t effective_only;
+	} LsarQosInfo;
+
+	typedef struct {
+		uint32_t length;
+		uint8_t *root_directory;
+		unicode_string *object_name;
+		uint32_t attributes;
+		uint32_t security_descriptor;
+		LsarQosInfo *security_quality_of_service;
+	} LsarObjectAttributes;
+
+	typedef struct {
+		unicode_string name;
+		sid_t *sid;
+	} LsarDomainInfo;
+
+	typedef struct {
+		unicode_string name;
+		unicode_string dns_domain;
+		unicode_string dns_forest;
+		uuid_t domain_guid;
+		sid_t *sid;
+	} LsarDnsDomainInfo;
+
+	enum {
+		POLICY_INFO_AUDIT_EVENTS   = 2,
+		POLICY_INFO_PRIMARY_DOMAIN = 3,
+		POLICY_INFO_ACCOUNT_DOMAIN = 5,
+		POLICY_INFO_SERVER_ROLE    = 6,
+		POLICY_INFO_MODIFICATION   = 9,
+		POLICY_INFO_DNS_DOMAIN     = 12
+	};
+
+	typedef [switch_type(short)] union {
+		[case(POLICY_INFO_ACCOUNT_DOMAIN)] LsarDomainInfo account_domain;
+		[case(POLICY_INFO_DNS_DOMAIN)] LsarDnsDomainInfo dns_domain;
+	} LsarPolicyInfo;
+
+	typedef struct {
+		sid_t *sid;
+	} LsarSidPtr;
+
+	typedef struct {
+		[range(0,1000)] uint32_t num_sids;
+		[size_is(num_sids)] LsarSidPtr *sids;
+	} LsarSidArray;
+
+	typedef enum {
+		SID_NAME_USE_NONE = 0, /* NOTUSED */
+		SID_NAME_USER     = 1, /* user */
+		SID_NAME_DOM_GRP  = 2, /* domain group */
+		SID_NAME_DOMAIN   = 3, /* domain: don't know what this is */
+		SID_NAME_ALIAS    = 4, /* local group */
+		SID_NAME_WKN_GRP  = 5, /* well-known group */
+		SID_NAME_DELETED  = 6, /* deleted account: needed for c2 rating */
+		SID_NAME_INVALID  = 7, /* invalid account */
+		SID_NAME_UNKNOWN  = 8  /* oops. */
+	} LsarSidType;
+
+	typedef struct {
+		LsarSidType sid_type;
+		uint32_t rid;
+		uint32_t sid_index;
+	} LsarTranslatedSid;
+
+	typedef struct {
+		[range(0,1000)] uint32_t count;
+		[size_is(count)] LsarTranslatedSid *sids;
+	} LsarTransSidArray;
+
+	typedef struct {
+		unicode_string name;
+		sid_t *sid;
+	} LsarTrustInformation;
+
+	typedef struct {
+		[range(0,1000)] uint32_t count;
+		[size_is(count)] LsarTrustInformation *domains;
+		uint32_t max_count;
+	} LsarRefDomainList;
+
+	typedef struct {
+		uint16_t sid_type;
+		unicode_string name;
+		uint32_t sid_index;
+	} LsarTranslatedName;
+
+	typedef struct {
+		[range(0,1000)] uint32_t count;
+		[size_is(count)] LsarTranslatedName *names;
+	} LsarTransNameArray;
+
+	[op(0x00)]
+	int LsarClose([in,out] policy_handle *handle);
+
+	[op(0x07)]
+	int LsarQueryInformationPolicy([in] policy_handle *handle,
+			[in] uint16_t level,
+			[out,switch_is(level),unique] LsarPolicyInfo *info);
+
+	[op(0x0f)]
+	int LsarLookupSids([in] policy_handle *handle,
+			[in] LsarSidArray *sids,
+			[out,unique] LsarRefDomainList *domains,
+			[in,out] LsarTransNameArray *names,
+			[in] uint16_t level,
+			[in,out] uint32_t *count);
+
+	[op(0x2c)]
+	int LsarOpenPolicy2([in,string,unique] wchar_t *system_name,
+			[in] LsarObjectAttributes *object_attributes,
+			[in] uint32_t desired_access,
+			[out] policy_handle *policy_handle);
+
+	[op(0x2e)]
+	int LsarQueryInformationPolicy2([in] policy_handle *handle,
+			[in] uint16_t level,
+			[out,switch_is(level),unique] LsarPolicyInfo *info);
+}

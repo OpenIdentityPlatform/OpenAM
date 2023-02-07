@@ -1,0 +1,94 @@
+application/access             mdf              # Microsoft Access
+#application/excel              xls              # Microsoft Excel
+application/vnd.ms-excel       xls              # Microsoft Excel
+application/font-tdpfr         pfr              # TrueDoc Portable Font Resource
+application/futuresplash       spl              # Macromedia Flash
+application/hep                hep              # Hummingbird Host Explorer Profiles
+application/lotus-123          wks              # Lotus 123
+application/mac-binhex40       hqx              # Macintosh binhexed archives
+application/mspowerpoint       ppt              # Microsoft Powerpoint
+application/msword             doc              # Microsoft Word
+application/octet-stream       bin exe ani      # Binary File
+application/oda                oda
+application/pagemaker          pm5 pt5 pm       # PageMaker
+application/pdf                pdf              # Adobe Acrobat
+application/postscript         ai eps ps        # Postscript File
+application/rtf                rtf              # Rich Text File
+application/toolbook           tbk              # Toolbook
+application/wordperfect        wp               # WordPerfect
+application/wordperfect5.1     wp5              # WordPerfect Version 5.1
+application/wordperfect6.1     wp6              # WordPerfect Version 6.1
+application/wordperfectd       wpd              # WordPerfect
+application/x-bcpio            bcpio            #
+application/x-cpio             cpio             #
+application/x-csh              csh              # C-Shell Program
+application/x-director         dcr              # Director File
+application/x-dvi              dvi              # TeX dvi Format
+application/x-gtar             gtar             # Gzip and Tar file
+application/x-gzip             gz tgz           # Gzip and Tar file
+application/x-compress         z                # Gzip and Tar file
+application/x-hdf              hdf              # NCSA HDF
+application/x-ica              ica              # WinFrames
+application/x-javascript       js               # Javascript
+application/x-latex            latex            # Latex File
+application/x-mif              mif              #
+application/x-netcdf           nc cdf           #
+#application/x-sh               sh               # sh Shell Program
+application/x-shar             shar             #
+application/x-shockwave-flash  swf              # Macromedia Shockwave file
+application/x-spss             sav spp sbs sps spo # SPSS
+application/x-stuffit          sit              # Macintosh Stuff-It
+application/x-sv4cpio          sv4cpio          #
+application/x-sv4crc           sv4crc           #
+application/x-tar              tar              # UNIX Tape Archive
+application/x-tcl              tcl              # TCL Programming Language
+application/x-tex              tex              # Tex/LaTeX
+application/x-texinfo          texinfo texi     # TexInfo
+application/x-troff            t tr roff        # Troff file
+application/x-troff-man        man              # Troff with MAN macros
+application/x-troff-me         me               # Troff with ME macros
+application/x-troff-ms         ms               # Troff with MS macros
+application/x-ustar            ustar            # Ustar file
+application/vnd.ms-access      mdb mda mde      # MS Access
+application/vnd.ms-project     mpp              # MS Project
+application/x-wais-source      src              # WAIS Sources
+application/zip                zip jar          # ZIP Compressed File
+audio/basic                    au snd           # Audio Sound File
+audio/x-aiff                   aif aiff aifc    # AIFF Sound File
+audio/x-midi                   mid              # MIDI Sound File
+audio/x-pn-realaudio           ra ram rm rpm    # REALAUDIO Sound File
+audio/x-wav                    wav              # WAV Sound File
+audio/x-mpegurl                mp3              # MP3 Sound File
+audio/mpeg3                    mp3              # MP3 Sound File
+audio/x-mpeg-3                 mp3              # MP3 Sound File
+audio/mpeg                     mp2 mpa mpg mpga # MP2 Sound File
+audio/x-mpeg                   mp2              # MP2 Sound File
+chemical/x-pdb                 pdb              # PDB Chemistry Model File
+chemical/x-xyz                 xyz              # XYZ Chemistry Model File
+drawing/x-dwf                  dwf              # AutoCAD
+image/gif                      gif              # GIF image file
+image/ief                      ief              # Image Exchange
+image/jpeg                     jpeg jpg jpe     # JPG image file
+image/png                      png              # Portable Network Graphics
+image/tiff                     tiff tif         # TIFF image file
+image/x-cmu-raster             ras              #
+image/x-portable-anymap        pnm              #
+image/x-portable-bitmap        pbm              #
+image/x-portable-graymap       pgm              #
+image/x-portable-pixmap        ppm              #
+image/x-rgb                    rgb              # RGB Image File
+image/x-xbitmap                xbm              # X-bitmap Image File
+image/x-xpixmap                xpm              # X-pixmap Image File
+image/x-xwindowdump            xwd              #
+text/css                       css              # Cascading Style Sheet
+text/html                      html htm         # HTML Document
+text/plain                     txt ini log in cfg m4 sh     # Plain Text File
+text/richtext                  rtx              # Rich Text File
+text/tab-separated-values      tsv              #
+text/x-setext                  etx              #
+text/x-sgml                    sgml sgm         # SGML Document
+video/mpeg                     mpeg mpg mpe     # MPEG Movie File
+video/quicktime                qt mov           # Quicktime Movie File
+video/x-ms-asf                 asf asx          # Windows Media  File
+video/x-msvideo                avi              # AVI Movie File
+video/x-sgi-movie              movie            # SGI Movie File

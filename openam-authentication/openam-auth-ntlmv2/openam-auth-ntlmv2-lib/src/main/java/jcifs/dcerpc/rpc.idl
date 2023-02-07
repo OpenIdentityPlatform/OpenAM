@@ -1,0 +1,63 @@
+interface rpc
+{
+	/* base types */
+
+	typedef unsigned char uint8_t;
+	typedef unsigned short uint16_t;
+	typedef unsigned int uint32_t;
+
+	/* dce */
+
+	typedef struct {
+	    uint32_t time_low;
+	    uint16_t time_mid;
+	    uint16_t time_hi_and_version;
+	    uint8_t clock_seq_hi_and_reserved;
+	    uint8_t clock_seq_low;
+	    uint8_t node[6];
+	} uuid_t;
+
+	/* win32 stuff */
+
+	typedef struct {
+		uint32_t type;
+		uuid_t uuid;
+	} policy_handle;
+
+	/*
+	 * typedef struct _UNICODE_STRING
+	 *     USHORT Length;
+	 *     USHORT MaximumLength;
+	 *     [size_is(MaximumLength / 2), length_is((Length) / 2) ] USHORT *  Buffer;
+	 * } UNICODE_STRING;
+	 */
+
+	typedef struct {
+		uint16_t length;
+		uint16_t maximum_length;
+		[length_is(length / 2),size_is(maximum_length / 2)] uint16_t *buffer;
+	} unicode_string;
+
+	/* 
+	 * typedef struct _SID_IDENTIFIER_AUTHORITY {
+	 *     UCHAR Value[6];
+	 * } SID_IDENTIFIER_AUTHORITY, *PSID_IDENTIFIER_AUTHORITY;
+	 * 
+	 * #define SECURITY_NT_AUTHORITY           {0,0,0,0,0,5}
+	 * 
+	 * typedef struct _SID {
+	 *    UCHAR Revision;
+	 *    UCHAR SubAuthorityCount;
+	 *    SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
+	 *    [size_is(SubAuthorityCount)] ULONG SubAuthority[*];
+	 * } SID, *PSID;
+	 */
+
+	typedef struct {
+		uint8_t revision;
+		uint8_t sub_authority_count;
+		uint8_t identifier_authority[6];
+		[size_is(sub_authority_count)] uint32_t sub_authority[*];
+	} sid_t;
+}
+
