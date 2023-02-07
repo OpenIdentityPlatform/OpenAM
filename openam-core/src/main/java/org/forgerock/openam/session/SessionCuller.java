@@ -145,14 +145,23 @@ public class SessionCuller extends GeneralTaskRunnable {
                 if (!getIsPolling()) {
                     long expectedTime;
                     if (willExpire(session.getMaxIdleTime())) {
-                        expectedTime = (session.getLatestRefreshTime() + (session.getMaxIdleTime() * 60)) * 1000;
-                        if (sessionPollerPool.getCacheBasedPolling()) {
-                            expectedTime = Math.min(expectedTime, (session.getLatestRefreshTime() +
-                                    (session.getMaxCachingTime() * 60)) * 1000);
+                        try {
+                            session.refresh(false);
+                            expectedTime = (session.getLatestRefreshTime() + (session.getMaxIdleTime() * 60)) * 1000;
+                            if (sessionPollerPool.getCacheBasedPolling()) {
+                                expectedTime = Math.min(expectedTime, (session.getLatestRefreshTime() +
+                                        (session.getMaxCachingTime() * 60)) * 1000);
+                            }
+                        } catch (SessionException e) {
+                            expectedTime = -1;
+                            if (sessionDebug.messageEnabled()) {
+                                sessionDebug.message("got error while refreshing session {} : {}, seems expired",session, e.toString());
+                            }
                         }
                     } else {
                         expectedTime = (session.getLatestRefreshTime() + (SessionMeta.getAppSSOTokenRefreshTime() * 60)) * 1000;
                     }
+
                     if (expectedTime > scheduledExecutionTime()) {
                         // Get an instance as required otherwise it causes issues on container restart.
                         SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
@@ -185,9 +194,16 @@ public class SessionCuller extends GeneralTaskRunnable {
             // schedule at the max session time
             long expectedTime = -1;
             if (willExpire(session.getMaxSessionTime())) {
-                expectedTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime()+5,session.getMaxSessionTime()) * 60)) * 1000;
+                try {
+                    session.refresh(false);
+                    expectedTime = (session.getLatestRefreshTime() + (Math.min(session.getMaxIdleTime()+5,session.getMaxSessionTime()) * 60)) * 1000;
+                } catch (SessionException e) {
+                    if (sessionDebug.messageEnabled()) {
+                        sessionDebug.message("got error while refreshing session {} : {}, seems expired",session, e.toString());
+                    }
+                }
             }
-            if (expectedTime>System.currentTimeMillis() && expectedTime > scheduledExecutionTime()) {
+            if (expectedTime > System.currentTimeMillis() && expectedTime > scheduledExecutionTime()) {
                 SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                 return;
             }
