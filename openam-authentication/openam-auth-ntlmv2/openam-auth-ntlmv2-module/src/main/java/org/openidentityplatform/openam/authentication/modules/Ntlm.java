@@ -69,7 +69,7 @@ public class Ntlm extends AMLoginModule {
 	public void init(Subject subject, Map sharedState, Map options) {
     	setForceCallbacksRead(true);
     	setSharedStateEnabled(true);
-        setAuthLevel(Integer.parseInt(CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.authlevel","0")));
+        setAuthLevel(Integer.parseInt(CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.authlevel","0")));
         if (logger.isDebugEnabled())
         	System.setProperty("jcifs.util.loglevel", "4");
         System.setProperty("jcifs.smb.client.connTimeout", "3000");
@@ -78,19 +78,19 @@ public class Ntlm extends AMLoginModule {
 //        System.setProperty("jcifs.smb.lmCompatibility", "3" );
 //        System.setProperty("jcifs.smb.client.useExtendedSecurity", "true" );
         if (ntlmManager==null
-        		||!StringUtils.equals(ntlmManager.getDomain(), CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domain"))
-        		||!StringUtils.equals(ntlmManager.getDomainController(), CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domainController"))
-        		||!StringUtils.equals(ntlmManager.getDomainControllerName(), CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domainControllerHostName"))
-        		||!StringUtils.equals(ntlmManager.getServiceAccount(), CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.serviceAccount"))
-        		||!StringUtils.equals(ntlmManager.getServicePassword(), CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.servicePassword"))
+        		||!StringUtils.equals(ntlmManager.getDomain(), CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domain"))
+        		||!StringUtils.equals(ntlmManager.getDomainController(), CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domainController"))
+        		||!StringUtils.equals(ntlmManager.getDomainControllerName(), CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domainControllerHostName"))
+        		||!StringUtils.equals(ntlmManager.getServiceAccount(), CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.serviceAccount"))
+        		||!StringUtils.equals(ntlmManager.getServicePassword(), CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.servicePassword"))
         	)
         	synchronized (Ntlm.class) {
 				ntlmManager = new NtlmManager(
-						CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domain"), 
-						CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domainController"),
-						CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.domainControllerHostName"),
-						CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.serviceAccount"),
-						CollectionHelper.getMapAttr(options, "ru.org.openam.auth.modules.ntlm.servicePassword")
+						CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domain"), 
+						CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domainController"),
+						CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.domainControllerHostName"),
+						CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.serviceAccount"),
+						CollectionHelper.getMapAttr(options, "org.openidentityplatform.openam.authentication.modules.ntlm.servicePassword")
 						);
 			}
     }
