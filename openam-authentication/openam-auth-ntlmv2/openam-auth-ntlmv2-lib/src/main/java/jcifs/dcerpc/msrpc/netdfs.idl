@@ -1,0 +1,81 @@
+[
+	uuid(4fc742e0-4a10-11cf-8273-00aa004ae673),
+	version(3.0)
+]
+interface netdfs
+{
+	import "../rpc.idl";
+
+	const uint32_t DFS_VOLUME_FLAVOR_STANDALONE = 0x100;
+	const uint32_t DFS_VOLUME_FLAVOR_AD_BLOB = 0x200;
+
+	const uint32_t DFS_STORAGE_STATE_OFFLINE = 0x0001;
+	const uint32_t DFS_STORAGE_STATE_ONLINE = 0x0002;
+	const uint32_t DFS_STORAGE_STATE_ACTIVE = 0x0004;
+
+	typedef struct {
+		[string] wchar_t *entry_path;
+	} DfsInfo1;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] DfsInfo1 *s;
+	} DfsEnumArray1;
+
+	typedef struct {
+		uint32_t state;
+		[string] wchar_t *server_name;
+		[string] wchar_t *share_name;
+	} DfsStorageInfo;
+
+	typedef struct {
+		[string] wchar_t *path;
+		[string] wchar_t *comment;
+		uint32_t state;
+		uint32_t num_stores;
+		[size_is(num_stores)] DfsStorageInfo *stores;
+	} DfsInfo3;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] DfsInfo3 *s;
+	} DfsEnumArray3;
+
+	typedef struct {
+		[string] wchar_t *dfs_name;
+	} DfsInfo200;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] DfsInfo200 *s;
+	} DfsEnumArray200;
+
+	typedef struct {
+		uint32_t flags;
+		[string] wchar_t *dfs_name;
+	} DfsInfo300;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] DfsInfo300 *s;
+	} DfsEnumArray300;
+
+	typedef union {
+		[case(1)] DfsEnumArray1 *info1;
+		[case(3)] DfsEnumArray3 *info3;
+		[case(200)] DfsEnumArray200 *info200;
+		[case(300)] DfsEnumArray300 *info300;
+	} DfsEnumInfo;
+
+	typedef struct {
+		uint32_t level,
+		[switch_is(level)] DfsEnumInfo e;
+	} DfsEnumStruct;
+
+	[op(0x15)]
+	int NetrDfsEnumEx([in,string,unique] wchar_t dfs_name,
+			[in] uint32_t level,
+			[in] uint32_t prefmaxlen,
+			[in,out,unique] DfsEnumStruct *info,
+			[in,out,unique] uint32_t *totalentries);
+}

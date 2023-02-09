@@ -843,6 +843,11 @@
         </dependency>
 
         <dependency>
+            <artifactId>openam-auth-ntlmv2-module</artifactId>
+            <groupId>org.openidentityplatform.openam</groupId>
+        </dependency>
+
+        <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>org.openidentityplatform.commons</groupId>
         </dependency>

@@ -1,0 +1,11 @@
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+<ModuleProperties moduleName="Ntlm" version="1.0" >
+    <Callbacks length="1" order="1" timeout="300" header="This server uses NTLM Authentication">
+        <HttpCallback>
+            <HttpHeader>X-Authorization</HttpHeader>
+            <Negotiation>WWW-Authenticate: NTLM</Negotiation>
+            <HttpErrorCode>401</HttpErrorCode>
+        </HttpCallback>
+    </Callbacks>
+</ModuleProperties>

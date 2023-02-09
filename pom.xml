@@ -14,6 +14,7 @@
  *
  * Copyright 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Agile Digital Engineering
+ * Portions Copyrighted 2017-2023 Open Identity Platform Community.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -792,6 +793,11 @@
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-auth-qr</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-auth-ntlmv2-module</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

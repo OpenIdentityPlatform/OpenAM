@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+		"jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+	<Service name="iPlanetAMAuthNtlmService" version="1.0">
+		<Schema 
+			serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthNtlmService"
+			i18nFileName="amAuthNtlm"
+			revisionNumber="30"
+			i18nKey="ru.org.openam.auth.modules.ntlm.description">
+	    
+            <Organization>
+				<AttributeSchema name="ru.org.openam.auth.modules.ntlm.authlevel"
+						type="single"
+						syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="ru.org.openam.auth.modules.ntlm.authlevel">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema name="ru.org.openam.auth.modules.ntlm.domain" i18nKey="ru.org.openam.auth.modules.ntlm.domain" type="single" syntax="string" >
+                    <DefaultValues><Value>DOMAINNAME</Value></DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.domainController" i18nKey="ru.org.openam.auth.modules.ntlm.domainController" type="single" syntax="string" >
+                    <DefaultValues><Value>hostname.domain.com</Value></DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.domainControllerHostName" i18nKey="ru.org.openam.auth.modules.ntlm.domainControllerHostName" type="single" syntax="string" >
+                    <DefaultValues><Value>hostname</Value></DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.serviceAccount" i18nKey="ru.org.openam.auth.modules.ntlm.serviceAccount" type="single" syntax="string" >
+                    <DefaultValues><Value>servicename@domain.fqdn</Value></DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.servicePassword" i18nKey="ru.org.openam.auth.modules.ntlm.servicePassword" type="single" syntax="password" >
+                    <DefaultValues><Value>password</Value></DefaultValues>
+                </AttributeSchema>
+				<SubSchema name="serverconfig" inheritance="multiple">
+					<AttributeSchema name="ru.org.openam.auth.modules.ntlm.authlevel"
+							type="single"
+							syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+							i18nKey="ru.org.openam.auth.modules.ntlm.authlevel">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<AttributeSchema name="ru.org.openam.auth.modules.ntlm.domain" i18nKey="ru.org.openam.auth.modules.ntlm.domain" type="single" syntax="string" >
+	                    <DefaultValues><Value>DOMAINNAME</Value></DefaultValues>
+	                </AttributeSchema>
+	                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.domainController" i18nKey="ru.org.openam.auth.modules.ntlm.domainController" type="single" syntax="string" >
+	                    <DefaultValues><Value>hostname.domain.com</Value></DefaultValues>
+	                </AttributeSchema>
+	                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.domainControllerHostName" i18nKey="ru.org.openam.auth.modules.ntlm.domainControllerHostName" type="single" syntax="string" >
+	                    <DefaultValues><Value>hostname</Value></DefaultValues>
+	                </AttributeSchema>
+	                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.serviceAccount" i18nKey="ru.org.openam.auth.modules.ntlm.serviceAccount" type="single" syntax="string" >
+	                    <DefaultValues><Value>servicename@domain.fqdn</Value></DefaultValues>
+	                </AttributeSchema>
+	                <AttributeSchema name="ru.org.openam.auth.modules.ntlm.servicePassword" i18nKey="ru.org.openam.auth.modules.ntlm.servicePassword" type="single" syntax="password" >
+	                    <DefaultValues><Value>password</Value></DefaultValues>
+	                </AttributeSchema>
+				</SubSchema>
+			</Organization>
+		</Schema>
+	</Service>
+</ServicesConfiguration>

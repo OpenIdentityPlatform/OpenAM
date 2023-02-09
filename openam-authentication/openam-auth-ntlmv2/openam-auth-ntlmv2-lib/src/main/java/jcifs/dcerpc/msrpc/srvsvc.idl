@@ -1,0 +1,107 @@
+[
+	uuid(4b324fc8-1670-01d3-1278-5a47bf6ee188),
+	version(3.0)
+]
+interface srvsvc
+{
+	import "../rpc.idl";
+
+	typedef struct {
+		[string] wchar_t *netname;
+	} ShareInfo0;
+
+	typedef struct {
+		int count;
+		[size_is(count)] ShareInfo0 *array;
+	} ShareInfoCtr0;
+
+	typedef struct {
+		[string] wchar_t *netname;
+		int type;
+		[string] wchar_t *remark;
+	} ShareInfo1;
+
+	typedef struct {
+		int count;
+		[size_is(count)] ShareInfo1 *array;
+	} ShareInfoCtr1;
+
+	typedef struct {
+		[string] wchar_t *netname;
+		int type;
+		[string] wchar_t *remark;
+		uint32_t permissions;
+		uint32_t max_uses;
+		uint32_t current_uses;
+		[string] wchar_t *path;
+		[string] wchar_t *password;
+		uint32_t sd_size;
+		[size_is(sd_size)] uint8_t *security_descriptor;
+	} ShareInfo502;
+
+	typedef struct {
+		int count;
+		[size_is(count)] ShareInfo502 *array;
+	} ShareInfoCtr502;
+
+	typedef [switch_type(int)] union {
+		[case(0)] ShareInfo0 *info0;
+		[case(1)] ShareInfo1 *info1;
+		[case(502)] ShareInfo502 *info1;
+	} ShareInfo;
+
+	typedef [switch_type(int)] union {
+		[case(0)] ShareInfoCtr0 *info0;
+		[case(1)] ShareInfoCtr1 *info1;
+		[case(502)] ShareInfoCtr502 *info1;
+	} ShareCtr;
+
+	[op(0x0f)]
+	int ShareEnumAll([in,string,unique] wchar_t *servername,
+			[in,out] int *level,
+			[in,out,switch_is(*level)] ShareCtr *info,
+			[in] unsigned long prefmaxlen,
+			[out] unsigned long *totalentries,
+			[in,out] unsigned long *resume_handle);
+
+	[op(0x10)]
+	int ShareGetInfo([in,string,unique] wchar_t *servername,
+			[in,string] wchar_t *sharename,
+			[in] int level,
+			[out,switch_is(level)] ShareInfo *info);
+
+	typedef struct {
+		unsigned long platform_id;
+		[string] wchar_t *name;
+	} ServerInfo100;
+
+	typedef [switch_type(int)] union {
+		[case(0)] ServerInfo100 *info0;
+	} ServerInfo;
+
+	[op(0x15)]
+	int ServerGetInfo([in,string,unique] wchar_t *servername,
+			[in] int level,
+			[out,switch_is(level)] ServerInfo *info);
+
+	typedef struct {
+		uint32_t elapsedt;  
+		uint32_t msecs;  
+		uint32_t hours;  
+		uint32_t mins;  
+		uint32_t secs;  
+		uint32_t hunds;
+		uint32_t timezone;  
+		uint32_t tinterval;  
+		uint32_t day;  
+		uint32_t month;  
+		uint32_t year;  
+		uint32_t weekday;
+	} TimeOfDayInfo;
+
+	[op(0x1c)]
+	int RemoteTOD([in,string,unique] wchar_t *servername,
+			[out,unique] TimeOfDayInfo *info);
+}
+
+

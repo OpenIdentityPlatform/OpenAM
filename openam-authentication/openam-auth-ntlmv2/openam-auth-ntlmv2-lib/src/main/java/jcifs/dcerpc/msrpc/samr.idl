@@ -1,0 +1,96 @@
+[
+	uuid(12345778-1234-abcd-ef00-0123456789ac),
+	version(1.0)
+]
+interface samr
+{
+	import "../rpc.idl";
+	import "lsarpc.idl";
+
+	typedef [v1_enum] enum {
+		ACB_DISABLED               = 0x00000001, /* 1 = User account disabled */
+		ACB_HOMDIRREQ              = 0x00000002, /* 1 = Home directory required */
+		ACB_PWNOTREQ               = 0x00000004, /* 1 = User password not required */
+		ACB_TEMPDUP                = 0x00000008, /* 1 = Temporary duplicate account */
+		ACB_NORMAL                 = 0x00000010, /* 1 = Normal user account */
+		ACB_MNS                    = 0x00000020, /* 1 = MNS logon user account */
+		ACB_DOMTRUST               = 0x00000040, /* 1 = Interdomain trust account */
+		ACB_WSTRUST                = 0x00000080, /* 1 = Workstation trust account */
+		ACB_SVRTRUST               = 0x00000100, /* 1 = Server trust account */
+		ACB_PWNOEXP                = 0x00000200, /* 1 = User password does not expire */
+		ACB_AUTOLOCK               = 0x00000400, /* 1 = Account auto locked */
+		ACB_ENC_TXT_PWD_ALLOWED    = 0x00000800, /* 1 = Encryped text password is allowed */
+		ACB_SMARTCARD_REQUIRED     = 0x00001000, /* 1 = Smart Card required */
+		ACB_TRUSTED_FOR_DELEGATION = 0x00002000, /* 1 = Trusted for Delegation */
+		ACB_NOT_DELEGATED          = 0x00004000, /* 1 = Not delegated */
+		ACB_USE_DES_KEY_ONLY       = 0x00008000, /* 1 = Use DES key only */
+		ACB_DONT_REQUIRE_PREAUTH   = 0x00010000  /* 1 = Preauth not required */
+	} SamrAcctFlags;
+
+	[op(0x01)]
+	int SamrCloseHandle([in] policy_handle *handle);
+
+	[op(0x39)]
+	int SamrConnect2([in,string,unique] wchar_t *system_name,
+			[in] uint32_t access_mask,
+			[out] policy_handle *handle);
+
+	[op(0x3e)]
+	int SamrConnect4([in,string,unique] wchar_t *system_name,
+			[in] uint32_t unknown,
+			[in] uint32_t access_mask,
+			[out] policy_handle *handle);
+
+	[op(0x07)]
+	int SamrOpenDomain([in] policy_handle *handle,
+			[in] uint32_t access_mask,
+			[in] sid_t *sid,
+			[out] policy_handle *domain_handle);
+
+	typedef struct {
+		uint32_t idx;
+		unicode_string name;
+	} SamrSamEntry;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] SamrSamEntry *entries;
+	} SamrSamArray;
+
+	[op(0x0f)]
+	int SamrEnumerateAliasesInDomain([in] policy_handle *domain_handle,
+			[in,out] uint32_t *resume_handle,
+			[in] uint32_t acct_flags,
+			[out,unique] SamrSamArray *sam,
+			[out] uint32_t num_entries);
+
+	[op(0x1b)]
+	int SamrOpenAlias([in] policy_handle *domain_handle,
+			[in] uint32_t access_mask,
+			[in] uint32_t rid,
+			[out] policy_handle *alias_handle);
+
+	[op(0x21)]
+	int SamrGetMembersInAlias([in] policy_handle *alias_handle,
+			[out] LsarSidArray *sids);
+
+	typedef [v1_enum] enum {
+		SE_GROUP_MANDATORY          = 0x00000001,
+		SE_GROUP_ENABLED_BY_DEFAULT = 0x00000002,
+		SE_GROUP_ENABLED            = 0x00000004,
+		SE_GROUP_OWNER              = 0x00000008,
+		SE_GROUP_USE_FOR_DENY_ONLY  = 0x00000010,
+		SE_GROUP_RESOURCE           = 0x20000000,
+		SE_GROUP_LOGON_ID           = 0xC0000000
+	} SamrGroupAttrs;
+
+	typedef struct {
+		uint32_t rid;
+		SamrGroupAttrs attributes;
+	} SamrRidWithAttribute;
+
+	typedef struct {
+		uint32_t count;
+		[size_is(count)] SamrRidWithAttribute *rids;
+	} SamrRidWithAttributeArray;
+}
