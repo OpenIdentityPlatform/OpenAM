@@ -10,7 +10,7 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2023 Open Identity Platform Community.
 -->
@@ -23,16 +23,35 @@
         <artifactId>openam-authentication</artifactId>
         <version>14.7.2-SNAPSHOT</version>
     </parent>
-    <modules>
-        <module>openam-auth-ntlmv2-lib</module>
-        <module>openam-auth-ntlmv2-module</module>
-    </modules>
-
     <!-- Component Definition -->
-    <name>OpenAM NTLMv2 Parent</name>
-    <description>OpenAM NTLMv2 Parent</description>
+    <name>OpenAM NTLMv2 Authentication Module</name>
+    <description>OpenAM Authentication NTLMv2</description>
     <artifactId>openam-auth-ntlmv2</artifactId>
-    <packaging>pom</packaging>
-
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.poweredge.ntlmv2-auth</groupId>
+            <artifactId>ntlmv2-lib</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+    </dependencies>
 
 </project>
