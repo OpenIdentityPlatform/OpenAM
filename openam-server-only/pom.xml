@@ -843,7 +843,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>openam-auth-ntlmv2-module</artifactId>
+            <artifactId>openam-auth-ntlmv2</artifactId>
             <groupId>org.openidentityplatform.openam</groupId>
         </dependency>
 
