@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -4986,7 +4987,10 @@ public class LoginState {
         Set<AMPostAuthProcessInterface> postLoginInstanceSet = new LinkedHashSet<>();
         if ((postLoginClassSet != null) && (!postLoginClassSet.isEmpty())) {
             StringBuilder sb = new StringBuilder();
-            for (String postLoginClassName : postLoginClassSet) {
+            for (String postLoginClassName : new TreeSet<>(postLoginClassSet)) {
+                if(postLoginClassName.contains("|")) { //a symbol before '|' symbol defines post process module order in settings
+                    postLoginClassName = postLoginClassName.split("\\|")[1];
+                }
                 if (sb.length() > 0) {
                     sb.append("|");
                 }
