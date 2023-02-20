@@ -44,11 +44,7 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.core.rest.authn.core.AuthIndexType;
-import org.forgerock.openam.core.rest.authn.core.AuthenticationContext;
-import org.forgerock.openam.core.rest.authn.core.LoginAuthenticator;
-import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
-import org.forgerock.openam.core.rest.authn.core.LoginProcess;
+import org.forgerock.openam.core.rest.authn.core.*;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
@@ -73,7 +69,7 @@ public class RestAuthenticationHandler {
 
     private final CoreServicesWrapper coreServicesWrapper;
     private final RedirectUrlValidator<String> urlValidator =
-            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+            new RedirectUrlValidator<>(ValidGotoUrlExtractor.getInstance());
     
     /**
      * Constructs an instance of the RestAuthenticationHandler.
@@ -385,8 +381,10 @@ public class RestAuthenticationHandler {
     }
 
     private void setCookies(LoginProcess loginProcess, HttpServletRequest request, HttpServletResponse response) throws AuthException {
-        coreServicesWrapper.setAuthCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
-        coreServicesWrapper.setLbCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
+        if(!(loginProcess instanceof CompletedLoginProcess)) {
+            coreServicesWrapper.setAuthCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
+            coreServicesWrapper.setLbCookie(loginProcess.getAuthContext().getAuthContext(), request, response);
+        }
         switch (loginProcess.getLoginStage()) {
             case REQUIREMENTS_WAITING:
                 break;
