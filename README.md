@@ -69,6 +69,24 @@ For example, `-Xmx2048m`
 
 ---
 
+## How To Guides
+
+* [Config OpenAM as OAuth2 Service Provider](https://github.com/OpenIdentityPlatform/OpenAM/wiki/Config-OpenAM-as-OAuth2-Service-Provider)
+* [How to Add Authorization and Protect Your Application With OpenAM and OpenIG Stack](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Add-Authorization-and-Protect-Your-Application-With-OpenAM-and-OpenIG-Stack)
+* [How to Customise OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Customise-OpenAM)
+* [How to disable XUI by default](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-disable-XUI-by-default)
+* [How to make OpenAM log more verbose](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-make-OpenAM-log-more-verbose)
+* [How To Run OpenAM in Kubernetes](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-To-Run-OpenAM-in-Kubernetes)
+* [How to Setup 2FA with Google Authenticator in OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Setup-2FA-with-Google-Authenticator-in-OpenAM)
+* [How To Setup Active Directory Authentication In OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-To-Setup-Active-Directory-Authentication-In-OpenAM)
+* [How to setup Kerberos Authentication with OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-setup-Kerberos-Authentication-with-OpenAM)
+* [How to Setup WebAuthn Authentication in OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Setup-WebAuthn-Authentication-in-OpenAM)
+* [How to Start OpenAM and OpenDJ in Separate Docker Contaners](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Start-OpenAM-and-OpenDJ-in-Separate-Docker-Contaners)
+* [How to Use Apache Cassandra as User DataStore in OpenAM](https://github.com/OpenIdentityPlatform/OpenAM/wiki/How-to-Use-Apache-Cassandra-as-User-DataStore-in-OpenAM)
+* [Migrate OpenAM to Apache Cassandra without Single Point of Failure](https://github.com/OpenIdentityPlatform/OpenAM/wiki/Migrate-OpenAM-to-Apache-Cassandra-without-Single-Point-of-Failure)
+* [OpenAM Monitoring Using Prometheus](https://github.com/OpenIdentityPlatform/OpenAM/wiki/OpenAM-Monitoring-Using-Prometheus)
+* [Creating a Custom Authentication Module](https://github.com/OpenIdentityPlatform/OpenAM/wiki/Write-a-custom-authentication-module)
+
 
 ## Support and Mailing List Information
 * OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
