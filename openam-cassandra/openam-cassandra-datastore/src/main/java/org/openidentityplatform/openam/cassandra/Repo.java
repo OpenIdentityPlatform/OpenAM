@@ -666,7 +666,6 @@ public class Repo extends IdRepo {
 			return new RepoSearchResults(result.keySet(),(maxResults>0&&result.size()>maxResults)?RepoSearchResults.SIZE_LIMIT_EXCEEDED:RepoSearchResults.SUCCESS,result,type);
 		}catch(Throwable e){
 			logger.error("search {} {} {} {} {} {} {} {} {}: {}",type,pattern,maxTime,maxResults,returnAttrs,returnAllAttrs,filterOp,avPairs,recursive,logger.isDebugEnabled()?e:e.getMessage());
-			e.printStackTrace();
 			throw new IdRepoException(e.getMessage());
 		}
 	}
