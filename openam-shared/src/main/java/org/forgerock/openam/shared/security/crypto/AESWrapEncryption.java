@@ -65,7 +65,7 @@ public class AESWrapEncryption implements AMEncryption, ConfigurableKey {
     private static final byte VERSION = 2; // v1 is JCEEncryption
     private static final int AESWRAP_BLOCK_SIZE = 8;
 
-    private static final int CACHE_SIZE = Integer.getInteger("amCryptoCacheSize", 500);
+    private static final int CACHE_SIZE = Integer.getInteger("amCryptoCacheSize", 1024);
 
     private static final String CIPHER_PROVIDER_ALGORITHM
             = Double.parseDouble(System.getProperty("java.specification.version")) >= 17 ? "AESWrapPad" : "AESWrap";

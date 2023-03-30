@@ -27,7 +27,7 @@ import javax.crypto.Cipher;
  * @since 12.0.0
  */
 public class PerThreadCipherProvider implements CipherProvider {
-    private static final int DEFAULT_MAX_SIZE = 500;
+    private static final int DEFAULT_MAX_SIZE = 1024;
 
     /**
      * Cache of constructed cipher instances indexed by thread id. Ensures that each thread receives its own cipher

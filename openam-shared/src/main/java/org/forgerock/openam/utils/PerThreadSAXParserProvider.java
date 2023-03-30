@@ -28,7 +28,7 @@ import javax.xml.parsers.SAXParser;
  * @since 12.0.0
  */
 class PerThreadSAXParserProvider implements SAXParserProvider {
-    private static final int DEFAULT_CACHE_SIZE = 500;
+    private static final int DEFAULT_CACHE_SIZE = 1024;
 
     private final PerThreadSAXParserCache validatingParserCache;
     private final PerThreadSAXParserCache nonValidatingParserCache;
