@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @since 12.0.0
  */
 class PerThreadDocumentBuilderProvider implements DocumentBuilderProvider {
-    private static final int DEFAULT_CACHE_SIZE = 500;
+    private static final int DEFAULT_CACHE_SIZE = 1024;
 
     private final PerThreadCache<DocumentBuilder, ParserConfigurationException> validatingDBCache;
     private final PerThreadCache<DocumentBuilder, ParserConfigurationException> nonValidatingDBCache;

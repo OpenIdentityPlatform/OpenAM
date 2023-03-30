@@ -50,7 +50,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 public class XPathAPI {
 
    static private final int CACHE_SIZE =
-      SystemPropertiesManager.getAsInt(Constants.XPATHFACTORY_CACHE_SIZE, 500);
+      SystemPropertiesManager.getAsInt(Constants.XPATHFACTORY_CACHE_SIZE, 1024);
 
    static private final PerThreadCache<XPathFactory, RuntimeException> xpathFactoryCache =
       new PerThreadCache<XPathFactory, RuntimeException>(CACHE_SIZE) {

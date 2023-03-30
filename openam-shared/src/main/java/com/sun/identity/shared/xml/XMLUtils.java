@@ -118,7 +118,7 @@ public class XMLUtils {
      * Size of document builder cache.
      */
     private static final int DOCBUILDER_CACHE_SIZE =
-            SystemPropertiesManager.getAsInt(Constants.XML_DOCUMENT_BUILDER_CACHE_SIZE, 500);
+            SystemPropertiesManager.getAsInt(Constants.XML_DOCUMENT_BUILDER_CACHE_SIZE, 1024);
 
     /**
      * Size of the SAXParser cache. Defaults to same size as document builder cache.
@@ -127,7 +127,7 @@ public class XMLUtils {
             SystemPropertiesManager.getAsInt(Constants.XML_SAXPARSER_CACHE_SIZE, DOCBUILDER_CACHE_SIZE);
 
     private static final int TRANSFORMER_FACTORY_CACHE_SIZE =
-            SystemPropertiesManager.getAsInt(Constants.XML_TRANSFORMER_FACTORY_CACHE_SIZE, 500);
+            SystemPropertiesManager.getAsInt(Constants.XML_TRANSFORMER_FACTORY_CACHE_SIZE, 1024);
 
     /**
      * Provider for DocumentBuilder instances. Caches in an LRU cache per thread.
