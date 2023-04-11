@@ -204,8 +204,8 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                 if (internalSession == null) {
                     throw NullResultException.INSTANCE;
                 }
+                getCache().put(key, internalSession);
             }
-            getCache().put(key, internalSession);
             return internalSession;
 
         } catch (Exception e) {
