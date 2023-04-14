@@ -55,10 +55,7 @@ import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -89,6 +86,9 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     
     private Cache<String, Boolean> idRepoExists;
     private Cache<String, Boolean> idRepoActive;
+
+    private Cache<String, Set> idRepoMembers;
+    private Cache<String, Set> idRepoMemberships;
 
     private IdCacheStats cacheStats;
 
@@ -130,6 +130,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         idRepoExists = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
         idRepoActive = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
         idCacheServiceAttributes= CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.service.cache.maxTime", 300), TimeUnit.SECONDS).build();
+        idRepoMembers = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
+        idRepoMemberships = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(SystemProperties.getAsInt("org.openidentityplatform.com.iplanet.am.sdk.cache.maxTime", 10), TimeUnit.SECONDS).build();
     }
 
     private void resetCache(int maxCacheSize) {
@@ -236,6 +238,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         idRepoExists.invalidateAll();
         idRepoActive.invalidateAll();
         idCacheServiceAttributes.invalidateAll();
+        idRepoMembers.invalidateAll();
+        idRepoMemberships.invalidateAll();
         initializeCache();
     }
 
@@ -269,6 +273,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String cachedID = getCacheId(dn);
         idRepoExists.invalidate(cachedID);
         idRepoActive.invalidate(cachedID);
+        idRepoMembers.invalidate(cachedID);
+        idRepoMemberships.invalidate(cachedID);
         switch (eventType) {
         case AMEvent.OBJECT_ADDED:
             cb = getFromCache(dn);
@@ -342,6 +348,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
        	idRepoCache.invalidate(key);
        	idRepoExists.invalidate(key);
         idRepoActive.invalidate(key);
+        idRepoMembers.invalidate(key);
+        idRepoMemberships.invalidate(key);
     }
 
     public Map getAttributes(SSOToken token, IdType type, String name,
@@ -447,7 +455,36 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         }
         return attributes;
     }
-    
+
+    @Override
+    public Set getMembers(SSOToken token, IdType type, String name, String amOrgName, IdType membersType, String amsdkDN) throws IdRepoException, SSOException {
+        final String key=new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId().toLowerCase();
+        Set res = idRepoMembers.getIfPresent(key);
+        if (res == null) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getMembers(): "
+                        + "NO entry found in Cache for key = " + key + ". Getting members from DS: ");
+            }
+            res=super.getMembers(token, type, name, amOrgName, membersType, amsdkDN);;
+            idRepoMembers.put(key, res);
+        }
+        return new HashSet(res);
+    }
+
+    @Override
+    public Set getMemberships(SSOToken token, IdType type, String name, IdType membershipType, String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
+        final String key=new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId().toLowerCase();
+        Set res = idRepoMemberships.getIfPresent(key);
+        if (res == null) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getMemberships(): "
+                        + "NO entry found in Cache for key = " + key + ". Getting members from DS: ");
+            }
+            res = super.getMemberships(token, type, name, membershipType, amOrgName, amsdkDN);
+            idRepoMemberships.put(key, res);
+        }
+        return new HashSet(res);
+    }
 
     final String getCacheKeyForService(IdType type, String name, String serviceName, String amOrgName) {
     	if (IdType.REALM.equals(type)) {
