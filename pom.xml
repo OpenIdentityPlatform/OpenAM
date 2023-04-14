@@ -120,7 +120,7 @@
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.31</freemarker.version>
     <java-ipv6.version>0.17</java-ipv6.version>
-    <json.version>20090211</json.version>
+    <json.version>20230227</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.1.210</h2database.version>
     <activemq.version>[5.15.9,5.17)</activemq.version>
