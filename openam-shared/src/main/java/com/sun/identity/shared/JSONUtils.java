@@ -112,10 +112,8 @@ public class JSONUtils {
         if (!json.has(key)) {
             return 0;
         }
-
-        String str = json.getString(key);
         try {
-            return Long.parseLong(str);
+            return json.getLong(key);
         } catch (NumberFormatException e) {
             return 0;
         }
