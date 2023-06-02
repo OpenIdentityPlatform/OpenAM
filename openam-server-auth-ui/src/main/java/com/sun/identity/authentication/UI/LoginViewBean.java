@@ -380,6 +380,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                         }
                     }
                     if (redirect_url == null) {
+                        java.util.Locale locale =
+                                com.sun.identity.shared.locale.Locale.getLocale(
+                                        AuthUtils.getLocale(ac));
+                        fallbackLocale = locale;
+                        rb =  rbCache.getResBundle(bundleName, locale);
                         ResultVal = rb.getString("authentication.already.login");
                     }
                     LoginSuccess = true;
