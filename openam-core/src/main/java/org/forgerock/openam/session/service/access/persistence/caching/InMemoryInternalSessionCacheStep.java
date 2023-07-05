@@ -33,6 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;
@@ -57,6 +58,7 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * Session cache implemented using a simple in-memory cache data structure.
  */
+@Singleton
 public class InMemoryInternalSessionCacheStep implements InternalSessionStoreStep {
 
     /**
@@ -158,7 +160,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
         next.remove(session);
     }
 
-    private void invalidateCache(final SessionID sessionID) {
+    public void invalidateCache(final SessionID sessionID) {
         InternalSession session = getCache().getIfPresent(sessionID.toString());
         if (session != null) {
             // Remove all references to this session
