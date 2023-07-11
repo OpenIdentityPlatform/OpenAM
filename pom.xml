@@ -122,7 +122,7 @@
     <java-ipv6.version>0.17</java-ipv6.version>
     <json.version>20230227</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
-    <h2database.version>2.1.210</h2database.version>
+    <h2database.version>2.2.220</h2database.version>
     <activemq.version>[5.15.9,5.17)</activemq.version>
     <javax.inject.version>1_2</javax.inject.version>
     <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
