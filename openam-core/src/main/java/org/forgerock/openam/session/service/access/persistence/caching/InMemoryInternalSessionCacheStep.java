@@ -13,7 +13,7 @@
  *
  * Copyright 2016 ForgeRock AS.
  * 
- * Portions Copyrighted 2020 Open Identity Platform Community.
+ * Portions Copyrighted 2023 Open Identity Platform Community.
  */
 
 package org.forgerock.openam.session.service.access.persistence.caching;
@@ -257,7 +257,7 @@ public class InMemoryInternalSessionCacheStep implements InternalSessionStoreSte
                     .concurrencyLevel(16)
                     .maximumWeight(maxCacheSize)
                     .weigher(new SessionIDWeigher())
-                    .expireAfterWrite(Duration.ofMinutes(maxCacheTime))
+                    .expireAfterWrite(Duration.ofSeconds(maxCacheTime))
                     .build();
     }
 
