@@ -60,6 +60,8 @@ public class UpdateTask extends AbstractTask {
     	}
     	if (previous==null) {
     		previous=adapter.read(token.getTokenId(), options);
+    	}else {
+    		previous=new Token(previous);
     	}
     	final Token updated;
         if (previous == null) {
@@ -68,7 +70,7 @@ public class UpdateTask extends AbstractTask {
             updated = adapter.update(previous, token, options);
         }
         if (token.getTokenId()!=null) {
-        	sid2token.put(token.getTokenId(), updated==null?token:updated);
+        	sid2token.put(token.getTokenId(), new Token(updated==null?token:updated));
         }
         handler.processResults(updated);
     }
