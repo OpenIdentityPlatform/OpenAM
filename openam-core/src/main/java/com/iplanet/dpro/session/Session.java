@@ -61,7 +61,6 @@ import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.service.SessionType;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -863,16 +862,11 @@ public class Session implements Blacklistable, AMSession{
      */
     public void addInternalSessionListener() {
         try {
-            if (SessionNotificationHandler.handler == null) {
-                SessionNotificationHandler.handler = new SessionNotificationHandler(SessionCache.getInstance());
-                PLLClient.addNotificationHandler(SESSION_SERVICE,
-                        SessionNotificationHandler.handler);
-            }
             String url = WebtopNaming.getNotificationURL().toString();
             SessionOperations operations = sessionOperationStrategy.getOperation(sessionID);
             operations.addSessionListener(this, url);
         } catch (Exception e) {
-            //todo : something! :-D
+            sessionDebug.warning("error adding internal session listener", e);
         }
     }
 

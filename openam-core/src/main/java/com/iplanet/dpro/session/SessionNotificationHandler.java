@@ -34,6 +34,7 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionNotification;
 import com.iplanet.services.comm.client.NotificationHandler;
+import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
@@ -42,6 +43,8 @@ import org.forgerock.openam.session.SessionEventType;
 import org.forgerock.openam.session.service.SessionAccessManager;
 
 import java.util.Vector;
+
+import static org.forgerock.openam.session.SessionConstants.SESSION_SERVICE;
 
 /**
  * <code>SessionNotificationHandler</code> implements
@@ -62,6 +65,13 @@ public class SessionNotificationHandler implements NotificationHandler {
 
     static {
         sessionDebug = Debug.getInstance("amSession");
+        try {
+            SessionNotificationHandler.handler = new SessionNotificationHandler(SessionCache.getInstance());
+            PLLClient.addNotificationHandler(SESSION_SERVICE,
+                    SessionNotificationHandler.handler);
+        } catch (Exception e) {
+            sessionDebug.error("error setting session notification handler", e);
+        }
     }
 
     /**
