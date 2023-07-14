@@ -951,6 +951,10 @@ public class SAMLUtils  extends SAMLUtilsCommon {
      */
     public static boolean verifyResponse(Response response,
     String requestUrl, HttpServletRequest request) {
+        if(!response.isSigned()) {
+            debug.message("verifyResponse: Response is not signed");
+            return false;
+        }
         if (!response.isSignatureValid()) {
             debug.message("verifyResponse: Response's signature is invalid.");
             return false;
