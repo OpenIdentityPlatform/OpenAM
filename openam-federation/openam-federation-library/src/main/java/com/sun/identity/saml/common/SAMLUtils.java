@@ -1589,13 +1589,13 @@ public class SAMLUtils  extends SAMLUtilsCommon {
         List assertions = null;    
         SAMLServiceManager.SOAPEntry partnerdest = null;
         Subject assertionSubject = null;
-        if (samlResponse.isSigned()) {
-            // verify the signature
-            boolean isSignedandValid = verifySignature(samlResponse);
-            if (!isSignedandValid) {
-                throw new SAMLException(bundle.getString("invalidResponse"));
-            }
+
+        // verify the signature
+        boolean isSignedandValid = verifySignature(samlResponse);
+        if (!isSignedandValid) {
+            throw new SAMLException(bundle.getString("invalidResponse"));
         }
+
         // check Assertion and get back a Map of relevant data including,
         // Subject, SOAPEntry for the partner and the List of Assertions.
         Map ssMap = verifyAssertionAndGetSSMap(samlResponse);
