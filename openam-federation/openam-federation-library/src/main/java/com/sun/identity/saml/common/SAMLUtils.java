@@ -951,6 +951,10 @@ public class SAMLUtils  extends SAMLUtilsCommon {
      */
     public static boolean verifyResponse(Response response,
     String requestUrl, HttpServletRequest request) {
+        if(!response.isSigned()) {
+            debug.message("verifyResponse: Response is not signed");
+            return false;
+        }
         if (!response.isSignatureValid()) {
             debug.message("verifyResponse: Response's signature is invalid.");
             return false;
@@ -1585,13 +1589,13 @@ public class SAMLUtils  extends SAMLUtilsCommon {
         List assertions = null;    
         SAMLServiceManager.SOAPEntry partnerdest = null;
         Subject assertionSubject = null;
-        if (samlResponse.isSigned()) {
-            // verify the signature
-            boolean isSignedandValid = verifySignature(samlResponse);
-            if (!isSignedandValid) {
-                throw new SAMLException(bundle.getString("invalidResponse"));
-            }
+
+        // verify the signature
+        boolean isSignedandValid = verifySignature(samlResponse);
+        if (!isSignedandValid) {
+            throw new SAMLException(bundle.getString("invalidResponse"));
         }
+
         // check Assertion and get back a Map of relevant data including,
         // Subject, SOAPEntry for the partner and the List of Assertions.
         Map ssMap = verifyAssertionAndGetSSMap(samlResponse);
