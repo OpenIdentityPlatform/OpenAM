@@ -5,11 +5,10 @@ MAINTAINER Open Identity Platform Community <open-identity-platform-openam@googl
 ENV CATALINA_HOME=/usr/local/tomcat \
     OPENAM_PATH="openam" \
     OPENAM_USER="openam" \
-    OPENAM_DATA_DIR="/usr/openam/config" \
-    MAX_MEMORY="2g"   
+    OPENAM_DATA_DIR="/usr/openam/config" 
 ENV PATH=$CATALINA_HOME/bin:$PATH \
  	JAVA_OPTS="--add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED --add-exports java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED" \
-    CATALINA_OPTS="-server -XX:+UseG1GC -Xmx$MAX_MEMORY -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
+    CATALINA_OPTS="-server -XX:+UseG1GC -XX:+UseContainerSupport -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
 WORKDIR $CATALINA_HOME
 
