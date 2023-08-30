@@ -44,6 +44,13 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven3-plugin</artifactId>
+                <dependencies>
+					<dependency>
+					    <groupId>org.codehaus.plexus</groupId>
+					    <artifactId>plexus-utils</artifactId>
+					    <version>3.5.1</version>
+					</dependency>
+				</dependencies>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
