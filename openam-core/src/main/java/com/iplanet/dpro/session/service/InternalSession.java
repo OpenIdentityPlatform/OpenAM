@@ -87,11 +87,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 		return String.format("%s sid=%s" , super.toString(),sessionID,this.getID());
 	}
 
-	/**
-     * Expiry time which is long enough to make sessions functionally non expiring.
-     */
-    public static final long NON_EXPIRING_SESSION_LENGTH_MINUTES = 42 * TimeUnit.DAYS.toMinutes(365);
-
     /*
      * Session property names
      */

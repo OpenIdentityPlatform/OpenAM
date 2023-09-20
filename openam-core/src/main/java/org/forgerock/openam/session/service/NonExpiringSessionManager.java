@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.session.service;
 
-import static com.iplanet.dpro.session.service.InternalSession.NON_EXPIRING_SESSION_LENGTH_MINUTES;
+import static org.forgerock.openam.session.SessionConstants.NON_EXPIRING_SESSION_LENGTH_MINUTES;
 
 import java.util.HashSet;
 import java.util.Set;

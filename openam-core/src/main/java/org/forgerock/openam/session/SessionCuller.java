@@ -119,7 +119,7 @@ public class SessionCuller extends GeneralTaskRunnable {
      * Returns true if the provided time is less than Long.MAX_VALUE seconds.
      */
     boolean willExpire(long minutes) {
-        return minutes < InternalSession.NON_EXPIRING_SESSION_LENGTH_MINUTES;
+        return minutes < SessionConstants.NON_EXPIRING_SESSION_LENGTH_MINUTES;
     }
 
     /**

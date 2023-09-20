@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.NonExpiringSessionManager;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.mockito.Mock;
@@ -75,7 +76,7 @@ public class NonExpiringSessionManagerTest {
     @Test
     public void shouldSetUpSessionCorrectly() {
         nonExpiringSessionManager.addNonExpiringSession(mockInternalSession);
-        verify(mockInternalSession).setMaxSessionTime(InternalSession.NON_EXPIRING_SESSION_LENGTH_MINUTES);
+        verify(mockInternalSession).setMaxSessionTime(SessionConstants.NON_EXPIRING_SESSION_LENGTH_MINUTES);
         verify(mockInternalSession).setMaxIdleTime(5*10);
         verify(mockInternalSession).setLatestAccessTime();
     }
