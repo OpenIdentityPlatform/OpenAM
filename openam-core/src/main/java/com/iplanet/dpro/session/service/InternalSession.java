@@ -25,6 +25,7 @@
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 

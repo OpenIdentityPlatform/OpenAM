@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
  */
 
 package org.forgerock.openam.session;
@@ -26,7 +27,6 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.session.util.RestrictedTokenAction;
