@@ -25,6 +25,7 @@
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 
@@ -86,11 +87,6 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 	public String toString() {
 		return String.format("%s sid=%s" , super.toString(),sessionID,this.getID());
 	}
-
-	/**
-     * Expiry time which is long enough to make sessions functionally non expiring.
-     */
-    public static final long NON_EXPIRING_SESSION_LENGTH_MINUTES = 42 * TimeUnit.DAYS.toMinutes(365);
 
     /*
      * Session property names

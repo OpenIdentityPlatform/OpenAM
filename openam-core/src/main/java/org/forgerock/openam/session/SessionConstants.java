@@ -23,11 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
 */
 package org.forgerock.openam.session;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
+
+import java.util.concurrent.TimeUnit;
 
 public class SessionConstants {
 
@@ -109,4 +112,9 @@ public class SessionConstants {
     public static final int DEFAULT_POOL_SIZE = 5;
 
     public static final int DEFAULT_THRESHOLD = 10000;
+
+    /**
+     * Expiry time which is long enough to make sessions functionally non expiring.
+     */
+    public static final long NON_EXPIRING_SESSION_LENGTH_MINUTES = 42 * TimeUnit.DAYS.toMinutes(365);
 }
