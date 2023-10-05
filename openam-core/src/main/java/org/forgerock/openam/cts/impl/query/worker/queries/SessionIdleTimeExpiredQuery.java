@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC.
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
@@ -33,6 +34,7 @@ import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.util.Reject;
 import org.forgerock.util.query.QueryFilter;
 
@@ -45,7 +47,7 @@ import com.iplanet.dpro.session.service.SessionState;
  */
 public class SessionIdleTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
 
-    private final QueryFactory<C, CoreTokenField> queryFactory;
+    private final QueryFactory<C, Filter> queryFactory;
     private final int pageSize;
 
     @Inject
