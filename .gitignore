@@ -11,4 +11,5 @@ openam-ui/openam-ui-ria/npm-debug.log.*
 test-output
 .DS_Store
 bin/
+obj/
 *.versionsBackup
