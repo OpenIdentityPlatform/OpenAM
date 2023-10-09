@@ -64,19 +64,20 @@ public class Server implements Runnable, Closeable {
 	        if (!Files.exists(Paths.get("target"+File.separator+"embedded_keystore"))) {
 	        	Files.copy(this.getClass().getResourceAsStream("/embedded_keystore"),Paths.get("target"+File.separator+"embedded_keystore"),StandardCopyOption.REPLACE_EXISTING);
 	        }
-	        
+	        Files.copy(this.getClass().getResourceAsStream("/cassandra.yaml"),Paths.get("target"+File.separator+"cassandra.yaml"),StandardCopyOption.REPLACE_EXISTING);
+	        System.setProperty("cassandra.config",""+Paths.get("target"+File.separator+"cassandra.yaml").toUri());
 	        //start
-	        final CountDownLatch startupLatch = new CountDownLatch(1) ;
-	        executor.execute( new Runnable(){
-	            @Override
-	            public void run() {
-	                cassandraDaemon = new CassandraDaemon();
+//	        final CountDownLatch startupLatch = new CountDownLatch(1) ;
+//	        executor.execute( new Runnable(){
+//	            @Override
+//	            public void run() {
+	                cassandraDaemon = new CassandraDaemon(true);
 	                cassandraDaemon.activate();
-	                startupLatch.countDown();
-	            }});
-	        if (!startupLatch.await(5, TimeUnit.MINUTES)) {
-                throw new AssertionError("Cassandra daemon did not start within timeout");
-            }
+//	                startupLatch.countDown();
+//	            }});
+//	        if (!startupLatch.await(5, TimeUnit.MINUTES)) {
+//                throw new AssertionError("Cassandra daemon did not start within timeout");
+//            }
 	        System.setProperty("datastax-java-driver.basic.contact-points.0",DatabaseDescriptor.getRpcAddress().getHostAddress()+":"+DatabaseDescriptor.getNativeTransportPort());
 	        System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", DatabaseDescriptor.getLocalDataCenter());
 
