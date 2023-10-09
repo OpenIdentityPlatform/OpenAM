@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.fail;
@@ -44,7 +44,7 @@ public class PrivilegeValidatorTest {
     @Test
     public void shouldErrorIfRealmWasNotValid() throws EntitlementException {
         doThrow(new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER))
-                .when(mockValidator).validateRealms(anyListOf(String.class));
+                .when(mockValidator).validateRealms(anyCollection());
         try {
             validator.validateReferralPrivilege(createReferral("Badger"));
             fail();
