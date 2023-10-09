@@ -140,7 +140,7 @@ public class TokenOwnerAuthzModule implements CrestAuthorizationModule {
         String tokenId =  request.getResourcePath(); // infer from the token from resource path
         if (StringUtils.isEmpty(tokenId)) {
             //if there's no tokenId then is it supplied as additional parameter
-            tokenId = request.getAdditionalParameter(tokenIdParameter);
+            tokenId = SessionResourceUtil.getTokenID(context, request);
         }
 
         final String queryUsername = ssoTokenManager.createSSOToken(tokenId).getProperty(Constants.UNIVERSAL_IDENTIFIER);
