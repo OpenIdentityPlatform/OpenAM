@@ -502,6 +502,10 @@ public class CookieUtils {
                 domains.add(domain);
             }
         }
+    	
+        if (domains.isEmpty()) {
+        	domains.add(host);
+    	}
         return domains;
     }
 }
