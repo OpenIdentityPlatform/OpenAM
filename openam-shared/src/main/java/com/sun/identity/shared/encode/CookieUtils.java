@@ -497,11 +497,16 @@ public class CookieUtils {
         String host = request.getServerName();
         Set<String> domains = new HashSet<>();
 
-        for (String domain : processedCookieDomains) {
-        	if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
-                domains.add(domain);
-            }
-        }
+        if (processedCookieDomains.isEmpty()) {
+        	domains.add(host);
+    	}else {
+	        for (String domain : processedCookieDomains) {
+	        	if (domain != null && StringUtils.endsWithIgnoreCase(host, domain)) {
+	                domains.add(domain);
+	            }
+	        }
+    	}
+        
         return domains;
     }
 }
