@@ -22,8 +22,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.forgerock.http.header.CookieHeader;
+import org.forgerock.http.protocol.Cookie;
 
 import com.google.inject.Inject;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
@@ -34,9 +37,12 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.Context;
 
 /**
  * A Util class with common functions used by SessionResource, SessionResourceV2 and ActionHandlers
@@ -214,4 +220,71 @@ public class SessionResourceUtil {
     public JsonValue invalidSession() {
         return json(object(field(VALID, false)));
     }
+
+    /**
+     * Returns the token ID of the session or as a parameter. The token ID may come from a header, a cookie or a URL parameter.
+     *
+     * @param context The request context.
+     * @param request The request.
+     * @return The token ID of the session or as a parameter. Null is returned if there is no token ID.
+     */
+    public static String getTokenID(Context context, Request request) {
+        String cookieName = null;
+        String tokenId = getTokenIdFromUrlParam(request);
+        if (tokenId == null) {
+            cookieName = SystemProperties.get("com.iplanet.am.cookie.name", "iPlanetDirectoryPro");
+            tokenId = getTokenIdFromHeader(context, cookieName);
+        }
+        if (tokenId == null)
+            tokenId = getTokenIdFromCookie(context, cookieName);
+        return tokenId;
+    }
+
+    /**
+     * Returns the token ID of the session, from a given header.
+     *
+     * @param context The request context.
+     * @param cookieName The name of the header to extract the token from.
+     * @return The token ID of the session. Null is returned if there is no token ID.
+     */
+    public static String getTokenIdFromHeader(Context context, String cookieName) {
+        if (context != null && context.containsContext(HttpContext.class)) {
+            List<String> header = ((HttpContext)context.asContext(HttpContext.class)).getHeader(cookieName.toLowerCase());
+            if (!header.isEmpty())
+                return header.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the token ID of the session, from a cookie.
+     *
+     * @param context The request context.
+     * @param cookieName The name of the cookie to extract the token from.
+     * @return The token ID of the session. Null is returned if there is no token ID.
+     */
+    public static String getTokenIdFromCookie(Context context, String cookieName) {
+        if (context != null && context.containsContext(HttpContext.class)) {
+            List<String> headers = ((HttpContext)context.asContext(HttpContext.class)).getHeader("cookie");
+            for (String header : headers) {
+                for (Cookie cookie : CookieHeader.valueOf(header).getCookies()) {
+                    if (cookie.getName().equalsIgnoreCase(cookieName)) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the token ID from the "tokenId" query parameter.
+     *
+     * @param context The request context.
+     * @return The token ID from the "tokenId" query parameter. Null is returned if there is no token ID.
+     */
+    private static String getTokenIdFromUrlParam(Request request) {
+        return request.getAdditionalParameter("tokenId");
+    }
+
 }
