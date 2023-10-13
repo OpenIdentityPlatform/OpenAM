@@ -92,9 +92,11 @@ public class SessionConstraint {
     static SessionQueryManager sqm=null;
    
     static QuotaExhaustionAction getQuotaExhaustionAction() {
-    		if (quotaExhaustionAction != null) 
-            return quotaExhaustionAction;
         String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
+        if (quotaExhaustionAction != null
+               && quotaExhaustionAction.getClass().getName().equals(clazzName)) 
+            return quotaExhaustionAction;
+
         try {
             quotaExhaustionAction = Class.forName(clazzName).asSubclass(QuotaExhaustionAction.class).newInstance();
         } catch (Exception ex) {
