@@ -458,7 +458,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     @Override
     public Set getMembers(SSOToken token, IdType type, String name, String amOrgName, IdType membersType, String amsdkDN) throws IdRepoException, SSOException {
-        final String key=new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId().toLowerCase();
+        final String key=(new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId() + "_" + membersType.getName()).toLowerCase();
         Set res = idRepoMembers.getIfPresent(key);
         if (res == null) {
             if (DEBUG.messageEnabled()) {
@@ -468,12 +468,18 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
             res=super.getMembers(token, type, name, amOrgName, membersType, amsdkDN);;
             idRepoMembers.put(key, res);
         }
+        else {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getMembers(): "
+                        + "Cache hit for key = " + key + ".");
+            }
+        }
         return new HashSet(res);
     }
 
     @Override
     public Set getMemberships(SSOToken token, IdType type, String name, IdType membershipType, String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
-        final String key=new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId().toLowerCase();
+        final String key=(new AMIdentity(token, name, type, amOrgName, amsdkDN).getUniversalId() + "_" + membershipType.getName()).toLowerCase();
         Set res = idRepoMemberships.getIfPresent(key);
         if (res == null) {
             if (DEBUG.messageEnabled()) {
@@ -482,6 +488,12 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
             }
             res = super.getMemberships(token, type, name, membershipType, amOrgName, amsdkDN);
             idRepoMemberships.put(key, res);
+        }
+        else {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getMemberships(): "
+                        + "Cache hit for key = " + key + ".");
+            }
         }
         return new HashSet(res);
     }
