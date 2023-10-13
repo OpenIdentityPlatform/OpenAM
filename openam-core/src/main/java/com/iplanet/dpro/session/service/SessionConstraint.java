@@ -92,9 +92,11 @@ public class SessionConstraint {
     static SessionQueryManager sqm=null;
    
     static QuotaExhaustionAction getQuotaExhaustionAction() {
-    		if (quotaExhaustionAction != null) 
-            return quotaExhaustionAction;
         String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
+        if (quotaExhaustionAction != null
+               && quotaExhaustionAction.getClass().getName().equals(clazzName)) 
+            return quotaExhaustionAction;
+
         try {
             quotaExhaustionAction = Class.forName(clazzName).asSubclass(QuotaExhaustionAction.class).newInstance();
         } catch (Exception ex) {
@@ -144,8 +146,11 @@ public class SessionConstraint {
          // Step 3: checking the constraints
             if (sessions != null && SystemProperties.getAsBoolean("org.openidentityplatform.openam.cts.quota.exhaustion.enabled", true)) {
             		sessions.remove(internalSession.getSessionID().toString());
-	    	        while (sessions.size() >= quota) 
+	    	        while (sessions.size() >= quota) {
 	    	            reject = getQuotaExhaustionAction().action(internalSession, sessions);
+	    	            if (reject)
+	    	                break;
+	    	        }
             }
         } catch (Exception e) {
             if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
