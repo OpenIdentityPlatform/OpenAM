@@ -378,7 +378,8 @@ public class AMKeyProvider implements KeyProvider {
         else
         {
         	privateKey = getPrivateKey(certAlias);
-        	mapKey.putIfAbsent(certAlias, privateKey);
+		if (privateKey != null)
+        		mapKey.putIfAbsent(certAlias, privateKey);
         }
 
         if (publicKey != null && privateKey != null) {
