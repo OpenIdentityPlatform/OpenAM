@@ -120,7 +120,6 @@
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
     <freemarker.version>2.3.31</freemarker.version>
     <java-ipv6.version>0.17</java-ipv6.version>
-    <json.version>20230227</json.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
     <activemq.version>[5.15.9,5.17)</activemq.version>
@@ -1637,12 +1636,6 @@
         <groupId>com.googlecode.java-ipv6</groupId>
         <artifactId>java-ipv6</artifactId>
         <version>${java-ipv6.version}</version>
-      </dependency>
-      <!-- Native Json Manipulation -->
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>${json.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>
