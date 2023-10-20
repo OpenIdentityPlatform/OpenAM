@@ -106,10 +106,12 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                 throw new ExpiredTokenException();
             }
         } finally {
-            try {
-                tokenStore.deleteDeviceCode(clientId, code, request);
-            } catch (OAuth2Exception e) {
-                logger.warn("Could not delete issued/expired device code", e);
+            if(deviceCode.isAuthorized() || deviceCode.getExpiryTime() < currentTimeMillis()) {
+                try {
+                    tokenStore.deleteDeviceCode(clientId, code, request);
+                } catch (OAuth2Exception e) {
+                    logger.warn("Could not delete issued/expired device code", e);
+                }
             }
         }
 
