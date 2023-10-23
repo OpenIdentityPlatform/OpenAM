@@ -46,6 +46,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -362,17 +364,30 @@ public class AMCRLStore extends AMCertStore {
      *
      * @param dpExt
      */
-    private synchronized X509CRL
+    @SuppressWarnings("unchecked")
+	private synchronized X509CRL
     getUpdateCRLFromCrlDP(CRLDistributionPointsExtension dpExt) {
         // Get CRL Distribution points
         if (dpExt == null) {
             return null;
         }
 
-        List dps = null;
+        List<DistributionPoint> dps = null;
         try {
-            dps = (List) dpExt.get(CRLDistributionPointsExtension.POINTS);
-        } catch (IOException ioex) {
+        	try { //jdk21
+        		Method m=dpExt.getClass().getDeclaredMethod("getDistributionPoints");
+        		dps = (List<DistributionPoint>)m.invoke(dpExt);
+        	}
+        	catch (NoSuchMethodException|InvocationTargetException e) {
+        		try {
+	        		Method m=dpExt.getClass().getDeclaredMethod("get",String.class);
+	        		dps = (List<DistributionPoint>)m.invoke(dpExt,"points");
+        		}
+	        	catch (NoSuchMethodException|InvocationTargetException e2) {
+	        		throw new RuntimeException(e2);
+	        	}
+			}
+        } catch (Throwable ioex) {
             if (debug.warningEnabled()) {
                 debug.warning("AMCRLStore.getUpdateCRLFromCrlDP: ", ioex);
             }

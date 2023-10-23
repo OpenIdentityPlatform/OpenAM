@@ -31,6 +31,8 @@ package com.sun.identity.authentication.modules.cert;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -68,6 +70,7 @@ import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.CertificateExtensions;
+import sun.security.x509.DistributionPoint;
 import sun.security.x509.GeneralName;
 import sun.security.x509.GeneralNameInterface;
 import sun.security.x509.GeneralNames;
@@ -564,16 +567,53 @@ public class Cert extends AMLoginModule {
                 new X509CertImpl(cert.getEncoded());
             X509CertInfo cinfo = 
                 new X509CertInfo(certImpl.getTBSCertificate());
-            CertificateExtensions exts = (CertificateExtensions) 
-                            cinfo.get(X509CertInfo.EXTENSIONS);
-            SubjectAlternativeNameExtension altNameExt = 
-                (SubjectAlternativeNameExtension)
-                    exts.get(SubjectAlternativeNameExtension.NAME);
-
+            CertificateExtensions exts=null;
+            //exts = (CertificateExtensions)cinfo.get(X509CertInfo.EXTENSIONS);
+            try {//jdk21
+        		Method m=cinfo.getClass().getDeclaredMethod("getExtensions");
+        		exts = (CertificateExtensions)m.invoke(cinfo);
+        	}
+        	catch (NoSuchMethodException|InvocationTargetException e) {
+        		try {
+	        		Method m=cinfo.getClass().getDeclaredMethod("get",String.class);
+	        		exts = (CertificateExtensions)m.invoke(cinfo,X509CertInfo.EXTENSIONS);
+        		}
+	        	catch (NoSuchMethodException|InvocationTargetException e2) {
+	        		throw new RuntimeException(e2);
+	        	}
+			}
+            
+            SubjectAlternativeNameExtension altNameExt=null;
+            //altNameExt = (SubjectAlternativeNameExtension)exts.get(SubjectAlternativeNameExtension.NAME);
+            try {//jdk21
+        		Method m=exts.getClass().getDeclaredMethod("getExtension",String.class);
+        		altNameExt = (SubjectAlternativeNameExtension)m.invoke(exts,SubjectAlternativeNameExtension.NAME);
+        	}
+        	catch (NoSuchMethodException|InvocationTargetException e) {
+        		try {//jdk21
+	        		Method m=exts.getClass().getDeclaredMethod("get",String.class);
+	        		altNameExt = (SubjectAlternativeNameExtension)m.invoke(exts,SubjectAlternativeNameExtension.NAME);
+        		}
+	        	catch (NoSuchMethodException|InvocationTargetException e2) {
+	        		throw new RuntimeException(e2);
+	        	}
+			}
             if (altNameExt != null) {
-                GeneralNames names = (GeneralNames) altNameExt.get
-                    (SubjectAlternativeNameExtension.SUBJECT_NAME);
-        
+                GeneralNames names=null;
+                //names = (GeneralNames) altNameExt.get(SubjectAlternativeNameExtension.SUBJECT_NAME);
+                try {
+            		Method m=altNameExt.getClass().getDeclaredMethod("getNames");
+            		names = (GeneralNames)m.invoke(altNameExt);
+            	}
+            	catch (NoSuchMethodException|InvocationTargetException e) {
+            		try {
+    	        		Method m=altNameExt.getClass().getDeclaredMethod("get",String.class);
+    	        		names = (GeneralNames)m.invoke(altNameExt,"SubjectAlternativeName");
+            		}
+    	        	catch (NoSuchMethodException|InvocationTargetException e2) {
+    	        		throw new RuntimeException(e2);
+    	        	}
+    			}
                 GeneralName generalname = null;  
                 Iterator itr = (Iterator) names.iterator();
                 while ((userTokenId == null) && itr.hasNext()) {

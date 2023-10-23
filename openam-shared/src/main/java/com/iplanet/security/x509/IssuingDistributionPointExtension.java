@@ -29,9 +29,6 @@
 package com.iplanet.security.x509;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import java.util.*;
 
 
@@ -39,7 +36,6 @@ import sun.security.util.BitArray;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
 import sun.security.x509.AVA;
 import sun.security.x509.Extension;
 import sun.security.x509.GeneralNames;
@@ -162,7 +158,7 @@ public class IssuingDistributionPointExtension extends Extension {
 
     
     // cached hashCode value
-    private volatile int hashCode;
+    //private volatile int hashCode;
 
 
     /**
@@ -432,15 +428,19 @@ public class IssuingDistributionPointExtension extends Extension {
      * @param out the DerOutputStream to write the extension to.
      * @exception IOException on encoding errors.
      */
-    public void encode(OutputStream out) throws IOException {
-        DerOutputStream tmp = new DerOutputStream();
-        if (this.extensionValue == null) {
-            this.extensionId = PKIXExtensions.IssuingDistributionPoint_Id;
-            this.critical = true;
-            encodeThis();
-        }
-        super.encode(tmp);
-        out.write(tmp.toByteArray());
+    public void encode(DerOutputStream out)  {
+    	try {
+	        DerOutputStream tmp = new DerOutputStream();
+	        if (this.extensionValue == null) {
+	            this.extensionId = PKIXExtensions.IssuingDistributionPoint_Id;
+	            this.critical = true;
+	          	encodeThis();
+	        }
+	        super.encode(tmp);
+	        out.write(tmp.toByteArray());
+    	 }catch(IOException e) {
+         	throw new RuntimeException(e);
+         }
     }
 
      // Encode this extension value
@@ -571,7 +571,7 @@ public class IssuingDistributionPointExtension extends Extension {
     private static void encodeRDN(RDN rdn, DerOutputStream derOut)
         throws IOException {
 
-        List avas = rdn.avas();
+        List<AVA> avas = rdn.avas();
         AVA[] avaArray = (AVA[])avas.toArray(new AVA[avas.size()]);
         derOut.putOrderedSetOf(DerValue.tag_Set, avaArray);
     }
