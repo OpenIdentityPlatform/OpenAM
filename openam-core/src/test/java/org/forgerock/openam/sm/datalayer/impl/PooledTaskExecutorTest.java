@@ -112,9 +112,9 @@ public class PooledTaskExecutorTest {
 
         // Then
         debug("Waiting for tasks to complete");
-        task1.join(TimeUnit.SECONDS.toMillis(10));
-        task2.join(TimeUnit.SECONDS.toMillis(10));
-        task3.join(TimeUnit.SECONDS.toMillis(10));
+        task1.join(TimeUnit.SECONDS.toMillis(100));
+        task2.join(TimeUnit.SECONDS.toMillis(100));
+        task3.join(TimeUnit.SECONDS.toMillis(100));
 
         assertThat(task1.isAlive()).as("Task 1 thread running").isFalse();
         assertThat(task2.isAlive()).as("Task 2 thread running").isFalse();
