@@ -43,13 +43,14 @@ public class SessionAccessManager {
     private final SessionCache sessionCache;
     private final InternalSessionStore internalSessionStore;
     private final NonExpiringSessionManager nonExpiringSessionManager;
-
+    private final ScheduledExecutorService scheduledExecutorService;
+    
     @VisibleForTesting
     @Inject
     SessionAccessManager(final SessionCache sessionCache, final AMExecutorServiceFactory esf,
             final ThreadMonitor threadMonitor, final InternalSessionStore internalSessionStore) {
         this.sessionCache = sessionCache;
-        ScheduledExecutorService scheduledExecutorService = esf.createScheduledService(1, "NonExpiringSessionManager");
+        this.scheduledExecutorService = esf.createScheduledService(1, "NonExpiringSessionManager");
         this.nonExpiringSessionManager = new NonExpiringSessionManager(this, scheduledExecutorService, threadMonitor);
         this.internalSessionStore = internalSessionStore;
     }
