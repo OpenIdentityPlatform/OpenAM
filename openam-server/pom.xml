@@ -44,7 +44,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven3-plugin</artifactId>
-                <version>1.10.9</version>
+                <version>1.10.10</version>
                 <dependencies>
 					<dependency>
 					    <groupId>org.codehaus.plexus</groupId>
@@ -99,7 +99,7 @@
 							<com.sun.identity.configuration.directory>${basedir}/target/config</com.sun.identity.configuration.directory>
 							<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
 							<ssoadm.disabled>false</ssoadm.disabled>
-<!--							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>-->
+							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
 							<com.iplanet.services.debug.directory />
 							<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
  							<XUI.enable>false</XUI.enable>
