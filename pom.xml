@@ -369,27 +369,27 @@
 			        </execution>
 			      </executions>
 			    </plugin>
-			    <plugin>
-			      <groupId>org.sonatype.plugins</groupId>
-			      <artifactId>nexus-staging-maven-plugin</artifactId>
-			      <version>1.6.13</version>
-			      <extensions>true</extensions>
-			      <configuration>
-			        <serverId>ossrh</serverId>
-			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
-			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
-			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
-			      </configuration>
-			      <dependencies>
-			      	<dependency>
-				        <groupId>com.google.guava</groupId>
-				        <artifactId>guava</artifactId>
-				        <version>15.0</version>
-				     </dependency>
-			      </dependencies>
-			    </plugin>
+<!--			    <plugin>-->
+<!--			      <groupId>org.sonatype.plugins</groupId>-->
+<!--			      <artifactId>nexus-staging-maven-plugin</artifactId>-->
+<!--			      <version>1.6.13</version>-->
+<!--			      <extensions>true</extensions>-->
+<!--			      <configuration>-->
+<!--			        <serverId>ossrh</serverId>-->
+<!--			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+<!--			        <autoReleaseAfterClose>false</autoReleaseAfterClose>-->
+<!--			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>-->
+<!--			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>-->
+<!--			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>-->
+<!--			      </configuration>-->
+<!--			      <dependencies>-->
+<!--			      	<dependency>-->
+<!--				        <groupId>com.google.guava</groupId>-->
+<!--				        <artifactId>guava</artifactId>-->
+<!--				        <version>15.0</version>-->
+<!--				     </dependency>-->
+<!--			      </dependencies>-->
+<!--			    </plugin>-->
             </plugins>
         </build>
     </profile>
