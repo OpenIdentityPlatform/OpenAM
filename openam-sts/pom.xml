@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.7.5-SNAPSHOT</version>
+        <version>14.8.1</version>
     </parent>
     <artifactId>openam-sts</artifactId>
     <packaging>pom</packaging>
