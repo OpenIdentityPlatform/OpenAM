@@ -18,7 +18,7 @@
     <parent>
         <artifactId>openam-federation</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>14.8.1</version>
+        <version>14.8.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
