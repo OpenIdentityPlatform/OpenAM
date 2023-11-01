@@ -25,6 +25,7 @@
  * $Id: IdCachedServicesImpl.java,v 1.21 2009/08/25 06:50:53 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.idm.server;
 
@@ -58,6 +59,7 @@ import com.sun.identity.sm.ServiceManager;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -273,8 +275,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String cachedID = getCacheId(dn);
         idRepoExists.invalidate(cachedID);
         idRepoActive.invalidate(cachedID);
-        idRepoMembers.invalidate(cachedID);
-        idRepoMemberships.invalidate(cachedID);
+        invalidateMembersAndMemberships(cachedID);
         switch (eventType) {
         case AMEvent.OBJECT_ADDED:
             cb = getFromCache(dn);
@@ -348,8 +349,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
        	idRepoCache.invalidate(key);
        	idRepoExists.invalidate(key);
         idRepoActive.invalidate(key);
-        idRepoMembers.invalidate(key);
-        idRepoMemberships.invalidate(key);
+        invalidateMembersAndMemberships(key);
+
+    }
+
+    private void invalidateMembersAndMemberships(String key) {
+        List<IdType> types = Arrays.asList(IdType.USER, IdType.ROLE, IdType.GROUP,
+                IdType.AGENT, IdType.FILTEREDROLE, IdType.REALM, IdType.AGENTONLY, IdType.AGENTGROUP);
+        List<String> keys = types.stream().map(t -> String.format("%s_%s", key, t.getName())).collect(Collectors.toList());
+        idRepoMembers.invalidateAll(keys);
+        idRepoMemberships.invalidateAll(keys);
     }
 
     public Map getAttributes(SSOToken token, IdType type, String name,
