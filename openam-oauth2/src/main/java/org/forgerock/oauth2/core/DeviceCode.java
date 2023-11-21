@@ -22,9 +22,12 @@ import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.DateUtils;
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -324,6 +327,10 @@ public class DeviceCode extends JsonValue implements Token {
     }
 
     public void setAuthorized(boolean authorized) {
+        Date authInstantDate = newDate();
+        String authInstant = DateUtils.toUTCDateFormat(authInstantDate);
+        setStringProperty(ISAuthConstants.AUTH_INSTANT, authInstant);
+        
         setStringProperty("AUTHORIZED", Boolean.toString(authorized));
     }
 
