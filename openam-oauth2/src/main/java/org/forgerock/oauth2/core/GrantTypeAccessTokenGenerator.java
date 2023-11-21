@@ -52,6 +52,7 @@ public class GrantTypeAccessTokenGenerator {
         //retrieve end user's original authenticated time from session
         long authTime = 0;
         AuthorizationCode authCode = request.getToken(AuthorizationCode.class);
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
         if (authCode != null) {
             String sessionId = authCode.getSessionId();
             if (StringUtils.isNotBlank(sessionId)) {
@@ -63,7 +64,14 @@ public class GrantTypeAccessTokenGenerator {
                     logger.error("Error retrieving session from AuthorizationCode", e);
                 }
             }
+        } else if (deviceCode != null) {
+            try {
+                authTime = stringToDate(deviceCode.getStringProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
+            } catch (ParseException e) {
+                logger.error("Error retrieving session from DeviceCode", e);
+            }
         }
+
         RefreshToken refreshToken = null;
         if (providerSettings.issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(grantType, clientId,
