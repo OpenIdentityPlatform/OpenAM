@@ -25,6 +25,8 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
+
+import java.util.HashSet;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
@@ -42,17 +44,19 @@ public class DestroyOldestAction extends QuotaExhaustionActionImpl {
     public boolean action(InternalSession is, Map<String, Long> sessions) {
         long smallestExpTime = Long.MAX_VALUE;
         String oldestSessionID = null;
-        for (Map.Entry<String, Long> entry : sessions.entrySet()) 
-        	if (!StringUtils.equals(is.getSessionID().toString(), entry.getKey())){
+        for (String sid : new HashSet<String>(sessions.keySet())) 
+        	if (!StringUtils.equals(is.getSessionID().toString(), sid)){
 	            try {
-	                Session session = new Session(new SessionID(entry.getKey()));
+	                Session session = new Session(new SessionID(sid));
 	                session.refresh(false);
 	                long expTime = session.getTimeLeft();
 	                if (expTime <= smallestExpTime) {
 	                    smallestExpTime = expTime;
-	                    oldestSessionID = entry.getKey();
+	                    oldestSessionID = sid;
 	                }
-	            } catch (SessionException ssoe) {}
+	            } catch (SessionException ssoe) {
+	            	sessions.remove(sid); //session invalid
+	            }
 	        }
         if (oldestSessionID != null) { 
         	destroy(oldestSessionID,sessions);
