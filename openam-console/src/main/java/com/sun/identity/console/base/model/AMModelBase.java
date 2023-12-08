@@ -98,9 +98,6 @@ public class AMModelBase
     public static Debug debug = Debug.getInstance(
         AMAdminConstants.CONSOLE_DEBUG_FILENAME);
 
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
-
     private static String LOG_PROVIDER = "Console";
 
     protected String locationDN = null;
@@ -515,8 +512,9 @@ public class AMModelBase
     protected Map getConsoleAttributes() {
         if (consoleAttributes == null) {
             try {
+            	final SSOToken adminSSOToken=AMAdminUtils.getSuperAdminSSOToken();
                 AMIdentityRepository repo = new AMIdentityRepository(
-                    adminSSOToken, getStartDN());
+                		adminSSOToken, getStartDN());
                 AMIdentity realmIdentity = repo.getRealmIdentity();
                 Set servicesFromIdRepo = realmIdentity.getAssignedServices();
                 if (servicesFromIdRepo.contains(ADMIN_CONSOLE_SERVICE)) {
@@ -525,7 +523,7 @@ public class AMModelBase
                 } else {
                     OrganizationConfigManager orgCfgMgr =
                         new OrganizationConfigManager(
-                            adminSSOToken, getStartDN());
+                        		adminSSOToken, getStartDN());
                     consoleAttributes = orgCfgMgr.getServiceAttributes(
                         ADMIN_CONSOLE_SERVICE);
                 }
