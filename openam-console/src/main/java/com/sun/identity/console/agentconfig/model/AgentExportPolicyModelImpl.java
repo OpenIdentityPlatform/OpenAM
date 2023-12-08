@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public class AgentExportPolicyModelImpl extends AMModelBase implements AgentExportPolicyModel {
 
-    // private static SSOToken adminSSOToken = AMAdminUtils.getSuperAdminSSOToken();
     public AgentExportPolicyModelImpl(HttpServletRequest req, Map map) {
         super(req, map);
     }

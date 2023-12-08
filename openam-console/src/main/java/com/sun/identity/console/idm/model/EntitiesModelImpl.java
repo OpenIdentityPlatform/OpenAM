@@ -96,8 +96,7 @@ public class EntitiesModelImpl
     private static boolean isWSSEnabled = false;
 
     private boolean endUser = false;
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
+
     private static RequiredValueValidator reqValidator =
         new RequiredValueValidator();
     private Map requiredAttributeNames = new HashMap();
@@ -821,6 +820,8 @@ public class EntitiesModelImpl
         boolean can = false;
 
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             AMIdentityRepository repo = new AMIdentityRepository(
                 adminSSOToken, realmName);
             Set allowedOperations = repo.getAllowedIdOperations(
@@ -1642,6 +1643,8 @@ public class EntitiesModelImpl
     public String getPropertiesViewBean(String name) {
         String url = null;
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             ServiceSchemaManager mgr = new ServiceSchemaManager(
                 name, adminSSOToken);
             ServiceSchema schema = mgr.getSchema(SchemaType.USER);

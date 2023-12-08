@@ -60,8 +60,6 @@ import java.util.StringTokenizer;
 public class AMCommonNameGenerator
     implements AMAdminConstants, ServiceListener
 {
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
 
     private static final String DEFAULT_FORMAT = "{cn}";
 
@@ -82,6 +80,8 @@ public class AMCommonNameGenerator
 
     private void initialize() {
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             serviceSchemaManager = new ServiceSchemaManager(
                 G11N_SERVICE_NAME, adminSSOToken);
             serviceConfigManager = new ServiceConfigManager(
@@ -172,6 +172,8 @@ public class AMCommonNameGenerator
     private Map getUserAttributeValues(String univId) {
         Map values = null;
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             AMIdentity amid = IdUtils.getIdentity(adminSSOToken, univId);
             if (amid != null) {
                 Map map = amid.getAttributes();
@@ -208,6 +210,8 @@ public class AMCommonNameGenerator
         Map mapping = new HashMap();
         String serviceName = IdUtils.getServiceName(IdUtils.getType(idType));
         if (serviceName != null) {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             ServiceSchemaManager svcSchemaMgr = new ServiceSchemaManager(
                 serviceName, adminSSOToken);
             ServiceSchema svcSchema = svcSchemaMgr.getSchema(idType);
@@ -291,6 +295,8 @@ public class AMCommonNameGenerator
         Map map = null;
 
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             AMIdentityRepository repo = new AMIdentityRepository(
                 adminSSOToken, realm);
             AMIdentity realmIdentity = repo.getRealmIdentity();

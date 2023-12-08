@@ -60,8 +60,6 @@ import java.util.TreeSet;
 public class SubConfigMeta {
     public static final String SUBCONFIG_ID_DELIMITER = "/";
 
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
 
     private String serviceName;
     private AMModel amModel;
@@ -173,6 +171,8 @@ public class SubConfigMeta {
 
     private void initialize() {
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             ServiceConfigManager mgr = new ServiceConfigManager(
                 serviceName, adminSSOToken);
             globalConfig = mgr.getGlobalConfig(null);

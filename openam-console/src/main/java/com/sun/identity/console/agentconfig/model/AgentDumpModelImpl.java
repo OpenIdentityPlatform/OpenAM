@@ -44,8 +44,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AgentDumpModelImpl extends AMModelBase implements AgentDumpModel
 {
 
-    private static SSOToken adminSSOToken = AMAdminUtils.getSuperAdminSSOToken();
-
     public AgentDumpModelImpl(HttpServletRequest req, Map map) {
         super(req, map);
     }
@@ -53,6 +51,7 @@ public class AgentDumpModelImpl extends AMModelBase implements AgentDumpModel
     public Map getAttributeValues(String universalId)
             throws AMConsoleException {
         try {
+        	final SSOToken adminSSOToken = AMAdminUtils.getSuperAdminSSOToken();
             AMIdentity amid = IdUtils.getIdentity(adminSSOToken, universalId);
             Map values = AgentConfiguration.getAgentAttributes(amid, true);
             return values;
