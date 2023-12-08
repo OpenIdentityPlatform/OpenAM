@@ -69,8 +69,6 @@ public class UMUserPasswordResetOptionsModelImpl
     implements UMUserPasswordResetOptionsModel
 {
     private OrganizationConfigManager orgCfgMgr;
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
 
     public UMUserPasswordResetOptionsModelImpl(
         HttpServletRequest req,
@@ -500,6 +498,8 @@ public class UMUserPasswordResetOptionsModelImpl
         String realmName) {
         if (orgCfgMgr == null) {
             try {
+            	SSOToken adminSSOToken =
+            	        AMAdminUtils.getSuperAdminSSOToken();
                 orgCfgMgr = new OrganizationConfigManager(
                     adminSSOToken, realmName);
             } catch (SMSException e) {

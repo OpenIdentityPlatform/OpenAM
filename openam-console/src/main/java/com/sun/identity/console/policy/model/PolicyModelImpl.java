@@ -101,8 +101,6 @@ public class PolicyModelImpl
     private Map mapSvcNameToManagedResource = new HashMap();
     private Set requiredResourceNameService = new HashSet();
     private Set notRequiredResourceNameService = new HashSet();
-    private static SSOToken adminSSOToken =
-        AMAdminUtils.getSuperAdminSSOToken();
 
     /**
      * Creates a simple model using default resource bundle. 
@@ -1815,6 +1813,8 @@ public class PolicyModelImpl
 
     private boolean hasPolicyConfigSvcRegistered(String realmName) {
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             OrganizationConfigManager orgCfgMgr = new OrganizationConfigManager(
                 adminSSOToken, realmName);
             Set names = orgCfgMgr.getAssignedServices();
@@ -1905,6 +1905,8 @@ public class PolicyModelImpl
         Set instances = null;
 
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             AMAuthenticationManager mgr = new AMAuthenticationManager(
                 adminSSOToken, realmName);
             Set inst = mgr.getAuthenticationInstances();
@@ -1934,6 +1936,8 @@ public class PolicyModelImpl
         String level = "0";
 
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             AMAuthenticationManager mgr = new AMAuthenticationManager(
                 adminSSOToken, realmName);
             AMAuthenticationInstance ai = mgr.getAuthenticationInstance(name);
@@ -1971,6 +1975,8 @@ public class PolicyModelImpl
         logEvent("ATTEMPT_GET_REALM_NAMES", param);
 
         try {
+        	SSOToken adminSSOToken =
+        	        AMAdminUtils.getSuperAdminSSOToken();
             OrganizationConfigManager orgMgr = new OrganizationConfigManager(
                 adminSSOToken, base);
             logEvent("SUCCEED_GET_REALM_NAMES", param);
