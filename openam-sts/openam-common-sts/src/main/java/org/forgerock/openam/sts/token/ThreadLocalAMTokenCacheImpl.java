@@ -58,10 +58,6 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
          * @throws TokenValidationException if there was a previous cached session - an illegal state.
          */
         void setSessionEntry(String sessionId, boolean invalidateAfterTokenCreation) throws TokenValidationException {
-            if (sessionEntry != null) {
-                throw new TokenValidationException(ResourceException.INTERNAL_ERROR, "In the ThreadLocalAMTokenCache, " +
-                        "a session entry is being set over an existing session entry. Illegal state!");
-            }
             sessionEntry = new AMSessionCacheEntry(sessionId, invalidateAfterTokenCreation);
         }
 
@@ -75,10 +71,6 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
          * @throws TokenValidationException if there was a previous cached session - an illegal state.
          */
         void setDelegatedSessionEntry(String delegatedSessionId, boolean invalidateAfterTokenCreation) throws TokenValidationException {
-            if (delegatedSessionEntry != null) {
-                throw new TokenValidationException(ResourceException.INTERNAL_ERROR, "In the ThreadLocalAMTokenCache, " +
-                        "a delegated session entry is being set over an existing delegated session entry. Illegal state!");
-            }
             delegatedSessionEntry = new AMSessionCacheEntry(delegatedSessionId, invalidateAfterTokenCreation);
         }
 
