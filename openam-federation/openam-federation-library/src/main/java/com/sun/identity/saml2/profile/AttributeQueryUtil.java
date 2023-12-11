@@ -164,7 +164,7 @@ public class AttributeQueryUtil {
         }
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            signAttributeQuery(attrQuery, realm, false);
+            signAttributeQuery(attrQuery, realm, true);
             return sendAttributeQuerySOAP(attrQuery, location,
                 attrAuthorityEntityID, aad);
         } else {
@@ -372,7 +372,7 @@ public class AttributeQueryUtil {
         if (encryptedID != null) {
             EncryptedAssertion encryptedAssertion = null;
             try {
-                signAssertion(assertion, realm, attrAuthorityEntityID, false);
+                signAssertion(assertion, realm, attrAuthorityEntityID, true);
                 encryptedAssertion = encryptAssertion(assertion,
                         encryptedID, attrAuthorityEntityID, requesterEntityID,
                         realm, attrQueryProfileAlias);
@@ -407,7 +407,7 @@ public class AttributeQueryUtil {
         respIssuer.setValue(attrAuthorityEntityID);
         samlResp.setIssuer(respIssuer);
 
-        signResponse(samlResp, attrAuthorityEntityID, realm, false);
+        signResponse(samlResp, attrAuthorityEntityID, realm, true);
 
         return samlResp;
     }

@@ -390,7 +390,7 @@ public class DoManageNameID {
                                    String hostEntityRole, String remoteEntity) 
         throws SAML2Exception {
         signMNIRequest(mniRequest, realm, hostEntity, 
-                       hostEntityRole, remoteEntity, false);
+                       hostEntityRole, remoteEntity, true);
     }
     
     private static void signMNIRequest(ManageNameIDRequest mniRequest, 
@@ -503,7 +503,7 @@ public class DoManageNameID {
                                String hostEntityRole, String remoteEntity) 
         throws SAML2Exception {
         signMNIResponse(mniResponse, realm, hostEntity, 
-                        hostEntityRole, remoteEntity, false); 
+                        hostEntityRole, remoteEntity, true); 
     }
     
     private static void signMNIResponse(ManageNameIDResponse mniResponse, 
