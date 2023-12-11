@@ -147,7 +147,7 @@ public class AuthnQueryUtil {
         }                
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            signAuthnQuery(authnQuery, realm, false);
+            signAuthnQuery(authnQuery, realm, true);
             return sendAuthnQuerySOAP(authnQuery, location,
                authnAuthorityEntityID, realm, aad);
         } else {
@@ -342,7 +342,7 @@ public class AuthnQueryUtil {
         respIssuer.setValue(authnAuthorityEntityID);
         samlResp.setIssuer(respIssuer);
 
-        signResponse(samlResp, authnAuthorityEntityID, realm, false);
+        signResponse(samlResp, authnAuthorityEntityID, realm, true);
 
         return samlResp;
     }

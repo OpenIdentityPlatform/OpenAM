@@ -164,7 +164,7 @@ public class QueryClient {
                                             "wantXACMLAuthzDecisionQuerySigned");
                     if (wantQuerySigned != null &&
                         wantQuerySigned.equals("true")) {
-                        signAttributeQuery(xacmlQuery,realm,pepEntityID, false);
+                        signAttributeQuery(xacmlQuery,realm,pepEntityID, true);
                     }
                 }
                 

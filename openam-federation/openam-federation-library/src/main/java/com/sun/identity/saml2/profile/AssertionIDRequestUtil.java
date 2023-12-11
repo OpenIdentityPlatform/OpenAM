@@ -126,7 +126,7 @@ public class AssertionIDRequestUtil {
             samlAuthorityEntityID, role, realm, binding, location);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            signAssertionIDRequest(assertionIDRequest, realm, false);
+            signAssertionIDRequest(assertionIDRequest, realm, true);
             return sendAssertionIDRequestBySOAP(assertionIDRequest,
                 location.toString(), realm, samlAuthorityEntityID, role, roled);
         } else {
@@ -479,7 +479,7 @@ public class AssertionIDRequestUtil {
         respIssuer.setValue(samlAuthorityEntityID);
         samlResp.setIssuer(respIssuer);
 
-        signResponse(samlResp, samlAuthorityEntityID, role, realm, false);
+        signResponse(samlResp, samlAuthorityEntityID, role, realm, true);
 
         return samlResp;
     }

@@ -788,7 +788,7 @@ public class LogoutUtil {
                                String hostEntityRole, String remoteEntity) 
         throws SAML2Exception {
         signSLORequest(sloRequest, realm, hostEntity, 
-                       hostEntityRole, remoteEntity, false);
+                       hostEntityRole, remoteEntity, true);
     }
     
     static void signSLORequest(LogoutRequest sloRequest, 
@@ -926,7 +926,7 @@ public class LogoutUtil {
                                 String hostEntityRole, String remoteEntity) 
         throws SAML2Exception {
         signSLOResponse(sloResponse, realm, hostEntity, 
-                        hostEntityRole, remoteEntity, false); 
+                        hostEntityRole, remoteEntity, true); 
     }
     
     static void signSLOResponse(LogoutResponse sloResponse, 

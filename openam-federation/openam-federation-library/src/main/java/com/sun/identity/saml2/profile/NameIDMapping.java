@@ -200,7 +200,7 @@ public class NameIDMapping {
                 userID, realm, spEntityID, idpEntityID, nimURL,
                 targetSPEntityID, targetNameIDFormat);
 
-            signNIMRequest(nimRequest, realm, spEntityID, false);
+            signNIMRequest(nimRequest, realm, spEntityID, true);
 
             BaseConfigType config = metaManager.getIDPSSOConfig(realm,
                 idpEntityID);
@@ -304,7 +304,7 @@ public class NameIDMapping {
         }
 
         nimResponse.setStatus(status);
-        signNIMResponse(nimResponse, realm, idpEntityID, false);
+        signNIMResponse(nimResponse, realm, idpEntityID, true);
 
         return nimResponse;
     }
