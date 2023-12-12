@@ -30,6 +30,7 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -180,11 +181,18 @@ public class OAuth extends AMLoginModule {
 
                 final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
 
-                if (xuiState.isXUIEnabled()) {
+                boolean xuiRequest = false;
+                if(request.getHeader("Referer") != null) {
+                    try {
+                        xuiRequest = new URI(request.getHeader("Referer")).getPath().contains("/XUI/");
+                    } catch (Exception ignored) {}
+                }
+
+                if (xuiState.isXUIEnabled() || xuiRequest) {
                     // When XUI is in use the request URI points to the authenticate REST endpoint, which shouldn't be
                     // presented to the end-user, hence we use the contextpath only and rely on index.html and the
                     // XUIFilter to direct the user towards the XUI.
-                    originalUrl.append(request.getContextPath());
+                    originalUrl.append(request.getContextPath().concat("/XUI/"));
                     // The REST endpoint always exposes the realm parameter even if it is not actually present on the
                     // query string (e.g. DNS alias or URI segment was used), so this logic here is just to make sure if
                     // the realm parameter was not present on the querystring, then we add it there.
