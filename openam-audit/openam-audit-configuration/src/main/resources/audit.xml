@@ -846,7 +846,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory" order="500">
                         <DefaultValues>
-                            <Value>%BASE_DIR%/%SERVER_URI%/log/</Value>
+                            <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="rotationEnabled" type="single" syntax="boolean"
