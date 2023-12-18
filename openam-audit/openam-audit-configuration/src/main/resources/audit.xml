@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
 -->
 <!DOCTYPE ServicesConfiguration
         PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -21,7 +22,7 @@
     <Service name="AuditService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/AuditService"
                 i18nFileName="audit"
-                revisionNumber="1"
+                revisionNumber="2"
                 resourceName="audit"
                 i18nKey="audit-description"
                 propertiesViewBeanURL="../audit/RealmAuditConfig">
@@ -762,6 +763,44 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
+
+                <SubSchema name="JSONStdout" inheritance="multiple" i18nKey="handler.name.jsonstdout" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="8000">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics" order="8100">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="elasticsearchCompatible" type="single" syntax="boolean" i18nKey="audit.handlers.json.elasticsearchCompatible.enabled" order="8200">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="8200">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JsonStdoutAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
             </Global>
 
             <Organization>
@@ -1499,6 +1538,43 @@
                                      validator="RequiredValueValidator" order="7600">
                         <DefaultValues>
                             <Value>org.forgerock.openam.audit.events.handlers.JmsAuditEventHandlerFactory</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
+                <SubSchema name="JSONStdout" inheritance="multiple" i18nKey="handler.name.jsonstdout" i18nFileName="audit">
+                    <AttributeSchema name="enabled" type="single" syntax="boolean"
+                                     i18nKey="audit.handlers.all.enabled" order="8000">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="topics" type="multiple_choice" i18nKey="audit.handlers.all.topics" order="8100">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicChoiceValues"/>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <DefaultValuesClassName
+                                    className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="elasticsearchCompatible" type="single" syntax="boolean" i18nKey="audit.handlers.json.elasticsearchCompatible.enabled" order="8200">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="handlerFactory" type="single" i18nKey="handler.factory" order="8300">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.audit.events.handlers.JsonStdoutAuditEventHandlerFactory</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
