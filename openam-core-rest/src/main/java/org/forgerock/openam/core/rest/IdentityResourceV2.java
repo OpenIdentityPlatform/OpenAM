@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
  */
 
 package org.forgerock.openam.core.rest;
@@ -22,7 +23,6 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
@@ -1011,6 +1011,24 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                 return newResultPromise(newActionResponse(json(object())));
             } catch (ResourceException re) {
                 debug.warning("Cannot change password! " + resourceId + ":" + re);
+                return re.asPromise();
+            }
+        } else if("setGroups".equalsIgnoreCase(action)) {
+            RealmContext realmContext = context.asContext(RealmContext.class);
+            final String realm = realmContext.getRealm().asPath();
+
+            JsonValue value = request.getContent();
+            try {
+                Set<String> groups = new HashSet<>(value.get("groups").asList(String.class));
+                IdentityRestUtils.changeMemberships(context, realm, resourceId, groups);
+                if (debug.messageEnabled()) {
+                    String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                    debug.message("IdentityResource.actionInstance :: ACTION of set groups for " + resourceId
+                            + " in realm " + realm + " performed by " + principalName);
+                }
+                return newResultPromise(newActionResponse(json(object())));
+            } catch (ResourceException re) {
+                debug.warning("Cannot set groups! " + resourceId + ":" + re);
                 return re.asPromise();
             }
         } else {
