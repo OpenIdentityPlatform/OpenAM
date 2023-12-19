@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC
  */
 package org.forgerock.openam.core.rest;
 
@@ -28,6 +29,7 @@ import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.collections4.CollectionUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
@@ -53,6 +55,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class IdentityRestUtils {
 
@@ -89,6 +92,56 @@ public final class IdentityRestUtils {
             debug.warning("IdentityRestUtils.changePassword() :: SSOException occurred while changing "
                     + "the password for user: " + username, ssoe);
             throw new PermanentException(401, "An error occurred while trying to change the password", ssoe);
+        } catch (IdRepoException ire) {
+            throw RESOURCE_MAPPING_HANDLER.handleError(ire);
+        }
+    }
+
+    public static void changeMemberships(Context serverContext, String realm, String username, Set<String> groupNames)
+            throws ResourceException {
+        try {
+            SSOToken token = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
+
+            //check if groups exist
+            for(String gn : groupNames) {
+                AMIdentity groupIdentity = new AMIdentity(token, gn, IdType.GROUP, realm, null);
+                if(!groupIdentity.isExists()) {
+                    throw new SSOException("group " + gn + " does not exist");
+                }
+            }
+
+            AMIdentity userIdentity = new AMIdentity(token, username, IdType.USER, realm, null);
+
+            Set<String> membershipsToAdd = new HashSet<>(groupNames);
+            Set<String> membershipsToRemove = new HashSet<>();
+            Set<AMIdentity> currentMembershipsIdentity = userIdentity.getMemberships(IdType.GROUP);
+            final Set<String> currentMemberships = CollectionUtils.isNotEmpty(currentMembershipsIdentity)
+                    ? currentMembershipsIdentity.stream().map(AMIdentity::getName).collect(Collectors.toSet())
+                    : null;
+
+            if (!CollectionUtils.isEmpty(currentMemberships)) {
+                membershipsToRemove = currentMemberships.stream().filter(cm -> !groupNames.contains(cm)).collect(Collectors.toSet());
+                membershipsToAdd = groupNames.stream().filter(m -> !currentMemberships.contains(m)).collect(Collectors.toSet());
+            }
+
+            if (!CollectionUtils.isEmpty(membershipsToRemove)) {
+                for (String idName : membershipsToRemove) {
+                    AMIdentity groupIdentity = new AMIdentity(token, idName, IdType.GROUP, realm, null);
+                    groupIdentity.removeMember(userIdentity);
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(membershipsToAdd)) {
+                for (String idName : membershipsToAdd) {
+                    AMIdentity groupIdentity = new AMIdentity(token, idName, IdType.GROUP, realm, null);
+                    groupIdentity.addMember(userIdentity);
+                }
+            }
+
+        } catch (SSOException ssoe) {
+            debug.warning("IdentityRestUtils.changeMemberships() :: SSOException occurred while changing "
+                    + "the groups for user: " + username, ssoe);
+            throw new PermanentException(401, "An error occurred while trying to change the user groups", ssoe);
         } catch (IdRepoException ire) {
             throw RESOURCE_MAPPING_HANDLER.handleError(ire);
         }
