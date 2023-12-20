@@ -2369,7 +2369,12 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             cachedDn = dnCache.get(generateDNCacheKey(name, type));
         }
         if (cachedDn != null) {
-            return cachedDn.toString();
+        	if ("".equals(cachedDn)) {
+        		throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED,
+                        IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED, CLASS_NAME,
+                        ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue());
+        	}
+        	return cachedDn.toString();
         }
         String dn = null;
         DN searchBase = getBaseDN(type);
@@ -2409,7 +2414,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (entry == null) {
                 DEBUG.message("DJLDAPv3Repo.getDN: Unable to find entry with name: " + name + " under searchbase: " + searchBase
                         + " with scope: " + defaultScope);
-
+                if (dnCacheEnabled) {
+                    dnCache.put(generateDNCacheKey(name, type), "");
+                }
                 throw new IdentityNotFoundException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND,
                         ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED,
                         new Object[]{name, type.getName()});
