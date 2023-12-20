@@ -643,6 +643,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("Create invoked on " + type + ": " + name + " attrMap = "
                     + IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrMap, null));
         }
+        if (dnCacheEnabled) {
+            dnCache.remove(generateDNCacheKey(name, type));
+        }
         String dn = generateDN(type, name);
         Set<String> objectClasses = getObjectClasses(type);
         //First we should make sure that we wrap the attributes with a case insensitive hashmap.
@@ -2370,9 +2373,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         }
         if (cachedDn != null) {
         	if ("".equals(cachedDn)) {
-        		throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED,
-                        IdRepoErrorCode.LDAP_EXCEPTION_OCCURRED, CLASS_NAME,
-                        ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue());
+        		throw new IdentityNotFoundException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.TYPE_NOT_FOUND,
+                        ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED,
+                        new Object[]{name, type.getName()});
         	}
         	return cachedDn.toString();
         }
