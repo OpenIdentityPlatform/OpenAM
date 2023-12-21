@@ -25,7 +25,7 @@
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 
@@ -959,7 +959,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
      * Sets the creation time of the Internal Session, as the number of seconds
      * since midnight January 1, 1970 GMT.
      */
-    private void setCreationTime() {
+    public void setCreationTime() {
         creationTimeInSeconds = currentTimeMillis() / 1000;
     }
 
