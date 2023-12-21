@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 
 package com.sun.identity.authentication.service;
@@ -1408,6 +1409,7 @@ public class LoginState {
                 }
             } else {
                 DEBUG.message("request: in putProperty stuff");
+                session.setCreationTime();
                 session.setClientID(userDN);
                 session.setType(SessionType.USER);
                 session.setMaxSessionTime(maxSession);
