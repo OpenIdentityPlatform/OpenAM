@@ -38,7 +38,7 @@ import com.iplanet.am.util.SystemProperties;
 
 
 public class ExecuteCallback {
-	final static Logger logger=LoggerFactory.getLogger(ExecuteCallback.class.getName());
+	final static Logger logger=LoggerFactory.getLogger(ExecuteCallback.class.getPackage().getName());
 	
 	final CqlSession session;
 	final Statement<?> statement;
@@ -82,7 +82,7 @@ public class ExecuteCallback {
 			final QueryTrace trace=result.getQueryTrace();
 			logger.trace("{}μs {} {}",trace.getDurationMicros(),trace.getParameters(),trace.getCoordinatorAddress());
 		}else if (logger.isTraceEnabled()){
-			logger.trace("{} {} ms {}: {} {}: {}"
+			logger.trace("{} {} ms {}: {}: {}"
 					,statement.getExecutionProfileName() 
 					,System.currentTimeMillis()-start
 					,getKeyspace()
@@ -110,7 +110,7 @@ public class ExecuteCallback {
 	static ArrayList<String> debugQuery(Statement<?>  statement) {
 		final ArrayList<String> debugs=new ArrayList<String>();
 		if (statement instanceof DefaultBoundStatement) {
-			final StringHolder query=new StringHolder(((DefaultBoundStatement)statement).getPreparedStatement().getQuery());
+			final StringHolder query=new StringHolder(((DefaultBoundStatement)statement).getPreparedStatement().getQuery().toLowerCase());
 			final ColumnDefinitions cd=((DefaultBoundStatement)statement).getPreparedStatement().getVariableDefinitions();
 			cd.forEach(c -> {
 				try {
@@ -119,9 +119,11 @@ public class ExecuteCallback {
 					}else if (c.getType().asCql(false, false).equals("int") ) {
 						query.value=query.value.replace(":"+c.getName().asInternal(),""+((DefaultBoundStatement)statement).getInt(c.getName()));
 					}else if (c.getType().asCql(false, false).equals("timestamp") ) {
-						query.value=query.value.replace(":"+c.getName().asInternal(),""+((DefaultBoundStatement)statement).getInstant(c.getName()).toString());
+						query.value=query.value.replace(":"+c.getName().asInternal(),""+((DefaultBoundStatement)statement).getInstant(c.getName()));
 					}else if (c.getType().asCql(false, false).equals("list<text>") ) {
 						query.value=query.value.replace(":"+c.getName().asInternal(),""+((DefaultBoundStatement)statement).getList(c.getName(),String.class));
+					}else if (c.getType().asCql(false, false).equals("blob") ) {
+						query.value=query.value.replace(":"+c.getName().asInternal(),"[blob="+((DefaultBoundStatement)statement).getByteBuffer(c.getName())==null?null:((DefaultBoundStatement)statement).getByteBuffer(c.getName()).capacity()+" bytes]");
 					}else {
 						query.value=query.value+" unknown type "+c.getType().asCql(false, false);
 					}
@@ -131,7 +133,11 @@ public class ExecuteCallback {
 			});
 			debugs.add(query.value);
 		}else if (statement instanceof SimpleStatement) {
-			debugs.add(((SimpleStatement)statement).getQuery()+" "+((SimpleStatement)statement).getNamedValues());
+			final StringHolder query=new StringHolder(((SimpleStatement)statement).getQuery());
+			((SimpleStatement)statement).getNamedValues().forEach((k,v) -> {
+				query.value=query.value.replace(":"+k.asInternal(),""+v);
+			});
+			debugs.add(query.value);
 		}else if (statement instanceof DefaultBatchStatement) {
 			((DefaultBatchStatement)statement).forEach(t -> {
 				debugs.addAll(debugQuery(t));
