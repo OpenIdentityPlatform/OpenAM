@@ -152,7 +152,7 @@
     "brace-expansion": {
       "version": "1.1.11",
       "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-      "integrity": "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
+      "integrity": "sha1-PH/L9SnYcibz0vUrlm/1Jx60Qd0=",
       "dev": true,
       "requires": {
         "balanced-match": "^1.0.0",
@@ -370,7 +370,7 @@
     "esprima": {
       "version": "4.0.1",
       "resolved": "https://registry.npmjs.org/esprima/-/esprima-4.0.1.tgz",
-      "integrity": "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==",
+      "integrity": "sha1-E7BM2z5sXRnfkatph6hpVhmwqnE=",
       "dev": true
     },
     "event-emitter": {
@@ -1824,7 +1824,7 @@
     "which": {
       "version": "1.3.1",
       "resolved": "https://registry.npmjs.org/which/-/which-1.3.1.tgz",
-      "integrity": "sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ==",
+      "integrity": "sha1-pFBD1U9YBTFtqNYvn1CRjT2nCwo=",
       "dev": true,
       "requires": {
         "isexe": "^2.0.0"
