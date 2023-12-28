@@ -46,7 +46,7 @@ public class ExecuteCallback {
 	
 	public ExecuteCallback(String profile,CqlSession session,Statement<?>  statement){
 		this.session=session;
-		this.statement=statement.setExecutionProfileName(profile).setTracing(logger.isTraceEnabled() && SystemProperties.getAsBoolean(ExecuteCallback.class.getPa.concat(".trace.server"), false));
+		this.statement=statement.setExecutionProfileName(profile).setTracing(logger.isTraceEnabled() && SystemProperties.getAsBoolean(ExecuteCallback.class.getPackage().getName().concat(".trace.server"), false));
 	}
 	
 	public ResultSet execute(){
