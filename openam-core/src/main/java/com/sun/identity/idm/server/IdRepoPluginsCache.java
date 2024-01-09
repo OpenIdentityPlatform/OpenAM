@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +85,7 @@ public class IdRepoPluginsCache implements ServiceListener {
     // The Map contains <orgName, MAP<name, IdRepo object>>
     private Map idrepoPlugins = new HashMap();
     // Needs to synchronized for get(), put() and clear()
-    private Map readonlyPlugins = new Hashtable();
+    private Map readonlyPlugins = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService scheduler;
     
