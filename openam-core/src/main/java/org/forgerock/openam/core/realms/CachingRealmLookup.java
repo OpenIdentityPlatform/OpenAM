@@ -18,13 +18,11 @@ package org.forgerock.openam.core.realms;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -43,13 +41,21 @@ final class CachingRealmLookup implements RealmLookup {
 
     private static Debug debug = AMIdentityRepository.debug;
 
-    private final Map<String, Realm> orgIdentifierToOrgName =
-            Collections.synchronizedMap(new CaseInsensitiveHashMap<String, Realm>());
-    private final Set<String> unknownOrgLookupCache =
-            Collections.synchronizedSet(new CaseInsensitiveHashSet<String>());
-    private final Map<Realm, Boolean> orgStatusCache =
-            Collections.synchronizedMap(new CaseInsensitiveHashMap<Realm, Boolean>());
+    private final Cache<String, Realm> orgIdentifierToOrgName=CacheBuilder.newBuilder()
+    		.maximumSize(1024)
+    		.expireAfterAccess(1, TimeUnit.HOURS)
+    		.build();
 
+    private final Cache<String, Boolean> unknownOrgLookupCache=CacheBuilder.newBuilder()
+    		.maximumSize(1024)
+    		.expireAfterAccess(1, TimeUnit.HOURS)
+    		.build();
+    
+    private final Cache<Realm, Boolean> orgStatusCache=CacheBuilder.newBuilder()
+    		.maximumSize(1024)
+    		.expireAfterAccess(1, TimeUnit.HOURS)
+    		.build();
+    
     private final RealmLookup delegate;
     private final Provider<ServiceConfigManager> idRepoServiceProvider;
     private AtomicBoolean initialised = new AtomicBoolean();
@@ -73,13 +79,13 @@ final class CachingRealmLookup implements RealmLookup {
     @Override
     public Realm lookup(String orgIdentifier) throws RealmLookupException {
         init();
-        Realm realm = orgIdentifierToOrgName.get(orgIdentifier);
+        Realm realm = orgIdentifierToOrgName.getIfPresent(orgIdentifier);
         if (realm != null) {
             return realm;
         }
 
         // Don't go to the expense of an organisation search if we have failed to look this up already.
-        if (unknownOrgLookupCache.contains(orgIdentifier)) {
+        if (unknownOrgLookupCache.getIfPresent(orgIdentifier)!=null) {
             debug.message("RealmsCache.lookup: orgIdentifier {} found in unknown org lookup cache.", orgIdentifier);
             throw new NoRealmFoundException(orgIdentifier);
         }
@@ -87,7 +93,7 @@ final class CachingRealmLookup implements RealmLookup {
         try {
             realm = delegate.lookup(orgIdentifier);
         } catch (NoRealmFoundException e) {
-            unknownOrgLookupCache.add(orgIdentifier);
+            unknownOrgLookupCache.put(orgIdentifier,true);
             throw e;
         }
 
@@ -99,10 +105,11 @@ final class CachingRealmLookup implements RealmLookup {
     @Override
     public boolean isActive(Realm realm) throws RealmLookupException {
         init();
-        if (orgStatusCache.containsKey(realm)) {
-            return orgStatusCache.get(realm);
+        Boolean res=orgStatusCache.getIfPresent(realm);
+        if (res!=null) {
+            return res;
         }
-        boolean active = delegate.isActive(realm);
+        Boolean active = delegate.isActive(realm);
         orgStatusCache.put(realm, active);
         return active;
     }
@@ -127,9 +134,9 @@ final class CachingRealmLookup implements RealmLookup {
 
         private void clearCaches() {
             debug.message("RealmsCache: Clearing caches due to config change.");
-            orgIdentifierToOrgName.clear();
-            orgStatusCache.clear();
-            unknownOrgLookupCache.clear();
+            orgIdentifierToOrgName.invalidateAll();
+            orgStatusCache.invalidateAll();
+            unknownOrgLookupCache.invalidateAll();
         }
     }
 }
