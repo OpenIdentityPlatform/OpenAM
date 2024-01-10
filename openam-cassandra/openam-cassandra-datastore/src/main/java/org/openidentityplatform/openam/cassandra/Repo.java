@@ -350,7 +350,9 @@ public class Repo extends IdRepo {
 
 	final static String asyncField="save.async";
 	
+	static Boolean unlogged=SystemProperties.getAsBoolean("org.openidentityplatform.openam.cassandra.repo.batch.unlooged", false);
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setAttributes(SSOToken token, IdType type, String name, Map<String, Set<String>> attributes_in, boolean isAdd) throws IdRepoException, SSOException {
 		validate(type, IdOperation.EDIT);
@@ -364,14 +366,10 @@ public class Repo extends IdRepo {
 			
 			if (!attributes.containsKey("uid")) { //Always create uid field 
 				if (isAdd || !isExists(token, type, name)) {
-					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{name})));		
+					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{disableCaseSensitive.contains("uid")?name.toLowerCase():name})));		
 				}
 			}
-			if (!attributes.containsKey(activeAttr)) {
-				if (isAdd || !isExists(token, type, name)) {
-					attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
-				}
-			}
+			
 			if (isAdd) { //test if exist
 				final Integer ttl=getTTL(type, "uid");
 				final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl_exist:statement_add_value_exist).bind()
@@ -388,18 +386,16 @@ public class Repo extends IdRepo {
 				}
 				attributes.remove("uid");
 			}
-			BatchStatement statements=BatchStatement.newInstance(DefaultBatchType.LOGGED); 
+			Map<String, Set<String>> oldValuesMap=null;
+			if (!isAdd) { //get old values for rewrite
+				attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{disableCaseSensitive.contains("uid")?name.toLowerCase():name})));	
+				oldValuesMap=getAttributes(token,type,name,attributes.keySet());
+			}
+			BatchStatement statements=BatchStatement.newInstance(unlogged?DefaultBatchType.UNLOGGED:DefaultBatchType.LOGGED); 
 			for (final Entry<String, Set<String>>  entry: attributes.entrySet()) {
 				final Set<String> oldValues=new HashSet<String>();
-				if (!isAdd) { //get old values
-					BoundStatement statement=statement_select_by_fields.bind()
-							.setString("type", type.getName())
-							.setString("uid",  disableCaseSensitive.contains("uid")?name.toLowerCase():name)
-							.setList("fields",Arrays.asList(new String[] {entry.getKey().toLowerCase()}),String.class);
-					final ResultSet rc=new ExecuteCallback(profile,session,statement).execute();
-					for (Row row : rc){
-						oldValues.add(row.getString("value"));
-					}
+				if (oldValuesMap!=null) { //get old values
+					oldValues.addAll(oldValuesMap.getOrDefault(entry.getKey(), Collections.EMPTY_SET));
 				}
 				final Integer ttl=getTTL(type, entry.getKey());
 				final Set<String> values=convert(entry.getKey(),entry.getValue());
