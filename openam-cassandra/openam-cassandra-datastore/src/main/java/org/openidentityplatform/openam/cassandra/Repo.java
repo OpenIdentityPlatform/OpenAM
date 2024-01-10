@@ -364,12 +364,6 @@ public class Repo extends IdRepo {
 			
 			final boolean async=(attributes.remove(asyncField)!=null);
 			
-			if (!attributes.containsKey("uid")) { //Always create uid field 
-				if (isAdd || !isExists(token, type, name)) {
-					attributes.put("uid", new HashSet<String>(Arrays.asList(new String[]{disableCaseSensitive.contains("uid")?name.toLowerCase():name})));		
-				}
-			}
-			
 			if (isAdd) { //test if exist
 				final Integer ttl=getTTL(type, "uid");
 				final BoundStatement statement=((ttl!=null && ttl>0)?statement_add_value_ttl_exist:statement_add_value_exist).bind()
