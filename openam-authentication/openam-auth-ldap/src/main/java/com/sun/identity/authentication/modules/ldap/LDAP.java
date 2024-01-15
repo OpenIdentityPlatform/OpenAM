@@ -210,7 +210,7 @@ public class LDAP extends AMLoginModule {
             useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
             isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
             protocolVersion = CollectionHelper.getMapAttr(
-                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLSv1");
+                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLS");
 
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,

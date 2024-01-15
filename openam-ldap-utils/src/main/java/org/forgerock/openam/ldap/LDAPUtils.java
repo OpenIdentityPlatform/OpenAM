@@ -232,7 +232,7 @@ public final class LDAPUtils {
         int heartBeatTimeout =
                 SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
         if (ssl != null && ssl.booleanValue()) {
-            String defaultProtocolVersion = SystemPropertiesManager.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            String defaultProtocolVersion = SystemPropertiesManager.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
                 //needs to be established.

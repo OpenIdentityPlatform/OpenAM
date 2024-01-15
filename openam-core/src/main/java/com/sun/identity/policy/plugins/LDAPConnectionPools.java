@@ -117,7 +117,7 @@ public class LDAPConnectionPools {
                         debug.message("Create LDAPConnectionPool: " + host);
                     }
                     if (ssl) {
-                        String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+                        String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
                         options.set(LDAPConnectionFactory.SSL_CONTEXT,
                                 new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
                     }
