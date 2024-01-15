@@ -27,6 +27,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Filter;
 
 /**
  * Abstract class for the performing of queries related to the CTS Worker Framework.
@@ -105,7 +106,7 @@ public abstract class CTSWorkerBaseQuery<C> implements CTSWorkerQuery {
      *
      * @return The QueryBuilder used to generate queries to perform.
      */
-    protected abstract QueryBuilder<C, PartialToken> getQuery();
+    protected abstract QueryBuilder<C, Filter> getQuery();
 
     /**
      * Enforces the overriding of toString for the purpose of logging.
