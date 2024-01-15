@@ -84,7 +84,7 @@ public class DSConfigMgr implements IDSConfigMgr {
 
     private int connRetryInterval = 1000;
     private HashSet retryErrorCodes = new HashSet();
-    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
 
     static Debug debugger = null;
 

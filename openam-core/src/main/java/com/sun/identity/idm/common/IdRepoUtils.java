@@ -334,7 +334,7 @@ public class IdRepoUtils {
         String connectionMode = CollectionHelper.getMapAttr(attrValues, LDAP_CONNECTION_MODE);
         if (LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) ||
                 LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode)){
-            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
             options = options.set(SSL_CONTEXT,
                     new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
           if (LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode)) {

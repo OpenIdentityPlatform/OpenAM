@@ -392,7 +392,7 @@ class UserIdRepo {
                 .set(AUTHN_BIND_REQUEST, request);
 
         if (userSSLStore != null && userSSLStore.equals("SSL")) {
-            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
             options = options.set(SSL_CONTEXT,
                     new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
         }
