@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
@@ -60,8 +59,8 @@ public class SessionIdleTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
     }
 
     @Override
-    public QueryBuilder getQuery() {
-        Calendar now = getCalendarInstance();
+    public QueryBuilder<C, Filter> getQuery() {
+    	final Calendar now = getCalendarInstance();
 
         QueryFilter<CoreTokenField> filter =
                 QueryFilter.and(

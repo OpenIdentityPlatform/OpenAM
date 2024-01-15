@@ -59,7 +59,7 @@ public class MaxSessionTimeExpiredQuery<C> extends CTSWorkerBaseQuery {
     }
 
     @Override
-    public QueryBuilder getQuery() {
+    public QueryBuilder<C, Filter> getQuery() {
         Calendar now = getCalendarInstance();
 
         QueryFilter<CoreTokenField> filter =
