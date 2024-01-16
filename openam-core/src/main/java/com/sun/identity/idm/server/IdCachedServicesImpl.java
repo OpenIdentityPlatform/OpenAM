@@ -25,7 +25,7 @@
  * $Id: IdCachedServicesImpl.java,v 1.21 2009/08/25 06:50:53 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 package com.sun.identity.idm.server;
 
@@ -520,19 +520,24 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 	@Override
 	public Map getServiceAttributes(SSOToken token, IdType type, String name, String serviceName, Set attrNames,String amOrgName, String amsdkDN, boolean isString) throws IdRepoException, SSOException {
 		final String cacheKey=getCacheKeyForService(type, name, serviceName,  amOrgName);
-    	Map res=idCacheServiceAttributes.getIfPresent(cacheKey);
+    	Map<String, Set<String>> res = idCacheServiceAttributes.getIfPresent(cacheKey);
     	if (res==null) { //add to cache
-			res=super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString);
+			res = super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString);
 			idCacheServiceAttributes.put(cacheKey, res);
 		}else if (!res.keySet().containsAll(attrNames)) { //add unknown/new fields
 			res.putAll(super.getServiceAttributes(token, type, name, serviceName, attrNames, amOrgName, amsdkDN, isString));
 		}
     	for (String attrName : (Set<String>)attrNames) {
 			if (!res.containsKey(attrName)) {
-				res.put(attrName, new LinkedHashSet<String>(0));
+				res.put(attrName, new LinkedHashSet<>(0));
 			}
 		}
-		return res; 
+        if(attrNames.size() > 0) { //filter by attr names, return only requested attrs
+            return res.entrySet().stream()
+                    .filter(e -> attrNames.contains(e.getKey()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+		return res;
 	}
 
 	@Override
