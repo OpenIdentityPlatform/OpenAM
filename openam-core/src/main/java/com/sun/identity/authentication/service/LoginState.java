@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 
 package com.sun.identity.authentication.service;
