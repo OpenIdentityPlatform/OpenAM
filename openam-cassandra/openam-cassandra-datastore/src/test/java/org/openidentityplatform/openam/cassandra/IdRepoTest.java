@@ -378,6 +378,7 @@ public class IdRepoTest {
 		assertTrue(repo.isExists(null, IdType.USER, "9170000000"));
 		assertTrue(repo.isActive(null, IdType.USER, "9170000000"));
 		
+		repo.removeAttributes(null,IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[] {"inetuserstatus"})));
 		repo.removeAttributes(null,IdType.USER, "9170000000",new HashSet<String>(Arrays.asList(new String[] {"uid"})));
 		assertFalse(repo.isExists(null, IdType.USER, "9170000000"));
 		assertFalse(repo.isActive(null, IdType.USER, "9170000000"));

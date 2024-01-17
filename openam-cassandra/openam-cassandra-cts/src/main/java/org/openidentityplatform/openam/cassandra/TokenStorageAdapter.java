@@ -83,21 +83,21 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 
 	PreparedStatement get_statement_read() throws DataLayerException {
 		if (static_statement_read==null) {
-			static_statement_read=getSession().prepare("select * from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId limit 1");
+			static_statement_read=getSession().prepare("select * from \""+cfg.getKeySpace()+"\".\""+cfg.getTableName()+"\" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId limit 1");
 		}
 		return static_statement_read;
 	}
 	
 	PreparedStatement get_statement_delete() throws DataLayerException {
 		if (static_statement_delete==null) {
-			static_statement_delete=getSession().prepare("delete from "+cfg.getTableName()+" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId");
+			static_statement_delete=getSession().prepare("delete from \""+cfg.getKeySpace()+"\".\""+cfg.getTableName()+"\" where "+CoreTokenField.TOKEN_ID.toString()+"=:coreTokenId");
 		}
 		return static_statement_delete;
 	}
 	
 	PreparedStatement get_statement_update() throws DataLayerException {
 		if (static_statement_update==null) {
-			static_statement_update=getSession().prepare("update "+cfg.getTableName()+" using ttl :ttl set coreTokenDate01=:coreTokenDate01,coreTokenDate02=:coreTokenDate02,coreTokenDate03=:coreTokenDate03,coreTokenDate04=:coreTokenDate04,coreTokenDate05=:coreTokenDate05,coreTokenExpirationDate=:coreTokenExpirationDate,coreTokenInteger01=:coreTokenInteger01,coreTokenInteger02=:coreTokenInteger02,coreTokenInteger03=:coreTokenInteger03,coreTokenInteger04=:coreTokenInteger04,coreTokenInteger05=:coreTokenInteger05,coreTokenInteger06=:coreTokenInteger06,coreTokenInteger07=:coreTokenInteger07,coreTokenInteger08=:coreTokenInteger08,coreTokenInteger09=:coreTokenInteger09,coreTokenInteger10=:coreTokenInteger10,coreTokenObject=:coreTokenObject,coreTokenString01=:coreTokenString01,coreTokenString02=:coreTokenString02,coreTokenString03=:coreTokenString03,coreTokenString04=:coreTokenString04,coreTokenString05=:coreTokenString05,coreTokenString06=:coreTokenString06,coreTokenString07=:coreTokenString07,coreTokenString08=:coreTokenString08,coreTokenString09=:coreTokenString09,coreTokenString10=:coreTokenString10,coreTokenString11=:coreTokenString11,coreTokenString12=:coreTokenString12,coreTokenString13=:coreTokenString13,coreTokenString14=:coreTokenString14,coreTokenString15=:coreTokenString15,coreTokenMultiString01=:coreTokenMultiString01,coreTokenMultiString02=:coreTokenMultiString02,coreTokenMultiString03=:coreTokenMultiString03,coreTokenType=:coreTokenType,coreTokenUserId=:coreTokenUserId,etag=:etag,createTimestamp=:createTimestamp where coreTokenId=:coreTokenId");
+			static_statement_update=getSession().prepare("update \""+cfg.getKeySpace()+"\".\""+cfg.getTableName()+"\" using ttl :ttl set coreTokenDate01=:coreTokenDate01,coreTokenDate02=:coreTokenDate02,coreTokenDate03=:coreTokenDate03,coreTokenDate04=:coreTokenDate04,coreTokenDate05=:coreTokenDate05,coreTokenExpirationDate=:coreTokenExpirationDate,coreTokenInteger01=:coreTokenInteger01,coreTokenInteger02=:coreTokenInteger02,coreTokenInteger03=:coreTokenInteger03,coreTokenInteger04=:coreTokenInteger04,coreTokenInteger05=:coreTokenInteger05,coreTokenInteger06=:coreTokenInteger06,coreTokenInteger07=:coreTokenInteger07,coreTokenInteger08=:coreTokenInteger08,coreTokenInteger09=:coreTokenInteger09,coreTokenInteger10=:coreTokenInteger10,coreTokenObject=:coreTokenObject,coreTokenString01=:coreTokenString01,coreTokenString02=:coreTokenString02,coreTokenString03=:coreTokenString03,coreTokenString04=:coreTokenString04,coreTokenString05=:coreTokenString05,coreTokenString06=:coreTokenString06,coreTokenString07=:coreTokenString07,coreTokenString08=:coreTokenString08,coreTokenString09=:coreTokenString09,coreTokenString10=:coreTokenString10,coreTokenString11=:coreTokenString11,coreTokenString12=:coreTokenString12,coreTokenString13=:coreTokenString13,coreTokenString14=:coreTokenString14,coreTokenString15=:coreTokenString15,coreTokenMultiString01=:coreTokenMultiString01,coreTokenMultiString02=:coreTokenMultiString02,coreTokenMultiString03=:coreTokenMultiString03,coreTokenType=:coreTokenType,coreTokenUserId=:coreTokenUserId,etag=:etag,createTimestamp=:createTimestamp where coreTokenId=:coreTokenId");
 		}
 		return static_statement_update;
 	}
@@ -225,7 +225,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 		final Collection<Token> res = new ArrayList<Token>();
 		try {
 			final Filter filter=query.getQuery().accept(new org.openidentityplatform.openam.cassandra.QueryFilterVisitor(),null);
-			Select select=selectFrom(filter.getTable()).all();
+			Select select=selectFrom(cfg.getKeySpace(),filter.getTable()).all();
     		for(Relation clause : filter.clauses) { 
     			select=select.where(clause);
     		}
@@ -284,7 +284,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 				requestedAttributes.add(tokenField.toString());
 			requestedAttributes.add("coreTokenId");
 			final Filter filter=query.getQuery().accept(new org.openidentityplatform.openam.cassandra.QueryFilterVisitor(),null);
-    		Select select=selectFrom(filter.getTable()).columns(requestedAttributes.toArray(new String[0]));
+    		Select select=selectFrom(cfg.getKeySpace(),filter.getTable()).columns(requestedAttributes.toArray(new String[0]));
     		for(Relation clause : filter.clauses) { 
     			select=select.where(clause);
     		}

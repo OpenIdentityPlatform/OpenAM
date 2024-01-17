@@ -93,6 +93,7 @@ public class Repo extends IdRepo {
 	final static String created = "_created";
 	final static String updated = "_updated";
 
+	String keyspace="test";
 	@Override
 	public void initialize(Map<String, Set<String>> configParams) throws IdRepoException  {
 		super.initialize(configParams);
@@ -151,7 +152,7 @@ public class Repo extends IdRepo {
 				disableCaseSensitive.addAll(Arrays.asList(new String[]{"uid","mail","iplanet-am-user-alias-list"}));
 			}
 				
-			final String keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
+			keyspace=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-organization_name","test");
 			final String[] servers=((Map<String, Set<String>>)configParams).get("sun-idrepo-ldapv3-config-ldap-server").toArray(new String[0]);
 			final String username=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authid",null);
 			final String password=CollectionHelper.getMapAttr(configParams, "sun-idrepo-ldapv3-config-authpw",null);
@@ -159,8 +160,7 @@ public class Repo extends IdRepo {
 			logger.info("create session {}/{}",username,servers);
 			CqlSessionBuilder builder=CqlSession.builder()
 					.withApplicationName("OpenAM datastore: "+keyspace)
-					.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()))
-					.withKeyspace(keyspace);
+					.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()));
 			if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
 				builder=builder.withAuthCredentials(username, password);
 			}
@@ -173,19 +173,19 @@ public class Repo extends IdRepo {
 					}
 				}
 			}
-			session=builder.build();
-			statement_select_by_type=session.prepare("select uid,field,value,change from values where type=:type limit 64000 allow filtering");
-			statement_select_by_uid=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid");
-			statement_select_by_fields=session.prepare("select uid,field,value,change from values where type=:type and uid=:uid and field in :fields limit 64000");
-			statement_select_created_updated_by_uid=session.prepare("select max(change) as updated, min(change) as created from values where type=:type and uid=:uid");
-			statement_delete_by_uid=session.prepare("delete from values where type=:type and uid=:uid");
-			statement_delete_by_fields=session.prepare("delete from values where type=:type and uid=:uid and field in :fields");
-			statement_delete_by_field_value=session.prepare("delete from values where type=:type and uid=:uid and field=:field and value=:value");
-			statement_add_value=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
-			statement_add_value_ttl=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
+			session=Cluster.getSession();
+			statement_select_by_type=session.prepare("select uid,field,value,change from \""+keyspace+"\".\"values\" where type=:type limit 64000 allow filtering");
+			statement_select_by_uid=session.prepare("select uid,field,value,change from \""+keyspace+"\".\"values\" where type=:type and uid=:uid");
+			statement_select_by_fields=session.prepare("select uid,field,value,change from \""+keyspace+"\".\"values\" where type=:type and uid=:uid and field in :fields limit 64000");
+			statement_select_created_updated_by_uid=session.prepare("select max(change) as updated, min(change) as created from \""+keyspace+"\".\"values\" where type=:type and uid=:uid");
+			statement_delete_by_uid=session.prepare("delete from \""+keyspace+"\".\"values\" where type=:type and uid=:uid");
+			statement_delete_by_fields=session.prepare("delete from \""+keyspace+"\".\"values\" where type=:type and uid=:uid and field in :fields");
+			statement_delete_by_field_value=session.prepare("delete from \""+keyspace+"\".\"values\" where type=:type and uid=:uid and field=:field and value=:value");
+			statement_add_value=session.prepare("insert into \""+keyspace+"\".\"values\" (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now()))");
+			statement_add_value_ttl=session.prepare("insert into \""+keyspace+"\".\"values\" (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) using ttl :ttl");
 			
-			statement_add_value_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS");
-			statement_add_value_ttl_exist=session.prepare("insert into values (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS using ttl :ttl");
+			statement_add_value_exist=session.prepare("insert into \""+keyspace+"\".\"values\" (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS");
+			statement_add_value_ttl_exist=session.prepare("insert into \""+keyspace+"\".\"values\" (type,uid,field,value,change) values (:type,:uid,:field,:value,toTimestamp(now())) IF NOT EXISTS using ttl :ttl");
 		}catch(Exception e){
 			logger.error("error",e);
 			throw new RuntimeException(e);
@@ -206,9 +206,6 @@ public class Repo extends IdRepo {
 	@Override
 	public void shutdown() {
 		super.shutdown();
-		if (session!=null && !session.isClosed()) {
-			session.close();
-		}
 		session=null;
 	}
 	
@@ -235,6 +232,7 @@ public class Repo extends IdRepo {
 		if (value!=null && !value.isEmpty() && value.contains(activeValue)) { //activeAttr is set and activeAttr==activeValue
 			return true; 
 		}else if ((value==null || value.isEmpty()) && isExists(token, type, name)){ //activeAttr is not set and isExists==true
+			setActiveStatus(token, type, name, true); //restore activeAttr
 			return true; 
 		}
 		return false;
@@ -379,6 +377,9 @@ public class Repo extends IdRepo {
 					}
 				}
 				attributes.remove("uid");
+				if (!attributes.containsKey(activeAttr)) {
+					attributes.put(activeAttr, new HashSet<String>(Arrays.asList(new String[]{activeValue})));
+				}
 			}
 			Map<String, Set<String>> oldValuesMap=null;
 			if (!isAdd) { //get old values for rewrite
@@ -508,7 +509,7 @@ public class Repo extends IdRepo {
 		return indexByValue.get(table,new Callable<PreparedStatement>() {
 			@Override
 			public PreparedStatement call() throws Exception {
-				return session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values limit 64000");
+				return session.prepare("select uid,field,value from \""+keyspace+"\"."+table+" where type=:type and field=:field and value in :values limit 64000");
 			}
 		});
 	}
@@ -522,7 +523,7 @@ public class Repo extends IdRepo {
 		return indexByValueAndUID.get(table,new Callable<PreparedStatement>() {
 			@Override
 			public PreparedStatement call() throws Exception {
-				return session.prepare("select uid,field,value from "+table+" where type=:type and field=:field and value in :values and uid=:uid limit 64000");
+				return session.prepare("select uid,field,value from \""+keyspace+"\"."+table+" where type=:type and field=:field and value in :values and uid=:uid limit 64000");
 			}
 		});
 	}
@@ -621,7 +622,7 @@ public class Repo extends IdRepo {
 							values.add(row.getString("value"));
 						}
 					}catch(UncheckedExecutionException e) {
-						logger.debug("unknown index {}: {} {}",session.getKeyspace().get(),filterEntry.getKey(),e.getCause().toString());
+						logger.debug("unknown index {}: {} {}",keyspace,filterEntry.getKey(),e.getCause().toString());
 					}
 					//join result
 					if (result.isEmpty()) {

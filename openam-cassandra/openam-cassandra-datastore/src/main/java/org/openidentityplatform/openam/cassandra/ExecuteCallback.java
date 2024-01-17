@@ -56,7 +56,11 @@ public class ExecuteCallback {
 			onSuccess(result.getExecutionInfo());
 			return result;
 		}catch(Throwable e){
-			onFailure(e);
+			try {
+				onFailure(e);
+			}catch (Throwable e2) {
+				logger.error("",e2);
+			}
 			throw e;
 		}
 
@@ -82,10 +86,9 @@ public class ExecuteCallback {
 			final QueryTrace trace=result.getQueryTrace();
 			logger.trace("{}μs {} {}",trace.getDurationMicros(),trace.getParameters(),trace.getCoordinatorAddress());
 		}else if (logger.isTraceEnabled()){
-			logger.trace("{} {} ms {}: {}: {}"
+			logger.trace("{} {} ms: {}: {}"
 					,statement.getExecutionProfileName() 
 					,System.currentTimeMillis()-start
-					,getKeyspace()
 					,debugQuery(statement)
 					,statement.getConsistencyLevel()
 			);
@@ -93,18 +96,13 @@ public class ExecuteCallback {
 	}
 	
 	public void onFailure(Throwable t) {
-		logger.warn("{} {} ms {}: {} {}: {}"
+		logger.warn("{} {} ms: {} {}: {}"
 				,statement.getExecutionProfileName()
 				,System.currentTimeMillis()-start
-				,getKeyspace()
 				,debugQuery(statement)
 				,statement.getConsistencyLevel()
 				,t.getMessage()
 		);
-	}
-	
-	String getKeyspace() {
-		return statement.getKeyspace()==null?session.getKeyspace().get().toString():statement.getKeyspace().toString();
 	}
 	
 	static ArrayList<String> debugQuery(Statement<?>  statement) {

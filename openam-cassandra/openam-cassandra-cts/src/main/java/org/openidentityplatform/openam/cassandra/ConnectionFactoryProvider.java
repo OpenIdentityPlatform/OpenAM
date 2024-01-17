@@ -35,8 +35,6 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.CqlSessionBuilder;
-import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -60,7 +58,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 	// Injected
 	private final TimeoutConfig timeoutConfig;
 	private final ConnectionConfigFactory configFactory;
-	private final DataLayerConfiguration dataLayerConfiguration;
+//	private final DataLayerConfiguration dataLayerConfiguration;
 
 	private final Debug debug;
 	private final ConnectionType connectionType;
@@ -85,7 +83,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 		this.timeoutConfig = timeoutConfig;
 		this.debug = debug;
 		this.connectionType = connectionType;
-		this.dataLayerConfiguration=dataLayerConfiguration;
+//		this.dataLayerConfiguration=dataLayerConfiguration;
 	}
 
 	static ConnectionFactory connectionFactory=null;
@@ -104,15 +102,14 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 			
 					debug("Creating Embedded Factory:\nURL: {0}\nMax Connections: {1}\nHeartbeat: {2}\nOperation Timeout: {3}", config.getLDAPURLs(), config.getMaxConnections(), config.getLdapHeartbeat(), timeout);
 			
-					final String keyspace=dataLayerConfiguration.getKeySpace();
+//					final String keyspace=dataLayerConfiguration.getKeySpace();
 					
 			//		final String username=config.getBindDN();
 			//		final String password=new String(config.getBindPassword());
 					
-					CqlSessionBuilder builder=CqlSession.builder()
-							.withApplicationName("OpenAM CTS: "+keyspace)
-							.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()))
-							.withKeyspace(keyspace);
+//					CqlSessionBuilder builder=CqlSession.builder()
+//							.withApplicationName("OpenAM CTS: "+keyspace)
+//							.withConfigLoader(DriverConfigLoader.fromDefaults(Repo.class.getClassLoader()));
 			//		if (StringUtils.isNotBlank(username)&&StringUtils.isNotBlank(password)) {
 			//			builder=builder.withAuthCredentials(username, password);
 			//		}
@@ -125,7 +122,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 			//				}
 			//			}
 			//		}
-					connectionFactory=new ConnectionFactory(builder);
+					connectionFactory=new ConnectionFactory();
 				}
 			}
 		}
@@ -138,10 +135,8 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 	}
 
 	public static class ConnectionFactory implements org.forgerock.openam.sm.datalayer.api.ConnectionFactory<CqlSession> {
-		final CqlSessionBuilder builder;
-
-		public ConnectionFactory(CqlSessionBuilder cluster) {
-			this.builder = cluster;
+		
+		public ConnectionFactory() {
 		}
 
 		@Override
@@ -161,7 +156,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 			if (session==null) {
 				synchronized (this.getClass()) {
 					if (session==null) {
-						session=builder.build(); 
+						session=Cluster.getSession(); 
 					}
 				}
 			}
@@ -171,7 +166,7 @@ public class ConnectionFactoryProvider implements org.forgerock.openam.sm.datala
 		@Override
 		public void close() {
 			if (session!=null && !session.isClosed()) {
-				session.close();
+				session=null;
 			}
 		}
 
