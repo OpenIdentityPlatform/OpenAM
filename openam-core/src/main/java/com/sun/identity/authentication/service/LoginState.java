@@ -1104,13 +1104,16 @@ public class LoginState {
             InternalSession internalSession = getReferencedSession();
             
             final SessionActivator sa=getSessionActivator();
-            DEBUG.message("activate before isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}" , 
-            		isSessionUpgrade(),forceAuth,sa.getClass().getSimpleName(),oldSessionReference,getOldSession(),sessionReference,getSession(),finalSessionId);
+            if(DEBUG.messageEnabled()) {
+                DEBUG.message("activate before isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}",
+                        isSessionUpgrade(), forceAuth, sa.getClass().getSimpleName(), oldSessionReference, getOldSession(), sessionReference, getSession(), finalSessionId);
+            }
             
             final boolean isSessionActivated = sa.activateSession(this, AuthD.getSessionService(),internalSession, subject);
-            
-            DEBUG.message("activate after isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}" , 
-            		isSessionUpgrade(),forceAuth,sa.getClass().getSimpleName(),oldSessionReference,getOldSession(),sessionReference,getSession(),finalSessionId);
+            if(DEBUG.messageEnabled()) {
+                DEBUG.message("activate after isSessionUpgrade={} forceAuth={} getSessionActivator={} oldSessionReference={} getOldSession={} sessionReference={} getSession={} finalSessionId={}",
+                        isSessionUpgrade(), forceAuth, sa.getClass().getSimpleName(), oldSessionReference, getOldSession(), sessionReference, getSession(), finalSessionId);
+            }
             
             if (isSessionActivated) {
                 this.activatedSessionTrackingId = internalSession.getProperty(Constants.AM_CTX_ID);
