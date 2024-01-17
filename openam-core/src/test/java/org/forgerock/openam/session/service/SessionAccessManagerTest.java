@@ -70,7 +70,7 @@ public class SessionAccessManagerTest {
         sessionAccessManager.persistInternalSession(session);
 
         // Then
-        verify(sessionStore).create(any(InternalSession.class));
+        verify(sessionStore).update(any(InternalSession.class));
     }
 
     @Test
