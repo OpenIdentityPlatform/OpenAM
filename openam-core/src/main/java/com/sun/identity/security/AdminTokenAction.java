@@ -144,7 +144,11 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     public void authenticationInitialized() {
         authInitialized = true;
         // Generate the DPro's SSOToken
-        appSSOToken = getSSOToken();
+        if (SystemProperties.isServerMode()) { //use in server first internalAppSSOToken (without CTS)
+        	appSSOToken = internalAppSSOToken;
+        }else {
+        	appSSOToken = getSSOToken();
+        }
         if (debug.messageEnabled()) {
             debug.message("AdminTokenAction:authenticationInit " +
                     "called. AppSSOToken className=" + (String)
@@ -193,49 +197,47 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
      */
     public SSOToken run() {
         SSOToken answer = null;
-    	synchronized (this) {
-	        // Check if we have a valid cached SSOToken
-	        if (appSSOToken != null) {
-	        	if(tokenManager.isValidToken(appSSOToken)) {
-		            try {
-		                if (validateSession) {
-		                    tokenManager.refreshSession(appSSOToken);
-		                }
-		                if (tokenManager.isValidToken(appSSOToken)) {
-		                    return appSSOToken;
-		                }else {
-		            		debug.message("AdminTokenAction.reset: invalid token.");
-		                    appSSOToken = null;
-		            	}
-		            } catch (SSOException ssoe) {
-		                debug.error("AdminTokenAction.reset: couldn't retrieve valid token.", ssoe);
+        // Check if we have a valid cached SSOToken
+        if (appSSOToken != null) {
+        	if(tokenManager.isValidToken(appSSOToken)) {
+	            try {
+	                if (validateSession) {
+	                    tokenManager.refreshSession(appSSOToken);
+	                }
+	                if (tokenManager.isValidToken(appSSOToken)) {
+	                    return appSSOToken;
+	                }else {
+	            		debug.message("AdminTokenAction.reset: invalid token.");
 	                    appSSOToken = null;
-		            }
-	        	}else {
-	        		debug.message("AdminTokenAction.reset: invalid token.");
-	                appSSOToken = null;
-	        	}
-	        }
+	            	}
+	            } catch (SSOException ssoe) {
+	                debug.error("AdminTokenAction.reset: couldn't retrieve valid token.", ssoe);
+                    appSSOToken = null;
+	            }
+        	}else {
+        		debug.message("AdminTokenAction.reset: invalid token.");
+                appSSOToken = null;
+        	}
+        }
 
-        	// Try getting the token from serverconfig.xml
-            // Check if internalAppSSOToken is present
-            if (!authInitialized && internalAppSSOToken != null) { 
-            	if (tokenManager.isValidToken(internalAppSSOToken)) {
-            		return internalAppSSOToken;
-            	}else {
-            		internalAppSSOToken=null;
-            	}
+    	// Try getting the token from serverconfig.xml
+        // Check if internalAppSSOToken is present
+        if (!authInitialized && internalAppSSOToken != null) { 
+        	if (tokenManager.isValidToken(internalAppSSOToken)) {
+        		return internalAppSSOToken;
+        	}else {
+        		internalAppSSOToken=null;
+        	}
+        }
+    	answer = getSSOToken();
+        if (answer != null) {
+            if (!SystemProperties.isServerMode() || authInitialized) {
+                appSSOToken = answer;
             }
-        	answer = getSSOToken();
-            if (answer != null) {
-                if (!SystemProperties.isServerMode() || authInitialized) {
-                    appSSOToken = answer;
-                }
-                return answer;
-            } else if (debug.messageEnabled()) {
-                debug.message("AdminTokenAction::run Unable to get SSOToken from serverconfig.xml");
-            }
-		}
+            return answer;
+        } else if (debug.messageEnabled()) {
+            debug.message("AdminTokenAction::run Unable to get SSOToken from serverconfig.xml");
+        }
         
         // Check for configured Application Token Provider in AMConfig.properties
         String appTokenProviderName = SystemProperties.get(ADMIN_TOKEN_PROVIDER);
