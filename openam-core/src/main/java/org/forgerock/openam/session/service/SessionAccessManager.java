@@ -131,7 +131,7 @@ public class SessionAccessManager {
     public void persistInternalSession(InternalSession session) {
 
         try {
-            if(internalSessionStore.getBySessionID(session.getID()) != null) {
+            if(session.isStored()) {
                 internalSessionStore.update(session);
             }
             else  {

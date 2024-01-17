@@ -5011,9 +5011,13 @@ public class LoginState {
                     sb.append(postLoginClassName);
                 }
             }
-            InternalSession session = getReferencedSession();
-            if(session != null)
-            	session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
+            if(!isNoSession()) {
+                InternalSession session = getReferencedSession();
+                if(session != null) {
+                    session.putProperty(ISAuthConstants.POST_AUTH_PROCESS_INSTANCE, sb.toString());
+                }
+            }
+
         }
         return postLoginInstanceSet;
     }
