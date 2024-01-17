@@ -11,17 +11,36 @@
 [![Top language](https://img.shields.io/github/languages/top/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM)
 [![Code size in bytes](https://img.shields.io/github/languages/code-size/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM)
 
-Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements and Web Services Security.
+# Project Overview 
 
-Cross Domain Single Sign On (CDSSO), SAML 2.0, OAuth 2.0 & OpenID Connect ensure that OpenAM integrates easily with legacy, custom and cloud applications without requiring any modifications. It's a developer-friendly, open-source control solution that allows you to own and protect your users digital identities.
+Open Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements, and Web Services Security.
+
+Cross Domain Single Sign On (CDSSO), SAML 2.0, OAuth 2.0 & OpenID Connect ensure that OpenAM integrates easily with legacy, custom, and cloud applications without requiring any modifications. 
+It's a developer-friendly, open-source control solution that allows you to own and protect your user's digital identities.
+
+## Key Features
+### Authentication Management
+With OpenAM you can set up complex authentication processes using various authentication methods,
+such as login and password, OTP, saved cookie, QR authentication, and more...
+OpenAM also supports third-party identity providers using SAML, OAuth2, NTLM, and Kerberos protocols.
+### Access Management
+Integrations with [OpenIG](https://github.com/OpenIdentityPlatform/OpenIG) or OpenAM Policy Agent allow you to set up flexible access policies to your resources.
+There could be role-based, authentication level-based, or attribute-based and, if you need flexible logic, you can script access policy.
+### Cross Domain Single Sign-On
+After a single authentication, a user gets access to all resources protected by OpenAM. So, there is no need to authenticate at other services.
+### Federation
+OpenAM supports OAuth2/OIDC and SAMLv2 Federation protocols, so OpenAM can act as both Identity and Service Provider.
+### Extensibility
+If you have to extend OpenAM functionality, it is relatively easy to do. OpenAM pluggable architecture allows modification relatively easy.
+You can implement your custom authentication module, user data source, session data source, post-authentication process logic, and more...
 
 ## License
 This project is licensed under the [Common Development and Distribution License (CDDL)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md). 
 
 ## Downloads 
-* [OpenAM ZIP](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
-* [OpenAM WAR](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
-* [OpenAM Docker](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
+* [OpenAM Distribution Packages](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)
+* [OpenAM Docker Image](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
+
 ### Download OpenAM Policy Agents:
 * [OpenAM Java Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
 * [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#Установка-файлов-бинарной-поставки) (Windows/Linux)
@@ -32,10 +51,10 @@ This project is licensed under the [Common Development and Distribution License 
 
 **[OpenAM Quick Start Guide](https://github.com/OpenIdentityPlatform/OpenAM/wiki/Quick-Start-Guide)**
 
-## How-to build
-To build OpenAM from source you should use JDK 8
+## How-to Build OpenAM from Source
+To build OpenAM from source you should use JDK 8 or higher
 
-For windows use:
+For Windows users before clone and build run the following command:
 ```bash
 git config --system core.longpaths true
 ```
@@ -45,8 +64,8 @@ git clone https://github.com/OpenIdentityPlatform/OpenAM.git
 mvn install -f OpenAM
 ```
 
-## How-to run after build
-Add FQDN host name in /etc/hosts (Windows c:\windows\systems32\drivers\etc\hosts):
+## How-to Run After the Build
+Add FQDN host name in `/etc/hosts` (Windows `c:\windows\systems32\drivers\etc\hosts`) file: 
 
 ```bash
 127.0.0.1 login.domain.com
@@ -90,9 +109,10 @@ For example, `-Xmx2048m`
 
 ## Support and Mailing List Information
 * OpenAM Community Wiki: https://github.com/OpenIdentityPlatform/OpenAM/wiki
-* OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
+* OpenAM Community Discussions: https://github.com/OpenIdentityPlatform/OpenIG/discussions
 * OpenAM Community Archive: https://groups.google.com/d/forum/open-identity-platform-openam
 * OpenAM Community on Gitter: https://gitter.im/OpenIdentityPlatform/OpenAM
+* OpenAM Community Mailing List: open-identity-platform-openam@googlegroups.com
 * OpenAM Commercial support RFP: support@3a-systems.ru (English, Russian)
 
 ## Contributing
