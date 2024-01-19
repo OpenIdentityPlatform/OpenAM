@@ -1608,8 +1608,10 @@ public class LoginState {
     /* destroy session */
     void destroySession() {
         if (sessionReference != null) {
-            AuthUtils.removeAuthContext(finalSessionId);
-            LazyConfig.AUTHD.destroySession(finalSessionId);
+            if(!isNoSession()) {
+                AuthUtils.removeAuthContext(finalSessionId);
+                LazyConfig.AUTHD.destroySession(finalSessionId);
+            }
             finalSessionId = null;
             sessionReference = null;
         }
@@ -4232,7 +4234,7 @@ public class LoginState {
             String[] data = dataList.toArray(new String[dataList.size()]);
             String contextId = null;
             SSOToken localSSOToken = null;
-            if (!isNoSession()) {
+            if (!isNoSession() && oldSessionReference != null) {
                 localSSOToken = getSSOToken();
             }
             if (localSSOToken != null) {
@@ -4252,7 +4254,11 @@ public class LoginState {
             if (authMethName != null) {
                 props.put(LogConstants.MODULE_NAME, authMethName);
             }
-            InternalSession session = getReferencedSession();
+            InternalSession session = null;
+            if(!isNoSession()) {
+                session = getReferencedSession();
+            }
+
             if (session != null) {
                 props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }
