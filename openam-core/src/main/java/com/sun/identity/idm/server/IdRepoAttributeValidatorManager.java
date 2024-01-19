@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdConstants;
@@ -54,7 +56,7 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
     static Debug debug = Debug.getInstance("amIdm");
     static boolean initializedListeners;
     static ServiceConfigManager idRepoServiceConfigManager;
-    static Map<String, IdRepoAttributeValidator> validatorCache = new HashMap();
+    static Map<String, IdRepoAttributeValidator> validatorCache = new ConcurrentHashMap<>();
 
     private IdRepoAttributeValidatorManager() {
         // Initialize listeners
@@ -96,7 +98,7 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
         }
 
         Map<String, Set<String>> configParams = new HashMap();
-        synchronized (validatorCache) {
+        //synchronized (realm) {
             try {
                 ServiceConfig orgConfig =
                     idRepoServiceConfigManager.getOrganizationConfig(realm,
@@ -138,7 +140,8 @@ public class IdRepoAttributeValidatorManager implements ServiceListener {
                 validator = new IdRepoAttributeValidatorImpl();
             }
             validator.initialize(configParams);
-        }
+            validatorCache.put(realm, validator);
+        //}
 
         return validator;
     }
