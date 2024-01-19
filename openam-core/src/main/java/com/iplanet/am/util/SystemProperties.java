@@ -43,6 +43,7 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
@@ -139,12 +140,29 @@ public class SystemProperties {
     private static String initSecondaryError = null;
     private static String instanceName = null;
 
+    static Map<String,String> systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
+    
+    static {
+    	final Properties pOnChange=new Properties() 
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public synchronized Object setProperty(String key, String value) {
+				systemProp.put(key, value);
+				return super.setProperty(key, value);
+			}
+		};
+		pOnChange.putAll(System.getProperties());
+    	System.setProperties(pOnChange);
+    }
+    
     /*
      * Initialization to load the properties file for config information before
      * anything else starts.
      */
     static {
-        try {
+        try { 
             // Load properties from file
             String serverName = System.getProperty(SERVER_NAME_PROPERTY);
             String configName = System.getProperty(CONFIG_NAME_PROPERTY, AMCONFIG_FILE_NAME);
@@ -274,9 +292,8 @@ public class SystemProperties {
         String value = getProp(key);
         return ((value == null) ? def : value);
     }
-
     private static String getProp(String key) {
-        String answer = System.getProperty(key);
+        String answer = systemProp.get(key);
         if (answer == null) {
             answer = propertiesHolderRef.get().getProperty(key);
         }
