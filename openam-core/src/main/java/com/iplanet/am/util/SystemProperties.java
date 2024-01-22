@@ -140,23 +140,6 @@ public class SystemProperties {
     private static String initSecondaryError = null;
     private static String instanceName = null;
 
-    static Map<String,String> systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
-    
-    static {
-    	final Properties pOnChange=new Properties() 
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public synchronized Object setProperty(String key, String value) {
-				systemProp.put(key, value);
-				return super.setProperty(key, value);
-			}
-		};
-		pOnChange.putAll(System.getProperties());
-    	System.setProperties(pOnChange);
-    }
-    
     /*
      * Initialization to load the properties file for config information before
      * anything else starts.
@@ -292,7 +275,26 @@ public class SystemProperties {
         String value = getProp(key);
         return ((value == null) ? def : value);
     }
+    
+    static Map<String,String> systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
+    
+    private static class pOnChange extends Properties {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public synchronized Object setProperty(String key, String value) {
+			systemProp.put(key, value);
+			return super.setProperty(key, value);
+		}
+	};
+	
     private static String getProp(String key) {
+    	if (!(SystemProperties.getProperties() instanceof pOnChange)) {
+    		systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
+    		final pOnChange newpOnChange=new pOnChange();
+    		newpOnChange.putAll(systemProp);
+        	System.setProperties(newpOnChange);
+    	}
         String answer = systemProp.get(key);
         if (answer == null) {
             answer = propertiesHolderRef.get().getProperty(key);
