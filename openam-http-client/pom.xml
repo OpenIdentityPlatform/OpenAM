@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.8.3</version>
+        <version>14.8.4-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
@@ -47,7 +47,7 @@
         <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
         <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
         <developerConnection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</developerConnection>
-      <tag>14.8.3</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <repositories>
