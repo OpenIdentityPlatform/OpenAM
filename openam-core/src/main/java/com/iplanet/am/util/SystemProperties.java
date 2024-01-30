@@ -43,12 +43,16 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
+import javax.xml.rpc.holders.StringHolder;
 
 import com.google.common.base.Predicate;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.forgerock.openam.utils.StringUtils;
@@ -275,27 +279,23 @@ public class SystemProperties {
         String value = getProp(key);
         return ((value == null) ? def : value);
     }
-    
-    static Map<String,String> systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
-    
-    private static class pOnChange extends Properties {
-		private static final long serialVersionUID = 1L;
 
-		@Override
-		public synchronized Object setProperty(String key, String value) {
-			systemProp.put(key, value);
-			return super.setProperty(key, value);
-		}
-	};
-	
+
+    static Cache<String, StringHolder> propertyCache;
+
     private static String getProp(String key) {
-    	if (!(SystemProperties.getProperties() instanceof pOnChange)) {
-    		systemProp=new ConcurrentHashMap<>(Maps.fromProperties(System.getProperties()));
-    		final pOnChange newpOnChange=new pOnChange();
-    		newpOnChange.putAll(systemProp);
-        	System.setProperties(newpOnChange);
-    	}
-        String answer = systemProp.get(key);
+        String answer;
+        try {
+            if (propertyCache==null) {
+                propertyCache= CacheBuilder.newBuilder()
+                        .maximumSize(2048)
+                        .expireAfterAccess(60, TimeUnit.SECONDS)
+                        .build();
+            }
+            answer = propertyCache.get(key, () -> new StringHolder(System.getProperty(key))).value;
+        } catch (ExecutionException e) {
+            answer=System.getProperty(key);
+        }
         if (answer == null) {
             answer = propertiesHolderRef.get().getProperty(key);
         }
