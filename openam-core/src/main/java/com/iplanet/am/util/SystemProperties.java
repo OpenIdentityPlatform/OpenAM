@@ -283,6 +283,12 @@ public class SystemProperties {
 
     static Cache<String, StringHolder> propertyCache;
 
+    static void clearCache() {
+        if (propertyCache!=null) {
+            propertyCache.invalidateAll();
+        }
+    }
+
     private static String getProp(String key) {
         String answer;
         try {
@@ -464,6 +470,7 @@ public class SystemProperties {
      * @exception MissingResourceException
      */
     public static void initializeProperties(String file) throws MissingResourceException {
+        clearCache();
         Properties props = new Properties();
         ResourceBundle bundle = ResourceBundle.getBundle(file);
         // Copy the properties to props
@@ -501,6 +508,7 @@ public class SystemProperties {
      * @param withDefaults <code>true</code> to include default properties.
      */
     public static void initializeProperties(Properties properties, boolean reset, boolean withDefaults) {
+        clearCache();
         Properties defaultProp = null;
         if (withDefaults) {
             SSOToken appToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -536,6 +544,7 @@ public class SystemProperties {
      * @param propertyValue property value.
      */
     public static void initializeProperties(String propertyName, String propertyValue) {
+        clearCache();
         Properties newProps = new Properties();
         newProps.put(propertyName, propertyValue);
         initializeProperties(newProps, false, false);
