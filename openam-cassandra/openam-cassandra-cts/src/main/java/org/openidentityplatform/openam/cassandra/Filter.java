@@ -47,12 +47,14 @@ public class Filter {
 		return "Filter [clauses=" + clauses + "]";
 	}
 
-	public Map<String,Object> field2value=new TreeMap<String,Object>(String.CASE_INSENSITIVE_ORDER);
-	public List<Relation> clauses=new ArrayList<Relation>();
+	public Map<String,Object> field2value= new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	public List<Relation> clauses= new ArrayList<>();
 	public String getTable() {
-		for (String field: field2value.keySet()) {
-			if (!StringUtils.equalsIgnoreCase("coreTokenId",field)) {
-				return field;
+		if (field2value.size()==1) { //use index only one field
+			for (String field : field2value.keySet()) {
+				if (!StringUtils.equalsIgnoreCase("coreTokenId", field) && !StringUtils.equalsIgnoreCase("coreTokenString13", field)) {
+					return field;
+				}
 			}
 		}
 		return dataLayerConfiguration.getTableName();
