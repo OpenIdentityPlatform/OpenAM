@@ -27,6 +27,7 @@
     $Id: amAuthAD.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
     Portions Copyrighted 2013-2016 ForgeRock AS.
+    Portions Copyrighted 2024 3A Systems LLC
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -38,7 +39,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthADService"
             i18nFileName="amAuthAD"
-            revisionNumber="30"
+            revisionNumber="31"
             i18nKey="sunAMAuthADServiceDescription"
             resourceName="activedirectory">
 
@@ -60,19 +61,36 @@
                     order="200"
                     resourceName="secondaryLdapServer">
                 </AttributeSchema>
+                <AttributeSchema name="openam-use-binding-for-auth"
+                     type="single"
+                     syntax="boolean"
+                     i18nKey="a1021"
+                     order="210"
+                     resourceName="useBindingForAuth">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-binding-user-domain"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a1022"
+                                 order="220"
+                                 resourceName="userDomain">
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                     type="list"
                     syntax="dn"
                     i18nKey="a103"
                     order="300"
-                                 resourceName="userSearchStartDN">
+                    resourceName="userSearchStartDN">
                     <DefaultValues>
                         <Value>@UM_NORMALIZED_ORGBASE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-bind-dn"
                     type="single"
-                    syntax="dn"
+                    syntax="string"
                     i18nKey="a104"
                     order="400"
                     resourceName="userBindDN">
@@ -259,6 +277,23 @@
                         order="200"
                         resourceName="secondaryLdapServer">
                     </AttributeSchema>
+                    <AttributeSchema name="openam-use-binding-for-auth"
+                         type="single"
+                         syntax="boolean"
+                         i18nKey="a1021"
+                         order="210"
+                         resourceName="useBindingForAuth">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-binding-user-domain"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a1022"
+                                     order="220"
+                                     resourceName="userDomain">
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                         type="list"
                         syntax="dn"
@@ -271,7 +306,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-bind-dn"
                         type="single"
-                        syntax="dn"
+                        syntax="string"
                         i18nKey="a104"
                         order="400"
                         resourceName="userBindDN">

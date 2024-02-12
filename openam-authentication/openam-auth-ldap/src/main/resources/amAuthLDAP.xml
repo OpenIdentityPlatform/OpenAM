@@ -28,6 +28,7 @@
 
     Portions Copyrighted 2011-2016 ForgeRock AS.
     Portions Copyrighted 2019 Open Source Solution Technology Corporation
+    Portions Copyrighted 2024 3A Systems LLC
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -60,6 +61,16 @@
                     i18nKey="a102"
                     order="200"
                     resourceName="secondaryLdapServer">
+                </AttributeSchema>
+                <AttributeSchema name="openam-use-binding-for-auth"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a1021"
+                                 order="210"
+                                 resourceName="useBindingForAuth">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                     type="list"
@@ -301,6 +312,16 @@
                         i18nKey="a102"
                         order="200"
                         resourceName="secondaryLdapServer">
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-use-binding-for-auth"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a1021"
+                                     order="210"
+                                     resourceName="useBindingForAuth">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                         type="list"

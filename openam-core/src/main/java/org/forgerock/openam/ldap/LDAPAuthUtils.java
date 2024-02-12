@@ -27,6 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 
 package org.forgerock.openam.ldap;
@@ -63,6 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -98,6 +100,8 @@ import org.forgerock.util.time.Duration;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
+
+    private boolean useBindingForAuth;
     private String authDN = "";
     private Set<String> userSearchAttrs = null;
     private String searchFilter = "";
@@ -126,15 +130,17 @@ public class LDAPAuthUtils {
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
     private boolean isAd = false;
+
+    private String bindingUserDomain = null;
     private String protocolVersion;
 
     // Resource Bundle used to get l10N message
     private ResourceBundle bundle;
 
     private static Map<String, ConnectionFactory> connectionPools =
-            new ConcurrentHashMap<String, ConnectionFactory>();
+            new ConcurrentHashMap<>();
     private static Map<String, ConnectionFactory> adminConnectionPools =
-            new ConcurrentHashMap<String, ConnectionFactory>();
+            new ConcurrentHashMap<>();
     private ConnectionFactory cPool = null;
     private ConnectionFactory acPool = null;
     private final static int NO_EXPIRY_TIME = -1;
@@ -151,8 +157,8 @@ public class LDAPAuthUtils {
     private static int maxDefaultPoolSize = MAX_CONNECTION_POOL_SIZE;
     // contains host:port:min:max
     private static Set<String> poolSize = null;
-    private Set<String> userAttributes = new HashSet<String>();
-    private Map<String, Set<String>> userAttributeValues = new HashMap<String, Set<String>>();
+    private Set<String> userAttributes = new HashSet<>();
+    private Map<String, Set<String>> userAttributeValues = new HashMap<>();
     private boolean isDynamicUserEnabled;
     private String [] attrs = null;
     private static String AD_PASSWORD_EXPIRED = "data 532";
@@ -247,7 +253,7 @@ public class LDAPAuthUtils {
      * @throws LDAPUtilException If the provided search base was invalid.
      */
     public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean isSecure,
-            ResourceBundle bundle, String baseDN, Debug debug) throws LDAPUtilException {
+            ResourceBundle bundle, String baseDN, boolean useBindingForAuth, Debug debug) throws LDAPUtilException {
         this.primaryServers = primaryServers;
         this.secondaryServers = secondaryServers;
         servers = new LinkedHashSet<String>(primaryServers);
@@ -257,11 +263,17 @@ public class LDAPAuthUtils {
 
         this.baseDN = baseDN;
         this.debug = debug;
+        this.useBindingForAuth = useBindingForAuth;
 
-        if (baseDN == null || baseDN.length() < 1) {
+        if (!useBindingForAuth && (baseDN == null || baseDN.length() < 1)) {
             debug.message("Invalid  search Base");
             throw new LDAPUtilException("SchBaseInvalid", (Object[]) null);
         }
+    }
+
+    public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean isSecure,
+                         ResourceBundle bundle, String baseDN, Debug debug) throws LDAPUtilException {
+        this(primaryServers, secondaryServers, isSecure, bundle, baseDN, false, debug);
     }
 
     private ConnectionFactory createConnectionPool(Map<String, ConnectionFactory> connectionPools,
@@ -398,11 +410,15 @@ public class LDAPAuthUtils {
         boolean shouldRetry = false;
         do {
             try {
-                searchForUser();
-                if (screenState == ModuleState.SERVER_DOWN || screenState == ModuleState.USER_NOT_FOUND) {
-                    return;
+                if (this.useBindingForAuth) {
+                    bindAuthentication();
+                } else {
+                    searchForUser();
+                    if (screenState == ModuleState.SERVER_DOWN || screenState == ModuleState.USER_NOT_FOUND) {
+                        return;
+                    }
+                    authenticate();
                 }
-                authenticate();
                 shouldRetry = false;
             } catch (LDAPUtilException e) {
                 // cases for err=53
@@ -434,6 +450,45 @@ public class LDAPAuthUtils {
             }
         } while (shouldRetry);
 
+    }
+
+    /**
+     * Binds to LDAP server using provided credentials
+     */
+    private void bindAuthentication() throws LDAPUtilException {
+        String bindingUserId = userId;
+        if(!userId.contains("@") && StringUtils.isNotBlank(bindingUserDomain)) {
+            bindingUserId = String.format("%s@%s", userId, bindingUserDomain);
+        }
+        BindRequest bindRequest =
+                LDAPRequests.newSimpleBindRequest(bindingUserId, userPassword.toCharArray());
+
+        try(Connection conn = getConnection()) {
+            BindResult bindResult = conn.bind(bindRequest);
+            if(bindResult.isSuccess()) {
+                setState(ModuleState.SUCCESS);
+                userNamingValue = userId;
+            }
+        } catch (LdapException ere) {
+            if (debug.messageEnabled()) {
+                debug.message("authenticateUser: error binding with credentials to" + servers + ": ", ere);
+            }
+            if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
+                    ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
+                    ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
+                    ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Cannot connect to " + servers, ere);
+                }
+                setState(ModuleState.SERVER_DOWN);
+            } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
+                if (debug.messageEnabled()) {
+                    debug.message(servers + " unwilling to perform auth request");
+                }
+                String[] args = {ere.getMessage()};
+                throw new LDAPUtilException("FConnect", ResultCode.UNWILLING_TO_PERFORM, args);
+            }
+        }
     }
 
     /**
@@ -585,7 +640,7 @@ public class LDAPAuthUtils {
         if (userSearchAttrs.size() == 1) {
             filter = Filter.equality(userSearchAttrs.iterator().next(), userId);
         } else {
-            List<Filter> searchFilters = new ArrayList<Filter>(userSearchAttrs.size());
+            List<Filter> searchFilters = new ArrayList<>(userSearchAttrs.size());
             for (String searchAttr : userSearchAttrs) {
                 searchFilters.add(Filter.equality(searchAttr, userId));
             }
@@ -727,7 +782,7 @@ public class LDAPAuthUtils {
                                     attr = entry.getAttribute(attrs[i]);
 
                                     if (attr != null) {
-                                        Set<String> s = new HashSet<String>();
+                                        Set<String> s = new HashSet<>();
                                         Iterator<ByteString> values = attr.iterator();
 
                                         while (values.hasNext()) {
@@ -974,7 +1029,7 @@ public class LDAPAuthUtils {
             return Collections.EMPTY_LIST;
         }
 
-        List<Control> controls = new ArrayList<Control>();
+        List<Control> controls = new ArrayList<>();
         DecodeOptions options = new DecodeOptions();
         Control c;
 
@@ -1301,10 +1356,9 @@ public class LDAPAuthUtils {
      * TODO-JAVADOC
      */
     public String getUserId() {
-        if (returnUserDN) {
+        if (returnUserDN && !useBindingForAuth) {
             return userDN;
-        }
-        else {
+        } else {
             return userNamingValue;
         }
     }
@@ -1524,6 +1578,10 @@ public class LDAPAuthUtils {
         }
     }
 
+    public void setUseBindingForAuth(boolean useBindingForAuth) {
+        this.useBindingForAuth = useBindingForAuth;
+    }
+
     /**
      * Sets attributes names to be use in the search for the
      * user prior to authenticating with the bind. These attributes
@@ -1582,6 +1640,10 @@ public class LDAPAuthUtils {
      */
     public void setProtocolVersion(String tlsVersion) {
         this.protocolVersion = tlsVersion;
+    }
+
+    public void setBindingUserDomain(String bindingUserDomain) {
+        this.bindingUserDomain = bindingUserDomain;
     }
 
     class PasswordPolicyResult {

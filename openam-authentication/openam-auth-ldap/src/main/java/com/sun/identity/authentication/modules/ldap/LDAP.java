@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -86,6 +87,8 @@ public class LDAP extends AMLoginModule {
     private String regEx;
     private String currentConfigName;
     private String bindDN;
+
+    private Boolean useBindingForAuth = false;
     private String protocolVersion;
     private int currentState;
     protected LDAPAuthUtils ldapUtil;
@@ -113,7 +116,7 @@ public class LDAP extends AMLoginModule {
         ACCOUNT_LOCKED(5, "accountLocked");
 
         private static final Map<Integer,LoginScreen> lookup =
-                new HashMap<Integer,LoginScreen>();
+                new HashMap<>();
 
         static {
             for(LoginScreen ls : EnumSet.allOf(LoginScreen.class)) {
@@ -180,7 +183,9 @@ public class LDAP extends AMLoginModule {
 
             String baseDN = CollectionHelper.getServerMapAttr(
                 currentConfig, "iplanet-am-auth-ldap-base-dn");
-            if (baseDN == null) {
+
+            useBindingForAuth = CollectionHelper.getBooleanMapAttr(currentConfig, "openam-use-binding-for-auth", false);
+            if (baseDN == null && !useBindingForAuth) {
                 debug.error("BaseDN for search was null");
             }
 
@@ -193,6 +198,7 @@ public class LDAP extends AMLoginModule {
                     debug.error("LDAP.initializeLDAP : " + pLen, ex);
                 }
             }
+
             bindDN = CollectionHelper.getMapAttr(currentConfig,
                 "iplanet-am-auth-ldap-bind-dn", "");
             char[] bindPassword = CollectionHelper.getMapAttr(
@@ -255,7 +261,7 @@ public class LDAP extends AMLoginModule {
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, isSecure, bundle, baseDN, debug);
+            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, isSecure, bundle, baseDN, useBindingForAuth, debug);
             ldapUtil.setScope(searchScope);
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setUserNamingAttribute(userNamingAttr);
@@ -273,9 +279,11 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
             ldapUtil.setOperationTimeout(operationTimeout);
             ldapUtil.setProtocolVersion(protocolVersion);
+            ldapUtil.setUseBindingForAuth(useBindingForAuth);
 
             if (debug.messageEnabled()) {
                 debug.message("bindDN-> " + bindDN
+                        + "\nuseBindingForAuth-> " + useBindingForAuth
                         + "\nrequiredPasswordLength-> " + requiredPasswordLength
                         + "\nbaseDN-> " + baseDN
                         + "\nuserNamingAttr-> " + userNamingAttr

@@ -24,6 +24,7 @@
  *
  * $Id: AD.java,v 1.3 2008/06/25 05:41:55 qcheng Exp $
  *
+ *  Portions Copyrighted 2024 3A Systems LLC
  */
 
 
@@ -77,6 +78,10 @@ public class AD extends LDAP {
         }
         
         ldapUtil.setAD(true);
+
+        String bindingUserDomain = CollectionHelper.getMapAttr(currentConfig, "openam-binding-user-domain");
+        ldapUtil.setBindingUserDomain(bindingUserDomain);
+
         return returnValue;
     }
 }
