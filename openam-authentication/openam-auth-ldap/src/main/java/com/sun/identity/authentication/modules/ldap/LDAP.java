@@ -57,6 +57,7 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.ldap.LDAPAuthUtils;
 import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.ModuleState;
@@ -184,11 +185,6 @@ public class LDAP extends AMLoginModule {
             String baseDN = CollectionHelper.getServerMapAttr(
                 currentConfig, "iplanet-am-auth-ldap-base-dn");
 
-            useBindingForAuth = CollectionHelper.getBooleanMapAttr(currentConfig, "openam-use-binding-for-auth", false);
-            if (baseDN == null && !useBindingForAuth) {
-                debug.error("BaseDN for search was null");
-            }
-
             String pLen = CollectionHelper.getMapAttr(currentConfig,
                 "iplanet-am-auth-ldap-min-password-length");
             if (pLen != null) {
@@ -199,8 +195,13 @@ public class LDAP extends AMLoginModule {
                 }
             }
 
-            bindDN = CollectionHelper.getMapAttr(currentConfig,
-                "iplanet-am-auth-ldap-bind-dn", "");
+            bindDN = CollectionHelper.getMapAttr(currentConfig, "iplanet-am-auth-ldap-bind-dn", "");
+
+            useBindingForAuth = StringUtils.isEmpty(bindDN);
+            if (baseDN == null && !useBindingForAuth) {
+                debug.error("BaseDN for search was null");
+            }
+
             char[] bindPassword = CollectionHelper.getMapAttr(
                 currentConfig, "iplanet-am-auth-ldap-bind-passwd", "").toCharArray();
             String userNamingAttr = CollectionHelper.getMapAttr(

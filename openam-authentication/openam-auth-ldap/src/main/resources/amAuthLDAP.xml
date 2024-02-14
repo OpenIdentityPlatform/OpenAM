@@ -62,16 +62,6 @@
                     order="200"
                     resourceName="secondaryLdapServer">
                 </AttributeSchema>
-                <AttributeSchema name="openam-use-binding-for-auth"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="a1021"
-                                 order="210"
-                                 resourceName="useBindingForAuth">
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                     type="list"
                     syntax="dn"
@@ -312,16 +302,6 @@
                         i18nKey="a102"
                         order="200"
                         resourceName="secondaryLdapServer">
-                    </AttributeSchema>
-                    <AttributeSchema name="openam-use-binding-for-auth"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a1021"
-                                     order="210"
-                                     resourceName="useBindingForAuth">
-                        <DefaultValues>
-                            <Value>false</Value>
-                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-base-dn"
                         type="list"
