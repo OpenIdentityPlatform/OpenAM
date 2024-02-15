@@ -1791,7 +1791,7 @@ public class LoginState {
             AuthContextLocal authContext
     ) throws AuthException {
         DEBUG.message("LoginState: createSession: Creating new session: ");
-        InternalSession session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
+        InternalSession session = LazyConfig.AUTHD.newSession(getOrgDN(), false, !isNoSession());
         DEBUG.message("Save authContext in InternalSession");
         finalSessionId = session.getID();
         sessionReference = session.getSessionID();
@@ -3837,7 +3837,7 @@ public class LoginState {
     /**
      * @return <code>true</code> if noSession mode was enabled in the request.
      */
-    boolean isNoSession() {
+    public boolean isNoSession() {
         return Boolean.parseBoolean(requestMap.get(NO_SESSION_QUERY_PARAM))
                 || (servletRequest != null && Boolean.parseBoolean(
                 (String) servletRequest.getAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR)));
@@ -4079,6 +4079,7 @@ public class LoginState {
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         newRequest = true;
+        servletRequest = req;
         this.finalSessionId = sid;
         if (DEBUG.messageEnabled()) {
             DEBUG.message("requestType : " + newRequest);

@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.authentication.service;
 
@@ -527,7 +528,17 @@ public class AuthD implements ConfigurationListener {
      * @return new <code>InternalSession</code>
      */
     public static InternalSession newSession(final String domain, final boolean stateless) {
-        return getSessionService().newInternalSession(domain, stateless);
+        return newSession(domain, stateless, true);
+    }
+
+    /**
+     * Creates a new session.
+     *
+     * @param domain Domain Name.
+     * @return new <code>InternalSession</code>
+     */
+    public static InternalSession newSession(final String domain, final boolean stateless, final boolean checkCts) {
+        return getSessionService().newInternalSession(domain, stateless, checkCts);
     }
     
     /**
