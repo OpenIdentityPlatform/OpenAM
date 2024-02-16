@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.iplanet.am.sdk.common;
 
@@ -65,18 +66,18 @@ public class CacheBlockExpiryTest {
 
         Assert.assertTrue(cb.isEntryExpirationEnabled());
 
-        cb.putAttributes(PRINCIPAL_DN, attributes, null, true, false);
+        cb.putAttributes(attributes, null, true, false);
 
-        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
-        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCache());
+        Assert.assertTrue(cb.hasCompleteSet());
 
         // Go past the 5 min cache expiry timeout, expect cache entry to have expired.
         FastForwardTimeService.INSTANCE.fastForward(10, TimeUnit.MINUTES);
 
-        Assert.assertFalse(cb.hasCache(PRINCIPAL_DN));
-        Assert.assertFalse(cb.hasCompleteSet(PRINCIPAL_DN));
+        Assert.assertFalse(cb.hasCache());
+        Assert.assertFalse(cb.hasCompleteSet());
 
-        Map cachedAttributes = cb.getAttributes(PRINCIPAL_DN, false);
+        Map cachedAttributes = cb.getAttributes(false);
         Assert.assertTrue(cachedAttributes.isEmpty());
     }
 
@@ -87,18 +88,18 @@ public class CacheBlockExpiryTest {
 
         Assert.assertTrue(cb.isEntryExpirationEnabled());
 
-        cb.putAttributes(PRINCIPAL_DN, attributes, null, true, false);
+        cb.putAttributes(attributes, null, true, false);
 
-        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
-        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCache());
+        Assert.assertTrue(cb.hasCompleteSet());
 
         // Stay within the cache expire timeout, expect cache entries to still be valid.
         FastForwardTimeService.INSTANCE.fastForward(4, TimeUnit.MINUTES);
 
-        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
-        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCache());
+        Assert.assertTrue(cb.hasCompleteSet());
 
-        Map cachedAttributes = cb.getAttributes(PRINCIPAL_DN, false);
+        Map cachedAttributes = cb.getAttributes(false);
         Assert.assertFalse(cachedAttributes.isEmpty());
     }
 }

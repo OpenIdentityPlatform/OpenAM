@@ -25,6 +25,7 @@
  * $Id: CacheBlockBase.java,v 1.6 2009/10/29 00:28:46 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 
 package com.iplanet.am.sdk.common;
@@ -74,7 +75,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 public abstract class CacheBlockBase {
 
     // Maintains a Cache of cacheEntries.
-    private AMHashMap cacheEntries;
+    private CacheEntry cacheEntry = null;
 
     // CacheBock representation entry DN
     private final String entryDN;
@@ -104,7 +105,6 @@ public abstract class CacheBlockBase {
 
     public CacheBlockBase(String entryDN, boolean validEntry) {
         if (validEntry) {
-            cacheEntries = new AMHashMap();
             stringAttributes = new AMHashMap(false);
             byteAttributes = new AMHashMap(true);
         } else {
@@ -132,7 +132,6 @@ public abstract class CacheBlockBase {
         writeLock.lock();
         try {
             if (exists) {
-                cacheEntries = new AMHashMap();
                 stringAttributes = new AMHashMap(false);
                 byteAttributes = new AMHashMap(true);
             }
@@ -263,24 +262,22 @@ public abstract class CacheBlockBase {
         }
     }
 
-    public boolean hasCache(String principalDN) {
+    public boolean hasCache() {
         boolean hasExpired = hasExpiredAndUpdated();
         readLock.lock();
         try {
-            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            return (ce != null && !hasExpired);
+            return (this.cacheEntry != null && !hasExpired);
         } finally {
             readLock.unlock();
         }
     }
 
-    public boolean hasCompleteSet(String principalDN) {
+    public boolean hasCompleteSet() {
         boolean hasExpired = hasExpiredAndUpdated();
         readLock.lock();
         try {
-            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            if (ce != null && !hasExpired) {
-                return ce.isCompleteSet();
+            if (this.cacheEntry != null && !hasExpired) {
+                return this.cacheEntry.isCompleteSet();
             } else {
                 return false;
             }
@@ -289,24 +286,23 @@ public abstract class CacheBlockBase {
         }
     }
 
-    public Map getAttributes(String principalDN, boolean byteValues) {
-        return getAttributes(principalDN, null, byteValues);
+    public Map getAttributes(boolean byteValues) {
+        return getAttributes(null, byteValues);
     }
 
-    public Map getAttributes(String principalDN, Set attrNames, boolean byteValues) {
+    public Map getAttributes(Set attrNames, boolean byteValues) {
         boolean hasExpired = hasExpiredAndUpdated();
         Map attributes = new AMHashMap(byteValues);
         readLock.lock();
         try {
             // Get the cache entry for the principal
-            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            if (ce != null && !hasExpired) {
+            if (this.cacheEntry != null && !hasExpired) {
                 // Get the names of attributes that this principal can access
                 Set accessibleAttrs = null;
                 if (attrNames == null) {
-                    accessibleAttrs = ce.getReadableAttrNames();
+                    accessibleAttrs = this.cacheEntry.getReadableAttrNames();
                 } else {
-                    accessibleAttrs = ce.getReadableAttrNames(attrNames);
+                    accessibleAttrs = this.cacheEntry.getReadableAttrNames(attrNames);
                 }
                 if (!accessibleAttrs.isEmpty()) {
                     // Get the attribute values from the appropriate string or binary cache if they exist.
@@ -331,7 +327,7 @@ public abstract class CacheBlockBase {
                     }
                 }
                 // Get the names of attributes that are invalid/not accessible
-                Set inAccessibleAttrs = ce.getInaccessibleAttrNames(attrNames);
+                Set inAccessibleAttrs = this.cacheEntry.getInaccessibleAttrNames(attrNames);
                 ((AMHashMap) attributes).addEmptyValues(inAccessibleAttrs);
             }
         } finally {
@@ -340,25 +336,23 @@ public abstract class CacheBlockBase {
         return attributes;
     }
 
-    public void putAttributes(String principalDN, Map attributes,
+    public void putAttributes(Map attributes,
             Set inAccessibleAttrNames, boolean isCompleteSet, boolean byteValues) {
         writeLock.lock();
         try {
-            CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-            if (ce == null) {
-                ce = new CacheEntry();
-                cacheEntries.put(principalDN, ce);
+            if (this.cacheEntry == null) {
+                this.cacheEntry = new CacheEntry();
             }
 
             // Copy only the attributes in the common place. Store the invalid/
             // unreadable attrs per principal.
             if (!byteValues) {
                 Set attrsWithValues = stringAttributes.copyValuesOnly(attributes);
-                ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
+                this.cacheEntry.putAttributes(attrsWithValues, inAccessibleAttrNames,
                         isCompleteSet);
             } else {
                 Set attrsWithValues = byteAttributes.copyValuesOnly(attributes);
-                ce.putAttributes(attrsWithValues, inAccessibleAttrNames,
+                this.cacheEntry.putAttributes(attrsWithValues, inAccessibleAttrNames,
                         isCompleteSet);
             }
 
@@ -368,12 +362,11 @@ public abstract class CacheBlockBase {
         }
     }
 
-    public void removeAttributes(String principalDN) {
+    public void removeAttributes() {
         writeLock.lock();
         try {
-            CacheEntry ce = (CacheEntry) cacheEntries.remove(principalDN);
-            if (ce != null) {
-                ce.clear(); // To remove all used references
+            if (this.cacheEntry != null) {
+                this.cacheEntry.clear(); // To remove all used references
             }
         } finally {
             writeLock.unlock();
@@ -386,30 +379,18 @@ public abstract class CacheBlockBase {
             try {
                 stringAttributes.removeKeys(attrNames);
                 byteAttributes.removeKeys(attrNames);
-                // Remove them from the list of readable attributes of each principal
-                Iterator itr = cacheEntries.keySet().iterator();
-                while (itr.hasNext()) {
-                    String principalDN = (String) itr.next();
-                    removeAttributes(principalDN, attrNames);
-                }
+                removeAttributes();
             } finally {
                 writeLock.unlock();
             }
         }
     }
 
-    private void removeAttributes(String principalDN, Set attrNames) {
-        CacheEntry ce = (CacheEntry) cacheEntries.get(principalDN);
-        if (ce != null) {
-            ce.removeAttributeNames(attrNames);
-        }
-    }
-
     public void replaceAttributes(String principalDN, Map sAttributes, Map bAttributes) {
         if (sAttributes != null && !sAttributes.isEmpty()) {
-            putAttributes(principalDN, sAttributes, null, false, false);
+            putAttributes(sAttributes, null, false, false);
         } else if (bAttributes != null && !bAttributes.isEmpty()) {
-            putAttributes(principalDN, bAttributes, null, false, true);
+            putAttributes(bAttributes, null, false, true);
         }
     }
 
@@ -424,7 +405,7 @@ public abstract class CacheBlockBase {
                 // If entry is not valid then all these maps will be null
                 stringAttributes.clear();
                 byteAttributes.clear();
-                cacheEntries.clear();
+                this.cacheEntry.clear();
             }
             // Don't have to change isValidEntry as it would have been updated if
             // the entry was deleted. Also do not change the object type here
@@ -454,14 +435,8 @@ public abstract class CacheBlockBase {
         }        
         sb.append("\nCache Entries: ");
 
-        if (cacheEntries != null && !cacheEntries.isEmpty()) {
-            Iterator itr = cacheEntries.keySet().iterator();
-            while (itr.hasNext()) {
-                String principal = (String) itr.next();
-                CacheEntry ce = (CacheEntry) cacheEntries.get(principal);
-                sb.append("\nPrincipal: ").append(principal);
-                sb.append(ce.toString());
-            }
+        if (cacheEntry != null) {
+            sb.append(this.cacheEntry.toString());
         } else {
             sb.append("<empty>");
         }
