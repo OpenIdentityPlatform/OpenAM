@@ -352,6 +352,8 @@ public class LoginState {
     // Enable Module based Auth
     private boolean enableModuleBasedAuth = true;
     private ISLocaleContext localeContext = new ISLocaleContext();
+
+    private boolean noSessionAttributeSet = false;
     
     /**
      * The sharedState Map of the {@link AMLoginModule} and subclasses.
@@ -433,6 +435,8 @@ public class LoginState {
      */
     public void setHttpServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+        this.noSessionAttributeSet = servletRequest != null && Boolean.parseBoolean(
+                (String) servletRequest.getAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR));
     }
 
     /**
@@ -1749,7 +1753,7 @@ public class LoginState {
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         newRequest = true;
-        servletRequest = request;
+        this.setHttpServletRequest(request);
         servletResponse = response;
         setParamHash(requestHash);
         client = getClient();
@@ -1791,7 +1795,7 @@ public class LoginState {
             AuthContextLocal authContext
     ) throws AuthException {
         DEBUG.message("LoginState: createSession: Creating new session: ");
-        InternalSession session = LazyConfig.AUTHD.newSession(getOrgDN(), false);
+        InternalSession session = LazyConfig.AUTHD.newSession(getOrgDN(), false, !isNoSession());
         DEBUG.message("Save authContext in InternalSession");
         finalSessionId = session.getID();
         sessionReference = session.getSessionID();
@@ -3837,10 +3841,9 @@ public class LoginState {
     /**
      * @return <code>true</code> if noSession mode was enabled in the request.
      */
-    boolean isNoSession() {
+    public boolean isNoSession() {
         return Boolean.parseBoolean(requestMap.get(NO_SESSION_QUERY_PARAM))
-                || (servletRequest != null && Boolean.parseBoolean(
-                (String) servletRequest.getAttribute(ISAuthConstants.NO_SESSION_REQUEST_ATTR)));
+                || noSessionAttributeSet;
     }
 
     /**
@@ -4079,6 +4082,7 @@ public class LoginState {
         }
         AuthContextLocal authContext = new AuthContextLocal(this.userOrg);
         newRequest = true;
+        this.setHttpServletRequest(req);
         this.finalSessionId = sid;
         if (DEBUG.messageEnabled()) {
             DEBUG.message("requestType : " + newRequest);
@@ -4460,7 +4464,10 @@ public class LoginState {
             if (authMethName != null) {
                 props.put(LogConstants.MODULE_NAME, authMethName);
             }
-            InternalSession session = getReferencedSession();
+            InternalSession session = null;
+            if(!isNoSession()) {
+                session = getReferencedSession();
+            }
             if (session != null) {
                 props.put(LogConstants.LOGIN_ID_SID, finalSessionId.toString());
             }

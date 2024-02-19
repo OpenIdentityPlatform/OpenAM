@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 
@@ -113,7 +114,10 @@ public class SessionService {
     }
 
     public InternalSession newInternalSession(String domain, boolean stateless) {
-        return internalSessionFactory.newInternalSession(domain, stateless);
+        return newInternalSession(domain, stateless, true);
+    }
+    public InternalSession newInternalSession(String domain, boolean stateless, boolean checkCts) {
+        return internalSessionFactory.newInternalSession(domain, stateless, checkCts);
     }
 
     /**

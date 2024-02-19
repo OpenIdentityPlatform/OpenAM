@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.authentication.audit;
 
@@ -40,12 +41,10 @@ import org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
-import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.inject.Inject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
 import java.security.Principal;
+import java.util.Collections;
 
 /**
  * This auditor is specifically aimed at constructing and logging authentication events for the login process.
@@ -87,7 +86,8 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
                     .eventName(AM_LOGIN_COMPLETED)
                     .result(SUCCESSFUL)
                     .entry(getAuditEntryDetail(moduleName, loginState))
-                    .trackingIds(getTrackingIds(loginState))
+                    .trackingIds(loginState == null || loginState.isNoSession()
+                            ? Collections.emptySet() : getTrackingIds(loginState))
                     .userId(userDN == null ? "" : userDN)
                     .principal(DNUtils.DNtoName(userDN));
 

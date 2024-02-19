@@ -27,6 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.authentication.service;
 
@@ -638,14 +639,14 @@ public class AMLoginContext {
 
                         boolean sessionActivated = authContext.getLoginState().activateSession(subject);
                         if (sessionActivated) {
-                            authContext.getLoginState().logSuccess();
-                            auditor.auditLoginSuccess(authContext.getLoginState());
                             if (amAccountLockout.isLockoutEnabled()) {
                                 amAccountLockout.resetPasswdLockout(authContext.getLoginState().getUserUniversalId(
                                         authContext.getLoginState().getUserDN()), true);
                             }
                             loginStatus.setStatus(LoginStatus.AUTH_SUCCESS);
                             authContext.getLoginState().persistSession();
+                            authContext.getLoginState().logSuccess();
+                            auditor.auditLoginSuccess(authContext.getLoginState());
                             debug.message("login success");
                         } else {
                             logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED,
