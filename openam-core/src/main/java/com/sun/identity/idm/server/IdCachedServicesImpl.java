@@ -422,11 +422,11 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
             // Find the missing attributes and add to cache
             Set missAttrNames = attributes.getMissingAndEmptyKeys(attrNames);
             cb = new IdCacheBlock(dn, true);
-            cb.putAttributes(attributes, missAttrNames, false,
+            cb.putAttributes(principalDN, attributes, missAttrNames, false,
                     !isStringValues);
             idRepoCache.put(dn, cb);
         } else { // Entry present in cache
-            attributes = (AMHashMap) cb.getAttributes(attrNames,
+            attributes = (AMHashMap) cb.getAttributes(principalDN, attrNames,
                     !isStringValues);
 
             // Find the missing attributes that need to be obtained from DS
@@ -449,7 +449,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                 // as invalid (Attribute level Negative caching)
                 Set newMissAttrNames = dsAttributes
                         .getMissingAndEmptyKeys(missAttrNames);
-                cb.putAttributes(dsAttributes, newMissAttrNames,
+                cb.putAttributes(principalDN, dsAttributes, newMissAttrNames,
                         false, !isStringValues);
             } else { // All attributes found in cache
                 cacheStats.updateGetHitCount(getSize());
@@ -614,7 +614,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         // Get the cache entry
         IdCacheBlock cb = idRepoCache.getIfPresent(dn);
         AMHashMap attributes;
-        if ((cb != null) && cb.hasCompleteSet()) {
+        if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
             if (MonitoringUtil.isRunning() &&
                 ((monIdRepo = Agent.getIdrepoSvcMBean()) != null)) {
@@ -626,7 +626,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                     + "getAttributes(): DN: " + dn
                     + " found all attributes in Cache.");
             }
-            attributes = (AMHashMap) cb.getAttributes(false);
+            attributes = (AMHashMap) cb.getAttributes(principalDN, false);
         } else {
             // Get all the attributes from data store
             if (DEBUG.messageEnabled()) {
@@ -641,7 +641,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                 cb = new IdCacheBlock(dn, true);
                 idRepoCache.put(dn, cb);
             }
-            cb.putAttributes(attributes, null, true, false);
+            cb.putAttributes(principalDN, attributes, null, true, false);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("IdCachedServicesImpl.getAttributes(): "
                         + "attributes NOT found in cache. Fetched from DS.");
@@ -672,16 +672,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         String dn = IdUtils.getUniversalId(id).toLowerCase();
 
         // Update the cache
-        if (type.equals(IdType.USER)) {
-            // Update cache locally for modified deleted user attributes
-            if (isString) {
-                updateCache(token, dn, attributes, null);
-            } else {
-                updateCache(token, dn, null, attributes);
-            }
-        } else {
+//        if (type.equals(IdType.USER)) {
+//            // Update cache locally for modified delted user attributes
+//            if (isString) {
+//                updateCache(token, dn, attributes, null);
+//            } else {
+//                updateCache(token, dn, null, attributes);
+//            }
+//        } else {
             dirtyCache(dn);
-        }
+//        }
     }
 
     @Override
@@ -800,7 +800,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 	                		@SuppressWarnings("rawtypes")
 							final Set missAttrNames = ctrl.getReturnAttributes()==null?Collections.emptySet():attributes.getMissingAndEmptyKeys(ctrl.getReturnAttributes());
 	                        cb = new IdCacheBlock(universalID, true);
-	                        cb.putAttributes(attributes, missAttrNames, false,false);
+	                        cb.putAttributes(principalDN, attributes, missAttrNames, false,false);
 	                        idRepoCache.put(universalID, cb);
 						}
                 	}catch (Throwable e) {

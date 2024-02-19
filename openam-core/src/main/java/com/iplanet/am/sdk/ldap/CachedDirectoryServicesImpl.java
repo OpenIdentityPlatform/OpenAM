@@ -25,7 +25,6 @@
  * $Id: CachedDirectoryServicesImpl.java,v 1.5 2009/11/20 23:52:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -562,7 +561,8 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
             sdkCache.put(entryDN, cb);
         } else {
             objectType = super.getObjectType(adminToken, entryDN, cb
-                    .getAttributes(false));
+                    .getAttributes(CommonUtils.getPrincipalDN(adminToken),
+                            false));
         }
         cb.setObjectType(objectType);
         if (objectType == AMObject.ORGANIZATION
@@ -682,14 +682,15 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         AMHashMap attributes;
         if (cb != null) {
             validateEntry(token, cb);
-            if (cb.hasCompleteSet()) {
+            if (cb.hasCompleteSet(principalDN)) {
                 cacheStats.updateHitCount(getSize());
                 if (debug.messageEnabled()) {
                     debug.message("CachedDirectoryServicesImpl."
                             + "getAttributes(): found all attributes " 
                             + "in Cache.");
                 }
-                attributes = (AMHashMap) cb.getAttributes(byteValues);
+                attributes = (AMHashMap) cb.getAttributes(principalDN,
+                        byteValues);
             } else { // Get the whole set from DS and store it;
                 // ignore incomplete set
                 if (debug.messageEnabled()) {
@@ -699,7 +700,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
                 }
                 attributes = (AMHashMap) super.getAttributes(token, entryDN,
                         ignoreCompliance, byteValues, profileType);
-                cb.putAttributes(attributes, null, true,
+                cb.putAttributes(principalDN, attributes, null, true,
                         byteValues);
             }
         } else { // Attributes not cached
@@ -707,7 +708,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
             attributes = (AMHashMap) super.getAttributes(token, entryDN,
                     ignoreCompliance, byteValues, profileType);
             cb = new CacheBlock(entryDN, true);
-            cb.putAttributes(attributes, null, true, byteValues);
+            cb.putAttributes(principalDN, attributes, null, true, byteValues);
             sdkCache.put(dn, cb);
 
             if (debug.messageEnabled()) {
@@ -829,7 +830,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
             // plugins
             cb = new CacheBlock(dn, true);
             Set missAttrNames = attributes.getMissingAndEmptyKeys(attrNames);
-            cb.putAttributes(attributes, missAttrNames, false,
+            cb.putAttributes(principalDN, attributes, missAttrNames, false,
                     byteValues);
             sdkCache.put(dn, cb);
 
@@ -841,14 +842,15 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
             return attributes;
         } else { // Entry present in cache
             validateEntry(token, cb); // Entry may be an invalid entry
-            AMHashMap attributes = (AMHashMap) cb.getAttributes(attrNames, byteValues);
+            AMHashMap attributes = (AMHashMap) cb.getAttributes(principalDN,
+                    attrNames, byteValues);
 
             // Find the missing attributes that need to be obtained from DS
             // Only find the missing keys as the ones with empty sets are not
             // found in DS
             Set missAttrNames = attributes.getMissingKeys(attrNames);
             if (!missAttrNames.isEmpty()) {
-                boolean isComplete = cb.hasCompleteSet();
+                boolean isComplete = cb.hasCompleteSet(principalDN);
                 AMHashMap dsAttributes = null;
                 if (!isComplete ||
                 // Check for "nsRole" and "nsRoleDN" attributes
@@ -873,17 +875,18 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
 
                         // Update dsAttributes with rest of the attributes
                         // in cache
-                        dsAttributes.putAll(cb.getAttributes(
+                        dsAttributes.putAll(cb.getAttributes(principalDN,
                                 byteValues));
 
                         // Update the cache
-                        cb.putAttributes(dsAttributes,
+                        cb.putAttributes(principalDN, dsAttributes,
                                 newMissAttrNames, isComplete, byteValues);
                         missAttrNames = newMissAttrNames;
                     }
                 } else {
                     // Update cache with invalid attributes
-                    cb.putAttributes(cb.getAttributes(byteValues), missAttrNames, isComplete, byteValues);
+                    cb.putAttributes(principalDN, cb.getAttributes(principalDN,
+                            byteValues), missAttrNames, isComplete, byteValues);
                 }
                 if (!missAttrNames.isEmpty()) {
                     attributes = getPluginAttrsAndUpdateCache(token,

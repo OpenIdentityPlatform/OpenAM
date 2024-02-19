@@ -25,7 +25,6 @@
  * $Id: IdRemoteCachedServicesImpl.java,v 1.20 2010/01/28 00:45:25 bigfatrat Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.idm.remote;
 
@@ -332,7 +331,10 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             }
             return super.isExists(token, type, name, amOrgName);
         }
-        if (cb.hasCache()) {
+        // Get the principal DN
+        AMIdentity tokenId = IdUtils.getIdentity(token);
+        String principalDN = tokenId.getUniversalId();
+        if (cb.hasCache(principalDN)) {
             return true;
         } else {
             return super.isExists(token, type, name, amOrgName);
@@ -400,11 +402,11 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             // plugins
             Set missAttrNames = attributes.getMissingAndEmptyKeys(attrNames);
             cb = new IdCacheBlock(dn, true);
-            cb.putAttributes(attributes, missAttrNames, false,
+            cb.putAttributes(principalDN, attributes, missAttrNames, false,
                     !isStringValues);
             idRepoCache.put(dn, cb);
         } else { // Entry present in cache
-            attributes = (AMHashMap) cb.getAttributes(attrNames,
+            attributes = (AMHashMap) cb.getAttributes(principalDN, attrNames,
                     !isStringValues);
 
             // Find the missing attributes that need to be obtained from DS
@@ -427,7 +429,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 // invalid (Attribute level Negative caching)
                 Set newMissAttrNames = dsAttributes
                         .getMissingAndEmptyKeys(missAttrNames);
-                cb.putAttributes(dsAttributes, newMissAttrNames,
+                cb.putAttributes(principalDN, dsAttributes, newMissAttrNames,
                         false, !isStringValues);
             } else { // All attributes found in cache
                 cacheStats.updateGetHitCount(getSize());
@@ -471,7 +473,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
         AMHashMap attributes;
-        if ((cb != null) && cb.hasCompleteSet()) {
+        if ((cb != null) && cb.hasCompleteSet(principalDN)) {
             cacheStats.updateGetHitCount(getSize());
             if (SystemProperties.isServerMode() &&
                 MonitoringUtil.isRunning() &&
@@ -485,7 +487,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                     + "getAttributes(): found all attributes in "
                     + "Cache.");
             }
-            attributes = (AMHashMap) cb.getAttributes(false);
+            attributes = (AMHashMap) cb.getAttributes(principalDN, false);
         } else {
             // Get the whole set from DS and store it;
             if (DEBUG.messageEnabled()) {
@@ -499,7 +501,7 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 cb = new IdCacheBlock(dn, true);
                 idRepoCache.put(dn, cb);
             }
-            cb.putAttributes(attributes, null, true, false);
+            cb.putAttributes(principalDN, attributes, null, true, false);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("IdRemoteCachedServicesImpl."
                     + "getAttributes(): attributes NOT found in cache. "

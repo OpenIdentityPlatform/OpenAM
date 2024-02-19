@@ -12,7 +12,6 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
  */
 package com.sun.identity.idm.common;
 
@@ -63,19 +62,19 @@ public class IdCacheBlockTest {
 
         Assert.assertFalse(cb.isEntryExpirationEnabled());
 
-        cb.putAttributes(attributes, null, true, false);
+        cb.putAttributes(PRINCIPAL_DN, attributes, null, true, false);
 
-        Assert.assertTrue(cb.hasCache());
-        Assert.assertTrue(cb.hasCompleteSet());
+        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
 
         // Go past the default cache expire timeout, not expecting anything to change as a result
         // since cache expiry is disabled.
         FastForwardTimeService.INSTANCE.fastForward(cb.getDefaultEntryExpirationTime() * 2, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue(cb.hasCache());
-        Assert.assertTrue(cb.hasCompleteSet());
+        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
 
-        Map cachedAttributes = cb.getAttributes(false);
+        Map cachedAttributes = cb.getAttributes(PRINCIPAL_DN, false);
         Assert.assertFalse(cachedAttributes.isEmpty());
     }
 
@@ -86,18 +85,18 @@ public class IdCacheBlockTest {
 
         Assert.assertFalse(cb.isEntryExpirationEnabled());
 
-        cb.putAttributes(attributes, null, true, false);
+        cb.putAttributes(PRINCIPAL_DN, attributes, null, true, false);
 
-        Assert.assertTrue(cb.hasCache());
-        Assert.assertTrue(cb.hasCompleteSet());
+        Assert.assertTrue(cb.hasCache(PRINCIPAL_DN));
+        Assert.assertTrue(cb.hasCompleteSet(PRINCIPAL_DN));
 
         // Clear the cache, expect entry to no longer be available.
         cb.clear();
 
-        Assert.assertFalse(cb.hasCache());
-        Assert.assertFalse(cb.hasCompleteSet());
+        Assert.assertFalse(cb.hasCache(PRINCIPAL_DN));
+        Assert.assertFalse(cb.hasCompleteSet(PRINCIPAL_DN));
 
-        Map cachedAttributes = cb.getAttributes( false);
+        Map cachedAttributes = cb.getAttributes(PRINCIPAL_DN, false);
         Assert.assertTrue(cachedAttributes.isEmpty());
     }
 }
