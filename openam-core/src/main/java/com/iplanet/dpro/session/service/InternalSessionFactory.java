@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC
  */
 
 package com.iplanet.dpro.session.service;
@@ -88,8 +89,24 @@ public class InternalSessionFactory {
      * @param stateless   Indicates whether or not this session should be issued as a stateless session.
      */
     public InternalSession newInternalSession(String domain, boolean stateless) {
+        return newInternalSession(domain, stateless, true);
+    }
+
+    /**
+     * Creates a new Internal Session
+     *
+     * @param domain      Authentication Domain
+     * @param stateless   Indicates whether or not this session should be issued as a stateless session.
+     * @param checkCts    Indicates whether or not this session exists in cts.
+     */
+    public InternalSession newInternalSession(String domain, boolean stateless, boolean checkCts) {
         try {
-            final SessionID sessionID = generateSessionId(domain);
+            final SessionID sessionID;
+            if(checkCts) {
+                sessionID = generateSessionId(domain);
+            } else {
+                sessionID = SessionID.generateSessionID(serverConfig, domain);
+            }
             return generateInternalSession(sessionID, stateless);
         } catch (SessionException e) {
             sessionDebug.error("Error creating new session", e);
