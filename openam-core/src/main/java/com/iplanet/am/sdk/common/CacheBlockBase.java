@@ -405,7 +405,7 @@ public abstract class CacheBlockBase {
                 // If entry is not valid then all these maps will be null
                 stringAttributes.clear();
                 byteAttributes.clear();
-                this.cacheEntry = null;
+                this.cacheEntry.clear();
             }
             // Don't have to change isValidEntry as it would have been updated if
             // the entry was deleted. Also do not change the object type here
