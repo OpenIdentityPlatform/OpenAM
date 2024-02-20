@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2023 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service.cluster;
@@ -124,22 +125,22 @@ public class ClusterStateService extends GeneralTaskRunnable {
     /**
      * Service Globals
      */
-    public static Debug sessionDebug = null;
+    public static Debug sessionDebug;
 
     /**
      * Servers in the cluster environment
      */
-    private static Map<String, StateInfo> servers = new HashMap<String, StateInfo>();
+    private static final Map<String, StateInfo> servers = new HashMap<>();
 
     /**
      * Sites in the environment
      */
-    private static Map<String, StateInfo> sites = new HashMap<String, StateInfo>();
+    private static final Map<String, StateInfo> sites = new HashMap<>();
 
     /**
      * Sites and Servers that are currently down.
      */
-    private static Set<String> down = new HashSet<String>();
+    private static final Set<String> down = new HashSet<>();
 
     /**
      * Server Information
@@ -157,6 +158,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
     public static final int DEFAULT_TIMEOUT = 1000;
 
     private static boolean doRequest = true;
+
     private static final String doRequestFlag = SystemProperties.
             get(Constants.URLCHECKER_DOREQUEST, "false");
 
@@ -477,7 +479,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             return true;
         }
 
-        boolean result = false;
+        boolean result;
         Socket sock = null;
         InputStream is = null;
 
@@ -500,13 +502,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
                     connection.setReadTimeout(timeout);
 
                     if (connection instanceof HttpsURLConnection) {
-                        ((HttpsURLConnection) connection).setHostnameVerifier(new HostnameVerifier() {
-
-                            @Override
-                            public boolean verify(String hostname, SSLSession session) {
-                                return true;
-                            }
-                        });
+                        ((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
                     }
                     is = connection.getInputStream();
                     responseCode = connection.getResponseCode();
