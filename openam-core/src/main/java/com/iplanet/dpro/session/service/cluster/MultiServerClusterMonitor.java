@@ -25,10 +25,12 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service.cluster;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.iplanet.am.util.SystemProperties;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import com.iplanet.dpro.session.SessionException;
@@ -57,10 +60,13 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class MultiServerClusterMonitor implements ClusterMonitor {
 
+    private static final boolean MONITOR_CLUSTER_SITES = SystemProperties.
+            getAsBoolean("org.openidentityplatform.cluster.monitorSites", true);
+
     private final Debug sessionDebug;
     private final SessionServiceConfig serviceConfig;
     private final SessionServerConfig serverConfig;
-    private final ConcurrentMap<String, String> clusterMemberMap = new ConcurrentHashMap<String, String>();
+    private final ConcurrentMap<String, String> clusterMemberMap = new ConcurrentHashMap<>();
     private final ClusterStateServiceFactory clusterStateServiceFactory;
     private volatile ClusterStateService clusterStateService = null;
 
@@ -146,8 +152,13 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
                 serverConfig.getLocalServerSessionServiceURL().toExternalForm(),
                 serverConfig.getLocalServerID());
 
-        // Collect all Sites to monitor
-        Map<String, String> siteMemberMap = getSiteMemberMap();
+        final Map<String, String> siteMemberMap;
+        if(MONITOR_CLUSTER_SITES) {
+            // Collect all Sites to monitor
+            siteMemberMap = getSiteMemberMap();
+        } else {
+            siteMemberMap = Collections.emptyMap();
+        }
 
         // Instantiate the State Service.
         clusterStateService = clusterStateServiceFactory.createClusterStateService(serverConfig,
@@ -166,7 +177,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      * @return
      */
     private Map<String, String> getSiteMemberMap() throws Exception {
-        Map<String, String> siteMemberMap = new HashMap<String, String>();
+        Map<String, String> siteMemberMap = new HashMap<>();
         for (Object nodeId : serverConfig.getAllServerIDs()) {
             String serverOrSiteId = (String) nodeId;
             if (serverConfig.isSite(serverOrSiteId)) {

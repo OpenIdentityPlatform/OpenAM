@@ -161,8 +161,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     private static final String doRequestFlag = SystemProperties.
             get(Constants.URLCHECKER_DOREQUEST, "false");
-    private static final boolean MONITOR_CLUSTER_SITES = SystemProperties.
-            getAsBoolean("org.openidentityplatform.cluster.monitorSites", true);
 
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
@@ -252,20 +250,14 @@ public class ClusterStateService extends GeneralTaskRunnable {
             this.timeout = timeout;
             this.period = period;
 
-            if(MONITOR_CLUSTER_SITES) {
-                serverSelectionList = new StateInfo[serverMembers.size() + siteMembers.size()];
-            } else {
-                serverSelectionList = new StateInfo[serverMembers.size()];
-            }
+            serverSelectionList = new StateInfo[serverMembers.size() + siteMembers.size()];
 
             for (Map.Entry<String, String> entry : serverMembers.entrySet()) {
                 populateMap(servers, getServerInfo(entry.getKey(), entry.getValue()));
             }
 
-            if(MONITOR_CLUSTER_SITES) {
-                for (Map.Entry<String, String> entry : siteMembers.entrySet()) {
-                    populateMap(sites, getServerInfo(entry.getKey(), entry.getValue()));
-                }
+            for (Map.Entry<String, String> entry : siteMembers.entrySet()) {
+                populateMap(sites, getServerInfo(entry.getKey(), entry.getValue()));
             }
 
             // to ensure that ordering in different server instances is identical
