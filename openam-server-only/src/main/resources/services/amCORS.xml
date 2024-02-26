@@ -58,6 +58,9 @@
                                  i18nKey="a102"
                                  order="200"
                                  resourceName="allowedOrigins">
+                    <DefaultValues>
+                        <Value>*</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="accepted-methods"
                                  type="list"
@@ -76,6 +79,20 @@
                                  i18nKey="a104"
                                  order="400"
                                  resourceName="acceptedHeaders">
+                    <DefaultValues>
+                        <Value>Origin</Value>
+                        <Value>Accept</Value>
+                        <Value>Connection</Value>
+                        <Value>User-Agent</Value>
+                        <Value>Host</Value>
+                        <Value>Accept-Encoding</Value>
+                        <Value>Accept-Language</Value>
+                        <Value>Content-Length</Value>
+                        <Value>Content-Type</Value>
+                        <Value>Upgrade-Insecure-Requests</Value>
+                        <Value>Referer</Value>
+                        <Value>Cookie</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="exposed-headers"
                                  type="list"
