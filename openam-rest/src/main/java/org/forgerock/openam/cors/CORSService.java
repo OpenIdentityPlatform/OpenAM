@@ -18,6 +18,7 @@ package org.forgerock.openam.cors;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.collections4.CollectionUtils;
 import org.forgerock.openam.cors.utils.CSVHelper;
+import org.forgerock.util.Reject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,6 +85,11 @@ public class CORSService {
 
 
         this.enabled = enabled;
+
+        if(enabled) {
+            Reject.ifTrue(acceptedOrigins == null || acceptedOrigins.size() < 1, "AcceptedOrigins must have at least one value.");
+            Reject.ifTrue(acceptedMethods == null || acceptedMethods.size() < 1, "AcceptedOrigins must have at least one value.");
+        }
 
         if(acceptedOrigins == null) {
             acceptedOrigins = new ArrayList<>();
@@ -157,7 +163,6 @@ public class CORSService {
      *
      * @param req The request
      * @param res The response
-     * @return true if the request was valid and successfully handled
      */
     private void handlePreflightFlow(final HttpServletRequest req, final HttpServletResponse res) {
 
