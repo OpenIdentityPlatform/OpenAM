@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amCORS.xml,v 1.3 2024/02/16 05:45:41 qcheng Exp $
+  
+   Portions Copyrighted 2025 3A Systems LLC.
+
+-->
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="CORSService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/CORSService"
+                i18nFileName="amCORS"
+                resourceName="cors"
+                i18nKey="cors-service-description">
+            <Global>
+                <AttributeSchema name="cors-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a101"
+                                 order="100"
+                                 resourceName="enabled">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="allowed-origins"
+                                 type="list"
+                                 syntax="url"
+                                 i18nKey="a102"
+                                 order="200"
+                                 resourceName="allowedOrigins">
+                </AttributeSchema>
+                <AttributeSchema name="accepted-methods"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a103"
+                                 order="300"
+                                 resourceName="acceptedMethods">
+                    <DefaultValues>
+                        <Value>POST</Value>
+                        <Value>PUT</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="accepted-headers"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a104"
+                                 order="400"
+                                 resourceName="acceptedHeaders">
+                </AttributeSchema>
+                <AttributeSchema name="exposed-headers"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a105"
+                                 order="500"
+                                 resourceName="exposedHeaders">
+                </AttributeSchema>
+                <AttributeSchema name="max-age"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a106"
+                                 order="600"
+                                 resourceName="maxAge">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="allow-credentials"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a107"
+                                 order="700"
+                                 resourceName="allowCredentials">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="expected-hostname"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a108"
+                                 order="800"
+                                 resourceName="expectedHostname">
+                </AttributeSchema>
+            </Global>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

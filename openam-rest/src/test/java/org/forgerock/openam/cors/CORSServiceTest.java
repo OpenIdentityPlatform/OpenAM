@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014 ForgeRock AS.
+* Portions Copyrighted 2024 3A Systems LLC.
 */
 package org.forgerock.openam.cors;
 
@@ -37,9 +38,9 @@ public class CORSServiceTest {
 
     @BeforeMethod
     public void setUp() {
-        ArrayList<String> origins = new ArrayList<String>();
+        ArrayList<String> origins = new ArrayList<>();
         origins.add("www.google.com");
-        ArrayList<String> methods = new ArrayList<String>();
+        ArrayList<String> methods = new ArrayList<>();
         methods.add("POST");
         methods.add("DELETE");
         methods.add("OPTIONS");
@@ -48,7 +49,7 @@ public class CORSServiceTest {
         ArrayList<String> exposedHeaders = new ArrayList<String>();
         exposedHeaders.add("x-posed-header");
 
-        testService = new CORSService(origins, methods, acceptedHeaders,
+        testService = new CORSService(true, origins, methods, acceptedHeaders,
                 exposedHeaders, 999, true, null);
 
         mockRequest = mock(HttpServletRequest.class);
@@ -62,7 +63,7 @@ public class CORSServiceTest {
         list.add("one");
 
         //when
-        CORSService service = new CORSService(null, list, list, list, 0, false, null);
+        CORSService service = new CORSService(true, null, list, list, list, 0, false, null);
 
         //then
 
@@ -76,7 +77,7 @@ public class CORSServiceTest {
         ArrayList<String> list2 = new ArrayList<String>();
 
         //when
-        CORSService service = new CORSService(list2, list, list, list, 0, false, null);
+        CORSService service = new CORSService(true, list2, list, list, list, 0, false, null);
 
         //then
     }
@@ -88,7 +89,7 @@ public class CORSServiceTest {
         list.add("one");
 
         //when
-        CORSService service = new CORSService(list, null, list, list, 0, false, null);
+        CORSService service = new CORSService(true, list, null, list, list, 0, false, null);
 
         //then
     }
@@ -101,7 +102,7 @@ public class CORSServiceTest {
         ArrayList<String> list2 = new ArrayList<String>();
 
         //when
-        CORSService service = new CORSService(list, list2, list, list, 0, false, null);
+        CORSService service = new CORSService(true, list, list2, list, list, 0, false, null);
 
         //then
     }
@@ -192,7 +193,7 @@ public class CORSServiceTest {
         ArrayList<String> methods = new ArrayList<String>();
         methods.add("POST");
 
-        testService = new CORSService(origins, methods, null, null, 0, false, null);
+        testService = new CORSService(true, origins, methods, null, null, 0, false, null);
 
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");
         given(mockRequest.getMethod()).willReturn("POST");
@@ -271,7 +272,7 @@ public class CORSServiceTest {
         exposedHeaders.add("x-posed-header");
         exposedHeaders.add("x-posed-header2");
 
-        testService = new CORSService(origins, methods, acceptedHeaders,
+        testService = new CORSService(true, origins, methods, acceptedHeaders,
                 exposedHeaders, 0, true, "www.openam.com");
 
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");
@@ -298,7 +299,7 @@ public class CORSServiceTest {
         exposedHeaders.add("x-posed-header");
         exposedHeaders.add("x-posed-header2");
 
-        testService = new CORSService(origins, methods, acceptedHeaders,
+        testService = new CORSService(true, origins, methods, acceptedHeaders,
                 exposedHeaders, 0, true, null);
 
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");

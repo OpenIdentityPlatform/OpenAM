@@ -15,21 +15,20 @@
 */
 package org.forgerock.openam.cors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Enumeration;
+import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.collections4.CollectionUtils;
+import org.forgerock.openam.cors.utils.CSVHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.forgerock.openam.cors.utils.CSVHelper;
-import org.forgerock.util.Reject;
-
-import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * See <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a> for further information.
@@ -54,6 +53,8 @@ public class CORSService {
 
     private final CSVHelper csvHelper = new CSVHelper();
 
+    private final boolean enabled;
+
     private final List<String> acceptedOrigins;
     private final List<String> acceptedMethods;
     private final List<String> acceptedHeaders;
@@ -77,12 +78,19 @@ public class CORSService {
      * @param expectedHostname (Optional) the name of the host the request should be headed to in its Host header
      * @throws IllegalArgumentException If the acceptedOrigins or acceptedMethods params are null or empty
      */
-    public CORSService(final List<String> acceptedOrigins, final List<String> acceptedMethods,
+    public CORSService(final boolean enabled, List<String> acceptedOrigins, List<String> acceptedMethods,
                        List<String> acceptedHeaders, List<String> exposedHeaders,
                        int maxAge, final boolean allowCredentials, String expectedHostname) {
 
-        Reject.ifTrue(acceptedOrigins == null || acceptedOrigins.size() < 1, "AcceptedOrigins must have at least one value.");
-        Reject.ifTrue(acceptedMethods == null || acceptedMethods.size() < 1, "AcceptedOrigins must have at least one value.");
+
+        this.enabled = enabled;
+
+        if(acceptedOrigins == null) {
+            acceptedOrigins = new ArrayList<>();
+        }
+        if(acceptedMethods == null) {
+            acceptedMethods = new ArrayList<>();
+        }
 
         if (maxAge < 0) {
             maxAge = 0;
@@ -98,7 +106,7 @@ public class CORSService {
 
         this.acceptedOrigins = acceptedOrigins;
         this.acceptedMethods = acceptedMethods;
-        this.acceptedHeaders = acceptedHeaders;
+        this.acceptedHeaders = acceptedHeaders.stream().map(String::toLowerCase).collect(Collectors.toList());
         this.exposedHeaders = exposedHeaders;
         this.allowCredentials = allowCredentials;
         this.maxAge = maxAge;
@@ -115,6 +123,9 @@ public class CORSService {
      * @return true if the caller is to continue processing the request
      */
     public boolean handleRequest(final HttpServletRequest req, final HttpServletResponse res) {
+        if(!this.enabled) {
+            return true;
+        }
         if (req.getHeader(CORSConstants.ORIGIN) == null) {
             return true;
         }
@@ -292,6 +303,10 @@ public class CORSService {
             DEBUG.warning("CORS Fail - Request did not contain an origin header.");
             return false;
         }
+        if(CollectionUtils.isEmpty(acceptedOrigins)) {
+            DEBUG.warning("CORS Fail - Accepted Origins setting is empty");
+            return false;
+        }
 
         if (!acceptedOrigins.contains(CORSConstants.ALL)) {
             //if we're from a valid origin or not
@@ -304,6 +319,11 @@ public class CORSService {
         //check we are the host we're supposed to be
         if (expectedHostname != null && !expectedHostname.isEmpty() && !expectedHostname.equals(hostHeader)) {
             DEBUG.warning("CORS Fail - Expected hostname does not equal actual hostname.");
+            return false;
+        }
+
+        if(CollectionUtils.isEmpty(acceptedMethods)) {
+            DEBUG.warning("CORS Fail - Accepted Method setting is empty");
             return false;
         }
 
