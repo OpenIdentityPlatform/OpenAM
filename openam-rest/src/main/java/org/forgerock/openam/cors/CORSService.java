@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -199,18 +198,6 @@ public class CORSService {
      */
     private boolean handleActualRequestFlow(final HttpServletRequest req, final HttpServletResponse res) {
 
-        Enumeration<String> headerNames = req.getHeaderNames();
-
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String header = headerNames.nextElement();
-                if (!acceptedHeaders.contains(header.toLowerCase()) && !simpleHeaders.contains(header.toLowerCase())) {
-                    DEBUG.warning("CORS Fail - Headers do not match allowed headers.");
-                    return false;
-                }
-            }
-        }
-
         final String originHeader = req.getHeader(CORSConstants.ORIGIN);
 
         if(exposedHeaders.size() > 0) {
@@ -333,7 +320,7 @@ public class CORSService {
         }
 
         //then look to see if one of the method types allowed for CORS from the configuration
-        if (!acceptedMethods.contains(req.getMethod())) {
+        if (!acceptedMethods.contains(req.getMethod()) && !CORSConstants.HTTP_OPTIONS.equals(req.getMethod())) {
             DEBUG.warning("CORS Fail - Requested HTTP method has not been whitelisted.");
             return false;
         }

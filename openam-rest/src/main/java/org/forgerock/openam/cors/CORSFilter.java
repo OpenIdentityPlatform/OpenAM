@@ -63,7 +63,6 @@ public class CORSFilter implements Filter {
         if (corsConfigListener.getCorsService().handleRequest(req, res)) {
             chain.doFilter(req, res);
         }
-
     }
 
     /**
