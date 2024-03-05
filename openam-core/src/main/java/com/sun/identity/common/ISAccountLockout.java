@@ -230,6 +230,9 @@ public class ISAccountLockout {
         if (((lastFailTime + failureLockoutTime) > now) &&
             (fail_count >= failureLockoutCount)
         ) {
+            if(lockedAt > 0 && failureLockoutMultiplier > 0) { //if was previously locked, multiply duration
+                acInfo.setActualLockoutDuration(acInfo.getActualLockoutDuration() * failureLockoutMultiplier);
+            }
             lockedAt = now;
         }
         if (debug.messageEnabled()) {
