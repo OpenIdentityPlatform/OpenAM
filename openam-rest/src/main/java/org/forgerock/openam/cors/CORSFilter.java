@@ -58,9 +58,10 @@ public class CORSFilter implements Filter {
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse res = (HttpServletResponse) response;
 
-        CORSConfigListener corsConfigListener = InjectorHolder.getInstance(CORSConfigListener.class);
+        final CORSConfigListener corsConfigListener = InjectorHolder.getInstance(CORSConfigListener.class);
+        final CORSService corsService = corsConfigListener.getCorsService();
 
-        if (corsConfigListener.getCorsService().handleRequest(req, res)) {
+        if (corsService == null || corsConfigListener.getCorsService().handleRequest(req, res)) {
             chain.doFilter(req, res);
         }
     }
