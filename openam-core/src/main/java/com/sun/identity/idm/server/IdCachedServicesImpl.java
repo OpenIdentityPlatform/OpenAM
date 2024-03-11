@@ -353,7 +353,6 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
        	idRepoExists.invalidate(key);
         idRepoActive.invalidate(key);
         invalidateMembersAndMemberships(key);
-
     }
 
     private void invalidateMembersAndMemberships(String key) {
@@ -651,7 +650,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
     }
 
     public void setActiveStatus(SSOToken token, IdType type, String name,
-        String amOrgName, String amsdkDN, boolean active) throws SSOException,
+                                String amOrgName, String amsdkDN, boolean active) throws SSOException,
         IdRepoException {
         super.setActiveStatus(token, type, name, amOrgName, amsdkDN, active);
         AMIdentity id = new AMIdentity(token, name, type, amOrgName, amsdkDN);
@@ -696,8 +695,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         }
     }
 
+    @Override
+    public AMIdentity create(SSOToken token, IdType type, String name, Map attrMap, String amOrgName) throws IdRepoException, SSOException {
+        AMIdentity id = super.create(token, type, name, attrMap, amOrgName);
+        final String key=id.getUniversalId().toLowerCase();
+        dirtyCache(key);
+        return id;
+    }
+
     public void delete(SSOToken token, IdType type, String name,
-        String orgName, String amsdkDN) throws IdRepoException,
+                       String orgName, String amsdkDN) throws IdRepoException,
         SSOException {
         // Call parent to delete the entry
         super.delete(token, type, name, orgName, amsdkDN);
@@ -760,8 +767,10 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                 AMIdentity uvid = new AMIdentity(token, pattern, type, orgName, null);
                 String universalID = uvid.getUniversalId().toLowerCase();
                 IdCacheBlock cb = idRepoCache.getIfPresent(universalID);
-                if ((cb != null) && !cb.hasExpiredAndUpdated() && cb.isExists() &&
-                                                                            (ctrl.getSearchModifierMap() == null)) {
+                if ((cb != null)
+                        && !cb.hasExpiredAndUpdated()
+                        && cb.isExists()
+                        && ctrl.getSearchModifierMap() == null) {
                     // Check if search is for a specific identity
                     // Search is for a specific user, look in the cache
                     Map attributes;
@@ -790,9 +799,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
                             throw (ide);
                         }
                     }
-                }else {
-                	final AMIdentity tokenId = IdUtils.getIdentity(token);
-                	final String principalDN = IdUtils.getUniversalId(tokenId);
+                } else {
                 	final IdSearchResults res=super.search(token, type, ctrl, orgName, crestQuery);
                 	try {
 	                	for (AMIdentity idm : (Set<AMIdentity>)res.getSearchResults()) {
