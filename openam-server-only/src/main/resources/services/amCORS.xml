@@ -69,6 +69,7 @@
                                  order="300"
                                  resourceName="acceptedMethods">
                     <DefaultValues>
+                        <Value>GET</Value>
                         <Value>POST</Value>
                         <Value>PUT</Value>
                     </DefaultValues>
