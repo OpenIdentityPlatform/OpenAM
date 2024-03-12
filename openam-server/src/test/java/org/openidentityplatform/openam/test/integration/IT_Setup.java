@@ -1,7 +1,5 @@
 package org.openidentityplatform.openam.test.integration;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -33,7 +31,6 @@ public class IT_Setup {
 
     @BeforeTest
     public void webdriverSetup() {
-        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
         driver = new ChromeDriver(options);
@@ -127,7 +124,7 @@ public class IT_Setup {
         for(int i = 0; i < 3; i++) {
             try {
                 WebElement bodyElement  = new WebDriverWait(driver,Duration.ofSeconds(20)).until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-                return StringUtils.containsIgnoreCase(bodyElement.getText(), str);
+                return bodyElement.getText().toLowerCase().contains(str.toLowerCase());
             } catch (StaleElementReferenceException e) {
                 lastException = e;
             }

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2023 3A Systems LLC.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -98,7 +99,7 @@ public abstract class BaseURLProvider {
      */
     public String getRealmURL(HttpServletRequest request, String basePath, Realm realm) throws InvalidBaseUrlException {
         try {
-            Realm dnsRealm = Realm.of(URI.create(request.getRequestURI()).getHost());
+            Realm dnsRealm = Realm.of(URI.create(request.getRequestURL().toString()).getHost());
             return getRealmURL(getRootURL(request), basePath, dnsRealm, realm);
         } catch (RealmLookupException e) {
             throw new InvalidBaseUrlException(e.getMessage(), e);

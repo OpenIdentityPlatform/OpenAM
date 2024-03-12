@@ -56,6 +56,7 @@ import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.audit.HttpAccessAuditFilterFactory;
+import org.forgerock.openam.cors.CORSConfigListener;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -76,6 +77,7 @@ public class RestGuiceModule extends AbstractModule {
     protected void configure() {
         bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
         bind(ResourceApiVersionBehaviourManager.class).to(VersionBehaviourConfigListener.class).in(Singleton.class);
+        bind(CORSConfigListener.class).in(Singleton.class);
         bind(Key.get(Filter.class, Names.named("LoggingFilter"))).to(CrestLoggingFilter.class).in(Singleton.class);
         bind(Key.get(Logger.class, Names.named("RestAuthentication")))
                 .toInstance(LoggerFactory.getLogger("restAuthenticationFilter"));
