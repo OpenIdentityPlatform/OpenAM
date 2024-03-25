@@ -30,6 +30,7 @@
 package com.sun.identity.wss.security;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Set;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -1108,10 +1109,11 @@ public class WSSUtils {
         try {
             Canonicalizer c14n = Canonicalizer.getInstance(
                 "http://www.w3.org/2001/10/xml-exc-c14n#");
-            byte outputBytes[] = c14n.canonicalizeSubtree(node);
+            ByteArrayOutputStream os=new ByteArrayOutputStream();
+            c14n.canonicalizeSubtree(node,os);
             DocumentBuilder documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             Document doc = documentBuilder.parse(
-                new ByteArrayInputStream(outputBytes));
+                new ByteArrayInputStream(os.toByteArray()));
             Element result = doc.getDocumentElement();
             return result;
         } catch (Exception e) {

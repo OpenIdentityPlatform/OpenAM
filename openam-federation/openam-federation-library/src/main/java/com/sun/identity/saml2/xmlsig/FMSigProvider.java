@@ -36,6 +36,7 @@ import java.util.Set;
 
 import javax.xml.xpath.XPathException;
 
+import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -256,7 +257,7 @@ public final class FMSigProvider implements SigProvider {
             );
         }
         Element nscontext =
-                org.apache.xml.security.utils.XMLUtils.
+                AMSignatureProvider.
                         createDSctx(doc, "ds", Constants.SignatureSpecNS);
         Element sigElement = null;
         try {

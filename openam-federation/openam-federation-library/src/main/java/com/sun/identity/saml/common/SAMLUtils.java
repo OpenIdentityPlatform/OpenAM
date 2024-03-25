@@ -31,6 +31,7 @@ package com.sun.identity.saml.common;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import java.io.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -45,10 +46,6 @@ import java.util.StringTokenizer;
 
 import java.text.StringCharacterIterator;
 import java.text.CharacterIterator;
-import java.io.UnsupportedEncodingException;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
 
 import java.security.MessageDigest;
 
@@ -1716,11 +1713,12 @@ public class SAMLUtils  extends SAMLUtilsCommon {
           try {
               Canonicalizer c14n = Canonicalizer.getInstance(
                   "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-              byte outputBytes[] = c14n.canonicalizeSubtree(node);
-              DocumentBuilder documentBuilder = 
+              ByteArrayOutputStream os=new ByteArrayOutputStream();
+              c14n.canonicalizeSubtree(node,os);
+              DocumentBuilder documentBuilder =
                  XMLUtils.getSafeDocumentBuilder(false);
               Document doc = documentBuilder.parse(
-                  new ByteArrayInputStream(outputBytes));
+                  new ByteArrayInputStream(os.toByteArray()));
               Element result = doc.getDocumentElement();
               return result;
           } catch (Exception e) {

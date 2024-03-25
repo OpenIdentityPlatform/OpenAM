@@ -40,6 +40,7 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
+import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SSODescriptorType;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -241,7 +242,7 @@ public final class SAML2MetaSecurityUtils {
         NodeList sigElements = null;
         try {
             Element nscontext =
-                    org.apache.xml.security.utils.XMLUtils
+                    AMSignatureProvider
                             .createDSctx (doc,"ds", Constants.SignatureSpecNS);
             sigElements =
                     XPathAPI.selectNodeList(doc, "//ds:Signature", nscontext);
