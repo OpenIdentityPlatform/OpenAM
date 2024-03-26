@@ -89,7 +89,7 @@ jobs:
           submodules: recursive
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ github.repository }}
@@ -98,9 +98,9 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ github.event.inputs.releaseVersion }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -113,7 +113,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
@@ -136,7 +136,7 @@ jobs:
           submodules: recursive
       - name: Docker meta (alpine)
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ github.repository }}
@@ -145,9 +145,9 @@ jobs:
             type=raw,value=alpine
             type=raw,value=${{ github.event.inputs.releaseVersion }}-alpine
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -161,7 +161,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push image
         continue-on-error: true
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./openam-distribution/openam-distribution-docker
           file: ./openam-distribution/openam-distribution-docker/Dockerfile-alpine

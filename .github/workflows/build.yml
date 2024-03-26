@@ -73,7 +73,7 @@ jobs:
           echo "release_version=$git_version_last" >> $GITHUB_ENV
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             localhost:5000/${{ github.repository }}
@@ -81,13 +81,13 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ env.release_version }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
@@ -122,7 +122,7 @@ jobs:
           echo "release_version=$git_version_last" >> $GITHUB_ENV
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             localhost:5000/${{ github.repository }}
@@ -130,13 +130,13 @@ jobs:
             type=raw,value=alpine
             type=raw,value=${{ env.release_version }}-alpine
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
