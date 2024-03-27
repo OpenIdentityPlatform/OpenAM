@@ -196,8 +196,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                            WSSUtils.bundle.getString("invalidalgorithm"));
               }
             }
-            Element wsucontext = org.apache.xml.security.utils.
-                    XMLUtils.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
+            Element wsucontext = AMSignatureProvider.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
 
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                     "//*[@wsu:Id]", wsucontext);
@@ -429,8 +428,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                            SAMLUtils.bundle.getString("invalidalgorithm"));
             }
 
-            Element wsucontext = org.apache.xml.security.utils.
-                XMLUtils.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
+            Element wsucontext = AMSignatureProvider.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
 
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                     "//*[@wsu:Id]", wsucontext);
@@ -575,8 +573,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
         }
         
         try {
-            Element wsucontext = org.apache.xml.security.utils.
-                    XMLUtils.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
+            Element wsucontext = AMSignatureProvider.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
 
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                     "//*[@wsu:Id]", wsucontext);
@@ -603,8 +600,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                 }
             }
 
-            Element nscontext = org.apache.xml.security.utils.
-                  XMLUtils.createDSctx (doc,"ds",Constants.SignatureSpecNS);
+            Element nscontext = AMSignatureProvider.createDSctx (doc,"ds",Constants.SignatureSpecNS);
             NodeList sigElements = XPathAPI.selectNodeList (doc,
                 "//ds:Signature", nscontext);
             int sigElementsLength = sigElements.getLength();
@@ -733,8 +729,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                return null;
             }
 
-            Element nscontext = org.apache.xml.security.utils.
-                XMLUtils.createDSctx(doc,"ds",Constants.SignatureSpecNS);
+            Element nscontext = AMSignatureProvider.createDSctx(doc,"ds",Constants.SignatureSpecNS);
             Element sigElement = (Element) XPathAPI.selectSingleNode(
                           securityElement, "ds:Signature[1]", nscontext);
 
@@ -750,8 +745,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
             if (reference != null) {
                 String id = reference.getAttribute(SAMLConstants.TAG_URI);
                 id = id.substring(1);
-                nscontext = org.apache.xml.security.utils.
-                    XMLUtils.createDSctx(doc,SAMLConstants.PREFIX_WSU,
+                nscontext = AMSignatureProvider.createDSctx(doc,SAMLConstants.PREFIX_WSU,
                                          WSSConstants.WSU_NS);
                 Node n = XPathAPI.selectSingleNode(
                     doc, "//*[@"+ SAMLConstants.PREFIX_WSU + ":" +
@@ -853,8 +847,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                            SAMLUtils.bundle.getString("invalidalgorithm"));
             }
 
-            Element wsucontext = org.apache.xml.security.utils.
-                XMLUtils.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
+            Element wsucontext = AMSignatureProvider.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
 
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                     "//*[@wsu:Id]", wsucontext);

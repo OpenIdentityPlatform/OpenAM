@@ -29,7 +29,9 @@
 
 package com.sun.identity.wss.security;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,6 +46,9 @@ import org.apache.xml.security.transforms.TransformSpi;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.keys.content.X509Data;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class <code>STRTransform</code> extends from <code>TransformSpi</code>
@@ -67,6 +72,8 @@ public class STRTransform extends TransformSpi {
        }
     }
 
+
+
     /**
      * Returns the transformation engine URI.
      */
@@ -74,6 +81,55 @@ public class STRTransform extends TransformSpi {
         return STR_TRANSFORM_URI;
     }
 
+    @Override
+    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input, OutputStream outputStream, Element element, String s, boolean b) throws IOException, CanonicalizationException, InvalidCanonicalizerException, TransformationException, ParserConfigurationException, SAXException {
+        WSSUtils.debug.message("STRTransform.enginePerformTransform:: Start");
+        //Document doc = transformObject.getDocument();
+        Element str = null;
+        if(input.isElement()) {
+        } else {
+            WSSUtils.debug.error("STRTransform.enginePerformTransform:: Input" +
+                    " is not an element");
+            throw new  CanonicalizationException(
+                    WSSUtils.bundle.getString("invalidElement"));
+        }
+        //Element element = (Element)input.getSubNode();
+        if(!WSSConstants.TAG_SECURITYTOKEN_REFERENCE.equals(
+                element.getLocalName())) {
+            WSSUtils.debug.error("STRTransform.enginePerformTransform:: input" +
+                    " must be security token reference");
+            throw new IOException(
+                    WSSUtils.bundle.getString("invalidElement"));
+        }
+        Element dereferencedToken = null;
+        SecurityTokenReference ref = null;
+        try {
+            ref = new SecurityTokenReference(element);
+            //dereferencedToken = dereferenceSTR(doc, ref);
+            dereferencedToken=element;
+        } catch (SecurityException se) {
+            WSSUtils.debug.error("STRTransform.enginePerformTransform:: error",
+                    se);
+            throw new TransformationException(
+                    WSSUtils.bundle.getString("transformfailed"));
+        }
+        String canonAlgo = s;//getCanonicalizationAlgo(transformObject);
+        Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
+        ByteArrayOutputStream os=new ByteArrayOutputStream();
+        canon.canonicalizeSubtree(dereferencedToken, "#default",os);
+        StringBuffer bf = new StringBuffer(new String(os.toByteArray()));
+        String bf1 = bf.toString();
+
+        int lt = bf1.indexOf("<");
+        int gt = bf1.indexOf(">");
+        int idx = bf1.indexOf(XMLNS);
+        if (idx < 0 || idx > gt) {
+            idx = bf1.indexOf(" ");
+            bf.insert(idx + 1, "xmlns=\"\" ");
+            bf1 = bf.toString();
+        }
+        return new XMLSignatureInput(bf1.getBytes());
+    }
     /**
      * Perform the XMLSignature transformation for the given input.
      */
@@ -112,8 +168,9 @@ public class STRTransform extends TransformSpi {
         }
         String canonAlgo = getCanonicalizationAlgo(transformObject);
         Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
-        byte[] buf = canon.canonicalizeSubtree(dereferencedToken, "#default");
-        StringBuffer bf = new StringBuffer(new String(buf));
+        ByteArrayOutputStream os=new ByteArrayOutputStream();
+        canon.canonicalizeSubtree(dereferencedToken, "#default",os);
+        StringBuffer bf = new StringBuffer(new String(os.toByteArray()));
         String bf1 = bf.toString();
 
         int lt = bf1.indexOf("<");

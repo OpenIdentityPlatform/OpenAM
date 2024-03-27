@@ -39,6 +39,7 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
+import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -243,7 +244,7 @@ public final class WSFederationMetaSecurityUtils {
         NodeList sigElements = null;
         try {
             Element nscontext =
-                    org.apache.xml.security.utils.XMLUtils
+                    AMSignatureProvider
                             .createDSctx (doc,"ds", Constants.SignatureSpecNS);
             sigElements =
                     XPathAPI.selectNodeList(doc, "//ds:Signature", nscontext);

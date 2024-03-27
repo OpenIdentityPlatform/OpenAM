@@ -32,6 +32,8 @@ package com.sun.identity.wss.security;
 import java.security.cert.X509Certificate;
 import javax.xml.transform.TransformerException;
 import java.util.ResourceBundle;
+
+import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
@@ -186,8 +188,7 @@ public class KeyIdentifier {
                       doc,  "//*[@ID=\"" + value + "\"]");
             } else {
                Element nscontext =
-                   org.apache.xml.security.utils.
-                   XMLUtils.createDSctx(doc, WSSConstants.WSU_TAG,
+                       AMSignatureProvider.createDSctx(doc, WSSConstants.WSU_TAG,
                                         WSSConstants.WSU_NS);
                tokenElement =  (Element) XPathAPI.selectSingleNode(
                      doc,  "//*[@" + "wsu:Id" + "=\"" + value + "\"]");

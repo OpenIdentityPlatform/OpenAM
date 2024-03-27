@@ -144,132 +144,6 @@
   <!-- Profiles -->
   <profiles>
     <profile>
-      <id>clover</id>
-      <properties>
-        <clover.plugin.version>4.1.1</clover.plugin.version>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.atlassian.maven.plugins</groupId>
-            <artifactId>clover-maven-plugin</artifactId>
-            <version>${clover.plugin.version}</version>
-            <configuration>
-              <includesTestSourceRoots>false</includesTestSourceRoots>
-              <singleCloverDatabase>true</singleCloverDatabase>
-              <generateHistorical>false</generateHistorical>
-              <generateHtml>true</generateHtml>
-              <title>OpenAM ${project.version} Coverage Report</title>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <dependencies>
-        <dependency>
-          <groupId>com.atlassian.clover</groupId>
-          <artifactId>clover</artifactId>
-          <version>${clover.plugin.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>forgerock-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <inherited>false</inherited>
-            <configuration>
-              <source>8</source>
-              <charset>utf-8</charset>
-              <encoding>utf-8</encoding>
-              <source>${maven.compiler.source}</source>
-              <additionalJOption>${javadoc.options}</additionalJOption>
-              <additionalparam>${javadoc.opts}</additionalparam>
-              <detectLinks>true</detectLinks>
-              <bottom><![CDATA[Copyright &#169; 2010-2016, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
-              <links>
-                <link>http://docs.oracle.com/javase/7/docs/api</link>
-                <link>http://openam.forgerock.org/apidocs/</link>
-                <link>http://www.restlet.org/documentation/2.1/jse/api</link>
-                <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
-                <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
-              </links>
-              <taglets>
-                <taglet>
-                  <tagletClass>com.sun.identity.tools.javadocs.SupportedAPITaglet</tagletClass>
-                </taglet>
-                <taglet>
-                  <tagletClass>com.sun.identity.tools.javadocs.SupportedAllAPITaglet</tagletClass>
-                </taglet>
-              </taglets>
-              <tagletArtifact>
-                <groupId>org.openidentityplatform.openam</groupId>
-                <artifactId>javadoc-utils</artifactId>
-                <version>${javadoc-utils.version}</version>
-              </tagletArtifact>
-              <doctitle>OpenAM ${project.version} Public API Javadoc</doctitle>
-              <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
-              <finalName>openam-${project.version}-public</finalName>
-              <subpackages>
-                                com.iplanet.am.sdk:com.iplanet.am.util:com.iplanet.dpro.parser:com.iplanet.dpro.session.service:com.iplanet.log:com.iplanet.services.cdm:com.iplanet.services.ldap:com.iplanet.services.util:com.iplanet.sso:com.iplanet.ums:com.sun.identity.authentication:com.sun.identity.entitlement:com.sun.identity.federation.accountmgmt:com.sun.identity.federation.common:com.sun.identity.federation.message:com.sun.identity.federation.message.common:com.sun.identity.federation.plugins:com.sun.identity.federation.services:com.sun.identity.idm:com.sun.identity.jaxrpc:com.sun.identity.liberty.ws.authnsvc:com.sun.identity.liberty.ws.authnsvc.mechanism:com.sun.identity.liberty.ws.authnsvc.protocol:com.sun.identity.liberty.ws.common:com.sun.identity.liberty.ws.common.wsse:com.sun.identity.liberty.ws.disco:com.sun.identity.liberty.ws.disco.plugins:com.sun.identity.liberty.ws.dst:com.sun.identity.liberty.ws.dst.service:com.sun.identity.liberty.ws.idpp.common:com.sun.identity.liberty.ws.idpp.plugin:com.sun.identity.liberty.ws.interaction:com.sun.identity.liberty.ws.interfaces:com.sun.identity.liberty.ws.paos:com.sun.identity.liberty.ws.security:com.sun.identity.liberty.ws.soapbinding:com.sun.identity.log:com.sun.identity.plugin.configuration:com.sun.identity.plugin.datastore:com.sun.identity.plugin.log:com.sun.identity.plugin.session:com.sun.identity.policy:com.sun.identity.sae.api:com.sun.identity.saml:com.sun.identity.saml2.assertion:com.sun.identity.saml2.common:com.sun.identity.saml2.ecp:com.sun.identity.saml2.plugins:com.sun.identity.saml2.profile:com.sun.identity.saml2.protocol:com.sun.identity.security:com.sun.identity.shared.debug:com.sun.identity.shared.jaxrpc:com.sun.identity.shared.locale:com.sun.identity.shared.stats:com.sun.identity.shared.whitelist:com.sun.identity.sm:com.sun.identity.wsfederation.common:com.sun.identity.wsfederation.plugins:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.security.handler:com.sun.identity.wss.sts:com.sun.identity.xacml.client:com.sun.identity.xacml.common:com.sun.identity.xacml.context:com.sun.identity.xacml.context.impl:com.sun.identity.xacml.policy:com.sun.identity.xacml.policy.impl:com.sun.identity.xacml.saml2:com.sun.identity.xacml.saml2.impl:com.sun.liberty:org.forgerock.openam.authentication.modules.oath.plugins:org.forgerock.oauth2.core:org.forgerock.openam.authentication.service:org.forgerock.openam.entitlement:org.forgerock.openam.ldap:org.forgerock.openam.oauth2.provider:org.forgerock.openam.session.service:org.forgerock.openam.upgrade:org.forgerock.openam.authentication.modules.common.mapping:org.forgerock.openam.services.email:org.forgerock.openam.selfservice.config:org.forgerock.openam.selfservice.config.beans:org.forgerock.openam.sts.tokengeneration.saml2.statements:org.forgerock.openam.sts.config.user:org.forgerock.openam.sts.token:org.forgerock.openam.sts.user.invocation:org.forgerock.openam.sts:org.forgerock.openam.sts.rest.token.validator:org.forgerock.openam.sts.tokengeneration.oidc
-                            </subpackages>
-              <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
-              <docletArtifact>
-                <groupId>org.openidentityplatform.openam</groupId>
-                <artifactId>javadoc-utils</artifactId>
-                <version>${javadoc-utils.version}</version>
-              </docletArtifact>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>precommit</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>enforce-no-snapshots</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireReleaseDeps>
-                      <message>No snapshot dependencies allowed</message>
-                      <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
-                      <excludes>
-                        <exclude>org.openidentityplatform.openam:*</exclude>
-                        <exclude>org.openidentityplatform.commons:forgerock-persistit-core:*</exclude>
-                        <exclude>org.openidentityplatform.openig:openig-toolkit:*</exclude>
-                      </excludes>
-                    </requireReleaseDeps>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>jdk7.options</id>
-      <activation>
-        <jdk>1.7</jdk>
-      </activation>
-      <properties>
-        <!-- Surefire Argument Line -->
-        <java.surefire.options>-Xms256m -Xmx256m -XX:MaxPermSize=96m</java.surefire.options>
-        <!-- JavaDoc Setting Properties -->
-        <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
-      </properties>
-    </profile>
-    <profile>
       <id>jdk8.options</id>
       <activation>
         <jdk>1.8</jdk>
@@ -277,10 +151,8 @@
       <properties>
         <!-- Disable Doclint on JDK8+ -->
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
-        <!-- Surefire Argument Line -->
-        <java.surefire.options>-Xmx1g</java.surefire.options>
         <!-- JavaDoc Setting Properties -->
-        <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
+        <javadoc.options>-J-Xmx2g</javadoc.options>
       </properties>
     </profile>
     <profile>
@@ -333,7 +205,7 @@
           --add-exports java.sql/java.sql=ALL-UNNAMED
         </java.surefire.options>
         <!-- JavaDoc Setting Properties -->
-        <javadoc.options>-J-Xms2g -J-Xmx2g</javadoc.options>
+        <javadoc.options>-J-Xmx2g</javadoc.options>
       </properties>
     </profile>
    	<profile>
@@ -1695,7 +1567,7 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>2.1.7</version>
+        <version>3.0.4</version>
       </dependency>
       <!-- Test dependency -->
       <dependency>
