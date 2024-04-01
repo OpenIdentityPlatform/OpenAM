@@ -28,25 +28,51 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.forgerock.openam.authentication.modules.oauth2.service.DefaultServiceUrlProvider;
 import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrlProvider;
 import org.forgerock.openam.authentication.modules.oauth2.service.ServiceUrlProvider;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.utils.MappingUtils;
+import org.forgerock.openam.utils.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.openam.utils.MappingUtils;
-import org.forgerock.openam.utils.StringUtils;
-import org.owasp.esapi.util.CollectionsUtil;
 
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ACCOUNT_MAPPER;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ACCOUNT_MAPPER_CONFIG;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ACCOUNT_PROVIDER;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ANONYMOUS_USER;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ATTRIBUTE_MAPPER;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_ATTRIBUTE_MAPPER_CONFIG;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_AUTH_LEVEL;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_AUTH_SERVICE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_CLIENT_ID;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_CLIENT_SECRET;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_CREATE_ACCOUNT;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_CUSTOM_PROPERTIES;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_EMAIL_FROM;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_EMAIL_GWY_IMPL;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_LOGOUT_BEHAVIOUR;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_LOGOUT_SERVICE_URL;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_MAIL_ATTRIBUTE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_MAP_TO_ANONYMOUS_USER_FLAG;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_PROFILE_SERVICE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_PROFILE_SERVICE_PARAM;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_PROMPT_PASSWORD;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SAVE_ATTRIBUTES_TO_SESSION;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SCOPE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SMTP_HOSTNAME;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SMTP_PASSWORD;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SMTP_PORT;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SMTP_SSL_ENABLED;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SMTP_USERNAME;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_SSO_PROXY_URL;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.KEY_TOKEN_SERVICE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.OIDC_SCOPE;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.SCOPE_SEPARATOR;
 
 
 /* 
@@ -61,6 +87,9 @@ public class OAuthConf {
 
     static final String CLIENT = "genericHTML";
     static final String ESIA_PREFIX = "esia";
+
+    static final String ESIA_KEY_PATH = "[esia-key-path]";
+    static final String ESIA_CERT_PATH = "[esia-cert-path]";
     
     private boolean openIDConnect;
     private String accountProvider;
@@ -94,6 +123,8 @@ public class OAuthConf {
     private String emailFrom = null;
     private String authLevel = "0";
 	private Map<String, String> customProperties = null;
+
+    private ServiceUrlProvider serviceUrlProvider;
 
     OAuthConf() {
     }
@@ -141,6 +172,14 @@ public class OAuthConf {
         
         customProperties  = CollectionUtils.isNotEmpty((Set<String>)config.get(KEY_CUSTOM_PROPERTIES))  
         		? MappingUtils.parseMappings((Set<String>) config.get(KEY_CUSTOM_PROPERTIES)) : Collections.EMPTY_MAP;
+
+        if(this.authServiceUrl != null && this.authServiceUrl.contains(ESIA_PREFIX)) {
+            final String keyPath = customProperties.get(ESIA_KEY_PATH);
+            final String certPath = customProperties.get(ESIA_CERT_PATH);
+            serviceUrlProvider = new ESIAServiceUrlProvider(keyPath, certPath);
+        } else {
+            serviceUrlProvider = new DefaultServiceUrlProvider();
+        }
     }
 
     public int getAuthnLevel() {
@@ -163,7 +202,7 @@ public class OAuthConf {
     }
 
     public Map<String, String> getSMTPConfig() {
-        Map<String, String> config = new HashMap<String, String>();
+        Map<String, String> config = new HashMap<>();
         config.put(KEY_EMAIL_GWY_IMPL, gatewayEmailImplClass);
         config.put(KEY_SMTP_HOSTNAME, smtpHostName);
         config.put(KEY_SMTP_PORT, smtpPort);
@@ -259,14 +298,7 @@ public class OAuthConf {
 
     public String getAuthServiceUrl(String originalUrl, String state) throws
             AuthLoginException {
-    	
-    	ServiceUrlProvider provider = null;
-    	if(this.authServiceUrl.contains(ESIA_PREFIX))
-    		provider = new ESIAServiceUrlProvider();
-    	else
-    		provider = new DefaultServiceUrlProvider();
-    	
-    	return provider.getServiceUri(this, originalUrl, state);
+    	return serviceUrlProvider.getServiceUri(this, originalUrl, state);
 
     }
 
@@ -281,26 +313,12 @@ public class OAuthConf {
     
     public Map<String, String> getTokenServiceGETParameters(String code, String authServiceURL)
             throws AuthLoginException {
-
-    	ServiceUrlProvider provider = null;
-    	if(this.authServiceUrl.contains(ESIA_PREFIX))
-    		provider = new ESIAServiceUrlProvider();
-    	else
-    		provider = new DefaultServiceUrlProvider();
-    	
-    	return provider.getTokenServiceGETparameters(this, code, authServiceURL);
+    	return serviceUrlProvider.getTokenServiceGETparameters(this, code, authServiceURL);
     }
 
     public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
             throws AuthLoginException {
-
-    	ServiceUrlProvider provider = null;
-    	if(this.authServiceUrl.contains(ESIA_PREFIX))
-    		provider = new ESIAServiceUrlProvider();
-    	else
-    		provider = new DefaultServiceUrlProvider();
-    	
-    	return provider.getTokenServicePOSTparameters(this, code, authServiceURL);
+    	return serviceUrlProvider.getTokenServicePOSTparameters(this, code, authServiceURL);
     }
 
     public String getProfileServiceUrl() {
@@ -308,7 +326,7 @@ public class OAuthConf {
     }
 
     public Map<String, String> getProfileServiceGetParameters() {
-        return Collections.<String, String>emptyMap();
+        return Collections.emptyMap();
     }
     
     public void validateConfiguration() throws AuthLoginException {
@@ -367,6 +385,10 @@ public class OAuthConf {
     
     public Map<String, String> getCustomProperties() {
         return customProperties;
+    }
+
+    public ServiceUrlProvider getServiceUrlProvider() {
+        return serviceUrlProvider;
     }
 
 }

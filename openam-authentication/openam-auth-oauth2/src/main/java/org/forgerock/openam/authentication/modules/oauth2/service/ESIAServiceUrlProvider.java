@@ -33,6 +33,11 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 
 	private final static String UTF_8 = "UTF-8";
 	private final static SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss Z");
+
+	final Signer signer;
+	public ESIAServiceUrlProvider(String keyPath, String certPath) {
+		this.signer = new Signer(keyPath, certPath);
+	}
 	
 	@Override
 	public String getServiceUri(OAuthConf config, String originalUrl, String state) throws AuthLoginException {
@@ -44,7 +49,7 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 			
 			authUrl = MessageFormat.format(uriTemplate, 
 				URLEncoder.encode(config.getClientId(), UTF_8), 
-				URLEncoder.encode(Signer.signString(config.getScope() +timestamp+config.getClientId()+state), UTF_8),
+				URLEncoder.encode(signer.signString(config.getScope() +timestamp+config.getClientId()+state), UTF_8),
 				URLEncoder.encode(originalUrl, UTF_8),
 				URLEncoder.encode(config.getScope(), UTF_8),
 				URLEncoder.encode(state, UTF_8), 
@@ -73,7 +78,7 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	        parameters.put(PARAM_CLIENT_ID, config.getClientId());
 	        parameters.put(PARAM_CODE, URLEncoder.encode(code, UTF_8));
 	        parameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(config.getScope()+timestamp+config.getClientId()+state), UTF_8));
+	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(signer.signString(config.getScope()+timestamp+config.getClientId()+state), UTF_8));
 	        parameters.put(PARAM_REDIRECT_URI, URLEncoder.encode(authServiceURL, UTF_8));
 	        parameters.put(PARAM_SCOPE, URLEncoder.encode(config.getScope(), UTF_8));
 	        parameters.put("state", URLEncoder.encode(state, UTF_8));
@@ -88,11 +93,10 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	
        
     public Map<String, String> getTokenServiceClientPOSTparameters(OAuthConf config, 
-    		String scope)
-            throws AuthLoginException {
+    		String scope) {
     	
     	
-		Map<String, String> parameters = new LinkedHashMap<String, String>();
+		Map<String, String> parameters = new LinkedHashMap<>();
         String timestamp = getTimeStamp();
         String state = UUID.randomUUID().toString();
         try {
@@ -103,8 +107,7 @@ public class ESIAServiceUrlProvider implements ServiceUrlProvider {
 	        parameters.put("state", URLEncoder.encode(state, UTF_8));
 	        parameters.put("timestamp", URLEncoder.encode(timestamp, UTF_8));
 	        parameters.put("token_type", "Bearer");
-	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(Signer.signString(scope+timestamp+config.getClientId()+state), UTF_8));
-	        
+	        parameters.put(PARAM_CLIENT_SECRET, URLEncoder.encode(signer.signString(scope+timestamp+config.getClientId()+state), UTF_8));
 	        
 		} catch (Exception e) {
 			throw new RuntimeException(e);
