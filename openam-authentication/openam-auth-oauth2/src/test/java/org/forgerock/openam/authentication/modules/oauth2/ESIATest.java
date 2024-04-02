@@ -8,11 +8,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.StringWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -41,25 +42,14 @@ public class ESIATest extends PowerMockTestCase {
 		PowerMockito.when(HttpRequestContent.getInstance()).thenReturn(httpRequestContent);
 		ESIAServiceUrlProvider.getSyncOffset();
 	}
+
+	final static String algorithm = "ECGOST3410-2012";
+	final static String paramsSpec = "Tc26-Gost-3410-12-256-paramSetA";
+	final static String signatureAlgorithm = "GOST3411WITHGOST3410-2012-256";
+	final static String alias = "openam-test";
 	
 	@Test
-	public void testSigner() {
-		URL certUrl = ESIATest.class.getClassLoader().getResource("test.crt");
-		URL keyUrl = ESIATest.class.getClassLoader().getResource("test.key");
-		System.setProperty(Signer.class.getName().concat(".certPath"), certUrl.getPath());
-		System.setProperty(Signer.class.getName().concat(".keyPath"), keyUrl.getPath());
-		
-		String signed = new Signer().signString("test");
-		System.out.println(signed);
-	}
-
-	public void generateCertificate() throws Exception {
-
-		final String algorithm = "ECGOST3410-2012";
-		final String paramsSpec = "Tc26-Gost-3410-12-256-paramSetA";
-		final String signatureAlgorithm = "GOST3411WITHGOST3410-2012-256";
-
-		final String alias = "openam-test";
+	public void testSigner() throws Exception {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
 		KeyPairGenerator keygen = KeyPairGenerator.getInstance(algorithm, "BC");
@@ -67,6 +57,15 @@ public class ESIATest extends PowerMockTestCase {
 
 		KeyPair keyPair = keygen.generateKeyPair();
 
+		final String keyPath = generateTempKeyFile(keyPair);
+		final String certPath = generateTempCertificateFile(keyPair);
+
+		String signed = new Signer(keyPath, certPath).signString("test");
+		Assert.assertNotNull(signed);
+		System.out.println(signed);
+	}
+
+	private String generateTempCertificateFile(KeyPair keyPair)throws Exception {
 		org.bouncycastle.asn1.x500.X500Name subject = new org.bouncycastle.asn1.x500.X500Name("CN=" + alias);
 		BigInteger serial = BigInteger.ONE;
 		Date notBefore = new Date();
@@ -85,18 +84,24 @@ public class ESIATest extends PowerMockTestCase {
 				= new org.bouncycastle.cert.jcajce.JcaX509CertificateConverter();
 
 		X509Certificate certificate = certificateConverter.getCertificate(certificateHolder);
-		PrivateKey privateKey = keyPair.getPrivate();
 
-		try(StringWriter sw = new StringWriter(); JcaPEMWriter writer = new JcaPEMWriter(sw)) {
-			writer.writeObject(privateKey);
-			writer.flush();
-			System.out.println(sw.getBuffer().toString());
-		}
+		File file = File.createTempFile("cert-", ".pem");
 
-		try(StringWriter sw = new StringWriter(); JcaPEMWriter writer = new JcaPEMWriter(sw)) {
+		try(FileWriter sw = new FileWriter(file); JcaPEMWriter writer = new JcaPEMWriter(sw)) {
 			writer.writeObject(certificate);
 			writer.flush();
-			System.out.println(sw.getBuffer().toString());
 		}
+		return file.getAbsolutePath();
 	}
+
+	private String generateTempKeyFile(KeyPair keyPair) throws Exception {
+		PrivateKey privateKey = keyPair.getPrivate();
+		File file = File.createTempFile("key-", ".pem");
+		try(FileWriter sw = new FileWriter(file); JcaPEMWriter writer = new JcaPEMWriter(sw)) {
+			writer.writeObject(privateKey);
+			writer.flush();
+		}
+		return file.getAbsolutePath();
+	}
+
 }
