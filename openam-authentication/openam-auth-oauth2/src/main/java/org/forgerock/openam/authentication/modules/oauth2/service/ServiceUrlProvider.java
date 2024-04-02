@@ -7,11 +7,11 @@ import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 import com.sun.identity.authentication.spi.AuthLoginException;
 
 public interface ServiceUrlProvider {
-	public String getServiceUri(OAuthConf config, String originalUrl, String state) throws AuthLoginException;
+	String getServiceUri(OAuthConf config, String originalUrl, String state) throws AuthLoginException;
 	
-	 public Map<String, String> getTokenServicePOSTparameters(OAuthConf config, String code, String authServiceURL)
+	 Map<String, String> getTokenServicePOSTparameters(OAuthConf config, String code, String authServiceURL)
 	            throws AuthLoginException;
 
-	public Map<String, String> getTokenServiceGETparameters(OAuthConf oAuthConf, String code, String authServiceURL) 
+	Map<String, String> getTokenServiceGETparameters(OAuthConf oAuthConf, String code, String authServiceURL)
 			throws AuthLoginException;
 }

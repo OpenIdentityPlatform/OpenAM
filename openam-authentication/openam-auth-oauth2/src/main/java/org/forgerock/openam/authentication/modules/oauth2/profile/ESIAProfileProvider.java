@@ -78,9 +78,10 @@ public class ESIAProfileProvider implements ProfileProvider {
 				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_SCOPE))
 				&& config.getCustomProperties().containsKey(ESIA_ORG_INFO_URL) 
 				&& StringUtils.isNotBlank(config.getCustomProperties().get(ESIA_ORG_INFO_URL))) {
-			
-			ESIAServiceUrlProvider provider = new ESIAServiceUrlProvider();
-			
+
+
+			ESIAServiceUrlProvider provider = (ESIAServiceUrlProvider)config.getServiceUrlProvider();
+
 			try {
 				JSONObject orgsJson = new JSONObject(orgsStr);
 				JSONArray orgsArray = orgsJson.getJSONArray("elements");
