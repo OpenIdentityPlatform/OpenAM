@@ -13,6 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
@@ -104,7 +105,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final String ISSUER_NAME = "openam-auth-fr-oath-issuer-name";
     private static final int TOTAL_ATTEMPTS = 3;
 
-    private static final String MODULE_NAME = "ForgeRock Authenticator (OATH)";
+    private static final String MODULE_NAME = "Authenticator (OATH)";
 
     //module attribute holders
     private String issuerName;

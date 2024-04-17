@@ -24,6 +24,7 @@
   your own identifying information:
   "Portions Copyrighted 2012 ForgeRock AS"
 
+  Portions Copyrighted 2024 3A Systems LLC
 -->
 
 
@@ -177,7 +178,7 @@
                                  validator="RequiredValueValidator"
                                  resourceName="oathIssuerName">
                     <ExampleValue>
-                        <Value>ForgeRock</Value>
+                        <Value>OpenAM</Value>
                     </ExampleValue>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
@@ -313,7 +314,7 @@
                                      validator="RequiredValueValidator"
                                      resourceName="oathIssuerName">
                         <ExampleValue>
-                            <Value>ForgeRock</Value>
+                            <Value>OpenAM</Value>
                         </ExampleValue>
                     </AttributeSchema>
                 </SubSchema>
