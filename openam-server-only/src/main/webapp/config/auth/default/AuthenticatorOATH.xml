@@ -14,6 +14,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
 
   Copyright 2012-2015 ForgeRock AS.
+  Portions Copyrighted 2024 3A Systems LLC
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -21,10 +22,10 @@
 
 <ModuleProperties moduleName="AuthenticatorOATH" version="1.0">
     <!-- For determining which we are -->
-    <Callbacks length="0" order="1" timeout="120" header="ForgeRock Authenticator (OATH)">
+    <Callbacks length="0" order="1" timeout="120" header="Authenticator (OATH)">
     </Callbacks>
     <!-- For when we're optional and device isn't registered -->
-    <Callbacks length="1" order="2" timeout="120" header="ForgeRock Authenticator (OATH)">
+    <Callbacks length="1" order="2" timeout="120" header="Authenticator (OATH)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -37,7 +38,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For when we're not optional and a device isn't registered -->
-    <Callbacks length="1" order="3" timeout="120" header="ForgeRock Authenticator (OATH)">
+    <Callbacks length="1" order="3" timeout="120" header="Authenticator (OATH)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -75,10 +76,10 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="6" timeout="120" header="ForgeRock Authenticator (OATH) Emergency Code Used">
+    <Callbacks length="2" order="6" timeout="120" header="Authenticator (OATH) Emergency Code Used">
         <TextOutputCallback>
-            You have used one of your Emergency ForgeRock Authenticator (OATH) Codes. Please make sure you have a note of
-            any remaining ForgeRock Authenticator (OATH) Codes.
+            You have used one of your Emergency Authenticator (OATH) Codes. Please make sure you have a note of
+            any remaining Authenticator (OATH) Codes.
         </TextOutputCallback>
         <ConfirmationCallback>
             <OptionValues>
