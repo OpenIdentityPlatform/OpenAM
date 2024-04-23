@@ -37,7 +37,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthAuthenticatorOATHService"
                 i18nFileName="amAuthAuthenticatorOATH"
-                revisionNumber="1"
+                revisionNumber="2"
                 i18nKey="iPlanetAMAuthAuthenticatorOATHServiceDescription"
                 resourceName="authenticatoroath">
 
