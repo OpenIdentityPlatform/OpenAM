@@ -21,6 +21,9 @@
         <artifactId>openam</artifactId>
         <version>14.8.5-SNAPSHOT</version>
     </parent>
+	<properties>
+		<node.install.directory>${project.basedir}</node.install.directory>
+	</properties>
 
     <artifactId>openam-ui</artifactId>
     <name>OpenAM UI Parent</name>
@@ -593,7 +596,7 @@
 							<phase>initialize</phase>
 							<configuration>
 								<nodeVersion>v20.12.2</nodeVersion>
-								<npmVersion>6.14.8</npmVersion>
+								<npmVersion>10.5.0</npmVersion>
 							</configuration>
 						</execution>
 						<execution>
