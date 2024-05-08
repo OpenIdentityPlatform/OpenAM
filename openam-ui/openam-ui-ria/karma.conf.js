@@ -12,12 +12,13 @@ module.exports = function (config) {
         ],
         exclude: [],
         preprocessors: {
-            "target/test-classes/**/*.js": ["babel"]
+            "target/test-classes/org/**/*.js": ["babel"],
+            "target/test-classes/store/**/*.js": ["babel"]
         },
         babelPreprocessor: {
             options: {
                 ignore: ["libs/"],
-                presets: ["es2015"]
+                presets: ["env"]
             }
         },
         reporters: ["notify", "nyan"],
