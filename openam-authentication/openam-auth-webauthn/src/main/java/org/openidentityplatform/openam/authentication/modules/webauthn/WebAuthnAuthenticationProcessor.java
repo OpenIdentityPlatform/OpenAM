@@ -16,27 +16,12 @@
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.sun.identity.idm.IdUtils;
 import com.webauthn4j.WebAuthnManager;
+import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.converter.exception.DataConversionException;
 import com.webauthn4j.data.AuthenticationData;
 import com.webauthn4j.data.AuthenticationParameters;
 import com.webauthn4j.data.AuthenticationRequest;
-import com.webauthn4j.validator.exception.ValidationException;
-import org.apache.commons.lang.ArrayUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.PublicKeyCredentialDescriptor;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
 import com.webauthn4j.data.PublicKeyCredentialType;
@@ -46,6 +31,14 @@ import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.data.client.challenge.Challenge;
 import com.webauthn4j.data.client.challenge.DefaultChallenge;
 import com.webauthn4j.server.ServerProperty;
+import com.webauthn4j.validator.exception.ValidationException;
+import org.apache.commons.lang.ArrayUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class WebAuthnAuthenticationProcessor {
 

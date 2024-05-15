@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 3A-Systems LLC. All rights reserved.
+ * Copyright 2024 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;

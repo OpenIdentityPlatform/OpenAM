@@ -18,6 +18,7 @@ package org.openidentityplatform.openam.authentication.modules.webauthn;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -72,10 +73,8 @@ public class WebAuthnRegistration extends AMLoginModule {
 	
 	private final static int LOGIN_REQUEST_CREDENTIALS_STATE = 2;
 	
-	private final static int CHALLENGE_ID_CB_INDEX = 0;
-	private final static int CHALLENGE_ATTESTATION_CB_INDEX = 1;
-	private final static int CHALLENGE_CLIENT_DATA_CB_INDEX = 2;
-	private final static int CREDENTIAL_REQUEST_CB_INDEX = 3;
+	private final static int CREDENTIALS_CB_INDEX = 0;
+    private final static int CREDENTIAL_REQUEST_CB_INDEX = 1;
 	
 	private WebAuthnRegistrationProcessor webAuthnRegistrationProcessor = null;
 	private	AttestationConveyancePreference attestation = null;
@@ -184,9 +183,16 @@ public class WebAuthnRegistration extends AMLoginModule {
 	}
 	
 	private int processCredentials(Callback[] callbacks) throws AuthLoginException {
-		String id = 					new String(((PasswordCallback) callbacks[CHALLENGE_ID_CB_INDEX]).getPassword());
-		String attestationObjectStr = 	new String(((PasswordCallback) callbacks[CHALLENGE_ATTESTATION_CB_INDEX]).getPassword());
-		String clientDataJSONStr = 		new String(((PasswordCallback) callbacks[CHALLENGE_CLIENT_DATA_CB_INDEX]).getPassword());
+		final String credentialsStr = new String(((PasswordCallback) callbacks[CREDENTIALS_CB_INDEX]).getPassword());
+		final Map<String, String> credentials;
+		try {
+			credentials = mapper.readValue(credentialsStr, new TypeReference<Map<String, String>>() {});
+		} catch (Exception e) {
+			debug.error("invalid credentials data: " + credentialsStr, e);
+			throw new AuthLoginException(e);
+		}
+		String attestationObjectStr = 	credentials.get("attestationObject");
+		String clientDataJSONStr = 		credentials.get("clientDataJSON");
 
 		Authenticator authenticator = webAuthnRegistrationProcessor.processCredentials(attestationObjectStr, clientDataJSONStr, getHttpServletRequest());
 

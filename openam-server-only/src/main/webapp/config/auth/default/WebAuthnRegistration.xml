@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2019 3A-Systems LLC
+    Portions Copyrighted 2024 3A-Systems LLC
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -45,15 +45,9 @@
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="4" order="2" timeout="120" header="Sending credentials..." template="WebAuthnRegisterCredentials.jsp">
+    <Callbacks length="2" order="2" timeout="120" header="Sending credentials..." template="WebAuthnRegisterCredentials.jsp">
     	<PasswordCallback echoPassword="false" >
-            <Prompt>Id</Prompt>
-        </PasswordCallback>
-        <PasswordCallback echoPassword="false" >
-            <Prompt>Attestation Object</Prompt>
-        </PasswordCallback>
-        <PasswordCallback echoPassword="false" >
-            <Prompt>Client Data Json</Prompt>
+            <Prompt>Credentials</Prompt>
         </PasswordCallback>
         <TextOutputCallback>CREDENTIALS_PLACEHOLDER</TextOutputCallback>
     </Callbacks>

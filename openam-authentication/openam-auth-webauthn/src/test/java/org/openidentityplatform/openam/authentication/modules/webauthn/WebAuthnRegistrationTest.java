@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 3A-Systems LLC. All rights reserved.
+ * Copyright 2024 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -86,20 +86,19 @@ public class WebAuthnRegistrationTest {
 	@Test
 	public void testProcessCredentials() throws Exception {
 
-		PasswordCallback idCallback = new PasswordCallback("id", false);
-		idCallback.setPassword("Dt46gcUIV08YHRo4tXmt85Ie8Ihiw2MDr5ARgPhKG2ByDhmH0jzQbivWALXGM0RKM0LWO9mI7rtX1KNnzhhyLVCE_3F1V-ePT2M-HNu-91bcBeZ_CHzrAVksE-wP2NCpJSp_dMlxV1-rPUampHGoMRMyU_7Xi9Rw8Scl_9jqRitCRD3XbZWOCOY8B7T0j-EIAGFrIei30YwTMxQBndBDu8WcYUA60yM0BwwR482seQSCHBfh8maYy1GEyiP8bpeYjZHuDouel5EKIvc2pa5esGVuVY1cBQaMfZh4DVMCgnJlb8PvoOfmKJhUXTStVdDXrtplK9Id-AWh2UdoMK-T".toCharArray());
+		PasswordCallback idCallback = new PasswordCallback("data", false);
+		final String credentialId = "Dt46gcUIV08YHRo4tXmt85Ie8Ihiw2MDr5ARgPhKG2ByDhmH0jzQbivWALXGM0RKM0LWO9mI7rtX1KNnzhhyLVCE_3F1V-ePT2M-HNu-91bcBeZ_CHzrAVksE-wP2NCpJSp_dMlxV1-rPUampHGoMRMyU_7Xi9Rw8Scl_9jqRitCRD3XbZWOCOY8B7T0j-EIAGFrIei30YwTMxQBndBDu8WcYUA60yM0BwwR482seQSCHBfh8maYy1GEyiP8bpeYjZHuDouel5EKIvc2pa5esGVuVY1cBQaMfZh4DVMCgnJlb8PvoOfmKJhUXTStVdDXrtplK9Id-AWh2UdoMK-T";
+		final String attestationObject = "o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEcwRQIgbdJQ2Q0udhpZxTSwCM00TvxDTPhQ2lxRafOkQgvd8IkCIQDnjiJiGygHNbsCm-yEznz8RkdR94YDCqp5Fpcp-g7wRWN4NWOBWQF1MIIBcTCCARagAwIBAgIJAIqK93XCOr_GMAoGCCqGSM49BAMCMBMxETAPBgNVBAMMCFNvZnQgVTJGMB4XDTE3MTAyMDIxNTEzM1oXDTI3MTAyMDIxNTEzM1owEzERMA8GA1UEAwwIU29mdCBVMkYwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ5gjPmSDFBJap5rwDMdyqO4lCcWqQXxXtHBN-S-zt6ytC3amquoctXGuOOKZikTkT_gX8LFXVqmMZIcvC4EziGo1MwUTAdBgNVHQ4EFgQU8bJw2i1BjqI2uvqQWqNempxTxD4wHwYDVR0jBBgwFoAU8bJw2i1BjqI2uvqQWqNempxTxD4wDwYDVR0TAQH_BAUwAwEB_zAKBggqhkjOPQQDAgNJADBGAiEApFdcnvfziaAunldkAvHDwNViRH461fZv_6tFlbYPGEwCIQCS1PM8fMOKTgdr3hpqeQq_ysQK8NJZtPbFADEk8effHWhhdXRoRGF0YVkBg0mWDeWIDoxodDQXD2R2YFuP5K65ooYyx5lc87qDHZdjQQAAAAAAAAAAAAAAAAAAAAAAAAAAAP8O3jqBxQhXTxgdGji1ea3zkh7wiGLDYwOvkBGA-EobYHIOGYfSPNBuK9YAtcYzREozQtY72Yjuu1fUo2fOGHItUIT_cXVX549PYz4c2773VtwF5n8IfOsBWSwT7A_Y0KklKn90yXFXX6s9RqakcagxEzJT_teL1HDxJyX_2OpGK0JEPddtlY4I5jwHtPSP4QgAYWsh6LfRjBMzFAGd0EO7xZxhQDrTIzQHDBHjzax5BIIcF-HyZpjLUYTKI_xul5iNke4Oi56XkQoi9zalrl6wZW5VjVwFBox9mHgNUwKCcmVvw--g5-YomFRdNK1V0Neu2mUr0h34BaHZR2gwr5OlAQIDJiABIVggFIRwFmWDe2G6Vap-47mKkZJy0fjxw7vaWjy3nUlKxjUiWCCXaby_67nTqm3pDPHI8mI2dkZzZjS9beegzhdkL6Hddg";
+		final String clientDataJSON = "eyJjaGFsbGVuZ2UiOiJPRGRFUTBVM1EwWTFSamxFUWpBd1FVTTVPRE0yTjBOQk9EWTBNRGc0TkVZIiwib3JpZ2luIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9";
+		final String credentials = String.format("{\"credentialId\": \"%s\", " +
+				"\"attestationObject\": \"%s\", " +
+				"\"clientDataJSON\": \"%s\" }", credentialId, attestationObject, clientDataJSON);
+		idCallback.setPassword(credentials.toCharArray());
 		
 
-		PasswordCallback attestationObjectCallback = new PasswordCallback("attestation object", false);
-		attestationObjectCallback.setPassword("o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEcwRQIgbdJQ2Q0udhpZxTSwCM00TvxDTPhQ2lxRafOkQgvd8IkCIQDnjiJiGygHNbsCm-yEznz8RkdR94YDCqp5Fpcp-g7wRWN4NWOBWQF1MIIBcTCCARagAwIBAgIJAIqK93XCOr_GMAoGCCqGSM49BAMCMBMxETAPBgNVBAMMCFNvZnQgVTJGMB4XDTE3MTAyMDIxNTEzM1oXDTI3MTAyMDIxNTEzM1owEzERMA8GA1UEAwwIU29mdCBVMkYwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ5gjPmSDFBJap5rwDMdyqO4lCcWqQXxXtHBN-S-zt6ytC3amquoctXGuOOKZikTkT_gX8LFXVqmMZIcvC4EziGo1MwUTAdBgNVHQ4EFgQU8bJw2i1BjqI2uvqQWqNempxTxD4wHwYDVR0jBBgwFoAU8bJw2i1BjqI2uvqQWqNempxTxD4wDwYDVR0TAQH_BAUwAwEB_zAKBggqhkjOPQQDAgNJADBGAiEApFdcnvfziaAunldkAvHDwNViRH461fZv_6tFlbYPGEwCIQCS1PM8fMOKTgdr3hpqeQq_ysQK8NJZtPbFADEk8effHWhhdXRoRGF0YVkBg0mWDeWIDoxodDQXD2R2YFuP5K65ooYyx5lc87qDHZdjQQAAAAAAAAAAAAAAAAAAAAAAAAAAAP8O3jqBxQhXTxgdGji1ea3zkh7wiGLDYwOvkBGA-EobYHIOGYfSPNBuK9YAtcYzREozQtY72Yjuu1fUo2fOGHItUIT_cXVX549PYz4c2773VtwF5n8IfOsBWSwT7A_Y0KklKn90yXFXX6s9RqakcagxEzJT_teL1HDxJyX_2OpGK0JEPddtlY4I5jwHtPSP4QgAYWsh6LfRjBMzFAGd0EO7xZxhQDrTIzQHDBHjzax5BIIcF-HyZpjLUYTKI_xul5iNke4Oi56XkQoi9zalrl6wZW5VjVwFBox9mHgNUwKCcmVvw--g5-YomFRdNK1V0Neu2mUr0h34BaHZR2gwr5OlAQIDJiABIVggFIRwFmWDe2G6Vap-47mKkZJy0fjxw7vaWjy3nUlKxjUiWCCXaby_67nTqm3pDPHI8mI2dkZzZjS9beegzhdkL6Hddg".toCharArray());
+		TextOutputCallback credentialsCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "credentials");
 		
-		PasswordCallback clientDataJSONCallback = new PasswordCallback("client data json", false);
-		clientDataJSONCallback.setPassword("eyJjaGFsbGVuZ2UiOiJPRGRFUTBVM1EwWTFSamxFUWpBd1FVTTVPRE0yTjBOQk9EWTBNRGc0TkVZIiwib3JpZ2luIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9".toCharArray());
-		
-		TextOutputCallback credentials = new TextOutputCallback(TextOutputCallback.INFORMATION, "credentials");
-		
-		Callback[] callbacks = new Callback[] {idCallback,
-				attestationObjectCallback, clientDataJSONCallback, credentials};
+		Callback[] callbacks = new Callback[] {idCallback, credentialsCallback};
 		
 		assertEquals(ISAuthConstants.LOGIN_SUCCEED, webAuthnRegistration.process(callbacks, 2));
 	}
