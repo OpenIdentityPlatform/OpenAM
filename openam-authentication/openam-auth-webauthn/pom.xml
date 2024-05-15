@@ -24,7 +24,7 @@
         <version>14.8.5-SNAPSHOT</version>
     </parent>
     <properties>
-    	<webauthn4j.version>0.9.5.RELEASE</webauthn4j.version>
+    	<webauthn4j.version>0.21.9.RELEASE</webauthn4j.version>
     </properties>
 
     <!-- Component Definition -->

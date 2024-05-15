@@ -11,17 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 3A-Systems LLC. All rights reserved.
+ * Copyright 2024 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.idm.IdUtils;
+import com.webauthn4j.WebAuthnManager;
+import com.webauthn4j.converter.exception.DataConversionException;
+import com.webauthn4j.data.AuthenticationData;
+import com.webauthn4j.data.AuthenticationParameters;
+import com.webauthn4j.data.AuthenticationRequest;
+import com.webauthn4j.validator.exception.ValidationException;
 import org.apache.commons.lang.ArrayUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,28 +41,29 @@ import com.webauthn4j.data.PublicKeyCredentialDescriptor;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
 import com.webauthn4j.data.PublicKeyCredentialType;
 import com.webauthn4j.data.UserVerificationRequirement;
-import com.webauthn4j.data.WebAuthnAuthenticationContext;
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
 import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.data.client.challenge.Challenge;
 import com.webauthn4j.data.client.challenge.DefaultChallenge;
 import com.webauthn4j.server.ServerProperty;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
 
 public class WebAuthnAuthenticationProcessor {
+
+	private final WebAuthnManager webAuthnManager;
 	
-	private Challenge challenge;
+	private final Challenge challenge;
 	
 	long timeout;
 	
 	public WebAuthnAuthenticationProcessor(String sessionId, long timeout) {
 		this.challenge = new DefaultChallenge(sessionId.getBytes());
 		this.timeout = timeout;
+		webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 	}
 	
-	public PublicKeyCredentialRequestOptions requestCredentials(String username, HttpServletRequest request, 
-			Set<Authenticator> authenticators) throws AuthLoginException, JsonProcessingException {
+	public PublicKeyCredentialRequestOptions requestCredentials(
+			HttpServletRequest request,
+			Set<Authenticator> authenticators) {
 		
         String rpId = request.getServerName();
 
@@ -77,13 +88,14 @@ public class WebAuthnAuthenticationProcessor {
 	}
 	
 	public AuthenticatorData<?> processCredentials(HttpServletRequest request, String idStr, 
-			String authenticatorDataStr, String clientDataJSONStr, String signatureStr, 
-			String userHandleStr, Set<Authenticator> authenticators) {
+			String authenticatorDataStr, String clientDataJSONStr, String signatureStr, byte[] userHandle,
+			Set<Authenticator> authenticators) {
+
 		byte[] id = Base64Utils.decodeFromUrlSafeString(idStr);
 		byte[] clientDataJSON = Base64Utils.decodeFromUrlSafeString(clientDataJSONStr);
 		byte[] authenticatorData = Base64Utils.decodeFromUrlSafeString(authenticatorDataStr);
 		byte[] signature = Base64Utils.decodeFromUrlSafeString(signatureStr);
-		
+
 		Authenticator foundAuthenticator = null;
 		for(Authenticator authenticator : authenticators ) {
 			if(ArrayUtils.isEquals(authenticator.getAttestedCredentialData().getCredentialId(), id)) {
@@ -91,35 +103,57 @@ public class WebAuthnAuthenticationProcessor {
 				break;
 			}
 		}
-		
+
 		if(foundAuthenticator == null) {
 			return null;
 		}
-		
-		Origin origin = new Origin(request.getScheme(), request.getServerName(), request.getServerPort());
+
+		Origin origin = new Origin(request.getHeader("Origin"));
         String rpId = request.getServerName();
-               
-        
-        byte[] tokenBindingId = null;
-        ServerProperty serverProperty = new ServerProperty(origin, rpId, challenge, tokenBindingId);
-        boolean userVerificationRequired = false;
 
-        WebAuthnAuthenticationContext authenticationContext =
-                new WebAuthnAuthenticationContext(
-                        id,
-                        clientDataJSON,
-                        authenticatorData,
-                        signature,
-                        serverProperty,
-                        userVerificationRequired
-                );
-        
-        WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = 
-        		new WebAuthnAuthenticationContextValidator();
 
-        WebAuthnAuthenticationContextValidationResponse response = 
-        		webAuthnAuthenticationContextValidator.validate(authenticationContext, foundAuthenticator);
-        
-        return response.getAuthenticatorData();
+		byte[] tokenBindingId = null;
+		ServerProperty serverProperty = new ServerProperty(origin, rpId, challenge, tokenBindingId);
+		List<byte[]> allowCredentials = null;
+		boolean userVerificationRequired = false;
+		boolean userPresenceRequired = true;
+
+		Authenticator authenticator = authenticators.stream().filter(a ->
+						Objects.deepEquals(a.getAttestedCredentialData().getCredentialId(), id))
+				.findFirst().orElse(null);
+
+		AuthenticationParameters authenticationParameters =
+				new AuthenticationParameters(
+						serverProperty,
+						authenticator,
+						allowCredentials,
+						userVerificationRequired,
+						userPresenceRequired
+				);
+
+		AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+				id, userHandle, authenticatorData, clientDataJSON, null, signature
+		);
+
+		AuthenticationData authenticationData;
+		try {
+			authenticationData = webAuthnManager.parse(authenticationRequest);
+		} catch (DataConversionException e) {
+			// If you would like to handle WebAuthn data structure parse error, please catch DataConversionException
+			throw e;
+		}
+		try {
+			webAuthnManager.validate(authenticationData, authenticationParameters);
+		} catch (ValidationException e) {
+			// If you would like to handle WebAuthn data validation error, please catch ValidationException
+			throw e;
+		}
+// please update the counter of the authenticator record TODO
+//        updateCounter(
+//                authenticationData.getCredentialId(),
+//                authenticationData.getAuthenticatorData().getSignCount()
+//        );
+
+		return authenticationData.getAuthenticatorData();
 	}
 }

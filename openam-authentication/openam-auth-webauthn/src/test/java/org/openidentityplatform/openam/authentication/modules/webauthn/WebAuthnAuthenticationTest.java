@@ -30,6 +30,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.idm.AMIdentity;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -53,13 +54,13 @@ public class WebAuthnAuthenticationTest {
 		when(webAuthnAuthentication.getHttpServletRequest()).thenReturn(httpServletRequest);
 		when(webAuthnAuthentication.getSessionId()).thenReturn("87DCE7CF5F9DB00AC98367CA8640884F");
 		doNothing().when(webAuthnAuthentication).replaceCallback(anyInt(), anyInt(), any(Callback.class));
-		doReturn(Collections.<Authenticator>emptySet()).when(webAuthnAuthentication).loadAuthenticators();
+		doReturn(Collections.<Authenticator>emptySet()).when(webAuthnAuthentication).loadAuthenticators(any(AMIdentity.class));
 	}
 	
 	@Test
 	public void testProcessRequestUsername() throws Exception {
 		webAuthnAuthentication.init(null, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
-		assertEquals(1, webAuthnAuthentication.process(null, 1));
+		assertEquals(webAuthnAuthentication.process(null, 1), 2);
 	}
 	
 	@Test

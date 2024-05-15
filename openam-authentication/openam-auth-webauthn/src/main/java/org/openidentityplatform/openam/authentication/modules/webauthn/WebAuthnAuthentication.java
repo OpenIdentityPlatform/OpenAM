@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 3A-Systems LLC. All rights reserved.
+ * Copyright 2024 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -30,6 +30,10 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
 
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.SerializationUtils;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider;
@@ -87,13 +91,10 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	private String userAttribute = null;
 	
 	private long timeout;
-	
-	private AccountProvider accountProvider = new DefaultAccountProvider();
 
-	private Set<Authenticator> authenticators;
-	
 	private int authLevel = 0;
-	
+
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void init(Subject subject, Map sharedState, Map options) {
@@ -109,32 +110,19 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		this.authLevel = Integer.parseInt(CollectionHelper.getMapAttr(options, 
 				WebAuthnAuthentication.class.getName().concat(".authlevel"),
 				"0"));
+
+		webAuthnAuthenticationProcessor = new WebAuthnAuthenticationProcessor(
+				getSessionId(), this.timeout);
 	}
 
 	@Override
 	public int process(Callback[] callbacks, int state) throws LoginException {
-		if(webAuthnAuthenticationProcessor == null) {
-			webAuthnAuthenticationProcessor = new WebAuthnAuthenticationProcessor(
-						getSessionId(), this.timeout);
-		}
-		
-		
+
+
 		try {
 			switch (state) {
 			case ISAuthConstants.LOGIN_START:
-				if(callbacks == null) { 		//no callback init authentication
-					if(username == null && sharedState.containsKey(getUserKey())) {
-						username = (String)sharedState.get(getUserKey());
-						return requestCredentials();
-					} else {
-						return ISAuthConstants.LOGIN_START;
-					}
-				}
-				else {
-					//getting username
-					username = ((NameCallback)callbacks[0]).getName();
-					return requestCredentials();
-				}
+				return requestCredentials();
 			case LOGIN_REQUEST_CREDENTIALS_STATE:
 				return processCredentials(callbacks);
 			default:
@@ -152,10 +140,9 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	}
 	
 	public int requestCredentials() throws AuthLoginException, JsonProcessingException {
-		
-		authenticators = loadAuthenticators();
-		PublicKeyCredentialRequestOptions credentialCreationOptions = 
-				webAuthnAuthenticationProcessor.requestCredentials(username, getHttpServletRequest(), authenticators);
+
+		PublicKeyCredentialRequestOptions credentialCreationOptions =
+				webAuthnAuthenticationProcessor.requestCredentials(getHttpServletRequest(), Collections.emptySet());
         
 	    String credentialCreationOptionsString = mapper.writeValueAsString(credentialCreationOptions);
         TextOutputCallback credentialCreationOptionsCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, credentialCreationOptionsString);
@@ -171,16 +158,28 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		String clientDataJSONStr = 		new String(((PasswordCallback) callbacks[CHALLENGE_CLIENT_DATA_CB_INDEX]).getPassword());
 		String signatureStr = 			new String(((PasswordCallback) callbacks[CHALLENGE_SIGNATURE_CB_INDEX]).getPassword());
 		String userHandleStr = 			new String(((PasswordCallback) callbacks[CHALLENGE_USER_HANDLE_CB_INDEX]).getPassword());
+
+		String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+		byte[] userHandle = Base64Utils.decodeFromUrlSafeString(userHandleStr);
+		String userId = new String(userHandle);
+
+		final AMIdentity identity;
+		try {
+			identity = AuthD.getAuth().getIdentity(IdType.USER, userId, realm);
+		} catch (AuthException e) {
+			throw new AuthLoginException(e);
+		}
+		final Set<Authenticator> authenticators = loadAuthenticators(identity);
 		
-		
-		AuthenticatorData<?> authenticatorData = webAuthnAuthenticationProcessor.processCredentials(getHttpServletRequest(), id, authenticatorDataStr, 
-				clientDataJSONStr, signatureStr, userHandleStr, authenticators);
+		AuthenticatorData<?> authenticatorData = webAuthnAuthenticationProcessor.processCredentials(
+				getHttpServletRequest(), id, authenticatorDataStr,
+				clientDataJSONStr, signatureStr, userHandle, authenticators);
 		
 		if(authenticatorData == null) {
 			logger.warn("processCredentials: authenticator data with id {} not found for identity: {}", id, username);
 			throw new InvalidPasswordException("authenticator not found");
 		}
-		
+		this.username = userId;
 		setAuthLevel(this.authLevel);
 		
 		return ISAuthConstants.LOGIN_SUCCEED;
@@ -194,14 +193,11 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Set<Authenticator> loadAuthenticators() throws AuthLoginException {
+	protected Set<Authenticator> loadAuthenticators(AMIdentity identity) throws AuthLoginException {
 		Set<Authenticator> authenticators = new HashSet<>();
-		
-		Map<String, Set<String>> attributes = new HashMap<>();
-    	attributes.put("uid", Collections.singleton(username));
-		AMIdentity user = accountProvider.searchUser(getAMIdentityRepository(getRequestOrg()), attributes);
+
 		try {
-			Set<String> authenticatorsMarshalled =  user.getAttribute(userAttribute);
+			Set<String> authenticatorsMarshalled =  identity.getAttribute(userAttribute);
 			for(String authenticatorMarshalled: authenticatorsMarshalled) {
 				byte[] bytesDecoded = Base64Utils.decodeFromUrlSafeString(authenticatorMarshalled);
 				Authenticator decoded = (Authenticator)SerializationUtils.deserialize(bytesDecoded);

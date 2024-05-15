@@ -46,22 +46,26 @@ public class WebAuthnRegistrationTest {
 	@BeforeMethod
 	public void initMocks() throws AuthLoginException {
 		
-		HttpServletRequest httpServletRequest =  mock(HttpServletRequest.class);
+		HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
 		when(httpServletRequest.getScheme()).thenReturn("http");
 		when(httpServletRequest.getServerName()).thenReturn("localhost");
 		when(httpServletRequest.getServerPort()).thenReturn(8080);
+		when(httpServletRequest.getHeader("Origin")).thenReturn("http://localhost:8080");
 		
 		webAuthnRegistration = mock(WebAuthnRegistration.class, Mockito.CALLS_REAL_METHODS);
 		when(webAuthnRegistration.getHttpServletRequest()).thenReturn(httpServletRequest);
 		when(webAuthnRegistration.getSessionId()).thenReturn("87DCE7CF5F9DB00AC98367CA8640884F");
 		doNothing().when(webAuthnRegistration).replaceCallback(anyInt(), anyInt(), any(Callback.class));
 		doNothing().when(webAuthnRegistration).save(any(Authenticator.class));
+		doNothing().when(webAuthnRegistration).initUserId();
+		webAuthnRegistration.userId = "test";
+		webAuthnRegistration.init(null, Collections.emptyMap(), Collections.emptyMap());
 	}
 	
 	@Test
 	public void testProcessRequestUsername() throws Exception {
 		webAuthnRegistration.init(null, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
-		assertEquals(1, webAuthnRegistration.process(null, 1));
+		assertEquals(webAuthnRegistration.process(null, 1), 2);
 	}
 	
 	@Test
@@ -85,9 +89,7 @@ public class WebAuthnRegistrationTest {
 		PasswordCallback idCallback = new PasswordCallback("id", false);
 		idCallback.setPassword("Dt46gcUIV08YHRo4tXmt85Ie8Ihiw2MDr5ARgPhKG2ByDhmH0jzQbivWALXGM0RKM0LWO9mI7rtX1KNnzhhyLVCE_3F1V-ePT2M-HNu-91bcBeZ_CHzrAVksE-wP2NCpJSp_dMlxV1-rPUampHGoMRMyU_7Xi9Rw8Scl_9jqRitCRD3XbZWOCOY8B7T0j-EIAGFrIei30YwTMxQBndBDu8WcYUA60yM0BwwR482seQSCHBfh8maYy1GEyiP8bpeYjZHuDouel5EKIvc2pa5esGVuVY1cBQaMfZh4DVMCgnJlb8PvoOfmKJhUXTStVdDXrtplK9Id-AWh2UdoMK-T".toCharArray());
 		
-		PasswordCallback typeCallback = new PasswordCallback("type", false);
-		typeCallback.setPassword("public-key".toCharArray());
-		
+
 		PasswordCallback attestationObjectCallback = new PasswordCallback("attestation object", false);
 		attestationObjectCallback.setPassword("o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEcwRQIgbdJQ2Q0udhpZxTSwCM00TvxDTPhQ2lxRafOkQgvd8IkCIQDnjiJiGygHNbsCm-yEznz8RkdR94YDCqp5Fpcp-g7wRWN4NWOBWQF1MIIBcTCCARagAwIBAgIJAIqK93XCOr_GMAoGCCqGSM49BAMCMBMxETAPBgNVBAMMCFNvZnQgVTJGMB4XDTE3MTAyMDIxNTEzM1oXDTI3MTAyMDIxNTEzM1owEzERMA8GA1UEAwwIU29mdCBVMkYwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ5gjPmSDFBJap5rwDMdyqO4lCcWqQXxXtHBN-S-zt6ytC3amquoctXGuOOKZikTkT_gX8LFXVqmMZIcvC4EziGo1MwUTAdBgNVHQ4EFgQU8bJw2i1BjqI2uvqQWqNempxTxD4wHwYDVR0jBBgwFoAU8bJw2i1BjqI2uvqQWqNempxTxD4wDwYDVR0TAQH_BAUwAwEB_zAKBggqhkjOPQQDAgNJADBGAiEApFdcnvfziaAunldkAvHDwNViRH461fZv_6tFlbYPGEwCIQCS1PM8fMOKTgdr3hpqeQq_ysQK8NJZtPbFADEk8effHWhhdXRoRGF0YVkBg0mWDeWIDoxodDQXD2R2YFuP5K65ooYyx5lc87qDHZdjQQAAAAAAAAAAAAAAAAAAAAAAAAAAAP8O3jqBxQhXTxgdGji1ea3zkh7wiGLDYwOvkBGA-EobYHIOGYfSPNBuK9YAtcYzREozQtY72Yjuu1fUo2fOGHItUIT_cXVX549PYz4c2773VtwF5n8IfOsBWSwT7A_Y0KklKn90yXFXX6s9RqakcagxEzJT_teL1HDxJyX_2OpGK0JEPddtlY4I5jwHtPSP4QgAYWsh6LfRjBMzFAGd0EO7xZxhQDrTIzQHDBHjzax5BIIcF-HyZpjLUYTKI_xul5iNke4Oi56XkQoi9zalrl6wZW5VjVwFBox9mHgNUwKCcmVvw--g5-YomFRdNK1V0Neu2mUr0h34BaHZR2gwr5OlAQIDJiABIVggFIRwFmWDe2G6Vap-47mKkZJy0fjxw7vaWjy3nUlKxjUiWCCXaby_67nTqm3pDPHI8mI2dkZzZjS9beegzhdkL6Hddg".toCharArray());
 		
@@ -96,7 +98,7 @@ public class WebAuthnRegistrationTest {
 		
 		TextOutputCallback credentials = new TextOutputCallback(TextOutputCallback.INFORMATION, "credentials");
 		
-		Callback[] callbacks = new Callback[] {idCallback, typeCallback, 
+		Callback[] callbacks = new Callback[] {idCallback,
 				attestationObjectCallback, clientDataJSONCallback, credentials};
 		
 		assertEquals(ISAuthConstants.LOGIN_SUCCEED, webAuthnRegistration.process(callbacks, 2));

@@ -34,11 +34,15 @@
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
-<ModuleProperties moduleName="WebAuthnAuthentication" header="WebAuthn Authentication" version="1.0" >
+<ModuleProperties moduleName="WebAuthnAuthentication" version="1.0" >
     <Callbacks length="1" order="1" timeout="120" header="WebAuthn Authentication" >
-        <NameCallback>
-            <Prompt>User Name:</Prompt>
-        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Log In</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
     </Callbacks>
 
     <Callbacks length="6" order="2" timeout="120" header="Sending credentials..." template="WebAuthnAuthenticationCredentials.jsp">
