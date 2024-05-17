@@ -252,7 +252,7 @@
             </div>
         </body>
        	<script>
-        	processAuthenticationChallenge();
+        	WebAuthn().processAuthenticationChallenge();
     	</script>
     </jato:useViewBean>
 </html>
