@@ -1,0 +1,36 @@
+<div class="container">
+    <script>
+        require(['../assets/js/webauthn.js'], function () {
+            processAuthenticationChallenge();
+        });
+    </script>
+
+    {{#if reqs.header}}
+    <div class="page-header">
+        <h1 class="text-center">{{reqs.header}}</h1>
+    </div>
+    {{/if}}
+
+    <form action="" method="post" class="form login col-sm-6 col-sm-offset-3" autocomplete="off" data-stage="{{reqs.stage}}" style="display: none;">
+        <fieldset class="row">
+            {{#each reqs.callbacks}}
+            {{#equals type "ConfirmationCallback"}}
+            {{#if ../showRememberLogin}}
+            {{> login/_RememberLogin }}
+            {{/if}}
+            {{/equals}}
+
+            <div class="form-group">
+                {{callbackRender}}
+            </div>
+            {{/each}}
+
+            {{> login/_SelfService }}
+            {{#if firstUserNamePassStage}}
+            {{#if showSocialLogin}}
+            {{> login/_SocialAuthn }}
+            {{/if}}
+            {{/if}}
+        </fieldset>
+    </form>
+</div>

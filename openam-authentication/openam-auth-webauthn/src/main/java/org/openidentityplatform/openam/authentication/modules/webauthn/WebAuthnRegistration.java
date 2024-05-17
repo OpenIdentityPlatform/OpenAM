@@ -11,46 +11,46 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019 3A-Systems LLC. All rights reserved.
+ * Copyright 2024 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
 
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.login.LoginException;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
-import org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.data.AttestationConveyancePreference;
 import com.webauthn4j.data.AuthenticatorAttachment;
 import com.webauthn4j.data.PublicKeyCredentialCreationOptions;
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextOutputCallback;
+import javax.security.auth.login.LoginException;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -58,43 +58,42 @@ import com.webauthn4j.data.PublicKeyCredentialCreationOptions;
  */
 public class WebAuthnRegistration extends AMLoginModule {
 
-	final static Logger logger = LoggerFactory.getLogger(WebAuthnRegistration.class);
+	protected Debug debug = null;
 	
 	final static ObjectMapper mapper = new ObjectMapper();
 	static {
 		mapper.setSerializationInclusion(Include.NON_NULL);
+	}
+
+	public WebAuthnRegistration() {
+		debug = Debug.getInstance("amWebAuthnRegistration");
 	}
 	
 	private Map<String, Object> sharedState = null;
 	
 	private final static int LOGIN_REQUEST_CREDENTIALS_STATE = 2;
 	
-	private final static int CHALLENGE_ID_CB_INDEX = 0;
-	private final static int CHALLENGE_TYPE_CB_INDEX = 1;
-	private final static int CHALLENGE_ATTESTATION_CB_INDEX = 2;
-	private final static int CHALLENGE_CLIENT_DATA_CB_INDEX = 3;
-	
-	private final static int CREDENTIAL_REQUEST_CB_INDEX = 4;
+	private final static int CREDENTIALS_CB_INDEX = 0;
+    private final static int CREDENTIAL_REQUEST_CB_INDEX = 1;
 	
 	private WebAuthnRegistrationProcessor webAuthnRegistrationProcessor = null;
 	private	AttestationConveyancePreference attestation = null;
 	private	AuthenticatorAttachment authenticatorAttachment = null;
 	
-	private String username = null;
+	protected String userId = null;
 	private long timeout;
 	
 	private String userAttribute = null;
 	
-	private AccountProvider accountProvider = new DefaultAccountProvider();
-
 	private int authLevel = 0;
-	
+
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void init(Subject subject, Map sharedState, Map options) {
 		
 		this.sharedState = sharedState;
-		
+
 		this.attestation = AttestationConveyancePreference.create(
 				CollectionHelper.getMapAttr(options, 
 						WebAuthnRegistration.class.getName().concat(".attestation"),
@@ -120,43 +119,52 @@ public class WebAuthnRegistration extends AMLoginModule {
 		this.authLevel  = Integer.parseInt(CollectionHelper.getMapAttr(options, 
 				WebAuthnRegistration.class.getName().concat(".authlevel"),
 				"0"));
+
+
+		webAuthnRegistrationProcessor = new WebAuthnRegistrationProcessor(
+				getSessionId(),
+				attestation, authenticatorAttachment, timeout);
+
+		initUserId();
+	}
+
+	protected void initUserId() {
+		try {
+			SSOTokenManager mgr = SSOTokenManager.getInstance();
+			InternalSession is = getLoginState(WebAuthnRegistration.class.getName()).getOldSession();
+			if (is == null) {
+				throw new AuthLoginException("amAuth", "noInternalSession", null);
+			}
+			SSOToken token = mgr.createSSOToken(is.getID().toString());
+			userId = token.getProperty("UserToken");
+			if (debug.messageEnabled()) {
+				debug.message("WebAuthnRegistration.initUserId() : Username from SSOToken : " + userId);
+			}
+		} catch (Exception e) {
+			debug.error("WebAuthnRegistration.initUserId() : Exception", e);
+		}
 	}
 
 	@Override
 	public int process(Callback[] callbacks, int state) throws LoginException {
-
-		if(webAuthnRegistrationProcessor == null) {
-			webAuthnRegistrationProcessor = new WebAuthnRegistrationProcessor(
-						getSessionId(),
-						attestation, authenticatorAttachment, timeout);
+		if (StringUtils.isBlank(userId)) {
+			throw new AuthLoginException("amAuth", "noUserName", null);
 		}
-		
+
 		try {
 			switch (state) {
 			case ISAuthConstants.LOGIN_START:
-				if(callbacks == null) { 		//no callback init authentication
-					if(username == null && sharedState.containsKey(getUserKey())) {
-						username = (String)sharedState.get(getUserKey());
-						return requestCredentials();
-					} else {
-						return ISAuthConstants.LOGIN_START;
-					}
-				}
-				else {
-					//getting username
-					username = ((NameCallback)callbacks[0]).getName();
-					return requestCredentials();
-				}
+				return requestCredentials();
 			case LOGIN_REQUEST_CREDENTIALS_STATE:
 				return processCredentials(callbacks);
 			default:
 				break;
 			}
 		} catch(AuthLoginException e) {
-			logger.error("process: AuthLoginException {}", e.toString());
+			debug.error("process: AuthLoginException {}", e.toString());
 			throw e;
 		} catch(Exception e) {
-			logger.error("process: Exception {}", e.toString());
+			debug.error("process: Exception {}", e.toString());
 			throw new AuthLoginException(e);
 		}
 
@@ -165,7 +173,7 @@ public class WebAuthnRegistration extends AMLoginModule {
 	
 	public int requestCredentials() throws AuthLoginException, JsonProcessingException {
 
-		PublicKeyCredentialCreationOptions credentialCreationOptions = webAuthnRegistrationProcessor.requestCredentials(username, getHttpServletRequest());
+		PublicKeyCredentialCreationOptions credentialCreationOptions = webAuthnRegistrationProcessor.requestCredentials(userId, getHttpServletRequest());
         
 	    String credentialCreationOptionsString = mapper.writeValueAsString(credentialCreationOptions);
         TextOutputCallback credentialCreationOptionsCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, credentialCreationOptionsString);
@@ -175,12 +183,19 @@ public class WebAuthnRegistration extends AMLoginModule {
 	}
 	
 	private int processCredentials(Callback[] callbacks) throws AuthLoginException {
-		String id = 					new String(((PasswordCallback) callbacks[CHALLENGE_ID_CB_INDEX]).getPassword());
-		String type = 					new String(((PasswordCallback) callbacks[CHALLENGE_TYPE_CB_INDEX]).getPassword());
-		String attestationObjectStr = 	new String(((PasswordCallback) callbacks[CHALLENGE_ATTESTATION_CB_INDEX]).getPassword());
-		String clientDataJSONStr = 		new String(((PasswordCallback) callbacks[CHALLENGE_CLIENT_DATA_CB_INDEX]).getPassword());
-		
-		Authenticator authenticator = webAuthnRegistrationProcessor.processCredentials(id, type, attestationObjectStr, clientDataJSONStr, getHttpServletRequest());
+		final String credentialsStr = new String(((PasswordCallback) callbacks[CREDENTIALS_CB_INDEX]).getPassword());
+		final Map<String, String> credentials;
+		try {
+			credentials = mapper.readValue(credentialsStr, new TypeReference<Map<String, String>>() {});
+		} catch (Exception e) {
+			debug.error("invalid credentials data: " + credentialsStr, e);
+			throw new AuthLoginException(e);
+		}
+		String attestationObjectStr = 	credentials.get("attestationObject");
+		String clientDataJSONStr = 		credentials.get("clientDataJSON");
+
+		Authenticator authenticator = webAuthnRegistrationProcessor.processCredentials(attestationObjectStr, clientDataJSONStr, getHttpServletRequest());
+
 		save(authenticator);
 		
 		setAuthLevel(authLevel);
@@ -188,34 +203,27 @@ public class WebAuthnRegistration extends AMLoginModule {
 		return ISAuthConstants.LOGIN_SUCCEED;
 	}
 	
-    @SuppressWarnings("unchecked")
-	protected void save(Authenticator authenticator) throws AuthLoginException {
-
-		Map<String, Set<String>> attributes = new HashMap<>();
-    	attributes.put("uid", Collections.singleton(username));
-    	String randomPassword = RandomStringUtils.random(20, true, true);
-    	attributes.put("userPassword", Collections.singleton(randomPassword));
-        attributes.put("inetuserstatus", Collections.singleton("Active"));
-        AMIdentity user = accountProvider.provisionUser(getAMIdentityRepository(getRequestOrg()), attributes);
-		
-    	try {
-			user.setActiveStatus(true);
-			Set<String> authenticators =  user.getAttribute(userAttribute);
+    protected void save(Authenticator authenticator) throws AuthLoginException {
+		String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+		try {
+			AMIdentity id = AuthD.getAuth().getIdentity(IdType.USER, userId, realm);
+			Set<String> authenticators = id.getAttribute(userAttribute);
 			byte[] bytes = SerializationUtils.serialize(authenticator);
 			String authStr = Base64Utils.encodeToUrlSafeString(bytes);
 			authenticators.add(authStr);
-			user.setAttributes(Collections.singletonMap(userAttribute, authenticators));
-			user.store();
-		} catch (SSOException | IdRepoException e) {
-			logger.error("save: error update user : {}", e);
+			id.setAttributes(Collections.singletonMap(userAttribute, authenticators));
+			id.store();
+		} catch (SSOException | IdRepoException | AuthException e) {
+			debug.error("WebAuthnRegistration: save(): error update user : {}", e);
 			throw new AuthLoginException(e);
 		}
-    	
 	}
 
 
 	@Override
 	public Principal getPrincipal() {
-		return new WebAuthnPrincipal(username);
+		return new WebAuthnPrincipal(userId);
 	}
+
+
 }
