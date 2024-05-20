@@ -7,7 +7,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthWebAuthnRegistrationService"
             i18nFileName="amAuthWebAuthn"
-            revisionNumber="1"
+            revisionNumber="2"
             i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.description"
             resourceName="webauthnreg">
 
@@ -78,9 +78,9 @@
 	                    	syntax="string"
 	                    	i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.attestation">
 	                    <ChoiceValues>
-	                        <ChoiceValue i18nKey="none">None</ChoiceValue>
-	                        <ChoiceValue i18nKey="indirect">Indirect</ChoiceValue>
-	                        <ChoiceValue i18nKey="direct">Direct</ChoiceValue>
+	                        <ChoiceValue i18nKey="none">none</ChoiceValue>
+	                        <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
+	                        <ChoiceValue i18nKey="direct">direct</ChoiceValue>
 	                    </ChoiceValues>
 	                    <DefaultValues>
 	                        <Value>none</Value>
@@ -91,9 +91,9 @@
 	                        syntax="string"
 	                        i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnRegistration.authType">
 	                    <ChoiceValues>
-	                        <ChoiceValue i18nKey="unspecified">Unspecified</ChoiceValue>
-	                        <ChoiceValue i18nKey="cross-platform">Cross-platform</ChoiceValue>
-	                        <ChoiceValue i18nKey="platform">Platform</ChoiceValue>
+	                        <ChoiceValue i18nKey="unspecified">unspecified</ChoiceValue>
+	                        <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
+	                        <ChoiceValue i18nKey="platform">platform</ChoiceValue>
 	                    </ChoiceValues>
 	                    <DefaultValues>
 	                        <Value>unspecified</Value>

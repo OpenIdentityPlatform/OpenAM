@@ -7,7 +7,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthWebAuthnAuthenticationService"
             i18nFileName="amAuthWebAuthn"
-            revisionNumber="1"
+            revisionNumber="2"
             i18nKey="org.openidentityplatform.openam.authentication.modules.webauthn.WebAuthnAuthentication.description"
             resourceName="webauthnauth">
 
