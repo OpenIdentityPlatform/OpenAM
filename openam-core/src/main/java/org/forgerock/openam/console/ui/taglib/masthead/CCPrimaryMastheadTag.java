@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2024 3A Systems LLC
  */  
 package org.forgerock.openam.console.ui.taglib.masthead;
 
@@ -48,5 +49,10 @@ public class CCPrimaryMastheadTag extends com.sun.web.ui.taglib.masthead.CCPrima
     	String switchToXUI = "<a href=\""+CONTEXT_ROOT.concat("/XUI/?relam=/")+"\" class=\"MstLnkLft\" title=\"Switch to XUI\"  target=\"_top\">Switch to XUI</a>";
     	buffer.append(switchToXUI);
     	super.appendGeneralLinks(buffer);
+    }
+
+    @Override
+    protected void appendVersionLink(NonSyncStringBuffer buffer) {
+        //do nothing
     }
 }
