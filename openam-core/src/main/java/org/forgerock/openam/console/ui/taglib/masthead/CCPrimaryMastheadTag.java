@@ -50,9 +50,4 @@ public class CCPrimaryMastheadTag extends com.sun.web.ui.taglib.masthead.CCPrima
     	buffer.append(switchToXUI);
     	super.appendGeneralLinks(buffer);
     }
-
-    @Override
-    protected void appendVersionLink(NonSyncStringBuffer buffer) {
-        //do nothing
-    }
 }

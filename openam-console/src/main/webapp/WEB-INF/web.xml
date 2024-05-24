@@ -176,12 +176,10 @@
         <servlet-name>AgentConfigurationServlet</servlet-name>
         <url-pattern>/agentconfig/*</url-pattern>
     </servlet-mapping>
-<!--      
     <servlet-mapping>
         <servlet-name>VersionServlet</servlet-name>
         <url-pattern>/ccversion/*</url-pattern>
     </servlet-mapping>
--->    
     <servlet-mapping>
         <servlet-name>FSServlet</servlet-name>
         <url-pattern>/federation/*</url-pattern>
