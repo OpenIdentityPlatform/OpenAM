@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.shared.concurrency.LockFactory;
@@ -383,11 +384,13 @@ public final class PolicyManager {
             if (namedPolicy == null) {
                return (Collections.EMPTY_SET);
             } else {
+                final Set<String> names;
                 if (pattern.equals("*")) {
-                    return (namedPolicy.getSubConfigNames());
+                    names = namedPolicy.getSubConfigNames();
                 } else {
-                    return (namedPolicy.getSubConfigNames(pattern));
+                    names = namedPolicy.getSubConfigNames(pattern);
                 }
+                return names.stream().map(LDAPUtils::escapeValue).collect(Collectors.toSet());
             }
        } catch (SMSException se) {
             debug.error("Unable to get named policies for organization: " 
