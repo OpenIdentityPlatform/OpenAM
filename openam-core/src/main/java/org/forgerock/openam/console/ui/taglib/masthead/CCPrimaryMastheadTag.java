@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2024 3A Systems LLC
  */  
 package org.forgerock.openam.console.ui.taglib.masthead;
 

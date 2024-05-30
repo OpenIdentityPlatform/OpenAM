@@ -26,74 +26,19 @@
  */
 /**
  * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2024 3A Systems LLC
  */
 package com.sun.identity.console.version;
 
-import com.iplanet.jato.CompleteRequestException;
-import com.iplanet.jato.RequestContext;
-import com.iplanet.jato.RequestContextImpl;
-import com.iplanet.jato.ViewBeanManager;
-import com.iplanet.jato.view.ViewBean;
-import com.sun.identity.console.base.AMViewBeanBase;
-import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-public class VersionServlet extends
-    com.sun.web.ui.servlet.version.VersionServlet {
+public class VersionServlet extends HttpServlet {
 
-    @Override
-    protected void initializeRequestContext(RequestContext requestContext) {
-        super.initializeRequestContext(requestContext);
-
-        ViewBeanManager viewBeanManager =
-            new ViewBeanManager(requestContext,
-            getPackageName(VersionServlet.class.getName()));
-        ((RequestContextImpl) requestContext).setViewBeanManager(
-            viewBeanManager);
-    }
-
-    @Override
-    protected void onRequestHandlerNotFound(
-        RequestContext requestContext,
-        String handlerName) throws ServletException {
-        AMViewBeanBase.debug.error("VersionServlet.onRequestHandlerNotFound: " +
-            handlerName);
-    }
-
-    @Override
-    protected void onRequestHandlerNotSpecified(RequestContext requestContext)
-        throws ServletException {
-        AMViewBeanBase.debug.error(
-            "VersionServlet.onRequestHandlerNotSpecified");
-    }
-
-    @Override
-    protected void onUncaughtException(
-        RequestContext requestContext,
-        Exception e) throws ServletException, IOException {
-        HttpServletRequest httpRequest = (HttpServletRequest) requestContext.getRequest();
-        AMViewBeanBase.debug.error("VersionServlet.onUncaughtException", e);
-        String redirectUrl = VersionViewBean.getCurrentURL(httpRequest) +
-            "/base/AMUncaughtException";
-        requestContext.getResponse().sendRedirect(redirectUrl);
-    }
-
-    @Override
-    protected void onPageSessionDeserializationException(
-            RequestContext requestContext,
-            ViewBean viewBean,
-            Exception e)
-            throws ServletException, IOException {
-        HttpServletRequest httpRequest = (HttpServletRequest) requestContext.getRequest();
-        AMViewBeanBase.debug.error("VersionServlet.onUncaughtException", e);
-        String redirectUrl = VersionViewBean.getCurrentURL(httpRequest)
-                + "/base/AMInvalidURL";
-        requestContext.getResponse().sendRedirect(redirectUrl);
-        throw new CompleteRequestException();
-    }
-
-    @Override
-    protected void onSessionTimeout(RequestContext requestContext) throws ServletException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/jsp/Version.jsp").forward(request, response);
     }
 }
