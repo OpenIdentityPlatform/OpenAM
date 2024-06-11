@@ -244,11 +244,11 @@ public class AuthXMLHandler implements RequestHandler {
             sreq.setHttpServletRequest(servletReq);
             authResponse = processAuthXMLRequest(content, auditor, sreq, servletReq, servletRes);
         } catch (AuthException e) {
-            debug.error("Got Auth Exception", e);
+            debug.message("Got Auth Exception", e);
             authResponse = new AuthXMLResponse(AuthXMLRequest.NewAuthContext);
             authResponse.setErrorCode(e.getErrorCode());
         } catch (Exception ex) {
-            debug.error("Error while processing xml request",ex);
+            debug.message("Error while processing xml request", ex);
             authResponse = new AuthXMLResponse(AuthXMLRequest.NewAuthContext);
             setErrorCode(authResponse, ex);
         }
