@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-tools'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Installing OpenAM Tools</title>
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Tools (ssoadm, etc.)</secondary>
+ </indexterm>
+ <para>OpenAM tools are found in <filename>.zip</filename> files where you
+ unpacked the archive of the entire package, such as
+ <filename>~/Downloads/openam</filename>.</para>
+
+ <variablelist>
+  <varlistentry>
+   <term><filename><?eval ${ssoadminZipFile}?></filename></term>
+   <listitem>
+    <para>Administration tools: <command>ampassword</command>,
+    <command>ssoadm</command> and <command>amverifyarchive</command></para>
+
+    <para>See <xref linkend="install-openam-admin-tools" />.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
+   <listitem>
+    <para>Configuration and upgrade tools, alternatives to using
+    the GUI configuration wizard</para>
+
+    <para>See <xref linkend="install-openam-config-tools" />.</para>
+   </listitem>
+  </varlistentry>
+  <!--
+  <varlistentry>
+   <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
+   <listitem>
+    <para>Tool to check for problems with your deployment and
+    configuration</para>
+   </listitem>
+  </varlistentry>
+  -->
+ </variablelist>
+ 
+ <procedure xml:id="install-openam-admin-tools">
+  <title>To Set Up Administration Tools</title>
+
+  <step>
+   <para>Make sure OpenAM is installed and running before proceeding.</para>
+  </step>
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk</screen>
+  </step>
+
+  <step>
+   <para>Create a file system directory to unpack the tools.</para>
+
+   <screen>$ mkdir -p /path/to/openam-tools/admin</screen>
+  </step>
+
+  <step>
+   <para>Unpack the tools.</para>
+
+   <screen>$ cd /path/to/openam-tools/admin
+$ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?></screen>
+  </step>
+
+  <step performance="optional">
+   <para>If you use IBM Java, add
+   <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
+   <literal>-D"amKeyGenDescriptor.provider=IBMJCE"</literal> options to the
+   <command>setup</command> or <command>setup.bat</command> script before
+   you install the tools.</para>
+
+   <para>The options should be set for the <command>java</command> command
+   at the end of the script.</para>
+
+   <screen>$ tail setup
+CLASSPATH="$CLASSPATH:resources"
+
+$JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
+                      -D"path.AMConfig=$path_AMConfig" \
+                      -D"path.debug=$path_debug" \
+                      -D"path.log=$path_log" \
+                      -D"amCryptoDescriptor.provider=IBMJCE" \
+                      -D"amKeyGenDescriptor.provider=IBMJCE" \
+                      -cp "$CLASSPATH" \
+                      com.sun.identity.tools.bundles.Main</screen>
+  </step>
+
+  <step>
+   <para>Run the <command>setup</command> utility (<command>setup.bat</command>
+   on Windows), providing the path to the directory where OpenAM configuration
+   files are located, and where you want debug and log information to be
+   located.</para>
+   <screen>$ ./setup
+Path to config files of OpenAM server [/home/mark/openam]:
+Debug Directory [/path/to/openam-tools/admin/debug]:
+Log Directory [/path/to/openam-tools/admin/log]:
+The scripts are properly setup under directory:
+ /path/to/openam-tools/admin/openam
+Debug directory is /path/to/openam-tools/admin/debug.
+Log directory is /path/to/openam-tools/admin/log.
+The version of this tools.zip is: <replaceable>version and date</replaceable>
+The version of your server instance is: OpenAM <replaceable>version and date</replaceable></screen>
+   <para>After setup, the tools are located under a directory named after the
+   instance of OpenAM.</para>
+   <screen>$ ls openam/bin/
+ampassword  amverifyarchive  ssoadm</screen>
+   <para>On Windows, these files are .bat scripts.</para>
+  </step>
+
+  <step performance="optional">
+   <para>If you use IBM Java, add
+   <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
+   <literal>-D"amKeyGenDescriptor.provider=IBMJCE"</literal> options to the
+   <command>ssoadm</command> or <command>ssoadm.bat</command> script before
+   using the script.</para>
+
+   <para>The options should be set before the call to
+   <literal>com.sun.identity.cli.CommandManager</literal> at the end of the
+   script.</para>
+
+   <screen>$ tail -3 /path/to/openam-tools/admin/openam/bin/ssoadm
+    -D"amCryptoDescriptor.provider=IBMJCE" \
+    -D"amKeyGenDescriptor.provider=IBMJCE" \
+    com.sun.identity.cli.CommandManager "$@"</screen>
+  </step>
+
+  <step>
+   <para>Check that <command>ssoadm</command> works properly.</para>
+   <screen>$ echo password > /tmp/pwd.txt
+$ chmod 400 /tmp/pwd.txt
+$ cd /path/to/openam-tools/admin/openam/bin/
+$ ./ssoadm list-servers -u amadmin -f /tmp/pwd.txt
+
+http://openam.example.com:8080/openam</screen>
+   <para>The <command>ssoadm</command> commands can also be run from
+   <filename>ssoadm.jsp</filename> in OpenAM, for example at
+   <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>,
+   once the page has been enabled as described in the section on <link
+    xlink:href="admin-guide#openam-ssoadm-jsp-overview"
+    xlink:role="http://docbook.org/xlink/role/olink">OpenAM ssoadm.jsp</link>
+    in the <citetitle>Administration Guide</citetitle>.</para>
+  <para>Not all of the sub-commands available through the <command>ssoadm</command>
+  command are available on the <literal>ssoadm.jsp</literal> web page.</para>
+  </step>
+  <step performance="optional">
+   <para>If you connect to OpenAM over SSL (HTTPS), the <command>ssoadm</command>
+   by default tries to trust the certificate based on the CA certificates in
+   the Java <literal>cacerts</literal> truststore. This might not work for your
+   deployment.</para>
+
+   <para >If the SSL certificate configured for the container where you deployed
+   OpenAM was not signed by a recognized CA then the SSL connection process
+   fails. For example, if you used a self-signed certificate as described in the
+   <citetitle>Administration Guide</citetitle> procedure, <link
+   xlink:href="admin-guide#openam-with-https-on-tomcat"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up OpenAM
+   With HTTPS on Tomcat</citetitle></link>, then the <command>ssoadm</command>
+   command cannot trust that certificate by default. To allow the
+   <command>ssoadm</command> command to trust the certificate, edit the
+   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows)
+   script as follows.</para>
+
+   <para>Add two additional options to the <command>java</command> command in
+   the script to identify the proper trust store and trust store password,
+   depending on how you set up SSL. The following example points to the key
+   store in which Tomcat holds the self-signed certificate that it presents
+   when establishing an HTTPS connection.</para>
+
+   <literallayout class="monospaced"
+   >-D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
+ -D"javax.net.ssl.trustStorePassword=changeit"</literallayout>
+
+   <para>If the <command>ssoadm</command> command cannot access the server
+   key store in this way, set up your own trust store and import the server
+   certificate using the Java <command>keytool</command> command.</para>
+  </step>
+
+  <step>
+   <para>If you have deployed OpenAM in a site configuration, edit the
+   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows) script
+   to map the site URL to the OpenAM server URL.</para>
+
+   <para>To do this, set a
+   <literal>com.iplanet.am.naming.map.site.to.server</literal> system property
+   option of the <command>java</command> command in the script. The option
+   takes the following form.</para>
+
+   <literallayout class="monospaced"
+   >-D"com.iplanet.am.naming.map.site.to.server=<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,
+ <replaceable>other-lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
+
+   <para>The property maps each <replaceable>lb-url</replaceable> key to an
+   <replaceable>openam-url</replaceable> value, where
+   <replaceable>lb-url</replaceable> is the URL to a site load balancer and
+   <replaceable>openam-url</replaceable> is the URL to the OpenAM server against
+   which you set up the <command>ssoadm</command> command.</para>
+
+   <para>The <command>ssoadm</command> command is dependent on the OpenAM server
+   against which you set it up, so always map site load balancer URLs to that
+   server's <replaceable>openam-url</replaceable>.</para>
+
+   <para>For example, if your site is behind
+   <literal>https://lb.example.com:443/openam</literal>, and the OpenAM server
+   against which you set up the <command>ssoadm</command> is at
+   <literal>http://openam.example.com:8080/openam</literal>, then add the
+   following property to the <command>java</command> command (all on one line
+   without spaces).</para>
+
+   <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
+ https://lb.example.com:443/openam=http://openam.example.com:8080/openam"</literallayout>
+
+   <para>Repeat this step for each OpenAM server in your site configuration.
+   You can install all your instances of <command>ssoadm</command> on the same
+   host, but in each case the command should manage only one OpenAM
+   server.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="install-openam-config-tools">
+  <title>To Set Up Configuration Tools</title>
+  <indexterm>
+   <primary>Installing</primary>
+   <secondary>Silent configuration</secondary>
+  </indexterm>
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk</screen>
+  </step>
+  <step>
+   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <informalexample><?dbfo pgwide="1"?>
+   <screen>$ cd /path/to/openam-tools/config
+$ unzip ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
+Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
+  inflating: README
+  inflating: sampleconfiguration
+  inflating: sampleupgrade
+ extracting: <?eval ${ssoconfigJarFile}?>
+ extracting: <?eval ${ssoconfigUpgradeJarFile}?>
+  inflating: license.txt</screen>
+   </informalexample>
+   <para>Set up configuration files based on the
+   <filename>sampleconfiguration</filename> example, and then apply the
+   configuration to a deployed OpenAM .war file using the following
+   command.</para>
+   <screen>$ java -jar <?eval ${ssoconfigJarFile}?> -f <replaceable>config.file</replaceable></screen>
+   <para>The <replaceable>config.file</replaceable> is set up by default to
+   use the embedded data store with OpenAM installed on
+   <literal>server1.example.com</literal>. You must edit the file before using
+   it, as described in the <citetitle>OpenAM Reference</citetitle> for
+   <link xlink:show="new" xlink:href="reference#man-configurator-jar-1"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   ><command>configurator.jar</command></link>.</para>
+  </step>
+ </procedure>
+
+ <!--
+ <procedure xml:id="install-openam-diagnostic-tool">
+  <title>To Set Up Diagnostic Tool</title>
+  <para>The diagnostic tool, <command>ssodtool.sh</command>
+  (<command>ssodtool.bat</command> on Windows), works in both graphical and
+  console mode.</para>
+  <step>
+   <para>Make sure the <literal>JAVA_HOME</literal> environment variable
+   is properly set.</para>
+   <screen>$ echo $JAVA_HOME
+/path/to/jdk</screen>
+  </step>
+  <step>
+   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <screen>$ cd /path/to/openam-tools/diagnostic
+$ unzip ~/Downloads/openam/<?eval ${diagnosticsZipFile}?>
+...
+  inflating: services/webcontainer/service.xml
+  inflating: ssodtool.bat
+  inflating: ssodtool.sh</screen>
+ <para>You can start the graphical user interface by using the tools without
+ options, or in console mode using the <command>ssodtool.sh - -console</command>
+ command.</para>
+  </step>
+ </procedure>
+ -->
+</chapter>
