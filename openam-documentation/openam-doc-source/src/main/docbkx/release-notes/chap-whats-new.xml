@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-whats-new'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>What's New in OpenAM ${serverDocTargetVersion}</title>
+
+ <important>
+  <para>
+   OpenAM ${serverDocTargetVersion} is a maintenance release
+   that resolves a number of issues, including security issues in OpenAM.
+   It is strongly recommended that you update to this release
+   to make your deployment more secure,
+   and to take advantage of important functional fixes.
+   ForgeRock customers can contact support for help and further information.
+  </para>
+ </important>
+
+ <itemizedlist>
+  <para>
+   Before you install OpenAM or update your existing OpenAM installation,
+   read these release notes.
+   Then update or install OpenAM.</para>
+
+  <listitem>
+   <para>
+    If you have already installed OpenAM, see <link
+    xlink:show="new"
+    xlink:href="release-notes#update-from-earlier-release"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>To Update OpenAM From 11.0</citetitle></link>.
+   </para>
+   
+   <para>
+    Do <emphasis>not</emphasis> perform an upgrade
+    by deploying the new version
+    and then importing an existing configuration
+    by running the <command>ssoadm import-svc-config</command> command.
+    Importing an outdated configuration can result in a corrupted installation.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    If you are installing OpenAM for the first time, see <link
+    xlink:show="new"
+    xlink:href="release-notes#install-fresh"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>To Install OpenAM</citetitle></link>.
+   </para>
+  </listitem>
+ </itemizedlist>
+
+ <section xml:id="product-enhancements">
+  <title>Product Enhancements</title>
+
+  <para>
+   In addition to fixes,
+   this release includes the following limited product enhancements.
+  </para>
+
+  <itemizedlist><!-- This list is for 11.0.2. -->
+   <listitem>
+    <para>
+     <emphasis role="bold">OAuth 2.0 Refresh Token Renewal</emphasis>.
+     OpenAM now issues a new refresh token when an access token is refreshed (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3951"
+      xlink:show="new"
+     >OPENAM-3951</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Quicker UI Customization</emphasis>.
+     While customizing the UI, you can set the advanced server property,
+     <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,
+     to <literal>false</literal> to allow OpenAM immediately to pick up changes
+     to the files as you customize them (
+     <link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3989"
+     >OPENAM-3989</link>).
+     You can set advanced server properties in OpenAM Console under
+     Configuration > Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
+     For production servers, leave this set to the default, <literal>true</literal>.
+    </para>
+   </listitem>
+
+  <listitem><!-- OPENAM-3918 -->
+   <para>
+     <emphasis role="bold">Whitelist for Custom Login URIs</emphasis>.
+     OpenAM now includes a property that specifies
+     a whitelist for custom login URIs
+     so that the CDCServlet and the Distributed Authentication UI (DAS)
+     can check login URI values against those in the whitelist.
+    </para>
+
+    <para>
+     The property name is <literal>org.forgerock.openam.cdc.validLoginURIs</literal>.
+     If you use custom login URIs in your deployment, add them to the whitelist,
+     separating URIs with commas,
+     setting <literal>org.forgerock.openam.cdc.validLoginURIs</literal>
+     to <literal>/UI/Login,/customLoginURI</literal> for example.
+     You can set this property in OpenAM console under
+     Configuration > Servers and Sites > Default Server Settings > Advanced.
+     The default value is <literal>/UI/Login</literal>.
+    </para>
+
+    <para>
+     The CDCServlet and DAS accept only <literal>loginURI</literal> values
+     that match one of the values in the whitelist.
+     OpenAM strips query strings from <literal>loginURI</literal> values
+     before comparing them with the values in the whitelist,
+     so only include the URIs, not query string parameters.
+    </para>
+   </listitem>
+
+   <listitem>
+     <para>
+      <emphasis role="bold">Configurable DN Cache for LDAP Data Stores</emphasis>.
+      OpenAM now has the capability to enable and disable DN caching.
+      DN caching helps avoid DN lookups
+      that can happen in bursts during authentication.
+      (
+      <link
+       xlink:show="new"
+       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3822"
+       >OPENAM-3822</link>
+      ).
+     </para>
+
+     <para>
+      You can configure this feature as part of a Data Store profile.
+      To configure DN caching in OpenAM console,
+      browse to Access Control > <replaceable>Realm Name</replaceable>
+      > Data Stores > <replaceable>Data Store Name</replaceable> > Cache Control.
+     </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">CTS Connection Management Improvement</emphasis> (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3219"
+      xlink:show="new"
+     >OPENAM-3219</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Debug Log Improvements</emphasis>.
+     AMSetupServlet now displays all configuration parameters
+     in debug logs when the log level is set to ERROR (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2089"
+      xlink:show="new"
+     >OPENAM-2089</link>).
+    </para>
+
+    <para>
+     Debug log improvements have also reduced spurious stack traces
+     that were logged during authentication processing (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-371"
+      xlink:show="new"
+     >OPENAM-371</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Attributes Populated on Dynamic User Creation</emphasis>.
+     When creating users dynamically, OpenAM now populates all attributes
+     that are provided and mapped for SAML 2.0 federation (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-474"
+      xlink:show="new"
+     >OPENAM-474</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Policies Support Additional HTTP Operations</emphasis>.
+     Policies now support all types of HTTP operations, not just GET and POST (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-336"
+      xlink:show="new"
+     >OPENAM-336</link>).
+    </para>
+   </listitem>
+
+   <!-- The following were listed in 11.0.1 notes.
+      <listitem>
+       <para>
+        OpenAM REST API now allows logout with a restricted token
+        (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3484"
+               xlink:show="new">OPENAM-3484</link>).
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Restricted token <literal>asString</literal> values now use a hash
+        in order to limit their size
+        (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3414"
+               xlink:show="new">OPENAM-3414</link>).
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        The SAML 2.0 IDP Adapter interface now
+        includes a <literal>preSignResponse</literal> method
+        (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3190"
+               xlink:show="new">OPENAM-3190</link>).
+       </para>
+
+       <para>
+        This method makes it possible
+        to adjust the content of a SAML response
+        in order to add a custom SAML extension for example.
+        The method is called after the SAML Response object is created
+        but before the SAML Response is signed or encrypted.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        The default SAML 2.0 IDP attribute mapper implementation now
+        provides a way to Base64 encode binary attributes
+        (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2767"
+               xlink:show="new">OPENAM-2767</link>).
+       </para>
+
+       <para>
+        In order to have the default IDP attribute mapper
+        Base64 encode binary attributes when adding them to the SAML attributes,
+        use the <literal>;binary</literal> postfix for the attribute name,
+        as in the following example:
+       </para>
+
+       <literallayout class="monospaced">objectGUID=objectGUID;binary</literallayout>
+
+       <para>
+        This maps the local binary attribute <literal>objectGUID</literal>
+        to a SAML attribute called <literal>objectGUID</literal>
+        that is Base64 encoded.
+       </para>
+
+       <para>
+        The default IDP attribute mapper also supports NameFormat URI format
+        as shown in the following example:
+       </para>
+
+       <literallayout class="monospaced"
+       >urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary</literallayout>
+      </listitem>
+
+      <listitem>
+       <para>
+        The <literal>AttributeQueryUtil.getAttributeMapForFedlet</literal> method
+        now handles failure status codes received from the IDP
+        (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1749"
+               xlink:show="new">OPENAM-1749</link>).
+       </para>
+      </listitem>
+   -->
+  </itemizedlist>
+ </section>
+ 
+ <section xml:id="product-documentation">
+  <title>OpenAM Documentation</title>
+
+  <itemizedlist>
+    <para>
+     You can read the following additional
+     <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/openam/11.0.0/"
+     >product documentation for OpenAM 11.0.0</link>
+     online at <link xlink:show="new" xlink:href="http://docs.forgerock.org/" />.
+    </para>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/release-notes/"
+            xlink:show="new">OpenAM 11.0.0 Release Notes</link>
+     </para>
+    </listitem>
+  
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/install-guide/"
+            xlink:show="new">OpenAM 11.0.0 Installation Guide</link></para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/upgrade-guide/"
+            xlink:show="new">OpenAM 11.0.0 Upgrade Guide</link></para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/admin-guide/"
+            xlink:show="new">OpenAM 11.0.0 Administration Guide</link>
+     </para>
+    </listitem>
+  
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/dev-guide/"
+            xlink:show="new">OpenAM 11.0.0 Developer's Guide</link>
+     </para>
+    </listitem>
+  
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/reference/"
+            xlink:show="new">OpenAM 11.0.0 Reference</link>
+     </para>
+    </listitem>
+  
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/apidocs/"
+            xlink:show="new">OpenAM 11.0.0 Javadoc</link>
+     </para>
+    </listitem>
+   </itemizedlist>
+ </section>
+
+ <section xml:id="doc-changes">
+  <title>Documentation Changes</title>
+  <para>
+   The following changes have been made to the documentation:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The installation instructions for the Distributed Authentication
+     (see
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/install-guide#chap-install-das"
+           xlink:show="new">Installing OpenAM Distributed Authentication</link>)
+           is missing a step.</para>
+     <para>
+      After "Step 2. Make sure the realms used have a Realm/DNS alias for the DAS
+      configured in OpenAM under Access Control &gt; <replaceable>Realm
+      Name</replaceable> &gt; General."
+     </para>
+     <para>
+      Add step 3. "Create a 2.2 agent profile in OpenAM for the DAS to
+      connect to the server."
+     </para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+</chapter>

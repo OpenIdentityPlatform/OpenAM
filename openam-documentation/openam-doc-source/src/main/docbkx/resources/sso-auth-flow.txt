@@ -1,0 +1,64 @@
+@startuml sso.png
+
+/'
+    CCPL HEADER START
+
+    This work is licensed under the Creative Commons
+    Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+    To view a copy of this license, visit
+    http://creativecommons.org/licenses/by-nc-nd/3.0/
+    or send a letter to Creative Commons, 444 Castro Street,
+    Suite 900, Mountain View, California, 94041, USA.
+
+    You can also obtain a copy of the license at
+    src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+    See the License for the specific language governing permissions
+    and limitations under the License.
+
+    If applicable, add the following below this CCPL HEADER, with the fields
+    enclosed by brackets "[]" replaced with your own identifying information:
+         Portions Copyright [yyyy] [name of copyright owner]
+
+    CCPL HEADER END
+
+         Copyright 2013 ForgeRock, Inc.
+
+    To generate a sequence diagram from this file, process
+    it with PlantUML, http://plantuml.sourceforge.net/sequence.html
+'/
+
+title SSO with Policy Agent
+autonumber
+
+participant "Browser" as UA
+participant "Application & Agent" as App
+box "OpenAM" #FAFAFA
+        participant "Policy, Session Services" as PS
+        participant "AuthN Service" as AuthN
+end box
+
+UA->App: Browse to protected resource. If\nSSOToken is present, skip to 8.\nOtherwise...
+
+App->UA: Redirect...
+
+UA->AuthN: ...to OpenAM for authentication.
+
+AuthN->UA: Authentication page
+
+UA->AuthN: Submit credentials.
+
+AuthN->UA: Set valid SSOToken with the configured domain name, and redirect...
+
+UA->App: ...to the application.
+
+App->PS: Request SSOToken validation
+
+PS->App: Response for SSOToken validation
+
+App->PS: Request policy decision
+
+PS->App: Response for policy decision
+
+App->UA: Allow access & return resource,\n or deny access & return HTTP 403.
+@enduml
+
