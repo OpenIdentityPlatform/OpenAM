@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-javaee-agents'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Java EE Policy Agents ${agentsDocTargetVersion}</title>
+
+ <!-- Note: no plan to release 3.3.1 JPAs at this time. -->
+
+ <para>
+  This release notes concern OpenAM Java EE policy agents.
+  Java EE policy agents run in application servers
+  and protect Java EE applications.
+ </para>
+
+ <para>
+   OpenAM Java EE Policy Agents ${agentsDocTargetVersion}
+   is a maintenance release that resolves a number of issues.
+   Update to this release to take advantage of important functional fixes.
+   ForgeRock customers can contact support for help and further information.
+ </para>
+
+ <section xml:id="what-new-javaee-agents">
+  <title>New in JavaEE Policy Agents ${agentsDocTargetVersion}</title>
+
+  <para>
+   No new features have been added since the release of 3.3.0.
+  </para>
+ </section>
+
+ <section xml:id="product-documentation">
+  <title>OpenAM Java EE Policy Agent Documentation</title>
+
+   <itemizedlist>
+    <para>
+     You can read the following additional
+     <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/openam-pa/3.3.0/"
+     >product documentation for OpenAM policy agents 3.3.0</link>
+     online at <link xlink:show="new" xlink:href="http://docs.forgerock.org/" />.
+    </para>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam-pa/3.3.0/jee-release-notes/"
+            xlink:show="new">OpenAM Java EE Policy Agent 3.3.0 Release Notes</link>
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam-pa/3.3.0/jee-install-guide/"
+            xlink:show="new">OpenAM Java EE Policy Agent 3.3.0 Installation Guide</link></para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link xlink:href="http://docs.forgerock.org/en/openam-pa/3.3.0/jee-reference/"
+            xlink:show="new">OpenAM Java EE Policy Agent 3.3.0 Reference</link>
+     </para>
+    </listitem>
+   </itemizedlist>
+ </section>
+
+ <section xml:id="before-you-start-javaee-agents">
+ <title>Before You Install OpenAM Java EE Policy Agents</title>
+
+  <para>This section covers software and hardware prerequisites for installing
+  and running OpenAM Java EE Policy Agents.</para>
+
+ <note>
+  <para>
+   The content of this section has not changed since the 3.3.0 release.
+  </para>
+ </note>
+
+  <para>If you have a special request to support a combination not listed here,
+  contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
+  >info@forgerock.com</link>.</para>
+
+  <section xml:id="java-requirements-javaee-agents">
+   <title>Java EE Agents Java Requirements</title>
+
+   <para>Java EE policy agents run in a Java EE Web container and require Java
+   Development Kit 6 or Java Development Kit 7. ForgeRock recommends the most
+   recent update of Java 6 or 7 to ensure you have the latest security fixes.</para>
+
+   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+  </section>
+
+  <section xml:id="browser-requirements-javaee-agents">
+   <title>Java EE Agents Browsers Tested</title>
+
+   <itemizedlist>
+    <para>ForgeRock has tested this policy agent release with the following web
+    browsers.</para>
+    <listitem><para>Chrome release 16 and later</para></listitem>
+    <listitem><para>Firefox 3.6 and later</para></listitem>
+    <listitem><para>Internet Explorer 7 and later</para></listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="web-container-requirements-javaee-agents">
+   <title>Web Application Container Requirements</title>
+
+   <itemizedlist>
+    <para>Java EE policy agents support the following Java EE application
+    containers.</para>
+
+    <listitem>
+     <para><?eval ${agentTomcatSupport}?></para>
+    </listitem>
+    <listitem>
+     <para><?eval ${agentGlassFishSupport}?></para>
+    </listitem>
+    <listitem>
+     <para><?eval ${agentWebSphereSupport}?></para>
+    </listitem>
+    <listitem>
+     <para><?eval ${agentJBossSupport}?></para>
+    </listitem>
+    <listitem>
+     <para><?eval ${agentJettySupport}?></para>
+    </listitem>
+    <listitem>
+     <para><?eval ${agentWebLogicSupport}?></para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="platform-requirements-javaee-agents">
+   <title>Java EE Agents Platform Requirements</title>
+
+   <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
+   later, and on Microsoft Windows Server 2008 R2 and 2012.</para>
+
+   <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
+   or later.</para>
+
+   <para>Other Java EE policy agents have been tested on Linux 2.6 or
+   later.</para>
+
+   <para>Testing has focused on 64-bit operating systems.</para>
+  </section>
+
+  <section xml:id="hardware-requirements-javaee-agents">
+   <title>Java EE Agents Hardware Requirements</title>
+
+   <para>You can deploy OpenAM Java EE policy agents on any hardware supported
+   for the combination of software required.</para>
+
+    <para>ForgeRock has tested this release on x86 and x64 based systems.</para>
+  </section>
+ </section>
+
+ <section xml:id="upgrade-install">
+  <title>Upgrading &amp; Installing Java EE Policy Agents</title>
+
+  <para>
+   ForgeRock recommends that you upgrade Java EE policy agents to this release.
+   If you are installing OpenAM Java EE policy agents for the first time,
+   you can use the same installation instructions as for 3.3.0.
+  </para>
+
+  <procedure xml:id="upgrade-from-earlier-release">
+   <title>To Upgrade From Java EE Policy Agents 3.3.0</title>
+
+   <step>
+    <para>
+     Back up the policy agent installation and configuration directories.
+    </para>
+
+    <para>
+     Also back up the configuration if it is stored centrally in OpenAM.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Redirect client traffic away from the protected application.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Uninstall the old policy agent.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Install the new policy agent.
+    </para>
+
+    <para>
+     For new features, the policy agent uses the default configuration
+     until you make changes.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Validate that the policy agent is performing as expected.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Allow client traffic to flow to the protected application.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="install-fresh">
+   <title>To Install Java EE Policy Agents</title>
+
+   <para>
+    If you have not yet installed and configured Java EE Policy Agents,
+    then install this release instead of 3.3.0.
+   </para>
+
+   <step>
+    <para>
+     Download and unzip the policy agents.
+    </para>
+
+    <para>
+     Find a link to the OpenAM download page from
+     <link xlink:show="new" xlink:href="http://forgerock.com/download-stack/" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Follow the instructions in the
+     <link xlink:href="http://docs.forgerock.org/en/openam-pa/3.3.0/jee-install-guide/"
+           xlink:show="new"
+     ><citetitle>OpenAM Java EE Policy Agent 3.3.0 Installation Guide</citetitle></link>.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="javaee-agent-compatibility">
+  <title>Java EE Policy Agent Compatibility</title>
+
+  <para>
+   This section concerns OpenAM Java EE Policy Agents 3.3.0.
+   It has not changed since that release.
+  </para>
+
+  <section xml:id="javaee-agent-major-changes">
+   <title>Important Changes to Java EE Policy Agent Functionality</title>
+
+   <para>The default policy evaluation mode for new policy agent profiles is
+   now self rather than subtree, in order to better scale for large numbers of
+   policy rules.</para>
+
+   <para>Upgrade does not change existing policy agent profile configurations,
+   however. If you want to adopt the new default setting for existing policy
+   agents, you must change the setting manually.</para>
+
+   <para>To do so for Java EE policy agents, set
+   <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
+
+  </section>
+
+  <section xml:id="javaee-agent-deprecated">
+   <title>Deprecated Functionality</title>
+
+   <para>Support for Oracle WebLogic 10g is deprecated and is likely to be
+   removed in a future release.</para>
+  </section>
+
+  <section xml:id="javaee-agent-removed">
+   <title>Removed Functionality</title>
+
+   <para>No functionality has been removed in this release.</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-issues">
+  <title>Java EE Policy Agents Fixes, Limitations, &amp; Known Issues</title>
+
+  <para>
+   OpenAM Java EE policy agent issues are tracked at
+   <link xlink:show="new"
+         xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"/>.
+  </para>
+
+  <section xml:id="javaee-agent-fixes">
+   <title>Key Fixes</title>
+
+    <para>
+     The following bugs were fixed in release ${agentsDocTargetVersion}.
+     For details, see the
+     <link xlink:show="new"
+           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+     >OpenAM issue tracker</link>.
+    </para>
+
+   <!-- List generated at 15:07:05 20140225 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"j2ee+agents"+AND+fixVersion+%3D+"Agents-3.3.1"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3618" xlink:show="new">OPENAM-3618</link>: J2EE agents don't allow to set 'httponly' flag for SSO tracking cookie</para></listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="javaee-agent-limitations">
+   <title>Limitations</title>
+
+   <!-- For OPENAM-1991 TODO: Remove when this is fixed -->
+   <para>Apache Tomcat can fail to shut down properly when the Java EE policy
+   agent for Tomcat is deployed. To work around this limitation, add the
+   following to your Tomcat configuration in the <literal>&lt;Server port="8005"
+   shutdown="SHUTDOWN"&gt;</literal> section.</para>
+   <literallayout class="monospaced"
+   >&lt;Listener
+ className="org.forgerock.agents.tomcat.v6.TomcatLifeCycleListener" /&gt;</literallayout>
+  </section>
+
+  <section xml:id="javaee-agent-known-issues">
+   <title>Known Issues</title>
+
+   <para>The following important known issues remained open at the time
+   release ${agentsDocTargetVersion} became available. For
+   details and information on other issues, see the <link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
+   tracker</link>.</para>
+
+   <!-- List generated at 15:07:48 20140225 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"j2ee+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3209" xlink:show="new">OPENAM-3209</link>: Tomcat 6 agent custom-install does not modify global web.xml</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2974" xlink:show="new">OPENAM-2974</link>: agentadmin should allow to configure multiple instances for the same agent on the same host</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1206" xlink:show="new">OPENAM-1206</link>: J2EE agent silent install isn't silent</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1106" xlink:show="new">OPENAM-1106</link>: Null messages in the error log</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-868" xlink:show="new">OPENAM-868</link>: J2EE Agent strips off servlet context when processing request for JSF application (Apache Trinidad)</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-605" xlink:show="new">OPENAM-605</link>: Tomcat J2ee Agent initialization fails on Windows 2003</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-211" xlink:show="new">OPENAM-211</link>: J2EE agents are unable to work, if the container was started prior to OpenAM</para></listitem>
+   </itemizedlist>
+  </section>
+ </section>
+</chapter>
