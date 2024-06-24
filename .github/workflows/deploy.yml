@@ -46,7 +46,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ !(github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='')}}
-        run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} package --file pom.xml
+        run: mvn --batch-mode --errors --update-snapshots -P man-pages -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} package --file pom.xml
       - name: Publish to the Maven Central Repository
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -94,3 +94,16 @@ jobs:
         with:
          name: OpenAM Dockerfile
          path: openam-distribution/openam-distribution-docker/Dockerfile*           
+      - name: Publish docs in wiki
+        continue-on-error: true
+        shell: bash
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run:   |
+          cd ${{ github.event.repository.name }}.wiki
+          rm -rf docbkx
+          mv ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
+          git add -A
+          git commit -a -m "upload docs after deploy ${{ github.sha }}"
+          git push --quiet --force
