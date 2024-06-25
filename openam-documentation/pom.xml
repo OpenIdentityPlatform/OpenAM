@@ -41,6 +41,7 @@
     <modules>
         <module>openam-doc-log-message-ref</module>
         <module>openam-doc-ssoadm-ref</module>
+        <module>openam-doc-source</module>
     </modules>
 
 </project>

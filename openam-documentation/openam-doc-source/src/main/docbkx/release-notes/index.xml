@@ -71,5 +71,5 @@
  <xinclude:include href='chap-compatibility.xml' />
  <xinclude:include href='chap-issues.xml' />
  <xinclude:include href="chap-feedback.xml" />
- <xinclude:include href="chap-support.xml" />
+<!-- <xinclude:include href="chap-support.xml" />-->
 </book>

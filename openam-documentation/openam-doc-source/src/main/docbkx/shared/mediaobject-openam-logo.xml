@@ -9,6 +9,8 @@
   ! or send a letter to Creative Commons, 444 Castro Street,
   ! Suite 900, Mountain View, California, 94041, USA.
   !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
   ! See the License for the specific language governing permissions
   ! and limitations under the License.
   !
@@ -18,20 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock, Inc.
+  !      Copyright 2024 3A Systems LLC
   !
 -->
- <appendix xml:id="appendix-interface-stability"
- xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Release Levels &amp; Interface Stability</title>
-
- <para>This appendix includes definitions for product release levels
- and interface stability.</para>
-
-  <xinclude:include href="../shared/sec-release-levels.xml" />
-  <xinclude:include href="../shared/sec-interface-stability.xml" />
-</appendix>
+<mediaobject xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+             xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+             xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+             xmlns:xlink='http://www.w3.org/1999/xlink'
+             xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+    <imageobject>
+        <imagedata fileref="images/openam-logo.png" role="top"/>
+    </imageobject>
+</mediaobject>

@@ -57,7 +57,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='' }}
-        run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare release:perform --file pom.xml
+        run: mvn --batch-mode -P man-pages -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare release:perform --file pom.xml
       - name: Release on GitHub
         uses: softprops/action-gh-release@v2
         with:
@@ -77,6 +77,21 @@ jobs:
             openam-server-only/target/*.war
             openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
             openam-distribution/openam-distribution-docker/target/Dockerfile*
+      - name: Publish docs in wiki
+        continue-on-error: true
+        shell: bash
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run:   |
+          cd ${{ github.event.repository.name }}.wiki
+          rm -rf docbkx
+          mv ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
+          git add -A
+          git commit -a -m "upload docs after release ${{ github.event.inputs.releaseVersion }}"
+          git tag -f ${{ github.event.inputs.releaseVersion }}
+          git push --quiet --force
+          git push --quiet --force origin ${{ github.event.inputs.releaseVersion }}
   release-docker:
     runs-on: 'ubuntu-latest'
     needs:

@@ -32,15 +32,15 @@
  <title>How to Report Problems &amp; Provide Feedback</title>
 
  <para>If you have questions regarding OpenAM policy agents which are not
- answered by the documentation, there is a mailing list which can be found at
- <link xlink:href="https://lists.forgerock.org/mailman/listinfo/openam"
- xlink:show="new">https://lists.forgerock.org/mailman/listinfo/openam</link>
+ answered by the documentation, there is a discussions section
+ <link xlink:href="https://github.com/OpenIdentityPlatform/OpenAM/discussions"
+ xlink:show="new">https://github.com/OpenIdentityPlatform/OpenAM/discussions</link>
  where you are likely to find an answer.</para>
 
  <para>If you have found issues or reproducible bugs within OpenAM
  <?eval ${agentsDocTargetVersion}?> policy agents, report them in <link
- xlink:href="https://bugster.forgerock.org" xlink:show="new"
- >https://bugster.forgerock.org</link>.</para>
+ xlink:href="https://github.com/OpenIdentityPlatform/OpenAM/issues" xlink:show="new"
+ >https://github.com/OpenIdentityPlatform/OpenAM/issues</link>.</para>
 
  <itemizedlist>
   <para>When requesting help with a problem, include the following
