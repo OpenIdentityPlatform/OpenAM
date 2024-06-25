@@ -67,5 +67,5 @@
 
  <xinclude:include href='chap-javaee-agents.xml' />
  <xinclude:include href="../shared/chap-feedback.xml" />
- <xinclude:include href="../shared/chap-support.xml" />
+<!-- <xinclude:include href="../shared/chap-support.xml" />-->
 </book>

@@ -255,11 +255,11 @@
   standard requests (create, read, update, delete, query, patch), and also
   how resource providers offer extended operations in a managed way (using
   actions). Applications built to interact with OpenAM REST APIs
-  increasingly can interoperate with other products in the ForgeRock stack
+  increasingly can interoperate with other products in the Open Identity Platform stack
   such as <link xlink:show="new"
-  xlink:href="http://forgerock.com/what-we-offer/open-identity-stack/openidm/"
+  xlink:href="https://github.com/OpenIdentityPlatform/OpenIDM"
   >OpenIDM for identity management</link> and <link xlink:show="new"
-  xlink:href="http://forgerock.com/what-we-offer/open-identity-stack/opendj/"
+  xlink:href="https://github.com/OpenIdentityPlatform/OpenDJ"
   >OpenDJ for highly available data</link>.</para>
  </section>
 </chapter>

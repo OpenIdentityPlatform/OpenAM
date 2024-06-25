@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2024 3A Systems LLC.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-documentation</artifactId>
+        <version>15.0.2-SNAPSHOT</version>
+    </parent>
+
+    <name>OpenAM Server Documentation Sources</name>
+
+    <artifactId>openam-doc-source</artifactId>
+    <packaging>jar</packaging>
+
+    <description>
+        DocBook XML source for hand-written OpenAM core user documentation.
+    </description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <phase>pre-site</phase>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.openidentityplatform.openam</groupId>
+                                    <artifactId>openam-doc-log-message-ref</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>log-message-ref</classifier>
+                                    <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openidentityplatform.openam</groupId>
+                                    <artifactId>openam-doc-ssoadm-ref</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>ssoadm-ref</classifier>
+                                    <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>man-pages</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openidentityplatform.commons</groupId>
+                        <artifactId>doc-maven-plugin</artifactId>
+                        <version>${commons-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>build-man-pages</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>process</goal>
+                                    <goal>build</goal>
+                                    <goal>release</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <projectName>OpenAM</projectName>
+                            <projectVersion>${project.version}</projectVersion>
+                            <releaseVersion>${project.version}</releaseVersion>
+                            <buildReleaseZip>true</buildReleaseZip>
+                            <googleAnalyticsId />
+                            <isDraftMode>no</isDraftMode>
+                            <formats combine.self="override">
+                                <format>man</format>
+                                <format>epub</format>
+                                <format>html</format>
+                                <format>pdf</format>
+                                <format>webhelp</format>
+                                <format>xhtml5</format>
+                            </formats>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

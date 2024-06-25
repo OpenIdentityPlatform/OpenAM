@@ -21,6 +21,7 @@
   ! CCPL HEADER END
   !
   !      Copyright 2011-2015 ForgeRock AS.
+  !      Portions Copyright 2024 3A Systems LLC
   !    
 -->
 <book xml:id='web-agent-release-notes'
@@ -30,7 +31,7 @@
                           http://docbook.org/xml/5.0/xsd/docbook.xsd'
       xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <xinclude:include href="../shared/mediaobject-fr-logo.xml" />
+  <xinclude:include href="../shared/mediaobject-openam-logo.xml" />
   <title>OpenAM Web Policy Agent Release Notes</title>
   <subtitle>Version ${agentsDocTargetVersion}</subtitle>
   <abstract>
@@ -72,5 +73,5 @@
 
  <xinclude:include href='chap-web-agents.xml' />
  <xinclude:include href="../shared/chap-feedback.xml" />
- <xinclude:include href="../shared/chap-support.xml" />
+<!-- <xinclude:include href="../shared/chap-support.xml" />-->
 </book>
