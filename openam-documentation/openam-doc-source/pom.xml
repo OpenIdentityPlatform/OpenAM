@@ -27,7 +27,7 @@
     <name>OpenAM Server Documentation Sources</name>
 
     <artifactId>openam-doc-source</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <description>
         DocBook XML source for hand-written OpenAM core user documentation.
