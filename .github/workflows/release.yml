@@ -77,6 +77,12 @@ jobs:
             openam-server-only/target/*.war
             openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
             openam-distribution/openam-distribution-docker/target/Dockerfile*
+      - uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: ${{ github.event.repository.name }}.wiki
+          fetch-depth: 0
       - name: Publish docs in wiki
         continue-on-error: true
         shell: bash
