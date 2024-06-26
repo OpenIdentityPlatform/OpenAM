@@ -93,7 +93,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
          name: OpenAM Dockerfile
-         path: openam-distribution/openam-distribution-docker/Dockerfile*           
+         path: openam-distribution/openam-distribution-docker/Dockerfile*
+      - name: Configure Git User
+        run: |
+          git config --global user.name "Open Identity Platform Community"
+          git config --global user.email "open-identity-platform-opendj@googlegroups.com"
+          cd ..
       - uses: actions/checkout@v4
         continue-on-error: true
         with:
