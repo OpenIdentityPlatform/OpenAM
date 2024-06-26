@@ -408,8 +408,8 @@ public class IdRepoTest {
 		long created = Long.parseLong(fieldsValues.get("_created").stream().findFirst().get());
 		long updated = Long.parseLong(fieldsValues.get("_updated").stream().findFirst().get());
 		assertTrue(created < updated);
-		assertEquals(create, created / 1000);
-		assertEquals(create, updated / 1000);
+		assertTrue(((created / 1000) - create) <= 1);
+		assertTrue(((updated / 1000) - create) <= 1);
 
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
 	}

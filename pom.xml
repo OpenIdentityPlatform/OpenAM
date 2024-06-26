@@ -140,7 +140,7 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.2.3</logback.version>
-    <netty.version>4.1.99.Final</netty.version>
+    <netty.version>4.1.108.Final</netty.version>
   </properties>
   <!-- Profiles -->
   <profiles>
