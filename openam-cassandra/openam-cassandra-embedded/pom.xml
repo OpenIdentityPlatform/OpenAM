@@ -20,7 +20,7 @@
    <parent>
        <groupId>org.openidentityplatform.openam</groupId>
        <artifactId>openam-cassandra</artifactId>
-       <version>15.0.2</version>
+       <version>15.0.3-SNAPSHOT</version>
    </parent>
 
   <artifactId>openam-cassandra-embedded</artifactId>
