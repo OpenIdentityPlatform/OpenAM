@@ -79,7 +79,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>4.6.4-SNAPSHOT</opendj.version>
+    <opendj.version>4.6.4</opendj.version>
     <commons-plugin.version>2.1.4</commons-plugin.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
@@ -242,27 +242,27 @@
 			        </execution>
 			      </executions>
 			    </plugin>
-<!--			    <plugin>-->
-<!--			      <groupId>org.sonatype.plugins</groupId>-->
-<!--			      <artifactId>nexus-staging-maven-plugin</artifactId>-->
-<!--			      <version>1.6.13</version>-->
-<!--			      <extensions>true</extensions>-->
-<!--			      <configuration>-->
-<!--			        <serverId>ossrh</serverId>-->
-<!--			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
-<!--			        <autoReleaseAfterClose>false</autoReleaseAfterClose>-->
-<!--			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>-->
-<!--			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>-->
-<!--			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>-->
-<!--			      </configuration>-->
-<!--			      <dependencies>-->
-<!--			      	<dependency>-->
-<!--				        <groupId>com.google.guava</groupId>-->
-<!--				        <artifactId>guava</artifactId>-->
-<!--				        <version>15.0</version>-->
-<!--				     </dependency>-->
-<!--			      </dependencies>-->
-<!--			    </plugin>-->
+			    <plugin>
+			      <groupId>org.sonatype.plugins</groupId>
+			      <artifactId>nexus-staging-maven-plugin</artifactId>
+			      <version>1.6.13</version>
+			      <extensions>true</extensions>
+			      <configuration>
+			        <serverId>ossrh</serverId>
+			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+			        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
+			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
+			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+			      </configuration>
+			      <dependencies>
+			      	<dependency>
+				        <groupId>com.google.guava</groupId>
+				        <artifactId>guava</artifactId>
+				        <version>15.0</version>
+				     </dependency>
+			      </dependencies>
+			    </plugin>
             </plugins>
         </build>
     </profile>
