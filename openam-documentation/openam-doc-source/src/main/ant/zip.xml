@@ -1,0 +1,23 @@
+<project name="zip">
+    <target name="docs">
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <foreach param="docname" target="formats" inheritall="true">
+            <path>
+                <dirset dir="${basedir}/src/main/docbkx/" casesensitive="yes">
+                    <include name="*/"/>
+                    <exclude name="*/*/**"/>
+                    <exclude name="resources"/>
+                    <exclude name="shared"/>
+                </dirset>
+            </path>
+            <mapper type="flatten"/>
+        </foreach>
+    </target>
+    <target name="formats">
+        <foreach param="format" list="${compress_formats}" target="dozip" inheritall="true"/>
+    </target>
+    <target name="dozip" >
+        <echo message="compressing ${format} ${docname} from ${project_build_dir}/docbkx/${format}/${docname} to ${project_build_dir}/docbkx/${format}/${docname}.zip"/>
+        <zip basedir="${project.build.directory}/docbkx/${format}/${docname}" destfile="${project.build.directory}/docbkx/${format}/${docname}.zip"/>
+    </target>
+</project>
