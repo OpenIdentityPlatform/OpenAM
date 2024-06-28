@@ -103,6 +103,40 @@
                             </formats>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>zip-docs</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <property name="compress_formats" value="webhelp,xhtml,html"/>
+                                        <ant antfile="${basedir}/src/main/ant/zip.xml">
+                                            <target name="docs"/>
+                                        </ant>>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>ant-contrib</groupId>
+                                <artifactId>ant-contrib</artifactId>
+                                <version>${ant.contrib.version}</version>
+                                <exclusions>
+                                    <exclusion>
+                                        <groupId>ant</groupId>
+                                        <artifactId>ant</artifactId>
+                                    </exclusion>
+                                </exclusions>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
