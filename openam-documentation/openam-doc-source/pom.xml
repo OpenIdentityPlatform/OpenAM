@@ -69,6 +69,9 @@
     <profiles>
         <profile>
             <id>man-pages</id>
+            <activation>
+                <os><family>unix</family></os>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

@@ -30,9 +30,9 @@ jobs:
          key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
          restore-keys: ${{ runner.os }}-m2-repository
     - name: Set Integration Test Environment
-      if: matrix.os != 'windows-latest'
+      if: matrix.os == 'ubuntu-latest'
       run:  | 
-        echo "MAVEN_PROFILE_FLAG=-P integration-test -P man-pages" >> $GITHUB_OUTPUT 
+        echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
