@@ -30,16 +30,16 @@ jobs:
          key: ${{ runner.os }}-m2-repository-${{ hashFiles('**/pom.xml') }}
          restore-keys: ${{ runner.os }}-m2-repository
     - name: Set Integration Test Environment
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os != 'windows-latest'
       run:  | 
-        echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
+        echo "MAVEN_PROFILE_FLAG=-P integration-test -P man-pages" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
     - name: Build with Maven
       env:
         MAVEN_OPTS: ${{ matrix.java != '8' && '--add-exports java.desktop/com.sun.imageio.plugins.png=ALL-UNNAMED' || '' }} -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
-      run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml -P man-pages ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
+      run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
