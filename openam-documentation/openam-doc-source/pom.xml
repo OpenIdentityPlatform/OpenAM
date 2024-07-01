@@ -71,6 +71,7 @@
             <id>man-pages</id>
             <activation>
                 <os><family>unix</family></os>
+                <jdk>8</jdk>
             </activation>
             <build>
                 <plugins>
