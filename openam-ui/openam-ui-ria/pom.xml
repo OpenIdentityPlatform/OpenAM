@@ -325,7 +325,7 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <arguments>run build:production -- --target-version=${project.version}</arguments>
+                            <arguments>run build:production -- --verbose --target-version=${project.version}</arguments>
                         </configuration>
                     </execution>
                 </executions>
