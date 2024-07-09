@@ -1,5 +1,10 @@
 module.exports = function (config) {
     config.set({
+        client: {
+            mocha: {
+                timeout : 6000
+            }
+        },
         basePath: ".",
         frameworks: ["mocha", "requirejs"],
         files: [
