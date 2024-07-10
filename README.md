@@ -39,11 +39,13 @@ This project is licensed under the [Common Development and Distribution License 
 * [OpenAM Docker Image](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)
 
 ### Download OpenAM Policy Agents:
+* [OpenIG gateway/reverse proxy/authorization endpoint](https://github.com/OpenIdentityPlatform/OpenIG/releases)
 * [OpenAM Java Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
-* [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#Установка-файлов-бинарной-поставки) (Windows/Linux)
-* [OpenAM Web Policy Agent Apache 2.2](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
-* [OpenAM Web Policy Agent Apache 2.4](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) (Linux x64)
-* [OpenAM Web Policy Agent (IIS  Windows x32/x64 ZIP)](https://ci.appveyor.com/api/buildjobs/cnebrw2f43my9vxr/artifacts/IIS_WINNT_4.1.0.zip)
+* [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#install-binary-distribution) (Windows/Linux)
+* [OpenAM Web Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents)
+  * [Apache 2.2 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) 
+  * [Apache 2.4 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) 
+  * [IIS  Windows x32/x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)
 
 ## How-to Build OpenAM from Source
 To build OpenAM from source you should use JDK 8 or higher
