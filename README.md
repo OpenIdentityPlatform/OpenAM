@@ -43,8 +43,8 @@ This project is licensed under the [Common Development and Distribution License 
 * [OpenAM Java Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)
 * [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#install-binary-distribution) (Windows/Linux)
 * [OpenAM Web Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents)
-  * [Apache 2.2 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) 
-  * [Apache 2.4 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents#downloads) 
+  * [Apache 2.2 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)
+  * [Apache 2.4 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases) 
   * [IIS  Windows x32/x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)
 
 ## How-to Build OpenAM from Source
