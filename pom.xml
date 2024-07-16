@@ -79,7 +79,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>4.6.4</opendj.version>
+    <opendj.version>4.6.5</opendj.version>
     <commons-plugin.version>2.1.4</commons-plugin.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
