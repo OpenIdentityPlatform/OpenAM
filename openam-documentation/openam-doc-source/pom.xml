@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>15.0.3-SNAPSHOT</version>
+        <version>15.0.3</version>
     </parent>
 
     <name>OpenAM Server Documentation Sources</name>
@@ -116,10 +116,10 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <property name="compress_formats" value="webhelp,xhtml,html"/>
+                                        <property name="compress_formats" value="webhelp,xhtml,html" />
                                         <ant antfile="${basedir}/src/main/ant/zip.xml">
-                                            <target name="docs"/>
-                                        </ant>>
+                                            <target name="docs" />
+                                        </ant>&gt;
                                     </target>
                                 </configuration>
                                 <goals>

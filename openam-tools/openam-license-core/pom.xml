@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.0.3-SNAPSHOT</version>
+        <version>15.0.3</version>
     </parent>
 
     <!-- Component Definition -->
