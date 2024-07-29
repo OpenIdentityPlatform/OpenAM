@@ -104,6 +104,7 @@
                                 <format>pdf</format>
                                 <format>webhelp</format>
                                 <format>xhtml5</format>
+                                <format>bootstrap</format>
                             </formats>
                         </configuration>
                     </plugin>

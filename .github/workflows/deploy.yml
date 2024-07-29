@@ -104,7 +104,7 @@ jobs:
         with:
           repository: ${{ github.repository }}.wiki
           path: ${{ github.event.repository.name }}.wiki
-      - name: Publish docs in wiki
+      - name: Publish docs to wiki
         continue-on-error: true
         shell: bash
         env:
@@ -113,7 +113,27 @@ jobs:
         run:   |
           cd ${{ github.event.repository.name }}.wiki
           rm -rf docbkx
-          mv ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
+          cp -R ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
           git add -A
           git commit -a -m "upload docs after deploy ${{ github.sha }}"
           git push --quiet --force
+
+      - uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: OpenIdentityPlatform/doc.openidentityplatform.org
+          path: doc.openidentityplatform.org
+          token: ${{ secrets.OIP_PAT_GH_TOKEN }}
+
+      - name: Publish docs to site
+        continue-on-error: true
+        shell: bash
+        run: |
+          export REPO_NAME_LC=$(echo '${{github.event.repository.name}}' | tr '[:upper:]' '[:lower:]')
+          export SITE_DOC_FOLDER=openam-documentation/openam-doc-source
+          cd doc.openidentityplatform.org
+          rm -rf ${REPO_NAME_LC}
+          cp -R ../${SITE_DOC_FOLDER}/target/docbkx/bootstrap ../doc.openidentityplatform.org/${REPO_NAME_LC}
+          git add -A
+          git commit -a -m "upload ${{github.event.repository.name}} docs after deploy ${{ github.sha }}"
+          git push --force https://github.com/OpenIdentityPlatform/doc.openidentityplatform.org.git

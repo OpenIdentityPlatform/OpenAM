@@ -83,7 +83,7 @@ jobs:
           repository: ${{ github.repository }}.wiki
           path: ${{ github.event.repository.name }}.wiki
           fetch-depth: 0
-      - name: Publish docs in wiki
+      - name: Publish docs to wiki
         continue-on-error: true
         shell: bash
         env:
@@ -92,12 +92,29 @@ jobs:
         run:   |
           cd ${{ github.event.repository.name }}.wiki
           rm -rf docbkx
-          mv ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
+          cp -R ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
           git add -A
           git commit -a -m "upload docs after release ${{ github.event.inputs.releaseVersion }}"
           git tag -f ${{ github.event.inputs.releaseVersion }}
           git push --quiet --force
           git push --quiet --force origin ${{ github.event.inputs.releaseVersion }}
+
+      - uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: OpenIdentityPlatform/doc.openidentityplatform.org
+          path: doc.openidentityplatform.org
+          token: ${{ secrets.OIP_PAT_GH_TOKEN }}
+      - name: Publish docs to site
+        continue-on-error: true
+        shell: bash
+        run: |
+          export REPO_NAME_LC=$(echo '${{github.event.repository.name}}' | tr '[:upper:]' '[:lower:]')
+          export TAG_NAME='${{github.event.repository.name}}-${{ github.event.inputs.releaseVersion }}'
+          cd doc.openidentityplatform.org
+          git tag -f '${TAG_NAME}'
+          git push --quiet --force origin '${TAG_NAME}'
+
   release-docker:
     runs-on: 'ubuntu-latest'
     needs:
