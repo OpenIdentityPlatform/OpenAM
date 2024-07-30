@@ -78,7 +78,6 @@
                     <plugin>
                         <groupId>org.openidentityplatform.commons</groupId>
                         <artifactId>doc-maven-plugin</artifactId>
-                        <version>${commons-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>build-man-pages</id>
@@ -104,6 +103,7 @@
                                 <format>pdf</format>
                                 <format>webhelp</format>
                                 <format>xhtml5</format>
+                                <format>bootstrap</format>
                             </formats>
                         </configuration>
                     </plugin>
