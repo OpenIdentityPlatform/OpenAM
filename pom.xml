@@ -80,7 +80,6 @@
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
     <opendj.version>4.6.5</opendj.version>
-    <commons-plugin.version>2.1.5</commons-plugin.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
@@ -1863,7 +1862,6 @@
 		<groupId>org.openidentityplatform.commons</groupId>
 		<artifactId>maven-external-dependency-plugin</artifactId>
 		<inherited>false</inherited>
-        <version>${commons-plugin.version}</version>
         <configuration>
 			<stagingDirectory>
 				${project.build.directory}/dependencies/
