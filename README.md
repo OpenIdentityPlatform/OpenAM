@@ -82,10 +82,14 @@ The next step is then to go to [http://login.domain.com:8080/openam](http://logi
 * OpenAM Community [issues](https://github.com/OpenIdentityPlatform/OpenAM/issues)
 * OpenAM [commercial support](https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List)
 
-## Contributing
-Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)
-
 ## Thanks 🥰
 * Sun Access Manager/OpenSSO
 * Oracle OpenSSO
 * Forgerock OpenAM
+
+## Contributing
+Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)
+
+<a href="https://github.com/OpenIdentityPlatform/OpenAM/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=OpenIdentityPlatform/OpenAM" />
+</a>
