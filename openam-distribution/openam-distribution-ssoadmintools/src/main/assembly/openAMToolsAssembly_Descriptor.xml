@@ -22,6 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019-2024 3A Systems, LLC
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -86,7 +87,7 @@
                 <include>org.mozilla:rhino</include>
                 <include>org.codehaus.groovy:groovy</include>
                 <include>org.kohsuke:groovy-sandbox</include>
-                <include>org.codehaus.groovy:groovy-jsr223:jar</include>
+                <include>org.codehaus.groovy:*:jar</include>
                 <include>org.openidentityplatform.opendj:opendj-core</include>
                 <include>org.openidentityplatform.commons.i18n-framework:core</include>
                 <include>org.openidentityplatform.commons.audit:core</include>
