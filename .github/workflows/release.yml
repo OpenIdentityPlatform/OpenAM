@@ -112,8 +112,8 @@ jobs:
           export REPO_NAME_LC=$(echo '${{github.event.repository.name}}' | tr '[:upper:]' '[:lower:]')
           export TAG_NAME='${{github.event.repository.name}}-${{ github.event.inputs.releaseVersion }}'
           cd doc.openidentityplatform.org
-          git tag -f '${TAG_NAME}'
-          git push --quiet --force origin '${TAG_NAME}'
+          git tag -f ${TAG_NAME}
+          git push --quiet --force origin ${TAG_NAME}
 
   release-docker:
     runs-on: 'ubuntu-latest'
