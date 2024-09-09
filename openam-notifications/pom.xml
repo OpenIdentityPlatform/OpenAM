@@ -19,7 +19,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.0.5-SNAPSHOT</version>
+        <version>15.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
