@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  * Portions Copyrighted 2024 3A Systems LLC.
  */
 
@@ -1035,6 +1036,8 @@ public class RealmOAuth2ProviderSettings implements OAuth2ProviderSettings {
                     attributeCache.clear();
                     jwks.clear();
                     loginUrlTemplate = null;
+                    supportedClaimsWithoutTranslations=null;
+                    supportedScopesWithoutTranslations=null;
                 }
             } else {
                 if (logger.messageEnabled()) {
