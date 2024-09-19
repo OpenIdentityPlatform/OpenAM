@@ -1,0 +1,201 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-install-multiple]
+== Installation Considerations for Multiple Servers
+
+This chapter covers what to do when installing multiple OpenAM servers.
+
+[#considerations-multiple-servers]
+=== Things to Consider When Installing Multiple Servers
+
+When installing multiple servers, consider the following points:
+
+* You generally install multiple servers to provide service availability. If one server is down for any reason, another server can respond instead. This means that you need some type of component, such as a load balancer or a proxying server, between incoming traffic and OpenAM to route around servers that are down.
++
+OpenAM uses a __site__ for this purpose. In an OpenAM site, multiple OpenAM servers are configured in the same way, and accessed through a load balancer layer.footnote:d14351e3553[Technically, it is possible to configure a site with only one OpenAM server.] The load balancer can be implemented in hardware or software, but it is separate and independent from OpenAM software. When installed properly, a site configuration improves service availability, as the load balancer routes around OpenAM servers that are down, sending traffic to other servers in the site.
+
+* The cookie domain is set to the server's full URL that was used to access the configurator, such as `example.net`, `server.west.example.com`, or `example.local`.
+
+* You can use a load balancer layer to protect OpenAM services as well. The load balancer can restrict access to OpenAM services, throttle traffic, offload HTTPS encryption, and so forth.
++
+As an alternative, or in addition, you can use a separate reverse proxy.
+
+* When you are protecting OpenAM with a load balancer or proxy service, configure your container so that OpenAM can trust the load balancer or proxy service.
+
+* OpenAM authentication can depend on information about the user to authenticate, such as the IP address where the request originated. When OpenAM is accessed through a load balancer or proxy layer, pass this information along using request headers. Also, configure OpenAM to consume and to forward the headers as necessary. See xref:#handle-request-headers["Handling HTTP Request Headers"] for details.
+
+
+
+[#configure-sites]
+=== Configuring OpenAM Sites
+
+The most expedient way to configure a server in a site is to set the site up during the initial OpenAM configuration. In the GUI configurator, this is done in the Site Configuration screen.
+
+It is also possible to configure a site separately. If you did not set up a site during initial configuration, perform the following steps to configure a site:
+
+[#configure-site-after-installation]
+.To Configure a Site With a First OpenAM Server
+====
+The following steps show how to set up the site for the first OpenAM server.
+
+. Login to OpenAM Console as administrator, by default `amadmin`, and then navigate to Deployment > Sites.
+
+. Click New to start configuring the new site.
+
+. On the New Site page enter the site name, and set the Primary URL to the load balancer URL that is the entry point for the site, such as `\https://lb.example.com/openam`.
++
+The site URL is the URL to the load balancer in front of the OpenAM servers in the site. For example, if your load balancer listens for HTTPS on host `lb.example.com` and port `443` with OpenAM under `/openam`, then your site URL is `\https://lb.example.com/openam`.
++
+Client applications and policy agents access the servers in the site through the site URL.
+
+. Click Save to keep the site configuration.
+
+. Navigate to Deployment > Servers > __Server Name__ > General.
+
+. Set the Parent Site to the name of the site you just created, and then select Save Changes.
++
+At this point, the server is part of the new site you have configured.
++
+For all additional servers in the OpenAM site, add them to the site at configuration time as described in xref:chap-install-core.adoc#add-servers-to-site["To Add a Server to a Site"].
+
+====
+
+
+[#configure-lb]
+=== Configuring Load Balancing for a Site
+
+Load balancer configuration requirements differ for OpenAM sites configured to use stateful and stateless sessions.footnote:d14351e3653[Some OpenAM deployments use both stateful and stateless sessions. If your deployment uses a substantial number of stateful sessions, follow the recommendations for deployments with stateful sessions.] For more information about OpenAM session types, see xref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"] in the __Administration Guide__.
+
+[#configure-lb-stateful]
+==== Load Balancer Configuration for Stateful Sessions
+
+An OpenAM site configured to use stateful sessions achieves the best performance when the server that originally authenticated a user continually manages that user's session, unless that server is no longer available.
+
+To achieve optimal performance, configure your load balancer for sticky sessions as follows:
+
+[#configure-site-load-balancing]
+.To Configure Site Load Balancing for Deployments With Stateful Sessions
+====
+
+. For each OpenAM server in the site, navigate to Deployment > Servers > __Server Name__ > General and set Parent Site to the site you created. Then, save your work.
+
+. Ensure that the `amlbcookie` cookie has a unique for each OpenAM server.
++
+
+.. For each OpenAM server in the site, navigate to Deployment > Servers > __Server Name__ > Advanced and review the value of the `com.iplanet.am.lbcookie.value` property. By default, the cookie value is set to the OpenAM server ID.
++
+Keep the value of the `amlbcookie` cookie set to the OpenAM server ID to reduce crosstalk among the OpenAM servers when using Web Policy Agent 4.1.x with CDSSO mode enabled.
++
+If you have replaced the value of the this property and you need to match the OpenAM server URLs with their corresponding server IDs, query the `global-config/servers` endpoint. For example:
++
+
+[source, console]
+----
+$ curl -X GET \
+--header 'Accept: application/json' \
+--header "iPlanetDirectoryPro: AQIC5...NDU1*" \
+'https://openam.example.com:8443/openam/json/global-config/servers?_queryFilter=true'
+"result": [
+ {
+    "_id": "01",
+    "_rev": "-1541617246",
+    "siteName": null,
+    "url": "https://openam.example.com:8443/openam"
+ }
+],
+"resultCount": 1,
+"totalPagedResults": -1,
+"totalPagedResultsPolicy": "NONE"
+----
++
+In the example above, the server ID for server `\https://openam.example.com:8443/openam` is `01`.
++
+Changes take effect only after you restart the OpenAM server.
+
+.. Restart each OpenAM server where you changed the cookie value. You can then check the cookie value by logging in to OpenAM console, and examining the `amlbcookie` cookie in your browser.
+
+
+. Configure your load balancer to perform sticky load balancing based on the `amlbcookie` value.
++
+In other words, the load balancer layer must keep track of which `amlbcookie` cookie value corresponds to which OpenAM server.
++
+When the load balancer receives a request, it inspects the value of the `amlbcookie` cookie, and then forwards the request to the corresponding OpenAM server.
+
+====
+
+[#lb-termination]
+===== Load Balancer Termination
+
+When traffic to and from the load balancer is protected with HTTPS, the approach described in xref:#configure-site-load-balancing["To Configure Site Load Balancing for Deployments With Stateful Sessions"] requires that you terminate the connection on the load balancer. You then either re-encrypt the traffic from the load balancer to OpenAM, or make connections from the load balancer to OpenAM over HTTP.
+
+
+[#lb-and-crosstalk]
+===== Request Forwarding Caveats
+
+Sticky load balancing based on the value of the `amlbcookie` cookie does not guarantee request forwarding to the corresponding OpenAM server in all cases. For example, ForgeRock Common REST API calls do not typically use cookies. Therefore, load balancers are not able to route these calls to the OpenAM server on which a user's session resides.
+
+The OpenAM server that does not hold the user's session can attempt to locate the user's session by retrieving it from the Core Token Service's token store, or by communicating with other OpenAM servers in an OpenAM site using back-channel communication over the network. This back-channel communication is called __crosstalk__.
+
+By default, OpenAM sites are configured with the Reduce Crosstalk option enabled. With this option enabled, the OpenAM server that does not hold the user's session attempts to retrieve it from the Core Token Service's token store if session failover is enabled.
+
+For example, suppose you deploy several OpenAM servers in a site configured for session failover. If the site's load balancer directs a user's request to a server other than the OpenAM server that held the user's session, then the server will attempt to retrieve the session from the Core Token Service, provided you have not modified the default OpenAM configuration.
+
+If you disable the Reduce Crosstalk option, the OpenAM server that does not hold the user's session attempts to retrieve it by using crosstalk. Because crosstalk generates network traffic, locating sessions from the Core Token Service's token store is preferred for performance reasons.
+
+Requests to update sessions, such as requests to log out, reset the session idle time, or set a session attribute, always use crosstalk to ensure the integrity of the update requests.
+
+See xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] for information about configuring remote session location options.
+
+
+
+[#configure-lb-stateless]
+==== Load Balancer Configuration for Stateless Sessions
+
+An OpenAM site configured to use stateless sessions does not require any special load balancer configuration.
+
+A request from a user to an OpenAM site does not need to be processed on the OpenAM server that originally authenticated the user. Any server in the site can accept a request from an OpenAM user with no performance degradation because the user's session resides in an HTTP cookie—not on the server—and is passed to the OpenAM server along with the request.
+
+
+
+[#handle-request-headers]
+=== Handling HTTP Request Headers
+
+HTTP requests can include information needed for access management, such as the client IP address used for adaptive risk-based authentication.
+
+Configure your load balancer or proxy to pass the information to OpenAM by using request headers. For example, the load balancer or proxy can send the client IP address by using the `X-Forwarded-For` HTTP request header.
+
+Also configure OpenAM to consume and to forward the headers as necessary. For example, to configure OpenAM to look for the client IP address in the `X-Forwarded-For` request header, set the advanced configuration property `com.sun.identity.authentication.client.ipAddressHeader` to `X-Forwarded-For` under Deployment > Servers > __Server Name__ > Advanced.
+
+In a site configuration where one OpenAM server can forward requests to another OpenAM server, you can retain the header by adding it to the advanced configuration property `openam.retained.http.request.headers`. If `X-Forwarded-For` is the only additional header to retain, set `openam.retained.http.request.head ers` to `X-DSAMEVersion,X-Forwarded-For`, for example.
+
+Configure these properties under Deployment > Servers > __Server Name__ > Advanced.
+
+
+[#handle-multiple-cookie-domains-wildfly]
+=== Handling Multiple Cookie Domains When Using Wildfly
+
+If you are using Wildfly as the OpenAM web container with multiple cookie domains, you must set the advanced server property, `com.sun.identity.authentication.setCookieToAllDomains`, to `false`.
+
+Set this property in the OpenAM console under Configure > Server Defaults > Advanced.
+
+

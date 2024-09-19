@@ -1,0 +1,328 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-jboss-7]
+== Installing Java EE Agents in JBoss 7
+
+This chapter covers installation of the policy agent for JBoss Application Server.
+
+[#before-jboss7-agent-install]
+=== Before You Install
+
+Make sure OpenAM is installed and running, and that you can contact OpenAM from the system running the policy agent. Next, create a profile for your policy agent as described in xref:../jee-users-guide/chap-jee-agent-config.adoc#create-agent-profiles[Creating Agent Profiles]. To protect resources with the agent, create at least one policy as described in link:../../../openam/13/admin-guide/#chap-authz-policy[Configuring Policies, window=\_blank] in the __OpenAM Administration Guide__. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources in order to test your policy agent after installation.
+
+You must install JBoss before installing the policy agent.
+
+You must install a supported version of the Java runtime environment. Set the `JAVA_HOME` environment variable accordingly. The policy agent installer requires Java.
+
+[source, console]
+----
+$ echo $JAVA_HOME
+/path/to/java
+----
+See the OpenAM __Installation Guide__ section, link:../../../openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also verify the checksum of the file you download against the checksum posted on the download page.
+
+Unzip the file in the directory where you plan to install the J2EE policy agent. The agent you install stores its configuration and logs under this directory.
+
+When you unzip the policy agent, you find the following directories under the `j2ee_agents/jboss_v7_agent` directory.
+
+Despite the directory name, the policy agent supports multiple container versions.
+--
+
+`bin`::
+The installation and configuration program `agentadmin`. For more details about the available command-line tools, see xref:tools-reference.adoc#tools-reference[Command-Line Tool Reference].
+
+`config`::
+Configuration templates used by the `agentadmin` command during installation
+
+`data`::
+Not used
+
+`etc`::
+Configuration templates used during installation
+
+`installer-logs`::
+Location for log files written during installation
+
+`legal-notices`::
+Contains licensing information including third-party licenses
+
+`lib`::
+Shared libraries used by the Java EE policy agent
+
+`locale`::
+Property files used by the installation program
+
+`README`::
+README file containing platform and install information for the agent
+
+--
+
+
+[#install-jboss7-agent]
+=== Installing the JBoss Policy Agent
+
+Complete the following procedures to install the policy agent.
+
+[#d0e5276]
+.To Create the Agent Profile
+====
+Regardless of whether you store configurations centrally in OpenAM or locally with your agents, the agent requires a profile so that it can connect to and communicate with OpenAM.
+
+. In the OpenAM console, browse to Realms > __Realm Name__ > Agents > J2EE, and then click the New... button in the Agent table.
+
+. Complete the web form using the following hints:
++
+--
+
+Name::
+The name for the agent profile used when you install the agent
+
+Password::
+Password the agent uses to authenticate to OpenAM
+
+Configuration::
+Centralized configurations are stored in the OpenAM configuration store. You can manage the centralized configuration through the OpenAM console. Local configurations are stored in a file alongside the agent.
+
+Server URL::
+The full URL to an OpenAM instance, or if OpenAM is deployed in a site configuration (behind a load balancer) then the site URL
++
+In centralized configuration mode, the Server URL is used to populate the agent profile for services, such as Login, Logout, Naming, and Cross Domain SSO.
+
+Agent URL::
+The URL to the J2EE agent application, such as `\http://www.example.com:8080/agentapp`
++
+In centralized configuration mode, the Agent URL is used to populate the Agent Profile for services, such as notifications.
+
+--
+
+====
+
+[#d0e5328]
+.To Create a Password File
+====
+
+. Create a text file containing only the password specified when creating the agent profile.
++
+UNIX example:
++
+
+[source, console]
+----
+$ echo password > /tmp/pwd.txt
+----
++
+Windows example:
++
+
+[source, console]
+----
+C:\> echo password > pwd.txt
+----
+
+. Protect the password file you create as appropriate for your operating system:
++
+UNIX example:
++
+
+[source, console]
+----
+$ chmod 400 /tmp/pwd.txt
+----
++
+Windows example:
++
+In Windows Explorer, right-click the created password file, for example `pwd.txt`, select Read-Only, and then click OK.
+
+====
+
+[#install-agent-into-jboss7]
+.To Install the Policy Agent into JBoss
+====
+If you want to include an application-specific module, make sure to type in `false` when prompted with the following question:
+
+[source]
+----
+Install agent as global module? [true]:
+----
+
+. Shut down the JBoss server where you plan to install the agent.
+
+. Make sure OpenAM is running.
+
+. Run `agentadmin --install` to install the agent.
++
+When you run the command, you will be prompted to read and accept the software license agreement for the agent installation. You can suppress the license agreement prompt by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
++
+
+[source, console]
+----
+$ /path/to/j2ee_agents/jboss_v7_agent/bin/agentadmin --install --acceptLicense
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+JBoss home directory : /path/to/jboss/
+JBoss deployment mode: standalone
+Install agent as global module: true
+OpenAM server URL : http://openam.example.com:8080/openam
+Agent URL : http://www.example.com:8080/agentapp
+Agent Profile name : JBossAgent
+Agent Profile Password file name : /tmp/pwd.txt
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/j2ee_agents/jboss_v7_agent/Agent_001/config/
+ OpenSSOAgentBootstrap.properties
+Agent Configuration file location
+/path/to/j2ee_agents/jboss_v7_agent/Agent_001/config/
+ OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/j2ee_agents/jboss_v7_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/j2ee_agents/jboss_v7_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/j2ee_agents/jboss_v7_agent/installer-logs/audit/install.log
+...
+----
++
+Upon successful completion, the installer updates the JBoss configuration, adds the agent web application under `JBOSS_HOME/server/standalone/deployments`, and also sets up configuration and log directories for the agent.
++
+
+[NOTE]
+======
+If the agent is in a different domain than the server, refer to __Administration Guide__ procedure, link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
+======
+
+. Take note of the configuration files and log locations.
++
+Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are thus located under the directory `j2ee_agents/jboss_v7_agent/Agent_001/`:
++
+--
+
+`config/OpenSSOAgentBootstrap.properties`::
+Used to bootstrap the Java EE policy agent, allowing the agent to connect to OpenAM and download its configuration.
+
+`config/OpenSSOAgentConfiguration.properties`::
+Only used if you configured the Java EE policy agent to use local configuration.
+
+`logs/audit/`::
+Operational audit log directory, only used if remote logging to OpenAM is disabled.
+
+`logs/debug/`::
+Debug directory where the debug file resides. Useful in troubleshooting policy agent issues.
+
+--
+
+. If your policy agent configuration is not in the top-level realm (/), then you must edit config/OpenSSOAgentBootstrap.properties to identify the sub-realm that has your policy agent configuration. Find com.sun.identity.agents.config.organization.name and change the / to the realm to your policy agent profile. This allows the policy agent to properly identify itself to the OpenAM server.
+
+. To protect a web application, you must add the following filter to the application's `WEB-INF/web.xml` deployment descriptor, following the opening <web-app> tag:
++
+
+[source, xml]
+----
+<filter>
+  <filter-name>Agent</filter-name>
+  <display-name>Agent</display-name>
+  <description>OpenAM Policy Agent Filter</description>
+ <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
+ </filter>
+ <filter-mapping>
+  <filter-name>Agent</filter-name>
+  <url-pattern>/*</url-pattern>
+  <dispatcher>REQUEST</dispatcher>
+  <dispatcher>INCLUDE</dispatcher>
+  <dispatcher>FORWARD</dispatcher>
+  <dispatcher>ERROR</dispatcher>
+ </filter-mapping>
+----
++
+You also need to add the following security constraint specification to the application's `WEB-INF/web.xml` file:
++
+
+[source, xml]
+----
+<security-constraint>
+  <web-resource-collection>
+   <web-resource-name>All resources</web-resource-name>
+    <description>Protects all resources</description>
+    <url-pattern>*.do</url-pattern>
+   </web-resource-collection>
+  </security-constraint>
+----
++
+You must also add the following security domain specification to the `jboss-web.xml` configuration file of the application:
++
+
+[source, xml]
+----
+<security-domain>java:/jaas/AMRealm</security-domain>
+----
++
+You can find that file packed in the `agentsample.ear` archive in the `/path/to/j2ee_agents/jboss_v7_agent/sampleapp/dist` directory. Once unpacked, you can find the file in the `WEB-INF` subdirectory.
+
+. If you typed in `false` to the `Install agent as global module` question during the installation process, you will need to add the following line to the `META-INF/MANIFEST.MF` file of the application:
++
+
+[source, xml]
+----
+Dependencies: org.forgerock.openam.agent
+----
+
+. If you responded `domain` to the `Enter the name of the deployment mode` question during the installation process, you must manually deploy the `j2ee_agents/jboss_v7_agent/etc/agentapp.war` file to JBoss.
++
+The reason manual deployment is required when running JBoss in domain mode is that the agent installer uses auto-deployment capabilities provided by the JBoss deployment scanner. The deployment scanner is used only in standalone mode. When running JBoss in standalone mode, it is not necessary to manually deploy the `agentapp.war` file.
+
+====
+
+[#run-jboss7-after-agent-installation]
+.To Run JBoss After Agent Installation
+====
+
+. Run JBoss.
+
+. (Optional) If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM then redirects you back to the resource you tried to access.
+
+====
+
+
+[#silent-jboss7-agent-installation]
+=== Silent JBoss Policy Agent Installation
+
+When performing a scripted, silent installation, use `agentadmin --install --saveResponse response-file` to create a response file for scripted installation. Then install silently using `agentadmin --install --acceptLicense --useResponse response-file`.
+
+
+[#uninstall-jboss7-agent]
+=== Removing JBoss Policy Agent Software
+
+Shut down the JBoss server before you uninstall the policy agent.
+
+To remove the Java EE policy agent, use `agentadmin --uninstall`. You must provide the JBoss configuration directory location.
+
+Uninstall does not remove the agent instance directory, but you can do so manually after removing the agent configuration from JBoss.
+
+

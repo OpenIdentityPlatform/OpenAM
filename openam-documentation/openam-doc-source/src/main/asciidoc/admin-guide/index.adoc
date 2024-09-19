@@ -1,0 +1,62 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+= Administration Guide
+:doctype: book
+:toc:
+:authors: Mark Craig, David Goldsmith, Gene Hirayama, Mike Jang, Chris Lee
+:copyright: Copyright 2011-2018 ForgeRock AS.
+:copyright: Portions Copyright 2024 3A Systems LLC.
+
+:imagesdir: ../
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+[abstract]
+Guide to configuring and using OpenAM features. OpenAM provides open source Authentication, Authorization, Entitlement, and Federation software.
+
+include::./preface.adoc[]
+include::./chap-admin-tools.adoc[]
+include::./chap-auth-services.adoc[]
+include::./chap-authz-policy.adoc[]
+include::./chap-realms.adoc[]
+include::./chap-agents.adoc[]
+include::./chap-audit-logging.adoc[]
+include::./chap-mobile.adoc[]
+include::./chap-usr-selfservices.adoc[]
+include::./chap-session-state.adoc[]
+include::./chap-sso.adoc[]
+include::./chap-cdsso.adoc[]
+include::./chap-federation.adoc[]
+include::./chap-oauth2.adoc[]
+include::./chap-openid-connect.adoc[]
+include::./chap-uma.adoc[]
+include::./chap-saml-1.adoc[]
+include::./chap-sts.adoc[]
+include::./chap-dashboard.adoc[]
+include::./chap-radius.adoc[]
+include::./sec-rest.adoc[]
+include::./chap-backup-restore.adoc[]
+include::./chap-manage-scripts.adoc[]
+include::./chap-certs-keystores.adoc[]
+include::./chap-monitoring.adoc[]
+include::./chap-tuning.adoc[]
+include::./chap-change-hosts.adoc[]
+include::./chap-securing.adoc[]
+include::./chap-troubleshooting.adoc[]
+include::./openam-glossary.adoc[]
+include::./appendix-interface-stability.adoc[]

@@ -88,6 +88,28 @@
                                     <goal>release</goal>
                                 </goals>
                             </execution>
+                            <execution>
+                                <id>build-man-pages-asciidoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>asciidoc-pre-process</goal>
+                                    <goal>antora</goal>
+                                    <goal>asciidoc-to-pdf</goal>
+                                </goals>
+                                <configuration>
+                                    <documents>
+                                        <document>getting-started</document>
+                                        <document>install-guide</document>
+                                        <document>upgrade-guide</document>
+                                        <document>admin-guide</document>
+                                        <document>dev-guide</document>
+                                        <document>deployment-planning</document>
+                                        <document>reference</document>
+                                        <document>web-users-guide</document>
+                                        <document>jee-users-guide</document>
+                                    </documents>
+                                </configuration>
+                            </execution>
                         </executions>
                         <configuration>
                             <projectName>OpenAM</projectName>

@@ -1,0 +1,779 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-cts-oids]
+== Core Token Service (CTS) Object Identifiers
+
+The OIDs related to SNMP monitoring of CTS follow guidance described in link:http://tools.ietf.org/html/rfc1271[RFC 1271, window=\_blank].
+
+The OIDs listed in this section include the prefix assigned to ForgeRock, `enterprises.36733`. They also include the entries associated with OpenAM (1), SNMP (2), and CTS monitoring (3): `1.2.3`.
+
+Therefore, the root OID for all CTS monitored components is `enterprises.36733.1.2.3`. All individual monitored CTS components are suffixes that are consistent with the image shown here.
+
+[#cts-oid-big-diagram]
+image::images/cts-top-diagram.png[]
+
+[#oid-token-types]
+=== CTS Token Type OIDs
+
+The table below shows how OIDs are split into different token types. Do not forget the prefix. For example, the complete OID for monitoring SAML v2.0 tokens is `enterprises.36733.1.2.3.1.1.2`
+
+The options for the token table are shown in the following table. For example, the token table OID for SAML v2.0 is based on the entries associated with ForgeRock, `enterprises.36733`, OpenAM `1`, SNMP `2`, CTS Monitoring `3`, token table `1`, entry `1`, and SAML v2.0 `2`, which is `enterprises.36733.1.2.3.1.1.2`.
+
+[#cts-monitoring-oid-token-types]
+.CTS Monitoring OID Categories
+[cols="50%,50%"]
+|===
+|OID, by Token Type |Description 
+
+a|`enterprises.36733.1.2.3.1.1.1`
+a|Session
+
+a|`enterprises.36733.1.2.3.1.1.2`
+a|SAML v2.0
+
+a|`enterprises.36733.1.2.3.1.1.3`
+a|OAuth 2.0
+
+a|`enterprises.36733.1.2.3.1.1.4`
+a|REST
+
+a|`enterprises.36733.1.2.3.1.1.5`
+a|OAuth 2.0 CSRF Protection
+
+a|`enterprises.36733.1.2.3.1.1.6`
+a|Resource Set
+
+a|`enterprises.36733.1.2.3.1.1.7`
+a|UMA Permission Ticket
+
+a|`enterprises.36733.1.2.3.1.1.8`
+a|UMA Requesting Party
+
+a|`enterprises.36733.1.2.3.1.1.9`
+a|UMA Audit Entry
+
+a|`enterprises.36733.1.2.3.1.1.10`
+a|Session Blacklist
+
+a|`enterprises.36733.1.2.3.1.1.11`
+a|UMA Pending Request
+
+a|`enterprises.36733.1.2.3.1.1.12`
+a|Security Token Service
+
+a|`enterprises.36733.1.2.3.1.1.13`
+a|OAuth 2.0 Blacklist
+
+a|`enterprises.36733.1.2.3.1.1.14`
+a|OAuth 2.0 Stateless
+
+a|`enterprises.36733.1.2.3.1.1.15`
+a|Push Notification
+
+a|`enterprises.36733.1.2.3.1.1.16`
+a|Cluster-wide Notification
+|===
+
+
+[#cts-monitoring-oid-operation-type]
+=== CTS Monitoring Operation Types
+
+OIDs related to CTS monitoring operations are based on basic CRUD operations (plus list).
+
+The options for the operation table are shown in the following table.
+
+[#cts-monitoring-oid-op-type]
+.CTS Monitoring Operation Types
+[cols="50%,50%"]
+|===
+|OID, by Operation |Description 
+
+a|`enterprises.36733.1.2.3.2.1.1`
+a|Create
+
+a|`enterprises.36733.1.2.3.2.1.2`
+a|Read
+
+a|`enterprises.36733.1.2.3.2.1.3`
+a|Update
+
+a|`enterprises.36733.1.2.3.2.1.4`
+a|Delete
+
+a|`enterprises.36733.1.2.3.2.1.5`
+a|List
+|===
+
+
+[#cts-monitoring-oid-data-types]
+=== CTS Monitoring Entry Data Types
+
+CTS monitoring entries use the following data types:
+--
+
+`Counter64`::
+A 64-bit, unsigned integer type.
+
++
+`Counter64` is a standard data type returned by SNMP OIDs. For more information, see link:https://tools.ietf.org/html/rfc2578#section-7.1.10[Structure of Management Information Version 2, window=\_top].
+
+`Float2dp`::
+A floating point number with the value link:https://tools.ietf.org/html/rfc2579#section-3.1[d-2, window=\_top] in the `DISPLAY-HINT` clause. SNMP clients that handle the `DISPLAY-HINT` clause will correctly display the value as a floating point number with two decimal places. Other types of clients that do not handle the `DISPLAY-HINT` clause will incorrectly display the value as an integer that is one hundred times larger than the correct value.
+
++
+`Float2dp` is a custom data type returned by some ForgeRock CTS OIDs.
+
+--
+
+
+[#cts-monitoring-oid-operation-count]
+=== CTS CRUD Operation Entries
+
+The OIDs in this table relate to all CRUD (and list) operations.
+
+The options for the CRUD operations table are shown in the following tables. Each value is associated with CRUD and list operations.
+
+[#cts-monitoring-oid-ops-entries]
+.CTS CRUD Operation Entries
+[cols="28%,21%,51%"]
+|===
+|OID, by Operation Entry |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.1`
+a|`Counter64`
+a|Cumulative count
+
+a|`enterprises.36733.1.2.3.3.1.2`
+a|`Float2dp`
+a|Average (in period)
+
+a|`enterprises.36733.1.2.3.3.1.3`
+a|`Counter64`
+a|Minimum (in period)
+
+a|`enterprises.36733.1.2.3.3.1.4`
+a|`Counter64`
+a|Maximum (in period)
+
+a|`enterprises.36733.1.2.3.3.1.5`
+a|`Counter64`
+a|Cumulative failure count
+
+a|`enterprises.36733.1.2.3.3.1.6`
+a|`Float2dp`
+a|Average failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.7`
+a|`Counter64`
+a|Minimum failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.8`
+a|`Counter64`
+a|Maximum failures (in period)
+|===
+Each of the options in this table can be divided into CRUD and list related operations. The suffix OID for such operations is as follows:
+
+* 1: Create
+
+* 2: Read
+
+* 3: Update
+
+* 4: Delete
+
+* 5: List
+
+For example, since the OID for cumulative count is `enterprises.36733.1.2.3.3.1.1`, the OID for the cumulative count of delete operations is `enterprises.36733.1.2.3.3.1.1.4`
+
+[#cts-monitoring-oid-ops-cumulative]
+.CTS CRUD Operation Table Cumulative Operations
+[cols="28%,21%,51%"]
+|===
+|Cumulative Count Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.1.1`
+a|`Counter64`
+a|Cumulative count of CREATE operations
+
+a|`enterprises.36733.1.2.3.3.1.1.2`
+a|`Counter64`
+a|Cumulative count of READ operations
+
+a|`enterprises.36733.1.2.3.3.1.1.3`
+a|`Counter64`
+a|Cumulative count of UPDATE operations
+
+a|`enterprises.36733.1.2.3.3.1.1.4`
+a|`Counter64`
+a|Cumulative count of DELETE operations
+
+a|`enterprises.36733.1.2.3.3.1.1.5`
+a|`Counter64`
+a|Cumulative count of LIST operations
+|===
+
+[#cts-monitoring-oid-ops-average]
+.CTS CRUD Operation Table Average Operations (In Period)
+[cols="28%,21%,51%"]
+|===
+|Average Number Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.2.1`
+a|`Float2dp`
+a|Average number of CREATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.2.2`
+a|`Float2dp`
+a|Average number of READ operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.2.3`
+a|`Float2dp`
+a|Average number of UPDATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.2.4`
+a|`Float2dp`
+a|Average number of DELETE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.2.5`
+a|`Float2dp`
+a|Average number of LIST operations (in period)
+|===
+
+[#cts-monitoring-oid-ops-min]
+.CTS CRUD Operation Table Minimum Operations (In Period)
+[cols="28%,21%,51%"]
+|===
+|Minimum Number Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.3.1`
+a|`Counter64`
+a|Minimum number of CREATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.3.2`
+a|`Counter64`
+a|Minimum number of READ operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.3.3`
+a|`Counter64`
+a|Minimum number of UPDATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.3.4`
+a|`Counter64`
+a|Minimum number of DELETE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.3.5`
+a|`Counter64`
+a|Minimum number of LIST operations (in period)
+|===
+
+[#cts-monitoring-oid-ops-max]
+.CTS CRUD Operation Table Maximum Operations (In Period)
+[cols="28%,21%,51%"]
+|===
+|Maximum Number Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.4.1`
+a|`Counter64`
+a|Maximum number of CREATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.4.2`
+a|`Counter64`
+a|Maximum number of READ operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.4.3`
+a|`Counter64`
+a|Maximum number of UPDATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.4.4`
+a|`Counter64`
+a|Maximum number of DELETE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.4.5`
+a|`Counter64`
+a|Maximum number of LIST operations (in period)
+|===
+
+[#cts-monitoring-oid-ops-cumu-fail]
+.CTS CRUD Operation Table Cumulative Failure Operations
+[cols="28%,21%,51%"]
+|===
+|Cumulative Failure Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.5.1`
+a|`Counter64`
+a|Cumulative Failure of CREATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.5.2`
+a|`Counter64`
+a|Cumulative Failure of READ operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.5.3`
+a|`Counter64`
+a|Cumulative Failure of UPDATE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.5.4`
+a|`Counter64`
+a|Cumulative Failure of DELETE operations (in period)
+
+a|`enterprises.36733.1.2.3.3.1.5.5`
+a|`Counter64`
+a|Cumulative Failure of LIST operations (in period)
+|===
+
+[#cts-monitoring-oid-ops-avg-fail]
+.CTS CRUD Operation Table Average Failure Operations in Period
+[cols="28%,21%,51%"]
+|===
+|Average Number, Failure Operations OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.6.1`
+a|`Float2dp`
+a|Average number of CREATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.6.2`
+a|`Float2dp`
+a|Average number of READ operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.6.3`
+a|`Float2dp`
+a|Average number of UPDATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.6.4`
+a|`Float2dp`
+a|Average number of DELETE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.6.5`
+a|`Float2dp`
+a|Average number of LIST operations failures (in period)
+|===
+
+[#cts-monitoring-oid-ops-min-fail]
+.CTS CRUD Operation Table Minimum Operations Failures in Period
+[cols="28%,21%,51%"]
+|===
+|Minimum Number, Operations Failures OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.7.1`
+a|`Counter64`
+a|Minimum number of CREATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.7.2`
+a|`Counter64`
+a|Minimum number of READ operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.7.3`
+a|`Counter64`
+a|Minimum number of UPDATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.7.4`
+a|`Counter64`
+a|Minimum number of DELETE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.7.5`
+a|`Counter64`
+a|Minimum number of LIST operations failures (in period)
+|===
+
+[#cts-monitoring-oid-ops-max-fail]
+.CTS CRUD Operation Table Maximum Operations Failures in Period
+[cols="28%,21%,51%"]
+|===
+|Maximum Number, Operations Failures OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.3.1.8.1`
+a|`Counter64`
+a|Maximum number of CREATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.8.2`
+a|`Counter64`
+a|Maximum number of READ operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.8.3`
+a|`Counter64`
+a|Maximum number of UPDATE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.8.4`
+a|`Counter64`
+a|Maximum number of DELETE operations failures (in period)
+
+a|`enterprises.36733.1.2.3.3.1.8.5`
+a|`Counter64`
+a|Maximum number of LIST operations failures (in period)
+|===
+
+
+[#cts-monitoring-oid-operation-token-type]
+=== CTS CRUD Operations Per Token Type
+
+OIDs that start with `enterprises.36733.1.2.3.4.1` are labels for CTS CRUD operations per token type.
+
+Tokens of each type can be created, read, updated, deleted, and listed. Each of these types can be measured cumulatively. They can also be measured over a period of time (default=10 seconds), as an average, minimum, and maximum.
+
+OID suffixes for CRUD operations are defined according to the following rules.
+
+The first part of the OID is `enterprises.36733.1.2.3.4.1`.
+
+The next OID suffix specifies a metric:
+
+[#d981e31398]
+.CTS CRUD Operation Metrics
+[cols="28%,21%,51%"]
+|===
+|OID Suffix |Data Type |Metric 
+
+a|1
+a|`Counter64`
+a|Cumulative count
+
+a|2
+a|`Float2dp`
+a|Average (in period)
+
+a|3
+a|`Counter64`
+a|Minimum (in period)
+
+a|4
+a|`Counter64`
+a|Maximum (in period)
+|===
+The next OID suffix specifies a token type:
+
+[#d981e31458]
+.CTS CRUD Operation Token Types
+[cols="50%,50%"]
+|===
+|OID Suffix |Token Type 
+
+a|1
+a|Session
+
+a|2
+a|SAML v2.0
+
+a|3
+a|OAuth 2
+
+a|4
+a|REST
+
+a|5
+a|OAuth 2.0 CSRF Protection
+
+a|6
+a|Resource Set
+
+a|7
+a|UMA Permission Ticket
+
+a|8
+a|UMA Requesting Party
+
+a|9
+a|UMA Audit Entry
+
+a|10
+a|Session Blacklist
+
+a|11
+a|UMA Pending Request
+
+a|12
+a|Security Token Service
+
+a|13
+a|OAuth 2.0 Blacklist
+
+a|14
+a|OAuth 2.0 Stateless
+
+a|15
+a|Push Notification
+
+a|16
+a|Cluster-wide Notification
+|===
+The final OID suffix specifies an operation:
+
+[#d981e31554]
+.CTS CRUD Operations
+[cols="50%,50%"]
+|===
+|OID Suffix |Operation 
+
+a|1
+a|Create
+
+a|2
+a|Read
+
+a|3
+a|Update
+
+a|4
+a|Delete
+
+a|5
+a|List
+|===
+The following examples illustrate OID construction for CTS CRUD operations per token type.
+
+[#d981e31595]
+.OID Examples for CTS CRUD Operations Per Token Type
+[cols="28%,21%,51%"]
+|===
+|OID |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.4.1.1.1.3`
+a|`Counter64`
+a|Cumulative count of updated Session tokens
+
+a|`enterprises.36733.1.2.3.4.1.4.3.4`
+a|`Counter64`
+a|Maximum deleted OAuth 2.0 tokens (in period)
+
+a|`enterprises.36733.1.2.3.4.1.2.10.5`
+a|`Float2dp`
+a|Average listed Session Blacklist tokens (in period)
+|===
+
+
+[#cts-monitoring-oid-operation-token-numbers]
+=== CTS Token Operation Status
+
+The CTS token OIDs defined in this section specify the total number of tokens of each type and their average current lifetimes.
+
+The options for token operations are shown in the following tables. Total and average current lifetimes are associated with each CTS token type.
+
+[#cts-token-totals]
+.CTS Total Tokens, by Type
+[cols="28%,21%,51%"]
+|===
+|Total Tokens, by Type |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.5.1.1.1`
+a|`Counter64`
+a|Total number of Session tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.2`
+a|`Counter64`
+a|Total number of SAML v2.0 tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.3`
+a|`Counter64`
+a|Total number of OAuth 2.0 tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.4`
+a|`Counter64`
+a|Total number of REST tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.5`
+a|`Counter64`
+a|Total number of OAuth 2.0 CSRF Protection tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.6`
+a|`Counter64`
+a|Total number of Resource Set tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.7`
+a|`Counter64`
+a|Total number of UMA Permission Ticket tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.8`
+a|`Counter64`
+a|Total number of UMA Requesting Party tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.9`
+a|`Counter64`
+a|Total number of UMA Audit Entry tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.10`
+a|`Counter64`
+a|Total number of Session Blacklist tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.11`
+a|`Counter64`
+a|Total number of UMA Pending Request tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.12`
+a|`Counter64`
+a|Total number of Security Token Service tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.13`
+a|`Counter64`
+a|Total number of OAuth 2.0 Blacklist tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.14`
+a|`Counter64`
+a|Total number of OAuth 2.0 Stateless tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.15`
+a|`Counter64`
+a|Total number of Push Notification tokens
+
+a|`enterprises.36733.1.2.3.5.1.1.16`
+a|`Counter64`
+a|Total number of Cluster-wide Notification tokens
+|===
+
+[#cts-token-avg-life]
+.CTS Token Average Lifetime, by Type
+[cols="28%,21%,51%"]
+|===
+|Average Token Lifetime, by Type |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.5.1.2.1`
+a|`Counter64`
+a|Average lifetime of Session tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.2`
+a|`Counter64`
+a|Average lifetime of SAML v2.0 tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.3`
+a|`Counter64`
+a|Average lifetime of OAuth 2.0 tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.4`
+a|`Counter64`
+a|Average lifetime of REST tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.5`
+a|`Counter64`
+a|Average lifetime of OAuth 2.0 CSRF Protection tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.6`
+a|`Counter64`
+a|Average lifetime of Resource Set tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.7`
+a|`Counter64`
+a|Average lifetime of UMA Permission Ticket tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.8`
+a|`Counter64`
+a|Average lifetime of UMA Requesting Party tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.9`
+a|`Counter64`
+a|Average lifetime of UMA Audit Entry tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.10`
+a|`Counter64`
+a|Average lifetime of Session Blacklist tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.11`
+a|`Counter64`
+a|Average lifetime of UMA Pending Request tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.12`
+a|`Counter64`
+a|Average lifetime of Security Token Service tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.13`
+a|`Counter64`
+a|Average lifetime of OAuth 2.0 Blacklist tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.14`
+a|`Counter64`
+a|Average lifetime of OAuth 2.0 Stateless tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.15`
+a|`Counter64`
+a|Average lifetime of Push Notification tokens in seconds
+
+a|`enterprises.36733.1.2.3.5.1.2.16`
+a|`Counter64`
+a|Average lifetime of Cluster-wide Notification tokens in seconds
+|===
+
+
+[#cts-reaper-oids]
+=== CTS Reaper Run Information
+
+The CTS reaper deletes unused or expired tokens. Unless OpenAM is in a shutdown cycle, the CTS reaper is designed to run continuously. By default, the CTS reaper runs in fixed intervals, unless OpenAM is in the process of shutting down.
+
+A single OID, `enterprises.36733.1.2.3.6.0`, relates to the CTS reaper. This OID:
+
+* Specifies the average rate of deleted tokens per CTS reaper run
+
+* Has the link:#cts-monitoring-oid-data-types[Float2dpdata type].
+
+
+
+[#cts-conn-factory-oids]
+=== CTS Connection Factory OIDs
+
+Every request for a CTS token is a request to the `CTSConnectionFactory`. Such requests can either succeed or fail. The following OIDs provide measures for both such connections. The CTSConnectionFactory OIDs are also measured using a rate window system, similar to all the other CTS OIDs, except the CTS Reaper.
+
+As there are no indexes required to look up the value of CTSConnectionFactory OIDs, they end in 0. Success or failure of these OIDs are not specific to any operation or token type.
+
+The following tables list the OIDs related to the CTSConnectionFactory.
+
+[#cts-token-factory-success]
+.CTSConnectionFactory, Successful Connections
+[cols="28%,21%,51%"]
+|===
+|Successes, CTSConnectionFactory |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.7.1.1.0`
+a|`Counter64`
+a|Cumulative number of successful connections
+
+a|`enterprises.36733.1.2.3.7.1.2.0`
+a|`Float2dp`
+a|Average number of successful connections (in period)
+
+a|`enterprises.36733.1.2.3.7.1.3.0`
+a|`Counter64`
+a|Minimum number of successful connections (in period)
+
+a|`enterprises.36733.1.2.3.7.1.4.0`
+a|`Counter64`
+a|Maximum number of successful connections (in period)
+|===
+
+[#cts-token-factory-fail]
+.CTSConnectionFactory, Failed Connections
+[cols="28%,21%,51%"]
+|===
+|Failures, CTSConnectionFactory |Data Type |Description 
+
+a|`enterprises.36733.1.2.3.7.2.1.0`
+a|`Counter64`
+a|Cumulative number of failed connections
+
+a|`enterprises.36733.1.2.3.7.2.2.0`
+a|`Float2dp`
+a|Average number of failed connections (in period)
+
+a|`enterprises.36733.1.2.3.7.2.3.0`
+a|`Counter64`
+a|Minimum number of failed connections (in period)
+
+a|`enterprises.36733.1.2.3.7.2.4.0`
+a|`Counter64`
+a|Maximum number of failed connections (in period)
+|===
+
+

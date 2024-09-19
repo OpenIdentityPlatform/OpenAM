@@ -1,0 +1,1007 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-authz-policy]
+== Defining Authorization Policies
+
+__Authorization__ is determining whether to grant or to deny a user access to a resource. __Policies__ define how to determine whether to grant or deny access. This chapter describes how to configure authorization policies in OpenAM.
+
+[#what-is-authz]
+=== About Authorization in OpenAM
+
+Applications rely on OpenAM for access management, which breaks down into authentication, or determining who is trying to access a resource, and authorization, or determining whether to grant or deny access. This is because whether access is granted generally depends on what the policies about access are, who is trying to gain access, and perhaps some other conditions, such as whether the access itself needs to happen over a secure channel or what time of day it is.
+
+To return to the international airport example from the discussion on authentication the policy might be that passengers with valid passports and visas presenting valid plane tickets are allowed through to the gate where the plane is waiting to take off, but only under the condition that the plane is going to leave soon. (You cannot expect to get to the gate today with a scheduled departure for three months from now.)
+
+[#what-is-authz-policies]
+==== OpenAM Resource Types, Policy Sets, and Policies
+
+Define authorization __policies__ to allow OpenAM to determine whether to grant a subject access to a resource.
+
+A policy defines the following:
+--
+
+__resources__::
+The resource definitions constrain which resources, such as web pages or access to the boarding area, the policy applies to.
+
+__actions__::
+The actions are verbs that describe what the policy allows users to do to the resources, such as read a web page, submit a web form, or access the boarding area.
+
+__subject conditions__::
+The subject conditions constrain who the policy applies to, such as all authenticated users, only administrators, or only passengers with valid tickets for planes leaving soon.
+
+__environment conditions__::
+The environment conditions set the circumstances under which the policy applies, such as only during work hours, only when accessing from a specific IP address, or only when the flight is scheduled to leave within the next four hours.
+
+__response attributes__::
+The response attributes define information that OpenAM attaches to a response following a policy decision, such as a name, email address, or frequent flyer status.
+
+--
+When queried about whether to let a user through to a protected resource, OpenAM decides whether to authorize access or not based on applicable policies as described below in xref:#what-is-authz-decision["OpenAM Policy Decisions"]. OpenAM communicates its decision to the application that is using OpenAM for access management. In the common case, this is a policy agent installed on the server where the application runs. The agent then enforces the authorization decision from OpenAM.
+
+[#figure-realm-app-policy-overview]
+image::images/realm-app-policy-overview.png[]
+To help with the creation of policies, OpenAM uses __resource types__ and __policy sets__.
+--
+
+Resource types::
+Resource types define a template for the resources that policies apply to, and the actions that could be performed on those resources.
+
++
+For example, the `URL` resource type that is included by default in OpenAM acts as a template for protecting web pages or applications. It contains resource patterns, such as `*://*:*/*?*`, which can be made more specific when used in the policy. The actions that the resource supports are also defined, as follows:
++
+
+* `GET`
+
+* `POST`
+
+* `PUT`
+
+* `HEAD`
+
+* `PATCH`
+
+* `DELETE`
+
+* `OPTIONS`
+
++
+OpenAM also includes a resource type to protect REST endpoints, with patterns including `https://*:*/*?*` and the CRUDPAQ actions:
++
+
+* `CREATE`
+
+* `READ`
+
+* `UPDATE`
+
+* `DELETE`
+
+* `PATCH`
+
+* `ACTION`
+
+* `QUERY`
+
+
+Policy Sets::
+Policy Sets are associated with a set of resource types, and contain one or more policies based upon the template it provides.
+
+--
+For example, an application for Example.com's HR service might contain resource types that constrain all policies to apply to URL resource types under `http*://example.com/hr*` and `http*://example.com/hr*?*`, and only the HTTP `GET` and `POST` actions.
+
+Configure policy sets, policies, and resource types in the OpenAM console under Realms > __Realm Name__ > Authorization.
+
+[#console-applications]
+image::images/console-applications.png[]
+For more information on viewing, creating, and editing policies and resource types, see xref:#configure-authz-apps["Configuring Resource Types, Policy Sets, and Policies"].
+
+
+[#what-is-authz-decision]
+==== OpenAM Policy Decisions
+
+OpenAM relies on policies to reach authorization decisions, such as whether to grant or to deny access to a resource. OpenAM acts as the __policy decision point__ (PDP), whereas OpenAM policy agents act as __policy enforcement points__ (PEP). In other words, a policy agent or other PEP takes responsibility only for enforcing a policy decision rendered by OpenAM. When you configured applications and their policies in OpenAM, you used OpenAM as a __policy administration point__ (PAP).
+
+Concretely speaking, when a PEP requests a policy decision from OpenAM it specifies the target resource(s), the policy set (default: `iPlanetAMWebAgentService`), and information about the subject and the environment. OpenAM as the PDP retrieves policies within the specified policy set that apply to the target resource(s). OpenAM then evaluates those policies to make a decision based on the conditions matching those of the subject and environment. When multiple policies apply for a particular resource, the default logic for combining decisions is that the first evaluation resulting in a decision to deny access takes precedence over all other evaluations. OpenAM only allows access if all applicable policies evaluate to a decision to allow access.
+
+OpenAM communicates the policy decision to the PEP. The concrete decision, applying policy for a subject under the specified conditions, is called an __entitlement__.
+
+The entitlement indicates the resource(s) it applies to, the actions permitted and denied for each resource, and optionally response attributes and __advice__.
+
+When OpenAM denies a request due to a failed condition, OpenAM can send advice to the PEP, and the PEP can then take remedial action. For instance, suppose a user comes to a web site having authenticated with an email address and password, which is configured as authentication level 0. Had the user authenticated using a one-time password, the user would have had authentication level 1 in their session. Yet, because they have authentication level 0, they currently cannot access the desired page, as the policy governing access requires authentication level 1. OpenAM sends advice, prompting the PEP to have the user re-authenticate using a one-time password module, gaining authentication level 1, and thus having OpenAM grant access to the protected page.
+
+
+[#what-is-authz-example]
+==== Example Authorization
+
+Consider the case where OpenAM protects a user profile web page. An OpenAM policy agent installed in the web server intercepts client requests to enforce policy. The policy says that only authenticated users can access the page to view and to update their profiles.
+
+When a user browses to the profile page, the OpenAM policy agent intercepts the request. The policy agent notices that the request is to access a protected resource, but the request is coming from a user who has not yet logged in and consequently has no authorization to visit the page. The policy agent therefore redirects the user's browser to OpenAM to authenticate.
+
+OpenAM receives the redirected user, serving a login page that collects the user's email and password. With the email and password credentials, OpenAM authenticates the user, and creates a session for the user. OpenAM then redirects the user to the policy agent, which gets the policy decision from OpenAM for the page to access, and grants access to the page.
+
+While the user has a valid session with OpenAM, the user can go away to another page in the browser, come back to the profile page, and gain access without having to enter their email and password again.
+
+Notice how OpenAM and the policy agent handle the access in the example. The web site developer can offer a profile page, but the web site developer never has to manage login, or handle who can access a page. As OpenAM administrator, you can change authentication and authorization independently of updates to the web site. You might need to agree with web site developers on how OpenAM identifies users so web developers can identify users by their own names when they log in. By using OpenAM and policy agents for authentication and authorization, your organization no longer needs to update web applications when you want to add external access to your Intranet for roaming users, open some of your sites to partners, only let managers access certain pages of your HR web site, or allow users already logged in to their desktops to visit protected sites without having to type their credentials again.
+
+
+
+[#policy-resolution]
+=== How OpenAM Reaches Policy Decisions
+
+OpenAM has to match policies to resources to take policy decisions. For a policy to match, the resource has to match one of the resource patterns defined in the policy. The user making the request has to match a subject. Furthermore, at least one condition for each condition type has to be satisfied.
+
+If more than one policy matches, OpenAM has to reconcile differences. When multiple policies match, the order in which OpenAM uses them to make a policy decision is not deterministic. However, a deny decision overrides an allow decision, and so by default once OpenAM reaches a deny decision it stops checking further policies. If you want OpenAM to continue checking despite the deny, navigate to Configure > Global Services, click Policy Configuration, and then enable Continue Evaluation on Deny Decision.
+
+
+[#configure-authz-apps]
+=== Configuring Resource Types, Policy Sets, and Policies
+
+You can configure resource types, policy sets, and policies by using the OpenAM console, or by using the REST interface.
+
+This section explains how to use the OpenAM console to configure resource types, policy sets, and policies to protect resources.
+
+For information on managing resource types, policy sets, and policies by using the REST API, see xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-resource-types["Managing Resource Types"] in the __Developer's Guide__, xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-applications["Managing Policy Sets"] in the __Developer's Guide__, and xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-policies["Managing Policies"] in the __Developer's Guide__.
+
+[TIP]
+====
+You can also configure policy sets and policies by using the `ssoadm` command. For more information see xref:../reference/openam-cli-tools.adoc#ssoadm-1[ssoadm(1)] in the __Reference__.
+====
+
+[#configure-resource-types-with-console]
+==== Configuring Resource Types by Using the OpenAM Console
+
+This section describes the process of using the OpenAM console for creating resource types, which define a template for the resources that policies apply to, and the actions that could be performed on those resources.
+
+[#create-resource-type-xui]
+.To Configure a Resource Type by Using the OpenAM Console
+====
+
+. In the OpenAM console, select Realms > __Realm Name__ > Authorization > Resource Types.
++
+
+.. To create a new resource type, click New Resource Type.
+
+.. To modify an existing resource type, click the resource type name.
+
+.. To delete an existing resource type, in the row containing the resource type click the Delete button.
++
+You can only delete resource types that are not being used by policy sets or policies. Trying to delete a resource type that is in use returns an HTTP 409 Conflict status code.
++
+Remove the resource type from any associated policy sets or policies to be able to delete it.
+
+
+. Provide a name for the resource type, and optionally a description.
++
+Do not use special characters within resource type, policy, or policy set names (for example, "my+resource+type") when using the console or REST endpoints. Using the special characters listed below causes OpenAM to return a 400 Bad Request error. The special characters are: double quotes (*"*), plus sign (*+*), comma (*,*), less than (*<*), equals (*=*), greater than (*>*), backslash (*\*), forward slash (*/*), semicolon (*;*), and null (*\u0000*).
+
+. To define resource patterns that policies using this resource type can expand upon, follow the steps below:
++
+
+.. In the Add a new pattern box, enter a pattern with optional wildcards that the policies will use as a template.
++
+For information on specifying patterns for matching resources, see xref:#policy-patterns-wildcards["Specifying Resource Patterns with Wildcards"].
+
+.. Click the Add Pattern button to confirm the pattern.
+
++
+
+[TIP]
+======
+To remove a pattern, click the Delete icon.
+======
+
+. To define the actions that policies using this resource type can allow or deny, follow the steps below:
++
+
+.. In the Add a new action box, enter an action related to the types of resources being described, and then click Add Action.
+
+.. Select either allow or deny as the default state for the action.
+
++
+To remove an action, click the Delete icon.
+
+. Continue adding the patterns and actions that your resource type requires.
+
+
+[#resource-types-console]
+image::images/resource-types-console.png[]
+
+
+. Click Create Resource Type to save a new resource type or Save Changes to save modifications to an existing resource type.
+
+====
+
+
+[#configure-apps-with-console]
+==== Configuring Policy Sets Using the OpenAM Console
+
+This section describes how to use the OpenAM console to create policy sets, which are used as templates for policies protecting Web sites, Web applications, or other resources.
+
+[#create-app-xui]
+.To Configure a Policy Set Using the OpenAM Console
+====
+
+. In the OpenAM console, select Realms > __Realm Name__ > Authorization > Policy Sets.
++
+
+.. To create a new policy set, click New Policy Set.
+
+.. To modify an existing policy set, in the row containing the name of the policy set click the Edit icon, and then click the Settings tab.
+
+
+. Enter an ID for the policy set. This is a required parameter
+
+. Enter a name for the policy set. The name is optional and is for display purposes only.
++
+Do not use special characters within resource type, policy, or policy set names (for example, "my+resource+type") when using the console or REST endpoints. Using the special characters listed below causes OpenAM to return a 400 Bad Request error. The special characters are: double quotes (*"*), plus sign (*+*), comma (*,*), less than (*<*), equals (*=*), greater than (*>*), backslash (*\*), forward slash (*/*), semicolon (*;*), and null (*\u0000*).
+
+. In the Resource Types drop-down menu, select one or more resource types that policies in this policy set will use.
++
+
+[TIP]
+======
+To remove a resource type from the policy set, select the label, and then press *Delete* or *Backspace*.
+======
+
+. Click Create to save a new policy set or Save Changes to save modifications to an existing policy set.
+
+
+[#policy-set-config]
+image::images/policy-set-console.png[]
+
+
+====
+To make use of a policy set and any policies it contains, you must configure a policy agent to use the policy set for policy decisions. For details see xref:chap-realms.adoc#agent-realm-application-for-policy-decisions["To Specify the Realm and Application for Policy Decisions"].
+
+[NOTE]
+====
+Once a policy set is created, users can only change the `displayName` of an existing policy set, not the `ID`, without deleting the associated policies.
+====
+
+
+[#configure-policies-with-console]
+==== Configuring Policies Using the OpenAM Console
+
+This section describes the process of using the OpenAM console to configure policies, which are used to protect a web site, web application, or other resource.
+
+[#create-policy-xui]
+.To Configure a Policy Using the OpenAM Console
+====
+
+. In the OpenAM console, select Realms > __Realm Name__ > Authorization > Policy Sets, and then click the name of the policy set in which to configure a policy:
+
+. To create a new policy, click Add a Policy.
+
+. In the Name field, enter a descriptive name for the policy.
++
+
+[NOTE]
+======
+Do not use special characters within resource type, policy, or policy set names (for example, "my+resource+type") when using the console or REST endpoints. Using the special characters listed below causes OpenAM to return a 400 Bad Request error. The special characters are: double quotes (*"*), plus sign (*+*), comma (*,*), less than (*<*), equals (*=*), greater than (*>*), backslash (*\*), forward slash (*/*), semicolon (*;*), and null (*\u0000*).
+======
+
+. To define resources that the policy applies to, follow the steps below:
++
+
+.. Select a resource type from the Resource Type drop-down list. The set of resource patterns within the selected resource type will populate the Resources drop-down list. For information on configuring resource types, see xref:#configure-resource-types-with-console["Configuring Resource Types by Using the OpenAM Console"].
+
+.. Select a resource pattern from the Resources drop-down list.
+
+.. (Optional) Optionally, replace the asterisks with values to define the resources that the policy applies to.
+
+
+[#resource-patterns-policies-step2]
+image::images/policy-patterns.png[]
+
+For information on specifying patterns for matching resources, see xref:#policy-patterns-wildcards["Specifying Resource Patterns with Wildcards"].
+
+.. Click Add to save the resource.
++
+The OpenAM console displays a page for your new policy. The Tab pages let you modify the policy's properties.
+
++
+
+[TIP]
+======
+To remove a resource, click the Delete icon.
+======
+
+. Repeat these steps to add all the resources to which your policy applies, and then click Create.
+
+. To configure the policy's actions, select the Actions tab and perform the following:
++
+
+.. Select an action that the policy applies to by selecting them from the Add an Action drop-down list.
+
+.. Select whether to allow or deny the action on the resources specified earlier.
+
+
+[#resource-actions-step1]
+image::images/policy-actions.png[]
+
+
+.. Repeat these steps to add all the appropriate actions, and then click Save Changes.
+
+
+. Define conditions in the OpenAM console by combining logical operators with blocks of configured parameters to create a rule set that the policy uses to filter requests for resources. Use drag and drop to nest logical operators at multiple levels to create complex rule sets.
++
+Valid drop-points in which to drop a block are displayed with a grey horizontal bar.
+
+
+[#policy-editor-valid-drop-points]
+image::images/policy-editor-valid-drop-points.png[]
+
+
+.. To define the subjects that the policy applies to, complete the following steps on the Subjects tab:
++
+
+... Click Add a Subject Condition, choose the type from the drop-down menu, specify any required subject values, click the checkmark to the right when done, and then drag the block into a valid drop point in the rule set above.
+
+
+[#policy-subjects]
+image::images/policy-subjects.png[]
+
+The available subject condition types are:
++
+--
+
+Authenticated Users::
+Any user that has successfully authenticated with OpenAM.
+
+Users & Groups::
+A user or group as defined in the Subjects pages of the realm the policy is created in.
++
+Select one or more users or groups from the User Subjects or Group Subjects drop-down lists, which display the subjects and groups available within the realm.
++
+To remove an entry, click the value, and then press *Delete* (Windows/GNU/Linux) or *Backspace* (Mac OS X).
+
+OpenID Connect/Jwt Claim::
+Validate a claim within a JSON Web Token (JWT).
++
+Type the name of the claim to validate in the Claim Name field, for example `sub`, and the required value in the Claim Value field, and then click the checkmark.
++
+Repeat the step to enter additional claims.
++
+The claim(s) will be part of the JWT payload together with the JWT header and signature. The JWT is sent in the authorization header of the bearer token.
++
+This condition type only supports string equality comparisons, and is case-sensitive.
+
+Never Match::
+Never match any subject. Has the effect of disabling the policy, as it will never match a subject.
++
+If you do not set a subject condition, "Never Match" is the default. In other words, you must set a subject condition for the policy to apply.
++
+To match regardless of the subject, configure a subject condition that is "Never Match" inside a logical `Not` block.
+
+--
+
+... To add a logical operator, click the Add a Logical Operator button, choose between `All Of`, `Not`, and `Any Of` from the drop-down menu, and then drag the block into a valid drop point in the rule set above.
+
+... Continue combining logical operators and subject conditions. To edit an item, click the Edit button. To remove an item, click the Delete button. When complete, click Save Changes.
+
+
+.. To configure environment conditions in the policy, complete the following steps on the Environments tab:
++
+
+... To add an environment condition, click the Environment Condition button, choose the type from the drop-down menu, specify any required parameters, and then drag the block into a drop-point in a logical block above.
++
+The available environment condition types are:
++
+--
+
+Active Session Time::
+Make the policy test how long the user's stateful or stateless session has been active, as specified in Max Session Time. To terminate the session if it has been active for longer than the specified time, set Terminate Sessions to `True`. The user will need to re-authenticate.
+
+Authentication by Module Chain::
+Make the policy test the service that was used to authenticate the user.
+
+Authentication by Module Instance::
+Make the policy test the authentication module used to authenticate, specified in Authentication Scheme. Specify a timeout for application authentication in Application Idle Timeout Scheme and the name of the application in Application Name.
+
+Authentication Level (greater than or equal to)::
+Make the policy test the minimum acceptable authentication level specified in Authentication Level.
+
+Authentication to a Realm::
+Make the policy test the realm to which the user authenticated.
+
+Current Session Properties::
+Make the policy test property values set in the user's stateful or stateless session.
++
+Set Ignore Value Case to `True` to make the test case-insensitive.
++
+Specify one or more pairs of session properties and values using the format `property:value`. For example, specify `clientType:genericHTML` to test whether the value of the `clientType` property is equal to`genericHTML`.
+
+Identity Membership::
+Make the policy apply if the UUID of the invocator is a member of at least one of the AMIdentity objects specified in AM Identity Name.
++
+Often used to filter requests on the identity of a Web Service Client (WSC).
+
+IPv4 Address/DNS Name::
+Make the policy test the IP version 4 address that the request originated from.
++
+The IP address is taken from the `requestIp` value of policy decision requests. If this is not provided, the IP address stored in the SSO token is used instead.
++
+Specify a range of addresses to test against by entering four sets of up to three digits, separated by full stops (*.*) in both Start IP and End IP.
++
+If only one of these values is provided, it is used as a single IP address to match.
++
+Optionally, specify a DNS name in DNS Name to filter requests to that domain.
+
+IPv6 Address/DNS Name::
+Make the policy test the IP version 6 address that the request originated from.
++
+The IP address is taken from the `requestIp` value of policy decision requests. If this is not provided, the IP address stored in the SSO token is used instead.
++
+Specify a range of addresses to test against by entering eight sets of four hexadecimal characters, separated by a colon (*:*) in both Start IP and End IP.
++
+If only one of these values is provided, it is used as a single IP address to match.
++
+Optionally, specify a DNS name in DNS Name to filter requests to those coming from the specified domain.
++
+Use an asterisk (***) in the DNS name to match multiple subdomains. For example `*.example.com` applies to requests coming from `www.example.com`, `secure.example.com`, or any other subdomain of `example.com`.
+
+LDAP Filter Condition::
+Make the policy test whether the user's entry can be found using the LDAP search filter you specify in the directory configured for the policy service, which by default is the identity repository. Navigate to Configure > Global Services, and then click Policy Configuration to see the global LDAP configuration.
++
+Alternatively, to configure these settings for a realm, navigate to Realms > __Realm Name__ > Services, and then click Policy Configuration.
+
+OAuth2 Scope::
+Make the policy test whether an authorization request includes all of the specified OAuth 2.0 scopes.
++
+Scope names must follow OAuth 2.0 scope syntax described in RFC 6749, link:https://tools.ietf.org/html/rfc6749#section-3.3[Access Token Scope, window=\_blank]. As described in that section, separate multiple scope strings with spaces, such as `openid profile`.
++
+The scope strings match regardless of order in which they occur, so `openid profile` is equivalent to `profile openid`.
++
+The condition is also met when additional scope strings are provided beyond those required to match the specified list. For example, if the condition specifies `openid profile`, then `openid profile email` also matches.
+
+Resource/Environment/IP Address::
+Make the policy apply to a complex condition such as whether the user is making a request from the localhost and has also authenticated with the LDAP authentication module.
++
+Entries must take the form of an `IF...ELSE` statement. The `IF` statement can specify either `IP` to match the user's IP address, or `dnsName` to match their DNS name.
++
+If the `IF` statement is true, the `THEN` statement must also be true for the condition to be fulfilled. If not, relevant advice is returned in the policy evaluation request.
++
+The available parameters for the `THEN` statement are as follows:
++
+[open]
+======
+
+`module`::
+The module that was used to authenticate the user, for example `DataStore`.
+
+`service`::
+The service that was used to authenticate the user.
+
+`authlevel`::
+The minimum required authentication level.
+
+`role`::
+The role of the authenticated user.
+
+`user`::
+The name of the authenticated user.
+
+`redirectURL`::
+The URL the user was redirected from.
+
+`realm`::
+The realm that was used to authenticate the user.
+
+======
++
+The IP address can be IPv4, IPv6, or a hybrid of the two.
++
+Example: `IF IP=[127.0.0.1] THEN role=admins`.
+
+Time (day, date, time, and timezone)::
+Make the policy test when the policy is evaluated.
++
+The values for day, date and time must be set in pairs that comprise a start and an end.
++
+
+[#policy-environment-time]
+image::images/policy-environment-time.png[]
++
+
+--
+
+... To add a logical operator, click the Logical button, choose between `All Of`, `Not`, and `Any Of` from the drop-down menu, and then drag the block into a valid drop point in the rule set above.
+
+... Continue combining logical operators and environment conditions, and when finished, click Save Changes.
+
+
+
+. (Optional) Add response attributes, retrieved from the user entry in the identity repository, into the headers of the request at policy decision time. The policy agent for the protected resources/applications or the protected resources/applications themselves retrieve the policy response attributes to customize or personalize the application. Policy response attributes come in two formats: subject attributes and static attributes.
++
+To configure response attributes in the policy, complete the following steps on the Response attributes tab:
++
+
+.. To add subject attributes, select them from the Subject attributes drop-down list
++
+To remove an entry, click the value, and then press *Delete* (Windows/GNU/Linux) or *Backspace* (Mac OS X)
+
+.. To add a static attribute, specify the key-value pair for each static attribute. Enter the Property Name and its corresponding Property Value in the fields, and then click the Add (*+*) icon.
++
+
+[NOTE]
+======
+To edit an entry, click the Edit icon in the row containing the attribute, or click the row itself. To remove an entry, click the Delete icon in the row containing the attribute.
+======
+
+.. Continue adding subject and static attributes, and when finished, click Save Changes.
+
+
+====
+
+
+[#policy-patterns-wildcards]
+==== Specifying Resource Patterns with Wildcards
+
+Resource patterns can specify an individual URL or resource name to protect. Alternatively, a resource pattern can match URLs or resource names by using wildcards.
+
+* The wildcards you can use are `*` and `-*-`.
++
+These wildcards can be used throughout resource patterns to match URLs or resource names. For a resource pattern used to match URLs, wildcards can be employed to match the scheme, host, port, path, and query string of a resource.
++
+
+** When used within the path segment of a resource, the wildcard `*` matches multiple path segments.
++
+For example, `\http://www.example.com/*` matches `\http://www.example.com/`, `\http://www.example.com/index.html`, and also `\http://www.example.com/company/images/logo.png`.
+
+** When used within the path segment of a resource, the wildcard `-*-` will only match a single path segment.
++
+For example, `\http://www.example.com/-*-` matches `\http://www.example.com/index.html` but does not match `\http://www.example.com/company/resource.html` or `\http://www.example.com/company/images/logo.png`.
+
+
+* Wildcards do not match `?`. You must explicitly add patterns to match URLs with query strings.
++
+
+** When matching URLs sent from a web policy or J2EE agent, an asterisk (***) used at the end of a pattern after a `?` character matches one or more characters, not zero or more characters.
++
+For example, `\http://www.example.com/*?*` matches `\http://www.example.com/users?_action=create`, but not `\http://www.example.com/users?`.
++
+To match everything under `\http://www.example.com/` specify three patterns, one for `\http://www.example.com/*`, one for `\http://www.example.com/*?`, and one for `\http://www.example.com/*?*`.
+
+** When matching resources by using the `policies?_action=evaluate` REST endpoint, an asterisk (***) used at the end of a pattern after a `?` character matches zero or more characters.
++
+For example, `\http://www.example.com/*?*` matches `\http://www.example.com/users?_action=create`, as well as `\http://www.example.com/users?`.
++
+To match everything under `\http://www.example.com/` specify two patterns, one for `\http://www.example.com/*`, one for `\http://www.example.com/*?*`.
+
+
+* When defining patterns to match URLs with query strings, OpenAM sorts the query string field-value pairs alphabetically by field name when normalizing URLs before checking whether a policy matches. Therefore the query string `?subject=SPBnfm+t5PlP+ISyQhVlplE22A8=&action=get` is equivalent to the query string `?action=get&subject=SPBnfm+t5PlP+ISyQhVlplE22A8=`.
+
+* Duplicate slashes (`/`) are not considered part of the resource name to match. A trailing slash is considered by OpenAM as part of the resource name.
++
+For example, `\http://www.example.com//path/`, and `\http://www.example.com/path//` are treated in the same way.
++
+`\http://www.example.com/path`, and `\http://www.example.com/path/` are considered two distinct resources.
+
+* Wildcards can be used to match protocols, host names, and port numbers.
++
+For example, `*://*:*/*` matches `\http://www.example.com:80/index.html`, `\https://www.example.com:443/index.html`, and `\http://www.example.net:8080/index.html`.
++
+When a port number is not explicitly specified, then the default port number is implied. Therefore `\http://www.example.com/*` is the same as `\http://www.example.com:80/*`, and `\https://www.example.com/*` is the same as `\https://www.example.com:443/*`.
+
+* Wildcards cannot be escaped.
+
+* Do not mix `*` and `-*-` in the same pattern.
+
+* By default, comparisons are not case sensitive. The delimiter, wildcards and case sensitivity are configurable. To see examples of other configurations, in the OpenAM Console, navigate to Configure > Global Services, click Policy Configuration, and scroll to Resource Comparator.
+
+
+
+
+[#script-policy]
+=== Importing and Exporting Policies
+
+You can import and export policies to and from files.
+
+You can use these files to backup policies, transfer policies between OpenAM instances, or store policy configuration in a version control system such as Git or Subversion.
+
+OpenAM supports exporting policies in JSON and link:http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html[eXtensible Access Control Markup Language (XACML) Version 3.0, window=\_blank] format. The features supported by each format are summarized in the table below:
+
+[#table-policy-format-compare]
+.Comparison of Policy Import/Export Formats
+[cols="66%,17%,17%"]
+|===
+.2+|Feature 2+|Supported? 
+|JSON
+|XACML
+
+a|Can be imported/exported from within the OpenAM console?
+a|No
+a|Yes
+
+a|Can be imported/exported on the command line, using the `ssoadm` command?
+a|Yes
+a|Yes
+
+a|Exports policies?
+a|Yes
+a|Yes
+
+a|Exports policy sets?
+a|Yes
+a|Partial
+
+a|Exports resource types?
+a|Yes
+a|Partial
+
+a|Creates an exact copy of the original policy sets, resource types, and policies upon import?
+a|Yes
+a|Partial
+|===
+
+[NOTE]
+====
+OpenAM can only import XACML 3.0 files that were either created by an OpenAM instance, or that have had minor manual modifications, due to the reuse of some XACML 3.0 parameters for non-standard information.
+====
+You can import and export policies by using the policy editor in the OpenAM console, using the REST API, or with the `ssoadm` command.
+
+* xref:#export-policy-to-xacml-xui["To Export Policies in XACML Format (OpenAM Console)"]
+
+* xref:#import-policy-in-xacml-xui["To Import Policies in XACML Format (OpenAM Console)"]
+
+* xref:#export-policy-to-json-ssoadm["To Export Policies in JSON Format (Command Line)"]
+
+* xref:#import-policy-in-json-ssoadm["To Import Policies in JSON Format (Command Line)"]
+
+* xref:#export-policy-to-xacml-ssoadm["To Export Policies in XACML Format (Command Line)"]
+
+* xref:#import-policy-in-xacml-ssoadm["To Import Policies in XACML Format (Command Line)"]
+
+For information on importing and exporting policies in XACML format by using the REST API, see xref:../dev-guide/chap-client-dev.adoc#rest-api-manage-xacml["Importing and Exporting XACML 3.0"] in the __Developer's Guide__.
+
+[#export-policy-to-xacml-xui]
+.To Export Policies in XACML Format (OpenAM Console)
+====
+
+* In the OpenAM console, select Realms > __Realm Name__ > Authorization > Policy Sets, and then click Export Policy Sets.
++
+All policy sets, and the policies within will be exported in XACML format.
+
+====
+
+[#import-policy-in-xacml-xui]
+.To Import Policies in XACML Format (OpenAM Console)
+====
+
+. In the OpenAM console, select Realms > __Realm Name__ > Authorization > Policy Sets, and then click Import Policy Sets.
+
+. Browse to the XACML format file, select it, and then click Open.
++
+Any policy sets, and the policies within will be imported from the selected XACML format file.
++
+
+[NOTE]
+======
+Policy sets and resource types will be generated from the details in the XACML format file, but may not match the definitions of the originals, for example the names are auto-generated.
+======
+
+====
+
+[#export-policy-to-json-ssoadm]
+.To Export Policies in JSON Format (Command Line)
+====
+
+* Use the `ssoadm policy-export` command:
++
+
+[source, console]
+----
+$ ssoadm \
+  policy-export \
+  --realm "/" \
+  --servername "http://openam.example.com:8080/openam" \
+  --jsonfile "myPolicies.json" \
+  --adminid amadmin \
+  --password-file /tmp/pwd.txt
+
+{
+  "RESOURCE_TYPE" : 1,
+  "POLICY" : 1,
+  "APPLICATION" : 1
+}
+----
++
+If exporting from a subrealm, include the top level realm ("`/`") in the `--realm` value. For example `--realm "/myRealm"`.
++
+For more information on the syntax of this command, see xref:../reference/openam-cli-tools.adoc#ssoadm-policy-export["ssoadm policy-export"] in the __Reference__.
+
+====
+
+[#import-policy-in-json-ssoadm]
+.To Import Policies in JSON Format (Command Line)
+====
+
+* Use the `ssoadm policy-import` command:
++
+
+[source, console]
+----
+$ ssoadm \
+  policy-import \
+  --realm "/myRealm" \
+  --servername "http://openam.example.com:8080/openam" \
+  --jsonfile "myPolicies.json" \
+  --adminid amadmin \
+  --password-file /tmp/pwd.txt
+
+{
+  "POLICY" : {
+    "CREATE_SUCCESS" : {
+      "count" : 1
+    }
+  },
+  "RESOURCE_TYPE" : {
+    "CREATE_SUCCESS" : {
+      "count" : 1
+    }
+  },
+  "APPLICATION" : {
+    "CREATE_SUCCESS" : {
+      "count" : 1
+    }
+  }
+}
+----
++
+If importing to a subrealm, include the top level realm ("`/`") in the `--realm` value. For example `--realm "/myRealm"`.
++
+For more information on the syntax of this command, see xref:../reference/openam-cli-tools.adoc#ssoadm-policy-import["ssoadm policy-import"] in the __Reference__.
+
+====
+
+[#export-policy-to-xacml-ssoadm]
+.To Export Policies in XACML Format (Command Line)
+====
+
+* Use the `ssoadm list-xacml` command:
++
+
+[source]
+----
+$ ssoadm \
+  list-xacml \
+  --realm "/" \
+  --adminid amadmin \
+  --password-file /tmp/pwd.txt
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <PolicySet
+ xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+ PolicyCombiningAlgId="urn...rule-combining-algorithm:deny-overrides"
+ Version="2014.11.25.17.41.15.597"
+ PolicySetId="/:2014.11.25.17.41.15.597">
+  <Target />
+  <Policy
+  RuleCombiningAlgId="urn...rule-combining-algorithm:deny-overrides"
+  Version="2014.11.25.17.40.08.067"
+  PolicyId="myPolicy">
+  <Description />
+  <Target>
+   <AnyOf>
+    <AllOf>
+     <Match
+      MatchId="urn...entitlement:json-subject-match">
+      <AttributeValue
+       DataType="urn...entitlement.conditions.subject.AuthenticatedUsers">
+       {}
+      </AttributeValue>
+      <AttributeDesignator
+       MustBePresent="true"
+       DataType="urn...entitlement.conditions.subject.AuthenticatedUsers"
+       AttributeId="urn...entitlement:json-subject"
+       Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" />
+     </Match>
+    </AllOf>
+   </AnyOf>
+   <AnyOf>
+    <AllOf>
+     <Match
+      MatchId="urn...entitlement:resource-match:application:iPlanetAMWebAgentService">
+      <AttributeValue
+       DataType="htp://www.w3.org/2001/XMLSchema#string">
+       http://www.example.com:8000/*?*
+      </AttributeValue>
+      <AttributeDesignator
+       MustBePresent="true"
+       DataType="htp://www.w3.org/2001/XMLSchema#string"
+       AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+       Category="urn...attribute-category:resource" />
+     </Match>
+    </AllOf>
+   </AnyOf>
+   <AnyOf>
+    <AllOf>
+     <Match
+      MatchId="urn...application-match">
+      <AttributeValue
+       DataType="htp://www.w3.org/2001/XMLSchema#string">
+       iPlanetAMWebAgentService
+      </AttributeValue>
+      <AttributeDesignator
+       MustBePresent="false"
+       DataType="htp://www.w3.org/2001/XMLSchema#string"
+       AttributeId="urn...application-id"
+       Category="urn...application-category" />
+     </Match>
+    </AllOf>
+   </AnyOf>
+   <AnyOf>
+    <AllOf>
+     <Match
+      MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+      <AttributeValue
+       DataType="htp://www.w3.org/2001/XMLSchema#string">
+       POST
+      </AttributeValue>
+      <AttributeDesignator
+       MustBePresent="true"
+       DataType="htp://www.w3.org/2001/XMLSchema#string"
+       AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+       Category="urn...attribute-category:action" />
+     </Match>
+    </AllOf>
+    <AllOf>
+     <Match
+      MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+      <AttributeValue
+       DataType="htp://www.w3.org/2001/XMLSchema#string">
+       GET
+      </AttributeValue>
+      <AttributeDesignator
+       MustBePresent="true"
+       DataType="htp://www.w3.org/2001/XMLSchema#string"
+       AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+       Category="urn...attribute-category:action" />
+     </Match>
+    </AllOf>
+   </AnyOf>
+  </Target>
+  <VariableDefinition
+   VariableId="....entitlement.applicationName">
+   <AttributeValue
+    DataType="htp://www.w3.org/2001/XMLSchema#string">
+    iPlanetAMWebAgentService
+   </AttributeValue>
+  </VariableDefinition>
+  <VariableDefinition
+   VariableId="...privilege.createdBy">
+   <AttributeValue
+    DataType="htp://www.w3.org/2001/XMLSchema#string">
+    id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org
+   </AttributeValue>
+  </VariableDefinition>
+  <VariableDefinition
+   VariableId="...privilege.lastModifiedBy">
+   <AttributeValue
+    DataType="htp://www.w3.org/2001/XMLSchema#string">
+    id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org
+   </AttributeValue>
+  </VariableDefinition>
+  <VariableDefinition
+   VariableId="...privilege.creationDate">
+   <AttributeValue
+    DataType="htp://www.w3.org/2001/XMLSchema#dateTime">
+    2014-11-25T17:40:08.067
+   </AttributeValue>
+  </VariableDefinition>
+  <VariableDefinition
+   VariableId="...privilege.lastModifiedDate">
+   <AttributeValue
+    DataType="htp://www.w3.org/2001/XMLSchema#dateTime">
+    2014-11-25T17:40:08.067
+   </AttributeValue>
+  </VariableDefinition>
+  <Rule
+   Effect="Permit"
+   RuleId="null:permit-rule">
+   <Description>Permit Rule</Description>
+   <Target>
+    <AnyOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        POST
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+        Category="urn...attribute-category:action" />
+      </Match>
+     </AllOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        GET
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+        Category="urn...attribute-category:action" />
+      </Match>
+     </AllOf>
+    </AnyOf>
+   </Target>
+   <Condition>
+    <Apply
+     FunctionId="urn...entitlement:json-subject-and-condition-satisfied">
+     <AttributeValue
+      DataType="urn...entitlement.conditions.subject.AuthenticatedUsers"
+      privilegeComponent="entitlementSubject">
+      {}
+     </AttributeValue>
+    </Apply>
+   </Condition>
+  </Rule>
+ </Policy>
+</PolicySet>
+
+ Policy definitions were returned under realm, /.
+----
++
+For more information on the syntax of this command, see xref:../reference/openam-cli-tools.adoc#ssoadm-list-xacml["ssoadm list-xacml"] in the __Reference__.
+
+====
+
+[#import-policy-in-xacml-ssoadm]
+.To Import Policies in XACML Format (Command Line)
+====
+
+* Use the `ssoadm create-xacml` command:
++
+
+[source, console]
+----
+$ ssoadm \
+  create-xacml \
+  --realm "/" \
+  --adminid amadmin \
+  --password-file /tmp/pwd.txt \
+  --xmlfile policy.xml
+
+ Policies were created under realm, /.
+----
++
+For more information on the syntax of this command, see xref:../reference/openam-cli-tools.adoc#ssoadm-create-xacml["ssoadm create-xacml"] in the __Reference__.
+
+====
+
+
+[#delegate-policy]
+=== Delegating Policy Management
+
+To delegate policy management and other administrative tasks, use privileges. You set privileges in OpenAM console on the Privileges page for a realm.
+
+For more information, see xref:chap-realms.adoc#delegating-realm-administration-privileges["Delegating Realm Administration Privileges"].
+
+

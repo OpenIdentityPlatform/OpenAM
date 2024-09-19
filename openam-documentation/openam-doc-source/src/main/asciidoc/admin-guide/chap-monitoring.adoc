@@ -1,0 +1,850 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-monitoring]
+== Monitoring OpenAM Services
+
+This chapter covers how to monitor OpenAM services to ensure appropriate performance and service availability.
+
+[#monitoring-interfaces]
+=== Monitoring Interfaces
+
+OpenAM lets you monitor OpenAM over protocol through web pages, Java Management Extensions (JMX), or Simple Network Management Protocol (SNMP). The services are based on JMX.
+
+To configure monitoring services, login to OpenAM console as OpenAM administrator, and navigate to Configure > Global Services > System, and then click Monitoring. Alternatively, you can use the `ssoadm set-attr-defs` command:
+
+[source, console]
+----
+$ ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-enabled=true
+----
+Restart OpenAM for the changes to take effect. You must also restart OpenAM if you disable monitoring.
+
+[#monitoring-web-pages]
+==== Web-Based Monitoring
+
+You can configure OpenAM to allow you to access a web based view of OpenAM MBeans on port 8082 where the core server runs, such as `\http://openam-ter.example.com:8082/`. Either use the console, or use the `ssoadm` command:
+
+[source, console]
+----
+$ ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-http-enabled=true
+----
+The default authentication file allows you to authenticate over HTTP as user `demo`, password `changeit`. The user name and password are kept in the file specified, with the password encrypted:
+
+[source, console]
+----
+$ cat openam/openam/openam_mon_auth
+demo AQICMBCKlwx6G3vzK3TYYRbtTpNYAagVIPNP
+----
+Or:
+
+[source, console]
+----
+$ cat openam/openam/opensso_mon_auth
+demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u
+----
+You can encrypt a new password using the `ampassword` command. After changing the authentication file, you must restart OpenAM for the changes to take effect.
+
+[#figure-web-based-monitoring]
+image::images/web-based-monitoring.png[]
+
+
+[#monitoring-jmx]
+==== JMX Monitoring
+
+You can configure OpenAM to allow you to listen for Java Management eXtension (JMX) clients, by default on port 9999. Either use the OpenAM console page under Configure > Global Services > System > Monitoring and make sure both Monitoring Status and Monitoring RMI interface status are both set to Enabled, or use the `ssoadm` command:
+
+[source, console]
+----
+$ ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-enabled=true \
+  iplanet-am-monitoring-rmi-enabled=true
+----
+A number of tools support JMX, including `jvisualvm` and `jconsole`. When you use `jconsole` to browse OpenAM MBeans for example, the default URL for the OpenAM running on the local system is `service:jmx:rmi:///jndi/rmi://localhost:9999/server`.
+
+[source, console]
+----
+$ jconsole service:jmx:rmi:///jndi/rmi://localhost:9999/server &
+----
+You can also browse the MBeans by connecting to your web application container, and browsing to the OpenAM MBeans. By default, JMX monitoring for your container is likely to be accessible only locally, using the process ID.
+
+[#figure-jconsole-to-openam]
+image::images/jconsole-to-openam.png[]
+Also see link:http://docs.oracle.com/javase/1.5.0/docs/guide/management/agent.html[Monitoring and Management Using JMX, window=\_blank] for instructions on how to connect remotely, how to use SSL, and so forth.
+
+[IMPORTANT]
+====
+JMX has a limitation in that some Operations and CTS tables cannot be properly serialized from OpenAM to JMX. As a result, only a portion of OpenAM's monitoring information is available through JMX. SNMP is a preferred monitoring option over JMX and exposes all OpenAM tables, especially for CTS, with no serialization limitations.
+====
+
+
+[#monitoring-snmp]
+==== SNMP Monitoring
+
+You can configure OpenAM to allow you to listen on port 8085 for SNMP monitoring. Either use the console, or use the `ssoadm` command:
+
+[source, console]
+----
+$ ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-snmp-enabled=true
+----
+
+
+
+[#cts-monitoring]
+=== Monitoring CTS Tokens
+
+The xref:../install-guide/chap-cts.adoc#chap-cts["Configuring the Core Token Service"] in the __Installation Guide__ (CTS) provides persistent and highly available token storage for a several components within OpenAM, including user sessions, OAuth 2.0, SAML v2.0 and UMA tokens.
+
+Depending on system load and usage, the CTS can produce a large quantity of tokens, which can be short lived. This style of usage is significantly different from typical LDAP usage. As such, systems administrators may be interested in monitoring this usage as part of LDAP directory maintenance.
+
+The CTS functions only with one external LDAP service, OpenDJ.
+
+To that end, the current state of CTS tokens on a system can be monitored over SNMP. The current state of different types of CTS tokens are associated with different Object Identifiers (OIDs) in a Management Information Base (MIB).
+
+To enable SNMP, see xref:#monitoring-snmp["SNMP Monitoring"]
+
+[#cts-monitor-commands]
+==== CTS SNMP Monitoring
+
+Once activated, SNMP monitoring works over UDP by default. You may want to install one of many available network monitoring tools. For the purpose of this section, basic SNMP service and monitoring tools have been installed on a GNU/Linux system. The same commands should work on a Mac OS X system.
+
+SNMP depends on labels known as Object Identifiers (OIDs). These are uniquely defined labels, organized in tree format. For OpenAM, they are configured in a `.mib` file named `FORGEROCK-OPENAM-CTS.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment.
+
+For detailed information on configured OIDs, see xref:../reference/chap-cts-oids.adoc#chap-cts-oids["Core Token Service (CTS) Object Identifiers"] in the __Reference__.
+
+With the OIDs in hand, you can set up an SNMP server to collect the data. You would also need SNMP utility commands with associated OIDs to measure the current state of a component. First, to verify the operation of SNMP on a GNU/Linux system, over port 8085, using SNMP version 2c, run the following command:
+
+[source, console]
+----
+# snmpstatus -c public -v 2c localhost
+----
+The output should normally specify communications over UDP. If you get a `timeout` message, the SNMP service may not be running.
+
+You can get the value for a specific OID. For example, the following command would retrieve the cumulative count for CTS create operations, over port 8085:
+
+[source, console]
+----
+# snmpget -c public -v 2c :8085 enterprises.36733.1.2.3.3.1.1.1
+----
+If your version of the tool does not support the `enterprises` OID string, use `1.3.6.1.4.1` instead, as in `1.3.6.1.4.1.36733.1.2.3.3.1.1.1`.
+
+For one view of the tree of OIDs, you can use the `snmpwalk` command. For example, the following command lists all OIDs related to CTS:
+
+[source, console]
+----
+# snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.3
+----
+A number of CTS OIDs are listed with a `Counter64` value. As defined in link:http://tools.ietf.org/search/rfc2578#section-7.1.10[RFC 2578,, window=\_blank] an OID so configured has a maximum value of `2^64 - 1`.
+
+
+[#snmp-policy-evaluation]
+==== SNMP Monitoring for Policy Evaluation
+
+You can monitor policy evaluation performance over SNMP. OpenAM records statistics for up to a number of recent policy evaluation requests. (You can configure the number in OpenAM console under Configuration > System > Monitoring. For details, see the system configuration reference section, xref:../reference/chap-config-ref.adoc#system-monitoring["Monitoring"] in the __Reference__.)
+
+Interface Stability: link:#interface-stability[Evolving]
+
+As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in the `.mib` file, `FORGEROCK-OPENAM-POLICY.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment. This file specifies the statistics OpenAM keeps for policy evaluation operations. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about policy evaluation on the command line.
+
+When monitoring is active, OpenAM records statistics about both the numbers and rates of policy evaluations performed, and also the times taken to process policy evaluations.
+
+The statistics are all read-only. The base OID for policy evaluation statistics is `enterprises.36733.1.2.2.1`. The following table describes the values that you can read:
+
+[#snmp-policy-evaluation-oids]
+.OIDs Used in SNMP Monitoring For Policy Evaluation
+[cols="33%,33%,34%"]
+|===
+|OID |Description |Syntax 
+
+a|`enterprises.36733.1.2.2.1.1.1`
+a|Cumulative number of policy evaluations for specific resources (self)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.1.2`
+a|Average rate of policy evaluations for specific resources (self)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.1.3`
+a|Minimum rate of policy evaluations for specific resources (self)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.1.4`
+a|Maximum rate of policy evaluations for specific resources (self)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.2.1`
+a|Cumulative number of policy evaluations for a tree of resources (subtree)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.2.2`
+a|Average rate of policy evaluations for a tree of resources (subtree)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.2.3`
+a|Minimum rate of policy evaluations for a tree of resources (subtree)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.2.4`
+a|Maximum rate of policy evaluations for a tree of resources (subtree)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.1.2`
+a|Average length of time to evaluate a policy for a specific resource (self)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.2.1.2`
+a|Slowest evaluation time for a specific resource (self)
+a|`SnmpAdminString`
+
+a|`enterprises.36733.1.2.2.1.2.2.1`
+a|Average length of time to evaluate a policy for a tree of resources (subtree)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.2.1.2.2.2`
+a|Slowest evaluation time for a tree of resources (subtree)
+a|`SnmpAdminString`
+
+a|`enterprises.36733.1.2.2.1.3.1`
+a|Slowest individual policy evaluation time overall
+a|`SnmpAdminString`
+|===
+
+
+[#snmp-sessions]
+==== SNMP Monitoring for Sessions
+
+You can monitor stateful session statistics over SNMP. OpenAM records statistics for up to a configurable number of recent sessions. (You can configure the number in OpenAM console under Configuration > System > Monitoring. For details, see the system configuration reference section, xref:../reference/chap-config-ref.adoc#system-monitoring["Monitoring"] in the __Reference__.)
+
+SNMP monitoring is not available for stateless sessions.
+
+Interface Stability: link:#interface-stability[Evolving]
+
+As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in a `.mib` file that specifies the statistics OpenAM keeps for policy evaluation operations, the `FORGEROCK-OPENAM-SESSION.mib` file. This file is found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about sessions on the command line.
+
+When monitoring is active, OpenAM records statistics about both the numbers of internal, remote, and CTS sessions, and also the times taken to process sessions.
+
+The statistics are all read-only. The base OID for session statistics is `enterprises.36733.1.2.1`. Times are expressed in nanoseconds rather than milliseconds, as many operations take less than one millisecond. The following table describes the values that you can read:
+
+[#snmp-sessions-oids]
+.OIDs Used in SNMP Monitoring For Sessions
+[cols="40%,40%,20%"]
+|===
+|OID |Description |Syntax 
+
+a|`enterprises.36733.1.2.1.1.1`
+a|Total number of current internal sessions
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.1.2`
+a|Average time it takes to refresh an internal session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.1.3`
+a|Average time it takes to logout an internal session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.1.4`
+a|Average time it takes to destroy an internal session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.1.5`
+a|Average time it takes to set a property on an internal session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.2.1`
+a|Total number of current remote sessions
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.2.2`
+a|Average time it takes to refresh a remote session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.2.3`
+a|Average time it takes to logout a remote session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.2.4`
+a|Average time it takes to destroy a remote session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.2.5`
+a|Average time it takes to set a property on a remote session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.3.1`
+a|Total number of sessions currently in the Core Token Service (CTS)
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.3.2`
+a|Average time it takes to refresh a CTS session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.3.3`
+a|Average time it takes to logout a CTS session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.3.4`
+a|Average time it takes to destroy a CTS session
+a|`Counter64`
+
+a|`enterprises.36733.1.2.1.3.5`
+a|Average time it takes to set a property on a CTS session
+a|`Counter64`
+|===
+
+
+
+[#is-openam-alive]
+=== Is OpenAM Running?
+
+You can check over HTTP whether OpenAM is up, using `isAlive.jsp`. Point your application to the file under the OpenAM URL, such as `\http://openam.example.com:8080/openam/isAlive.jsp`.
+
+If you get a success code (with `Server is ALIVE:` in the body of the page returned), then OpenAM is in operation.
+
+
+[#debug-logging]
+=== Debug Logging
+
+OpenAM services capture a variety of information in debug logs. Unlike audit log records, debug log records are unstructured. Debug logs contain a variety of types of information that is useful when troubleshooting OpenAM, including stack traces. The level of debug log record output is configurable. Debug log records are always written to flat files.
+
+[#log-debug-levels]
+==== Setting Debug Logging Levels
+
+To adjust the debug level while OpenAM is running, login to the OpenAM console as OpenAM administrator and navigate to Deployment > Servers > __Server Name__ > Debugging. The default level for debug logging is Error. This level is appropriate for normal production operations, in which case no debug log messages are expected.
+
+Setting the debug log level to Warning increases the volume of messages. Setting the debug log level to Message dumps detailed trace messages. Unless told to do so by qualified support personnel, do not use Warning and Message levels in production.
+
+By default, certain components that run in OpenAM's JVM—for example, embedded OpenDJ configuration stores—do not generate trace-level messages when you configure the debug log level to Message. If you need trace-level messages for these components, navigate to Deployment > Servers > __Server Name__ > Advanced, create a `org.forgerock.openam.slf4j.enableTraceInMessage` property, and set its value to `true`.
+
+
+[#log-debug-single-file]
+==== Debug Logging to a Single File
+
+During development, you might find it useful to log all debug messages to a single file. In order to do so, set Merge Debug Files to `on`.
+
+OpenAM logs to a single file immediately after you change this property. You do not need to restart OpenAM or the container in which it runs for the change to take effect.
+
+
+[#log-debug-selective-capture]
+==== Debug Logging By Service
+
+OpenAM lets you capture debug log messages selectively for a specific service. This can be useful when you must turn on debugging in a production system where you want to avoid excessive logging, but must gather messages when you reproduce a problem.
+Perform these steps to capture debug messages for a specific service:
+
+. Log in to OpenAM console as administrator, `amadmin`.
+
+. Browse to `Debug.jsp`, for example `\http://openam.example.com:8080/openam/Debug.jsp`.
++
+No links to this page are provided in the console.
+
+. Select the service to debug and also the level required given the hints provided in the `Debug.jsp` page.
++
+The changes takes effect immediately.
+
+. Promptly reproduce the problem you are investigating.
+
+. After reproducing the problem, immediately return to the `Debug.jsp` page, and revert to normal log levels to avoid filling up the disk where debug logs are stored.
+
+
+
+[#log-rotate-debug]
+==== Rotating Debug Logs
+
+By default OpenAM does not rotate debug logs. To rotate debug logs, edit `WEB-INF/classes/debugconfig.properties` where OpenAM is deployed.
+--
+The `debugconfig.properties` file includes the following properties:
+
+`org.forgerock.openam.debug.prefix`::
+Specifies the debug log file prefix applied when OpenAM rotates a debug log file. The property has no default. It takes a string as the property value.
+
+`org.forgerock.openam.debug.suffix`::
+Specifies the debug log file suffix applied when OpenAM rotates a debug log file. The property takes a `SimpleDateFormat` string. The default is `-MM.dd.yyyy-kk.mm`.
+
+`org.forgerock.openam.debug.rotation`::
+Specifies an interval in minutes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on time passed.
+
+`org.forgerock.openam.debug.rotation.maxsize`::
+Specifies a maximum log file size in megabytes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on log file size.
+
+--
+Changes to properties in the `debugconfig.properties` file take effect immediately. You do not need to restart OpenAM or the container in which it runs for the changes to take effect.
+
+
+
+[#recording]
+=== Recording Troubleshooting Information
+
+The OpenAM recording facility lets you initiate events to monitor OpenAM while saving output that is useful when performing troubleshooting.
+
+OpenAM recording events save four types of information:
+
+* OpenAM debug logs
+
+* Thread dumps, which show you the status of every active thread, with output similar to a JStack stack trace
+
+* Important run-time properties
+
+* The OpenAM configuration
+
+You initiate a recording event by invoking the `ssoadm start-recording` command or by using the `start` action of the `/json/records` REST API endpoint. Both methods use JSON to control the recording event.
+
+This section describes starting and stopping recording using the `ssoadm` command, using a JSON file to configure the recording event, and locating the output recorded information. For information about using the `/json/records` REST API endpoint to activate and deactivate recording, see xref:../dev-guide/chap-client-dev.adoc#sec-rest-api-recording["RESTful Troubleshooting Information Recording"] in the __Developer's Guide__.
+
+[#recording-start-stop]
+==== Starting and Stopping Recording
+
+Start OpenAM recording with the `ssoadm start-recording` command. For example:
+
+[source, console]
+----
+$ ssoadm \
+ start-recording \
+ --servername http://openam.example.com:8080/openam \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --jsonfile recording.json
+
+
+{
+ "recording":true,
+ "record": {
+  "issueID":103572,
+  "referenceID":"policyEvalFails",
+  "description":"Record everything",
+  "zipEnable":false,
+  "threadDump": {
+   "enable":true,
+   "delay": {
+     "timeUnit":"SECONDS",
+     "value":5
+   }
+  },
+  "configExport": {
+   "enable":true,
+   "password":"admin password",
+   "sharePassword":true
+  },
+  "debugLogs": {
+   "debugLevel":"message",
+   "autoStop": {
+    "time": {
+     "timeUnit":"MILLISECONDS",
+     "value":15000
+    },
+    "fileSize": {
+     "sizeUnit":"KB",
+     "value":1048576
+    }
+   }
+  },
+  "status":"RUNNING",
+  "folder":"/home/openam/debug/record/103572/policyEvalFails/"
+ }
+}
+----
+
+[NOTE]
+====
+The `ssoadm` command output in the preceding example is shown in indented format for ease of reading. The actual output is __not__ indented.
+====
+In the preceding `ssoadm start-recording` command example, the `recording.json` file specifies the information to be recorded and under what conditions recording automatically terminates. This file is known as the __recording control file__. xref:#recording-json["The Recording Control File"] describes the format of recording control files and provides an annotated example.
+
+An active recording event stops when:
+
+* You explicitly tell OpenAM to stop recording by executing the `ssoadm stop-recording` command. See the xref:../reference/index.adoc[Reference] for details about this command.
+
+* Another `ssoadm start-recording` command is sent to OpenAM that specifies an issue ID other that differs from the active recording event's issue ID. In this case, the initial recording session terminates and the new recording event starts. Note that you can determine whether an OpenAM recording event is active by using the `ssoadm get-recording-status` command.
+
+* A timer configured in the recording control file determines that the maximum amount of time for the recording event has been reached.
+
+* A file size monitor configured in the recording control file determines that the maximum amount of information in debug logs has been reached.
+
+
+
+[#recording-json]
+==== The Recording Control File
+
+A JSON file that is input to the `ssoadm start-recording` command controls the amount of information OpenAM records, the recording duration, and the location of recording output files.
+
+[#recording-file-format]
+===== File Format
+
+--
+The following properties comprise the recording control file:
+
+`issueID`::
+Type: Number
+
++
+__Required__. The issue identifier—a positive integer stored internally as a Java `long` data type. A case number is a good choice for the `issueID` value.
+
++
+The `issueID` is a component of the path at which recorded information is stored. See xref:#recording-location["Retrieving Recording Information"] for more information.
+
+`referenceID`::
+Type: String
+
++
+__Required__. A second identifier for the recording event. Use this property to segregate multiple recording events for the same issue.
+
++
+The `referenceID` is a component of the path at which recorded information is stored. See xref:#recording-location["Retrieving Recording Information"] for more information.
+
++
+Note that spaces are not allowed in the `referenceID` value.
+
+`Description`::
+Type: String
+
++
+__Required__. A textual description of the recording event.
+
+`zipEnable`::
+Type: Boolean
+
++
+__Required__. Whether to compress the output directory into a zip file when recording has stopped.
+
+`configExport`::
+Type: Object
+
++
+__Required__. An object containing the following properties:
++
+[open]
+====
+
+`enable`::
+Type: Boolean
+
++
+__Required__. Whether to export the OpenAM configuration upon completion of the recording event. Exporting the OpenAM configuration is a best practice, because it is extremely useful to have access to the configuration when troubleshooting.
+
+`password`::
+Type: String
+
++
+__Required__ if `enable` is `true`. A key required to import the exported configuration. The key is used the same way that the `ssoadm export-svc-cfg` command uses the `-e` argument.
+
+`sharePassword`::
+Type: Boolean
+
++
+__Required__ if `enable` is `true`. Whether to show the `password` value in the `ssoadm start-recording`, `ssoadm get-recording-status`, and `ssoadm stop-recording` output, and in the `info.json` file, which is output during recording events, and which contains run-time properties.
+
+====
++
+
+`debugLogs`::
+Type: Object
+
++
+__Required__. An object containing the following properties:
++
+[open]
+====
+
+`debugLevel`::
+Type: String
+
++
+__Required__. The debug level to set for the recording event. Set the value of `debugLevel` to `MESSAGE` to get the most troubleshooting information from your recording period. Other acceptable but less commonly used values are `ERROR` and `WARNING`.
+
+`autoStop`::
+Type: Object
+
++
+__Optional__. Contains another object used to specify an event that automatically ends a recording period. For time-based termination, specify a `time` object; for termination based on uncompressed file size, specify a `fileSize` object. If you specify both `time` and `fileSize` objects, the event that occurs first causes recording to stop.
+
++
+Specifying `fileSize` and `time` objects is a best practice, because it ensures that the recorded output does not occupy a larger than expected amount of space on your file system, and that recording events end in a timely fashion.
++
+[open]
+======
+
+`time`::
+Type: Object
+
++
+__Optional__; must be specified in the `autoStop` object if `fileSize` is not specified. Configures a recording period to terminate recording after this amount of time.
++
+[open]
+========
+
+`timeUnit`::
+Type: String
+
++
+__Required__. Acceptable values are `MILLISECONDS`, `SECONDS`, `MINUTES`, `HOURS`, and `DAYS`.
+
+`value`::
+Type: Numeric
+
++
+__Required__. Values in `MILLISECONDS` are rounded down to the second. The minimum acceptable value for `autoStop` is one second.
+
+========
++
+
+`fileSize`::
+Type: Object
+
++
+__Optional__; must be specified in the `autoStop` object if `time` is not specified. Configures a recording period to terminate after the aggregate size of uncompressed debug logs has reached this size.
++
+[open]
+========
+
+`sizeUnit`::
+Type: String
+
++
+__Required__. Acceptable values are `B`, `KB`, `MB`, and `GB`.
+
+`value`::
+Type: Numeric
+
++
+__Required__.
+
+========
++
+
+======
++
+
+====
++
+
+`threadDump`::
+Type: Object
+
++
+__Required__. An object containing the following properties:
++
+[open]
+====
+
+`enable`::
+Type: Boolean
+
++
+__Required__. Whether to dump threads during the recording event. Thread dumps are especially useful when troubleshooting performance issues and issues with unresponsive servers.
+
+`delay`::
+Type: Object
+
++
+__Required__ if `enable` is `true`. Contains another object used to specify an interval at which thread dumps are taken. The initial thread dump is taken at the start of the recording event; subsequent thread dumps are taken at multiples of the `delay` interval.
++
+[open]
+======
+
+`timeUnit`::
+Type: String
+
++
+__Required__. Acceptable values are `MILLISECONDS`, `SECONDS`, `MINUTES`, `HOURS`, and `DAYS`.
+
+`value`::
+Type: Numeric
+
++
+__Required__. The minimum acceptable value is one second. Time units that are smaller than seconds, such as `MILLISECONDS`, are rounded to the closest second.
+
+======
++
+
+====
++
+
+--
+
+
+[#recording-file-examples]
+===== Recording Control File Example
+
+The following is an example of a recording control file:
+
+
+[source, javascript]
+----
+{
+  "issueID": 103572,
+  "referenceID": "policyEvalFails",
+  "description": "Troubleshooting artifacts in support of case 103572",
+  "zipEnable": true,
+  "configExport": {
+    "enable": true,
+    "password": "5x2RR70",
+    "sharePassword": false
+  },
+  "debugLogs": {
+    "debugLevel": "MESSAGE",
+    "autoStop": {
+      "time":  {
+        "timeUnit": "SECONDS",
+        "value": 15
+      },
+      "fileSize": {
+        "sizeUnit": "GB",
+        "value": 1
+      }
+    }
+  },
+  "threadDump" : {
+    "enable": true,
+    "delay" :  {
+      "timeUnit": "SECONDS",
+      "value": 5
+     }
+  }
+}
+----
+The recording control file properties in the preceding example affect the recording output as follows:
+
+[#recording-example-behavior]
+.Recording Control File Example Properties and Their Effect on Recording Behavior
+[cols="25%,25%,50%"]
+|===
+|Recording Control File Property |Value |Effect 
+
+a|`issueID`, `referenceID`
+a|`103572`, `policyEvalFails`
+a|Recording output is stored at the path `debugFileLocation/record/103572/policyEvalFails_timestamp.zip`. For more information about the location of recording output, see xref:#recording-location["Retrieving Recording Information"].
+
+a|`Description`
+a|`Troubleshooting artifacts in support of case 103572`
+a|No effect.
+
+a|`zipEnable`
+a|`true`
+a|Recording output is compressed into a zip file.
+
+a|`configExport` / `enable`
+a|`true`
+a|The OpenAM configuration is exported at the start of the recording event.
+
+a|`configExport` / `password`
+a|`5x2RR70`
+a|Knowledge of this password will be required to access the OpenAM configuration that was saved during recording.
+
+a|`configExport` / `sharePassword`
+a|`false`
+a|The password is not displayed in output messages displayed during the recording event or in the `info.json` file.
+
+a|`debugLogs` / `debugLevel`
+a|`MESSAGE`
+a|Recording enables message-level debug logs during the recording event.
+
+a|`debugLogs` / `autoStop` / `time`
+a|`SECONDS`, `15`
+a|Because both the `time` and `fileSize` properties are set, recording stops after 15 seconds, or after the size of the debug logs exceeds 1 GB, whichever occurs first.
+
+a|`debugLogs` / `autoStop` / `fileSize`
+a|`GB`, `1`
+a|Because both the `time` and `fileSize` properties are set, recording stops after 15 seconds, or after the size of the debug logs exceeds 1 GB, whichever occurs first.
+
+a|`threadDump` / `enable`
+a|`true`
+a|Thread dumps are taken throughout the recording event.
+
+a|`threadDump` / `delay`
+a|`SECONDS`, `5`
+a|The first thread dump is taken when the recording event starts. Additional thread dumps are taken every five seconds hence.
+|===
+
+
+
+[#recording-location]
+==== Retrieving Recording Information
+
+Information recorded by OpenAM is stored at the path `debugFileLocation/record/issueID/referenceID`. For example, if the debug file location is `/home/openam/debug`, the issue ID `103572`, and the reference ID `policyEvalFails`, the path containing recorded information is `/home/openam/debug/record/103572/policyEvalFails`.
+
+When there are multiple recording events with the same `issueID` and `referenceID`, OpenAM appends a timestamp to the `referenceID` of the earliest paths. For example, multiple recording events for issue ID `103572` and reference ID `policyEvalFails` might be stored at the following paths:
+
+* Most recent recording: `debugFileLocation/record/103572/policyEvalFails`
+
+* Next most recent recording: `debugFileLocation/record/103572/policyEvalFails_2015-10-24-11-48-51-902-PDT`
+
+* Earliest recording: `debugFileLocation/record/103572/policyEvalFails_2015-08-10-15-15-10-140-PDT`
+
+OpenAM compresses the output from recording events when you set the `zipEnable` property to `true`. The output file can be found at the path `debugFileLocation/record/issueID/referenceID_timestamp.zip`. For example, compressed output for a recording event for issue ID `103572` and reference ID `policyEvalFails` might be stored at the following path: `debugFileLocation/record/103572/policyEvalFails_2015-08-12-12-19-02-683-PDT.zip`.
+
+Use the `referenceID` property value to segregate output from multiple problem recreations associated with the same case. For example, while troubleshooting case 103572, you notice that you only have a problem when evaluating policy for members of the Finance realm. You could trigger two recording events as follows:
+
+[#recording-output-location]
+.Segregating Recording Output Using the referenceID Value
+[cols="33%,33%,34%"]
+|===
+|OpenAM Behavior |referenceIDValue |Recording Output Path 
+
+a|Policy evaluation behaves as expected for members of the Engineering realm.
+a|`policyEvalSucceeds`
+a|`debugFileLocation/record/103572/policyEvalSucceeds`
+
+a|Policy evaluation unexpectedly fails for members of the Finance realm.
+a|`policyEvalFails`
+a|`debugFileLocation/record/103572/policyEvalFails`
+|===
+
+
+
+[#session-mgmt]
+=== Session Management
+
+The OpenAM console lets the administrator view and manage active user sessions on the Sessions tab page.
+
+Session management from the OpenAM console is only available for stateful sessions. Stateless sessions do not appear in the Sessions tab page.
+
+[#figure-session-management]
+image::images/session-management.png[]
+To end a user session manually, select the user's session, and then click the Invalidate Session button. As a result, the user has to authenticate again.
+
+[NOTE]
+====
+Deleting a user does not automatically remove any of the user's sessions. After deleting a user, check for any sessions for the user and remove them under the Console's Sessions tab.
+====
+
+

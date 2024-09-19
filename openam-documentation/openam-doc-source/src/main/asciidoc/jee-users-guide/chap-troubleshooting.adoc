@@ -1,0 +1,80 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-troubleshooting]
+== Troubleshooting
+
+This chapter offers solutions to issues that may occur during installation of OpenAM policy agents.
+[#solutions-to-common-issues]
+=== Solutions to Common Issues
+I am trying to install a policy agent, connecting to OpenAM over HTTPS, and seeing the following error:::
++
+--
+The Java platform includes certificates from many Certificate Authorities (CAs). If, however, you run your own CA, or you use self-signed certificates for HTTPS on the container where you run OpenAM, then the `agentadmin` command cannot trust the certificate presented during connection to OpenAM, and so cannot complete installation correctly.
+
+After setting up the container where you run OpenAM to use HTTPS, get the certificate to trust in a certificate file. The certificate you want is that of the CA who signed the container certificate, or the certificate itself if the container certificate is self-signed.
+
+Copy the certificate file to the system where you plan to install the policy agent. Import the certificate into a trust store that you will use during policy agent installation. If you import the certificate into the default trust store for the Java platform, then the `agentadmin` command can recognize it without additional configuration.
+
+Export and import of self-signed certificates is demonstrated in the __Administration Guide__ chapter on link:../../../openam/13/admin-guide/#chap-certs-keystores[Managing Certificates, window=\_blank].
+
+--
+
+I am trying to install the WebSphere policy agent on Linux. The system has IBM Java. When I run `agentadmin --install`, the script fails to encrypt the password from the password file, ending with this message:::
++
+--
+You must edit `agentadmin` to use IBMJCE, and then try again.
+
+See link:../jee-users-guide/index.html#install-with-ibm-jvm[To Install With IBM Java].
+
+--
+
+After installing a Java EE policy agent on WebSphere AS 7 or 8, accessing a URL for a folder in a protected application such as `\http://openam.example.com:9080/test/` results in `Error 404: SRVE0190E: File not found: {0}`, and redirection fails. What should I do to work around this problem?::
++
+--
+Perform the following steps to work around the problem, by setting the WebSphere custom property `com.ibm.ws.webcontainer.invokeFiltersCompatibility=true`:
+
+. In the WebSphere administrative console, browse to Servers > Server Types, and then click WebSphere application servers.
+
+. Click the server to apply the custom property to.
+
+. Browse to Configuration > Container settings > Web Container Settings > Web container.
+
+. Under Configuration > Additional Properties, click Custom Properties.
+
+. In the Custom Properties page, click New.
+
+. In the settings page, enter the Name `com.ibm.ws.webcontainer.invokeFiltersCompatibility` and Value `true` for the custom property.
++
+Some properties are case-sensitive.
+
+. Click Apply or OK as applicable.
+
+. Click Save in the Message box that appears.
+
+. Restart the server for the custom property to take effect.
+
+See the IBM documentation on link:http://www-01.ibm.com/support/docview.wss?uid=swg21284395[Setting webcontainer custom properties, window=\_blank] for additional information.
+
+--
+
+

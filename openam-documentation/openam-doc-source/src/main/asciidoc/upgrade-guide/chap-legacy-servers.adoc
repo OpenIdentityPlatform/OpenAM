@@ -1,0 +1,47 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-legacy-servers]
+== Migrating Legacy Servers
+
+Rather than upgrade legacy servers (running OpenSSO or Sun Access Manager, or an link:https://backstage.forgerock.com/#!/knowledge/kb/article/a18529200[OpenAM version that is no longer supported, window=\_blank]), you instead manually migrate from your existing deployment to a new deployment.
+
+For complex legacy deployments, Open Identity Platform Community link:https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List[Approved Vendors, window=\_blank] can assist you in the migration process.
+
+[#upgrade-legacy]
+.To Upgrade A Legacy Deployment
+====
+
+. Prepare your customized OpenAM server .war file.
+
+. Prepare a new deployment, installing servers from the new, customized .war file, starting with the instructions in xref:../install-guide/chap-install-core.adoc#chap-install-core["Installing OpenAM Core Services"] in the __Installation Guide__.
+
+. After installation, configure the new servers in the same way as the old servers, adapting as necessary.
++
+You can use the `ssoadm do-batch` command to apply multiple changes with one command.
+
+. Validate that the new service is performing as expected.
+
+. Redirect client application traffic from the old deployment to the new deployment.
+
+====
+

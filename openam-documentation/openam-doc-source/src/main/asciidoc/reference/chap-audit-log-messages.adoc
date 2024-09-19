@@ -1,0 +1,479 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-audit-log-messages]
+== OpenAM Audit Logging
+
+OpenAM writes log messages generated from audit events triggered by its components, instances, and other ForgeRock-based stack products.
+
+[#audit-log-format]
+=== Audit Log Format
+
+This chapter presents the audit log format for each topic-based file, event names, and audit constants used in its log messages.
+
+[#access-log-format]
+==== Access Log Format
+
+
+[#table-audit-log-schema-access]
+.Access Log Format
+[cols="25%,75%"]
+|===
+|Schema Property |Description 
+
+a|`_id`
+a|Specifies a universally unique identifier (UUID) for the message object, such as `a568d4fe-d655-49a8-8290-bfc02095bec9-491`.
+
+a|`timestamp`
+a|Specifies the timestamp when OpenAM logged the message, in UTC format to millisecond precision: `yyyy-MM-ddTHH:mm:ss.msZ`. For example: `2015-11-14T00:16:04.653Z`
+
+a|`eventName`
+a|Specifies the name of the audit event. For example, `AM-ACCESS-ATTEMPT` and `AM-ACCESS-OUTCOME`.
+
+a|`transactionId`
+a|Specifies the UUID of the transaction, which identifies an external request when it comes into the system boundary. Any events generated while handling that request will be assigned that transaction ID, so that you may see the same transaction ID even for different audit event topics. For example, `9c9e8d5c-2941-4e61-9c3c-8a990088e801`.
+
+ OpenAM supports a feature where trusted OpenAM deployment with multiple instances, components, and ForgeRock stack products can propagate the transaction ID through each call across the stack. OpenAM reads the `X-ForgeRock-TransactionId` HTTP header and appends an integer to the transaction ID. Note that this feature is disabled by default. When enabled, this feature should filter the `X-ForgeRock-TransactionId` HTTP header for connections from untrusted sources.
+
+a|`userid`
+a|Specifies the universal identifier for authenticated users. For example, `id=scarter,ou=user,o=shop,ou=services,dc=example,dc=com`.
+
+a|`trackingIds`
+a|Specifies a unique random string generated as an alias for each OpenAM session ID and OAuth 2.0 token. In releases prior to OpenAM 13.0.0, the `contextId` log property used a random string as an alias for the session ID. The `trackingIds` property also uses an alias when referring to session IDs, for example, `[ "45b17894529cf74301" ]`.
+
+ OpenAM 13.0.0 extends this property to handle OAuth 2.0 tokens. In this case, whenever OpenAM generates an access or grant token, it also generates unique random value and logs it as an alias. In this way, it is possible to trace back an access token back to its originating grant token, trace the grant token back to the session in which it was created, and then trace how the session was authenticated. An example of a `trackingIds` property in an OAuth 2.0/ OpenID Connect 1.0 environment is: `[ "1979edf68543ead001", "8878e51a-f2aa-464f-b1cc-b12fd6daa415", "3df9a5c3-8d1e-4ee3-93d6-b9bbe58163bc" ]`
+
+a|`server.ip`
+a|Specifies the IP address of the OpenAM server. For example, `127.0.0.1`.
+
+a|`server.port`
+a|Specifies the port number used by the OpenAM server. For example, `8080`.
+
+a|`client.ip`
+a|Specifies the client IP address.
+
+a|`client.port`
+a|Specifies the client port number.
+
+a|`request.protocol`
+a|Specifies the protocol associated with the request operation. Possible values: `CREST` and `PLL`.
+
+a|`request.operation`
+a|Specifies the request operation. For CREST operations, possible values: `READ`, `ACTION`, `QUERY`. For PLL operations, possible values: `LoginIndex`, `SubmitRequirements`, `GetSession`, `REQUEST_ADD_POLICY_LISTENER`.
+
+a|`request.detail`
+a|Specifies the detailed information about the request operation. For example, `{"action":"idFromSession"}`, `{"action":"validateGoto"}`, `{"action":"validate"}`, `{"action":"logout"}`, `{"action":"schema"}`, `{"action":"template"}`.
+
+a|`http.request.secure`
+a|Specifies if the request was sent over secure HTTP. For example, `true` or `false`.
+
+a|`http.request.method`
+a|Specifies the HTTP method requested by the client. For example, `GET`, `POST`, `PUT`.
+
+a|`http.request.path`
+a|Specifies the path of the HTTP request. For example, `\http://forgerock-am0.int.openrock.org:8080/openam/json/authenticate`.
+
+a|`http.request.queryParameters`
+a|Specifies the HTTP query parameter string. For example, `{ "_action": [ "idFromSession" ] }`, `{ "_queryFilter": [ "true" ] }`, `{ "_action": [ "validate" ] }`, `{ "_action": [ "logout" ] }`, `{ "realm": [ "/shop" ] }`, `{ "_action": [ "validateGoto" ] }`.
+
+a|`http.request.headers`
+a|Specifies the HTTP header for the request. For example, (Note: Line feeds added for readability purposes):
+ `{ "accept": [ "application/json, text/javascript, */*; q=0.01" ], "Accept-API-Version": [ "protocol=1.0" ], "accept-encoding": [ "gzip, deflate" ], "accept-language": [ "en-US;q=1,en;q=0.9" ], "cache-control": [ "no-cache" ], "connection": [ "Keep-Alive" ], "content-length": [ "0" ], "host": [ "forgerock-am.openrock.org" ], "pragma": [ "no-cache" ], "referer": [ "https://forgerock-am.openrock.org/openam/XUI/" ], "user-agent": [ "Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0" ], "x-nosession": [ "true" ], "x-requested-with": [ "XMLHttpRequest" ], "x-username": [ "anonymous" ] }`
+
+a|`http.request.cookies`
+a|Not used.
+
+a|`http.response.headers`
+a|Specifies the HTTP header for the response.
+
+a|`response.status`
+a|Specifies the response status of the request. Normally, `SUCCESS`, `FAILURE`, or null.
+
+a|`response.statusCode`
+a|Specifies the response status code, depending on the protocol. For CREST, HTTP failure codes are displayed but not HTTP success codes. For PLL endpoints, PLL error codes are displayed.
+
+a|`response.detail`
+a|Specifies the message associated with `response.statusCode`. For example, the `response.statusCode` of `401` has a `response.detail` of `{ "reason": "Unauthorized" }`.
+
+a|`response.elapsedTime`
+a|Specifies the time to execute the access event, usually in millisecond precision.
+
+a|`response.elapsedTimeUnits`
+a|Specifies the elapsed time units of the response. For example, `MILLISECONDS`.
+
+a|`component`
+a|Specifies the OpenAM service utilized. For example, `Server Info`, `Users`, `Config`, `Session`, `Authentication`, `Policy`, `OAuth`.
+
+a|`realm`
+a|Specifies the realm where the operation occurred. For example, the Top Level Realm (`"/"`) or the sub-realm name (`"/shop"`).
+|===
+
+
+[#activity-log-format]
+==== Activity Log Format
+
+
+[#table-audit-log-schema-activity]
+.Activity Log Format
+[cols="25%,75%"]
+|===
+|Property |Description 
+
+a|`_id`
+a|Specifies a universally unique identifier (UUID) for the message object, such as `a568d4fe-d655-49a8-8290-bfc02095bec9-487`.
+
+a|`timestamp`
+a|Specifies the timestamp when OpenAM logged the message, in UTC format to millisecond precision: `yyyy-MM-ddTHH:mm:ss.msZ`. For example: `2015-11-14T00:16:04.652Z`
+
+a|`eventName`
+a|Specifies the name of the audit event. For example, `AM-SESSION_CREATED`, `AM-SESSION-LOGGED_OUT`.
+
+a|`transactionId`
+a|Specifies the UUID of the transaction, which identifies an external request when it comes into the system boundary. Any events generated while handling that request will be assigned that transaction ID, so that you may see the same transaction ID for same even for different audit event topics. For example, `9c9e8d5c-2941-4e61-9c3c-8a990088e801`.
+
+a|`userId`
+a|Specifies the universal identifier for authenticated users. For example, `id=scarter,ou=user,o=shop,ou=services,dc=example,dc=com`.
+
+a|`trackingIds`
+a|Specifies an array containing a random context ID that identifies the session and a random string generated from an OAuth 2.0/OpenID Connect 1.0 flow that could track an access token ID or an grant token ID. For example, `[ "45b17894529cf74301" ]`.
+
+a|`runAs`
+a|Specifies the user to run the activity as. May be used in delegated administration. For example, `id=dsameuser,ou=user,dc=example,dc=com`.
+
+a|`objectId`
+a|Specifies the identifier of an object that has been created, updated, or deleted. For OpenAM 13.0.0, only session changes are recorded, so that the session `trackingId` is used in this field. For example, `[ "45b17894529cf74301" ]`
+
+a|`operation`
+a|Specifies the state change operation invoked: `CREATE`, `MODIFY`, or `DELETE`.
+
+a|`before`
+a|Not used.
+
+a|`after`
+a|Not used.
+
+a|`changedFields`
+a|Not used.
+
+a|`revision`
+a|Not used.
+
+a|`component`
+a|Specifies the OpenAM service utilized. Normally, `SESSION`.
+
+a|`realm`
+a|Specifies the realm where the operation occurred. For example, the Top Level Realm (`"/"`) or the sub-realm name (`"/shop"`).
+|===
+
+
+[#authentication-log-format]
+==== Authentication Log Format
+
+
+[#table-audit-log-schema-authentication]
+.Authentication Log Format
+[cols="25%,75%"]
+|===
+|Property |Description 
+
+a|`_id`
+a|Specifies a universally unique identifier (UUID) for the message object, such as `a568d4fe-d655-49a8-8290-bfc02095bec9-485`.
+
+a|`timestamp`
+a|Specifies the timestamp when OpenAM logged the message, in UTC format to millisecond precision: `yyyy-MM-ddTHH:mm:ss.msZ`. For example: `2015-11-14T00:16:04.640Z`
+
+a|`eventName`
+a|Specifies the name of the audit event. For example, `AM-LOGOUT`, `AM-LOGIN-MODULE-COMPLETED`, `AM-LOGIN-CHAIN-COMPLETED`.
+
+a|`transactionId`
+a|Specifies the UUID of the transaction, which identifies an external request when it comes into the system boundary. Any events generated while handling that request will be assigned that transaction ID, so that you may see the same transaction ID for same even for different audit event topics. For example, `9c9e8d5c-2941-4e61-9c3c-8a990088e801`.
+
+a|`userId`
+a|Specifies the universal identifier for authenticated users. For example, `id=scarter,ou=user,o=shop,ou=services,dc=example,dc=com`.
+
+a|`trackingIds`
+a|Specifies an array containing a random context ID that identifies the session and a random string generated from an OAuth 2.0/OpenID Connect 1.0 flow that could track an access token ID or an grant token ID. For example, `[ "45b17894529cf74301" ]`.
+
+a|`result`
+a|Specifies the outcome of a single authentication module within a chain, either `SUCCESSFUL` or `FAILED`.
+
+a|`principal`
+a|Specifies the array of accounts used to authenticate, such as `[ "amadmin" ]`, `[ "scarter" ]`.
+
+a|`context`
+a|Not used
+
+a|`entries`
+a|Specifies the JSON representation of the details of an authentication module or chain. OpenAM creates an event as each module completes and a final event at the end of the chain. For example, `[ { "moduleId": "DataStore", "info": { "moduleClass": "DataStore", "ipAddress": "127.0.0.1", "moduleName": "DataStore", "authLevel": "0" } } ]`
+
+a|`component`
+a|Specifies the OpenAM service utilized. Normally, `Authentication`.
+
+a|`realm`
+a|Specifies the realm where the operation occurred. For example, the Top Level Realm (`"/"`) or the sub-realm name (`"/shop"`).
+|===
+
+
+[#config-log-format]
+==== Config Log Format
+
+
+[#table-audit-log-schema-config]
+.Config Log Format
+[cols="25%,75%"]
+|===
+|Property |Description 
+
+a|`_id`
+a|Specifies a universally unique identifier (UUID) for the message object. For example, `6a568d4fe-d655-49a8-8290-bfc02095bec9-843`.
+
+a|`timestamp`
+a|Specifies the timestamp when OpenAM logged the message, in UTC format to millisecond precision: `yyyy-MM-ddTHH:mm:ss.msZ`. For example, `2015-11-14T00:21:03.490Z`
+
+a|`eventName`
+a|Specifies the name of the audit event. For example, `AM-CONFIG-CHANGE`.
+
+a|`transactionId`
+a|Specifies the UUID of the transaction, which identifies an external request when it comes into the system boundary. Any events generated while handling that request will be assigned that transaction ID, so that you may see the same transaction ID for different audit event topics. For example, `301d1a6e-67f9-4e45-bfeb-5e4047a8b432`.
+
+a|`userId`
+a|Not used.
+
+a|`trackingIds`
+a|Not used.
+
+a|`runAs`
+a|Specifies the user to run the activity as. May be used in delegated administration. For example, `id=amadmin,ou=user,dc=example,dc=com`.
+
+a|`objectId`
+a|Specifies the identifier of a system object that has been created, modified, or deleted. For example, `ou=SamuelTwo,ou=default,ou=OrganizationConfig,ou=1.0, ou=iPlanetAMAuthSAML2Service,ou=services,o=shop,ou=services, dc=example,dc=com`.
+
+a|`operation`
+a|Specifies the state change operation invoked: `CREATE`, `MODIFY`, or `DELETE`.
+
+a|`before`
+a|Specifies the JSON representation of the object prior to the activity. For example, `{ "sunsmspriority":["0"], "objectclass":["top","sunServiceComponent","organizationalUnit"], "ou":["SamuelTwo"],"sunserviceID":["serverconfig"] }`
+
+a|`after`
+a|Specifies the JSON representation of the object after the activity. For example, `{ "sunKeyValue":["forgerock-am-auth-saml2-auth-level=0", "forgerock-am-auth-saml2-meta-alias=/sp", "forgerock-am-auth-saml2-entity-name=http://", "forgerock-am-auth-saml2-authn-context-decl-ref=", "forgerock-am-auth-saml2-force-authn=none", "forgerock-am-auth-saml2-is-passive=none", "forgerock-am-auth-saml2-login-chain=", "forgerock-am-auth-saml2-auth-comparison=none", "forgerock-am-auth-saml2-req-binding= urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "forgerock-am-auth-saml2-binding= urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact", "forgerock-am-auth-saml2-authn-context-class-ref=", "forgerock-am-auth-saml2-slo-relay=http://", "forgerock-am-auth-saml2-allow-create=false", "forgerock-am-auth-saml2-name-id-format= urn:oasis:names:tc:SAML:2.0:nameid-format:persistent","`
+
+a|`changedFields`
+a|Specifies the fields that were changed. For example, `[ "sunKeyValue" ]`.
+
+a|`revision`
+a|Not used.
+
+a|`component`
+a|Not used.
+
+a|`realm`
+a|Specifies the realm where the operation occurred. For example, the Top Level Realm (`"/"`) or the sub-realm name (`"/shop"`).
+|===
+
+
+
+[#audit-log-event-names]
+=== Audit Log Event Names
+
+The following section presents the predefined names for the audit events:
+
+[#table-audit-log-event-names]
+.Audit Log Event Names
+[cols="50%,50%"]
+|===
+|Topic |EventName 
+
+a|`access`
+a|`AM-ACCESS_ATTEMPT`
+
+a|`access`
+a|`AM-ACCESS-OUTCOME`
+
+a|`activity`
+a|`AM-SESSION-CREATED`
+
+a|`activity`
+a|`AM-SESSION-IDLE_TIME_OUT`
+
+a|`activity`
+a|`AM-SESSION-MAX_TIMED_OUT`
+
+a|`activity`
+a|`AM-SESSION-LOGGED_OUT`
+
+a|`activity`
+a|`AM-SESSION-REACTIVATED`
+
+a|`activity`
+a|`AM-SESSION-DESTROYED`
+
+a|`activity`
+a|`AM-SESSION-PROPERTY_CHANGED`
+
+a|`access`
+a|`AM-LOGIN-MODULE-COMPLETED`
+
+a|`access`
+a|`AM-LOGIN-COMPLETED`
+
+a|`access`
+a|`AM-LOGOUT`
+
+a|`config`
+a|`AM-CONFIG-CHANGE`
+|===
+
+
+[#audit-log-components]
+=== Audit Log Components
+
+The following section presents the predefined audit event components that make up the log messages:
+
+[#table-audit-log-components]
+.Audit Log Event Components
+[cols="33%,67%"]
+|===
+|Event Component | 
+
+a|`OAuth`
+a|OAuth 2.0, OpenID Connect 1.0, and UMA
+
+a|`CTS`
+a|Core Token Service
+
+a|`Policy Agent`
+a|Web and Java EE policy agents
+
+a|`Authentication`
+a|Authentication service
+
+a|`Dashboard`
+a|Dashboard service
+
+a|`Server Info`
+a|Server information service
+
+a|`Users`
+a|Users component
+
+a|`Groups`
+a|Groups component
+
+a|`Oath`
+a|Mobile authentication
+
+a|`Devices`
+a|Trusted devices
+
+a|`Policy`
+a|Policies
+
+a|`Realms`
+a|Realms and sub-realms
+
+a|`Session`
+a|Session service
+
+a|`Script`
+a|Scripting service
+
+a|`Batch`
+a|Batch service
+
+a|`Config`
+a|Configuration
+
+a|`STS`
+a|Secure Token Service: REST and SOAP
+
+a|`Record`
+a|Recording service
+
+a|`Audit`
+a|Auditing service
+
+a|`Radius`
+a|RADIUS server
+|===
+
+
+[#audit-log-failure-reasons]
+=== Audit Log Failure Reasons
+
+The following section presents the predefined audit event failure reasons:
+
+[#table-audit-log-failure-reasons]
+.Audit Log Event Authentication Failure Reasons
+[cols="33%,67%"]
+|===
+|Failure |Description 
+
+a|`LOGIN_FAILED`
+a|Incorrect/invalid credentials presented.
+
+a|`INVALID_PASSWORD`
+a|Invalid credentials entered.
+
+a|`NO_CONFIG`
+a|Authentication chain does not exist.
+
+a|`NO_USER_PROFILE`
+a|No user profile found for this user.
+
+a|`USER_INACTIVE`
+a|User is not active.
+
+a|`LOCKED_OUT`
+a|Maximum number of failure attempts exceeded. User is locked out.
+
+a|`ACCOUNT_EXPIRED`
+a|User account has expired.
+
+a|`LOGIN_TIMEOUT`
+a|Login timed out.
+
+a|`MODULE_DENIED`
+a|Authentication module is denied.
+
+a|`MAX_SESSION_REACHED`
+a|Limit for maximum number of allowed sessions has been reached.
+
+a|`INVALID_REALM`
+a|Realm does not exist.
+
+a|`REALM_INACTIVE`
+a|Realm is not active.
+
+a|`USER_NOTE_FOUND`
+a|Role-based authentication: user does not belong to this role.
+
+a|`AUTH_TYPE_DENIED`
+a|Authentication type is denied.
+
+a|`SESSION_CREATE_ERROR`
+a|Cannot create a session.
+
+a|`INVALID_LEVEL`
+a|Level-based authentication: Invalid authentication level.
+|===
+
+

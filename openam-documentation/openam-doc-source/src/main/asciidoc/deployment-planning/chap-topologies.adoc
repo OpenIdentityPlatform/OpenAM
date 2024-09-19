@@ -1,0 +1,288 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-topologies]
+== Example Deployment Topology
+
+You can configure OpenAM in a wide variety of deployments depending on your security requirements and network infrastructure. This chapter presents an example enterprise deployment, featuring a highly available and scalable architecture across multiple data centers.
+
+[#logical-topology]
+=== About the Example Topology
+
+xref:#figure-active-openam-deployment["OpenAM Deployment Example"] presents an example topology of a multi-city multi-data-center deployment across a wide area network (WAN). The example deployment is partitioned into a two-tier architecture. The top tier is a DMZ with the initial firewall securing public traffic into the network. The second firewall limits traffic from the DMZ into the application tier where the protected resources are housed.
+
+[NOTE]
+====
+The example components in this chapter are presented for illustrative purposes. ForgeRock does not recommend specific products, such as reverse proxies, load balancers, switches, firewalls, and so forth, as OpenAM can be deployed within your existing networking infrastructure.
+====
+
+[#figure-active-openam-deployment]
+image::images/active-active-deployment.png[]
+
+
+[#public-tier]
+=== The Public Tier
+
+The public tier provides an extra layer of security with a DMZ consisting of load balancers and reverse proxies. This section presents the DMZ elements.
+
+[#gslb]
+==== The Global Load Balancer
+
+The example deployment uses a global load balancer (GLB) to route DNS requests efficiently to multiple data centers. The GLB reduces application latency by spreading the traffic workload among data centers and maintains high availability during planned or unplanned down time, during which it quickly re-routes requests to another data center to ensure online business activity continues successfully.
+
+You can install a cloud-based or a hardware-based version of the GLB. The leading GLB vendors offer solutions with extensive health-checking, site affinity capabilities, and other features for most systems. Detailed deployment discussions about global load balancers are beyond the scope of this guide.
+
+
+[#frontend-lbs]
+==== Front End Local Load Balancers
+
+Each data center has local front end load balancers to route incoming traffic to multiple reverse proxy servers, thereby distributing the load based on a scheduling algorithm. Many load balancer solutions provide server affinity or stickiness to efficiently route a client's inbound requests to the same server. Other features include health checking to determine the state of its connected servers, and SSL offloading to secure communication with the client.
+
+You can cluster the load balancers themselves or configure load balancing in a clustered server environment, which provides data and session failover and high availability across multiple nodes. Clustering also allows horizontal scaling for future growth. Many vendors offer hardware and software solutions for this requirement. In most cases, you must determine how you want to configure your load balancers, for example, in an active-passive configuration that supports high availability, or in an active-active configuration that supports session failover and redundancy.
+
+There are many load balancer solutions available in the market. You can set up an external network hardware load balancer, or a software solution like HAProxy (L4 or L7 load balancing) or Linux Virtual Server (LVS) (L4 load balancing), and many others.
+
+
+[#reverse-proxies]
+==== Reverse Proxies
+
+The reverse proxies work in concert with the load balancers to route the client requests to the back end Web or application servers, providing an extra level of security for your network. The reverse proxies also provide additional features, like caching to reduce the load on the Web servers, HTTP compression for faster transmission, URL filtering to deny access to certain sites, SSL acceleration to offload public key encryption in SSL handshakes to a hardware accelerator, or SSL termination to reduce the SSL encryption overhead on the load-balanced servers.
+
+The use of reverse proxies has several key advantages. First, the reverse proxies serve as an highly scalable SSL layer that can be deployed inexpensively using freely available products, like Apache HTTP server or nginx. This layer provides SSL termination and offloads SSL processing to the reverse proxies instead of the load balancer, which could otherwise become a bottleneck if the load balancer is required to handle increasing SSL traffic.
+
+xref:#figure-active-frontend-lbs-detailed["OpenAM Frontend Load Balancer Reverse Proxy Layer"] illustrates one possible deployment using HAProxy in an active-passive configuration for high availability. The HAProxy load balancers forward the requests to Apache 2.2 reverse proxy servers. For this example, we assume SSL is configured everywhere within the network.
+
+[#figure-active-frontend-lbs-detailed]
+image::images/active-frontend-lbs-detailed.png[]
+Another advantage to reverse proxies is that they allow access to only those endpoints required for your applications. If you need the authentication user interface and OAuth2/OpenID Connect endpoints, then you can expose only those endpoints and no others. A good rule of thumb is to check which functionality is required for your public interface and then use the reverse proxy to expose only those endpoints.
+
+A third advantage to reverse proxies is when you have applications that sit on non-standard containers for which ForgeRock does not provide a native agent. In this case, you can implement a reverse proxy in your Web tier, and deploy a policy agent on the reverse proxy to filter any requests.
+
+xref:#figure-active-frontend-lbs-rp-with-agent["OpenAM Frontend Load Balancers and Reverse Proxies with Agent"] shows a simple topology diagram of your Web tier with agents deployed on your reverse proxies. The dotted policy agents indicate that they can be optionally deployed in your network depending on your configuration, container type, and application.
+
+[#figure-active-frontend-lbs-rp-with-agent]
+image::images/active-frontend-lbs-rp-with-agent.png[]
+
+
+[#openig]
+==== OpenIG
+
+The ForgeRock IRM platform includes an open-source application gateway product, OpenIG, a versatile, Java EE servlet-based reverse proxy server. OpenIG allows you to integrate your applications into existing networks using current standards, such as SAML 2.0 federation, OAuth 2.0 and OpenID Connect 1.0, custom or legacy applications, or other vendor solutions without altering native applications. With OpenIG, you can extend OpenAM's authentication and authorization (policy) services to provide SSO across your mobile, social, partner, and Web applications.
+
+OpenIG provides a set of servlet filters that you can use as-is or chained together with other filters to provide complex operations processing on HTTP requests and responses. You can also write your own custom filters for legacy or custom applications. For more information, see the OpenIG documentation.
+
+You can deploy OpenIG on Tomcat or Jetty servers, allowing it to intercept the HTTP requests and carry out filtering operations on each request, and then log the user directly into the application. In such cases, you can deploy a policy agent for authorization purposes on the request.
+
+However, in the example deployment, you may not need to deploy a policy agent as OpenIG functions strictly as a reverse proxy in the DMZ. The inclusion of the policy agent in the illustration only indicates that you can deploy a policy agent with OpenIG when deployed on a Web container or app server.
+
+[#figure-active-frontend-lbs]
+image::images/active-frontend-lbs.png[]
+
+[NOTE]
+====
+Some OpenAM authentication modules may require additional user information to authenticate, such as the IP address where the request originated. When OpenAM is accessed through a load balancer or proxy layer, you can configure OpenAM to consume and forward this information with the request headers.
+====
+
+
+[#ssl-termination]
+==== SSL Termination
+
+One important security decision ia whether to terminate SSL or offload your SSL connections at the load balancer. Offloading SSL effectively decrypts your SSL traffic before passing it on as HTTP or at the reverse proxy. Another option is to run SSL pass-through where the load balancer does not decrypt the traffic but passes it on to the reverse proxy servers, which are responsible for the decryption. The other option is to deploy a more secure environment using SSL everywhere within your deployment.
+
+
+
+[#about-the-app-tier]
+=== About the Application Tier
+
+The application tier is where the protected resources reside on Web containers, application servers, or legacy servers. The policy agents intercept all access requests to the protected resources on the Web or app server and grants access to the user based on policy decisions made on the OpenAM servers..
+
+Because OpenAM is Java-based, you can install the server on a variety of platforms, such as Linux, Solaris, and Windows.
+
+[#figure-app-svr-deployment]
+image::images/app-svr-deployment.png[]
+OpenAM provides a cookie (default: `amlbcoookie`) for __sticky load balancing__ to ensure that the load balancer properly routes requests to the OpenAM servers. When the client sends an access request to a resource, the policy agent redirects the client to an authentication login page. Upon successful authentication, the policy agent forwards the request via the load balancer to one of the OpenAM servers.
+
+The OpenAM server that authenticated the user becomes the authoritative server during that user's session with OpenAM. Each authentication and authorization request related to the user's session is then evaluated by the authoritative server as long as that server is available. It is therefore important when load balancing, to send requests concerning the user to the authoritative server directly to reduce additional crosstalk from other servers trying contact the authoritative server.
+
+Directing OpenAM requests to the authoritative server is necessary only for OpenAM deployments that use stateful sessions. Because stateless sessions reside in the session token cookie (default: `iPlanetDirectoryPro`) rather than on the OpenAM server, any OpenAM server in a cluster can handle a request with a stateless session without crosstalk.
+
+To direct requests directly to the authoritative OpenAM server, the load balancer should use the value specified in the OpenAM load balancer cookie, `amlbcookie`, which you can configure to uniquely identify a server within a site.
+
+The load balancer inspects the sticky cookie to determine which OpenAM server should receive the request. This ensures that all subsequent requests involving the session are routed to the correct server.
+
+
+[#openam-agents]
+=== OpenAM Policy Agents
+
+Policy agents are OpenAM components that are installed on Web containers or application servers to protect the resources deployed there. Policy agents function as a type of gatekeeper to ensure clients are authenticated and authorized to access the resource as well as enforce SSO with registered devices.
+
+OpenAM provides two main policy agents: Web Policy Agent (WPA) and J2EE Policy Agent. The Web Policy Agent is a native plugin to a Web server and is distributed as a zip file. Web policy agents filter requests for Web server resources without any changes to the resources. The J2EE Policy Agent is set up as a servlet filter within the application server. Protected Java EE application configurations must be changed to filter requests through the Java EE policy agent.
+
+Both policy agents have the following features:
+
+* *Cookie Reset*. Policy agents can be configured to reset any number of cookies in the session before the client is redirected for authentication. This feature is typically used when the policy agent is deployed with a parallel authentication mechanism and cookies need to be reset. Make sure that the `name`, `domain`, and `path` properties are defined.
+
+* *Disable Policy Evaluation*. Policy agents act as a policy enforcement point (PEP) during the authorization phase for a client application. This feature is typically used when the policy agent is only used for SSO and does not require a policy evaluation request to OpenAM.
+
+* *Not-Enforced URLs/URIs List*. Policy agents protect all resources on the Web server or in a Web application that it serves and grants access only if the client has been authenticated and authorized to access the resources. However, there may be some resources, such as public HTML pages, graphics, or stylesheet files that do not require policy evaluation. To account for such files, the policy agent maintains a Not-Enforced URL list, specifying the URLs or resources that are available to any user. J2EE agents use a Not-Enforced URI list.
+
+* *URL Correction*. OpenAM is aware of the access management network and its registered clients, implementing a fully qualified domain name (FQDN) mapper that can be configured to correct invalid URLs. It also holds a list of invalid URLs and compares them to the URL the policy agent is attempting to access.
+
+* *Attribute Injection Into Requests*. Policy agents can be configured to inject user profile attributes into cookies, requests, and HTTP headers.
+
+* *Notifications*. Both agents have the ability to receive configuration notifications from OpenAM. In deployments with stateful sessions, both agents can receive session notifications from OpenAM.
+
+* *Cross-Domain Single Sign-On*. In deployments with stateful sessions, both agents can be configured for cross-domain single sign-on (CDSSO).
+
+
+[#openam-web-policy-agents]
+==== Web Policy Agents
+
+A Web policy agent is an installable component on a Web server that is configured to be called by the Web server when a client requests access to a protected resource on a Web site. The Web policy agent runs authentication and authorization services to allow the user access to a protected resource.
+
+[#figure-openam-web-policy-agent]
+image::images/openam-web-policy-agent.png[]
+Web Policy Agents are supported on different architectures, although not all Web server types and architecture combinations are supported. You can view the list of supported Web policy agents in the OpenAM Web Policy Agent documentation.
+
+
+[#j2ee-policy-agents]
+==== Java EE Policy Agents
+
+The J2EE policy agent is made up of a servlet filter and a J2EE realm. The servlet filter manages authentication and URL-based authorization to the protected application and implements SSO. The filter must be integrated into the application using the application's Web deployment descriptor. The J2EE realm is configured into the security settings of the application server and maps J2EE roles to OpenAM users and groups.
+
+[#figure-javaee-policy-agent]
+image::images/javaee-policy-agent.png[]
+OpenAM provides a variety of J2EE policy agents for application servers. You can view the list of supported Java EE policy agents in the OpenAM Java EE Policy Agent documentation.
+
+
+
+[#openam-sites]
+=== Sites
+
+OpenAM provides the capability to logically group two or more redundant OpenAM servers into a __site__, allowing the servers to function as a single unit identified by a site ID across a LAN or WAN. When you set up a single site, you place the OpenAM servers behind a load balancer to spread the load and provide system failover should one of the servers go down for any reason. You can use round-robin or load average for your load balancing algorithms.
+
+[NOTE]
+====
+Round-robin load balancing should only be used for a first time access of OpenAM or if the `amlbcookie` is not set; otherwise, cookie-based load balancing should be used.
+====
+In OpenAM deployments with stateful sessions, you configure each server in a site for session failover, in which the user's authenticated session continues uninterrupted in the event one of the servers go down. Session failover uses OpenAM's CTS to store and share user session data between servers in the site. When an OpenAM server goes does down, the other server(s) in the site reads user session data in the CTS store, allowing the user to run new transactions or requests without re-authenticating to the system. When the server becomes available, it reads the session data in the CTS store and services transactions for active users.
+
+Session failover requires that all servers in a site use the same Core Token Service, which is replicated across all servers. For more information, see xref:../install-guide/chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] in the __Installation Guide__.
+
+OpenAM deployments with stateless sessions do not use the CTS for session storage and retrieval to achieve session failover. Instead, the session is stored in a browser cookie.
+
+xref:#figure-active-app-tier["OpenAM Application Tier Deployment"] shows a possible implementation using RedHat Linux servers with OpenAM installed on each server. You can implement routing software, like Keepalived in such a deployment. If you require L7 load balancing, you can consider many other software and hardware solutions. OpenAM relies on OpenDJ's SDK for load balancing, failover, and heartbeat capabilities to spread the load across the directory servers or to throttle performance.
+
+[#figure-active-app-tier]
+image::images/active-app-tier-deployment.png[]
+
+[NOTE]
+====
+When protecting OpenAM with a load balancer or proxy service, configure your container so that OpenAM can trust the load balancer or proxy service.
+====
+One possible configuration (seen in xref:#figure-site-deployment-single-lb["OpenAM Site Deployment With a Single Load Balancer"]) is to set up a load balancer with multiple OpenAM servers. You configure the load balancer to be sticky using the value of the OpenAM cookie, `amlbcookie`, which routes client requests to that primary server. If the primary OpenAM server goes down for any reason, it fails over to another OpenAM server. Session data also continues uninterrupted if a server goes down as it is shared between OpenAM servers. You must also ensure that the container trusts the load balancer.
+
+You must determine if SSL should be terminated on the load balancer or communication be encrypted from the load balancer to the OpenAM servers.
+
+[#figure-site-deployment-single-lb]
+image::images/site-deployment-single-lb.png[]
+One problem with xref:#figure-site-deployment-single-lb["OpenAM Site Deployment With a Single Load Balancer"] is that the load balancer is a single point of failure. If the load balancer goes down, then the system becomes inoperable.
+
+To make the deployment highly available, you can set up another variation of the deployment by fronting more than one load balancer to the set of OpenAM servers in an active/passive configuration that provides high availability should one load balancer go down for an outage.
+
+[#figure-site-deployment-multi-lbs]
+image::images/site-deployment-multi-lbs.png[]
+
+[#multi-sites]
+==== Multiple Sites
+
+Another deployment variation is to set up multiple redundant sites, typically across a WAN network, which provides high availability for stateful sessions through system and session failover. This setup can be seen in xref:#figure-site-deployment-multi-site-2["OpenAM Site Deployment With Multiple Sites"] If the load balancer in one site goes down, the other site can resume processing requests with the authenticated user session running without interruption. If an OpenAM server goes down, it fails over to another OpenAM server while also keeping the authenticated user session active with uninterrupted service.
+
+Policy agent configuration and other configuration data can be shared among multiple, redundant sites, so that if one site fails, the other site can continue without requiring re-logging.
+
+For optimum performance, you want to keep sites local to your geographical location with session failover taking place only within a data center. The possible loss of a data center means clients must reestablish sessions, which may be an acceptable trade-off given the performance cost of highly-replicated systems across multiple sites over WAN. You must determine the optimum topology based on your performance and availability objectives.
+
+[#figure-site-deployment-multi-site-2]
+image::images/site-deployment-multi-site-2.png[]
+For more information, see xref:../install-guide/chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"] in the __Installation Guide__.
+
+
+
+[#backend-ds]
+=== Back End Directory Servers
+
+Each OpenAM server comes out-of-the-box with an embedded OpenDJ directory server that you can configure to store policies, configuration data, identity data, and CTS tokens. The embedded directory server is best suited for small systems or for evaluation purposes. It is not generally recommended for large-scale production systems.
+
+* *Identity Data Stores*. For identity repositories, OpenAM provides built-in support for LDAP and JDBC storage systems. You can implement a number of different directory server vendors for storing your identity data, allowing you to configure your directory servers in a number of deployment typologies.
++
+When configuring external LDAP Identity data stores, you must manually carry out additional installation tasks that could require a bit more time for the configuration process. For example, you must manually add schema definitions, access control instructions (ACIs), privileges for reading and updating the schema, and resetting user passwords. For more information, see xref:../install-guide/chap-prepare-install.adoc#prepare-identity-repository["Preparing an External Identity Repository"] in the __Installation Guide__.
++
+If OpenAM does not support your particular identity data store type, you can develop your own customized plugin to allow OpenAM to run method calls to fetch, read, create, delete, edit, or authenticate to your identity store data. For more information, see xref:../dev-guide/chap-customizing.adoc#sec-identity-repo-spi["Customizing Identity Data Storage"] in the __Developer's Guide__.
++
+You can configure the Data Store authentication module to require the user to authenticate against a particular identity data store for a specific realm. OpenAM associates a realm with at least one identity repository and authentication process. When you initially configure OpenAM, you define the identity repository for authenticating at the top level realm (/), which is used to administer OpenAM. From there, you can define additional realms with different authentication and authorization services as well as different identity repositories if you have enough identity data. For more information, see xref:../admin-guide/chap-realms.adoc#chap-realms["Configuring Realms"] in the __Administration Guide__.
+
+* *Configuration Data Stores*. OpenAM stores configuration data in the embedded OpenDJ directory server. Configuration data includes authentication information that defines how users and groups authenticate, identity data store information, service information, policy information for evaluation, and partner server information that can send trusted SAML assertions.
++
+The embedded OpenDJ directory server may be sufficient for your system, but you may want to deploy an external configuration store if required for large-scale systems with many policies or many realms. Like external identity stores, you must manually add schema definitions, ACIs, privileges for reading and updating the schema, and indexes for attributes used to access the configuration data.
++
+SAML keys are stored in the configuration store and are thus replicated. Also, OpenAM's signing keys are shipped with a test certificate. If you upgrade the keystore, you need to redistribute the certificates to all nodes so that they can continue to communicate with each other. For more information, see xref:../admin-guide/chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"] in the __Administration Guide__.
+
+* *CTS Data Stores*. The CTS provides persistent and highly available token storage for OpenAM session, OAuth 2.0, and SAML 2.0 tokens. If configured, CTS supports session token persistence for stateful session failover.
++
+CTS traffic is volatile compared to configuration data, so deploying CTS as a dedicated external data store is advantageous for systems with many users and many sessions. For more information, see xref:../install-guide/chap-cts.adoc#chap-cts["Configuring the Core Token Service"] in the __Installation Guide__.
+
+When configuring multiple external directory servers, make sure to deploy them with an active/passive load balancing algorithm. This setup eliminates the possibility of directory read-write errors if replication is not quick enough. For example, if an attribute is updated on OpenDJ-1 but read from OpenDJ-2, and if replication is not quick enough and the attribute is not written or updated in OpenDJ-2, an error could result.
+
+xref:#figure-site-deployment-ext-datastores["OpenAM Site Deployment With External Datastores"] shows a basic back end deployment with separate external identity, configuration, and CTS data stores. You can use load balancers to spread the load or throttle performance for the external data stores. Although not shown in the diagram, you can also set up a directory tier, separating the application tier from the repositories with another firewall. This tier provides added security for your identity repository or policy data.
+
+[NOTE]
+====
+ForgeRock recommends that you use the OpenAM's embedded OpenDJ directory server as the configuration data store and only set up an external configuration store if necessary.
+====
+
+[#figure-site-deployment-ext-datastores]
+image::images/site-deployment-ext-datastores.png[]
+
+
+[#active-active-configuration]
+=== Example Topology Configuration Diagram
+
+xref:#figure-active-active-configuration["OpenAM Example Deployment Configuration Diagram"] shows a simplified configuration diagram of the example deployment presented in this chapter (shown in xref:#figure-active-openam-deployment["OpenAM Deployment Example"]). The example deploys the various servers on Linux hosts.
+
+The firewalls can be a hardware or software solution or a combination firewall-router can be implemented in the deployment. The local load balancers are implemented using HAProxy servers in an active-passive configuration. You can also use Linux Keepalived for software load balancing or one of the many other solutions available. The Web and application servers have the Web policy agent and Java EE policy agent installed on each server respectively. OpenAM is deployed on Tomcat hosted on a Linux server. Within each datacenter, the OpenAM servers are configured as sites for failover and stateful session failover capabilities.
+
+The directory servers are OpenDJ servers that store identity and CTS data. For presentation purposes only, the configuration data is assumed to be stored within the embedded directory store on each OpenAM server. The OpenIG example does not show redundancy for high availability also due to presentation purposes.
+
+[#figure-active-active-configuration]
+image::images/active-active-configuration.png[]
+
+
+[#realms]
+=== Realms
+
+The previous sections in this chapter present the logical and physical topologies of an example highly available OpenAM deployment, including the clustering of servers using __sites__. One important configuration feature of OpenAM is its ability to run multiple client entities to secure and manage applications through a single OpenAM instance.
+
+OpenAM supports its multiple clients through its use of __realms__. You configure realms within OpenAM to handle different sets of users to whom you can set up different configuration options, storage requirements, delegated administrators, and customization options per realm.
+
+Typically, you can configure realms for customers, partners, or employees within your OpenAM instance, for different departments, or for subsidiaries. In such cases, you create a global administrator who can delegate privileges to realm administrators, each specifically responsible for managing their respective realms.
+
+

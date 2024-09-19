@@ -1,0 +1,152 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-jee-agents-features]
+== Java EE Policy Agent Features
+
+The Java EE policy agent provides a number of additional features that are useful for your deployment.
+
+[#filter-modes]
+=== Java EE Agent Filter Modes of Operation
+
+The agent filter intercepts all inbound client requests to access a protected resource and processes the request based on a global configuration property, `com.sun.identity.agents.config.filter.mode`, set in the policy agent profile on OpenAM. The configuration setting determines the filter mode of operation that should be carried out on the intercepted inbound request.
+
+The filter mode property can be set to one of the following values:
+
+* *NONE*. Specifies that nothing should be done with the inbound request. This mode is primarily used in development or testing environments and should never be used in production. If logging is enabled, the agent filter logs all intercepted requests for auditing purposes.
+
+* *SSO_ONLY*. Specifies that authentication should be enforced to all users who try to access protected web resources. The filter invokes the OpenAM Authentication service to verify the identity of the user. If the user's identity is verified, the user is issued a session token through OpenAM's Session service.
+
+* *J2EE_POLICY*. Specifies that the policy agent should not enforce OpenAM-based URL policies. Instead, authorization should be enforced through the container's Java EE security policies. Container security can be configured declaratively or programmatically, as follows:
++
+
+** *Declaratively*. Configure elements, such as `auth-constraint` and `security-constraint` in the application's `web.xml` file.
++
+For more information about container declarative security, see xref:chap-jee-agent-config.adoc#configuring-declarative-security[Configuring Container Declarative Security].
+
+** *Programmatically*. Configure method calls to security APIs in your environment.
+
++
+To determine user identity, the filter invokes OpenAM's Authentication service to verify the identity of the user. If OpenAM verifies the user's identity, the following events occur:
++
+
+** OpenAM's Session Service issues a session token to the user.
+
+** The policy agent logs the user into the container realm, where the container enforces authorization policies.
+
++
+Failure to configure container security while the filter is set to the `J2EE_POLICY` mode may result in users being requested to authenticate in OpenAM, even for not-enforced resources.
+
+* *URL_POLICY*. Specifies that authorization should be enforced only by OpenAM's URL resource-based policies. When the filter mode is `URL_POLICY`, no Java EE policies will be enforced. The `URL_POLICY` mode is commonly used in production deployments.
+
+* *ALL*. Specifies that SSO_ONLY, J2EE_POLICY, and URL_POLICY should be enforced. This setting ensures that the user gets properly authenticated with a valid session token ID, and then authorized through the Java EE container's declarative or programmatic security settings, and OpenAM's URL-based policies to access the web resource.
+
+For more information, see link:../jee-users-guide/index.html#j2ee-agent-general-properties[Configuring J2EE Policy Agent Global Properties].
+
+
+[#jee-agent-not-enforced-list]
+=== Not-Enforced URI and Client IP Lists
+
+The Java EE policy agent supports properties to bypass authentication and grant immediate access to resources not requiring protection, such as images, stylesheets, or static HTML pages.
+
+You can configure a Not-Enforced URI List using the `com.sun.identity.agents.config.notenforced.uri` property that grants the user access to resources whose URIs match those in the list.
+
+For example, you can set URI patterns with wildcards in the OpenAM console using the following patterns:
+
+[source, console]
+----
+/logout.html
+   /images/*
+   /css/-*-
+   /*.jsp?locale=*
+----
+For more information on wildcard usage, see link:../../../openam/13/admin-guide/#wildcard-syntax[Wildcard Usage, window=\_blank].
+
+The Java EE policy agent also supports a Not-Enforced Client IP List, which specifies the client IP addresses that can be excluded from authentication and authorization. This property lets administrators access the web site from a certain IP address, or gives a search engine access to the web resources.
+
+For more information on the Not-Enforced URI and Not-Enforced Client IP Lists and other related properties, see link:../jee-users-guide/index.html#j2ee-agent-not-enforced-uri-properties[Not Enforced URI Processing Properties].
+
+
+[#jee-agent-attribute-fetching]
+=== Attribute Fetch Modes
+
+Java EE policy agents provide the capability to fetch and inject user information into HTTP headers, request objects, and cookies and pass them on to the protected client applications. The client applications can then personalize content using these attributes in their web pages or responses.
+
+Specifically, you can configure the type of attributes to be fetched and the associated mappings for the attributes names used on OpenAM to those values used in the containers. The Java EE policy agent securely fetches the user and session data from the authenticated user as well as policy response attributes.
+
+For more details, see xref:chap-jee-agent-config.adoc#chap-jee-agent-config[Configuring Java EE Policy Agents].
+
+
+[#agent-login-attempt-limits]
+=== Login Attempt Limits
+
+When the user-agent does not present a valid SSO token, the agent will redirect the user to the login URL configured in OpenAM. The Java EE policy agent can be configured to limit the login attempts made to the policy agent to mitigate any redirect loops that may result in an error page presented to the end-user.
+
+You can use the `com.sun.identity.agents.config.login.attempt.limit` property to specify a non-zero value for the number of login attempts. For example, if the property is set to 3, then the agent will block the access request to the protected resource on the fourth login request.
+
+You can also limit the number of redirections the agent can take for a single browser session by setting the `com.sun.identity.agents.config.redirect.attempt.limit`.
+
+For more details, see link:../jee-users-guide/index.html#j2ee-agent-general-properties[General Properties].
+
+
+[#fqdn-checking]
+=== FQDN Checking
+
+The Java EE policy agent requires that clients accessing protected resources use valid URLs with fully qualified domain names (FQDNs). If invalid URLs are referenced, policy evaluation can fail as the FQDN will not match the requested URL, leading to blocked access to the resource. Misconfigured URLs can also result in incorrect policy evaluation for subsequent access requests.
+
+There are cases where clients may specify resource URLs that differ from the FQDNs stored in OpenAM policies; for example, in load balanced and virtual host environments. To handle these cases, the Java EE policy agent supports FQDN Checking properties: `FQDN Default` and `FQDN Virtual Host Map` properties.
+
+The `FQDN Default` property specifies the default URL with valid hostname. The property ensures that the policy agent can redirect to a URL with a valid hostname should it discover an invalid URL in the client request.
+
+The `FQDN Virtual Host Map` property stores map keys and their corresponding values, allowing invalid URLs, load balanced URLs, and virtual host URLs to be correctly mapped to valid URLs. Each entry in the Map has precedence over the `FQDN Default` setting, so that if no valid URLs exist in the `FQDN Virtual Host Map` property, the agent redirects to the value specified in the `FQDN Default` property.
+
+If you want the agent to redirect to a URL other than the one specified in the `FQDN Default` property, then it is good practice to include any anticipated invalid URLs in the `FQDN Virtual Host Map` property and map it to a valid URL.
+
+For more details, see link:../jee-users-guide/index.html#j2ee-agent-fqdn-properties[Fully Qualified Domain Name Checking Properties].
+
+
+[#cookie-reset]
+=== Cookie Reset Properties
+
+OpenAM provides cookie reset properties that the agent carries out prior to redirecting the client to a login page for authentication.
+
+Cookie reset is typically used when multiple parallel authentication mechanisms are in play with the policy agent and another authentication system. The policy agent can reset the cookies set by the other mechanism before redirecting the client to a login page.
+
+The cookie reset properties include a name list specifying all of the cookies that will reset, a domain map specifying the domains set for each cookie, and a path map specifying the path from which the cookie will be reset.
+
+If you have enabled attribute fetching using cookies to retrieve user data, it is good practice to use cookie reset, which will reset once you want to access an enforced URL without a valid session.
+
+For more details, see link:../jee-users-guide/index.html#j2ee-agent-cookie-reset-properties[Cookie Reset Properties].
+
+
+[#agent-cdsso]
+=== Cross Domain Single Sign-On
+
+Cross domain single sign-on (CDSSO) allows the Java EE policy agent to transfer a validated stateful session ID between an OpenAM domain and an application domain using a proprietary OpenAM mechanism. Normally, single sign-on cannot be implemented across domains as the session cookie from one domain (for example, website.com) is not accessible from another domain (for example, website.net).
+
+OpenAM's CDSSO solves this cross-domain problem and is best implemented in environments where all the domains are managed by the same organization, and where the OpenAM server is configured to use stateful sessions. OpenAM does not support CDSSO for deployments with stateless sessions.
+
+The Java EE policy agent works with an OpenAM component called a `CDCServlet` that generates a self-submitting form containing the valid session token from one domain. The form gets auto-submitted to the policy agent endpoint via a POST operation. The policy agent processes the request and extracts the session ID, which is again validated by OpenAM. If validation is successful, the policy agent sets the cookie in alternate domain. The client can then access a resource in that domain.
+
+For more details, see link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross Domain Single Sign-On, window=\_blank].
+
+

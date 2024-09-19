@@ -1,0 +1,454 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-hw-sw-requirements]
+== OpenAM Hardware and Software Requirements
+
+You can configure OpenAM in a wide variety of deployments depending on your security requirements and network infrastructure.
+
+[#hardware-requirements]
+=== Hardware Requirements
+
+This section covers hardware requirements for OpenAM.
+
+[#storage-requirements]
+==== Disk Storage Requirements
+
+This section considers disk storage requirements for OpenAM server, OpenAM policy agents, and OpenIG gateway.
+
+[#storage-requirements-server]
+===== Server Disk Storage Requirements
+
+Disk storage requirements for OpenAM servers depend partly on OpenAM itself and partly on your deployment. Disk storage requirements also depend on the space needed for binaries and configuration data, space for log files and rate of writes for logs, space for directory data and file system requirements when using an embedded OpenDJ directory server.
+For initial installation, a few hundred MB is sufficient, not including the downloaded files.
+
+* The OpenAM `.war` file size varies from release to release, but if your container holds one `.war` file and one directory with the contents of the `.war` file, the disk space required is on the order of 300 MB.
++
+This space requirement remains stable as you use OpenAM.
+
+* The OpenAM configuration directory initially fits in approximately 50 MB of disk space including the embedded OpenDJ directory server.
++
+This space requirement grows as you use OpenAM.
+
+By default, OpenAM servers write audit logs to flat files under `config-dir/openam/logs/`. Alternatively, OpenAM servers can write audit logs to `syslog`, or to a relational database.
+
+When using flat-file audit logging, OpenAM lets you configure rotation and purging for logs under`openam/logs/`, so you can effectively cap the maximum disk space used for logs. Make sure, however, that you retain the information you need before logs are purged. Also make sure that your disk can keep pace with the volume of logging, which can be significant in high volume deployments, as OpenAM logs not only errors, but also access messages.
+
+For details about audit logging configuration, see xref:../admin-guide/chap-audit-logging.adoc#chap-audit-logging["Configuring Audit Logging"] in the __Administration Guide__.
+
+By default, OpenAM servers write debug logs to flat files under `config-dir/openam/debug/`. OpenAM lets you configure rotation for debug logs. As you can change debug log levels at runtime when investigating issues, debug log volume is not as predictable as for regular logs. Leave a margin in production environments, so that you can turn up debug log levels to diagnose problems.
+
+For details about debug logging configuration, see xref:../admin-guide/chap-monitoring.adoc#debug-logging["Debug Logging"] in the __Administration Guide__.
+When using the embedded OpenDJ directory server, take the following into account:
+
+* OpenDJ is designed to work with local storage for the database, but not for network file system (NFS) nor network-attached storage (NAS) due to some file system locking functions that OpenDJ needs. High performance storage, like solid state drives (SSD), is essential if you need to handle high write throughput.
++
+By default, OpenAM's configuration directory resides under the `$HOME` directory of the user running the container. `$HOME` directories can be mounted over the network.
++
+This is not an issue if you are using OpenDJ mainly for configuration data. It can however be a serious problem when you use OpenDJ to back the CTS in a high-volume deployment.
+
+* Embedded OpenDJ directory server log files are stored under `config-dir/opends/logs/`. As for OpenAM, you can configure OpenDJ directory server log rotation and purging. The default cap for access logs is 2 GB.
+
+* OpenAM stores policy information in the configuration directory. The space this takes up depends on the policies you have.
+
+* By default, OpenAM stores CTS information in the configuration directory. The space this takes up depends on the volume of traffic to the server and whether OpenAM is configured for stateless sessions.
+
+* With the default database implementation, OpenDJ database files handling sustained writes can grow to about double their initial size on disk.
+
+* For OpenDJ on Linux systems, enable file system write barriers and ensure the file system journaling mode is ordered to avoid directory database file corruption after crashes or power failures. For details on enabling write barriers and setting the journaling mode for data, see the options for your file system in the `mount` command manual page.
+
+* OpenDJ directory server uses file descriptors when handling connections.
++
+Defaults can be limited to 1024 file descriptors per user on Linux systems. Consider increasing this limit to at least 64K. For details, see xref:../install-guide/chap-prepare-install.adoc#prerequisites-file-descriptors["Setting Maximum File Descriptors"] in the __Installation Guide__.
+
+
+
+[#storage-requirements-pa]
+===== Policy Agent Disk Storage Requirements
+
+Policy agents are implemented as libraries or Web applications, and so tend to be small on disk, not more than a few MB.
+
+You can configure policy agents to perform local logging to files, or to send log messages to OpenAM for remote logging. For details, see the __Configuration Reference__ for your policy agent.
+
+Debug messages are logged to local files, however, not remotely. Debug logging volume depends on log level. As for OpenAM, leave a margin in production environments so that you can turn up debug log levels to diagnose problems.
+
+
+[#storage-requirements-openig]
+===== OpenIG Disk Storage Requirements
+
+The OpenIG Web application can vary in size from release to release. On disk, the `.war` file is under 50 MB. For containers that keep both the `.war` file and an unpacked version, the total size is under 100 MB.
+
+By default, OpenIG configuration resides under the `$HOME` directory of the user who runs the container.
+
+If you use the default log sink, messages are sent to the container logs. Manage those as you would any container logs.
+
+Capture logging and any logging you perform from scriptable filters and handlers can potentially generate significant write traffic. Furthermore, OpenIG does not run rotation or purging for such logs. You must manage any logs OpenIG generates using a `CaptureFilter` or log messages from scriptable filters and handlers.
+
+Both normal log messages and debug messages go to the log sink. As for other components, debug logging volume depends on log level. Leave a margin in production environments so that you can turn up debug log levels to diagnose problems.
+
+
+[#storage-requirements-recommendations]
+===== Disk Storage Recommendations
+
+The following are based on the preceding information in this section. When deciding on disk storage, keep the following recommendations in mind:
+
+* Plan enough space and enough disk I/O to comfortably absorb the load for logs.
++
+Check your assumptions in testing. For example, make sure that logs are cleaned up so that they do not exceed your space threshold even in long-duration testing.
+
+* For deployments where an embedded OpenDJ directory service handles high throughput, make sure you use a local file system and that the user running the container has enough file descriptors.
+
+* When using local policy agent logs, make sure you have a mechanism in place to clean them up.
+
+* For OpenIG, make sure you turn off `CaptureFilter` logging, scriptable filter, and handler debug logging before moving to production.
+
+
+
+
+[#ram-requirements]
+==== Random Access Memory Requirements
+
+OpenAM core services require a minimum JVM heap size of 1 GB and, when running on JDK 7, a minimum permanent generation size of 256 MB. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ.
+
+[NOTE]
+====
+Ensure that the `Xms` and `Xmx` JVM parameters are set to the same value to prevent a large garbage collection as the memory profile increases from the default up to the `Xms` value. Also, setting `Xms` and `Xmx` to the same value ensures that small controlled garbage collection events minimize application unresponsiveness.
+====
+
+
+
+[#hw-and-sw-requirements]
+=== Software Requirements
+
+The following sections list software requirements for deploying OpenAM server and policy agent software.
+
+[#os-requirements]
+==== OpenAM Operating System Requirements
+
+ForgeRock supports customers using OpenAM server software on the following operating system versions:
+
+[#am-os-requirements]
+.Supported Operating Systems
+[cols="50%,50%"]
+|===
+|Operating System |Version 
+
+a|Red Hat Enterprise Linux, Centos
+a|6, 7
+
+a|SuSE
+a|11
+
+a|Ubuntu
+a|12.04 LTS, 14.04 LTS
+
+a|Solaris x64
+a|10, 11
+
+a|Solaris Sparc
+a|10, 11
+
+a|Windows Server
+a|2008, 2008 R2, 2012, 2012 R2
+|===
+
+
+[#sec-java-requirements]
+==== Java Requirements
+
+
+[#am-java-requirements]
+.JDK Requirements
+[cols="50%,50%"]
+|===
+|Vendor |Version 
+
+a|Oracle JDK
+a|7, 8
+
+a|IBM SDK, Java Technology Edition (Websphere only)
+a|7
+|===
+
+
+[#web-container-requirements]
+==== OpenAM Web Application Container Requirements
+
+
+[#am-web-containers]
+.Web Containers
+[cols="66%,34%"]
+|===
+|Web Container |Version 
+
+a|Apache Tomcat
+a|7, 8
+
+a|Oracle WebLogic Server
+a|12c
+
+a|JBoss Enterprise Application Platform
+a|6.1+
+
+a|JBoss Application Server
+a|7.2+
+
+a|WildFly AS
+a|9
+
+a|IBM WebSphere
+a|8.0, 8.5.5.8+
+|===
+The web application container must be able to write to its own home directory, where OpenAM stores configuration files.
+
+
+[#data-store-requirements]
+==== Data Store Requirements
+
+
+[#table-data-store-requirements]
+.Supported Data Stores
+[cols="28%,14%,15%,14%,14%,15%"]
+|===
+|Data Store |Version |CTS Datastore |Config Datastore |User Datastore |UMA Datastore 
+
+a|Embedded OpenDJ
+a|3.5
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+
+a|External OpenDJ
+a|2.6, 2.6.4, 3.0, 3.5
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+
+a|Oracle Unified Directory
+a|11g
+a|
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+
+a|Oracle Directory Server Enterprise Edition
+a|11g
+a|
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+
+a|Microsoft Active Directory
+a|2008, 2008 R2, 2012, 2012 R2
+a|
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+
+a|IBM Tivoli Directory Server
+a|6.3
+a|
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+|===
+
+
+[#sec-supported-clients]
+==== Supported Clients
+
+The following table summarizes supported clients:
+
+[#am-supported-clients]
+.Supported Clients
+[cols="23%,15%,16%,15%,15%,16%"]
+|===
+|Client Platform |Native Apps |Chrome 16+ |IE 9+, Microsoft Edge |Firefox 3.6+ |Safari 5+ 
+
+a|Windows 7 or later
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+
+a|Mac OS X 10.8 or later
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+
+a|Ubuntu 12.04 LTS or later
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+
+a|iOS 7 or later
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+a|
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+
+a|Android 4.3 or later
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+a|
+a|
+a|
+|===
+
+
+[#jee-pa-platform-requirements]
+==== Java EE Agents Platform Requirements
+
+The following table summarizes platform support.
+
+[#table-jee-pa-platform-requirements]
+.Supported Operating Systems & Web Application Containers
+[cols="33%,16%,51%"]
+|===
+|Operating Systems (OS) |OS Versions |Web Application Containers & Versions 
+
+a|[none]
+* CentOS
+* Red Hat Enterprise Linux
+* Oracle Linux
+a|[none]
+* 5, 6, 7
+a|[none]
+* Apache Tomcat 6, 7, 8
+* IBM Web Sphere Application Server 8, 8.5
+* JBoss Enterprise Application Platform 6
+* JBoss Application Server 7
+* Jetty 8 (at least 8.1.13)
+* Oracle WebLogic Server 11g, 12c
+
+a|[none]
+* Microsoft Windows Server
+a|[none]
+* 2008, 2008 R2, 2012, 2012 R2
+a|[none]
+* Apache Tomcat 6, 7, 8
+
+a|[none]
+* Oracle Solaris x64
+* Oracle Solaris SPARC
+a|[none]
+* 10, 11
+a|[none]
+* Apache Tomcat 6, 7, 8
+* Oracle WebLogic Server 11g, 12c
+
+a|[none]
+* Ubuntu Linux
+a|[none]
+* 12.04 LTS, 14.04 LTS
+a|[none]
+* Apache Tomcat 6, 7, 8
+* IBM Web Sphere Application Server 8, 8.5
+* JBoss Enterprise Application Platform 6
+* JBoss Application Server 7
+* Jetty 8 (at least 8.1.13)
+* Oracle WebLogic Server 11g, 12c
+|===
+
+
+[#web-pa-platform-requirements]
+==== Web Policy Agents Platform Requirements
+
+The following table summarizes platform support.
+
+[#table-web-pa-platform-requirements]
+.Supported Operating Systems & Web Servers
+[cols="33%,16%,51%"]
+|===
+|Operating Systems (OS) |OS Versions |Web Servers & Versions 
+
+a|[none]
+* CentOS
+* Red Hat Enterprise Linux
+* Oracle Linux
+a|[none]
+* 5, 6, 7
+a|[none]
+* Apache HTTP Server 2.2
+* Apache HTTP Server 2.4
+
+.3+a|[none]
+* Microsoft Windows Server
+a|[none]
+* 2008 R2
+a|[none]
+* Microsoft IIS 7
+
+a|[none]
+* 2008 R2
+a|[none]
+* Microsoft IIS 7.5
+
+a|[none]
+* 2012, 2012 R2
+a|[none]
+* Microsoft IIS 8
+
+a|[none]
+* Oracle Solaris x64
+* Oracle Solaris SPARC
+a|[none]
+* 10, 11
+a|[none]
+* Apache HTTP Server 2.2
+* Apache HTTP Server 2.4
+
+a|[none]
+* Ubuntu Linux
+a|[none]
+* 12.04 LTS, 14.04 LTS
+a|[none]
+* Apache HTTP Server 2.2
+* Apache HTTP Server 2.4
+|===
+--
+Before installing web policy agents on your platform, also make sure that the system provides the required components.
+
+All Systems::
+If agents use secure connections (SSL, TLS), then also make sure that OpenSSL is installed.
+
+Linux Systems::
+Before installing web policy agents on Linux, make sure the system can run `gcc` 4.4.7. `libc.so.6` must be available and it must support the GLIBC_2.3 ABI. You can check this by running the following command: `strings libc.so.6 | grep GLIBC_2`.
+
+Microsoft Windows Systems::
+Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8, make sure that the optional Application Development component of Web Server (IIS) is installed. In the Windows Server 2012 Server Manager for example, Application Development is a component of Web Server (IIS) | Web Server.
+
+Oracle Solaris Systems::
+Before installing web policy agents on Solaris 10, make sure you have applied the latest shared library patch for C++, at least 119963-16 on SPARC or 119964-12 on x64. The library is bundled on Solaris 10 update 5 and later.
+
+--
+
+
+

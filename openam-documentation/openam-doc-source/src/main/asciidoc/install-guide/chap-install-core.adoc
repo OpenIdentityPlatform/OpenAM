@@ -1,0 +1,402 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-install-core]
+== Installing OpenAM Core Services
+
+This chapter covers tasks required for a full install of OpenAM server with or without OpenAM Console.
+
+This chapter does not cover installation for enforcing policies on resource servers. To manage access to resources on other servers, you can use OpenIG or OpenAM policy agents.
+
+link:https://github.com/OpenIdentityPlatform/OpenIG[OpenIG, window=\_blank] is a high-performance reverse proxy server with specialized session management and credential replay functionality. It can function as a standards-based policy enforcement point.
+
+OpenAM policy agents provide policy enforcement on supported web servers and Java EE containers, and are tightly integrated with OpenAM. See the link:../web-users-guide/#web-users-guide[OpenAM Web Policy Agent User's Guide, window=\_blank], or the link:../jee-users-guide/#jee-users-guide[OpenAM Java EE Policy Agent User's Guide, window=\_blank] for instructions on installing OpenAM policy agents in supported web servers and Java EE application containers.
+
+[#openam-installation-options]
+.OpenAM Installation Options
+[cols="50%,50%"]
+|===
+|Installation Action |Documentation Reference 
+
+a|Install quickly for evaluation using default settings
+a|xref:#deploy-openam["To Deploy OpenAM"] and xref:#configure-openam-defaults["To Configure OpenAM With Defaults"]
+
+ Alternatively, follow the full example in xref:../getting-started/index.adoc[Getting Started With OpenAM].
+
+a|Install OpenAM server, choosing settings
+a|xref:#deploy-openam["To Deploy OpenAM"] and xref:#configure-openam-custom["To Custom Configure OpenAM"]
+
+a|Erase the configuration and start over
+a|xref:#delete-config-start-over["To Delete an OpenAM Configuration Before Redeploying"]
+
+a|Add an OpenAM server to a site
+a|xref:#deploy-openam["To Deploy OpenAM"], and xref:#add-servers-to-site["To Add a Server to a Site"]
+
+a|Troubleshoot an OpenAM installation
+a|xref:#troubleshoot-openam-installation["To Troubleshoot an OpenAM Installation"]
+
+a|Install `ssoadm` for CLI configuration
+a|xref:chap-install-tools.adoc#chap-install-tools["Installing OpenAM Tools"], or xref:../admin-guide/chap-admin-tools.adoc#openam-ssoadm-jsp-overview["OpenAM ssoadm.jsp"] in the __Administration Guide__.
+
+a|Perform a command-line install
+a|xref:chap-install-tools.adoc#install-openam-config-tools["To Set Up Configuration Tools"]
+
+a|Skin OpenAM for your organization
+a|xref:chap-custom-ui.adoc#chap-custom-ui["Customizing the OpenAM End User Pages"]
+
+a|Uninstall OpenAM
+a|xref:chap-uninstall.adoc#chap-uninstall["Removing OpenAM Software"]
+|===
+Select the `.war` file based on the type of deployment you need, as defined in the following table.
+
+[#deploy-openam]
+.To Deploy OpenAM
+====
+The `OpenAM-13.5.2.war` file contains OpenAM server with OpenAM Console. How you deploy the `.war` file depends on your web application container.
+
+. Deploy the `.war` file on your container.
++
+For example, copy the file to deploy on Apache Tomcat.
++
+
+[source, console]
+----
+$ cp OpenAM-13.5.2.war /path/to/tomcat/webapps/openam.war
+----
++
+You change the file name to `openam.war` when deploying in Tomcat so that the deployment URI is `/openam`.
++
+
+[NOTE]
+======
+You change the file name to something other than `openam.war` when deploying in Tomcat so that the deployment URI is not `/openam`. For helpful hints on avoiding obvious deployment defaults, see xref:../admin-guide/chap-securing.adoc#avoid-obvious-defaults["Avoiding Obvious Defaults"] in the __Administration Guide__.
+======
++
+
+[IMPORTANT]
+======
+To properly configure OpenAM, OpenAM requires a deployment URI with a non-empty string after `/`. Do not deploy OpenAM at the root context. Do not rename the `.war` file to `ROOT.war` before deploying on Tomcat, for example.
+======
++
+It can take several seconds for OpenAM to be deployed in your container.
+
+. Browse to the initial configuration screen, for example at `\http://openam.example.com:8080/openam`.
++
+
+[#figure-openam-start]
+image::images/openam-start.png[]
+
+====
+
+[#configure-openam-defaults]
+.To Configure OpenAM With Defaults
+====
+The default configuration option configures the embedded OpenDJ server using default ports. If the ports are already in use, OpenAM uses free ports as both configuration store and identity store.
+
+The default configuration sets the cookie domain based on the full URL that was used to access the configurator, such as `example.com`, `server.west.example.com`, or `example.local`.
+
+Configuration settings are saved to the home directory of the user running the web application container in a directory named after the deployment URI. In other words if OpenAM is deployed under `/openam`, then the configuration is saved under `$HOME/openam/`.
+
+. In the initial configuration screen, click Create Default Configuration under Default Configuration.
+
+. Review the software license agreement. If you agree to the license, click "I accept the license agreement", and then click Continue.
++
+
+[#figure-openam-license]
+image::images/openam-license-dialog.png[]
+
+. Provide different passwords for the default OpenAM administrator, `amadmin`, and default Policy Agent users.
++
+
+[#figure-openam-default-conf]
+image::images/openam-default-conf.png[]
+
+. When the configuration completes, click Proceed to Login, and then login as the OpenAM administrator with the first of the two passwords you provided.
++
+
+[#figure-openam-first-login]
+image::images/openam-first-login.png[]
++
+After successful login, OpenAM redirects you to OpenAM Realms.
++
+
+[#figure-openam-console-first-time]
+image::images/openam-realms.png[]
+
+====
+
+[#delete-config-start-over]
+.To Delete an OpenAM Configuration Before Redeploying
+====
+If you need to delete your configuration and start the process from the beginning, follow these steps.
+
+. Stop the OpenAM web application to clear the configuration held in memory.
++
+The following example shuts down Apache Tomcat (Tomcat) for example.
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/shutdown.sh
+Password:
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk/jre
+Using CLASSPATH:
+       /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar
+----
+
+. Delete OpenAM configuration files, by default under the `$HOME` of the user running the web application container.
++
+
+[source, console]
+----
+$ rm -rf $HOME/openam $HOME/.openamcfg
+----
++
+When using the internal OpenAM configuration store, this step deletes the embedded directory server and all of its contents. This is why you stop the application server before removing the configuration.
++
+If you use an external configuration store, delete the entries under the configured OpenAM suffix (by default dc=openam,dc=forgerock,dc=org).
+
+. Restart the OpenAM web application.
++
+The following example starts the Tomcat container.
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/startup.sh
+Password:
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk/jre
+Using CLASSPATH:
+       /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar
+----
+
+====
+
+[#configure-openam-custom]
+.To Custom Configure OpenAM
+====
+
+. In the initial configuration screen, click Create New Configuration under Custom Configuration.
+
+. Read the license agreement. If you agree to the license, click "I agree to the license agreement", and then click Continue.
+
+. On the Default User Password page, provide a password with at least eight characters for the OpenAM Administrator, `amadmin`.
++
+
+[#figure-openam-conf-amadmin]
+image::images/openam-conf-amadmin.png[]
+
+. Verify that the server settings are valid for your configuration.
++
+
+[#figure-openam-conf-server-settings]
+image::images/openam-conf-server-settings.png[]
++
+--
+
+Server URL::
+Provide a valid URL to the base of your OpenAM web container, including a FQDN.
++
+In a test environment, you can simulate the FQDN by adding it to your `/etc/hosts` as an alias. The following excerpt shows lines from the `/etc/hosts` file on a Linux system where OpenAM is installed.
++
+
+[source]
+----
+127.0.0.1 localhost.localdomain localhost
+::1 localhost6.localdomain6 localhost6
+127.0.1.1 openam openam.example.com
+----
+
+Cookie Domain::
+Domain that created cookies will be valid for, for example `example.com`.
+
+Platform Locale::
+Supported locales include en_US (English), de (German), es (Spanish), fr (French), ja (Japanese), ko (Korean), zh_CN (Simplified Chinese), and zh_TW (Traditional Chinese).
+
+Configuration Directory::
+Location on server for OpenAM configuration files. OpenAM must be able to write to this directory.
+
+--
+
+. In the Configuration Store screen, you can accept the defaults to allow OpenAM to store configuration data in an embedded directory. The embedded directory can be configured separately to replicate data for high availability if necessary.
++
+
+[#figure-openam-conf-store]
+image::images/openam-conf-store.png[]
++
+You can also add this OpenAM installation to an existing deployment, providing the URL of the site. See xref:#add-servers-to-site["To Add a Server to a Site"] for details.
++
+Alternatively, if you already manage an OpenDJ deployment, you can store OpenAM configuration data in your existing directory service. You must, however, create the suffix to store configuration data on the directory server before you configure OpenAM. OpenAM does not create the suffix when you use an external configuration store. For instructions to create a configuration store backend, see Step 3 in xref:chap-prepare-install.adoc#install-prepare-opendj-external-config-store["To Install an External OpenDJ Directory Server"].
+
+. In the User Store screen, you configure where OpenAM looks for user identities.
++
+OpenAM must have write access to the directory service you choose, as it adds to the directory schema needed to allow OpenAM to manage access for users in the user store.
++
+
+[#figure-openam-conf-user-store]
+image::images/openam-conf-user-store.png[]
++
+--
+
+User Data Store Type::
+If you have already provisioned a directory service with users in a supported user data store, then select that type of directory from the options available.
+
+SSL/TLS Enabled::
+To use a secure connection, check this box, then make sure the port you define corresponds to the port the directory server listens to for StartTLS or SSL connections. When using this option you also need to make sure the trust store used by the JVM running OpenAM has the necessary certificates installed.
+
+Directory Name::
+FQDN for the host housing the directory service.
+
+Port::
+LDAP directory port. The default for LDAP and LDAP with StartTLS to protect the connection is port 389. The default for LDAP over SSL is port 636. Your directory service might use a different port.
+
+Root Suffix::
+Base distinguished name (DN) where user data is stored.
+
+Login ID::
+Directory administrator user DN. The administrator must be able to update the schema and user data.
+
+Password::
+Password for the directory administrator user.
+
+--
+
+. In the Site Configuration screen, you can set up OpenAM as part of a site where the load is balanced across multiple OpenAM servers.
++
+If you have a site configuration with a load balancer, you can enable session high availability persistence and failover.footnote:d14351e2811[You can configure OpenAM to store sessions__statefully__or__statelessly__. Stateful sessions are stored in memory on the OpenAM server. They are also written to disk by thexref:chap-cts.adoc#chap-cts["Configuring the Core Token Service"]if you select the Enable Session HA and Persistence and Failover option in the Site Configuration screen. Stateless sessions are stored in HTTP cookies. The Enable Session HA and Persistence and Failover setting does not apply to stateless sessions. For more information about stateful and stateless sessions, seexref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"]in the__Administration Guide__.] OpenAM then stores sessions across server restarts, so that users do not have to login again.
++
+If you then add additional servers to this OpenAM site, OpenAM performs __session failover__, storing session data in a directory service that is shared by different OpenAM servers. The shared storage means that if an OpenAM server fails, other OpenAM servers in the site have access to the user's session data and can serve requests about that user. As a result, the user does not have to log in again. If session failover is important for your deployment, also follow the instructions in xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"].
++
+
+[#figure-openam-conf-site]
+image::images/openam-conf-site.png[]
++
+It is possible to set up a site after initial installation and configuration, as is described in xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"].
+
+. In the Agent Information screen, provide a password with at least eight characters to be used by policy agents to connect to OpenAM.
++
+
+[#figure-openam-conf-pa]
+image::images/openam-conf-pa.png[]
+
+. Check the summary screen, and if necessary, click Previous to return to earlier screens to fix any configuration errors as needed.
++
+
+[#figure-openam-conf-summary]
+image::images/openam-conf-summary.png[]
++
+After you click Create Configuration in the summary screen, configuration proceeds, logging progress that you can read in your browser and later, in the installation log. The process ends, and OpenAM shows the Proceed to Login prompt.
++
+
+[#figure-openam-proceed-to-login]
+image::images/openam-proceed-to-login.png[]
+
+. When the configuration completes, click Proceed to Login, and then login as the OpenAM administrator, `amadmin`.
++
+
+[#figure-openam-first-login-admin]
+image::images/openam-first-login.png[]
++
+After login, OpenAM redirects you to the OpenAM Realms page.
++
+
+[#figure-openam-console]
+image::images/openam-realms.png[]
++
+You can also access OpenAM Console by browsing to the Console URL, such as, `\http://openam.example.com:8080/openam/console`.
+
+. Restrict permissions to the configuration directory (by default, `$HOME/openam`, where $HOME corresponds to the user who runs the web container). Prevent other users from accessing files in the configuration directory.
+
+. If you specified the Other User Data Store option in the User Data Store Settings screen, you must index several attributes in your external identity repository. See xref:chap-prepare-install.adoc#install-index-opendj-external-idrepo["To Index External Identity Repository Attributes"] for more information.
+
+====
+
+[#add-servers-to-site]
+.To Add a Server to a Site
+====
+High availability requires redundant servers in case of failure. With OpenAM, you configure an OpenAM site with multiple servers in a pool behind a load balancing service that exposes a single URL as an entry point to the site.
+
+Follow these steps to configure a server to an existing site.
+
+. In the initial configuration screen, under Custom Configuration, click Create New Configuration.
+
+. In the first screen, enter the same password entered for the OpenAM Administrator, `amadmin`, when you configured the first server in the site.
+
+. Configure server settings as required.
++
+The cookie domain should be identical to that of the first server in the site.
+
+. In the configuration store screen, select Add to Existing Deployment, and enter the URL of the first OpenAM server in the site.
++
+The directory used to store configuration data should use the same directory service used for this purpose by other OpenAM servers in the site. If you use the embedded OpenDJ directory server, for example, you can set up the configurator for data replication with embedded directory servers used by other servers in the site.
++
+Settings for the user store are then shared with the existing server, so the corresponding wizard screen is skipped.
+
+. In the site configuration screen, select `Yes` and enter the same site configuration details as for the first server in the site.
++
+Settings for agent information are also shared with the existing server, so the corresponding wizard screen is skipped.
+
+. In the summary screen, verify the settings you chose, and then click Create Configuration.
+
+. When the configuration process finishes, click Proceed to Login, and then login as the OpenAM administrator to access OpenAM Console.
+
+====
+
+[#troubleshoot-openam-installation]
+.To Troubleshoot an OpenAM Installation
+====
+OpenAM can capture information in debug log files that are useful when troubleshooting OpenAM problems. xref:../admin-guide/chap-monitoring.adoc#debug-logging["Debug Logging"] in the __Administration Guide__ describes how to enable debug logging after OpenAM has been started.
+
+It is also possible to capture debug logs while installing OpenAM. This can be useful if you need to troubleshoot an installation problem.
+
+Follow these steps to capture debug logs while installing OpenAM on Tomcat:
+
+. If Tomcat is already started, stop it.
+
+. Specify the `-Dcom.iplanet.services.debug.level=message` option in the `CATALINA_OPTS` environment variable:
++
+
+[source, console]
+----
+$ export CATALINA_OPTS=-Dcom.iplanet.services.debug.level=message
+----
++
+There are several ways that you can specify the `CATALINA_OPTS` environment variable. You can set the variable:
++
+
+* In the `/path/to/tomcat/bin/setenv.sh` file
+
+* In the login shell of the user who runs Tomcat
+
+
+. Run the OpenAM installation. Debug log files containing troubleshooting information appear in the `/path/to/openam/openam/debug` directory.
+
+. When you have completed OpenAM installation and no longer need to capture debug logs, stop Tomcat, revert the debug logging options, and restart Tomcat.
+
+====
+

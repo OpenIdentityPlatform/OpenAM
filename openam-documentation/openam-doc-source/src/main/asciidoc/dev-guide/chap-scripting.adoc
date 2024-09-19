@@ -1,0 +1,1367 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-scripting]
+== Scripting OpenAM
+
+This chapter explains how to use scripting to exact fine control over various aspects of OpenAM.
+
+You can use scripts for client-side and server-side authentication, policy conditions, and handling OpenID Connect claims.
+
+This chapter covers the following topics:
+
+* xref:#script-env[The Scripting Environment]
+
+* xref:#scripting-api[The Scripting API]
+
+* xref:#sec-scripting-default-scripts[Using the Default Scripts]
+
+For information on managing scripts, see xref:../admin-guide/chap-manage-scripts.adoc#chap-manage-scripts["Managing Scripts"] in the __Administration Guide__ and xref:chap-client-dev.adoc#sec-manage-scripts-rest["RESTful Script Management"].
+
+[#script-env]
+=== The Scripting Environment
+
+This section introduces how OpenAM executes scripts, and covers thread pools and security configuration.
+
+You can use scripts to modify default OpenAM behavior in the following situations, also known as __contexts__:
+--
+
+Client-side Authentication::
+Scripts that are executed on the client during authentication.
++
+
+[NOTE]
+======
+Client-side scripts must be in JavaScript.
+======
+
+Server-side Authentication::
+Scripts are included in an authentication module and are executed on the server during authentication.
+
++
+Scripted authentication modules are an alternative to developing custom authentication modules by using Java as described in xref:chap-customizing.adoc#sec-auth-spi["Creating a Custom Authentication Module"]. A scripted authentication module allows you to customize default authentication behavior by adding Groovy or JavaScript code to the module configuration.
+
++
+To see an example server-side authentication script, see xref:#sec-scripted-auth-module["Default Server-side Authentication Script"].
+
+Policy Condition::
+Scripts used as conditions within policies.
+
++
+To see an example policy condition script, see xref:#sec-scripted-policy-condition["Default Policy Condition Script"].
+
+OIDC Claims::
+Scripts that gather and populate the claims in a request when issuing an ID token or making a request to the `userinfo` endpoint.
+
+--
+OpenAM implements a configurable scripting engine for each of the context types that are executed on the server.
+
+The scripting engines in OpenAM have two main components: security settings, and the thread pool.
+
+image::images/scripting-engine-overview.png[]
+
+[#script-engine-security]
+==== Security
+
+OpenAM scripting engines provide security features for ensuring that malicious Java classes are not directly called. The engines validate scripts by checking all directly-called Java classes against a configurable blacklist and whitelist, and, optionally, against the JVM SecurityManager, if it is configured.
+
+Whitelists and blacklists contain class names that are allowed or denied execution respectively. Specify classes in whitelists and blacklists by name or by using regular expressions.
+
+Classes called by the script are checked against the whitelist first, and must match at least one pattern in the list. The blacklist is applied after the whitelist, and classes matching any pattern are disallowed.
+
+You can also configure the scripting engine to make an additional call to the JVM security manager for each class that is accessed. The security manager throws an exception if a class being called is not allowed to execute.
+
+For more information on configuring script engine security, see xref:../reference/chap-config-ref.adoc#scripting-configuration["Scripting"] in the __Reference__.
+.Important Points About Script Engine Security
+--
+The following points should be considered when configuring the security settings within each script engine:
+
+The scripting engine only validates directly accessible classes.::
+The security settings only apply to classes that the script __directly__ accesses. If the script calls `Foo.a()` and then that method calls `Bar.b()`, the scripting engine will be unable to prevent it. You must consider the whole chain of accessible classes.
++
+
+[NOTE]
+======
+__Access__ includes actions such as:
+
+* Importing or loading a class.
+
+* Accessing any instance of that class. For example, passed as a parameter to the script.
+
+* Calling a static method on that class.
+
+* Calling a method on an instance of that class.
+
+* Accessing a method or field that returns an instance of that class.
+
+======
+
+Potentially dangerous Java classes are blacklisted by default.::
+All Java reflection classes (`java.lang.Class`, `java.lang.reflect.*`) are blacklisted by default to avoid bypassing the security settings.
+
++
+The `java.security.AccessController` class is also blacklisted by default to prevent access to the `doPrivileged()` methods.
++
+
+[CAUTION]
+======
+You should not remove potentially dangerous Java classes from the blacklist.
+======
+
+The whitelists and blacklists match class or package names only.::
+The whitelist and blacklist patterns apply only to the exact class or package names involved. The script engine does not know anything about inheritance, so it is best to whitelist known, specific classes.
+
+--
+
+
+[#script-engine-thread-pool]
+==== Thread Pools
+
+Each script is executed in an individual thread. Each scripting engine starts with an initial number of threads available for executing scripts. If no threads are available for execution, OpenAM creates a new thread to execute the script, until the configured maximum number of threads is reached.
+
+If the maximum number of threads is reached, pending script executions are queued in a number of buffer threads, until a thread becomes available for execution. If a created thread has completed script execution and has remained idle for a configured amount of time, OpenAM terminates the thread, shrinking the pool.
+
+For more information on configuring script engine thread pools, see xref:../reference/chap-config-ref.adoc#scripting-configuration["Scripting"] in the __Reference__.
+
+
+
+[#scripting-api]
+=== The Scripting API
+
+Client-side scripts have access only to the user agent API. The functionality provided by each user agent is different, refer to the API provided by your user agent for more information.
+
+[#scripting-api-global]
+==== Global API Functionality
+
+This section covers functionality available to each of the server-side script types.
+Global API functionality includes:
+
+* xref:#scripting-api-global-http-client[Accessing HTTP Services]
+
+* xref:#scripting-api-global-logger[Debug Logging]
+
+
+[#scripting-api-global-http-client]
+===== Accessing HTTP Services
+
+OpenAM passes an HTTP client object, `httpClient`, to server-side scripts. Server-side scripts can call HTTP services with the `httpClient.get` and `httpClient.post` methods. The methods return an `HttpClientResponse` object.
+
+[#scripted-auth-module-http-client-methods]
+.HTTP Client Methods
+[cols="25%,25%,25%,25%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`httpClient.get`
+a|`URI` (type: `String`)
+
+ `Request Data` (type: `Map`)
+a|`HttpClientResponse`
+a|Perform an HTTP GET on the specified URI with the specified request data and return the response retrieved.
+
+a|`httpClient.post`
+a|`URI` (type: `String`)
+
+ `Body` (type: `String`)
+
+ `Request Data` (type: `Map`)
+a|`HttpClientResponse`
+a|Perform an HTTP POST to the specified URI with the specified body and request data and return the response retrieved.
+|===
+The `requestData` object is a map in which the keys are `cookies` and `headers`. OpenAM ignores other keys.
+
+The `cookies` value, specifying the cookie headers in the request, is a list of maps where the keys are `domain`, `field`, and `value`.
+
+The `headers` value, specifying the headers in the request, is a list of maps where the keys are `field`, and `value`.
+
+An example `requestData` JavaScript object using GET would be as follows:
+
+[source, javascript]
+----
+var response = httpClient.get("http://example.com:8080/openam/json/users/" + username,
+{
+    cookies:[
+        {
+            "domain": ".example.com",
+            "field": "iPlanetDirectoryPro",
+            "value": "E8cDkvlad83kd....KDodkIEIx*DLEDLK...JKD09d"
+        }
+    ],
+    headers:[
+        {
+            "field": "Content-type",
+            "value": "application/json"
+        }
+    ]
+});
+----
+An example `requestData` JavaScript object using POST follows:
+
+[source, javascript]
+----
+var response = httpClient.post("http://example.com:8080/openam/json/authenticate","{
+    "authId": "eyAiYWxnIjogIkhTMjU2IiwgInR5cCI6ICJqd3QiIH0.eyAib3RrIjogIm03ODVzN2x
+    sbnR1bjZvbGZ1MHZhOGVtYTQxIiwgInNlc3Npb25JZCI6ICJBUUlDNXdNMkxZNFNmY3lEeDY3QnB
+    PdzJtRU9rUzNpLWhfNDdRWlMwNHBEN1ppdy4qQUFKVFNRQUNNREVBQWxOTEFCUXROak15TURjNU1
+    UZzROVFUwTXpnNE5qRTNNQS4uKiIsICJyZWFsbSI6ICJkYz1vcGVuYW0sZGM9Zm9yZ2Vyb2NrLGR
+    jPW9yZyIgfQ.VDRqaekQuXBm2lNI29hfwVADLxjepezuO0241VNDsIM",
+    "template": "",
+    "stage": "DataStore1",
+    "callbacks": [
+        {
+            "type": "NameCallback",
+            "output": [
+                {
+                    "name": "prompt",
+                    "value": "User Name:"
+                }
+            ],
+            "input": [
+                {
+                    "name": "IDToken1",
+                    "value": "demo"
+                }
+            ]
+        },
+        {
+            "type": "PasswordCallback",
+            "output": [
+                {
+                    "name": "prompt",
+                    "value": "Password:"
+                }
+            ],
+            "input": [
+                {
+                    "name": "IDToken2",
+                    "value": "changeit"
+                }
+            ]
+        }
+    ]
+    }",
+    {
+        cookies:[
+        ],
+        headers:[
+            {
+                "field": "Content-Type",
+                "value": "application/json"
+            }
+        ]
+});
+----
+
+[NOTE]
+====
+To get the form data, you can access the `sharedState` object to get the data that previous modules in the chain have obtained. For example, if you have a Data Store module in your chain, you can get the username and password from the `sharedState` object in the script.
+====
+HTTP client requests are synchronous, blocking until they return. You can, however, set a global timeout for server-side scripts. For details, see xref:../admin-guide/chap-auth-services.adoc#scripted-module-conf-hints["Hints for the Scripted Authentication Module"] in the __Administration Guide__.
+
+Server-side scripts can access response data by using the methods listed in the table below.
+
+[#scripted-auth-module-http-client-response-methods]
+.HTTP Client Response Methods
+[cols="33%,22%,22%,23%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`HttpClientResponse.getCookies`
+a|`Void`
+a|`Map<String, String>`
+a|Get the cookies for the returned response, if any exist.
+
+a|`HttpClientResponse.getEntity`
+a|`Void`
+a|`String`
+a|Get the entity of the returned response.
+
+a|`HttpClientResponse.getHeaders`
+a|`Void`
+a|`Map<String, String>`
+a|Get the headers for the returned response, if any exist.
+
+a|`HttpClientResponse.getReasonPhrase`
+a|`Void`
+a|`String`
+a|Get the reason phrase of the returned response.
+
+a|`HttpClientResponse.getStatusCode`
+a|`Void`
+a|`Integer`
+a|Get the status code of the returned response.
+
+a|`HttpClientResponse.hasCookies`
+a|`Void`
+a|`Boolean`
+a|Indicate whether the returned response had any cookies.
+
+a|`HttpClientResponse.hasHeaders`
+a|`Void`
+a|`Boolean`
+a|Indicate whether the returned response had any headers.
+|===
+
+
+[#scripting-api-global-logger]
+===== Debug Logging
+
+Server-side scripts can write messages to OpenAM debug logs by using the `logger` object.
+
+OpenAM does not log debug messages from scripts by default. You can configure OpenAM to log such messages by setting the debug log level for the `amScript` service. For details, see xref:../admin-guide/chap-monitoring.adoc#log-debug-selective-capture["Debug Logging By Service"] in the __Administration Guide__.
+
+The following table lists the `logger` methods.
+
+[#scripted-auth-module-logger-methods]
+.Logger Methods
+[cols="22%,22%,22%,34%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`logger.error`
+a|`Error Message` (type: `String`)
+a|`Void`
+a|Write __Error Message__ to OpenAM debug logs if ERROR level logging is enabled.
+
+a|`logger.errorEnabled`
+a|`Void`
+a|`Boolean`
+a|Return `true` when ERROR level debug messages are enabled.
+
+a|`logger.message`
+a|`Message` (type: `String`)
+a|`Void`
+a|Write __Message__ to OpenAM debug logs if MESSAGE level logging is enabled.
+
+a|`logger.messageEnabled`
+a|`Void`
+a|`Boolean`
+a|Return `true` when MESSAGE level debug messages are enabled.
+
+a|`logger.warning`
+a|`Warning Message` (type: `String`)
+a|`Void`
+a|Write __Warning Message__ to OpenAM debug logs if WARNING level logging is enabled.
+
+a|`logger.warningEnabled`
+a|`Void`
+a|`Boolean`
+a|Return `true` when WARNING level debug messages are enabled.
+|===
+
+
+
+[#scripting-api-authn]
+==== Authentication API Functionality
+
+This section covers the available functionality when Scripting authentication modules use client-side and server-side authentication script types.
+Authentication API functionality includes:
+
+* xref:#scripting-api-authn-state[Accessing Authentication State]
+
+* xref:#scripting-api-authn-id-repo[Accessing Profile Data]
+
+* xref:#scripting-api-authn-client-data[Accessing Client-Side Script Output Data]
+
+* xref:#scripting-api-authn-request-data[Accessing Request Data]
+
+
+[#scripting-api-authn-state]
+===== Accessing Authentication State
+
+OpenAM passes `authState` and `sharedState` objects to server-side scripts in order for the scripts to access authentication state.
+
+Server-side scripts can access the current authentication state through the `authState` object.
+
+The `authState` value is `SUCCESS` if the authentication is currently successful, or `FAILED` if authentication has failed. Server-side scripts must set a value for `authState` before completing.
+
+If an earlier authentication module in the authentication chain has set the login name of the user, server-side scripts can access the login name through `username`.
+
+The following authentication modules set the login name of the user:
+
+* Anonymous
+
+* Certificate
+
+* Data Store
+
+* Federation
+
+* HTTP Basic
+
+* JDBC
+
+* LDAP
+
+* Membership
+
+* RADIUS
+
+* SecurID,
+
+* Windows Desktop SSO
+
+* Windows NT
+
+
+
+[#scripting-api-authn-id-repo]
+===== Accessing Profile Data
+
+Server-side authentication scripts can access profile data through the methods of the `idRepository` object.
+
+[#scripted-auth-module-id-repo-methods]
+.Profile Data Methods
+[cols="22%,33%,11%,34%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`idRepository.getAttribute`
+a|`User Name` (type: `String`)
+
+ `Attribute Name` (type: `String`)
+a|`Set`
+a|Return the values of the named attribute for the named user.
+
+a|`idRepository.setAttribute`
+a|`User Name` (type: `String`)
+
+ `Attribute Name` (type: `String`)
+
+ `Attribute Values` (type: `Array`)
+a|`Void`
+a|Set the named attribute as specified by the attribute value for the named user, and persist the result in the user's profile.
+
+a|`idRepository.addAttribute`
+a|`User Name` (type: `String`)
+
+ `Attribute Name` (type: `String`)
+
+ `Attribute Value` (type: `String`)
+a|`Void`
+a|Add an attribute value to the list of attribute values associated with the attribute name for a particular user.
+|===
+
+
+[#scripting-api-authn-client-data]
+===== Accessing Client-Side Script Output Data
+
+Client-side scripts add data they gather into a String object named `clientScriptOutputData`. Client-side scripts then cause the user-agent automatically to return the data to OpenAM by HTTP POST of a self-submitting form.
+
+
+[#scripting-api-authn-request-data]
+===== Accessing Request Data
+
+Server-side scripts can get access to the login request by using the methods of the `requestData` object.
+
+The following table lists the methods of the `requestData` object. Note that this object differs from the client-side `requestData` object (see xref:#scripted-auth-module-http-client-methods["HTTP Client Methods"]) and contains information about the original authentication request made by the user.
+
+[#scripted-auth-module-request-data-methods]
+.Request Data Methods
+[cols="27%,18%,18%,37%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`requestData.getHeader`
+a|`Header Name` (type: `String`)
+a|`String`
+a|Return the String value of the named request header, or `null` if parameter is not set.
+
+a|`requestData.getHeaders`
+a|`Header Name` (type: `String`)
+a|`String[]`
+a|Return the array of String values of the named request header, or `null` if parameter is not set.
+
+a|`requestData.getParameter`
+a|`Parameter Name` (type: `String`)
+a|`String`
+a|Return the String value of the named request parameter, or `null` if parameter is not set.
+
+a|`requestData.getParameters`
+a|`Parameter Name` (type: `String`)
+a|`String[]`
+a|Return the array of String values of the named request parameter, or `null` if parameter is not set.
+|===
+
+
+
+[#scripting-api-authz]
+==== Authorization API Functionality
+
+This section covers functionality available when scripting authorization using the policy condition script context type.
+
+[#scripted-api-authz-state]
+===== Accessing Authorization State
+
+Server-side scripts can access the current authorization state through the following objects:
+
+[#scripted-api-authz-state-objects]
+.Authorization State Objects
+[cols="16%,17%,67%"]
+|===
+|Object |Type |Description 
+
+a|`authorized`
+a|`Boolean`
+a|Return `true` if the authorization is currently successful, or `false` if authorization has failed. Server-side scripts must set a value for `authorized` before completing.
+
+a|`environment`
+a|`Map<String, Set<String>>`
+a|Describe the environment passed from the client making the authorization request.
+
+ For example, the following shows a simple `environment` map with a single entry:
+ 
+[source]
+----
+"environment": {
+    "IP": [
+        "127.0.0.1"
+    ]
+}
+----
+
+a|`resourceURI`
+a|`String`
+a|Specify the URI of the resource to which authorization is being requested.
+
+a|`username`
+a|`String`
+a|Specify the user ID of the subject that is requesting authorization.
+|===
+
+
+[#scripting-api-authz-id-repo]
+===== Accessing Profile Data
+
+Server-side authorization scripts can access profile data of the subject of the authorization request through the methods of the `identity` object.
+
+[NOTE]
+====
+To access the profile data of the subject, they must be logged in and their SSO token must be available.
+====
+
+[#scripted-authz-module-id-repo-methods]
+.Authorization Script Profile Data Methods
+[cols="22%,33%,11%,34%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`identity.getAttribute`
+a|`Attribute Name` (type: `String`)
+a|`Set`
+a|Return the values of the named attribute for the subject of the authorization request.
+
+a|`identity.setAttribute`
+a|`Attribute Name` (type: `String`)
+
+ `Attribute Values` (type: `Array`)
+a|`Void`
+a|Set the named attribute to the values specified by the attribute value for the subject of the authorization request.
+
+a|`identity.addAttribute`
+a|`Attribute Name` (type: `String`)
+
+ `Attribute Value` (type: `String`)
+a|`Void`
+a|Add an attribute value to the list of attribute values associated with the attribute name for the subject of the authorization request.
+
+a|`identity.store`
+a|None
+a|`Void`
+a|Commit any changes to the identity repository.
+ 
+[CAUTION]
+====
+You must call `store()` otherwise changes will be lost when the script completes.
+====
+|===
+
+
+[#scripting-api-authz-session]
+===== Accessing Session Data
+
+Server-side authorization scripts can access session data of the subject of the authorization request through the methods of the `session` object.
+
+[NOTE]
+====
+To access the session data of the subject, they must be logged in and their SSO token must be available.
+====
+
+[#scripted-authz-module-session-methods]
+.Authorization Script Session Methods
+[cols="22%,33%,11%,34%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`session.getProperty`
+a|`Property Name` (type: String)
+a|`String`
+a|Retrieve properties from the session associated with the subject of the authorization request. For example, `AuthLevel`.
+|===
+
+
+[#scripting-api-authz-response]
+===== Setting Authorization Responses
+
+Server-side authorization scripts can return information in the response to an authorization request.
+
+[#scripted-authz-module-response-methods]
+.Authorization Script Response Methods
+[cols="31%,26%,21%,22%"]
+|===
+|Method |Parameters |Return Type |Description 
+
+a|`responseAttributes.put`
+a|`Attribute Name` (type: `String`)
+
+ `Attribute Values` (type: `Array`)
+a|`Void`
+a|Add an attribute to the response to the authorization request.
+
+a|`advice.put`
+a|`Advice Key` (type: `String`)
+
+ `Advice Values` (type: `Array`)
+a|`Void`
+a|Add advice key-value pairs to the response to a failing authorization request.
+
+a|`ttl`
+a|`TTL Value` (type: `Integer`)
+a|`Void`
+a|Add a time-to-live value to the response to a successful authorization, after which the decision is no longer valid.
+|===
+
+
+
+[#scripting-api-oidc-claims]
+==== OIDC Claims API Functionality
+
+This section covers functionality available when scripting OIDC claim handling using the OIDC claims script context type.
+
+[#scripted-api-oidc-request]
+===== Accessing OpenID Connect Requests
+
+Server-side scripts can access the OpenID Connect request through the following objects:
+
+[#scripted-api-oidc-request-objects]
+.OIDC Request Objects
+[cols="33%,22%,45%"]
+|===
+|Object |Type |Description 
+
+a|`scopes`
+a|`Set<String>`
+a|Contains a set of the requested scopes. For example:
+ 
+[source, javascript]
+----
+[
+    "profile",
+    "openid"
+]
+----
+
+a|`identity`
+a|`Class`
+a|Contains a representation of the identity of the resource owner.
+
+ For more details, see the `com.sun.identity.idm.AMIdentity` class in the link:../apidocs/index.html?com/sun/identity/idm/AMIdentity.html[OpenAM Javadoc, window=\_top].
+
+a|`session`
+a|`Class`
+a|Contains a representation of the user's session object if the request contained a session cookie.
+
+ For more details, see the `com.iplanet.sso.SSOToken` class in the link:../apidocs/index.html?com/iplanet/sso/SSOToken.html[OpenAM Javadoc, window=\_top].
+
+a|`claims`
+a|`Map<String, Object>`
+a|Contains a map of the claims the server provides by default. For example:
+ 
+[source, javascript]
+----
+{
+    "sub": "248289761001",
+    "updated_at": "1450368765"
+}
+----
+
+a|`requestedClaims`
+a|`Map<String, Set<String>>`
+a|Contains requested claims if the `claims` query parameter is used in the request and __Enable "claims_parameter_supported"__ is checked in the OAuth2 provider service configuration, otherwise is empty.
+
+ For more information see link:http://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter["Requesting Claims using the "claims" Request Parameter", window=\_blank] in the __OpenID Connect Core 1.0__ specification.
+
+ Example:
+ 
+[source]
+----
+{
+    "given_name": {
+        "essential": true,
+        "values": [
+            "Demo User",
+            "D User"
+        ]
+    },
+    "nickname": null,
+    "email": {
+        "essential": true
+    }
+}
+----
+|===
+
+
+
+
+[#sec-scripting-default-scripts]
+=== Using the Default Scripts
+
+This section covers the default scripts provided in OpenAM. These scripts act as templates for creating your own scripts. They are global and can be used in any realm, and cannot be deleted.
+
+[WARNING]
+====
+Editing a default script will affect every authentication module, policy condition, or OIDC claim configuration that uses the script.
+====
+
+[#sec-scripted-auth-module]
+==== Default Server-side Authentication Script
+
+This section demonstrates how to use the default server-side authentication script in a Scripted Authentication module.
+
+The default server-side authentication script only authenticates a subject when the current time on the OpenAM server is between 09:00 and 17:00. The script also uses the `logger` and `httpClient` functionality provided in the scripting API.
+
+To examine the contents of the default server-side authentication script in the OpenAM console browse to Realms > Top Level Realm > Scripts, and then click Scripted Module - Server Side.
+
+For more information on the functions available for use in server-side authentication scripts, see xref:#scripting-api["The Scripting API"].
+
+[#sec-scripted-auth-module-prepare]
+===== Preparing OpenAM
+
+OpenAM requires a small amount of configuration before trying the example server-side authentication script. You must first create a Scripted authentication module, and then include it in an authentication chain, which can then be used when logging in to OpenAM.
+
+The procedures in this section are:
+
+* xref:#proc-scripted-auth-module["To Create a Scripted Authentication Module that Uses the Default Server-side Authentication Script"]
+
+* xref:#proc-scripted-auth-chain["To Create an Authentication Chain that Uses a Scripted Authentication Module"]
+
+
+[#proc-scripted-auth-module]
+.To Create a Scripted Authentication Module that Uses the Default Server-side Authentication Script
+====
+In this procedure create a Scripted Authentication module, and link it to the default server-side authentication script.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Authentication > Modules.
+
+. On the Authentication Modules page, click Add Module.
+
+. On the New Module page, enter a module name, such as `myScriptedAuthModule`, in the Type drop-down menu, select `Scripted Module`, and then click Create.
+
+. On the module configuration page:
++
+
+.. Uncheck the Client-side Script Enabled checkbox.
+
+.. In the Server-side Script drop-down menu, select `Scripted Module - Server Side`.
+
+.. Click Save Changes.
+
+
+====
+
+[#proc-scripted-auth-chain]
+.To Create an Authentication Chain that Uses a Scripted Authentication Module
+====
+In this procedure create an authentication chain that uses a Data Store authentication module and the Scripted authentication module created in the previous procedure.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Authentication > Chains.
+
+. On the Authentication Chains page, click Add Chain.
+
+. On the Add Chain page, enter a name, such as `myScriptedChain`, and then click Create.
+
+. On the Edit Chain tab, click Add a Module.
+
+. In the New Module dialog box:
++
+
+.. In the Select Module drop-down menu, select `DataStore`.
+
+.. In the Select Criteria drop-down menu, select `Required`.
+
+.. Click OK.
+
++
+
+[NOTE]
+======
+The Data Store authentication module checks the user credentials, whereas the Scripted authentication module does not check credentials, but instead only checks that the authentication request is processed during working hours. Without the Data Store module, the username in the Scripted authentication module cannot be determined. Therefore, do not configure the Scripted authentication module (server-side script) as the __first__ module in an authentication chain, because it needs a username.
+======
+
+. On the Edit Chain tab, click Add Module.
+
+. In the New Module dialog box:
++
+
+.. In the Select Module drop-down menu, select the Scripted Module from the previous procedure, for example `myScriptedAuthModule`.
+
+.. In the Select Criteria drop-down menu, select `Required`.
+
+.. Click OK.
+
++
+The resulting chain resembles the following:
++
+
+image::images/scripting-sample-chain.png[]
+
+. On the Edit Chain tab, click Save Changes.
+
+====
+
+
+[#scripted-auth-module-try-it-out]
+===== Trying the Default Server-side Authentication Script
+
+This section shows how to log in using an authentication chain that contains a Scripted authentication module, which in turn uses the default server-side authentication script.
+
+[#d15472e16471]
+.To Login to OpenAM Using a Chain Containing a Scripted Authentication Module
+====
+
+. Log out of OpenAM.
+
+. In a browser, navigate to the OpenAM login URL, and specify the authentication chain created in the previous procedure as the value of the `service` query parameter.
++
+For example:
++
+
+[source, console]
+----
+https://openam.example.com:8443/openam/XUI/#login/&service=myScriptedChain
+----
+
+. Log in as user `demo` with password `changeit`.
++
+If login is successful, the user profile page appears. The script will also output messages, such as the following in the `debug/Authentication` log file:
++
+
+[source]
+----
+amScript:05/08/2015 11:31:21:835 AM CEST: Thread[pool-19-thread-5,5,main]
+Starting server-side JavaScript
+amScript:05/08/2015 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+User: demo
+amScript:05/08/2015 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+Current time: 11
+amScript:05/08/2015 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+Authentication allowed!
+----
++
+
+[TIP]
+======
+The default server-side authentication script outputs log messages at the `message` and `error` level.
+OpenAM does not log debug messages from scripts by default. You can configure OpenAM to log such messages by setting the debug log level for the `amScript` service. For details, see xref:../admin-guide/chap-monitoring.adoc#log-debug-selective-capture["Debug Logging By Service"] in the __Administration Guide__.
+======
+
+. (Optional) To test that the script is being used as part of the login process, edit the script to alter the times when authentication is allowed:
++
+
+.. Log out the `demo` user.
+
+.. Log in as an OpenAM administrator, for example `amadmin`.
+
+.. Click Realms > Top Level Realm > Scripts > Scripted Module - Server Side.
+
+.. In the script, swap the values for `START_TIME` and `END_TIME`, for example:
++
+
+[source, console]
+----
+var START_TIME = 17;
+var END_TIME   = 9; //
+----
+
+.. Click Save.
+
+.. Repeat steps 1, 2, and 3 above, logging into the module as the `demo` user as before. The authentication result will be the opposite of the previous result, as the allowed times have inverted.
+
+
+====
+
+
+
+[#sec-scripted-policy-condition]
+==== Default Policy Condition Script
+
+This section demonstrates how to use the sample policy condition script as part of an authorization policy. To examine the contents of the sample policy condition script in the OpenAM console browse to Realms > Top Level Realm > Scripts, and then click __Scripted Policy Condition__.
+
+The default policy condition script demonstrates how to access a user's profile information, use that information in HTTP calls, and make a policy decision based on the outcome.
+
+For more information on the functions available for use in policy condition scripts, see xref:#scripting-api["The Scripting API"].
+
+[#sec-scripted-policy-condition-prepare]
+===== Preparing OpenAM
+
+OpenAM requires a small amount of configuration before trying the default policy condition script. The default policy condition script requires that the subject of the policy has an address in their profile. The script compares the address to the country in the resource URL and to the country from which the request originated, as determined by an external GeoIP web service. The `demo` user also requires access to evaluate policies.
+
+The procedures in this section are:
+
+* xref:#proc-scripted-pol-address["To Add an Address to the Demo User"]
+
+* xref:#proc-scripted-pol-privilege["To Allow the Demo User to Evaluate a Policy"]
+
+* xref:#proc-scripted-pol-policy["To Create a Policy that Uses the Default Policy Condition Script"]
+
+* xref:#proc-enable-entitlement-debug-logging["To Enable Message-level Logging for Policy Evaluation"]
+
+
+[#proc-scripted-pol-address]
+.To Add an Address to the Demo User
+====
+In this procedure, add an address value to the `demo` user's profile. The default policy condition script uses the address when performing policy evaluation.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Subjects.
+
+. On the User tab, click the `demo` user.
+
+. In Home Address, enter a valid address. For example:
++
+
+[source, console]
+----
+201 Mission St, Suite 2900, San Francisco, CA 94105
+----
+
+. Click Save.
+
+====
+
+[#proc-scripted-pol-privilege]
+.To Allow the Demo User to Evaluate a Policy
+====
+In this procedure, add the `demo` user to a group and assign the privilege required to perform policy evaluations.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Subjects.
+
+. On the Group tab, click New, enter an ID for the group, such as `policyEval`, and then click OK.
+
+. On the User tab:
++
+
+.. Click the `demo` user.
+
+.. Click the Group tab.
+
+.. In the Available box, select the group created in step 3, and then click Add.
+
+.. Click Save.
+
+
+. Click Realms > Top Level Realm > Privileges.
+
+. Click the group created in step 3, for example `policyEval`.
+
+. On the Privileges page, select `Read and write access to all realm and policy properties`.
+
+. Click Save.
+
+====
+
+[#proc-scripted-pol-policy]
+.To Create a Policy that Uses the Default Policy Condition Script
+====
+In this procedure, create a policy that uses the default policy condition script. Policy evaluations can then be performed to test the script functionality.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Authorization > Policy Sets.
+
+. On the Policy Sets page, select `Default Policy Set`.
+
+. On the Default Policy Set page, click Add a Policy.
+
+. Define the policy as follows:
++
+
+.. Enter a name for the policy.
+
+.. Define resources to which the policy applies:
++
+
+... Select `URL` from the Resource Type drop down list.
+
+... Select the resource pattern `*://*:*/*` from the Resources drop down list.
+
+... Click Add.
++
+The `*://*:*/*` resource appears in the Resources field.
+
+... Click Add Resource to add a second resource to the policy.
+
+... Select the resource pattern `*://*:*/*?*` from the Resources drop down list.
+
+... Click Add.
++
+The `*://*:*/*?*` resource appears along with the `*://*:*/*` resource in the Resources field.
+
+... Click Create to create the policy.
++
+The Resources tab appears as follows:
++
+
+image::images/scripting-sample-policy-resources.png[]
+
+
+.. Specify actions to which the policy applies:
++
+
+... Select the Actions tab.
+
+... Select GET from the Add an Action drop down list.
+
+... The GET action appears in the list of actions. The default state for the GET action is Allow.
++
+The Actions tab appears as follows:
++
+
+image::images/scripting-sample-policy-actions.png[]
+
+... Click Save Changes.
+
+
+.. Configure subjects to which the policy applies:
++
+
+... Select the Subjects tab.
+
+... Click the edit icon—the pencil.
+
+... Select Authenticated Users from the Type drop down list.
+
+... Click the OK icon—the check mark.
++
+The Subjects tab appears as follows:
++
+
+image::images/scripting-sample-policy-subjects.png[]
+
+... Click Save Changes.
+
+
+.. Configure environments in which the policy applies:
++
+
+... Select the Environments tab.
+
+... Click Add an Environment Condition.
+
+... Select Script from the Type drop down list.
+
+... Select Scripted Policy Condition from the Script Name drop down list.
+
+... Click the OK icon—the check mark.
++
+The Environments tab appears as follows:
++
+
+image::images/scripting-sample-policy-environments.png[]
+
+... Click Save Changes.
+
+
+.. No additional configuration is required in the Response Attributes or Details tabs.
+
+
+====
+
+[#proc-enable-entitlement-debug-logging]
+.To Enable Message-level Logging for Policy Evaluation
+====
+The default policy condition script writes to the debug logs at the `message` level. Message-level debug logging is not enabled for policy evaluation by default.
+
+This section shows how to enable message-level debug logging for policy evaluation, so that logger output from the default policy condition script can be viewed in the `Entitlement` debug log.
+
+. Log in as an OpenAM administrator, for example `amadmin`.
+
+. Visit the `Debug.jsp` page, for example: `\https://openam.example.com:8443/openam/Debug.jsp`.
+
+. In the Debug instances drop-down, select `Entitlement`.
+
+. In the Level drop-down, choose the debug level required. In this example, select `Message`.
++
+
+image::images/enable-entitlement-debug-logs.png[]
+
+. Click Submit, and on the summary page that appears, click Confirm.
++
+Message-level debug logging is now enabled for policy evaluation.
+
+====
+
+
+[#sec-scripted-policy-condition-evaluate]
+===== Trying the Default Policy Condition Script
+
+This section demonstrates using a policy that contains the default policy condition script.
+
+To evaluate against a policy, you must first obtain an SSO token for the subject performing the evaluation, in this case the `demo` user. You can then make a call to the `policies?_action=evaluate` endpoint, including some environment information, which the policy uses to make an authorization decision.
+
+[#d15472e16946]
+.To Evaluate a Policy
+====
+
+. Obtain an SSO Token for the `demo` user:
++
+
+[source, console]
+----
+curl \
+--request POST \
+--header "X-OpenAM-Username: demo" \
+--header "X-OpenAM-Password: changeit" \
+https://openam.example.com:8443/openam/json/authenticate
+{
+     "tokenId": "AQIC5wM2...",
+     "successUrl": "/openam/console"
+}
+----
+
+. Send an evaluation request to the `policies` endpoint, using the SSO token of the `demo` user in the `iPlanetDirectoryPro` header.
++
+In the JSON data, set the `subject` property to also be the SSO token of the `demo` user. In the `resources` property, include a URL that resides on a server in the same country as the address set for the `demo` user. In the `environment` property, include an IP address that is also based in the same country as the user and the resource. The example below uses the ForgeRock Community web site URL and an IP address from a ForgeRock office, both located in the United States:
++
+
+[source, console]
+----
+curl \
+--request POST \
+--header "Content-Type: application/json" \
+--header "iPlanetDirectoryPro: AQIC5wM2..." \
+--data '{
+    "resources": [
+        "http://www.forgerock.org:80/index.html"
+    ],
+    "application": "iPlanetAMWebAgentService",
+    "subject": { "ssoToken": "AQIC5wM2..."},
+    "environment": {
+        "IP": [
+            "38.99.39.210"
+        ]
+    }
+}' \
+https://openam.example.com:8443/openam/json/policies?_action=evaluate
+[
+  {
+    "advices": {},
+    "ttl": 9223372036854775807,
+    "resource": "http://www.forgerock.org:80/index.html",
+    "actions": {
+      "POST": true,
+      "GET": true
+    },
+    "attributes": {
+      "countryOfOrigin": [
+        "United States"
+      ]
+    }
+  }
+]
+----
++
+If the country in the subject's profile matches the country determined from the source IP in the environment and the country determined from the resource URL, then OpenAM returns a list of actions available. The script will also add an attribute to the response called `countryOfOrigin` with the country as the value.
++
+If the countries do not match, no actions are returned. In the following example, the resource URL is based in France, while the IP and user's address in the profile are based in the United States:
++
+
+[source, console]
+----
+curl -X POST \
+-H "Content-Type: application/json" \
+-H "iPlanetDirectoryPro: AQIC5wM2..." \
+-d '{
+    "resources": [
+        "http://www.forgerock.fr:80/index.html"
+    ],
+    "application": "iPlanetAMWebAgentService",
+    "subject": { "ssoToken": "AQIC5wM2..."},
+    "environment": {
+        "IP": [
+            "38.99.39.210"
+        ]
+    }
+}' \
+'https://openam.example.com:8443/openam/json/policies?_action=evaluate'
+[
+    {
+        "advices": {},
+        "ttl": 9223372036854775807,
+        "resource": "http://www.forgerock.fr:80/index.html",
+        "actions": {},
+        "attributes": {}
+    }
+]
+----
+
+====
+
+
+
+[#sec-scripted-oidc-claims]
+==== Default OIDC Claims Script
+
+This section demonstrates how to use the default OIDC claims script to return the profile attributes of a user in response to an OpenID Connect request for the `profile` scope.
+
+The default OIDC claims script maps the following claims to the `profile` scope:
+
+* zoneinfo
+
+* family_name
+
+* locale
+
+* name
+
+To examine the contents of the default OIDC claims script in the OpenAM console browse to Realms > Top Level Realm > Scripts, and then click OIDC Claims Script.
+
+For more information on the functions available for use in OIDC claim scripts, see xref:#scripting-api["The Scripting API"].
+
+[#sec-scripted-oidc-claims-prepare]
+===== Preparing OpenAM
+
+OpenAM requires a small amount of configuration before trying the example OIDC claims script. You must first create an OAuth2 provider with OpenID Connect settings, and register an OpenID Connect client, before you can authenticate to the client using a web browser.
+
+The procedures in this section are:
+
+* xref:#proc-oidc-script-provider["To Create an OpenID Connect Provider Service"]
+
+* xref:#proc-oidc-script-client["To Register an OpenID Connect Client"]
+
+
+[#proc-oidc-script-provider]
+.To Create an OpenID Connect Provider Service
+====
+Follow the steps in this procedure to create an OpenID Connect provider service by using the wizard.
+
+. Log in to OpenAM as an administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Configure OAuth Provider > Configure OpenID Connect.
+
+. On the Configure OpenID Connect page, accept the default values and then click Create.
+
+. Navigate to Realms > Top Level Realm > Services, click OAuth2 Provider, and verify that the value for OIDC Claims Script is the default script, `OIDC Claims Script`.
+
+====
+For a more detailed explanation and example of creating an OpenID Connect provider service, see xref:../admin-guide/chap-openid-connect.adoc#configure-openid-connect-provider["Configuring OpenAM As OpenID Connect Provider"] in the __Administration Guide__.
+
+[#proc-oidc-script-client]
+.To Register an OpenID Connect Client
+====
+Follow the steps in this procedure to create an OpenID Connect client agent profile.
+
+. Log in to OpenAM as an administrator, for example `amadmin`.
+
+. Click Realms > Top Level Realm > Agents > OAuth 2.0/OpenID Connect Client.
+
+. In the Agent table, click New.
+
+. Enter a name for the client, such as `oidcTest`, provide a password, and then click Create.
+
+. On the OAuth 2.0/OpenID Connect Client page, click the agent name to configure the agent.
+
+. On the edit client page:
++
+
+.. In Redirection URIs, enter an example URI such as `\http://www.example.com`.
+
+.. In Scope(s), enter both `profile` and `openid`.
++
+The `profile` scope will return details about the subject such as given name and timezone. The `openid` scope indicates this is an OpenID Connect client.
+
+.. In Display name, enter the name of the client as it will be displayed on the consent page, for example `OIDC Claims Script Client`.
+
+
+. Save your work.
+
+====
+For a more detailed explanation and examples of registering an OpenID Connect client, see xref:../admin-guide/chap-openid-connect.adoc#register-openid-connect-clients["Registering OpenID Connect Relying Parties"] and xref:../admin-guide/chap-agents.adoc#configure-oauth2-client["Configuring OAuth 2.0 and OpenID Connect 1.0 Clients"] in the __Administration Guide__.
+
+
+[#scripted-oidc-claims-try-it-out]
+===== Trying the Default OIDC Claims Script
+
+This section shows how to authenticate to a registered OpenID Connect client and request scopes from OpenAM, which in turn uses the default OIDC Claims script to populate the scope with claims and profile values.
+
+[#d15472e17167]
+.To Authenticate to an OIDC Client and use the Default OIDC Claims Script
+====
+
+. Log out of OpenAM.
+
+. In an Internet browser, navigate to the OpenAM OAuth 2.0 authorization endpoint, `/oauth2/authorize`, and specify the following query parameters, with the values you configured in the agent profile:
++
+
+[#table-oidc-profile-mappings]
+.Query parameters for OpenID Connect Authorization to an Agent Profile
+[cols="20%,80%"]
+|===
+|Query Parameter |Agent Profile Property Value 
+
+a|`client_id`
+a|Name of the agent, for example `oidcTest`.
+
+a|`redirect_uri`
+a|Redirection URIs, for example `\http://www.example.com`.
+
+a|`response_type`
+a|Response Types, for example `code`.
+
+a|`scope`
+a|Scope(s), for example `openid profile`.
+|===
++
+For example: `\http://openam.example.com:8080/openam/oauth2/authorize?client_id=oidcTest&redirect_uri=http://www.example.com&response_type=code&scope=openid profile`
+
+. Log in to OpenAM as `demo`, with password `changeit`.
+
+. On the consent page, expand the panel labelled Your personal information to see the claim values the default OIDC script has populated into the requested `profile` scope.
++
+
+image::images/scripting-sample-oidc-consent.png[]
+
+. Click Allow to be redirected to the Redirection URI specified in the agent profile. The authorization code is appended to the redirection URI as the value of the `code` query parameter.
+
+====
+
+
+
+

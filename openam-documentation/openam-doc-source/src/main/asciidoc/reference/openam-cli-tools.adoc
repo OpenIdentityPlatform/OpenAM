@@ -1,0 +1,5979 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#openam-cli-tools]
+== OpenAM Command Line Tools
+
+[#agentadmin-1]
+=== agentadmin — manage OpenAM policy agent installation
+
+==== Synopsis
+`agentadmin` {options}
+
+[#d981e297]
+==== Description
+This command manages OpenAM policy agent installations. The `agentadmin` command requires a Java runtime environment.
+
+[#d981e305]
+==== Options
+The following options are supported.
+--
+
+`--install`::
+Installs a new Agent instance.
+
++
+Usage: `agentadmin --install [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to install in silent mode by specifying all the responses in a response specified by __file-name__. When this option is used the installer runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses to a response file specified by __file-name__.
+
+====
+
+`--custom-install`::
+Installs a new Agent instance
+
++
+Usage: `agentadmin --custom-install [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to install in silent mode by specifying all the responses in a response specified by __file-name__. When this option is used the installer runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses to a response file specified by __file-name__.
+
+====
+
+`--acceptLicense`::
+Auto-accepts the software license agreement. If this option is present on the command line with the `--install` or `--custom-install` option, the license agreement prompt is suppressed and the agent install continues. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
+
+`--uninstall`::
+Uninstalls an existing Agent instance.
+
++
+Usage: `agentadmin --uninstall [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to install in silent mode by specifying all the responses in a response specified by __file-name__. When this option is used the installer runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses to a response file specified by __file-name__.
+
+====
+
+`--version`::
+Displays the version information.
+
+`--uninstallAll`::
+Uninstalls all the agent instances.
+
+`--migrate`::
+Migrate agent to newer version
+
+`--listAgents`::
+Displays details of all the configured agents.
+
+`--agentInfo`::
+Displays details of the agent corresponding to the specified __agent-id__.
+
++
+Example: `agentadmin --agentInfo agent_001`
+
+`--encrypt`::
+Encrypts a given string.
+
++
+Usage: `agentadmin --encrypt agent-instance password-file`
++
+[open]
+====
+
+__agent-instance__::
+Agent instance identifier. The encryption functionality requires the use of agent instance specific encryption key present in its configuration file.
+
+__password-file__::
+File containing the password to encrypt.
+
+====
+
+`--getEncryptKey`::
+Generates an agent encryption key.
+
+--
+
+[#d981e512]
+==== Examples
+The following example installs an Apache HTTP Server 2.2 interactively, where Apache HTTP Server has been installed under `/path/to/apache22`.
+
+[source, console]
+----
+$ ./agentadmin --install --acceptLicense
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /path/to/apache22/conf
+OpenSSO server URL : http://openam.example.com:8080/openam
+Agent URL : http://www.example.com:80
+Agent Profile name : Apache Web Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentBootstrap.properties
+Agent Configuration Tag file location
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/web_agents/apache22_agent/installer-logs/audit/install.log
+...
+----
+
+'''
+[#ampassword-1]
+=== ampassword — change passwords for the OpenAM Administrator
+
+==== Synopsis
+`ampassword` {options}
+
+[#d981e557]
+==== Description
+This command allows you to change passwords held in the configuration store, and to encrypt passwords.
+
+[#d981e562]
+==== Options
+The following options are supported.
+--
+
+`-a | --admin [ -o | --old old-password-file -n | --new new-password-file ]`::
+Change the password for `amAdmin` from the value stored in __old-password-file__ to the value stored in __new-password-file__.
+
+`-p | --proxy [ -o | --old old-password-file -n | --new new-password-file ]`::
+Change the password for the proxy administrator from the value stored in __old-password-file__ to the value stored in __new-password-file__.
+
++
+The proxy administrator password is shown encrypted in the output from `ssoadm get-svrcfg-xml`.
+
+`-e | --encrypt [ password-file ]`::
+Display the password value provided encrypted with the key generated during OpenAM installation.
+
+`-h | --help`::
+Display the usage message.
+
+--
+
+[#d981e631]
+==== Examples
+The following example encrypts the password contained within a text file.
+
+* Create a text file, for example `$HOME/.pwd.txt`, containing the password string on a single line.
+
+* Encrypt the password by using the `ampassword` command:
++
+
+[source, console]
+----
+$ ampassword -e $HOME/.pwd.txt
+     AQICkZs3qy5QUCXir9tebIEEZYGFXI2lCC4B
+----
+
+
+'''
+[#amverifyarchive-1]
+=== amverifyarchive — check OpenAM log archives for tampering
+
+==== Synopsis
+`amverifyarchive` {options}
+
+[#d981e685]
+==== Description
+This command checks log archive integrity.
+
+[#d981e690]
+==== Options
+The following options are required.
+--
+
+`-l logName`::
+Verify log files of the specified type. To specify an individual log rather than a type, provide the entire log file name.
+
+`-p path`::
+Path to log files to verify.
+
+`-u userName`::
+User who can read log files.
+
+`-w password`::
+Password of the user who can read log files.
+
+--
+
+[#d981e732]
+==== Examples
+The following example checks the `amConsole` logs.
+
+[source, console]
+----
+$ amverifyarchive \
+ -l amConsole \
+ -p $HOME/openam/openam/log
+ -u amadmin \
+ -w password
+----
+
+'''
+[#man-configurator-jar-1]
+=== configurator.jar — install or upgrade OpenAM using a configuration file
+
+==== Synopsis
+`configurator.jar` {options}
+
+[#d981e773]
+==== Description
+This executable .jar file, openam-configurator-tool-13.5.2.jar, lets you perform silent installation, configuring a deployed OpenAM server by applying settings from a configuration file.
+
+[#d981e778]
+==== Options
+The following options are supported.
+--
+
+`-f | --file configuration-file`::
+Configure a deployed OpenAM web application archive using the specified configuration file. Installation and upgrade configuration files are described in the sections below.
+
+`--acceptLicense`::
+Auto-accept the software license agreement and suppress the display of the licence acceptance screen to the user. If the configuration file contains the `ACCEPT_LICENSES` property, it will have precedence over the command-line option.
+
+`-? | --help`::
+Display the usage message.
+
+--
+
+[#d981e810]
+==== Installation Configuration File
+Base your configuration on the `sampleconfiguration` file delivered with OpenAM, and using the hints in this section, or the comments included in the file.
+.Server Properties
+--
+These properties pertain to the OpenAM server instance.
+
+SERVER_URL::
+URL to the web container where you want OpenAM to run, such as `\http://openam.example.com:8080`
+
+DEPLOYMENT_URI::
+URI where you want to deploy OpenAM on the web container, such as `/openam`
+
+BASE_DIR::
+Configuration directory where OpenAM stores files and embedded configuration directory servers, such as `$HOME/openam`
+
+locale::
+The user locale, such as `en_GB`
+
+PLATFORM_LOCALE::
+The locale of the OpenAM server, such as `en_US`
+
+AM_ENC_KEY::
+The password encryption key, which must be the same on all servers in a multi-server installation, such as `O6QWwHPO4os+zEz3Nqn/2daAYWyiFE32`. If left blank, installing OpenAM generates a random password encryption key that you can view in the OpenAM console under Deployment > Servers > __Server Name__ > Security.
+
+ADMIN_PWD::
+Password of the OpenAM administrator user `amadmin`, which must be at least 8 characters in length and must match that of other servers in a multiserver deployment
+
+AMLDAPUSERPASSWD::
+Password of the default policy agent `UrlAccessAgent`, which must be at least 8 characters in length and must not be the same as the value of `ADMIN_PWD`
+
+COOKIE_DOMAIN::
+Name of the trusted DNS domain OpenAM returns to a browser when it grants a session ID to a user. By default, it is set to the full URL that was used to access the configurator, such as `example.com`.
+
+ACCEPT_LICENSES::
+Optional boolean property that can be set to always auto-accept the software license agreement and suppress the display of the license acceptance screen to the user. A value of `true` auto-accepts the license; any other value will be assumed to equal `false`, resulting in the presentation of the license. Default value is `false`. This property takes precedence over the `--acceptLicense` option, which can also be passed in to the application with the openam-configurator-tool-13.5.2.jar file.
+
+--
+.Configuration Store Properties
+--
+These properties pertain to the directory server where OpenAM stores its configuration.
+
+DATA_STORE::
+Type of the configuration data store. The value `embedded` means set up OpenAM with an embedded, OpenDJ based configuration store. The value `dirServer` means an external directory server, such as OpenDJ, or Sun Java System Directory Server. If you set this to `dirServer`, and the configuration store contains the configuration of other OpenAM servers, then the server is added to the existing multiserver installation.
+
+DIRECTORY_SSL::
+To use LDAP without SSL, set this to `SIMPLE`. To use LDAP with SSL, set this to `SSL`.
+
+DIRECTORY_SERVER::
+Fully qualified domain name of the configuration store directory server host, such as `opendj.example.com`
+
+DIRECTORY_PORT::
+LDAP or LDAPS port number for the configuration store directory server, such as 389 or 636
+
+DIRECTORY_ADMIN_PORT::
+Administration port number for the configuration store directory server, such as 4444
+
+DIRECTORY_JMX_PORT::
+Java Management eXtension port number, such as `1689`, used with the OpenDJ embedded configuration store
+
+ROOT_SUFFIX::
+Root suffix distinguished name (DN) for the configuration store, such as `o=openam`
+
+DS_DIRMGRDN::
+Distinguished name of the directory manager of the configuration store, such as `cn=Directory Manager`
+
+DS_DIRMGRPASSWD::
+Password for the directory manager of the configuration store
+
+--
+.User Data Store Properties
+--
+These properties pertain to the directory server where OpenAM stores user profiles. If you do not include these properties, or you leave these properties commented out, then OpenAM uses the same directory server as it uses for the configuration store.
+
+USERSTORE_TYPE::
+The type of directory server used. Valid values include the following.
++
+
+* `LDAPv3ForOpenDS`: ForgeRock 0penDJ or Sun OpenDS
+
+* `LDAPv3ForAD`: Active Directory with host and port settings
+
+* `LDAPv3ForADDC`: Active Directory with a Domain Name setting
+
+* `LDAPv3ForADAM`: Active Directory Application Mode
+
+* `LDAPv3ForODSEE`: Sun Java System Directory Server
+
+* `LDAPv3ForTivoli`: IBM Tivoli Directory Server
+
+
+USERSTORE_SSL::
+To use LDAP without SSL, set this to `SIMPLE`. To use LDAP with SSL, set this to `SSL`.
+
+USERSTORE_DOMAINNAME::
+If `USERSTORE_TYPE` is `LDAPv3ForADDC`, you set this to the Active Directory Domain Name, such as `ad.example.com`, and then set only the `USERSTORE_SSL`, `USERSTORE_MGRDN`, and `USERSTORE_PASSWD` additional parameters. This lets Active Directory use DNS to retrieve service locations. Otherwise, do not use.
+
+USERSTORE_HOST::
+Fully qualified domain name of the user data store directory server, such as `opendj.example.com`
+
+USERSTORE_PORT::
+Port number of the user data store. Default for LDAP is 389, and for LDAP over SSL is 636.
+
+USERSTORE_SUFFIX::
+Root suffix distinguished name for the user data in the directory, such as `dc=example,dc=com`
+
+USERSTORE_MGRDN::
+Distinguished name of the directory manager of the user data store, such as `cn=Directory Manager`
+
+USERSTORE_PASSWD::
+Password for the directory manager of the user data store
+
+--
+.Site Properties
+--
+These properties pertain when you configure multiple OpenAM servers in a site deployment, where a load balancer spreads request across multiple servers. Use the `DS_EMB_REPL*` and `existingserverid` properties only for the second and subsequent servers in a site configuration.
+
+LB_SITE_NAME::
+The name of the OpenAM site
+
+LB_PRIMARY_URL::
+The load balancer URL for the site, such as `\http://lb.example.com:80/openam`.
+
+LB_SESSION_HA_SFO::
+Whether to enable session persistence and failover for the site. Default: `false`
+
+DS_EMB_REPL_FLAG::
+Enable use of the embedded configuration store by setting this parameter to `embReplFlag`, only if the `DATA_STORE` parameter is set to `embedded`. Use the other `DS_EMB_REPL*` parameters in this section to set up configuration store data replication.
+
+DS_EMB_REPL_REPLPORT1::
+Replication port number for the new OpenAM server you are installing, such as 58989
+
+DS_EMB_REPL_HOST2::
+Host name of an existing OpenAM server housing the configuration store directory server with which to replicate, such as `openam1.example.com`
+
+DS_EMB_REPL_ADMINPORT2::
+Administration port number for the configuration store directory server used by the existing OpenAM server, such as 4444
+
+DS_EMB_REPL_REPLPORT2::
+Replication port number for the configuration store directory server used by the existing OpenAM server, such as 50899
+
+existingserverid::
+Full URL of the existing OpenAM server, such as `\http://server1.example.com:8080/openam`
+
+--
+
+[#d981e1205]
+==== Upgrade Configuration File
+Base your configuration on the `sampleconfiguration` file delivered with OpenAM, and using the hints in this section, or the comments included in the file.
+.Upgrade Properties
+--
+
+SERVER_URL::
+URL to the web container where OpenAM runs, such as `\http://openam.example.com:8080`
+
+DEPLOYMENT_URI::
+URI where OpenAM is deployed on the web container, such as `/openam`
+
+ACCEPT_LICENSES::
+Optional boolean property that can be set to always auto-accept the software license agreement and suppress displaying the license acceptance screen to the user. A value of `true` auto-accepts the license; any other value will be assumed to equal `false`, resulting in the presentation of the license. Default value is `false`. This property takes precedence over the `--acceptLicense` option, which can also be passed in to the application with the openam-configurator-tool-13.5.2.jar file.
+
+--
+
+[#d981e1250]
+==== Examples
+The following example shows a configuration file to install a server with an external user data store.
+
+[source]
+----
+# Server properties, AM_ENC_KEY="" means generate random key
+SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=$HOME/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=change3me
+AMLDAPUSERPASSWD=secret12
+COOKIE_DOMAIN=openam.example.com
+ACCEPT_LICENSES=true
+
+# Embedded configuration data store
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=openam.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=o=openam
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=chang3me
+
+# External OpenDJ based user data store
+USERSTORE_TYPE=LDAPv3ForOpenDS
+USERSTORE_SSL=SIMPLE
+#USERSTORE_DOMAINNAME=ad.example.com
+USERSTORE_HOST=opendj.example.com
+USERSTORE_PORT=389
+USERSTORE_SUFFIX=dc=example,dc=com
+USERSTORE_MGRDN=cn=Directory Manager
+USERSTORE_PASSWD=secret12
+
+# Uncomment to specify the site for the first server in a site configuration
+#LB_SITE_NAME=lb
+#LB_PRIMARY_URL=http://lb.example.com:80/openam
+----
+The following example shows a configuration file to install the second server in a site configuration.
+
+[source]
+----
+# Server properties, AM_ENC_KEY from first server
+SERVER_URL=http://server2.example.com:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=$HOME/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=O6QWwHPO4os+zEz3Nqn/2daAYWyiFE32
+ADMIN_PWD=change3me
+AMLDAPUSERPASSWD=secret12
+COOKIE_DOMAIN=openam.example.com
+ACCEPT_LICENSES=true
+
+# Embedded configuration data store
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=server2.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=o=openam
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=chang3me
+
+# External OpenDJ based user data store
+USERSTORE_TYPE=LDAPv3ForOpenDS
+USERSTORE_SSL=SIMPLE
+#USERSTORE_DOMAINNAME=ad.example.com
+USERSTORE_HOST=opendj.example.com
+USERSTORE_PORT=389
+USERSTORE_SUFFIX=dc=example,dc=com
+USERSTORE_MGRDN=cn=Directory Manager
+USERSTORE_PASSWD=secret12
+
+# Site properties
+LB_SITE_NAME=lb
+LB_PRIMARY_URL=http://lb.example.com:80/openam
+DS_EMB_REPL_FLAG=embReplFlag
+DS_EMB_REPL_REPLPORT1=58989
+DS_EMB_REPL_HOST2=server1.example.com
+DS_EMB_REPL_ADMINPORT2=4444
+DS_EMB_REPL_REPLPORT2=50889
+existingserverid=http://server1.example.com:8080/openam
+----
+The following example shows a configuration file to upgrade an OpenAM server.
+
+[source]
+----
+SERVER_URL=https://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true
+----
+The following example uses a configuration file with the `--acceptLicense` option on the command line.
+
+[source, console]
+----
+$ java \
+ -jar openam-configurator-tool-13.5.2.jar \
+ -f config.file \
+ --acceptLicense
+----
+
+'''
+[#man-upgrade-jar]
+=== upgrade.jar — upgrade OpenAM using a configuration file
+
+==== Synopsis
+`upgrade.jar` {options}
+
+[#d981e1307]
+==== Description
+This executable jar file, openam-upgrade-tool-13.5.2.jar, lets you perform a silent upgrade on a deployed OpenAM server by applying settings from a configuration file or using arguments. This capability allows you to include the `upgrade.jar` from a command line or in an upgrade script.
+
+[#d981e1315]
+==== Options
+The following options are supported.
+--
+
+`-f | --file configuration-file`::
+Upgrade a deployed OpenAM web application archive using the specified configuration file. Upgrade configuration files are described in the sections below. Also, you can specify the system properties on the command line, instead of using the configuration file. See Example 2 below.
+
+`--acceptLicense`::
+Auto-accept the software license agreement and suppress the display of the licence acceptance screen to the user. If the configuration file contains the `ACCEPT_LICENSES` property, it will have precedence over the command-line option.
+
+`-? | --help`::
+Display the usage message.
+
+--
+
+[#d981e1347]
+==== Upgrade Configuration File
+Base your configuration on the `sampleupgrade` file delivered with OpenAM, and using the hints in this section, or the comments included in the file.
+.Upgrade Properties
+--
+
+SERVER_URL::
+URL to the web container where OpenAM runs, such as `\http://openam.example.com:8080`.
+
+DEPLOYMENT_URI::
+URI where OpenAM is deployed on the web container, such as `/openam`.
+
+ACCEPT_LICENSES::
+Optional boolean property that can be set to always auto-accept the software license agreement and suppress displaying the license acceptance screen to the user. A value of `true` auto-accepts the license; any other value will be assumed to equal `false`, resulting in the presentation of the license. Default value is `false`. This property takes precedence over the `--acceptLicense` option, which can also be passed in to the application with the openam-upgrade-tool-13.5.2.jar file.
+
+--
+
+[#d981e1394]
+==== Examples
+The following example shows a configuration file and the commands to upgrade a server using the `upgrade.jar`. The configuration file is saved as `/tmp/upgrade.txt`.
+
+[source]
+----
+SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true
+----
+
+[source]
+----
+$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-13.5.2.jar \
+ -f /tmp/upgrade.txt
+----
+The following example shows how to specify system properties with the `upgrade.jar`.
+
+[source]
+----
+SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true
+----
+
+[source]
+----
+$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-13.5.2.jar \
+ -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam
+----
+The following example shows the use of the `--acceptLicense` option with the `upgrade.jar`.
+
+[source]
+----
+SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+----
+
+[source]
+----
+$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-13.5.2.jar \
+ -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam \
+ --acceptLicense
+----
+
+'''
+[#ssoadm-1]
+=== ssoadm — configure OpenAM core services
+
+==== Synopsis
+`ssoadm` [__subcommand__] [options]
+
+[#d981e1468]
+==== Description
+The `ssoadm` command provides a rich command-line interface for configuring OpenAM core services.
+
+Also see the __Installation Guide__ procedure, link:../install-guide/index.html#install-openam-admin-tools[To Set Up Administration Tools] in the __Installation Guide__ for instructions on setting up the `ssoadm` command.
+
+[#d981e1488]
+==== Global Options
+The following global options are supported.
+--
+
+`--debug, -d`::
+Run in debug mode. Results sent to the debug file.
+
+`--help, -?`::
+Print usage.
+
++
+This command can also be used with subcommands as in `ssoadm subcommand --help`.
+
+`--information, -O`::
+Print basic information about the tool.
+
+`--locale, -l`::
+Name of the locale to display the results.
+
+`--nolog, -O`::
+Disable audit logging.
+
+`--verbose, -v`::
+Run in verbose mode. Results sent to standard output.
+
+`--version, -V`::
+Print the version of this tool.
+
+--
+
+[#d981e1551]
+==== JVM Properties for ssoadm
+You can specifically set the authentication module or chain for administrator logins using two JVM settings. These settings provide more control to select the exact authentication mechanisms to be used when `ssoadm` authenticates administrators in the top-level realm.
+
+To set these properties, manually edit the following two JVM settings in the `ssoadm` or `ssoadm.bat` script.
+--
+
+`org.forgerock.openam.ssoadm.auth.indexType`::
+Specifies the module or chain-based authentication in the top level realm. If the property is set, OpenAM uses only __that__ authentication mechanism.
+
+`org.forgerock.openam.ssoadm.auth.indexName`::
+Specifies the actual name of the authentication module/chain as controlled by the `indexType` setting. For example, if the `indexType` is set to `module_instance` and `indexName` is set to `LDAP`, then `ssoadm` authenticates using only the LDAP authentication module.
+
+--
+
+[#d981e1607]
+==== Subcommands: By Category
+This section lists subcommands by category. The subsequent section lists subcommands in alphabetical order with a short description.
+
+See `ssoadm subcommand --help` for detailed options.
+[#d981e1620]
+===== Agent Configuration
+
+* link:#ssoadm-add-agent-to-grp[add-agent-to-grp]
+
+* link:#ssoadm-agent-remove-props[agent-remove-props]
+
+* link:#ssoadm-create-agent[create-agent]
+
+* link:#ssoadm-create-agent-grp[create-agent-grp]
+
+* link:#ssoadm-delete-agent-grps[delete-agent-grps]
+
+* link:#ssoadm-delete-agents[delete-agents]
+
+* link:#ssoadm-list-agent-grp-members[list-agent-grp-members]
+
+* link:#ssoadm-list-agent-grps[list-agent-grps]
+
+* link:#ssoadm-list-agents[list-agents]
+
+* link:#ssoadm-remove-agent-from-grp[remove-agent-from-grp]
+
+* link:#ssoadm-show-agent[show-agent]
+
+* link:#ssoadm-show-agent-grp[show-agent-grp]
+
+* link:#ssoadm-show-agent-membership[show-agent-membership]
+
+* link:#ssoadm-show-agent-types[show-agent-types]
+
+* link:#ssoadm-update-agent[update-agent]
+
+* link:#ssoadm-update-agent-grp[update-agent-grp]
+
+
+[#d981e1704]
+===== Authentication Service Management
+
+* link:#ssoadm-add-auth-cfg-entr[add-auth-cfg-entr]
+
+* link:#ssoadm-create-auth-cfg[create-auth-cfg]
+
+* link:#ssoadm-create-auth-instance[create-auth-instance]
+
+* link:#ssoadm-delete-auth-cfgs[delete-auth-cfgs]
+
+* link:#ssoadm-delete-auth-instances[delete-auth-instances]
+
+* link:#ssoadm-get-auth-cfg-entr[get-auth-cfg-entr]
+
+* link:#ssoadm-get-auth-instance[get-auth-instance]
+
+* link:#ssoadm-list-auth-cfgs[list-auth-cfgs]
+
+* link:#ssoadm-list-auth-instances[list-auth-instances]
+
+* link:#ssoadm-register-auth-module[register-auth-module]
+
+* link:#ssoadm-unregister-auth-module[unregister-auth-module]
+
+* link:#ssoadm-update-auth-cfg-entr[update-auth-cfg-entr]
+
+* link:#ssoadm-update-auth-cfg-props[update-auth-cfg-props]
+
+* link:#ssoadm-update-auth-instance[update-auth-instance]
+
+
+[#d981e1778]
+===== Data Store Management
+
+* link:#ssoadm-add-amsdk-idrepo-plugin[add-amsdk-idrepo-plugin]
+
+* link:#ssoadm-create-datastore[create-datastore]
+
+* link:#ssoadm-delete-datastores[delete-datastores]
+
+* link:#ssoadm-list-datastore-types[list-datastore-types]
+
+* link:#ssoadm-list-datastores[list-datastores]
+
+* link:#ssoadm-show-datastore[show-datastore]
+
+* link:#ssoadm-update-datastore[update-datastore]
+
+
+[#d981e1817]
+===== Entitlements
+
+* link:#ssoadm-add-app-priv[add-app-priv]
+
+* link:#ssoadm-create-appl[create-appl]
+
+* link:#ssoadm-create-appl-type[create-appl-type]
+
+* link:#ssoadm-create-xacml[create-xacml]
+
+* link:#ssoadm-delete-appl-types[delete-appl-types]
+
+* link:#ssoadm-delete-appls[delete-appls]
+
+* link:#ssoadm-delete-xacml[delete-xacml]
+
+* link:#ssoadm-list-appl-types[list-appl-types]
+
+* link:#ssoadm-list-appls[list-appls]
+
+* link:#ssoadm-list-xacml[list-xacml]
+
+* link:#ssoadm-set-appl[set-appl]
+
+* link:#ssoadm-set-entitlement-conf[set-entitlement-conf]
+
+* link:#ssoadm-show-app-priv[show-app-priv]
+
+* link:#ssoadm-show-appl[show-appl]
+
+* link:#ssoadm-show-entitlement-conf[show-entitlement-conf]
+
+* link:#ssoadm-update-app-priv[update-app-priv]
+
+* link:#ssoadm-update-app-priv-resources[update-app-priv-resources]
+
+* link:#ssoadm-update-app-priv-subjects[update-app-priv-subjects]
+
+
+[#d981e1911]
+===== Federation Management
+
+* link:#ssoadm-add-cot-member[add-cot-member]
+
+* link:#ssoadm-create-cot[create-cot]
+
+* link:#ssoadm-create-metadata-templ[create-metadata-templ]
+
+* link:#ssoadm-delete-cot[delete-cot]
+
+* link:#ssoadm-delete-entity[delete-entity]
+
+* link:#ssoadm-do-bulk-federation[do-bulk-federation]
+
+* link:#ssoadm-export-entity[export-entity]
+
+* link:#ssoadm-import-bulk-fed-data[import-bulk-fed-data]
+
+* link:#ssoadm-import-entity[import-entity]
+
+* link:#ssoadm-list-cot-members[list-cot-members]
+
+* link:#ssoadm-list-cots[list-cots]
+
+* link:#ssoadm-list-entities[list-entities]
+
+* link:#ssoadm-remove-cot-member[remove-cot-member]
+
+* link:#ssoadm-update-entity-keyinfo[update-entity-keyinfo]
+
+
+[#d981e1985]
+===== Identity Management
+
+* link:#ssoadm-add-member[add-member]
+
+* link:#ssoadm-add-privileges[add-privileges]
+
+* link:#ssoadm-add-svc-identity[add-svc-identity]
+
+* link:#ssoadm-create-identity[create-identity]
+
+* link:#ssoadm-delete-identities[delete-identities]
+
+* link:#ssoadm-get-identity[get-identity]
+
+* link:#ssoadm-get-identity-svcs[get-identity-svcs]
+
+* link:#ssoadm-list-identities[list-identities]
+
+* link:#ssoadm-list-identity-assignable-svcs[list-identity-assignable-svcs]
+
+* link:#ssoadm-remove-member[remove-member]
+
+* link:#ssoadm-remove-privileges[remove-privileges]
+
+* link:#ssoadm-remove-svc-identity[remove-svc-identity]
+
+* link:#ssoadm-set-identity-attrs[set-identity-attrs]
+
+* link:#ssoadm-set-identity-svc-attrs[set-identity-svc-attrs]
+
+* link:#ssoadm-show-identity-ops[show-identity-ops]
+
+* link:#ssoadm-show-identity-svc-attrs[show-identity-svc-attrs]
+
+* link:#ssoadm-show-identity-types[show-identity-types]
+
+* link:#ssoadm-show-members[show-members]
+
+* link:#ssoadm-show-memberships[show-memberships]
+
+* link:#ssoadm-show-privileges[show-privileges]
+
+
+[#d981e2089]
+===== Policy Management
+
+* link:#ssoadm-create-policies[create-policies]
+
+* link:#ssoadm-delete-policies[delete-policies]
+
+* link:#ssoadm-list-policies[list-policies]
+
+* link:#ssoadm-update-policies[update-policies]
+
+
+[#d981e2113]
+===== Realm Management
+
+* link:#ssoadm-add-svc-attrs[add-svc-attrs]
+
+* link:#ssoadm-add-svc-realm[add-svc-realm]
+
+* link:#ssoadm-create-realm[create-realm]
+
+* link:#ssoadm-delete-realm[delete-realm]
+
+* link:#ssoadm-delete-realm-attr[delete-realm-attr]
+
+* link:#ssoadm-get-realm[get-realm]
+
+* link:#ssoadm-get-realm-svc-attrs[get-realm-svc-attrs]
+
+* link:#ssoadm-list-realm-assignable-svcs[list-realm-assignable-svcs]
+
+* link:#ssoadm-list-realms[list-realms]
+
+* link:#ssoadm-remove-svc-attrs[remove-svc-attrs]
+
+* link:#ssoadm-remove-svc-realm[remove-svc-realm]
+
+* link:#ssoadm-set-realm-attrs[set-realm-attrs]
+
+* link:#ssoadm-set-svc-attrs[set-svc-attrs]
+
+* link:#ssoadm-set-realm-svc-attrs[set-realm-svc-attrs]
+
+* link:#ssoadm-show-auth-modules[show-auth-modules]
+
+* link:#ssoadm-show-data-types[show-data-types]
+
+* link:#ssoadm-show-realm-svcs[show-realm-svcs]
+
+
+[#d981e2202]
+===== Server Configuration
+
+* link:#ssoadm-add-site-members[add-site-members]
+
+* link:#ssoadm-add-site-sec-urls[add-site-sec-urls]
+
+* link:#ssoadm-clone-server[clone-server]
+
+* link:#ssoadm-create-server[create-server]
+
+* link:#ssoadm-create-site[create-site]
+
+* link:#ssoadm-delete-server[delete-server]
+
+* link:#ssoadm-delete-site[delete-site]
+
+* link:#ssoadm-export-server[export-server]
+
+* link:#ssoadm-get-svrcfg-xml[get-svrcfg-xml]
+
+* link:#ssoadm-import-server[import-server]
+
+* link:#ssoadm-list-server-cfg[list-server-cfg]
+
+* link:#ssoadm-list-servers[list-servers]
+
+* link:#ssoadm-list-sites[list-sites]
+
+* link:#ssoadm-remove-server-cfg[remove-server-cfg]
+
+* link:#ssoadm-remove-site-members[remove-site-members]
+
+* link:#ssoadm-remove-site-sec-urls[remove-site-sec-urls]
+
+* link:#ssoadm-set-site-pri-url[set-site-pri-url]
+
+* link:#ssoadm-set-site-sec-urls[set-site-sec-urls]
+
+* link:#ssoadm-set-svrcfg-xml[set-svrcfg-xml]
+
+* link:#ssoadm-show-site[show-site]
+
+* link:#ssoadm-show-site-members[show-site-members]
+
+* link:#ssoadm-update-server-cfg[update-server-cfg]
+
+
+[#d981e2316]
+===== Service Management
+To translate settings applied in OpenAM console to service attributes for use with `ssoadm`, login to the OpenAM console as as `amadmin` and access the services page, such as `\http://openam.example.com:8080/openam/services.jsp`.
+
+* link:#ssoadm-add-attr-defs[add-attr-defs]
+
+* link:#ssoadm-add-attrs[add-attrs]
+
+* link:#ssoadm-add-plugin-interface[add-plugin-interface]
+
+* link:#ssoadm-add-sub-schema[add-sub-schema]
+
+* link:#ssoadm-create-sub-cfg[create-sub-cfg]
+
+* link:#ssoadm-create-svc[create-svc]
+
+* link:#ssoadm-create-svrcfg-xml[create-svrcfg-xml]
+
+* link:#ssoadm-delete-attr[delete-attr]
+
+* link:#ssoadm-delete-sub-cfg[delete-sub-cfg]
+
+* link:#ssoadm-delete-svc[delete-svc]
+
+* link:#ssoadm-export-svc-cfg[export-svc-cfg]
+
+* link:#ssoadm-get-attr-defs[get-attr-defs]
+
+* link:#ssoadm-get-revision-number[get-revision-number]
+
+* link:#ssoadm-get-sub-cfg[get-sub-cfg]
+
+* link:#ssoadm-import-svc-cfg[import-svc-cfg]
+
+* link:#ssoadm-remove-attr-choicevals[remove-attr-choicevals]
+
+* link:#ssoadm-remove-attr-defs[remove-attr-defs]
+
+* link:#ssoadm-remove-sub-schema[remove-sub-schema]
+
+* link:#ssoadm-set-attr-any[set-attr-any]
+
+* link:#ssoadm-set-attr-bool-values[set-attr-bool-values]
+
+* link:#ssoadm-set-attr-choicevals[set-attr-choicevals]
+
+* link:#ssoadm-set-attr-defs[set-attr-defs]
+
+* link:#ssoadm-set-attr-end-range[set-attr-end-range]
+
+* link:#ssoadm-set-attr-i18n-key[set-attr-i18n-key]
+
+* link:#ssoadm-set-attr-start-range[set-attr-start-range]
+
+* link:#ssoadm-set-attr-syntax[set-attr-syntax]
+
+* link:#ssoadm-set-attr-type[set-attr-type]
+
+* link:#ssoadm-set-attr-ui-type[set-attr-ui-type]
+
+* link:#ssoadm-set-attr-validator[set-attr-validator]
+
+* link:#ssoadm-set-attr-view-bean-url[set-attr-view-bean-url]
+
+* link:#ssoadm-set-inheritance[set-inheritance]
+
+* link:#ssoadm-set-plugin-viewbean-url[set-plugin-viewbean-url]
+
+* link:#ssoadm-set-revision-number[set-revision-number]
+
+* link:#ssoadm-set-sub-cfg[set-sub-cfg]
+
+* link:#ssoadm-set-svc-i18n-key[set-svc-i18n-key]
+
+* link:#ssoadm-set-svc-view-bean-url[set-svc-view-bean-url]
+
+* link:#ssoadm-update-svc[update-svc]
+
+
+[#d981e2516]
+===== Other
+
+* link:#ssoadm-add-res-bundle[add-res-bundle]
+
+* link:#ssoadm-do-batch[do-batch]
+
+* link:#ssoadm-do-migration70[do-migration70]
+
+* link:#ssoadm-list-res-bundle[list-res-bundle]
+
+* link:#ssoadm-list-sessions[list-sessions]
+
+* link:#ssoadm-remove-res-bundle[remove-res-bundle]
+
+
+
+[#d981e2550]
+==== Subcommands: Alphabetical Order
+The following subcommands are supported.
+
+See also `ssoadm subcommand --help`.
+[#ssoadm-add-agent-to-grp]
+===== ssoadm add-agent-to-grp
+Add agents to a agent group.
+
+Usage: `ssoadm add-agent-to-grp --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--agentnames, -s`::
+Names of agents.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-add-amsdk-idrepo-plugin]
+===== ssoadm add-amsdk-idrepo-plugin
+Create AMSDK IdRepo Plug-in
+
+Usage: `ssoadm add-amsdk-idrepo-plugin --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--basedn, -b`::
+Directory Server base distinguished name.
+
+`--bind-password-file, -m`::
+File that contains password of bind password.
+
+`--binddn, -e`::
+Directory Server bind distinguished name.
+
+`--directory-servers, -s`::
+directory servers <protocol>://<hostname>:<port>. Can have multiple entries.
+
+`--dsame-password-file, -x`::
+File that contains password of the dsameuser
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--puser-password-file, -p`::
+File that contains password of the puser
+
+`[--org, -o]`::
+Organization objects naming attribute (defaults to 'o')
+
+`[--user, -a]`::
+User objects naming attribute (defaults to 'uid')
+
+--
+
+[#ssoadm-add-app-priv]
+===== ssoadm add-app-priv
+Add a policy set privilege to delegate resources of a given policy set.
+
+Usage: `ssoadm add-app-priv --options [--global-options]`
+.Options
+--
+
+`--actions, -a`::
+Possible values are READ, MODIFY, DELEGATE, ALL
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--application, -t`::
+Policy set name
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`--subjects, -s`::
+Subject name
+
+`--subjecttype, -b`::
+Possible values are User or Group
+
+`[--description, -p]`::
+Description for the this delegation.
+
+`[--resources, -r]`::
+Resources to delegate, All resources in the policy set will be delegated if this option is absent.
+
+--
+
+[#ssoadm-add-attr-defs]
+===== ssoadm add-attr-defs
+Add default attribute values in schema.
+
+Usage: `ssoadm add-attr-defs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-add-attrs]
+===== ssoadm add-attrs
+Add attribute schema to an existing service.
+
+Usage: `ssoadm add-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschemafile, -F`::
+XML file containing attribute schema definition.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Schema Type.
+
+`--servicename, -s`::
+Service Name.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-add-auth-cfg-entr]
+===== ssoadm add-auth-cfg-entr
+Add authentication configuration entry
+
+Usage: `ssoadm add-auth-cfg-entr --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--criteria, -c`::
+Criteria for this entry. Possible values are REQUIRED, OPTIONAL, SUFFICIENT, REQUISITE
+
+`--modulename, -o`::
+Module Name.
+
+`--name, -m`::
+Name of authentication configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--options, -t]`::
+Options for this entry.
+
+`[--position, -p]`::
+Position where the new entry is to be added. This is option is not set, entry shall be added to the end of the list. If value of this option is 0, it will be inserted to the front of the list. If value is greater of the length of the list, entry shall be added to the end of the list.
+
+--
+
+[#ssoadm-add-cot-member]
+===== ssoadm add-cot-member
+Add a member to a circle of trust.
+
+Usage: `ssoadm add-cot-member --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cot, -t`::
+Circle of Trust
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where circle of trust resides
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-add-member]
+===== ssoadm add-member
+Add an identity as member of another identity
+
+Usage: `ssoadm add-member --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity
+
+`--memberidname, -m`::
+Name of identity that is member.
+
+`--memberidtype, -y`::
+Type of Identity of member such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-add-plugin-interface]
+===== ssoadm add-plugin-interface
+Add Plug-in interface to service.
+
+Usage: `ssoadm add-plugin-interface --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--i18nkey, -k`::
+Plug-in I18n Key.
+
+`--interfacename, -i`::
+Name of interface.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--pluginname, -g`::
+Name of Plug-in.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-add-plugin-schema]
+===== ssoadm add-plugin-schema
+Add Plug-in schema to service.
+
+Usage: `ssoadm add-plugin-schema --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--classname, -c`::
+Name of the Plugin Schema class implementation
+
+`--i18nkey, -k`::
+Plug-in I18n Key.
+
+`--i18nname, -n`::
+Plug-in I18n Name.
+
+`--interfacename, -i`::
+Name of interface.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--pluginname, -g`::
+Name of Plug-in.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-add-privileges]
+===== ssoadm add-privileges
+Add privileges to an identity. To add a privilege to all authenticated users, use the "All Authenticated Users" idname with "role" idtype.
+
+Usage: `ssoadm add-privileges --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--privileges, -g`::
+Name of privileges to be added. Privilege names are AgentAdmin, ApplicationModifyAccess, ApplicationReadAccess, ApplicationTypesReadAccess, ConditionTypesReadAccess, DecisionCombinersReadAccess, EntitlementRestAccess, FederationAdmin, LogAdmin, LogRead, LogWrite, PolicyAdmin, PrivilegeRestAccess, PrivilegeRestReadAccess, RealmAdmin, RealmReadAccess, ResourceTypeModifyAccess, ResourceTypeReadAccess, SubjectAttributesReadAccess, and SubjectTypesReadAccess.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-add-res-bundle]
+===== ssoadm add-res-bundle
+Add resource bundle to data store.
+
+Usage: `ssoadm add-res-bundle --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--bundlefilename, -B`::
+Resource bundle physical file name.
+
+`--bundlename, -b`::
+Resource Bundle Name.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--bundlelocale, -o]`::
+Locale of the resource bundle.
+
+--
+
+[#ssoadm-add-site-members]
+===== ssoadm add-site-members
+Add members to a site.
+
+Usage: `ssoadm add-site-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servernames, -e`::
+Server names, e.g. http://www.example.com:8080/fam
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-add-site-sec-urls]
+===== ssoadm add-site-sec-urls
+Add Site Secondary URLs.
+
+Usage: `ssoadm add-site-sec-urls --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--secondaryurls, -a`::
+Secondary URLs
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-add-sub-schema]
+===== ssoadm add-sub-schema
+Add sub schema.
+
+Usage: `ssoadm add-sub-schema --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--filename, -F`::
+Name of file that contains the schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-add-svc-attrs]
+===== ssoadm add-svc-attrs
+Add service attribute values in a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm add-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values to be added e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values to be added.
+
+--
+
+[#ssoadm-add-svc-identity]
+===== ssoadm add-svc-identity
+Add Service to an identity
+
+Usage: `ssoadm add-svc-identity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-add-svc-realm]
+===== ssoadm add-svc-realm
+Add service to a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm add-svc-realm --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Service Name.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-agent-remove-props]
+===== ssoadm agent-remove-props
+Remove agent's properties.
+
+Usage: `ssoadm agent-remove-props --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentname, -b`::
+Name of agent.
+
+`--attributenames, -a`::
+properties name(s).
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-clone-server]
+===== ssoadm clone-server
+Clone a server instance.
+
+Usage: `ssoadm clone-server --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cloneservername, -o`::
+Clone server name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name
+
+--
+
+[#ssoadm-create-agent]
+===== ssoadm create-agent
+Create a new agent configuration.
+
+Usage: `ssoadm create-agent --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentname, -b`::
+Name of agent.
+
+`--agenttype, -t`::
+Type of agent. Possible values: J2EEAgent, WebAgent, 2.2_Agent, SharedAgent, OAuth2Client
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--agenturl, -g]`::
+Agent URL. e.g. http://www.agent.example:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.example:8080. This option is valid only for J2EEAgent and WebAgent agent types, and is required when the agent type is J2EEAgent or WebAgent.
+
+`[--attributevalues, -a]`::
+Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/
+
+`[--datafile, -D]`::
+Name of file that contains properties.
+
+`[--serverurl, -s]`::
+Server URL. e.g. http://www.example.com:58080/openam. This option is valid only for J2EEAgent and WebAgent agent types, and is required when the agent type is J2EEAgent or WebAgent.
+
+--
+
+[#ssoadm-create-agent-grp]
+===== ssoadm create-agent-grp
+Create a new agent group.
+
+Usage: `ssoadm create-agent-grp --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--agenttype, -t`::
+Type of agent group. e.g. J2EEAgent, WebAgent
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Properties e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains properties.
+
+`[--serverurl, -s]`::
+Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and WebAgent.
+
+--
+
+[#ssoadm-create-appl]
+===== ssoadm create-appl
+Create policy set.
+
+Usage: `ssoadm create-appl --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--applicationtype, -t`::
+Application type name
+
+`--name, -m`::
+Policy set name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`[--attributevalues, -a]`::
+Attribute values e.g. applicationType=iPlanetAMWebAgentService.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data. Mandatory attributes are resources, subjects, conditions and entitlementCombiner. Optional ones are actions, searchIndexImpl, saveIndexImpl, resourceComparator, subjectAttributeNames.
+
+--
+
+[#ssoadm-create-appl-type]
+===== ssoadm create-appl-type
+Create application type.
+
+Usage: `ssoadm create-appl-type --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Application Type name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--attributevalues, -a]`::
+Application Type attribute values e.g. actions=enabled=true.
+
+`[--datafile, -D]`::
+Name of file that contains attribute type values data. Mandatory attributes are actions, searchIndexImpl and saveIndexImpl. Optional are resourceComparator.
+
+--
+
+[#ssoadm-create-auth-cfg]
+===== ssoadm create-auth-cfg
+Create authentication configuration
+
+Usage: `ssoadm create-auth-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-create-auth-instance]
+===== ssoadm create-auth-instance
+Create authentication module instance
+
+Usage: `ssoadm create-auth-instance --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--authtype, -t`::
+Type of authentication module instance. Possible values include AD, Adaptive, Anonymous, Cert, DataStore, DeviceIdMatch, DeviceIdSave, Federation, HOTP, HTTPBasic, JDBC, LDAP, Membership, MSISDN, OATH, OAuth, OpenIdConnect, PersistentCookie, RADIUS, SAE, Scripted, WindowsDesktopSSO, NT, and WSSAuthModule.
+
+`--name, -m`::
+Name of authentication module instance.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-create-cot]
+===== ssoadm create-cot
+Create circle of trust.
+
+Usage: `ssoadm create-cot --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cot, -t`::
+Circle of Trust
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--prefix, -p]`::
+Prefix URL for idp discovery reader and writer URL.
+
+`[--realm, -e]`::
+Realm where circle of trust resides
+
+`[--trustedproviders, -k]`::
+Trusted Providers
+
+--
+
+[#ssoadm-create-datastore]
+===== ssoadm create-datastore
+Create data store under a realm
+
+Usage: `ssoadm create-datastore --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--datatype, -t`::
+Type of datastore. Use the list-datastore-types subcommand to get a list of supported datastore types.
+
+`--name, -m`::
+Name of datastore.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. sunIdRepoClass=com.sun.identity.idm.plugins.files.FilesRepo.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-create-identity]
+===== ssoadm create-identity
+Create identity in a realm
+
+Usage: `ssoadm create-identity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. sunIdentityServerDeviceStatus=Active.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-create-metadata-templ]
+===== ssoadm create-metadata-templ
+Create new metadata template.
+
+Usage: `ssoadm create-metadata-templ --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--affiecertalias, -K]`::
+Affiliation encryption certificate alias
+
+`[--affiliation, -F]`::
+Specify metaAlias for hosted affiliation. to be created. The format must be <realm name>/<identifier>
+
+`[--affimembers, -M]`::
+Affiliation members
+
+`[--affiownerid, -N]`::
+Affiliation Owner ID
+
+`[--affiscertalias, -J]`::
+Affiliation signing certificate alias
+
+`[--attraecertalias, -G]`::
+Attribute authority encryption certificate alias.
+
+`[--attrascertalias, -B]`::
+Attribute authority signing certificate alias
+
+`[--attrauthority, -I]`::
+Specify metaAlias for hosted attribute authority to be created. The format must be <realm name>/<identifier>.
+
+`[--attrqecertalias, -R]`::
+Attribute query provider encryption certificate alias
+
+`[--attrqscertalias, -A]`::
+Attribute query provider signing certificate alias
+
+`[--attrqueryprovider, -S]`::
+Specify metaAlias for hosted attribute query provider to be created. The format must be <realm name>/<identifier>.
+
+`[--authnaecertalias, -E]`::
+Authentication authority encryption certificate alias.
+
+`[--authnascertalias, -D]`::
+Authentication authority signing certificate alias
+
+`[--authnauthority, -C]`::
+Specify metaAlias for hosted authentication authority to be created. The format must be <realm name>/<identifier>.
+
+`[--extended-data-file, -x]`::
+Specify file name for the extended metadata to be created. XML will be displayed on terminal if this file name is not provided.
+
+`[--identityprovider, -i]`::
+Specify metaAlias for hosted identity provider to be created. The format must be <realm name>/<identifier>.
+
+`[--idpecertalias, -g]`::
+Identity provider encryption certificate alias.
+
+`[--idpscertalias, -b]`::
+Identity provider signing certificate alias
+
+`[--meta-data-file, -m]`::
+Specify file name for the standard metadata to be created. XML will be displayed on terminal if this file name is not provided.
+
+`[--serviceprovider, -s]`::
+Specify metaAlias for hosted service provider to be created. The format must be <realm name>/<identifier>.
+
+`[--specertalias, -r]`::
+Service provider encryption certificate alias
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+`[--spscertalias, -a]`::
+Service provider signing certificate alias
+
+`[--xacmlpdpecertalias, -j]`::
+Policy decision point encryption certificate alias
+
+`[--xacmlpdpscertalias, -t]`::
+Policy decision point signing certificate alias
+
+`[--xacmlpdp, -p]`::
+Specify metaAlias for policy decision point to be created. The format must be <realm name>/<identifier>.
+
+`[--xacmlpepecertalias, -z]`::
+Policy enforcement point encryption certificate alias
+
+`[--xacmlpepscertalias, -k]`::
+Policy enforcement point signing certificate alias
+
+`[--xacmlpep, -e]`::
+Specify metaAlias for policy enforcement point to be created. The format must be <realm name>/<identifier>.
+
+--
+
+[#ssoadm-create-realm]
+===== ssoadm create-realm
+Create realm.
+
+Usage: `ssoadm create-realm --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm to be created.
+
+--
+
+[#ssoadm-create-server]
+===== ssoadm create-server
+Create a server instance.
+
+Usage: `ssoadm create-server --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--serverconfigxml, -X`::
+Server Configuration XML file name.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-create-site]
+===== ssoadm create-site
+Create a site.
+
+Usage: `ssoadm create-site --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+`--siteurl, -i`::
+Site's primary URL, e.g. http://www.example.com:8080
+
+`[--secondaryurls, -a]`::
+Secondary URLs
+
+--
+
+[#ssoadm-create-sub-cfg]
+===== ssoadm create-sub-cfg
+Create a new sub configuration. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm create-sub-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+`--subconfigname, -g`::
+Sub-schema name of (or path to) the type of sub-configuration being added.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+`[--priority, -p]`::
+Priority of the sub configuration.
+
+`[--realm, -e]`::
+Name of realm (Sub Configuration shall be added to global configuration if this option is not provided).
+
+`[--subconfigid, -b]`::
+User-specfieid ID of (or path to) the sub-configuration.
+
+--
+
+[#ssoadm-create-svc]
+===== ssoadm create-svc
+Create a new service in server.
+
+Usage: `ssoadm create-svc --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--xmlfile, -X`::
+XML file(s) that contains schema.
+
+`[--continue, -c]`::
+Continue adding service if one or more previous service cannot be added.
+
+--
+
+[#ssoadm-create-svrcfg-xml]
+===== ssoadm create-svrcfg-xml
+Create serverconfig.xml file. No options are required for flat file configuration data store.
+
+Usage: `ssoadm create-svrcfg-xml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--basedn, -b]`::
+Directory Server base distinguished name.
+
+`[--dsadmin, -a]`::
+Directory Server administrator distinguished name
+
+`[--dshost, -t]`::
+Directory Server host name
+
+`[--dspassword-file, -x]`::
+File that contains Directory Server administrator password
+
+`[--dsport, -p]`::
+Directory Server port number
+
+`[--outfile, -o]`::
+File name where serverconfig XML is written.
+
+--
+
+[#ssoadm-create-xacml]
+===== ssoadm create-xacml
+Create policies in a realm with XACML input.
+
+Usage: `ssoadm create-xacml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--xmlfile, -X`::
+File that contains the policy XACML definition. In the console, paste the XML into the text field instead.
+
+`[--dryrun, -n]`::
+Provide a summary of the policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.
+
+`[--outfile, -o]`::
+Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, the outfile will not be used for anything.
+
+--
+
+[#ssoadm-delete-agent-grps]
+===== ssoadm delete-agent-grps
+Delete agent groups.
+
+Usage: `ssoadm delete-agent-grps --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--agentgroupnames, -s]`::
+Separate multiple agent group names with spaces.
+
+`[--file, -D]`::
+File containing agent group names, with multiple group names separated by spaces.
+
+--
+
+[#ssoadm-delete-agents]
+===== ssoadm delete-agents
+Delete agent configurations.
+
+Usage: `ssoadm delete-agents --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--agentnames, -s]`::
+Separate multiple agent names with spaces.
+
+`[--file, -D]`::
+File containing agent names, with multiple agent names separated by spaces.
+
+--
+
+[#ssoadm-delete-appl-types]
+===== ssoadm delete-appl-types
+Delete application types.
+
+Usage: `ssoadm delete-appl-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Application Type names
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-delete-appls]
+===== ssoadm delete-appls
+Delete policy sets.
+
+Usage: `ssoadm delete-appls --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Policy set names
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-delete-attr]
+===== ssoadm delete-attr
+Delete attribute schemas from a service
+
+Usage: `ssoadm delete-attr --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema to be removed.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-delete-attr-def-values]
+===== ssoadm delete-attr-def-values
+Delete attribute schema default values.
+
+Usage: `ssoadm delete-attr-def-values --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--defaultvalues, -e`::
+Default value(s) to be deleted
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-delete-auth-cfgs]
+===== ssoadm delete-auth-cfgs
+Delete authentication configurations
+
+Usage: `ssoadm delete-auth-cfgs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Name of authentication configurations.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-delete-auth-instances]
+===== ssoadm delete-auth-instances
+Delete authentication instances
+
+Usage: `ssoadm delete-auth-instances --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Name of authentication instances.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-delete-cot]
+===== ssoadm delete-cot
+Delete circle of trust.
+
+Usage: `ssoadm delete-cot --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cot, -t`::
+Circle of Trust
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where circle of trust resides
+
+--
+
+[#ssoadm-delete-datastores]
+===== ssoadm delete-datastores
+Delete data stores under a realm
+
+Usage: `ssoadm delete-datastores --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Names of datastore.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-delete-entity]
+===== ssoadm delete-entity
+Delete entity.
+
+Usage: `ssoadm delete-entity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--extendedonly, -x]`::
+Set to flag to delete only extended data.
+
+`[--realm, -e]`::
+Realm where data resides
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-delete-identities]
+===== ssoadm delete-identities
+Delete identities in a realm
+
+Usage: `ssoadm delete-identities --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--file, -D]`::
+Name of file that contains the identity names to be deleted.
+
+`[--idnames, -i]`::
+Names of identites.
+
+--
+
+[#ssoadm-delete-realm]
+===== ssoadm delete-realm
+Delete realm.
+
+Usage: `ssoadm delete-realm --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm to be deleted.
+
+`[--recursive, -r]`::
+Delete descendent realms recursively.
+
+--
+
+[#ssoadm-delete-realm-attr]
+===== ssoadm delete-realm-attr
+Delete attribute from a realm.
+
+Usage: `ssoadm delete-realm-attr --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributename, -a`::
+Name of attribute to be removed.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-delete-server]
+===== ssoadm delete-server
+Delete a server instance.
+
+Usage: `ssoadm delete-server --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam
+
+--
+
+[#ssoadm-delete-site]
+===== ssoadm delete-site
+Delete a site.
+
+Usage: `ssoadm delete-site --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-delete-sub-cfg]
+===== ssoadm delete-sub-cfg
+Remove Sub Configuration.
+
+Usage: `ssoadm delete-sub-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+`--subconfigname, -g`::
+Name of sub configuration.
+
+`[--realm, -e]`::
+Name of realm (Sub Configuration shall be deleted from the global configuration if this option is not provided).
+
+--
+
+[#ssoadm-delete-svc]
+===== ssoadm delete-svc
+Delete service from the server.
+
+Usage: `ssoadm delete-svc --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Service Name(s).
+
+`[--continue, -c]`::
+Continue deleting service if one or more previous services cannot be deleted.
+
+`[--deletepolicyrule, -r]`::
+Delete policy rule.
+
+--
+
+[#ssoadm-delete-xacml]
+===== ssoadm delete-xacml
+Delete XACML policies from a realm.
+
+Usage: `ssoadm delete-xacml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--file, -D]`::
+Name of file that contains the policy names to be deleted.
+
+`[--policynames, -p]`::
+Names of policy to be deleted.
+
+--
+
+[#ssoadm-do-batch]
+===== ssoadm do-batch
+Do multiple requests in one command.
+
+Usage: `ssoadm do-batch --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--batchfile, -Z`::
+Name of file that contains commands and options.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--batchstatus, -b]`::
+Name of status file.
+
+`[--continue, -c]`::
+Continue processing the rest of the request when preceeding request was erroneous.
+
+--
+
+[#ssoadm-do-bulk-federation]
+===== ssoadm do-bulk-federation
+Perform bulk federation.
+
+Usage: `ssoadm do-bulk-federation --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--metaalias, -m`::
+Specify metaAlias for local provider.
+
+`--nameidmapping, -e`::
+Name of file that will be created by this sub command. It contains remote user Id to name identifier. It shall be used by remote provider to update user profile.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--remoteentityid, -r`::
+Remote entity Id
+
+`--useridmapping, -g`::
+File name of local to remote user Id mapping. Format <local-user-id>|<remote-user-id>
+
+`[--spec, -c]`::
+Specify metadata specification, either idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-do-migration70]
+===== ssoadm do-migration70
+Migrate organization to realm.
+
+Usage: `ssoadm do-migration70 --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--entrydn, -e`::
+Distinguished name of organization to be migrated.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-embedded-status]
+===== ssoadm embedded-status
+Status of embedded store.
+
+Usage: `ssoadm embedded-status --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--port, -p`::
+Embedded store port
+
+`[--password, -w]`::
+Embedded store password
+
+--
+
+[#ssoadm-export-entity]
+===== ssoadm export-entity
+Export entity.
+
+Usage: `ssoadm export-entity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--extended-data-file, -x]`::
+Extended data
+
+`[--meta-data-file, -m]`::
+Metadata
+
+`[--realm, -e]`::
+Realm where data resides
+
+`[--sign, -g]`::
+Set this flag to sign the metadata
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-export-server]
+===== ssoadm export-server
+Export a server instance.
+
+Usage: `ssoadm export-server --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name
+
+`[--outfile, -o]`::
+Filename where configuration was written.
+
+--
+
+[#ssoadm-export-svc-cfg]
+===== ssoadm export-svc-cfg
+Export service configuration. In production environments, you should back up the service configuration using file system utilities or the export-ldif command. Note that export-ldif/import-ldif commands must be on the same deployment where the encryption keys are located.
+
+Usage: `ssoadm export-svc-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--encryptsecret, -e`::
+Secret key for encrypting password. Any arbitrary value can be specified.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--outfile, -o]`::
+Filename where configuration was written.
+
+--
+
+[#ssoadm-get-attr-choicevals]
+===== ssoadm get-attr-choicevals
+Get choice values of attribute schema.
+
+Usage: `ssoadm get-attr-choicevals --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributename, -a`::
+Name of attribute.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-get-attr-defs]
+===== ssoadm get-attr-defs
+Get default attribute values in schema.
+
+Usage: `ssoadm get-attr-defs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema. One of dynamic, global, or organization (meaning realm).
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributenames, -a]`::
+Attribute name(s).
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-get-auth-cfg-entr]
+===== ssoadm get-auth-cfg-entr
+Get authentication configuration entries
+
+Usage: `ssoadm get-auth-cfg-entr --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-get-auth-instance]
+===== ssoadm get-auth-instance
+Get authentication instance values
+
+Usage: `ssoadm get-auth-instance --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication instance.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-get-identity]
+===== ssoadm get-identity
+Get identity property values
+
+Usage: `ssoadm get-identity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributenames, -a]`::
+Attribute name(s). All attribute values shall be returned if the option is not provided.
+
+--
+
+[#ssoadm-get-identity-svcs]
+===== ssoadm get-identity-svcs
+Get the service in an identity
+
+Usage: `ssoadm get-identity-svcs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-get-realm]
+===== ssoadm get-realm
+Get realm property values.
+
+Usage: `ssoadm get-realm --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-get-realm-svc-attrs]
+===== ssoadm get-realm-svc-attrs
+Get realm's service attribute values.
+
+Usage: `ssoadm get-realm-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-get-recording-status]
+===== ssoadm get-recording-status
+Get the status of recording operations.
+
+Usage: `ssoadm get-recording-status --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://openam.example.com:8080/openam
+
+--
+
+[#ssoadm-get-revision-number]
+===== ssoadm get-revision-number
+Get service schema revision number.
+
+Usage: `ssoadm get-revision-number --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-get-sub-cfg]
+===== ssoadm get-sub-cfg
+Get sub configuration.
+
+Usage: `ssoadm get-sub-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+`--subconfigname, -g`::
+Name of sub configuration.
+
+`[--realm, -e]`::
+Name of realm (Sub Configuration shall be retrieved from the global configuration if this option is not provided).
+
+--
+
+[#ssoadm-get-svrcfg-xml]
+===== ssoadm get-svrcfg-xml
+Get server configuration XML from centralized data store
+
+Usage: `ssoadm get-svrcfg-xml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam
+
+`[--outfile, -o]`::
+File name where serverconfig XML is written.
+
+--
+
+[#ssoadm-import-bulk-fed-data]
+===== ssoadm import-bulk-fed-data
+Import bulk federation data which is generated by 'do-bulk-federation' sub command.
+
+Usage: `ssoadm import-bulk-fed-data --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--bulk-data-file, -g`::
+File name of bulk federation data which is generated by 'do-bulk-federation' sub command.
+
+`--metaalias, -m`::
+Specify metaAlias for local provider.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--spec, -c]`::
+Specify metadata specification, either idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-import-entity]
+===== ssoadm import-entity
+Import entity.
+
+Usage: `ssoadm import-entity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--cot, -t]`::
+Specify name of the Circle of Trust this entity belongs.
+
+`[--extended-data-file, -x]`::
+Specify file name for the extended entity configuration to be imported.<web>Extended entity configuration to be imported.
+
+`[--meta-data-file, -m]`::
+Specify file name for the standard metadata to be imported.<web>Standard metadata to be imported.
+
+`[--realm, -e]`::
+Realm where entity resides.
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-import-server]
+===== ssoadm import-server
+Import a server instance.
+
+Usage: `ssoadm import-server --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name
+
+`--xmlfile, -X`::
+XML file that contains configuration.
+
+--
+
+[#ssoadm-import-svc-cfg]
+===== ssoadm import-svc-cfg
+Import service configuration. In production environments, you should restore the service configuration using file system utilities or the import-ldif command. Note that import-ldif/export-ldif commands must be on the same deployment where the encryption keys are located.
+
+Usage: `ssoadm import-svc-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--encryptsecret, -e`::
+Secret key for decrypting password.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--xmlfile, -X`::
+XML file that contains configuration data.
+
+--
+
+[#ssoadm-list-agent-grp-members]
+===== ssoadm list-agent-grp-members
+List agents in agent group.
+
+Usage: `ssoadm list-agent-grp-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--filter, -x]`::
+Filter (Pattern).
+
+--
+
+[#ssoadm-list-agent-grps]
+===== ssoadm list-agent-grps
+List agent groups.
+
+Usage: `ssoadm list-agent-grps --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--agenttype, -t]`::
+Type of agent. e.g. J2EEAgent, WebAgent
+
+`[--filter, -x]`::
+Filter (Pattern).
+
+--
+
+[#ssoadm-list-agents]
+===== ssoadm list-agents
+List agent configurations.
+
+Usage: `ssoadm list-agents --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--agenttype, -t]`::
+Type of agent. e.g. J2EEAgent, WebAgent
+
+`[--filter, -x]`::
+Filter (Pattern).
+
+--
+
+[#ssoadm-list-app-privs]
+===== ssoadm list-app-privs
+List policy set privileges in a realm.
+
+Usage: `ssoadm list-app-privs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-list-appl-types]
+===== ssoadm list-appl-types
+List application types.
+
+Usage: `ssoadm list-appl-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-list-appls]
+===== ssoadm list-appls
+List policy set in a realm.
+
+Usage: `ssoadm list-appls --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-list-auth-cfgs]
+===== ssoadm list-auth-cfgs
+List authentication configurations
+
+Usage: `ssoadm list-auth-cfgs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-auth-instances]
+===== ssoadm list-auth-instances
+List authentication instances
+
+Usage: `ssoadm list-auth-instances --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-cot-members]
+===== ssoadm list-cot-members
+List the members in a circle of trust.
+
+Usage: `ssoadm list-cot-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cot, -t`::
+Circle of Trust
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where circle of trust resides
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-list-cots]
+===== ssoadm list-cots
+List circles of trust.
+
+Usage: `ssoadm list-cots --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where circle of trusts reside
+
+--
+
+[#ssoadm-list-datastore-types]
+===== ssoadm list-datastore-types
+List the supported data store types
+
+Usage: `ssoadm list-datastore-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-list-datastores]
+===== ssoadm list-datastores
+List data stores under a realm
+
+Usage: `ssoadm list-datastores --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-entities]
+===== ssoadm list-entities
+List entities under a realm.
+
+Usage: `ssoadm list-entities --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where entities reside.
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-list-identities]
+===== ssoadm list-identities
+List identities in a realm
+
+Usage: `ssoadm list-identities --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--filter, -x`::
+Filter (Pattern).
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-identity-assignable-svcs]
+===== ssoadm list-identity-assignable-svcs
+List the assignable service to an identity
+
+Usage: `ssoadm list-identity-assignable-svcs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-realm-assignable-svcs]
+===== ssoadm list-realm-assignable-svcs
+List the assignable services to a realm.
+
+Usage: `ssoadm list-realm-assignable-svcs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-list-realms]
+===== ssoadm list-realms
+List realms by name.
+
+Usage: `ssoadm list-realms --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm where search begins.
+
+`[--filter, -x]`::
+Filter (Pattern).
+
+`[--recursive, -r]`::
+Search recursively
+
+--
+
+[#ssoadm-list-res-bundle]
+===== ssoadm list-res-bundle
+List resource bundle in data store.
+
+Usage: `ssoadm list-res-bundle --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--bundlename, -b`::
+Resource Bundle Name.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--bundlelocale, -o]`::
+Locale of the resource bundle.
+
+--
+
+[#ssoadm-list-server-cfg]
+===== ssoadm list-server-cfg
+List server configuration.
+
+Usage: `ssoadm list-server-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam or enter default to list default server configuration.
+
+`[--withdefaults, -w]`::
+Set this flag to get default configuration.
+
+--
+
+[#ssoadm-list-servers]
+===== ssoadm list-servers
+List all server instances.
+
+Usage: `ssoadm list-servers --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-list-sessions]
+===== ssoadm list-sessions
+List stateful sessions.
+
+Usage: `ssoadm list-sessions --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--host, -t`::
+Host Name.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--filter, -x]`::
+Filter (Pattern).
+
+`[--quiet, -q]`::
+Do not prompt for session invalidation.
+
+--
+
+[#ssoadm-list-sites]
+===== ssoadm list-sites
+List all sites.
+
+Usage: `ssoadm list-sites --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-list-xacml]
+===== ssoadm list-xacml
+Export policies in realm as XACML.
+
+Usage: `ssoadm list-xacml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--namesonly, -n]`::
+Returns only names of matching policies. Policies are not returned.
+
+`[--outfile, -o]`::
+Filename where policy definition will be printed to. Definition will be printed in standard output if this option is not provided.
+
+`[--policynames, -p]`::
+Names of policy. This can be a wildcard. All policy definition in the realm will be returned if this option is not provided.
+
+--
+
+[#ssoadm-policy-export]
+===== ssoadm policy-export
+Export policy configuration for a given realm
+
+Usage: `ssoadm policy-export --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--jsonfile, -J`::
+JSON file for which to write the policy model to.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`--servername, -s`::
+Server name, e.g. http://openam.example.com:8080/openam
+
+--
+
+[#ssoadm-policy-import]
+===== ssoadm policy-import
+Import policy model into a given realm
+
+Usage: `ssoadm policy-import --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--jsonfile, -J`::
+JSON file containing the policy model to be imported.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`--servername, -s`::
+Server name, e.g. http://openam.example.com:8080/openam
+
+--
+
+[#ssoadm-register-auth-module]
+===== ssoadm register-auth-module
+Registers authentication module.
+
+Usage: `ssoadm register-auth-module --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--authmodule, -a`::
+Java class name of authentication module.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-remove-agent-from-grp]
+===== ssoadm remove-agent-from-grp
+Remove agents from a agent group.
+
+Usage: `ssoadm remove-agent-from-grp --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--agentnames, -s`::
+Names of agents.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-remove-app-priv-resources]
+===== ssoadm remove-app-priv-resources
+Remove policy set privilege resources.
+
+Usage: `ssoadm remove-app-priv-resources --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--application, -t`::
+Policy set name
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`[--resources, -r]`::
+Resources to removed, All resources in the policy set will be removed if this option is absent.
+
+--
+
+[#ssoadm-remove-app-priv-subjects]
+===== ssoadm remove-app-priv-subjects
+Remove policy set privilege subjects.
+
+Usage: `ssoadm remove-app-priv-subjects --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`--subjects, -s`::
+Subject name
+
+`--subjecttype, -b`::
+Possible values are User or Group
+
+--
+
+[#ssoadm-remove-app-privs]
+===== ssoadm remove-app-privs
+Remove policy set privileges.
+
+Usage: `ssoadm remove-app-privs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--names, -m`::
+Names of policy set privileges to be removed
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-remove-attr-choicevals]
+===== ssoadm remove-attr-choicevals
+Remove choice values from attribute schema.
+
+Usage: `ssoadm remove-attr-choicevals --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributename, -a`::
+Name of attribute.
+
+`--choicevalues, -k`::
+Choice values e.g. Inactive
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-remove-attr-defs]
+===== ssoadm remove-attr-defs
+Remove default attribute values in schema.
+
+Usage: `ssoadm remove-attr-defs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributenames, -a`::
+Attribute name(s).
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-remove-cot-member]
+===== ssoadm remove-cot-member
+Remove a member from a circle of trust.
+
+Usage: `ssoadm remove-cot-member --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--cot, -t`::
+Circle of Trust
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--realm, -e]`::
+Realm where circle of trust resides
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+--
+
+[#ssoadm-remove-member]
+===== ssoadm remove-member
+Remove membership of identity from another identity
+
+Usage: `ssoadm remove-member --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity
+
+`--memberidname, -m`::
+Name of identity that is member.
+
+`--memberidtype, -y`::
+Type of Identity of member such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-remove-plugin-schema]
+===== ssoadm remove-plugin-schema
+Add Plug-in interface to service.
+
+Usage: `ssoadm remove-plugin-schema --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--interfacename, -i`::
+Name of interface.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--pluginname, -g`::
+Name of Plug-in.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-remove-privileges]
+===== ssoadm remove-privileges
+Remove privileges from an identity
+
+Usage: `ssoadm remove-privileges --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--privileges, -g`::
+Name of privileges to be removed. Privilege names are AgentAdmin, ApplicationModifyAccess, ApplicationReadAccess, ApplicationTypesReadAccess, ConditionTypesReadAccess, DecisionCombinersReadAccess, EntitlementRestAccess, FederationAdmin, LogAdmin, LogRead, LogWrite, PolicyAdmin, PrivilegeRestAccess, PrivilegeRestReadAccess, RealmAdmin, RealmReadAccess, ResourceTypeModifyAccess, ResourceTypeReadAccess, SubjectAttributesReadAccess, and SubjectTypesReadAccess.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-remove-res-bundle]
+===== ssoadm remove-res-bundle
+Remove resource bundle from data store.
+
+Usage: `ssoadm remove-res-bundle --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--bundlename, -b`::
+Resource Bundle Name.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--bundlelocale, -o]`::
+Locale of the resource bundle.
+
+--
+
+[#ssoadm-remove-server-cfg]
+===== ssoadm remove-server-cfg
+Remove server configuration.
+
+Usage: `ssoadm remove-server-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--propertynames, -a`::
+Name of properties to be removed.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam or enter default to remove default server configuration.
+
+--
+
+[#ssoadm-remove-site-members]
+===== ssoadm remove-site-members
+Remove members from a site.
+
+Usage: `ssoadm remove-site-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servernames, -e`::
+Server names, e.g. http://www.example.com:8080/fam
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-remove-site-sec-urls]
+===== ssoadm remove-site-sec-urls
+Remove Site Secondary URLs.
+
+Usage: `ssoadm remove-site-sec-urls --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--secondaryurls, -a`::
+Secondary URLs
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-remove-sub-schema]
+===== ssoadm remove-sub-schema
+Remove sub schema.
+
+Usage: `ssoadm remove-sub-schema --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--subschemanames, -a`::
+Name(s) of sub schema to be removed.
+
+`[--subschemaname, -c]`::
+Name of parent sub schema.
+
+--
+
+[#ssoadm-remove-svc-attrs]
+===== ssoadm remove-svc-attrs
+Remove service attribute values in a realm.
+
+Usage: `ssoadm remove-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values to be removed e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values to be removed.
+
+--
+
+[#ssoadm-remove-svc-identity]
+===== ssoadm remove-svc-identity
+Remove Service from an identity
+
+Usage: `ssoadm remove-svc-identity --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-remove-svc-realm]
+===== ssoadm remove-svc-realm
+Remove service from a realm.
+
+Usage: `ssoadm remove-svc-realm --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service to be removed.
+
+--
+
+[#ssoadm-set-appl]
+===== ssoadm set-appl
+Set policy set attributes.
+
+Usage: `ssoadm set-appl --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Policy set name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`[--attributevalues, -a]`::
+Attribute values e.g. applicationType=iPlanetAMWebAgentService.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data. Possible attributes are resources, subjects, conditions, actions, searchIndexImpl, saveIndexImpl, resourceComparator, subjectAttributeNames and entitlementCombiner.
+
+--
+
+[#ssoadm-set-attr-any]
+===== ssoadm set-attr-any
+Set any member of attribute schema.
+
+Usage: `ssoadm set-attr-any --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--any, -y`::
+Attribute Schema Any value
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-bool-values]
+===== ssoadm set-attr-bool-values
+Set boolean values of attribute schema.
+
+Usage: `ssoadm set-attr-bool-values --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributename, -a`::
+Name of attribute.
+
+`--falsei18nkey, -j`::
+Internationalization key for false value.
+
+`--falsevalue, -z`::
+Value for false.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--truei18nkey, -k`::
+Internationalization key for true value.
+
+`--truevalue, -e`::
+Value for true.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-choicevals]
+===== ssoadm set-attr-choicevals
+Set choice values of attribute schema.
+
+Usage: `ssoadm set-attr-choicevals --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributename, -a`::
+Name of attribute.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--add, -p]`::
+Set this flag to append the choice values to existing ones.
+
+`[--choicevalues, -k]`::
+Choice value e.g. o102=Inactive.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-defs]
+===== ssoadm set-attr-defs
+Set default attribute values in schema.
+
+Usage: `ssoadm set-attr-defs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-end-range]
+===== ssoadm set-attr-end-range
+Set attribute schema end range.
+
+Usage: `ssoadm set-attr-end-range --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--range, -r`::
+End range
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-i18n-key]
+===== ssoadm set-attr-i18n-key
+Set i18nKey member of attribute schema.
+
+Usage: `ssoadm set-attr-i18n-key --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--i18nkey, -k`::
+Attribute Schema I18n Key
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-start-range]
+===== ssoadm set-attr-start-range
+Set attribute schema start range.
+
+Usage: `ssoadm set-attr-start-range --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--range, -r`::
+Start range
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-syntax]
+===== ssoadm set-attr-syntax
+Set syntax member of attribute schema.
+
+Usage: `ssoadm set-attr-syntax --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--syntax, -x`::
+Attribute Schema Syntax
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-type]
+===== ssoadm set-attr-type
+Set type member of attribute schema.
+
+Usage: `ssoadm set-attr-type --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--type, -p`::
+Attribute Schema Type
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-ui-type]
+===== ssoadm set-attr-ui-type
+Set UI type member of attribute schema.
+
+Usage: `ssoadm set-attr-ui-type --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--uitype, -p`::
+Attribute Schema UI Type
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-validator]
+===== ssoadm set-attr-validator
+Set attribute schema validator.
+
+Usage: `ssoadm set-attr-validator --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--validator, -r`::
+validator class name
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-attr-view-bean-url]
+===== ssoadm set-attr-view-bean-url
+Set properties view bean URL member of attribute schema.
+
+Usage: `ssoadm set-attr-view-bean-url --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--attributeschema, -a`::
+Name of attribute schema
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--url, -r`::
+Attribute Schema Properties View Bean URL
+
+`[--subschemaname, -c]`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-entitlement-conf]
+===== ssoadm set-entitlement-conf
+Set entitlements service configuration
+
+Usage: `ssoadm set-entitlement-conf --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. evalThreadSize=4.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data. Possible attributes are evalThreadSize, searchThreadSize, policyCacheSize and indexCacheSize.
+
+--
+
+[#ssoadm-set-identity-attrs]
+===== ssoadm set-identity-attrs
+Set attribute values of an identity
+
+Usage: `ssoadm set-identity-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-set-identity-svc-attrs]
+===== ssoadm set-identity-svc-attrs
+Set service attribute values of an identity
+
+Usage: `ssoadm set-identity-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-set-inheritance]
+===== ssoadm set-inheritance
+Set Inheritance value of Sub Schema.
+
+Usage: `ssoadm set-inheritance --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--inheritance, -r`::
+Value of Inheritance.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--schematype, -t`::
+Type of schema.
+
+`--servicename, -s`::
+Name of service.
+
+`--subschemaname, -c`::
+Name of sub schema.
+
+--
+
+[#ssoadm-set-plugin-viewbean-url]
+===== ssoadm set-plugin-viewbean-url
+Set properties view bean URL of plug-in schema.
+
+Usage: `ssoadm set-plugin-viewbean-url --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--interfacename, -i`::
+Name of interface.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--pluginname, -g`::
+Name of Plug-in.
+
+`--servicename, -s`::
+Name of service.
+
+`--url, -r`::
+Properties view bean URL.
+
+--
+
+[#ssoadm-set-realm-attrs]
+===== ssoadm set-realm-attrs
+Set attribute values of a realm.
+
+Usage: `ssoadm set-realm-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--append, -p]`::
+Set this flag to append the values to existing ones.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-set-realm-svc-attrs]
+===== ssoadm set-realm-svc-attrs
+Set attribute values of a service that is assigned to a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm set-realm-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--append, -p]`::
+Set this flag to append the values to existing ones.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-set-revision-number]
+===== ssoadm set-revision-number
+Set service schema revision number.
+
+Usage: `ssoadm set-revision-number --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--revisionnumber, -r`::
+Revision Number
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-set-site-id]
+===== ssoadm set-site-id
+Set the ID of a site.
+
+Usage: `ssoadm set-site-id --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--siteid, -i`::
+Site's ID, e.g. 10
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-set-site-pri-url]
+===== ssoadm set-site-pri-url
+Set the primary URL of a site.
+
+Usage: `ssoadm set-site-pri-url --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+`--siteurl, -i`::
+Site's primary URL, e.g. http://site.www.example.com:8080
+
+--
+
+[#ssoadm-set-site-sec-urls]
+===== ssoadm set-site-sec-urls
+Set Site Secondary URLs.
+
+Usage: `ssoadm set-site-sec-urls --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--secondaryurls, -a`::
+Secondary URLs
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-set-sub-cfg]
+===== ssoadm set-sub-cfg
+Set sub configuration. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm set-sub-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--operation, -o`::
+Operation (either add/set/delete) to be performed on the sub configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+`--subconfigname, -g`::
+Name of sub configuration.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+`[--realm, -e]`::
+Name of realm (Sub Configuration shall be set to global configuration if this option is not provided).
+
+--
+
+[#ssoadm-set-svc-attrs]
+===== ssoadm set-svc-attrs
+Set service attribute values in a realm. Long content for an attribute can be supplied in a file by appending '-file' to the attribute name, and giving the filename as the value.
+
+Usage: `ssoadm set-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-set-svc-i18n-key]
+===== ssoadm set-svc-i18n-key
+Set service schema i18n key.
+
+Usage: `ssoadm set-svc-i18n-key --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--i18nkey, -k`::
+I18n Key.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-set-svc-view-bean-url]
+===== ssoadm set-svc-view-bean-url
+Set service schema properties view bean URL.
+
+Usage: `ssoadm set-svc-view-bean-url --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servicename, -s`::
+Name of service.
+
+`--url, -r`::
+Service Schema Properties View Bean URL
+
+--
+
+[#ssoadm-set-svrcfg-xml]
+===== ssoadm set-svrcfg-xml
+Set server configuration XML to centralized data store
+
+Usage: `ssoadm set-svrcfg-xml --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam
+
+`--xmlfile, -X`::
+XML file that contains configuration.
+
+--
+
+[#ssoadm-show-agent]
+===== ssoadm show-agent
+Show agent profile.
+
+Usage: `ssoadm show-agent --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentname, -b`::
+Name of agent.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--includepassword, -p]`::
+Include the hashed password in the export.
+
+`[--inherit, -i]`::
+Set this to inherit properties from parent group.
+
+`[--outfile, -o]`::
+Filename where configuration is written to.
+
+--
+
+[#ssoadm-show-agent-grp]
+===== ssoadm show-agent-grp
+Show agent group profile.
+
+Usage: `ssoadm show-agent-grp --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--outfile, -o]`::
+Filename where configuration is written to.
+
+--
+
+[#ssoadm-show-agent-membership]
+===== ssoadm show-agent-membership
+List agent's membership.
+
+Usage: `ssoadm show-agent-membership --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentname, -b`::
+Name of agent.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-agent-types]
+===== ssoadm show-agent-types
+Show agent types.
+
+Usage: `ssoadm show-agent-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-show-app-priv]
+===== ssoadm show-app-priv
+Show policy set privilege.
+
+Usage: `ssoadm show-app-priv --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of policy set privilege
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-show-appl]
+===== ssoadm show-appl
+Show policy set attributes.
+
+Usage: `ssoadm show-appl --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Policy set name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+--
+
+[#ssoadm-show-appl-type]
+===== ssoadm show-appl-type
+Show application type details.
+
+Usage: `ssoadm show-appl-type --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Application Type name
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-show-auth-modules]
+===== ssoadm show-auth-modules
+Show the supported authentication modules in the system.
+
+Usage: `ssoadm show-auth-modules --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-show-data-types]
+===== ssoadm show-data-types
+Show the supported data type in the system.
+
+Usage: `ssoadm show-data-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-show-datastore]
+===== ssoadm show-datastore
+Show data store profile.
+
+Usage: `ssoadm show-datastore --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of datastore.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-entitlement-conf]
+===== ssoadm show-entitlement-conf
+Display entitlements service configuration
+
+Usage: `ssoadm show-entitlement-conf --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-show-identity-ops]
+===== ssoadm show-identity-ops
+Show the allowed operations of an identity a realm
+
+Usage: `ssoadm show-identity-ops --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-identity-svc-attrs]
+===== ssoadm show-identity-svc-attrs
+Show the service attribute values of an identity
+
+Usage: `ssoadm show-identity-svc-attrs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`--servicename, -s`::
+Name of service.
+
+--
+
+[#ssoadm-show-identity-types]
+===== ssoadm show-identity-types
+Show the supported identity type in a realm
+
+Usage: `ssoadm show-identity-types --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-members]
+===== ssoadm show-members
+Show the members of an identity. For example show the members of a role
+
+Usage: `ssoadm show-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--membershipidtype, -m`::
+Membership identity type.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-memberships]
+===== ssoadm show-memberships
+Show the memberships of an identity. For sample show the memberships of an user.
+
+Usage: `ssoadm show-memberships --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such as User, Role and Group.
+
+`--membershipidtype, -m`::
+Membership identity type.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-privileges]
+===== ssoadm show-privileges
+Show privileges assigned to an identity
+
+Usage: `ssoadm show-privileges --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--idname, -i`::
+Name of identity.
+
+`--idtype, -t`::
+Type of Identity such Role and Group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+--
+
+[#ssoadm-show-realm-svcs]
+===== ssoadm show-realm-svcs
+Show services in a realm.
+
+Usage: `ssoadm show-realm-svcs --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--mandatory, -y]`::
+Include Mandatory services.
+
+--
+
+[#ssoadm-show-site]
+===== ssoadm show-site
+Show site profile.
+
+Usage: `ssoadm show-site --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-show-site-members]
+===== ssoadm show-site-members
+Display members of a site.
+
+Usage: `ssoadm show-site-members --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--sitename, -s`::
+Site name, e.g. mysite
+
+--
+
+[#ssoadm-start-recording]
+===== ssoadm start-recording
+Start recording a bundle that contains troubleshooting information, including debug logs, thread dumps, and environment information.
+
+Usage: `ssoadm start-recording --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--jsonfile, -J`::
+JSON control file for a recording operation.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://openam.example.com:8080/openam
+
+--
+
+[#ssoadm-stop-recording]
+===== ssoadm stop-recording
+Stop an active recording operation.
+
+Usage: `ssoadm stop-recording --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://openam.example.com:8080/openam
+
+--
+
+[#ssoadm-unregister-auth-module]
+===== ssoadm unregister-auth-module
+Unregisters authentication module.
+
+Usage: `ssoadm unregister-auth-module --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--authmodule, -a`::
+Java class name of authentication module.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+--
+
+[#ssoadm-update-agent]
+===== ssoadm update-agent
+Update agent configuration.
+
+Usage: `ssoadm update-agent --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentname, -b`::
+Name of agent.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Properties e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains properties.
+
+`[--set, -s]`::
+Set this flag to overwrite properties values.
+
+--
+
+[#ssoadm-update-agent-grp]
+===== ssoadm update-agent-grp
+Update agent group configuration.
+
+Usage: `ssoadm update-agent-grp --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--agentgroupname, -b`::
+Name of agent group.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Properties e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains properties.
+
+`[--set, -s]`::
+Set this flag to overwrite properties values.
+
+--
+
+[#ssoadm-update-app-priv]
+===== ssoadm update-app-priv
+Update a policy set privilege.
+
+Usage: `ssoadm update-app-priv --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`[--actions, -a]`::
+Possible values are READ, MODIFY, DELEGATE, ALL
+
+`[--description, -p]`::
+Description for the this delegation.
+
+--
+
+[#ssoadm-update-app-priv-resources]
+===== ssoadm update-app-priv-resources
+Set policy set privilege resources.
+
+Usage: `ssoadm update-app-priv-resources --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--application, -t`::
+Policy set name
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`[--add, -p]`::
+Resources are added to this policy set if this option is set. Otherwise, resources in the current policy set privilege will be overwritten.
+
+`[--resources, -r]`::
+Resources to delegate, All resources in the policy set will be delegated if this option is absent.
+
+--
+
+[#ssoadm-update-app-priv-subjects]
+===== ssoadm update-app-priv-subjects
+Set policy set privilege subjects.
+
+Usage: `ssoadm update-app-priv-subjects --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name for the this delegation
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Realm name
+
+`--subjects, -s`::
+Subject name
+
+`--subjecttype, -b`::
+Possible values are User or Group
+
+`[--add, -p]`::
+Subjects are added to this policy set if this option is set. Otherwise, subjects in the current policy set privilege will be overwritten.
+
+--
+
+[#ssoadm-update-auth-cfg-entr]
+===== ssoadm update-auth-cfg-entr
+Set authentication configuration entries
+
+Usage: `ssoadm update-auth-cfg-entr --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--datafile, -D]`::
+Name of file that contains formatted authentication configuration entries in this format name|flag|options. option can be REQUIRED, OPTIONAL, SUFFICIENT, REQUISITE. e.g. myauthmodule|REQUIRED|my options.
+
+`[--entries, -a]`::
+formatted authentication configuration entries in this format name|flag|options. option can be REQUIRED, OPTIONAL, SUFFICIENT, REQUISITE. e.g. myauthmodule|REQUIRED|my options.
+
+--
+
+[#ssoadm-update-auth-cfg-props]
+===== ssoadm update-auth-cfg-props
+Set authentication configuration properties
+
+Usage: `ssoadm update-auth-cfg-props --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication configuration.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+authentication configuration properties, valid configuration keys are: iplanet-am-auth-login-failure-url, iplanet-am-auth-login-success-url and iplanet-am-auth-post-login-process-class.
+
+`[--datafile, -D]`::
+Name of file that contains authentication configuration properties.
+
+--
+
+[#ssoadm-update-auth-instance]
+===== ssoadm update-auth-instance
+Update authentication instance values
+
+Usage: `ssoadm update-auth-instance --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of authentication instance.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-update-datastore]
+===== ssoadm update-datastore
+Update data store profile.
+
+Usage: `ssoadm update-datastore --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--name, -m`::
+Name of datastore.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--realm, -e`::
+Name of realm.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. sunIdRepoClass=com.sun.identity.idm.plugins.files.FilesRepo.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-update-entity-keyinfo]
+===== ssoadm update-entity-keyinfo
+Update XML signing and encryption key information in hosted entity metadata.
+
+Usage: `ssoadm update-entity-keyinfo --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--entityid, -y`::
+Entity ID
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`[--idpecertalias, -g]`::
+Identity provider encryption certificate aliases.
+
+`[--idpscertalias, -b]`::
+Identity provider signing certificate aliases
+
+`[--realm, -e]`::
+Realm where entity resides.
+
+`[--specertalias, -r]`::
+Service provider encryption certificate aliases
+
+`[--spec, -c]`::
+Specify metadata specification, either wsfed, idff or saml2, defaults to saml2
+
+`[--spscertalias, -a]`::
+Service provider signing certificate aliases
+
+--
+
+[#ssoadm-update-server-cfg]
+===== ssoadm update-server-cfg
+Update server configuration.
+
+Usage: `ssoadm update-server-cfg --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--servername, -s`::
+Server name, e.g. http://www.example.com:8080/fam or enter default to update default server configuration.
+
+`[--attributevalues, -a]`::
+Attribute values e.g. homeaddress=here.
+
+`[--datafile, -D]`::
+Name of file that contains attribute values data.
+
+--
+
+[#ssoadm-update-svc]
+===== ssoadm update-svc
+Update service.
+
+Usage: `ssoadm update-svc --options [--global-options]`
+.Options
+--
+
+`--adminid, -u`::
+Administrator ID of running the command.
+
+`--password-file, -f`::
+File name that contains password of administrator.
+
+`--xmlfile, -X`::
+XML file(s) that contains schema.
+
+`[--continue, -c]`::
+Continue updating service if one or more previous services cannot be updated.
+
+--
+
+
+

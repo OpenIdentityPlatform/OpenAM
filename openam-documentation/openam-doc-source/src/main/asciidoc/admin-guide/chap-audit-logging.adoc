@@ -1,0 +1,919 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-audit-logging]
+== Configuring Audit Logging
+
+OpenAM supports a comprehensive Audit Logging Service that captures key auditing events, critical for system security, troubleshooting, and regulatory compliance.
+
+Audit logs gather operational information about events occurring within an OpenAM deployment to track processes and security data, such as authentication mechanisms, system access, user and administrator activity, error messages, and configuration changes.
+
+This chapter describes the new, common REST-based Audit Logging Service available in OpenAM 13.5.2-15. OpenAM 13.5.2-15 also supports a legacy Logging Service, based on a Java SDK and available in OpenAM versions prior to OpenAM 13.5.2-15. The legacy Logging Service will be deprecated in a future release of OpenAM.
+
+The Audit Logging Service uses a structured message format that adheres to a consistent and documented log structure common across the ForgeRock stack, including OpenAM, OpenIDM, OpenDJ, and OpenIG.
+
+[IMPORTANT]
+====
+By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators must manually enable audit logging in the directory server. For more information, see link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#log-common-audit-ldap-csv[To Enable LDAP CSV Access Logs, window=\_blank] in the __OpenDJ Administration Guide__.
+====
+
+[#about-audit-logs]
+=== About the Audit Logging Service
+
+OpenAM writes log messages generated from audit events triggered by its instances, policy agents, the `ssoadm` tool, and connected ForgeRock stack implementations.
+
+OpenAM's Audit Logging Service provides a versatile and rich feature set as follows:
+
+* *Global and Realm-Based Log Configuration*. You can configure audit logging globally, which ensures that all realms inherit your global log settings. You can also configure audit logging by realm, which allows you to set different log settings for each realm.
+
+* *Audit Event Handlers*. The Audit Logging Service supports a variety of audit event handlers that allow you to write logs to different types of data stores. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"] for a list of event handlers available in OpenAM 13.5.2-15.
+
+* *Audit Event Buffering*. By default, OpenAM writes each log message separately as they are generated. OpenAM supports message buffering, a type of batch processing, that stores log messages in memory and flushes the buffer after a preconfigured time interval or after a certain number of log messages reaches the configured threshold value.
+
+* *Tamper-Evident Logging*. You can digitally sign your audit logs to ensure no unauthorized tampering of your logs has taken place. To configure this feature, you must deploy a preconfigured logger certificate and store it at `/path/to/openam/openam/Logger.jks`.
+
+* *Log Rotation and Retention Policies*. OpenAM rotates JSON and CSV audit logs when it reaches a specified maximum size. You can also configure a time-based rotation policy, which disables the max-size rotation policy and implements log rotation based on a preconfigured time sequence. You also have the option to disable log rotation and use an external log rotation tool. preconfigured time sequence. OpenAM also provides the option to disable log rotation completely for these file types. OpenAM does not support external log rotation for JSON and CSV audit logs.
++
+For Syslog, JDBC, ElasticSearch, JMS, and Splunk handlers, OpenAM does not control log rotation and retention as they are handled by each respective service.
+
+* *Blacklisting Sensitive Fields*. The Audit Logging Service supports blacklisting, a type of filtering to hide sensitive values or fields, such as HTTP headers, query parameters, cookies, or the entire field value.
+
+* *Reverse DNS Lookup*. The Audit Logging Service supports a reverse DNS lookup feature for network troubleshooting purposes. Reverse DNS lookup is disabled by default as it enacts a performance hit in operation throughput.
+
+
+
+[#audit-log-topics]
+=== Audit Log Topics
+
+OpenAM integrates log messages based on four different audit topics. A __topic__ is a category of audit log event that has an associated one-to-one mapping to a schema type. Topics can be broadly categorized as access details, system activity, authentication operations, and configuration changes. The following table shows the basic event topics and associated audit log files, whose filenames are fixed:
+
+[#table-audit-log-topics]
+.Audit Log Topics
+[cols="22%,33%,45%"]
+|===
+|Event Topic |File Name |Description 
+
+a|Access
+a|`access.csv`
+a|Captures who, what, when, and output for every access request.
+
+a|Activity
+a|`activity.csv`
+a|Captures state changes to objects that have been created, updated, or deleted by end users (that is, non-administrators). For this release, only session changes are captured in the logs.
+
+ Future releases may also record changes to user trusted devices, UMA policies, OAuth 2.0 tokens and others.
+
+a|Authentication
+a|`authentication.csv`
+a|Captures when and how a subject is authenticated and related events.
+
+a|Configuration
+a|`config.csv`
+a|Captures configuration changes to the product with a timestamp and by whom. Note that the `userId` indicating the subject who made the configuration change is not captured in the `config.csv` but may be tracked using the `transactionId` in the `access.csv`.
+|===
+
+
+[#default-audit-logging-configuration]
+=== Default Audit Logging Configuration
+
+By default, OpenAM logs to a comma-separated value (CSV) audit event handler and stores CSV log files under `/path/to/openam/openam/log`.
+
+To modify the global audit logging configuration, navigate to Configure > Global Services > Audit Logging and change the default configuration as needed.
+
+To override the global audit logging configuration for a realm, navigate to Realms > __Realm Name__ > Services, add the Audit Logging service to the realm, and configure the service as needed.
+
+
+[#configuring-audit-event-handlers]
+=== Configuring Audit Event Handlers
+
+OpenAM supports the following types of audit event handlers:
+
+[#table-audit-handlers]
+.OpenAM Audit Event Handlers
+[cols="25%,25%,50%"]
+|===
+|Audit Event Handler Type |Publishes to |How to Configure 
+
+a|CSV
+a|CSV files
+a|xref:#configuring-csv-audit-event-handlers["Configuring CSV Audit Event Handlers"]
+
+a|Syslog
+a|The syslog daemon
+a|xref:#configuring-syslog-audit-event-handlers["Configuring Syslog Audit Event Handlers"]
+
+a|JDBC
+a|A relational database
+a|xref:#implementing-jdbc-audit-event-handlers["Implementing JDBC Audit Event Handlers"]
+
+a|Elasticsearch
+a|An Elasticsearch store
+a|xref:#implementing-elasticsearch-audit-event-handlers["Implementing Elasticsearch Audit Event Handlers"]
+
+a|JMS
+a|JMS topics
+a|xref:#configuring-jms-audit-event-handlers["Configuring JMS Audit Event Handlers"]
+|===
+This section provides procedures for configuring each type of audit handler.
+
+[#configuring-csv-audit-event-handlers]
+==== Configuring CSV Audit Event Handlers
+
+OpenAM's default audit event handler is the comma-separated values (CSV) handler, which is already configured for the global Audit Logging Service. The global configuration is used to control audit logging in realms that do not have the Audit Logging Service added to them.
+
+The following procedure describes how to configure a CSV audit event handler:
+
+[#configure-csv-audit-event-handler]
+.To Configure a CSV Audit Event Handler
+====
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. In the Event Handler Instances table, click Global CSV Handler.
+
+. Under General Handler Configuration, verify that the Enabled box is checked.
+
+. Select the topics for your audit logs. For a description of each topic, see xref:#audit-log-topics["Audit Log Topics"].
+
+. In the Log Directory field, override the default location of your logs if necessary. The default location is: `%BASE_DIR%/%SERVER_URI%/log/`.
++
+
+[WARNING]
+======
+It is very important that a different log directory be configured for each instance of the CSV audit event handler. If two instances are writing to the same file, it can interfere with log rotation and tamper-evident logs.
+======
+
+. For File Rotation, configure how files are rotated once they reach a specified file size or time interval. Enter the following parameters:
++
+
+.. For Rotation Enabled, keep the Enabled box check-marked. If disabled, OpenAM ignores log rotation and appends to the same file.
+
+.. For Maximum File Size, enter the maximum size of an audit file before rotation.
++
+Default: 100000000 bytes.
+
+.. OPTIONAL. For File Rotation Prefix, enter an arbitrary string that will be prefixed to every audit log to identify it. This parameter is used when time-based or size-based rotation is enabled.
+
+.. For File Rotation Suffix, enter a timestamp suffix based on the Java SimpleDateFormat that will be added to every audit log. This parameter is used when time-based or size-based log rotation is enabled.
++
+Default: `-MM.dd.yy-kk.mm`.
+
+.. For Rotation Interval, enter a time interval to trigger audit log file rotation in seconds. A negative or zero value disables this feature.
++
+Default: -1
++
+
+[NOTE]
+======
+Any combination of the three rotation policies (maximum file size, periodic duration, and duration since midnight) can be implemented including none at all.
+======
+
+.. For Rotation Times, enter a time duration after midnight to trigger file rotation, in seconds. For example, you can provide a value of `3600` to trigger rotation at 1:00 AM.
++
+
+[NOTE]
+======
+Negative durations are not supported.
+======
+
+
+. For File Retention, determine how long log files should be retained in your system. Configure the following file retention parameters:
++
+
+.. For Maximum Number of Historical Files, enter a number for allowed backup audit files.
++
+Default: `-1`, which indicates an unlimited number of files and disables the pruning of old history files.
+
+.. For Maximum Disk Space, enter the maximum amount of disk space that the total number of audit files can store. A negative or zero value indicates that this policy is disabled.
++
+Default: `-1`, which indicates an unlimited amount of disk space.
+
+.. For Minimum Free Space Required, enter the minimum amount of disk space required to store audit files. A negative or zero value indicates that this policy is disabled.
++
+Default: `-1`, which indicates no minimum amount of disk space is required.
+
+
+. For Buffering, configure if log events should be buffered in memory before they are written to the CSV file:
++
+
+.. For Buffering Enabled, click the Enabled box to start audit event buffering.
++
+The default buffer size is 5000 bytes.
++
+When buffering is enabled, all audit events are put into an in-memory buffer (one per handled topic), so that the original thread that generated the event can fulfill the requested operation, rather than wait for I/O to complete. A dedicated thread (one per handled topic) constantly pulls events from the buffer in batches and writes them to the CSV file. If the buffer becomes empty, the dedicated thread goes to sleep until a new item gets added.
+
+.. For Flush Each Event Immediately, click Enabled to write all buffered events before flushing.
++
+When the dedicated thread accesses the buffer, it copies the contents to an array to reduce contention, and then iterates through the array to write to the CSV file. The bytes written to the file can be buffered again in Java classes and the underlying operating system.
++
+When Flush Each Event Immediately is enabled, OpenAM flushes the bytes after each event is written. If the feature is disabled (default), the Java classes and underlying operation system determine when to flush the bytes.
+
+
+. For Tamper Evident Configuration, set up the feature to detect any tampering of the audit logs.
++
+When tamper evident logging is enabled, OpenAM generates an HMAC digest for each audit log event and inserts it into each audit log entry. The digest detects any addition or modification to an entry.
++
+OpenAM also supports another level of tamper evident security by periodically adding a signature entry to a new line in each CSV file. The entry signs the preceding block of events, so that verification can establish if any of these blocks have been added, removed, or edited by some user.
++
+
+.. Click Is Enabled to turn on the tamper evident feature for CSV logs.
+
+.. In the Certificate Store Location field, enter the location of the keystore. You must manually create the keystore and place it in this location. You can use a simple script to create your Java keystore: link:../resources/create-keystore.sh[create-keystore.sh, window=\_blank].
++
+Default: `%BASE_DIR%/%SERVER_URI%/Logger.jks`
+
+.. In the Certificate Store Password field, enter the certificate password.
+
+.. In the Certificate Store Password (confirm), re-enter the certificate password.
+
+.. In the Signature Interval field, enter a value in seconds for OpenAM to generate and add a new signature to the audit log entry.
++
+Default: `900` (seconds)
+
+
+. In the Audit Event Handler Factory field, keep the default class name for the audit event handler.
+
+. Click Add to save your changes.
+
+. On the Audit Logging page, click Save.
+
+====
+
+
+[#configuring-syslog-audit-event-handlers]
+==== Configuring Syslog Audit Event Handlers
+
+OpenAM can publish audit events to a syslog server, which is based on a widely-used logging protocol. You can configure your syslog settings on the OpenAM console.
+
+The following procedure describes how to configure a Syslog audit event handler:
+
+[#configure-syslog-audit-event-handler]
+.To Configure a Syslog Audit Event Handler
+====
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. In the Event Handler Instances section, click New.
+
+. On the Select Audit Event Handler page, click Syslog, and then click Next.
+
+. On the Add Audit Event Handler page, enter a name for your event handler. For example, `Syslog Audit Event Handler`.
+
+. Under General Handler Configuration, verify that the Enabled box is checked.
+
+. Select the topics for your audit logs. For a description of each topic, see xref:#audit-log-topics["Audit Log Topics"].
+
+. In the Server hostname field, enter the hostname or IP address of the receiving syslog server.
+
+. In the Server port field, enter the port of the receiving syslog server.
+
+. Select the Transport protocol for your configuration: `TCP` or `UDP`.
+
+. In the Connection timeout field, enter the number of seconds to connect to the syslog server. If the server has not responded in the specified time, a connection timeout occurs.
+
+. Select the syslog facility.
++
+A syslog message includes a PRI field that is calculated from the facility and severity values. All topics set the severity to `INFORMATIONAL` but allow you to choose the facility:
++
+
+[#table-syslog-facility]
+.Syslog Facilities
+[cols="40%,60%"]
+|===
+|Facility |Description 
+
+a|AUTH
+a|Security or authorization messages
+
+a|AUTHPRIV
+a|Security or authorization messages
+
+a|CLOCKD
+a|Clock daemon
+
+a|CRON
+a|Scheduling daemon
+
+a|DAEMON
+a|System daemons
+
+a|FTP
+a|FTP daemon
+
+a|KERN
+a|Kernel messages
+
+a|LOCAL0
+a|Local use 0 (local0)
+
+a|LOCAL1
+a|Local use 1 (local1)
+
+a|LOCAL2
+a|Local use 2 (local2)
+
+a|LOCAL3
+a|Local use 3 (local3)
+
+a|LOCAL4
+a|Local use 4 (local4)
+
+a|LOCAL5
+a|Local use 5 (local5)
+
+a|LOCAL6
+a|Local use 6 (local6)
+
+a|LOCAL7
+a|Local use 7 (local7)
+
+a|LOGALERT
+a|Log alert
+
+a|LOGAUDT
+a|Log audit
+
+a|LPR
+a|Line printer subsystem
+
+a|MAIL
+a|Mail system
+
+a|NEWS
+a|Network news subsystem
+
+a|NTP
+a|Network time protocol
+
+a|SYSLOG
+a|Internal messages generated by syslogd
+
+a|USER
+a|User-level messages
+
+a|UUCP
+a|Unix-to-unix-copy (UUCP) subsystem
+|===
++
+
+. In the Audit Event Handler Factory field, keep the default class name for the audit event handler.
+
+. For Buffering Enabled, click the Enabled box to start audit event buffering.
++
+When buffering is enabled, all audit events that get generated are formatted as syslog messsages and put into a queue. A dedicated thread constantly pulls events from the queue in batches and transmits them to the syslog server. If the queue becomes empty, the dedicated thread goes to sleep until a new item gets added. The default queue size is 5000.
+
+. Click Add to save your settings.
+
+. On the Audit Logging page, click Save.
+
+====
+
+
+[#implementing-jdbc-audit-event-handlers]
+==== Implementing JDBC Audit Event Handlers
+
+OpenAM supports audit logging to relational databases using the JDBC audit event handler. You can configure OpenAM to write to Oracle, MySQL, or other databases.
+
+Before configuring the JDBC audit event handler, you must perform several steps to allow OpenAM to log to the database:
+
+[#prepare-audit-logging-jdbc]
+.To Prepare for JDBC Audit Logging
+====
+
+. Create tables in the relational database in which you will write the audit logs. The SQL for Oracle and MySQL table creation is in the `audit.sql` file under `/path/to/tomcat/webapps/openam/WEB-INF/template/sql/db-type`.
++
+If you are using a different relational database, tailor the Oracle or MySQL `audit.sql` file to conform to your database's SQL syntax.
+
+. JDBC audit logging requires a database user with read and write privileges for the audit tables. Do one of the following:
++
+
+* Identify an existing database user and grant that user privileges for the audit tables.
+
+* Create a new database user with read and write privileges for the audit tables.
+
+
+. Obtain the JDBC driver from your database vendor. Place the JDBC driver `.zip` or `.jar` file in the container's `WEB-INF/lib` classpath. For example, place the JDBC driver in `/path/to/tomcat/webapps/openam/WEB-INF/lib` if you use Apache Tomcat.
+
+====
+The following procedure describes how to configure a JDBC audit event handler. Perform the following steps after you have created audit log tables in your database and installed the JDBC driver in the OpenAM web container:
+
+[#configure-audit-logging-jdbc]
+.To Configure a JDBC Audit Event Handler
+====
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. In the Event Handler Instances section, click New.
+
+. On the Select Audit Event Handler page, click JDBC, and then click Next.
+
+. On the Add Audit Event Handler page, enter a name for your event handler. For example, `JDBC Audit Event Handler`.
+
+. Under General Handler Configuration, verify that the Enabled box is checked.
+
+. Select the topics for your audit logs. For a description of each topic, see xref:#audit-log-topics["Audit Log Topics"].
+
+. For Database Type, click one of the following:
++
+
+* Oracle
+
+* MySQL
+
+* Other
+
++
+
+. For JDBC Database URL, enter the URL for your database server. For example, `jdbc:oracle:thin@//host.example.com:1521/ORCL`.
+
+. In the Database Driver Name field, enter the classname of the driver to connect to the datbase. For example, `oracle.jdbc.driver.OracleDriver` or `com.mysql.jdbc.Driver`.
+
+. In the Database Username field, enter the username to authenticate to the database server.
++
+This user must have read and write privileges for the audit tables.
+
+. In the Database User Password field, enter the password used to authenticate to the database server. Then, re-enter the password in the Database User Password (confirm) field.
+
+. In the Connection Timeout (seconds) field, enter the maximum wait time before failing the connection.
++
+Default: 30 (seconds)
+
+. In the Maximum Connection Idle Timeout (seconds) field, enter the maximum idle time in seconds before the connection is closed.
++
+Default: 600 (seconds)
+
+. In the Maximum Connection Time (seconds) field, enter the maximum time in seconds for a connection to stay open.
++
+Default: 1800 (seconds)
+
+. In the Minimum Idle Connections field, enter tne minimum number of idle connections allowed in the connection pool.
+
+. In the Maximum Connections field, enter the maximum number of connections in the connection pools.
+
+. In the Factory Class Name, enter the fully qualified class name of your custom JDBC audit event handler.
+
+. Click Add to save your changes.
+
+. On the Audit Logging page, click Save.
+
+====
+
+
+[#implementing-elasticsearch-audit-event-handlers]
+==== Implementing Elasticsearch Audit Event Handlers
+
+OpenAM supports audit logging to Elasticsearch 5.0. When you store OpenAM's audit logs in an Elasticsearch data store, you can use Kibana to perform data discovery and visualization on your logs.
+
+You can experiment with an Elasticsearch audit handler without enabling any Elasticsearch security features. However, for a more secure deployment, ForgeRock recommends that you use Elasticsearch Shield to require authentication to Elasticshield. Depending on your network topology, you might also want to configure SSL for Elasticsearch Shield.
+
+Before configuring the Elasticsearch audit event handler, you must configure an Elasticsearch index with OpenAM's audit schema:
+
+[#prepare-audit-logging-elasticsearch]
+.To Prepare for Elasticsearch Audit Logging
+====
+Perform the following steps to prepare an Elasticsearch instance for storing OpenAM audit events.
+
+[NOTE]
+======
+These steps apply to Elasticsearch 5.0 only. Breaking changes in Elasticsearch 6.0 make it incompatible with the schemas provided in this version of OpenAM.
+
+For more information, see link:https://www.elastic.co/guide/en/elasticsearch/reference/current/breaking-changes-6.0.html[Breaking Changes in 6.0, window=\_top] in the __Elasticsearch Reference Docs__.
+======
+
+. Review the JSON file containing OpenAM's audit schema. You can find the JSON file for the audit schema at the path `/path/to/tomcat/webapps/openam/WEB-INF/template/elasticsearch/audit.json`.
+
+. Copy the `audit.json` file to the system where you will create the Elasticsearch index for OpenAM auditing.
++
+In this example, you create an Elasticsearch index by executing an Elasticsearch REST API call using the `curl` command. Copy the `audit.json` file to a location that is accessible to the `curl` command you will run in the next step.
+
+. Create an Elasticsearch index for OpenAM auditing as follows:
++
+
+[source, console]
+----
+$ curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data @audit.json \
+ http://elasticsearch.example.com:9200/my_openam_audit_index
+----
++
+In this example, note the following:
++
+
+* `elasticsearch.example.com` is the name of the host on which Elasticsearch runs.
+
+* `9200` is the port number that you use to access Elasticsearch's REST API.
+
+* `my_openam_audit_index` is the name of the Elasticsearch index that you want to create.
+
++
+
+[TIP]
+======
+For more information on connecting to Elasticsearch, see link:https://www.elastic.co/guide/en/elasticsearch/guide/current/_talking_to_elasticsearch.html[Talking to Elasticsearch, window=\_top] in the __Elasticsearch documentation__.
+======
++
+
+====
+
+[#configure-elasticsearch-audit-event-handler]
+.To Configure an Elasticsearch Audit Event Handler
+====
+The following procedure describes how to configure an Elasticsearch audit event handler. Perform the following steps after you have created an Elasticsearch index for OpenAM audit logging:
+
+. If your Elasticsearch deployment uses Elasticsearch Shield configured for SSL, import the CA certificate used to sign Elasticsearch node certificates into the Java keystore on the host that runs OpenAM. For example:
++
+
+[source, console]
+----
+$ keytool \
+ -import \
+ -trustcacerts \
+ -alias elasticsearch \
+ -file /path/to/cacert.pem \
+ -keystore $JAVA_HOME/jre/lib/security/cacerts
+----
++
+If you are running an OpenAM site, import the CA certificate on all the servers in your site.
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. In the Event Handler Instances section, click New.
+
+. On the Select Audit Event Handler page, click Elasticsearch, and then click Next.
+
+. On the Add Audit Event Handler page, enter a name for your event handler. For example, `Elasticsearch Event Handler`.
+
+. Under General Handler Configuration:
++
+
+.. Verify that the Enabled box is checked.
+
+.. Select the topics for your audit logs. For a description of each topic, see xref:#audit-log-topics["Audit Log Topics"].
+
+
+. Under Elasticsearch Configuration:
++
+
+.. In the Server Hostname field, enter the hostname or IP address of the Elasticsearch server to which OpenAM should connect when writing audit logs.
+
+.. In the Server Port field, enter the port number to access Elasticsearch's REST API. The default port number is 9200.
+
+.. If SSL is enabled in your Elasticsearch deployment, click the Enabled check box for SSL Enabled.
+
+.. In the Elasticsearch Index field, specify the name of the index to be used for OpenAM audit logging. The index you specify in this field must be identical to the index you created in xref:#prepare-audit-logging-elasticsearch["To Prepare for Elasticsearch Audit Logging"].
+
+
+. If you have configured Elasticsearch Shield for user authentication, specify the name and password of an Elasticsearch user in the Username and Password fields under Authentication.
++
+If you are not using Elasticsearch Shield for user authentication, you can leave these fields blank.
+
+. Under Buffering, configure whether log events should be buffered in memory before they are written to the Elasticsearch data store:
++
+
+.. For Buffering enabled, click the Enabled box to start audit event buffering.
++
+When buffering is enabled, all audit events are put into an in-memory buffer (one per handled topic), so that the original thread that generated the event can fulfill the requested operation, rather than wait for I/O to complete. A dedicated thread (one per handled topic) constantly pulls events from the buffer in batches and writes them to Elasticsearch. If the buffer becomes empty, the dedicated thread goes to sleep until a new item gets added.
+
+.. For Batch Size, specify the number of audit events that OpenAM pulls from the audit buffer when writing a batch of events to Elasticsearch. The default is 500 audit events.
+
+.. For Queue Capacity, specify the maximum number of audit events that OpenAM can queue in this audit handler's buffer. The default is 10000 audit events.
++
+If the number of events to queue exceeds the queue capacity, OpenAM raises an exception and the excess audit events are dropped, and therefore not written to Elasticsearch.
+
+.. For Write interval, specify how often OpenAM should write buffered events to Elasticsearch. The default interval is 250 milliseconds.
+
+
+. In the Factory Class Name field under Audit Event Handler Factory, keep the default class name for the audit event handler.
+
+. Click Add to add the Elasticsearch audit logging event handler to the Audit Logging Service.
+
+. On the Audit Logging page, click Save to save your changes to the Audit Logging Service.
+
+====
+If you have configured the audit logging event handler correctly, OpenAM starts logging to Elasticsearch immediately after you have saved your changes to the Audit Logging Service.
+
+
+[#configuring-jms-audit-event-handlers]
+==== Configuring JMS Audit Event Handlers
+
+OpenAM supports audit logging to a JMS message broker. JMS is a Java API for sending messages between clients using a publish and subscribe model as follows:
+
+* OpenAM audit logging to JMS requires that the JMS message broker supports using JNDI to locate a JMS connection factory. See your JMS message broker documentation to verify that you can make connections to your broker by using JNDI before attempting to implement an OpenAM JMS audit handler.
+
+* OpenAM acts as a JMS publisher client, publishing JMS messages containing audit events to a JMS __topic__. footnote:topic-footnote[Note that OpenAM and JMS use the term__topic__differently. An__OpenAM audit topic__is a category of audit log event that has an associated one-to-one mapping to a schema type. A__JMS topic__is a distribution mechanism for publishing messages delivered to multiple subscribers.]
+
+* A JMS subscriber client, which is not part of the OpenAM software and must be developed and deployed separately from OpenAM, subscribes to the JMS topic to which OpenAM publishes audit events. The client then receives the audit events over JMS and processes them as desired.
+
+Before configuring the JMS audit event handler, you must perform several steps to allow OpenAM to publish audit events as a JMS client:
+
+[#prepare-audit-logging-jms]
+.To Prepare for JMS Audit Logging
+====
+
+. Obtain JNDI connection properties that OpenAM requires to connect to your JMS message broker. The specific connection properties vary depending on the broker. See your JMS message broker documentation for details.
++
+For example, connecting to an Apache ActiveMQ message broker requires the following properties:
++
+
+[#d19490e24650]
+.Example Apache ActiveMQ JNDI Connection Properties
+[cols="33%,67%"]
+|===
+|Property Name |Example Value 
+
+a|`java.naming.factory.initial`
+a|`org.apache.activemq.jndi.ActiveMQInitialContextFactory`
+
+a|`java.naming.provider.url`
+a|`tcp://localhost:61616`
+
+a|`topic.audit`
+a|`audit`
+|===
++
+
+. Obtain the JNDI lookup name of the JMS connection factory for your JMS message broker.
++
+For example, for Apache ActiveMQ, the JNDI lookup name is `ConnectionFactory`.
+
+. Obtain the JMS client `.jar` file from your JMS message broker vendor. Add the `.jar` file to OpenAM's classpath by placing it in the `WEB-INF/lib` directory.
++
+For example, place the JMS client `.jar` file in `/path/to/tomcat/webapps/openam/WEB-INF/lib` if you use Apache Tomcat.
+
+====
+The following procedure describes how to configure a JMS audit event handler.
+
+If your JMS message broker requires an SSL connection, you might need to perform additional, broker-dependent configuration tasks. For example, you might need to import a broker certificate into OpenAM's keystore, or provide additional JNDI context properties.
+
+See your JMS message broker's documentation for specific requirements for making SSL connections to your broker, and implement them as needed in addition to the steps in the following procedure.
+
+Perform the following steps after you have installed the JMS client `.jar` file in the OpenAM web container:
+
+[#configure-jms-audit-event-handler]
+.To Configure a JMS Audit Event Handler
+====
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. In the Event Handler Instances section, click New.
+
+. On the Select Audit Event Handler page, click JMS, and then click Next.
+
+. On the Add Audit Event Handler page, enter a name for your event handler. For example, `JMS Event Handler`.
+
+. Under General Handler Configuration:
++
+
+.. Verify that the Enabled box is checked.
+
+.. Select the OpenAM event handler topicsfootnote:topic-footnote[] for your audit logs. For a description of OpenAM event handler topics, see xref:#audit-log-topics["Audit Log Topics"].
+
+
+. Under JMS Configuration:
++
+
+.. In the Delivery Mode field, specify the JMS delivery mode.
++
+With persistent delivery, the JMS provider ensures that messages are not lost in transit in case of a provider failure by logging messages to storage when they are sent. Therefore, persistent delivery mode guarantees JMS message delivery, while non-persistent mode provides better performance.
++
+The default delivery mode is non-persistent delivery. Therefore, if your deployment requires delivery of every audit event to JMS subscriber clients, be sure to set the default configuration to `PERSISTENT`.
+
+.. For Session Mode, use the default setting, `AUTO`, unless your JMS broker implementation requires otherwise. See your broker documentation for more information.
+
+.. Specify properties that OpenAM will use to connect to your JMS message broker as key-value pairs in the JNDI Context Properties field. The format for properties is `[myPropertyName]=myPropertyValue`. For example, `[java.naming.provider.url]=tcp://localhost:61616`.
+
+.. Specify the name of the JMS topic to which OpenAM will publish messages containing audit events.
++
+Subscriber clients that process OpenAM audit events must subscribe to this topic.
+
+.. Specify the JNDI lookup name of the JMS connection factory in the JMS Connection Factory Name field.
+
+
+. Under Batch Events, configure whether log events should be batched before they are published to the JMS message broker:
++
+
+.. For Batch enabled, click the Enabled box to start batch publishing of audit events. Audit events will be queued and published to the JMS message broker in batches.
++
+If batch publishing is not enabled, OpenAM publishes audit events to the JMS message broker individually.
+
+.. For Capacity, specify the maximum capacity of the publishing queue. Execution is blocked if the queue size reaches capacity.
+
+.. For Max Batched, specify the maximum number of events to be delivered when OpenAM publishes the events to the JMS message broker.
+
+.. For Thread Count, specify the number of worker threads OpenAM should use to process the batch queue.
+
+.. Specify the batching timeout configuration as follows:
++
+
+* For Insert Timeout, specify the amount of time, in seconds, for queued events to be transmitted to the JMS message broker.
+
+* For Polling Timeout, specify the amount of time, in seconds, that worker threads wait for new audit events before becoming idle.
+
+* For Shutdown Timeout, specify the amount of time, in seconds, that worker threads wait for new audit events before shutting down.
+
+
+
+. In the Factory Class Name field under Audit Event Handler Factory, keep the default class name for the audit event handler.
+
+. Click Add to add the JMS audit logging event handler to the Audit Logging Service.
+
+. On the Audit Logging page, click Save to save your changes to the Audit Logging Service.
+
+====
+If you have configured the audit logging event handler correctly, OpenAM starts logging to JMS immediately after you have saved your changes to the Audit Logging Service.
+
+
+
+[#configuring-audit-logging]
+=== Configuring Audit Logging
+
+You can easily enable the Audit Logging service on the OpenAM Admin console, either globally or on a per-realm basis.
+
+[#configure-global-audit-logging]
+.To Configure Global Audit Logging
+====
+
+. Log in to the OpenAM console as an administrator, navigate to Configure > Global Services, and then click Audit Logging.
+
+. Make sure you have configured your audit event handler. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"].
+
+. In the Realm Attributes section, click Enabled to turn on Audit Logging.
+
+. For Resolve host name, click Enabled if you want to perform DNS host lookups, which populates the record's host name field in the logs. Note that enabling DNS host lookups may result in an overall performance hit due to the hostname searches.
+
+. For Field exclusion policies, enter any fields or values to exclude from your audit events in the New Value field, and then click Add.
++
+The purpose of this feature is to allow customers to perform two kinds of filtering: 1) Filter fields from the event. For example, customers with more basic auditing requirements may not be interested in capturing HTTP headers, query parameters, and cookies in the access logs; 2) Filter specific values from within fields that store key-value pairs as JSON. For example, the HTTP headers, query parameters and cookies.
+
+. On the Audit Logging page, click Save.
+
+====
+
+[#configure-realm-audit-logging]
+.To Configure Audit Logging per Realm
+====
+You can configure the audit logging server on a per realm basis, which allows you to set up different log locations for your realms and different types of handlers for each realm.
+
+If no specific realm is configured, audit logging will be governed by the global settings.
+
+. Log in to the OpenAM console as an administrator, and select the realm from which you want to work.
+
+. Click Services > Add a Service, select Audit Logging, and then click Create.
+
+. Make sure you have configured your audit event handler. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"].
+
+. On the Configuration tab, select the Audit logging checkbox to turn on audit logging.
+
+. For Field exclusion policies, enter any fields or values to exclude from your audit events in the New Value field, and then click Add.
++
+The purpose of this feature is to allow customers to perform two kinds of filtering: 1) Filter fields from the event. For example, customers with more basic auditing requirements may not be interested in capturing HTTP headers, query parameters, and cookies in the access logs; 2) Filter specific values from within fields that store key-value pairs as JSON. For example, the HTTP headers, query parameters and cookies.
+
+. Click Save Changes.
+
+====
+
+
+[#configuring-trusttransactionheader-system-property]
+=== Configuring the Trust Transaction Header System Property
+
+OpenAM supports the propagation of the transaction ID across the ForgeRock platform, such as from OpenDJ or OpenIDM to OpenAM, using the HTTP header `X-ForgeRock-TransactionId`. The `X-ForgeRock-TransactionId` header is automatically set in all outgoing HTTP calls from one ForgeRock product to another. Customers can also set this header themselves from their own applications or scripts calling into the ForgeRock platform.
+
+You can set a new property `org.forgerock.http.TrustTransactionHeader` to `true`, which will trust any incoming `X-ForgeRock-TransactionId` headers. By default, the `org.forgerock.http.TrustTransactionHeader` is set to `false`, so that a malicious actor cannot flood the system with requests using the same transaction ID header to hide their tracks.
+
+[#configure-trusttransactionheader-property]
+.To Configure the Trust Transactions Header System Property
+====
+
+. Log in to the OpenAM console.
+
+. Navigate to Configure > Server Defaults > Advanced.
+
+. In the Add a Name field, enter `org.forgerock.http.TrustTransactionHeader`, and enter `true` in the corresponding Add a Value field.
+
+. Click Save Changes.
++
+Your OpenAM instance will now accept incoming `X-ForgeRock-Transactionid` headers, which can then be tracked in the audit logs.
+
+====
+
+
+[#configuring-legacy-audit-logging-svc]
+=== Configuring the Legacy Audit Logging
+
+To configure OpenAM logging properties, log in to the OpenAM console as OpenAM administrator, and navigate to Configure > Global Services > System, and then click Logging.
+
+For more information on the available settings, see xref:../reference/chap-config-ref.adoc#system-logging["Logging"] in the __Reference__ reference.
+
+[#log-mgmt-core]
+==== Audit Logging to Flat Files
+
+By default, OpenAM audit logs are written to files in the configuration directory for the instance, such as `$HOME/openam/log/`.
+
+OpenAM sends messages to different log files, each named after the service logging the message, with two different types log files per service: `.access` and`.error`. Thus, the current log files for the authentication service are named `amAuthentication.access` and `amAuthentication.error`.
+
+For details, see xref:../reference/chap-log-messages.adoc#chap-log-messages["Log Files and Messages"] in the __Reference__.
+
+
+[#log-mgmt-syslog]
+==== Audit Logging to a Syslog Server
+
+OpenAM supports sending audit log messages to a syslog server for collation.
+
+You can enable syslog audit logging by using the OpenAM console, or the `ssoadm` command.
+
+[#enable-syslog-audit-logging-console]
+.Enabling Syslog Audit Logging by Using the OpenAM Console
+====
+
+. Log in to the OpenAM console as OpenAM administrator.
+
+. Navigate to Configure > Global Services > System, and then click Logging.
+
+. Set the __Logging Type__ option to `Syslog`.
+
+. Complete the following settings as appropriate for your syslog server:
++
+
+* `Syslog server host`
+
+* `Syslog server port`
+
+* `Syslog server protocol`
+
+* `Syslog facility`
+
+* `Syslog connection timeout`
+
++
+For information on these settings, see xref:../reference/chap-config-ref.adoc#system-logging["Logging"] in the __Reference__.
+
+. Save your work.
+
+====
+
+[#enable-syslog-audit-logging-SSOADM]
+.Enabling Syslog Audit Logging by Using SSOADM
+====
+
+. Create a text file, for example, `MySyslogServerSettings.txt` containing the settings used when audit logging to a syslog server, as shown below:
++
+
+[source, console]
+----
+iplanet-am-logging-syslog-port=514
+       iplanet-am-logging-syslog-protocol=UDP
+       iplanet-am-logging-type=Syslog
+       iplanet-am-logging-syslog-connection-timeout=30
+       iplanet-am-logging-syslog-host=localhost
+       iplanet-am-logging-syslog-facility=local5
+----
+
+. Use the following SSOADM command to configure audit logging to a syslog server:
++
+
+[source, console]
+----
+$ ssoadm \
+      set-attr-defs \
+      --adminid amadmin \
+      --password-file /tmp/pwd.txt \
+      --servicename iPlanetAMLoggingService \
+      --schematype Global \
+      --datafile MySyslogServerSettings.txt
+
+      Schema attribute defaults were set.
+----
+
+====
+
+
+[#log-mgmt-agents]
+==== Audit Logging in OpenAM Policy Agents
+
+By default, OpenAM Policy Agents log to local files in their configuration directories for debugging. The exact location depends on where you installed the agent.
+
+By default, OpenAM policy agents send log messages remotely to OpenAM when you log auditing information about URL access attempts. To configure audit logging for a centrally managed policy agent, login to the OpenAM console as administrator, and browse to Realms > __Realm Name__ > Agents > __Agent Type__ > __Agent Name__ > Global, and then scroll down to the Audit section.
+
+
+

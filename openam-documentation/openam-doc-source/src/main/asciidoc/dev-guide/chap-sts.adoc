@@ -1,0 +1,907 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-sts]
+== Working With the Security Token Service
+
+This chapter covers tasks developers perform when working with OpenAM's Security Token Service (STS).
+
+The Security Token Service transforms security tokens upon request. For example, you can call the Security Token Service to convert a username and password token to a SAML v2.0 token. For a complete description of the Security Token Service, including operational flow, supported token types, configuration, and deployment, see xref:../admin-guide/chap-sts.adoc#chap-sts["Configuring the Security Token Service"] in the __Administration Guide__.
+
+This section covers tasks that developers perform when working with the Security Token Service:
+
+* xref:#sts-publish["Publishing STS Instances"]
+
+* xref:#sts-consume["Consuming STS Instances"]
+
+* xref:#sts-query-validate-cancel["Querying, Validating, and Canceling Tokens"]
+
+* xref:#sts-custom-token-types["Extending STS to Support Custom Token Types"]
+
+Several sections in this chapter reference STS code examples. The following procedure describes how to access the examples:
+
+[#sts-access-example-code]
+.To Access the STS Example Code
+====
+
+. If you have not already done so, download and build the STS samples.
++
+For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+
+. Check out the `master` branch of the OpenAM source.
++
+You can find the STS code examples under `/path/to/openam-samples-external/sts-example-code`.
+
+====
+
+[#sts-publish]
+=== Publishing STS Instances
+
+You configure STS __instances__ to perform one or more token transformations. Each instance provides configuration details about how SAML v2.0 and/or OpenID Connect output tokens are encrypted or signed. Deployments that support multiple SAML v2.0 and/or OpenID Connect service providers require multiple STS instances.
+
+__Publishing an STS instance__ means creating an STS instance with a given configuration.
+
+OpenAM supports two types of STS instances: REST STS instances and SOAP STS instances. REST STS instances provide token transformations by letting users call REST API endpoints, while SOAP STS instances provide token transformations by letting users call WS-Trust 1.4-compliant SOAP endpoints.
+
+OpenAM provides two techniques for publishing STS instances:
+
+* Creating and configuring the instance by using the OpenAM console
+
+* Executing code that calls the `sts-publish` REST endpoint
+
+xref:../admin-guide/chap-sts.adoc#chap-sts["Configuring the Security Token Service"] in the __Administration Guide__ describes how to create and configure STS instances by using the OpenAM console. This chapter covers how to publish STS instances programmatically.
+
+When you publish a REST STS instance, OpenAM exposes a REST endpoint for accessing the instance, and the instance is immediately available for use to callers.
+
+For SOAP STS instances, there is an additional deployment step. In order for the SOAP endpoint to be exposed, a SOAP STS deployment must exist for the realm in which the SOAP STS instance was created. A SOAP STS deployment is a running web application separate from OpenAM. For information about creating SOAP STS deployments, see xref:../admin-guide/chap-sts.adoc#sts-deploy-soap-sts["Deploying SOAP STS Instances"] in the __Administration Guide__.
+
+[#sts-publish-service]
+==== The Publish Service
+
+To publish an STS instance, perform an HTTP POST on one of the `sts-publish` endpoints:
+
+* `/sts-publish/rest`, for REST STS instances
+
+* `/sts-publish/soap`, for SOAP STS instances
+
+Specify the `_action=create` parameter in the URL.
+
+For example, you could publish a REST STS instance named `username-transformer` in the Top Level Realm as follows:
+
+[source, console]
+----
+$ curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "invocation_context": "invocation_context_client_sdk",
+    "instance_state": {
+      "saml2-config": {
+        "issuer-name":"saml2-issuer",
+        ...
+      },
+      "deployment-config": {
+        "deployment-url-element":"username-transformer",
+        "deployment-realm":"/",
+        ...
+      },
+      "persist-issued-tokens-in-cts":"false",
+      "supported-token-transforms":[{
+        "inputTokenType":"USERNAME",
+        "outputTokenType":"OPENIDCONNECT",
+        "invalidateInterimOpenAMSession":false
+      }],
+      "oidc-id-token-config":{
+        "oidc-issuer":"test",
+        ...
+      }
+    }
+  } \
+ https://openam.example.com:8443/openam/sts-publish/rest?_action=create
+{
+  "_id":"username-transformer",
+  "_rev":"21939129",
+  "result":"success",
+  "url_element":"username-transformer"}
+}
+----
+The `instance_state` object in the JSON payload represents the STS instance's configuration. For a complete example of an `instance_state` object, see the sample code for the `RestSTSInstancePublisher` class in xref:#sts-publish-rest["Publishing REST STS Instances"].
+
+Accessing the `sts-publish` endpoint requires administrative privileges. Authenticate as an OpenAM administrative user, such as `amadmin`, before attempting to publish an STS instance.
+
+In addition to publishing instances, the `sts-publish` endpoint can also return the configuration of an STS instance when you perform an HTTP GET on the `sts-publish` endpoint for the instance. The endpoint you access differs for REST and SOAP STS instances:
+
+* For REST STS instances, access `/sts-publish/rest/realm/deployment-URL-element`
+
+* For SOAP STS instances, access `/sts-publish/soap/realm/deployment-URL-element`
+
+In the preceding examples, __deployment-URL-element__ is the value of the STS instance's deployment URL element—one of the instance's configuration properties. __realm__ is the realm in which a SOAP STS instance has been configured.
+
+For example, you could obtain the configuration of a REST STS instance configured in the Top Level Realm with the deployment URL element `username-transformer` as follows:
+
+[source, console]
+----
+$ curl \
+ --request GET \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/sts-publish/rest/username-transformer
+{
+  "_id":"username-transformer",
+  "_rev":"-659999943",
+  "username-transformer": {
+    "saml2-config": {
+      "issuer-name":"saml2-issuer",
+      ...
+    },
+    "deployment-config": {
+      "deployment-url-element":"username-transformer",
+      ...
+    },
+    "persist-issued-tokens-in-cts":"false",
+    "supported-token-transforms":[{
+      "inputTokenType":"USERNAME",
+      "outputTokenType":"OPENIDCONNECT",
+      "invalidateInterimOpenAMSession":false
+      }],
+    "oidc-id-token-config":{
+      "oidc-issuer":"test",
+      ...
+    }
+  }
+}
+----
+You can delete STS instances by performing an HTTP DELETE on the `sts-publish` endpoint. The endpoint you access differs for REST and SOAP STS instances:
+
+* For REST STS instances, perform an HTTP DELETE on `/sts-publish/rest/realm/deployment-URL-element`
+
+* For SOAP STS instances, perform an HTTP DELETE on `/sts-publish/soap/realm/deployment-URL-element`
+
+
+
+[#sts-publish-rest]
+==== Publishing REST STS Instances
+
+The sample code referenced in this section provides an example of how to programmatically publish REST STS instance. The code is not intended to be a working example. Rather, it is a starting point—code that you can modify to satisfy your organization's specific requirements. To access the sample code, see xref:#sts-access-example-code["To Access the STS Example Code"].
+
+After publishing a REST STS instance programmatically, you can view the instance's configuration in the OpenAM console. The instance is ready for consumption.
+
+Sample code is available for the following classes:
+--
+
+RestSTSInstancePublisher::
+The `RestSTSInstancePublisher` class exposes an API to publish, delete, and update REST STS instances by calling methods that perform an HTTP POST operation on the `soap-sts/publish` endpoint.
+
+RestSTSInstanceConfigFactory::
+The `RestSTSInstancePublisher`class calls the `RestSTSInstanceConfigFactory` class to create a `RestSTSInstanceConfig` instance. `RestSTSInstanceConfig` objects encapsulate all the configuration information of a REST STS instance, and emit JSON values that you can post to the `sts-publish/rest` endpoint to publish a REST STS instance.
+
+STSPublishContext::
+The sample `STSPublishContext` class specifies the configuration necessary to publish REST and SOAP STS instances. The class provides a programmatic method for setting configuration properties—the same configuration properties available through the OpenAM console under Realms > __Realm Name__ > STS.
+
+CustomTokenOperationContext::
+The sample `CustomTokenOperationContext` class specifies custom validators, token types, and transformations that a REST STS instance can support.
+
+--
+
+[IMPORTANT]
+====
+The sample code referenced in this section is __not__ compilable, because it uses classes that are not available publicly. The code provides patterns to developers familiar with the problem domain and is intended only to assist developers who want to programmatically publish REST STS instances.
+
+The sample code imports a number of classes, introducing dependencies. Classes imported from the OpenAM client SDK can remain in your code, but other imported classes must be removed and replaced with code that provides similar functionality in your environment. For example, the `RestSTSInstanceConfigFactory` class uses a constant named `CommonConstants.DEFAULT_CERT_MODULE_NAME` from the imported `com.forgerock.openam.functionaltest.sts.frmwk.common.CommonConstants` utility class. This utility class is not publicly available. Therefore, you need to replace this constant with another construct.
+
+The critical part of the sample code is the idioms that programmatically set all the state necessary to publish a REST STS instance.
+====
+
+
+[#sts-publish-soap]
+==== Publishing SOAP STS Instances
+
+The sample code referenced in this section provides an example of how to programmatically publish of a SOAP STS instance. The code is not intended to be a working example. Rather, it is starter code that you can modify to satisfy your organization's specific requirements. To access the sample code, see xref:#sts-access-example-code["To Access the STS Example Code"].
+
+After publishing a SOAP STS instance programmatically, you can view the instance's configuration in the OpenAM console. However, the instance is not ready for consumption until after you have created and deployed a SOAP STS `.war` file. For information about how to create and deploy a SOAP STS `.war` file, see xref:../admin-guide/chap-sts.adoc#sts-deploy-soap-sts["Deploying SOAP STS Instances"] in the __Administration Guide__."
+
+Sample code is available for the following classes:
+--
+
+SoapSTSInstancePublisher::
+The sample `SoapSTSInstancePublisher` class exposes an API to publish, delete, and update SOAP STS instances by calling methods that perform an HTTP POST operation on the `soap-sts-publish/publish` endpoint.
+
+SoapSTSInstanceConfigFactory::
+The sample `SoapSTSInstancePublisher` class calls the `SoapSTSInstanceConfigFactory` class to create a `SoapSTSInstanceConfig` instance. `SoapSTSInstanceConfig` objects encapsulate all the configuration information of a SOAP STS instance, and emit JSON values that you can post to the `soap-sts-publish/publish` endpoint to publish a REST STS instance.
+
+SoapSTSServerCryptoState::
+The sample `SoapSTSServerCryptoState` class specifies the configuration for the keystore used by a SOAP STS instance. The class provides a programmatic method for setting configuration properties—the same configuration properties available through the OpenAM console under Realms > __Realm Name__ > STS > Soap Keystore Configuration.
+
+STSPublishContext::
+The sample `STSPublishContext` class specifies the configuration necessary to publish REST and SOAP STS instances. The class provides a programmatic method for setting configuration properties—the same configuration properties available through the OpenAM console under Realms > __Realm Name__ > STS.
+
+--
+
+[IMPORTANT]
+====
+The sample code referenced in this section is __not__ compilable, because it uses classes that are not available publicly. The code provides patterns to developers familiar with the problem domain and is intended only to assist developers who want to programmatically publish SOAP STS instances.
+
+The sample code imports a number of classes, introducing dependencies. Classes imported from the OpenAM client SDK and the SOAP STS client SDK can remain in your code, but other imported classes must be removed and replaced with code that provides similar functionality in your environment. For example, the `SoapSTSInstanceConfigFactory` class uses a constant named `CommonConstants.DEFAULT_CERT_MODULE_NAME` from the imported `com.forgerock.openam.functionaltest.sts.frmwk.common.CommonConstants` utility class. This utility class is not publicly available. Therefore, you need to replace this constant with another construct.
+
+The critical part of the sample code is the idioms that programmatically set all the state necessary to publish a SOAP STS instance.
+====
+
+
+
+[#sts-consume]
+=== Consuming STS Instances
+
+Once REST and SOAP STS instance endpoints have been exposed, they are available for use to consumers as follows:
+
+* Developers access REST STS instances by making REST API calls that support token transformations.
+
+* Developers access SOAP STS instances by sending SOAP messages or by using the SOAP STS client SDK. OpenAM's SOAP STS is link:http://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html[WS-Trust 1.4, window=\_blank] compliant.
+
+
+[#sts-consume-rest]
+==== Consuming REST STS Instances
+
+You consume a REST STS instance by sending REST API calls to the instance's endpoint.
+
+[#sts-consume-rest-endpoint]
+===== REST STS Instance Endpoint
+
+REST STS instances' endpoints comprise the following parts:
+
+* The OpenAM context
+
+* The string `rest-sts`
+
+* The realm in which the REST STS instance is configured
+
+* The deployment URL element, which is one of the configuration properties of an STS instance
+
+For example, a REST STS instance configured in the realm `myRealm` with the deployment URL element `username-transformer` exposes the endpoint `/rest-sts/myRealm/username-transformer`.
+
+
+[#sts-consume-json-payload]
+===== JSON Representation of Token Transformations
+
+Token transformations are represented in JSON as follows:
+
+[source, console]
+----
+{
+  "input_token_state": {
+    "token_type": "INPUT_TOKEN_TYPE"
+    ... INPUT_TOKEN_TYPE_PROPERTIES ...
+  },
+  "output_token_state": {
+    "token_type": "OUTPUT_TOKEN_TYPE"
+    ... OUTPUT_TOKEN_TYPE_PROPERTIES ...
+  }
+}
+----
+REST STS supports the following token types and properties:
+
+* Input token types:
++
+
+** `USERNAME`
++
+Requires the `username` and `password` properties.
+
+** `OPENAM`
++
+Requires the `session_id` property, with an SSO token as its value.
+
+** `X509`
++
+No properties are required, because input X.509 tokens are presented either in HTTP headers or by using TLS. For more information about X.509 tokens, see the configuration details for the Authentication Target Mappings and Client Certificate Header Key properties in xref:../admin-guide/chap-sts.adoc#sts-configure-rest-properties["REST STS Configuration Properties"] in the __Administration Guide__.
+
+** `OPENIDCONNECT`
++
+Requires the `oidc_id_token` property, with the OpenID Connect token as its value.
+
+
+* Output token types:
++
+
+** `SAML2`
++
+Requires the `subject_confirmation` property, the value of which determines the `<saml:ConfirmationMethod>` element for the generated SAML v2.0 assertion. Valid values are `BEARER`, `SENDER_VOUCHES`, and `HOLDER_OF_KEY`.
++
+When generating an assertion with a holder-of-key subject confirmation method, the `proof_token_state` property is required. The value for this property is an object that contains the `base64EncodedCertificate` property.
+
+** `OPENIDCONNECT`
++
+Requires the `nonce` and `allow_access` properties.
+
+
+The following are examples of JSON payloads that define REST STS token transformations:
+
+. Transform a username token to a SAML v2.0 token with the bearer subject confirmation method:
++
+
+[source, console]
+----
+{
+  "input_token_state": {
+    "token_type": "USERNAME",
+    "username": "demo",
+    "password": "changeit"
+  },
+  "output_token_state": {
+    "token_type": "SAML2",
+    "subject_confirmation": "BEARER"
+  }
+}
+----
+
+. Transform an X.509 token to a SAML v2.0 token with the sender vouches subject confirmation method:
++
+
+[source, console]
+----
+{
+  "input_token_state": {
+    "token_type": "X509"
+  },
+  "output_token_state": {
+    "token_type": "SAML2",
+    "subject_confirmation": "SENDER_VOUCHES"
+  }
+}
+----
+
+. Transform an OpenID Connect token to a SAML v2.0 token with the holder-of-key subject confirmation method:
++
+
+[source, console]
+----
+{
+  "input_token_state": {
+    "token_type": "OPENIDCONNECT",
+    "oidc_id_token": "eyAiYWxQ.euTNnNDExNTkyMjEyIH0.kuNlKwyvZJqaC8EYpDyPJMiEcII"
+  },
+  "output_token_state": {
+    "token_type": "SAML2",
+    "subject_confirmation": "HOLDER_OF_KEY",
+    "proof_token_state": {
+      "base64EncodedCertificate": "MIMbFAAOBjQAwgYkCgYEArSQ...c/U75GB2AtKhbGS5pimrW0Y0Q=="
+     }
+  }
+}
+----
+
+. Transform an OpenAM SSO token to an OpenID Connect token:
++
+
+[source, console]
+----
+{
+  "input_token_state": {
+    "token_type": "OPENAM",
+    "session_id": "AQIC5wM2...TMQAA*"
+  },
+  "output_token_state": {
+    "token_type": "OPENIDCONNECT",
+    "nonce": "471564333",
+    "allow_access": true
+  }
+}
+----
+
+For more examples of JSON payloads that you can send to REST STS instances, see the comments in the sample code in xref:#sts-consume-rest-programmatic["Java Example"].
+
+
+[#sts-consume-rest-cli]
+===== Command-Line Example
+
+You can use the `curl` command to quickly verify that a published REST STS instance operates as expected.
+
+For example, if you publish a REST instance with a deployment URL element `usernmame-transformer` that supports username to SAML v2.0 bearer assertion token transformation, you can perform an HTTP POST to the `/rest-sts/username-transformer` endpoint, setting the `_action` parameter to `translate` as follows:
+
+[source]
+----
+$ curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "input_token_state": {
+        "token_type": "USERNAME",
+        "username": "demo",
+        "password": "changeit"
+    },
+    "output_token_state": {
+        "token_type": "SAML2",
+        "subject_confirmation": "BEARER"
+    }
+ }' \
+ https://openam.example.com:8443/openam/rest-sts/username-transformer?_action=translate
+ {
+  "issued_token":
+     "<saml:Assertion
+       xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\"
+       Version=\"2.0\"
+       ID=\"s2c51ebd0ad10aae44fb76e4b400164497c63b4ce6\"
+       IssueInstant=\"2016-03-02T00:14:47Z\">\n
+       <saml:Issuer>saml2-issuer</saml:Issuer>
+       <saml:Subject>\n
+        <saml:NameID
+         Format=\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\">demo
+        </saml:NameID>
+        <saml:SubjectConfirmation
+         Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">\n
+         <saml:SubjectConfirmationData
+          NotOnOrAfter=\"2016-03-02T00:24:47Z\" >
+         </saml:SubjectConfirmationData>
+        </saml:SubjectConfirmation>\n
+       </saml:Subject>
+       <saml:Conditions
+        NotBefore=\"2016-03-02T00:14:47Z\"
+        NotOnOrAfter=\"2016-03-02T00:24:47Z\">\n
+        <saml:AudienceRestriction>\n
+         <saml:Audience>saml2-issuer-entity</saml:Audience>\n
+        </saml:AudienceRestriction>\n</saml:Conditions>\n
+        <saml:AuthnStatement
+         AuthnInstant=\"2016-03-02T00:14:47Z\">
+         <saml:AuthnContext>
+          <saml:AuthnContextClassRef>
+           urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+          </saml:AuthnContextClassRef>
+         </saml:AuthnContext>
+        </saml:AuthnStatement>
+       </saml:Assertion>\n"
+}
+----
+The `iPlanetDirectoryPro` header is required and should contain the SSO token of an administrative user, such as `amAdmin`, who has access to perform the operation.
+
+
+[#sts-consume-rest-programmatic]
+===== Java Example
+
+The `RestSTSConsumer.java` sample code provides an example of how to consume a published REST STS instance programmatically. Tailor this example as required to provide programmatic consumption of your own REST STS instances. To access the sample code, see xref:#sts-access-example-code["To Access the STS Example Code"].
+
+[IMPORTANT]
+====
+The sample code referenced in this section is __not__ compilable, because it uses classes that are not available publicly. The code provides patterns to developers familiar with the problem domain and is intended only to assist developers who want to programmatically consume REST STS instances.
+====
+
+
+
+[#sts-consume-soap]
+==== Consuming SOAP STS Instances
+
+You consume a SOAP STS instance by sending it SOAP messages to the instance's endpoint, or by calling it using the OpenAM SOAP STS client SDK.
+
+[#sts-consume-soap-endpoint]
+===== SOAP STS Instance URL
+
+SOAP STS instances' URLs comprise the following parts:
+
+* The SOAP STS deployment context
+
+* The string `sts`
+
+* The realm in which the REST STS instance is configured
+
+* The deployment URL element, which is one of the configuration properties of an STS instance
+
+The SOAP STS deployment context comprises the base URL of the web container to which the SOAP STS `.war` file is deployed and the deployment web application name. For more information about SOAP STS deployments, see xref:../admin-guide/chap-sts.adoc#sts-deploy-soap-sts-deploy-war["Deploying the SOAP STS Instance to a Web Container"] in the __Administration Guide__.
+
+For example, a SOAP STS instance configured in the realm `myRealm` with the deployment URL element `soap-username-transformer` and the a deployment web application name `openam-soap-sts` would expose a URL similar to `\https://soap-sts-host.com:8443/openam-soap-sts/sts/myRealm/soap-username-transformer`.
+
+The WSDL for the service would be available at `\https://soap-sts-host.com:8443/openam-soap-sts/sts/myRealm/soap-username-transformer?wsdl`.
+
+
+[#sts-consume-soap-messages]
+===== Consuming SOAP STS Instances Using SOAP Messages
+
+Because an OpenAM SOAP STS instance is a WS-Trust 1.4-compliant security token service, users can consume the instance by sending it standard WS-Trust 1.4 SOAP STS framework messages, such as `RequestSecurityToken` messages, passed as the payload to WSDL ports that are implemented by the security token services.
+
+For more information about WS-Trust 1.4 security token services, see the link:http://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html[WS-Trust 1.4 specification, window=\_blank].
+
+
+[#sts-consume-soap-client-sdk]
+===== Consuming SOAP STS Instances Using the OpenAM SOAP STS Client SDK
+
+You can consume an OpenAM SOAP STS instance by calling it using the OpenAM SOAP STS client SDK.
+
+[#sts-consume-soap-client-sdk-about]
+====== About the SOAP STS Client SDK
+
+The SOAP STS client SDK is based on classes in link:http://cxf.apache.org[Apache CXF, window=\_blank], an open source service framework. Apache CXF provides the link:http://cxf.apache.org/javadoc/latest[org.apache.cxf.ws.security.trust.STSClient, window=\_blank] class, which encapsulates consumption of a SOAP STS service. However, using this class requires considerable expertise.
+
+The SOAP STS client SDK makes it easier to consume OpenAM SOAP STS instances than using Apache CXF for the following reasons:
+
+* The `org.forgerock.openam.sts.soap.SoapSTSConsumer` class in the OpenAM SOAP STS client SDK wraps the Apache CXF class `org.apache.cxf.ws.security.trust.STSClient`, providing a higher level of abstraction that makes consumption of SOAP STS instances easier to achieve.
+
+* The `SoapSTSConsumer` class' `issueToken`, `validateToken`, and `cancelToken` methods provide the three fundamental operations exposed by SOAP STS instances. Supporting classes facilitate the creation of state necessary to invoke these methods.
+
+* Classes in the SDK provide logic to allow OpenAM session tokens to be presented in order to satisfy the security policy bindings that mandate OpenAM sessions as supporting tokens. The STS client obtains secret password state—keystore entry passwords and aliases, username token credential information, and so forth—from a callback handler. The `SoapSTSConsumerCallbackHandler` class provides the means to create a callback handler initialized with state that will be encountered when consuming SOAP STS instances. The `SoapSTSConsumerCallbackHandler` instance can be passed to an STS client. The `TokenSpecification` class provides a way to create the varying token state necessary to obtain specific tokens and create any necessary supporting state.
+
+You can use the classes in the SOAP STS client SDK as is, or you can tailor them to your needs. For more information about the SOAP STS client SDK classes, see the source code and the Javadoc.
+
+
+[#sts-consume-soap-client-sdk-build]
+====== Building a SOAP STS Client SDK .jar File
+
+The SOAP STS client SDK is not part of the OpenAM client SDK. footnote:d15472e21342[The SOAP STS client SDK has a dependency on Apache CXF classes, which is not present in the OpenAM client SDK. Therefore, the two SDKs are not bundled together.] To use the SOAP STS client SDK, you must compile the source code for the SOAP STS client SDK and create a `.jar` file.
+
+[#sts-consume-soap-client-sdk-build-procedure]
+.To Build the SOAP STS Client SDK
+====
+
+. Download the OpenAM source code.
+
+. Change to the `openam-sts/openam-soap-sts` directory.
+
+. Run the `mvn install` command.
+
+. Locate the `openam-soap-sts-client-13.5.2-15.jar` file in the `openam-sts/openam-soap-sts/openam-soap-sts-client/target` directory.
+
+====
+
+
+
+
+
+[#sts-query-validate-cancel]
+=== Querying, Validating, and Canceling Tokens
+
+Both REST and SOAP STS instances support __token persistence__, which is the ability to store tokens issued for the STS instance in the Core Token Service (CTS). You enable token persistence for both REST and SOAP STS instances' configuration under Realms > __Realm Name__ > STS > __STS Instance Name__ > General Configuration > Persist Issued Tokens in Core Token Store. Tokens are saved in the CTS for the duration of the token lifetime, which is a configuration property for STS-issued SAML v2.0 and OpenID Connect tokens. Tokens with expired durations are periodically removed from the CTS.
+
+With token persistence enabled for an STS instance, OpenAM provides the ability to query, validate, and cancel tokens issued for the instance:
+
+* __Querying tokens__ means listing tokens issued for an STS instance or for a user.
+
+* __Validating a token__ means verifying that the token is still present in the CTS.
+
+* __Cancelling a token__ means removing the token from the CTS.
+
+
+[#sts-query-validate-cancel-sts-tokengen]
+==== Invoking the sts-tokengen Endpoint
+
+The `sts-tokengen` endpoint provides administrators with the ability to query and cancel tokens issued __for both REST and SOAP STS instances__ using REST API calls.
+
+When using the `sts-tokengen` endpoint, be sure to provide the token ID for an OpenAM administrator, such as `amadmin`, as the value of a header whose name is the name of the SSO token cookie, by default `iPlanetDirectoryPro`.
+
+[#sts-query-validate-cancel-sts-tokengen-query]
+===== Querying Tokens
+
+List tokens issued for an STS instance by using the `queryFilter` action in an HTTP GET call to the `sts-tokengen` endpoint with the `/sts-id` argument.
+
+The following example lists all the tokens issued for the `username-transformer` STS instance. The results show that OpenAM has issued two OpenID Connect tokens for the `demo` user for the `username-transformer` STS instance:
+
+[source, json]
+----
+$ curl \
+ --request GET \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/sts-tokengen\
+     ?_queryFilter=\/sts_id+eq+\'username-transformer'\
+ {
+  "result":[
+    {
+      "_id":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+      "_rev":"",
+      "token_id":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+      "sts_id":"username-transformer",
+      "principal_name":"demo",
+      "token_type":"OPENIDCONNECT",
+      "expiration_time":1459376096
+    },
+    {
+      "_id":"7CB70009970D1AAFF177AC2A08D58405EDC35DF5",
+      "_rev":"",
+      "token_id":"7CB70009970D1AAFF177AC2A08D58405EDC35DF5",
+      "sts_id":"username-transformer",
+      "principal_name":"demo",
+      "token_type":"OPENIDCONNECT",
+      "expiration_time":1459376098
+   }
+ ],
+ "resultCount":2,
+ "pagedResultsCookie":null,
+ "totalPagedResultsPolicy":"NONE",
+ "totalPagedResults":-1,
+ "remainingPagedResults":-1
+}
+----
+List tokens issued for a particular user with the `queryFilter` action in an HTTP GET call to the `sts-tokengen` endpoint with the `/token-principal` argument.
+
+The following example lists all the tokens issued for the `demo` user. The results show that OpenAM has issued two OpenID Connect tokens:
+
+[source, json]
+----
+$ curl \
+ --request GET \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/sts-tokengen\
+     ?_queryFilter=\/token_principal+eq+\'demo'\
+ {
+  "result":[
+    {
+      "_id":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+      "_rev":"",
+      "token_id":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+      "sts_id":"username-transformer",
+      "principal_name":"demo",
+      "token_type":"OPENIDCONNECT",
+      "expiration_time":1459376096
+    },
+    {
+      "_id":"7CB70009970D1AAFF177AC2A08D58405EDC35DF5",
+      "_rev":"",
+      "token_id":"7CB70009970D1AAFF177AC2A08D58405EDC35DF5",
+      "sts_id":"username-transformer",
+      "principal_name":"demo",
+      "token_type":"OPENIDCONNECT",
+      "expiration_time":1459376098
+   }
+ ],
+ "resultCount":2,
+ "pagedResultsCookie":null,
+ "totalPagedResultsPolicy":"NONE",
+ "totalPagedResults":-1,
+ "remainingPagedResults":-1
+}
+----
+
+
+[#sts-query-validate-cancel-sts-tokengen-cancel]
+===== Cancelling Tokens
+
+Cancel tokens by making an HTTP DELETE call to the `sts-tokengen`/__token_id__ endpoint:
+
+[source, console]
+----
+$ curl \
+ --request DELETE \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/sts-tokengen/B663D248CE4C3B63A7422000B03B8F5E0F8E443B
+{
+ "_id":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+ "_rev":"B663D248CE4C3B63A7422000B03B8F5E0F8E443B",
+ "result":"token with id B663D248CE4C3B63A7422000B03B8F5E0F8E443B successfully removed."
+}
+----
+
+
+
+[#query-validate-cancel-rest-sts-instance]
+==== Validating and Cancelling Tokens by Invoking a REST STS Instance
+
+REST STS users can validate and cancel tokens by making an HTTP POST call to a REST STS instance's endpoint.
+
+To validate a token, use the `validate` action. The following example validates an OpenID Connect token previously issued by the `username-transformer` REST STS instance:
+
+[source, console]
+----
+$ curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "validated_token_state": {
+        "token_type": "OPENIDCONNECT",
+        "oidc_id_token": "eyAidHlwIjogIkpXVCIsIC..."
+    }
+ }' \
+ https://openam.example.com:8443/openam/rest-sts/username-transformer?_action=validate
+{
+ "token_valid":true
+}
+----
+To cancel a token, use the `cancel` action. The following example cancels an OpenID Connect token previously issued by the `username-transformer` REST STS instance:
+
+[source, console]
+----
+$ curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "cancelled_token_state": {
+        "token_type": "OPENIDCONNECT",
+        "oidc_id_token": "eyAidHlwIjogIkpXVCIsIC..."
+    }
+ }' \
+ https://openam.example.com:8443/openam/rest-sts/username-transformer?_action=cancel
+{
+ "result":"OPENIDCONNECT token cancelled successfully."
+}
+----
+
+
+[#query-validate-cancel-soap-sts-instance]
+==== Validating and Cancelling Tokens by Invoking a SOAP STS Instance
+
+The source code for the `validateToken` and `cancelToken` methods in the `org.forgerock.openam.sts.soap.SoapSTSConsumer` class provides information needed to construct WS-Trust 1.4-compliant calls for validating and cancelling tokens.
+
+Locate the `org.forgerock.openam.sts.soap.SoapSTSConsumer` class under `openam-sts/openam-soap-sts/openam-soap-sts-client` in the OpenAM source code.
+
+
+
+[#sts-custom-token-types]
+=== Extending STS to Support Custom Token Types
+
+OpenAM supports token transformations to and from a variety of token types, including username, SAML v2.0, OpenID Connect, and X.509. In addition to these supported token types, REST STS instances can use custom token types as the input or output token, or both, in a token transformation. When you configure a REST STS instance to support a token transformation that takes a custom token type, you can also configure a custom validator and provider class for the custom token type. OpenAM uses custom validator classes to validate custom tokens and custom provider classes to produce custom tokens.
+
+Specify custom token validator and provider classes in the OpenAM console by configuring the Custom Token Validators and Custom Token Providers properties under Realms > __Realm Name__ > STS > __REST STS Instance Name__.
+
+A custom validator class can be used in transformations that produce standard STS output tokens, such as SAML v2.0 tokens or OpenID Connect tokens, and in transformations that produce custom output token types.
+
+A custom provider class can be used in token transformations that take standard STS input tokens, such as username tokens or OpenAM SSO tokens, and in transformations that take custom input token types.
+
+Before a REST STS instance can use a custom token type validator or provider class, you must bundle the class into the OpenAM `.war` file and restart OpenAM.
+
+OpenAM invokes a single instance of a validator or provider class to run all concurrently dispatched token transformations that use the custom token type. Because there is only a single instance of the class, you must code custom validator and provider classes to be thread-safe.
+
+[#sts-consume-rest-custom-validator]
+==== Developing Custom Token Type Validator Classes
+
+To create a custom token type validator class, implement the `org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidator` class.
+
+Custom token type validator classes implement the `validateToken` method. This method takes a `RestTokenValidatorParameters` object as input. Note that the generic type of `RestTokenValidatorParameters` is `org.forgerock.json.fluent.JsonValue`. As a result of using this type, custom validator classes can access the JSON representation of the input token passed to the REST STS instance in the `input_token_state` JSON key.
+
+The `validateToken` method returns an `org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorResult` object. At a minimum, this object contains the OpenAM SSO token corresponding to the validated principal. It can also contain additional information specified as a JSON value, allowing a custom validator to pass extra state to a custom provider in a token transformation.
+
+
+[#sts-consume-rest-custom-provider]
+==== Developing Custom Token Type Provider Classes
+
+To create a custom token type provider class, implement the `org.forgerock.openam.sts.rest.token.provider.RestTokenProvider` class.
+
+Custom token type provider classes implement the `createToken` method. This method takes an `org.forgerock.openam.sts.rest.token.provider.CustomRestTokenProviderParameters` object as input. This object gives the custom provider access to the following information:
+
+* The principal returned by the `RestTokenTransformValidator`
+
+* The OpenAM SSO token corresponding to the validated principal
+
+* Any additional state returned in the `RestTokenValidatorResult` object
+
+* The type of input token validated by the `RestTokenTransformValidator` in the token transformation
+
+* The `JsonValue` corresponding to this validated token, as specified by the `input_token_state` object in the transformation request
+
+* The `JsonValue` corresponding to the `token_output_state` object specified in the token transformation request (which can provide additional information pertinent to the creation of the output token)
+
+The `createToken` method returns a string representation of the custom token in a format that can be transmitted across HTTP in JSON. It should be base64-encoded if binary.
+
+
+[#sts-consume-rest-custom-using]
+==== Using Custom Token Type Validators and Providers
+
+This section provides an example of how to use custom token type validators and providers.
+
+The example assumes that you already configured a token transformation by completing the following tasks:
+
+* Implementing the `RestTokenTransformValidator` interface to create a custom token type validator
+
+* Implementing the `RestTokenProvider` interface to create a custom token type provider
+
+* Bundling the two classes into the OpenAM `.war` file
+
+* Restarting OpenAM
+
+* Publishing a REST STS instance with a custom token type named `CUSTOM`, specifying the custom validator and provider classes in the instance's configuration
+
+To transform a `CUSTOM` token to an OpenID Connect token, you might specify a JSON payload similar to the following:
+
+[source, javascript]
+----
+{
+    "input_token_state":
+        {
+            "token_type": "CUSTOM",
+            "extra_stuff": "very_useful_state"
+        },
+    "output_token_state":
+        {
+            "token_type": "OPENIDCONNECT",
+            "nonce": "1234",
+            "allow_access": true
+        }
+}
+----
+With the preceding JSON payload, OpenAM passes a `JsonValue` instance to the `validateToken` method of the custom token type validator class as follows:
+
+[source, javascript]
+----
+{
+    "token_type": "CUSTOM",
+    "extra_stuff": "very_useful_state"
+}
+----
+To transform a username token to a `CUSTOM` token, you might specify a JSON payload similar to the following:
+
+[source, javascript]
+----
+{
+    "input_token_state":
+        {
+            "token_type": "USERNAME",
+            "username": "unt_user17458687",
+            "password": "password"
+        },
+    "output_token_state":
+        {
+            "token_type": "CUSTOM",
+            "extra_stuff_for_custom": "some_useful_information"
+        }
+}
+----
+With the preceding JSON payload, OpenAM passes the following information to the `createToken` method of the custom token type provider:
+
+* The principal returned by the `USERNAME` token validator: `unt_user17458687`.
+
+* The OpenAM SSO token corresponding to this authenticated principal.
+
+* Additional state returned by the token validator, if any. Because the `USERNAME` token validator does not return any additional state, the additional state for this example would be null.
+
+* The input token type: `CUSTOM`
+
+* A `JsonValue` representation of the following:
++
+
+[source, javascript]
+----
+{
+    "token_type": "USERNAME",
+    "username": "unt_user17458687",
+    "password": "password"
+}
+----
++
+
+* A `JsonValue` representation of the following:
++
+
+[source, javascript]
+----
+{
+    "token_type": "CUSTOM",
+    "extra_stuff_for_custom": "some_useful_information"
+}
+----
++
+
+To transform a `CUSTOM` token to a `CUSTOM` token, you might specify a JSON payload similar to the following:
+
+[source, javascript]
+----
+{
+    "input_token_state":
+        {
+            "token_type": "CUSTOM",
+            "extra_stuff": "very_useful_state"
+        },
+    "output_token_state":
+        {
+            "token_type": "CUSTOM",
+            "extra_stuff_for_custom": "some_useful_information"
+        }
+}
+----
+The input to the custom validator and provider would be similar to the preceding examples, with the possible addition of any additional state that the custom validator returned from the `validateToken` method.
+
+
+

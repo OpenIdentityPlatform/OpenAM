@@ -1,0 +1,177 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-upgrade-components]
+== Upgrading OpenAM Components
+
+This chapter is concerned with upgrades for policy agents, OpenAM tools, and services.
+
+* xref:#upgrade-web-policy-agents["To Upgrade Web Policy Agents"]
+
+* xref:#upgrade-java-ee-policy-agents["To Upgrade Java EE Policy Agents"]
+
+* xref:#upgrade-tools["To Upgrade OpenAM Tools"]
+
+* xref:#upgrade-elliptic-curve-algorithms[" To Upgrade to Elliptical Curve Signature Algorithms for Stateless Sessions and OpenID Connect "]
+
+* xref:#upgrade-user-services["To Upgrade User Self Services"]
+
+
+[#upgrade-web-policy-agents]
+.To Upgrade Web Policy Agents
+====
+
+. Back up the policy agent installation and configuration directories.
++
+Also back up the configuration if it is stored centrally in OpenAM.
+
+. Redirect client traffic away from the protected application.
+
+. Stop the web server where the policy agent is installed.
+
+. Remove the old policy agent as described in the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[OpenAM Web Policy Agent User's Guide, window=\_blank].
++
+If the uninstallation process has changed, refer to the version of the __Web Policy Agent Installation Guide__ that corresponds to your web policy agent.
+
+. Install the new policy agent using the existing configuration.
+
+. Start the web server where the policy agent is installed.
++
+For new features, the policy agent uses the default configuration until you make changes.
+
+. Validate that the policy agent is performing as expected.
+
+. Allow client traffic to flow to the protected application.
+
+====
+
+[#upgrade-java-ee-policy-agents]
+.To Upgrade Java EE Policy Agents
+====
+
+. Back up the policy agent installation and configuration directories.
++
+Also back up the configuration if it is stored centrally in OpenAM.
+
+. Redirect client traffic away from the protected application.
+
+. Uninstall the old policy agent.
+
+. Install the new policy agent.
++
+For new features, the policy agent uses the default configuration until you make changes.
+
+. Validate that the policy agent is performing as expected.
+
+. Allow client traffic to flow to the protected application.
+
+====
+
+[#upgrade-tools]
+.To Upgrade OpenAM Tools
+====
+Since OpenAM 10.1, the session tools are no longer needed. Upgrading other tools consists of installing new tools and customizing tools scripts as necessary.
+
+. Install new versions of the tools.
+
+. Apply any customizations you made to the scripts, referring to the old tools installation as necessary.
+
+. Once the new tools are working, you can delete the old tools.
+
+====
+
+[#upgrade-elliptic-curve-algorithms]
+.To Upgrade to Elliptical Curve Signature Algorithms for Stateless Sessions and OpenID Connect
+====
+OpenAM supports Elliptic Curve Digital Signature Algorithms (ECDSA) for stateless sessions and OpenID Connect in OpenAM 13.5 or later.
+
+. Generate the public and private keys to use with the ECDSA algorithms using the standard curves parameters using `keytool` and configure stateless session to use ECDSA algorithms as shown in xref:../admin-guide/chap-session-state.adoc#session-state-configure-ecdsa-signing["Configuring Elliptic Curve Digital Signature Algorithms"] in the __Administration Guide__.
+
+. Manually add the ECDSA algorithms to OpenAM's OAuth2 provider as follows:
++
+
+.. On the OpenAM console, navigate to Configure > Global Services > OAuth2 Provider, and scroll down to ID Token Signing Algorithms supported.
+
+.. In the New Value field, select `ES256`. Repeat the step to add `ES384` and `ES512`, respectively.
+
+.. For Token Signing Algorithm, select an ECDSA algorithm, such as ES256.
+
+.. In the Token Signing RSA/ECDSA public/private key pair field, enter the alias of the ECDSA signing key in the keystore.
+
+.. Click Save.
+
+
+. Update the OpenID Connect Client as follows:
++
+
+.. On the Top Level Realm, click Agents, and then click OAuth 2.0/OpenID Connect Client.
+
+.. In the Agent box, select an existing OIDC client.
+
+.. In the ID Token Signed Response Algorithm field, enter the ECDSA algorithm. For example, `ES256`, `ES384`, or `ES512`.
+
+.. Click Save.
+
+
+====
+
+[#upgrade-user-services]
+.To Upgrade User Self Services
+====
+OpenAM 13.5 has an improved key management system that allows the user self-service feature to successfully operate in a multi-instance server deployment behind a load balancer. This key management system requires a JCEKS keystore that supports asymmetric and symmetric keys.
+
+To help you decide whether to enable a JCEKS keystore after upgrading to OpenAM 13.5, see the following table:
+
+[#self-services_upgrade]
+.User Self Service Feature Upgrade
+[cols="50%,50%"]
+|===
+|Upgrading from: |Enabling JCEKS required? 
+
+a|Versions prior to OpenAM 13.0
+a|No
+
+a|OpenAM 13.0 with the REST-based user self-service feature disabled
+a|No
+
+a|OpenAM 13.0 with the legacy user self-service feature enabled
+a|No
+
+a|OpenAM 13.0 with the REST-based user self-service feature enabled
+a|__Yes__
+|===
+The following steps show how to set up the JCEKS keystore for user self-service:
+
+. In the OpenAM console, navigate to Configure > Server Defaults > Security > Key Store.
+
+. Change the Keystore File property to `%BASE_DIR%/%SERVER_URI%/keystore.jceks`.
+
+. Change the Keystore Type property to `JCEKS`.
++
+These properties can also be modified on a per-server basis as required by navigating to Deployment > Servers > __Server Name__ > Security > Key Store.
++
+For more information about inherited properties, see xref:../reference/chap-config-ref.adoc#servers-configuration["Configuring Servers"] in the __Reference__.
+
+. Restart the OpenAM server.
+
+====
+

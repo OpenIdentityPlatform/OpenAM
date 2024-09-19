@@ -1,0 +1,491 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-apache-tomcat]
+== Installing Java EE Agents in Apache Tomcat
+
+This chapter covers installation of the policy agent for Apache Tomcat.
+
+[#before-tomcat-agent-install]
+=== Before You Install
+
+Make sure OpenAM is installed and running, and that you can contact OpenAM from the system running the policy agent. Next, create a profile for your policy agent as described in xref:../jee-users-guide/chap-jee-agent-config.adoc#create-agent-profiles[Creating Agent Profiles]. To protect resources with the agent, create at least one policy as described in link:../../../openam/13/admin-guide/#chap-authz-policy[Configuring Policies, window=\_blank] in the __OpenAM Administration Guide__. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources in order to test your policy agent after installation.
+
+You must install Apache Tomcat before you install the policy agent, and you must stop the server during installation.
+
+All of the Tomcat scripts must be present in `$CATALINA_HOME/bin`. The Tomcat Windows executable installer does not include the scripts, for example. If the scripts are not present in your installation, copy the contents of the `bin` directory from a .zip download of Tomcat of the same version as the one you installed.
+
+You must install a supported version of the Java runtime environment. Set the `JAVA_HOME` environment variable accordingly. The policy agent installer requires Java.
+
+[source, console]
+----
+$ echo $JAVA_HOME
+/path/to/java
+----
+See the OpenAM __Installation Guide__ section, link:../../../openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also verify the checksum of the file you download against the checksum posted on the download page.
+
+Unzip the file in the directory where you plan to install the J2EE policy agent. The agent you install stores its configuration and logs under this directory.
+
+When you unzip the policy agent, you find the following directories under the `j2ee_agents/tomcat_v6_agent` directory.
+
+Despite the directory name, the policy agent supports multiple container versions.
+--
+
+`bin`::
+The installation and configuration program `agentadmin`. For more details about the available command-line tools, see xref:tools-reference.adoc#tools-reference[Command-Line Tool Reference].
+
+`config`::
+Configuration templates used by the `agentadmin` command during installation
+
+`data`::
+Not used
+
+`etc`::
+Configuration templates used during installation
+
+`installer-logs`::
+Location for log files written during installation
+
+`legal-notices`::
+Contains licensing information including third-party licenses
+
+`lib`::
+Shared libraries used by the Java EE policy agent
+
+`locale`::
+Property files used by the installation program
+
+`README`::
+README file containing platform and install information for the agent
+
+--
+The web application deployment descriptor file, `web.xml`, is the basic configuration file for web applications. As such, the specific content of the `web.xml` file depends on the application. Apache Tomcat also provides a global `/path/to/tomcat/conf/web.xml` deployment descriptor, which sets defaults for all deployed applications. When you install the Apache Tomcat policy agent, you should be concerned with `/path/to/tomcat/conf/web.xml`, and also with the `WEB-INF/web.xml` files in each protected application.
+
+
+[#install-tomcat-agent]
+=== Installing the Tomcat Policy Agent
+
+This chapter covers installation of the policy agent for Tomcat.
+
+[#d0e4592]
+.To Create the Agent Profile
+====
+Regardless of whether you store configurations centrally in OpenAM or locally with your agents, the agent requires a profile so that it can connect to and communicate with OpenAM.
+
+. In the OpenAM console, browse to Realms > __Realm Name__ > Agents > J2EE, and then click the New... button in the Agent table.
+
+. Complete the web form using the following hints:
++
+--
+
+Name::
+The name for the agent profile used when you install the agent
+
+Password::
+Password the agent uses to authenticate to OpenAM
+
+Configuration::
+Centralized configurations are stored in the OpenAM configuration store. You can manage the centralized configuration through the OpenAM console. Local configurations are stored in a file alongside the agent.
+
+Server URL::
+The full URL to an OpenAM instance, or if OpenAM is deployed in a site configuration (behind a load balancer) then the site URL
++
+In centralized configuration mode, the Server URL is used to populate the agent profile for services, such as Login, Logout, Naming, and Cross Domain SSO.
+
+Agent URL::
+The URL to the J2EE agent application, such as `\http://www.example.com:8080/agentapp`
++
+In centralized configuration mode, the Agent URL is used to populate the Agent Profile for services, such as notifications.
+
+--
+
+====
+
+[#d0e4644]
+.To Create a Password File
+====
+
+. Create a text file containing only the password specified when creating the agent profile.
++
+UNIX example:
++
+
+[source, console]
+----
+$ echo password > /tmp/pwd.txt
+----
++
+Windows example:
++
+
+[source, console]
+----
+C:\> echo password > pwd.txt
+----
+
+. Protect the password file you create as appropriate for your operating system:
++
+UNIX example:
++
+
+[source, console]
+----
+$ chmod 400 /tmp/pwd.txt
+----
++
+Windows example:
++
+In Windows Explorer, right-click the created password file, for example `pwd.txt`, select Read-Only, and then click OK.
+
+====
+
+[#install-agent-into-tomcat6]
+.To Install the Policy Agent into Tomcat 6
+====
+The steps required for policy agent installation into Tomcat 6 are subtly different from those required for Tomcat 7. For Tomcat 6, you have the option to include a global `web.xml` file during the installation process if you plan to project every application within the container.
+
+. Shut down the Tomcat server where you plan to install the agent:
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/shutdown.sh
+----
+
+. Make sure OpenAM is running.
+
+. Run `agentadmin --install` to install the agent:
++
+
+[source, console]
+----
+$ /path/to/j2ee_agents/tomcat_v6_agent/bin/agentadmin --install --acceptLicense
+----
++
+
+.. When you run the command, you will be prompted to read and accept the software license agreement for the agent installation. You can suppress the license agreement prompt by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
+
+.. Enter the path to the Tomcat configuration folder. For example, `/path/to/apache-tomcat/conf`.
+
+.. Enter the OpenAM URL. For example, `\http://openam.example.com:8080/openam`. The installer attempts to connect with the OpenAM server. If OpenAM is not running, you can continue with the installation.
+
+.. Enter the `$CATALINA_HOME` environment variable specifying the path to the root of the Tomcat server. For example, `/path/to/apache-tomcat/`.
+
+.. For Tomcat 6 Installs Only: you will be prompted if you want the installer to deploy the agent filter in the global `web.xml`. Press Enter to accept the default value of `true` if you want to protect all applications in the container. If you want to protect only a few applications, enter `false`. For this example, accept the default:
++
+
+[source, console]
+----
+Choose yes to deploy the policy agent in the global web.xml file.
+[ ? : Help, < : Back, ! : Exit ]
+Install agent filter in global web.xml ? [true]:
+----
+
+.. Enter the agent URL. For example, `\http://openam.example.com:8080/agentapp`.
+
+.. Enter the agent profile name that you created in OpenAM. For example, `Tomcat Agent`.
+
+.. Enter the path to the password file. For example, `/tmp/pwd.txt`.
+
+
+. Next, review a summary of your responses and select an action to continue, go back a step, start over, or exit from the install:
++
+
+[source, console]
+----
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Tomcat Server Config Directory : /path/to/tomcat/conf
+OpenAM server URL : http://openam.example.com:8080/openam
+$CATALINA_HOME environment variable : /path/to/tomcat
+
+Tomcat global web.xml filter install : true
+Agent URL : http://www.example.com:8080/agentapp
+Agent Profile name : Tomcat Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+Verify your settings above and decide from the choices below.
+1. Continue with Installation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]:
+...
+
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+OpenSSOAgentBootstrap.properties
+Agent Configuration file location
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug
+
+Install log file location:
+/path/to/j2ee_agents/tomcat_v6_agent/installer-logs/audit/install.log
+
+Thank you for using OpenAM Policy Agent
+----
++
+Upon successful completion, the installer adds the agent configuration to the Tomcat configuration, and set up the configuration and log directories for the agent.
++
+
+[NOTE]
+======
+If the agent is in a different domain than the server, refer to the __Administration Guide__ procedure, link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
+======
+
+. Take note of the configuration files and log locations.
++
+Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are thus located under the directory `j2ee_agents/tomcat_v6_agent/Agent_001/`:
++
+--
+
+`config/OpenSSOAgentBootstrap.properties`::
+Used to bootstrap the Java EE policy agent, allowing the agent to connect to OpenAM and download its configuration.
+
+`config/OpenSSOAgentConfiguration.properties`::
+Only used if you configured the Java EE policy agent to use local configuration.
+
+`logs/audit/`::
+Operational audit log directory, only used if remote logging to OpenAM is disabled.
+
+`logs/debug/`::
+Debug directory where the `debug.out` debug file resides. Useful in troubleshooting policy agent issues.
+
+--
+
+. If your policy agent configuration is not in the top-level realm (/), then you must edit config/OpenSSOAgentBootstrap.properties to identify the sub-realm that has your policy agent configuration. Find com.sun.identity.agents.config.organization.name and change the "/" to the path to your policy agent profile. This allows the policy agent to properly identify itself to the OpenAM server.
+
+. Start the Tomcat server where you installed the agent:
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/startup.sh
+----
+
+====
+
+[#install-agent-into-tomcat7]
+.To Install the Policy Agent into Tomcat 7
+====
+The steps required for policy agent installation into Tomcat 7 are subtly different from those required for Tomcat 6. For Tomcat 7, you do not install the global `web.xml` file, but configure the application-specific `WEB-INF/web.xml` file after basic installation is complete. The `agentapp.war` is automatically copied to the Tomcat `webapps` folder. The Tomcat 8 install is identical to the Tomcat 7 installation process:
+
+. Shut down the Tomcat server where you plan to install the agent:
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/shutdown.sh
+----
+
+. Make sure OpenAM is running.
+
+. Run `agentadmin --install` to install the agent:
++
+
+[source, console]
+----
+$ /path/to/j2ee_agents/tomcat_v6_agent/bin/agentadmin --install --acceptLicense
+----
++
+
+.. When you run the command, you will be prompted to read and accept the software license agreement for the agent installation. You can suppress the license agreement prompt by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
+
+.. Enter the path to the Tomcat configuration folder. For example, `/path/to/apache-tomcat/conf`.
+
+.. Enter the OpenAM URL. For example, `\http://openam.example.com:8080/openam`.
+
+.. Enter the `$CATALINA_HOME` environment variable specifying the path to the root of the Tomcat server. For example, `/path/to/apache-tomcat/`.
+
+.. Enter the agent URL. For example, `\http://openam.example.com:8080/agentapp`.
+
+.. Enter the agent profile name that you created in OpenAM. For example, `Tomcat Agent`.
+
+.. Enter the path to the password file. For example, `/tmp/pwd.txt`.
+
+
+. Next, review a summary of your responses and select an action to continue, go back a step, start over, or exit from the install:
++
+
+[source, console]
+----
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Tomcat Server Config Directory : /path/to/tomcat/conf
+OpenAM server URL : http://openam.example.com:8080/openam
+$CATALINA_HOME environment variable : /path/to/tomcat
+
+Tomcat global web.xml filter install : false
+Agent URL : http://www.example.com:8080/agentapp
+Agent Profile name : Tomcat Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+Verify your settings above and decide from the choices below.
+1. Continue with Installation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]:
+...
+
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+OpenSSOAgentBootstrap.properties
+Agent Configuration file location
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug
+
+Install log file location:
+/path/to/j2ee_agents/tomcat_v6_agent/installer-logs/audit/install.log
+
+Thank you for using OpenAM Policy Agent
+----
++
+Upon successful completion, the installer adds the agent configuration to the Tomcat configuration, and also set up the configuration and log directories for the agent.
++
+
+[NOTE]
+======
+If the agent is in a different domain than the server, refer to the __Administration Guide__ procedure, link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
+======
+
+. Take note of the configuration files and log locations.
++
+Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are thus located under the directory `j2ee_agents/tomcat_v6_agent/Agent_001/`:
++
+--
+
+`config/OpenSSOAgentBootstrap.properties`::
+Used to bootstrap the Java EE policy agent, allowing the agent to connect to OpenAM and download its configuration.
+
+`config/OpenSSOAgentConfiguration.properties`::
+Only used if you configured the Java EE policy agent to use local configuration.
+
+`logs/audit/`::
+Operational audit log directory, only used if remote logging to OpenAM is disabled.
+
+`logs/debug/`::
+Debug directory where the `debug.out` debug file resides. Useful in troubleshooting policy agent issues.
+
+--
+
+. If your policy agent configuration is not in the top-level realm (/), then you must edit config/OpenSSOAgentBootstrap.properties to identify the sub-realm that has your policy agent configuration. Find com.sun.identity.agents.config.organization.name and change the "/" to the path to your policy agent profile. This allows the policy agent to properly identify itself to the OpenAM server.
+
+. If you want to protect all applications in the container, you must add a filter manually for each protected application's `WEB-INF/web.xml` deployment descriptor file, following the opening <web-app> tag. Make sure that the agent filter is first in the filter chain:
++
+
+[source, xml]
+----
+<filter>
+ <filter-name>Agent</filter-name>
+ <display-name>Agent</display-name>
+ <description>OpenAM Policy Agent Filter</description>
+ <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
+</filter>
+<filter-mapping>
+ <filter-name>Agent</filter-name>
+ <url-pattern>/*</url-pattern>
+ <dispatcher>REQUEST</dispatcher>
+ <dispatcher>INCLUDE</dispatcher>
+ <dispatcher>FORWARD</dispatcher>
+ <dispatcher>ERROR</dispatcher>
+</filter-mapping>
+----
+
+. Start the Tomcat server where you installed the agent:
++
+
+[source, console]
+----
+$ /path/to/tomcat/bin/startup.sh
+----
+
+====
+
+[#check-tomcat-agent-installation]
+.To Check the Policy Agent Installation
+====
+
+. Check the Tomcat server log after you start the server to make sure startup completed successfully:
++
+
+[source, console]
+----
+$ tail -n 1 /path/to/tomcat/logs/catalina.out
+INFO: Server startup in 810 ms
+----
+
+. Check the `debug.out` debug log to verify that the agent did start up:
++
+
+[source, console]
+----
+$ tail -n 7 /path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug/debug.out
+=======================================
+Version: ...
+Revision: 3111
+Build Date: 20120915
+Build Machine: builds.forgerock.org
+=======================================
+----
+
+. (Optional) If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM then redirects you back to the resource you tried to access.
+
+====
+
+
+[#silent-tomcat-agent-installation]
+=== Silent Tomcat Policy Agent Installation
+
+When performing a scripted, silent installation, use `agentadmin --install --saveResponse response-file` to create a response file for scripted installation. Then install silently using `agentadmin --install --acceptLicense --useResponse response-file`.
+
+
+[#uninstall-tomcat-agent]
+=== Remove Tomcat Policy Agent Software
+
+Shut down the Tomcat server before you uninstall the policy agent:
+
+[source, console]
+----
+$ /path/to/tomcat/bin/shutdown.sh
+----
+To remove the Java EE policy agent, use `agentadmin --uninstall`. You must provide the Tomcat server configuration directory location.
+
+Uninstall does not remove the agent instance directory, but you can do so manually after removing the agent configuration from Tomcat.
+
+

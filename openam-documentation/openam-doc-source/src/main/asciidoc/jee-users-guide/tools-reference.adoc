@@ -1,0 +1,173 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#tools-reference]
+== Command-Line Tool Reference
+
+[#agentadmin]
+=== agentadmin — manage OpenAM Java EE policy agent installation
+
+==== Synopsis
+`agentadmin` {options}
+
+[#d0e7311]
+==== Description
+This command manages OpenAM policy agent installations. The `agentadmin` command requires a Java runtime environment.
+
+[#d0e7319]
+==== Options
+The following options are supported.
+--
+
+`--install`::
+Installs a new agent instance.
+
++
+Usage: `agentadmin --install [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to install in silent mode by specifying all the responses in the __file-name__ file. When this option is used, `agentadmin` runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses in a response file specified by __file-name__.
+
+====
+
+`--custom-install`::
+Installs a new agent instance, specifying additional configuration options such as the key used to encrypt passwords.
+
++
+Usage: `agentadmin --custom-install [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to install in silent mode by specifying all the responses in the __file-name__ file. When this option is used, `agentadmin` runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses to the __file-name__ file.
+
+====
+
+`--acceptLicense`::
+Auto-accepts the software license agreement. If this option is present on the command line with the `--install` or `--custom-install` option, the license agreement prompt is suppressed and the agent installation continues. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
+
+`--uninstall`::
+Uninstalls an existing agent instance.
+
++
+Usage: `agentadmin --uninstall [--useResponse | --saveResponse file-name]`
++
+[open]
+====
+
+`--useResponse`::
+Use this option to uninstall in silent mode by specifying all the responses in the __file-name__ file. When this option is used, `agentadmin` runs in non-interactive mode.
+
+`--saveResponse`::
+Use this option to save all the supplied responses to the __file-name__ file.
+
+====
+
+`--version`::
+Displays the version information.
+
+`--uninstallAll`::
+Uninstalls all the agent instances.
+
+`--migrate`::
+Migrate agent to newer version
+
+`--listAgents`::
+Displays details of all the configured agents.
+
+`--agentInfo`::
+Displays details of the agent corresponding to the specified __agent-id__.
+
++
+Example: `agentadmin --agentInfo agent_001`
+
+`--encrypt`::
+Encrypts a given string.
+
++
+Usage: `agentadmin --encrypt agent-instance password-file`
++
+[open]
+====
+
+__agent-instance__::
+Agent instance identifier. The encryption functionality requires the use of agent instance specific encryption key present in its configuration file.
+
+__password-file__::
+File containing the password to encrypt.
+
+====
+
+`--getEncryptKey`::
+Generates an agent encryption key.
+
+--
+
+[#d0e7535]
+==== Examples
+The following example installs an Apache HTTP Server 2.2 interactively, where Apache HTTP Server has been installed under `/path/to/apache22`.
+
+[source, console]
+----
+$ ./agentadmin --install --acceptLicense
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /path/to/apache22/conf
+OpenSSO server URL : http://openam.example.com:8080/openam
+Agent URL : http://www.example.com:80
+Agent Profile name : Apache Web Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentBootstrap.properties
+Agent Configuration Tag file location
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/web_agents/apache22_agent/installer-logs/audit/install.log
+...
+----
+
+

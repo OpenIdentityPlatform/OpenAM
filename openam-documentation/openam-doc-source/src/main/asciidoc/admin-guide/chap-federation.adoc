@@ -1,0 +1,2589 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-federation]
+== Managing SAML v2.0 Federation
+
+This chapter addresses how to set up and manage SAML v2.0 for single sign-on (SSO) and single logout (SLO) across resources belonging to organizations participating in a circle of trust.
+
+[#about-federation]
+=== About SAML v2.0 SSO and Federation
+
+SAML v2.0 SSO is part of federated access management. Federation lets access management cross organizational boundaries. Federation helps organizations share identities and services without giving away their identity information, or the services they provide.
+
+To bridge heterogeneous systems, federation requires interoperability, and thus depends on standards for orchestrating interaction and exchanging information between providers. OpenAM federation relies on standards, such as link:http://saml.xml.org/saml-specifications[Security Assertion Markup Language (SAML) v2.0, window=\_top]. SAML v2.0 describes the messages, how they are relayed, how they are exchanged, and common use cases.
+To achieve SAML v2.0 SSO, OpenAM separates __identity providers__ from __service providers__, lets you include them in a __circle of trust__ and configure how the providers in the circle of trust interact:
+
+* An identity provider stores and serves identity profiles, and handles authentication.
+
+* A service provider offers services that access protected resources and handles authorization.
+
+* A circle of trust groups at least one identity provider and at least one service provider who agree to share authentication information with assertions about authenticated users that let service providers make authorization decisions.
++
+Providers in a circle of trust share __metadata__, configuration information that federation partners require to access each others' services.
+
+* SAML v2.0 SSO maps attributes from accounts at the identity provider to attributes on accounts at the service provider. The identity provider makes assertions to the service provider, for example, to attest that a user has authenticated with the identity provider. The service provider then consumes assertions from the identity provider to make authorization decisions, for example to let an authenticated user complete a purchase that gets charged to the user's account at the identity provider.
+
+In federation deployments where not all providers support SAML v2.0, OpenAM can act as a multi-protocol hub, translating for providers who rely on other and older standards, such as SAML v1.x, Liberty Alliance Project frameworks, and WS-Federation (for integration with Active Directory Federation Services, for example).
+
+
+[#saml-preparation]
+=== Preparing for Configuring SAML v2.0 on OpenAM
+
+Before you set up SAML v2.0 SSO in OpenAM, you must:
+
+* Know which providers will participate in circles of trust.
+
+* Know how OpenAM installations act as identity providers or service providers.
+
+* Determine whether your session state configuration limits your usage of certain SAML v2.0 profiles. For more information, see xref:#saml2-and-session-state["SAML v2.0 and Session State"].
+
+* Agree with other providers on a synchronized time service.
+
+* Define how to map shared user attributes in identity information exchanged with other participants in a circle of trust. Local user profile attribute names should map to user profile attribute names at other providers.
++
+For example, if you exchange user identifiers with your partners, and you call it `uid`, whereas another partner calls it `userid`, then you map your `uid` to your partner's `userid`.
+
+* Import the keys used to sign assertions into the keystore in your OpenAM configuration directory. You can use the Java `keytool` command.
++
+For more information about OpenAM keystores, including location and different types of keystores available and how to change the default keys, see xref:chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"].
+
+
+
+[#saml2-overview]
+=== OpenAM SAML v2.0 Deployment Overview
+
+Setting up and managing SAML v2.0 for SSO and SLO comprises three processes:
+
+* Configuring identity providers, service providers, and circles of trust.
++
+OpenAM provides wizards that let you configure SAML v2.0 identity providers, service providers, and circles of trust, which define the relationships among providers. You can also configure providers and circles of trust using the OpenAM console and the `ssoadm` command.
++
+See xref:#saml2-providers-and-cots["Configuring Identity Providers, Service Providers, and Circles of Trust"] for procedures to configure identity providers, service providers, and circles of trust.
+
+* Preparing your applications to initiate SSO and SLO.
++
+After configuring the providers and circles of trust, you can implement OpenAM's support for SSO and SLO in your applications.
++
+See xref:#saml2-sso-slo["Implementing SAML v2.0 Single Sign-On and Single Logout"] for procedures to implement SAML v2.0 SSO and SLO in OpenAM.
+
+* Managing federated accounts.
++
+After you have implemented SAML v2.0 single sign-on, there are several tasks you might perform when using federated account linking.
++
+See xref:#federation-linking-accounts["Managing Federated Accounts"] for procedures to manage federated accounts.
+
+
+
+[#saml2-providers-and-cots]
+=== Configuring Identity Providers, Service Providers, and Circles of Trust
+
+This section covers configuration tasks you perform before you can implement SAML v2.0 SSO and SLO.
+
+During setup, you must share metadata for providers that you host with other providers in the circle of trust. You must also configure remote providers, connecting to other providers by importing their metadata. In OpenAM terms, a hosted provider is one served by the current OpenAM server; a remote provider is one hosted elsewhere.
+
+This section provides procedures for performing the following tasks:
+
+[#d19490e27592]
+.Tasks for Configuring Entity Providers and Circles of Trust
+[cols="50%,50%"]
+|===
+|Task |See Section(s) 
+
+a|(Required) Creating identity and service providers.
+a|xref:#saml2-create-hosted-idp["Creating a Hosted Identity Provider"]
+
+ xref:#saml2-create-hosted-sp["Creating a Hosted Service Provider"]
+
+ xref:#saml2-configure-remote-idp["Configuring a Remote Identity Provider"]
+
+ xref:#saml2-configure-remote-sp["Configuring a Remote Service Provider"]
+
+a|(Optional) Creating a __fedlet__ for an OpenAM service provider.
+
+ A fedlet is an example web application that acts as a lightweight SAML v2.0 service provider.
+a|xref:#saml2-using-fedlet["Using the Fedlet"]
+
+a|(Optional) Deploying an identity provider discovery service.
+
+ When your circle of trust includes multiple identity providers, then service providers must __discover__ which identity provider corresponds to a request. You can deploy the identity provider discovery service for this purpose as a separate web application.
+a|xref:#deploy-idp-discovery["Deploying the Identity Provider Discovery Service"]
+
+a|(Optional) Modifying identity provider, service provider, and circle of trust configurations.
+
+ You might need to modify these configurations after you have created them using the wizards.
+a|xref:#configure-idp["Modifying an Identity Provider's Configuration"]
+
+ xref:#configure-sp["Modifying a Service Provider's Configuration"]
+
+ xref:#configure-cot["Modifying a Circle of Trust's Configuration"]
+
+a|(Optional) Configuring providers for failover.
+a|xref:#saml2-failover["Configuring Providers for Failover"]
+
+a|(Optional) Configuring Google Apps and Salesforce CRM as service providers.
+a|xref:#google-apps-as-sp["Configuring Google Apps as a Remote Service Provider"]
+
+ xref:#salesforce-as-sp["Configuring Salesforce CRM as a Remote Service Provider"]
+|===
+
+[#saml2-create-hosted-idp]
+==== Creating a Hosted Identity Provider
+
+The following procedure provides steps for creating a hosted identity provider by using the Create Hosted Identity Provider wizard:
+
+[#create-hosted-idp]
+.To Create a Hosted Identity Provider
+====
+
+. Under Realms > __Realm Name__ > Dashboard > Configure SAMLv2 Providers, click Create Hosted Identity Provider.
+
+. Unless you already have metadata for the provider, accept the Name for this identity provider in the field provided, or provide your own unique identifier.
++
+The default name is the URL to the current server which hosts the identity provider.
+
+. Select the Signing Key alias you imported into the OpenAM keystore as part of your preparation for SAML v2.0 configuration.
+
+. Either add the provider to the circle of trust you already created, or select the Add to new option and provide a New Circle of Trust name.
+
+. For the attributes you share, map service provider attribute names (Name in Assertion), to user profile names from your identity repository (Local Attribute Name).
++
+Use this approach to set up a mapping with all SPs in the circle of trust that do not have their own specific mappings configured.
++
+The default mapping implementation has additional features beyond simply retrieving string attributes from the user profile.
+
+* Add an attribute that takes a static value by enclosing the profile attribute name in double quotes (`"`).
++
+For example, you can add a static SAML attribute called `partnerID` with a value of `staticPartnerIDValue` by adding `partnerID` as the Name in Assertion with `"staticPartnerIDValue"` as the Local Attribute Name.
+
+* Base64 encode binary attributes when adding them to the SAML attributes by adding `;binary` to the end of the attribute name, as in the following example:
++
+
+[source]
+----
+objectGUID=objectGUID;binary
+----
++
+This maps the local binary attribute `objectGUID` to a SAML attribute called `objectGUID` that is Base64 encoded.
+
+* Use `NameFormatURI` format as shown in the following example:
++
+
+[source]
+----
+urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary
+----
+
+
+. Click Configure to save your configuration.
+
+. Export the XML-based metadata from your provider to share with other providers in your circle of trust.
++
+
+[source, console]
+----
+$ curl \
+ --output metadata.xml \
+ "http://www.idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=\
+ http://www.idp.example:8080/openam&realm=/realm-name"
+----
++
+When you have configured your provider in the Top Level Realm, you can omit the query string from the URL.
++
+Alternatively, provide the URL to other providers so they can load the metadata.
+
+====
+
+
+[#saml2-create-hosted-sp]
+==== Creating a Hosted Service Provider
+
+The following procedure provides steps for creating a hosted service provider by using the Create Hosted Service Provider wizard:
+
+[#create-hosted-sp]
+.To Create a Hosted Service Provider
+====
+
+. Under Realms > __Realm Name__ > Dashboard > Configure SAMLv2 Providers, click Create Hosted Service Provider.
+
+. Unless you already have metadata for the provider, accept the Name for this service provider in the field provided, or provide your own unique identifier.
++
+The default name is the URL to the current server which hosts the service provider.
+
+. Either add the provider to the circle of trust you already created, or select the Add to new option and provide a New Circle of Trust name.
+
+. (Optional)  If this SP requires more a different attribute mapping configuration than the default IdP attribute mapping, set the mapping in the Attribute Mapping section. Map identity provider attribute names in the Name in Assertion column to user profile names from your identity repository in the Local Attribute Name column.
+
+. Click Configure to save your configuration.
+
+. Export the XML-based metadata from your provider to share with other providers in your circle of trust:
++
+
+[source, console]
+----
+$ curl \
+ --output metadata.xml \
+ "http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=\
+ http://www.sp.example:8080/openam&realm=/realm-name"
+----
++
+When you have configured your provider in the Top Level Realm, you can omit the query string from the URL.
++
+Alternatively, provide the URL to other providers so they can load the metadata.
+
+====
+
+
+[#saml2-configure-remote-idp]
+==== Configuring a Remote Identity Provider
+
+The following procedure provides steps for configuring a remote identity provider by using the Register Remote Identity Provider wizard:
+
+[#configure-remote-idp]
+.To Configure a Remote Identity Provider
+====
+
+. Obtain the identity provider metadata or the URL where you can obtain it.
+
+. Under Realms > __Realm Name__ > Dashboard > Configure SAMLv2 Providers, click Configure Remote Identity Provider.
+
+. Provide the identity provider metadata or link to obtain metadata.
++
+The remote identity provider's metadata might contain more than one `KeyDescriptor` elements. If it does, the hosted OpenAM service provider will validate assertions from the identity provider against certificates with key descriptors with an appropriate `use` attribute. Incoming assertions that cannot be validated against any of the certificates will be rejected by the hosted service provider.
+
+. Either add the provider to the circle of trust you already created, or select Add to new and provide a New Circle of Trust name.
+
+. Click Configure to save your configuration.
+
+====
+
+
+[#saml2-configure-remote-sp]
+==== Configuring a Remote Service Provider
+
+The following procedure provides steps for configuring a remote service provider by using the Register Remote Service Provider wizard:
+
+[#configure-remote-sp]
+.To Configure a Remote Service Provider
+====
+
+. Obtain the service provider metadata, or the URL where you can obtain it.
+
+. Under Realms > __Realm Name__ > Dashboard > Configure SAMLv2 Providers, click Configure Remote Service Provider.
+
+. Provide the service provider metadata or link to obtain metadata.
++
+The remote service provider's metadata might contain more than one `KeyDescriptor` element. In this case, the hosted identity provider should consider any incoming SAML requests from the service provider to be valid as long as it can be validated with any of the certificates.
+
+. (Optional)  If the identity provider has not already mapped the attributes you share, map identity provider attribute names (Name in Assertion) to user profile names from your identity repository (Local Attribute Name).
++
+Use this approach to set up a mapping that is specific to this SP. Note that a remote SP-specific attribute mapping overrides the attribute mapping configuration specified in the hosted IdP configuration.
++
+The default mapping implementation has additional features beyond simply retrieving string attributes from the user profile.
+
+* Add an attribute that takes a static value by enclosing the profile attribute name in double quotes (`"`).
++
+For example, you can add a static SAML attribute called `partnerID` with a value of `staticPartnerIDValue` by adding `partnerID` as the Name in Assertion with `"staticPartnerIDValue"` as the Local Attribute Name.
+
+* Base64 encode binary attributes when adding them to the SAML attributes by adding `;binary` to the end of the attribute name, as in the following example:
++
+
+[source]
+----
+objectGUID=objectGUID;binary
+----
++
+This maps the local binary attribute `objectGUID` to a SAML attribute called `objectGUID` that is Base64 encoded.
+
+* Use `NameFormatURI` format as shown in the following example:
++
+
+[source]
+----
+urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary
+----
+
+
+. Either add the provider to the circle of trust you already created, or select Add to new and provide a New Circle of Trust name.
+
+. Click Configure to save your configuration.
+
+====
+
+
+[#saml2-using-fedlet]
+==== Using the Fedlet
+
+When your organization acts as the identity provider and you want to enable service providers to federate their services with yours, you can generate configuration files for a __Fedlet__. A Fedlet is a small Java web application that can act as a service provider for a specific identity provider without requiring that you install all of OpenAM.
+
+After receiving the configuration files for the Fedlet, the service provider administrator installs them, and then obtains the Fedlet web application from the OpenAM distribution and installs it in the application web container.
+
+Fedlets support SAML v2.0 features, as shown in the following table:
+
+[#fedlet-saml2-features]
+.Fedlet Support for SAML v2.0 Features
+[cols="80%,20%"]
+|===
+|SAML v2.0 Feature |Java Fedlet 
+
+a|IdP and SP-initiated Single Sign-On (HTTP Artifact)
+a|Supported
+
+a|IdP and SP-initiated Single Sign-On (HTTP POST)
+a|Supported
+
+a|IdP and SP-initiated Single Logout (HTTP POST)
+a|Supported
+
+a|IdP and SP-initiated Single Logout (HTTP Redirect)
+a|Supported
+
+a|Sign Requests and Responses
+a|Supported
+
+a|Encrypt Assertion, Attribute, and NameID Elements
+a|Supported
+
+a|Export SP Metadata
+a|Supported
+
+a|Attribute Queries
+a|Supported
+
+a|XACML Requests
+a|Supported
+
+a|Multiple IdPs
+a|Supported
+
+a|External IdP Discovery Service
+a|Supported
+
+a|Bundled IdP Reader Service for Discovery
+a|Supported
+|===
+For more information on installing and using Fedlets, see xref:../dev-guide/chap-fedlets.adoc#chap-fedlets["Building SAML v2.0 Service Providers With Fedlets"] in the __Developer's Guide__.
+
+
+[#deploy-idp-discovery]
+==== Deploying the Identity Provider Discovery Service
+
+When your circle of trust includes multiple identity providers, then service providers must discover which identity provider corresponds to a request. You can deploy the identity provider discovery service for this purpose as a separate web application.
+
+Browsers only send cookies for the originating domain. Therefore, when a browser accesses the service provider in the `www.sp.example` domain, the service provider has no way of knowing whether the user has perhaps already authenticated at `www.this-idp.example` or at `www.that-idp.example`. The providers therefore host an identity provider discovery service in a common domain, such as `www.disco.example`, and use that service to discover where the user logged in. The identity provider discovery service essentially writes and reads cookies from the common domain. The providers configure their circle of trust to use the identity provider discovery service as part of SAML v2.0 federation.
+
+Deploying the identity provider discovery service involves the following stages:
+
+. Deploy the `.war` into your web application container.
+
+. Configure the discovery service.
+
+. Add the identity provider discovery service endpoints for writing cookies to and reading cookies from the common domain to the circle of trust configurations for the providers.
+
+. Share metadata between identity providers and the service provider.
+
+
+[#deploy-idpdisco-on-tomcat]
+.To Deploy the Discovery Service on Tomcat
+====
+How you deploy the discovery service `.war` file depends on your web application container. The procedure in this section shows how to deploy on Apache Tomcat.
+
+. Copy the `IDPDiscovery-13.5.2.war` file to the `webapps/` directory.
++
+
+[source, console]
+----
+$ cp ~/Downloads/openam/IDPDiscovery-13.5.2.war \
+ /path/to/tomcat/webapps/disco.war
+----
+
+. Access the configuration screen through your browser.
++
+In this example, Apache Tomcat listens for HTTP requests on `www.disco.example:8080`, and Tomcat has unpacked the application under `/disco`, so the URL is `\http://www.disco.example:8080/disco`, which redirects to `Configurator.jsp`.
+
+====
+
+[#configure-idpdisco-deployed]
+.To Configure the Discovery Service
+====
+
+. Configure the identity provider discovery service.
+
+
+[#figure-idp-disco-config]
+image::images/idp-disco-config.png[]
+
+Hints for discovery service configuration parameters follow.
++
+--
+
+Debug Directory::
+The discovery service logs to flat files in this directory.
+
+Debug Level::
+Default is `error`. Other options include `error`, `warning`, `message`, and `off`.
++
+Set this to `message` in order to see the service working when you run your initial tests.
+
+Cookie Type::
+Set to PERSISTENT if you have configured OpenAM to use persistent cookies, meaning single sign-on cookies that can continue to be valid after the browser is closed.
+
+Cookie Domain::
+The cookie domain is the common cookie domain used in your circle of trust for identity provider discovery, in this case `.disco.example`.
+
+Secure Cookie::
+Set this to true if clients should only return cookies when a secure connection is used.
+
+Encode Cookie::
+Leave this true unless your OpenAM installation requires that you do not encode cookies. Normally, cookies are encoded such that cookies remain valid in HTTP.
+
+HTTP-Only Cookie::
+Set to true to use HTTPOnly cookies if needed to help prevent third-party programs and scripts from accessing the cookies.
+
+--
+
+. Restrict permissions to the discovery service configuration file in `$HOME/libIDPDiscoveryConfig.properties`, where $HOME corresponds to the user who runs the web container where you deployed the service.
+
+====
+
+[#add-idpdisco-to-circle-of-trust]
+.To Add the Discovery Service to Your Circles of Trust
+====
+Each provider has a circle of trust including itself. You configure each of these circles of trust to use the identity provider discovery service as described in the following steps:
+
+. On the service provider console, login as OpenAM Administrator.
+
+. On the service provider console, under Federation > Circle of Trust > __Circle of Trust Name__, add SAML2 Writer and Reader Service URLs for the identity provider discovery service endpoints, and Save your work.
++
+In this example, the writer URL is `\http://www.disco.example:8080/disco/saml2writer`, and the reader URL is `\http://www.disco.example:8080/disco/saml2reader`.
+
+. On each identity provider console, login as OpenAM Administrator.
+
+. On the identity provider console, under Federation > Circle of Trust Configuration > __Circle of Trust Name__, also add SAML2 Writer and Reader Service URLs for the identity provider discovery service endpoints, and Save your work.
+
+====
+
+[#share-idp-sp-metadata]
+.To Share Identity and Service Provider Metadata
+====
+Before performing these steps, install the administration tools for each provider as described in xref:../install-guide/chap-install-tools.adoc#install-openam-admin-tools["To Set Up Administration Tools"] in the __Installation Guide__. The administration tools include the `ssoadm` command that you need to export metadata:
+
+. On each identity provider console, register the service provider as a remote service provider adding to the circle of trust you configured to use the identity provider discovery service.
++
+The URL to the service provider metadata is something like `\http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp`.
+
+. Create metadata templates for each identity provider:
++
+
+[source, console]
+----
+$ ssh www.this-idp.example
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm \
+ create-metadata-templ \
+ --entityid "http://www.this-idp.example:8080/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --identityprovider /idp \
+ --meta-data-file this-standard.xml \
+ --extended-data-file this-extended.xml
+Hosted entity configuration was written to this-extended.xml.
+Hosted entity descriptor was written to this-standard.xml.
+
+$ ssh www.that-idp.example
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm \
+ create-metadata-templ \
+ --entityid "http://www.that-idp.example:8080/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --identityprovider /idp \
+ --meta-data-file that-standard.xml \
+ --extended-data-file that-extended.xml
+
+Hosted entity configuration was written to that-extended.xml.
+Hosted entity descriptor was written to that-standard.xml.
+----
+
+. For each identity provider extended metadata file, change the value of the `hosted` attribute to `0`, meaning the identity provider is remote.
+
+. On the service provider, add the identity providers to the circle of trust using the identity provider metadata.
++
+
+[source, console]
+----
+$ ssh www.sp.example
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm \
+ import-entity \
+ --cot discocot \
+ --meta-data-file ~/Downloads/this-standard.xml \
+ --extended-data-file ~/Downloads/this-extended.xml \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt
+
+Import file, /Users/mark/Downloads/this-standard.xml.
+Import file, /Users/mark/Downloads/this-extended.xml.
+$ ./ssoadm \
+ import-entity \
+ --cot discocot \
+ --meta-data-file ~/Downloads/that-standard.xml \
+ --extended-data-file ~/Downloads/that-extended.xml \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt
+
+Import file, /Users/mark/Downloads/that-standard.xml.
+Import file, /Users/mark/Downloads/that-extended.xml.
+----
+
+====
+
+
+[#configure-idp]
+==== Modifying an Identity Provider's Configuration
+
+Once you have set up an identity provider, you can configure it through the OpenAM console under Federation > Entity Providers > __Provider Name__.
+
+[#idp-assertion-content]
+===== Hints for Assertion Content
+
+Use the following hints to adjust settings on the Assertion Content tab page:
+[#idp-signing-encryption]
+.Signing and Encryption
+--
+
+Request/Response Signing::
+Specifies what parts of messages the identity provider requires the service provider to sign digitally.
+
+Encryption::
+When selected, the service provider must encrypt NameID elements.
+
+Certificate Aliases::
+Specifies aliases for certificates in the OpenAM keystore that are used to handle digital signatures, and to handle encrypted messages.
+
++
+Specify a Key Pass if the private key password is different from the keystore password, which is stored encrypted in the `.keypass` file for the server. For instructions on working with key pairs, also see xref:chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"].
+
++
+You can specify lists of aliases for signing and encryption:
++
+
+* If you specify multiple aliases in the Signing property, OpenAM uses the first key alias from the list to sign SAML assertions.
+
+* If you specify multiple aliases in the Encryption property, OpenAM will attempt to decrypt incoming protocol messages with all matching certificates in the list until decryption is successful.
+
++
+When a certificate is about to expire, add a new alias to either field to enable OpenAM to maintain the trust relationship between entities for a longer period of time. Make sure that the remote providers also update their copy of the OpenAM provider's metadata to ensure the key rollover process is seamless.
+
+--
+[#idp-nameid-format]
+.NameID Format
+--
+
+NameID Format List::
+Specifies the supported name identifiers for users that are shared between providers for single sign-on. If no name identifier is specified when initiating single sign-on, then the identity provider uses the first one that is supported by both providers.
+
+NameID Value Map::
+Maps name identifier formats to user profile attributes. The `persistent` and `transient` name identifiers need not be mapped.
+
++
+NameID mapping supports Base64-encoded binary values by adding a `;binary` flag to the mapping. With this flag set, OpenAM Base64-encodes the profile attribute when adding it to the assertion. The mapping may resemble the following:
++
+
+[source]
+----
+urn:oasis:names:tc:SAML:2.0:nameid-format:persistent=objectGUID;binary
+----
+
+Disable NameID Persistence::
+Disables the storage of the NameID values in the user data store for all NameIDs issued by the IdP instance as long as the NameID format is anything but the persistent NameID format: `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`. That is, you can disable the storage of NameID values with persistent NameID-Format if and only if there is a NameID value mapping set up for the NameID-Format.
++
+
+[NOTE]
+======
+By preventing the storage of the NameID values, the `ManageNameID` and the `NameIDMapping` SAML profiles will no longer work when using any persistent NameID formats. Existing account links that have been established and stored are not removed when disabling NameID persistence.
+======
++
+Attribute: `idpDisableNameIDPersistence`
+
++
+Default value: `false`
+
+--
+[#idp-authentication-context]
+.Authentication Context
+--
+
+Mapper::
+Specifies a class that implements the `IDPAuthnContextMapper` interface and sets up the authentication context.
+
++
+Attribute: `idpAuthnContextMapper`
+
++
+Default value: `com.sun.identity.saml2.plugins.DefaultIDPAuthnContextMapper`
+
+Authentication Context Class Ref Mapping::
+Specifies the mapping between a SAML v2.0 authentication context class reference and the OpenAM authentication scheme.
+
++
+Attribute: `idpAuthncontextClassrefMapping`
+
++
+Default value: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0||default`
+
+Supported Contexts::
+Specifies the supported authentication contexts, where the Key and Value can specify a corresponding OpenAM authentication method, and the Level corresponds to an authentication module authentication level.
+
+--
+[#idp-assertion-time]
+.Assertion Time
+--
+
+Not-Before Time Skew::
+Grace period in seconds for the `NotBefore` time in assertions.
+
+Effective Time::
+Validity in seconds of an assertion.
+
+--
+[#idp-basic-authentication]
+.Basic Authentication
+--
+
+Enabled, User Name, Password::
+When enabled, authenticate with the specified user name and password at SOAP end points.
+
+--
+[#idp-assertion-cache]
+.Assertion Cache
+--
+
+Enabled::
+When enabled, cache assertions.
+
+--
+
+
+[#idp-assertion-processing]
+===== Hints for Assertion Processing
+
+Use the following hints to adjust settings on the Assertion Processing tab page:
+[#idp-attribute-mapper]
+.Attribute Mapper
+--
+
+Attribute Mapper::
+Specifies a class that implements the attribute mapping.
+
++
+The default implementation attempts to retrieve the mapped attribute values from the user profile first. If the attribute values are not present in the user's profile, then it attempts to retrieve them from the user's session.
+
++
+Default: `com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper`
+
+Attribute Map::
+Maps SAML attributes to user profile attributes.
+
++
+The user profile attributes used here must both be allowed in user profiles, and also be specified for the identity repository. See xref:../dev-guide/chap-customizing.adoc#sec-custom-attr["Customizing Profile Attributes"] in the __Developer's Guide__, for instructions on allowing additional attributes in user profiles.
+
++
+To specify the list of profile attributes for an LDAP identity repository, login to OpenAM console as administrator and browse to Realms > __Realm Name__ > Data Stores, and click the data store name to open the configuration page. Scroll down to User Configuration, and edit the LDAP User Attributes list, and then click Save to keep your work.
+
++
+The default IdP mapping implementation allows you to add static values in addition to values taken from the user profile. You add a static value by enclosing the profile attribute name in double quotes (`"`), as in the following examples.
+
++
+To add a static SAML attribute called `nameID` with a value of `staticNameIDValue` with a name format of `urn:oasis:names:tc:SAML:2.0:attrname-format:uri`, add the following mapping.
++
+
+[source]
+----
+urn:oasis:names:tc:SAML:2.0:attrname-format:uri|nameID="staticNameIDValue"
+----
+
+--
+[#idp-account-mapper]
+.Account Mapper
+--
+
+Account Mapper::
+Specifies a class that implements `AccountMapper` to map remote users to local user profiles.
+
+--
+[#idp-local-configuration]
+.Local Configuration
+--
+
+Auth URL::
+URL where users are redirected to authenticate.
+
+Reverse Proxy URL::
+When a reverse proxy is used for SAML endpoints, it is specified here.
+
+External Application Logout URL::
+URL to which to send an HTTP POST including all cookies when receiving a logout request. To add a user session property as a POST parameter, include it in the URL query string as a `appsessionproperty` parameter.
+
+--
+
+
+[#idp-services]
+===== Hints for Services
+
+Use the following hints to adjust settings on the Services tab page:
+[#idp-meta-alias]
+.MetaAlias
+--
+
+MetaAlias::
+Used to locate the provider's entity identifier, specified as `[/realm-name]*/provider-name`, where __provider-name__ cannot contain slash characters (*/*). For example: `/myRealm/mySubrealm/idp`.
+
+--
+[#idp-service-attributes]
+.IDP Service Attributes
+--
+
+Artifact Resolution Service::
+Specifies the end point to handle artifact resolution. The Index is a unique number identifier for the end point.
+
+Single Logout Service::
+Specifies the end points to handle single logout, depending on the SAML binding selected.
+
+Manage NameID Service::
+Specifies the end points to handle name identifiers, depending on the SAML binding selected.
+
+Single SignOn Service::
+Specifies the end points to handle single sign-on.
+
+--
+[#idp-nameid-mapping]
+.NameID Mapping
+--
+
+URL::
+Specifies the end point to handle name identifier mapping.
+
+--
+
+
+[#idp-advanced]
+===== Hints for Advanced Settings
+
+Use the following hints to adjust settings on the Advanced tab page:
+[#idp-sae-configuration]
+.SAE Configuration
+--
+
+IDP URL::
+Specifies the end point to handle Secure Attribute Exchange requests.
+
+Application Security Configuration::
+Specifies how to handle encryption for Secure Attribute Exchange operations.
+
+--
+[#idp-ecp-configuration]
+.ECP Configuration
+--
+
+IDP Session Mapper::
+Specifies the class that finds a valid session from an HTTP servlet request to an identity provider with a SAML Enhanced Client or Proxy profile.
+
+--
+[#idp-session-synchronization]
+.Session Synchronization
+--
+
+Enabled::
+When enabled, the identity provider sends a SOAP logout request over the back channel to all service providers when a session times out. A session may time out when the maximum idle time or maximum session time is reached, for example.
+
+--
+[#idp-finder-implementation]
+.IDP Finder Implementation
+--
+
+IDP Finder Implementation Class::
+Specifies a class that finds the preferred identity provider to handle a proxied authentication request.
+
+IDP Finder JSP::
+Specifies a JSP that presents the list of identity providers to the user.
+
+Enable Proxy IDP Finder For All SPs::
+When enabled, apply the finder for all remote service providers.
+
+--
+[#idp-relay-state-url-list]
+.Relay State URL List
+--
+
+Relay State URL List::
+List of URLs permitted for the `RelayState` parameter. OpenAM validates the redirection URL in the `RelayState` parameter against this list. If the `RelayState` parameter's value is in the list, OpenAM allows redirection to the `RelayState` URL. If it is not in the list, a browser error occurs.
+
++
+Use the pattern matching rules described in xref:chap-auth-services.adoc#configure-valid-goto-url-resources["Configuring Valid goto URL Resources"] to specify URLs in the list.
+
++
+If you do not specify any URLs in this property, OpenAM does not validate the `RelayState` parameter.
+
+--
+[#idp-adapter]
+.IDP Adapter
+--
+
+IDP Adapter Class::
+Specifies a class to invoke immediately before sending a SAML v2.0 response.
+
+--
+
+
+
+[#configure-sp]
+==== Modifying a Service Provider's Configuration
+
+Once you have set up a service provider, you can configure it through the OpenAM console under Federation > Entity Providers > __Provider Name__.
+
+[#sp-assertion-content]
+===== Hints for Assertion Content
+
+Use the following hints to adjust settings on the Assertion Content tab page:
+[#sp-signing-encryption]
+.Signing and Encryption
+--
+
+Request/Response Signing::
+Specifies what parts of messages the service provider requires the identity provider to sign digitally.
+
+Encryption::
+The identity provider must encrypt selected elements.
+
+Certificate Aliases::
+Specifies aliases for certificates in the OpenAM keystore that are used to handle digital signatures, and to handle encrypted messages.
+
++
+You can specify lists of aliases for signing and encryption:
++
+
+* If you specify multiple aliases in the Signing property, OpenAM uses the first key alias from the list to sign SAML assertions.
+
+* If you configure multiple aliases in the Encryption property, OpenAM will use all private keys associated with the aliases until decryption is successful.
+
++
+When a certificate is about to expire, add a new alias to either field to enable OpenAM to maintain the trust relationship between entities for a longer period of time. Make sure that the remote providers also update their copy of the OpenAM provider's metadata to ensure the key rollover process is seamless.
+
+--
+[#sp-nameid-format]
+.NameID Format
+--
+
+NameID Format List::
+Specifies the supported name identifiers for users that are shared between providers for single sign-on. If no name identifier is specified when initiating single sign-on, then the service provider uses the first one in the list supported by the identity provider.
+
+Disable Federation Persistence::
+Disables the storage of NameIDs in the user data store even if the `NameID` format is `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent` in the received assertion and the account mapper has identified the local user.
++
+
+[NOTE]
+======
+When local authentication is utilized for account linking purposes, disabling federation persistence requires end users to authenticate locally for each SAML-based login.
+======
++
+Attribute: `spDoNotWriteFederationInfo`
+
++
+Default value: `false`
+
+--
+[#sp-authentication-context]
+.Authentication Context
+--
+
+Mapper::
+Specifies a class that implements the `SPAuthnContextMapper` interface and sets up the authentication context.
+
+Default Authentication Context::
+Specifies the authentication context used if no authentication context specified in the request.
+
+Supported Contexts::
+Specifies the supported authentication contexts. The Level corresponds to an authentication module authentication level.
+
+Comparison Type::
+How the authentication context in the assertion response must compare to the supported contexts.
+
+--
+[#sp-assertion-time]
+.Assertion Time
+--
+
+Assertion Time Skew::
+Grace period in seconds for the `NotBefore` time in assertions.
+
+--
+[#sp-basic-authentication]
+.Basic Authentication
+--
+
+Enabled, User Name, Password::
+When enabled, authenticate with the specified user name and password at SOAP end points.
+
+--
+
+
+[#sp-assertion-processing]
+===== Hints for Assertion Processing
+
+Use the following hints to adjust settings on the Assertion Processing tab page:
+[#sp-attribute-mapper]
+.Attribute Mapper
+--
+
+Attribute Mapper::
+Specifies a class that implements the attribute mapping.
+
+Attribute Map::
+Maps SAML attributes to user profile attributes.
+
+--
+[#sp-auto-federation]
+.Auto Federation
+--
+
+Enabled::
+When enabled, automatically federate user's accounts at different providers based on the specified SAML attribute.
+
+Attribute::
+Specifies the SAML attribute to match accounts at different providers.
+
+--
+[#sp-account-mapper]
+.Account Mapper
+--
+
+Account Mapper::
+Specifies a class that implements `AccountMapper` to map remote users to local user profiles.
+
+Use Name ID as User ID::
+When selected, fall back to using the name identifier from the assertion to find the user.
+
+--
+[#sp-artifact-message-encoding]
+.Artifact Message Encoding
+--
+
+Encoding::
+Specifies the message encoding format for artifacts.
+
+--
+[#sp-transient-user]
+.Transient User
+--
+
+Transient User::
+Specifies the user profile to map all identity provider users when sending transient name identifiers.
+
+--
+[#sp-url]
+.URL
+--
+
+Local Authentication URL::
+Specifies the local login URL.
+
+Intermediate URL::
+Specifies a URL to which the user is redirected after authentication but before the original URL requested.
+
+External Application Logout URL::
+Specifies the URL to which to send an HTTP POST including all cookies when receiving a logout request. To add a user session property as a POST parameter, include it in the URL query string as a `appsessionproperty` parameter.
+
+--
+[#sp-default-relay-state-url]
+.Default Relay State URL
+--
+
+Default Relay State URL::
+Specifies the URL to which to redirect users after the request has been handled. Used if not specified in the response.
+
+--
+[#sp-adapter]
+.Adapter
+--
+
+Adapter::
+Specifies a class that implements the `FederationSPAdapter` interface and performs application specific processing during the federation process.
+
+Adapter Environment::
+Specifies environment variables passed to the adapter class.
+
+--
+
+
+[#sp-services]
+===== Hints for Services
+
+Use the following hints to adjust settings on the Services tab page:
+[#sp-meta-alias]
+.MetaAlias
+--
+
+MetaAlias::
+Used to locate the hosted provider's entity identifier, specified as `[/realm-name]*/provider-name`, where __provider-name__ can not contain slash characters (*/*). For example: `/myRealm/mySubrealm/sp`.
+
+--
+[#sp-service-attributes]
+.SP Service Attributes
+--
+
+Single Logout Service::
+Specifies the end points to handle single logout, depending on the SAML binding selected.
+
+Manage NameID Service::
+Specifies the end points to handle name identifiers, depending on the SAML binding selected.
+
+Assertion Consumer Service::
+Specifies the end points to consume assertions, with Index corresponding to the index of the URL in the standard metadata.
+
+--
+
+
+[#sp-advanced]
+===== Hints for Advanced Settings
+
+Use the following hints to adjust settings on the Advanced tab page:
+[#sp-sae-configuration]
+.SAE Configuration
+--
+
+SP URL::
+Specifies the end point to handle Secure Attribute Exchange requests.
+
+SP Logout URL::
+Specifies the end point of the service provider that can handle global logout requests.
+
+Application Security Configuration::
+Specifies how to handle encryption for Secure Attribute Exchange operations.
+
+--
+[#sp-ecp-configuration]
+.ECP Configuration
+--
+
+Request IDP List Finder Implementation::
+Specifies a class that returns a list of preferred identity providers trusted by the SAML Enhanced Client or Proxy profile.
+
+Request IDP List Get Complete::
+Specifies a URI reference used to retrieve the complete identity provider list if the `IDPList` element is not complete.
+
+Request IDP List::
+Specifies a list of identity providers for the SAML Enhanced Client or Proxy to contact, used by the default implementation of the IDP Finder.
+
+--
+[#sp-idp-proxy]
+.IDP Proxy
+--
+
+IDP Proxy::
+When enabled, allow proxied authentication for this service provider.
+
+Introduction::
+When enabled, use introductions to find the proxy identity provider.
+
+Proxy Count::
+Specifies the maximum number of proxy identity providers.
+
+IDP Proxy List::
+Specifies a list of URIs identifying preferred proxy identity providers.
+
+--
+[#sp-session-synchronization]
+.Session Synchronization
+--
+
+Enabled::
+When enabled, the service provider sends a SOAP logout request over the back channel to all identity providers when a session times out. A session may time out when the maximum idle time or maximum session time is reached, for example.
+
+--
+[#sp-relay-state-url-list]
+.Relay State URL List
+--
+
+Relay State URL List::
+List of URLs permitted for the `RelayState` parameter. OpenAM validates the redirection URL in the `RelayState` parameter against this list. If the `RelayState` parameter's value is in the list, OpenAM allows redirection to the `RelayState` URL. If it is not in the list, a browser error occurs.
+
++
+Use the pattern matching rules described in xref:chap-auth-services.adoc#configure-valid-goto-url-resources["Configuring Valid goto URL Resources"] to specify URLs in the list.
+
++
+If you do not specify any URLs in this property, OpenAM does not validate the `RelayState` parameter.
+
+--
+
+
+
+[#configure-cot]
+==== Modifying a Circle of Trust's Configuration
+
+Once you have set up a circle of trust, you can configure it through the OpenAM console under Federation > Circle of Trust > __Circle of Trust Name__.
+--
+
+Name::
+String to refer to the circle of trust.
+
+Description::
+Short description of the circle of trust.
+
+IDFF Writer Service URL::
+Liberty Identity Federation Framework service that writes identity provider entity identifiers to Common Domain cookies after successful authentication, used in identity provider discovery. Example: `\http://www.disco.example:8080/openam/idffwriter`.
+
+IDFF Reader Service URL::
+Liberty Identity Federation Framework service that reads identity provider entity identifiers from Common Domain cookies, used in identity provider discovery. Example: `\http://www.disco.example:8080/openam/transfer`.
+
+SAML2 Writer Service URL::
+SAML v2.0 service that writes identity provider entity identifiers to Common Domain cookies after successful authentication, used in identity provider discovery. Example: `\http://www.disco.example:8080/openam/saml2writer`.
+
+SAML2 Reader Service URL::
+SAML v2.0 service that reads identity provider entity identifiers from Common Domain cookies, used in identity provider discovery. Example: `\http://www.disco.example:8080/openam/saml2reader`.
+
+Status::
+Whether this circle of trust is operational.
+
+Realm::
+Name of the realm participating in this circle of trust.
+
+Entity Providers::
+Known hosted and remote identity and service providers participating in this circle of trust.
+
+--
+
+
+[#saml2-failover]
+==== Configuring Providers for Failover
+
+OpenAM servers can function in a site configuration behind a load balancer. In addition to configuring the OpenAM site as described in xref:../install-guide/chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] in the __Installation Guide__, update provider metadata to reference the load balancer rather than the server as follows:
+
+. Before configuring the provider, follow the instructions in the __Installation Guide__ mentioned above, and make sure that failover works through the load balancer for normal OpenAM sessions.
+
+. Configure the provider on one of the servers using the load balancer URL as the entity ID.
+
+. Export the metadata and extended metadata for the provider. You can export metadata either by using the `ssoadm` command, or by using the `ssoadm.jsp` page in the OpenAM console. For more information about using the `ssoadm.jsp` page, see xref:chap-admin-tools.adoc#openam-ssoadm-jsp-overview["OpenAM ssoadm.jsp"].
++
+With the `ssoadm` command, you can export the metadata as shown in the following example for an Identity Provider, where the entity ID is `\http://lb.example.com:80/openam`.
++
+
+[source, console]
+----
+$ ssoadm \
+ export-entity \
+ --entityid "http://lb.example.com:80/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --meta-data-file idp.xml \
+ --extended-data-file idp-extended.xml
+----
+
+. Edit both the metadata and the extended metadata, changing all URLs in both files to use the load balancer URL.
+
+. Delete the provider configuration in OpenAM console.
+
+. Import the edited provider configuration in OpenAM console.
+
+. Enable SAML v2.0 failover in OpenAM console.
++
+Navigate to Configure > Global Services, and then click SAMLv2 Service Configuration.
++
+Select Enabled next to Enable SAMLv2 failover, and then click Save.
+
+At this point failover is operational for the provider you configured.
+
+
+[#google-apps-as-sp]
+==== Configuring Google Apps as a Remote Service Provider
+
+OpenAM can serve as the identity provider when you use link:http://apps.google.com/[Google Apps, window=\_blank] as a service provider, allowing users to have single sign-on with their Google Apps account.
+
+In order to use this service, you must have a Google Apps account for at least one of your domains, such as `example.com`.
+
+[#integrate-google-apps]
+.To Integrate With Google Apps
+====
+
+. If you have not yet done so, set up OpenAM as described in xref:#create-hosted-idp["To Create a Hosted Identity Provider"]. As part of the IdP configuration, you specify a signing key alias. In a subsequent step, you will provision Google Apps with this certificate's public key.
++
+For details about changing the signing certificate, see xref:chap-certs-keystores.adoc#change-signing-key["To Change OpenAM Default test Signing Key "].
+
+. Under Realms > __Realm Name__ > Dashboard, click Configure Google Apps.
+
+. On the first Configure Google Apps for Single Sign-On page, add your domain name(s), such as `example.com` to the list, and then click Create.
+
+. On the second Configure Google Apps for Single Sign-On page, save the OpenAM verification certificate to a text file, such as `OpenAM.pem`.
+
+. Follow the instructions under To Enable Access to the Google Apps API before clicking Finish.
++
+
+.. Access the Google Apps administration page for the first of your domains in a new browser tab or window.
+
+.. Login as Google Apps administrator.
+
+.. Select Enable Single Sign-On.
+
+.. Copy the URLs from the OpenAM page into the Google Apps setup screen.
+
+.. Upload the certificate file you saved, such as `OpenAM.pem` as the Google Apps Verification Certificate.
+
+.. Select Use a domain specific issuer.
+
+.. Save changes in Google Apps setup.
+
+.. Repeat the steps above for each domain you have configured.
+
+.. Click Finish to complete the process.
+
+
+====
+
+
+[#salesforce-as-sp]
+==== Configuring Salesforce CRM as a Remote Service Provider
+
+OpenAM can serve as the identity provider when you use link:http://www.salesforce.com/[Salesforce CRM, window=\_blank] as a service provider, allowing users to have single sign-on with their Salesforce CRM account.
+
+In order to use this service, you must have Salesforce CRM accounts for your organization or enable Salesforce just-in-time provisioning, which uses content from the SAML assertion created by OpenAM to create regular and portal users in Salesforce the first time they attempt to log in. To enable Salesforce just-in-time provisioning, see xref:#integrate-salesforce-jit["To Enable Salesforce CRM Just-in-Time Provisioning"].
+
+[#integrate-salesforce]
+.To Integrate With Salesforce CRM
+====
+
+. If you have not yet done so, set up OpenAM as described in xref:#create-hosted-idp["To Create a Hosted Identity Provider"], using a signing certificate that is needed by Salesforce CRM.
++
+For details about changing the signing certificate, see xref:chap-certs-keystores.adoc#change-signing-key["To Change OpenAM Default test Signing Key "].
+
+. If you do not have an account with administrator credentials on Salesforce CRM, create one. See the Salesforce documentation for information about how to create an account with administrator credentials.
+
+. In a new browser tab or window, log in to link:https://login.salesforce.com/[Salesforce CRM, window=\_blank] with your administrator credentials.
+
+. If your users go directly to Salesforce to access services, then their single sign-on is SP-initiated from the Salesforce side. Salesforce provides a My Domain feature to facilitate SP-initiated single sign-on for desktop and device users.
++
+Configure SP-initiated single sign-on in Salesforce as follows:
++
+
+.. Select Setup Home > Settings > Company Settings > My Domain.
+
+.. Select the domain name, and then register the domain.
+
+.. Wait until the domain is ready for testing to proceed.
+
+.. After the domain has been created, log out of Salesforce.
+
+.. Log back in to Salesforce using the domain alias.
+
+.. Select Setup Home > Settings > Company Settings > My Domain.
+
+.. Click Deploy to Users.
+
+
+. In the OpenAM console, under Realms > __Realm Name__ > Dashboard, click Configure Salesforce CRM.
++
+Click Configure Salesforce CRM a second time to start the Configure Salesforce CRM wizard.
++
+The Configure Salesforce CRM for Single Sign-On page appears.
+
+. Specify values in the Configure Salesforce CRM for Single Sign-On page as follows:
++
+
+.. Specify the Salesforce service provider entity in the "Salesforce Service Provider entityID" field. For example, `\https://openam.my.salesforce.com`.
++
+The entity ID is used as the persistent `EntityDescriptor` metadata element so that users can have multiple service provider instances. It also appears in the Entity Providers list in the Circle of Trust Configuration.
+
+.. Configure an attribute mapping to associate a Salesforce CRM attribute with the corresponding OpenAM user profile attribute. For example, you might map the Salesforce CRM `IDPEmail` attribute to the OpenAM `mail` attribute.
++
+The Configure Salesforce CRM wizard requires you to enter at least one attribute mapping.
+
+.. Click Add to insert the `IDPEmail` to `mail` mapping to the Remote to Local Attribute Mapping Table.
+
+.. If desired, configure additional attribute mappings.
+
+
+. Click Create.
++
+The following message appears:
++
+
+[source, httprequest]
+----
+Metadata now configured successfully.
+Click OK to retrieve the parameters for configuring the Service Provider.
+----
+
+. Click OK.
++
+A second Salesforce CRM Single Sign-On Configuration page appears.
+
+. Follow the instructions on the second Salesforce CRM Single Sign-On Configuration page:
++
+
+.. Specify single sign-on settings for Salesforce as follows:
++
+
+... In Salesforce CRM, navigate to Setup Home > Settings > Identity > Single Sign-On Settings.
+
+... Click Edit.
+
+... Select the SAML Enabled option.
+
+
+.. Create a new SAML single sign-on configuration as follows:
++
+
+... For Issuer, copy the issuer name from the Salesforce CRM Single Sign-On Configuration page in the OpenAM Configure Salesforce CRM wizard.
+
+... Set the Name and API Name fields to values of your choosing.
+
+... Copy or download the OpenAM verification certificate from the Salesforce CRM Single Sign-On Configuration page in the OpenAM Configure Salesforce CRM wizard. Save the verification certificate to a plain text file.
+
+... For Identity Provider Certificate, use the Browse button to locate and upload the file containing the OpenAM verification certificate.
+
+... For SAML Identity Type, select the "Assertion contains the Federation ID from the User object" option.
+
+... For SAML Identity Location, select the "Identity is in an Attribute" option.
+
+... Specify the Identity Provider Login URL as the URL for the OpenAM IdP. For example, `\https://openam.example.com:8443/openam/SSOPOST/metaalias/idp`.
+
+... If you require a specific logout page, enter it in the Identity Provider Logout URL field.
+
+... If you have a page to which you would like users redirected when encountering errors, enter the URL of your error page in the Custom Error URL field.
+
+... Copy the attribute name, such as `IDPEmail`, from the Salesforce CRM Single Sign-On Configuration page in the OpenAM Configure Salesforce CRM wizard to the Attribute Name field.
+
+... Select the Entity ID corresponding to the "My Domain" that you set up.
+
+... Click Save.
++
+The Salesforce Login URL appears.
+
+
+.. Perform the final steps required by the OpenAM Configure Salesforce CRM wizard:
++
+
+... Copy and paste the Salesforce Login URL to the Salesforce CRM Single Sign-On Configuration page in the OpenAM Configure Salesforce CRM wizard.
+
+... Click Finish to conclude operation of the OpenAM Configure Salesforce CRM wizard.
+
+
+.. Return to the Single Sign-On Settings page in Salesforce.
+
+.. Click Download Metadata to download the Salesforce CRM SP metadata. You will import the metadata into OpenAM in a subsequent step.
+
+.. Configure attribute mapping and name ID format for the OpenAM identity provider:
++
+
+... In the OpenAM console, navigate to Federation > Entity Providers > __Identity Provider Name__ > Assertion Processing.
+
+... Review the values in the Attribute Map field, which should be the same values that you configured when you ran the Configure Salesforce CRM wizard. In this example, the values should be `IDPEmail=mail`.
++
+If required, modify the values in the Attribute Map field, and then click Save.
+
+... In the OpenAM console, navigate to Federation > Entity Providers > __Identity Provider Name__ > Assertion Content > NameID Format.
+
+... Salesforce requires SAML assertions that specify an `unspecified` name ID format. In this step, configure the OpenAM-hosted IdP to support this requirement.
++
+If a value for an `unspecified` name ID format is already present in the NameID Value Map List, remove it from the list.
+
+... Add the value `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=attribute` to the NameID Value Map List. For `attribute`, specify the attribute that you copied in Step 9.b.x. For example, `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=mail`.
+
+... Click Save.
+
+
+.. Add users to Salesforce CRM:
++
+
+... In Salesforce CRM, navigate to Setup Home > Administration > Users > Users.
+
+... Click Users.
+
+... Add users as necessary, making sure the attribute chosen as the Federation ID matches the local attribute you mapped to the remote attribute in OpenAM.
+
+... Click Finish.
+
+
+
+. Configure OpenAM as the authentication provider for your Salesforce domain:
++
+
+.. In Salesforce CRM, navigate to Setup Home > Settings > Company Settings > My Domain.
+
+.. Click Edit in the Authentication Configuration section.
++
+The Authentication Configuration page appears, listing the available identity providers.
+
+.. Select the new Authentication Service.
+
+.. Click Save.
+
+
+. Reconfigure the remote service provider definition for Salesforce in OpenAM by deleting the service provider definition created by the Configure Salesforce CRM wizard and then importing service provider metadata that you previously exported from Salesforce CRM:
++
+
+.. In the OpenAM console, navigate to Federation > Entity Providers.
+
+.. Select the checkbox next to the entity provider definition for the Salesforce CRM service provider, which should be listed as an SP provider with a Remote location.
+
+.. Click Delete to remove the entity provider configuration.
+
+.. Click Import Entity.
++
+The Import Entity Provider page appears.
+
+.. Specify options on the Import Entity Provider page as follows:
++
+
+* Update the Realm Name if desired.
+
+* Click File as the location of the metadata file.
+
+* Use the Upload button to navigate to the location of the metadata file that you obtained from Salesforce in a previous step.
+
+
+
+. Add the new remote service provider definition for Salesforce CRM to the federation circle of trust in OpenAM:
++
+
+.. In the OpenAM console, navigate to Federation > Circle of Trust > __Circle of Trust Name__.
+
+.. Move the Salesforce CRM remote service provider from the Available column to the Selected column.
+
+.. Click Save.
+
++
+Configuring Salesforce CRM as a remote service provider is now complete. Users navigating to the Salesforce domain should be redirected to OpenAM for authentication. Upon successful authentication, they should be logged in to Salesforce.
+
+====
+
+[#integrate-salesforce-jit]
+.To Enable Salesforce CRM Just-in-Time Provisioning
+====
+With just-in-time provisioning enabled, Salesforce CRM automatically creates regular and portal users when new users access Salesforce by authenticating to OpenAM.
+
+. Add mappings to the OpenAM identity provider configuration required by Salesforce just-in-time provisioning:
++
+
+.. In the OpenAM console, navigate to Federation > Entity Providers > __Identity Provider Name__ > Assertion Processing.
+
+.. Add the following entries to the Attribute Map property:
++
+
+* `User.Email=mail`
+
+* `User.ProfileID="Standard User"`
+
+* `User.LastName=sn`
+
+* `User.Username=mail`
+
+
+.. Click Save.
+
+
+. Enable user provisioning in Salesforce CRM:
++
+
+.. Log in to your Salesforce domain.
+
+.. In Salesforce CRM, navigate to Setup Home > Settings > Identity > Single Sign-On Settings.
+
+.. Click Edit.
+
+.. Set options in the Just-in-time User Provisioning section as follows:
++
+
+* Select the User Provisioning Enabled check box.
+
+* For User Provisioning Type, select Standard.
+
+
+.. Click Save.
+
++
+Configuring just-in-time provisioning in Salesforce CRM is now complete. When new users access Salesforce by authenticating to OpenAM, Salesforce automatically creates regular and portal users.
+
+====
+
+
+
+[#saml2-sso-slo]
+=== Implementing SAML v2.0 Single Sign-On and Single Logout
+
+OpenAM provides two options for implementing SAML v2.0 SSO and SLO:
+
+* __Integrated mode__, in which you include a SAML2 authentication module in an OpenAM authentication chain on a service provider (SP), thereby integrating SAML v2.0 authentication into the normal OpenAM authentication process. The authentication module handles the SAML v2.0 protocol details for you.
++
+Because the authentication chain that includes the SAML2 authentication module resides on the SP, integrated mode supports SP-initiated SSO only. You cannot trigger IdP-initiated SSO from an integrated mode implementation.
++
+Integrated mode supports both IdP-initiated and SP-initiated SLO.
++
+See xref:#saml2-integrated-mode["Implementing SAML v2.0 SSO and SLO in Integrated Mode"] for procedures to implement SSO and SLO using integrated mode.
+
+* __Standalone mode__, in which you invoke JSPs to initiate SSO and SLO. When implementing standalone mode, you do not configure an OpenAM authentication chain.
++
+See xref:#saml2-standalone-mode["Implementing SAML v2.0 SSO and SLO in Standalone Mode"] for procedures to implement SSO and SLO using standalone mode.
+
+Integrated mode was introduced in OpenAM 13. All SAML v2.0 deployments prior to OpenAM 13 are standalone mode implementations.
+
+When configuring OpenAM to support SAML v2.0 SSO and SLO, you choose between integrated mode and standalone mode. See xref:#saml2-deciding-on-the-implementation-mode["Deciding Between Integrated Mode and Standalone Mode"] for details about whether to choose integrated or standalone mode for your deployment.
+
+[#saml2-deciding-on-the-implementation-mode]
+==== Deciding Between Integrated Mode and Standalone Mode
+
+You can achieve SAML v2.0 SSO and SLO by using integrated mode, in which you configure a SAML2 authentication module and integrate it into an authentication chain. Or, you can use standalone mode, in which you invoke JSPs to initiate SSO and SLO.
+
+The following table provides information to help you decide whether to implement integrated mode or standalone mode for your OpenAM SAML v2.0 deployment:
+
+[#d19490e29909]
+.Integrated or Standalone Mode?
+[cols="50%,50%"]
+|===
+|Deployment Task or Requirement |Implementation Mode 
+
+a|You are migrating an existing OpenAM SAML v2.0 deployment from OpenAM 12 (or earlier) to OpenAM 13.5.2-15. Note that all OpenAM SAML v2.0 deployments prior to OpenAM 13 are standalone mode deployments.
+a|Do not modify your deployment to integrated mode unless you want to change your authentication scenario to have SAML v2.0 authentication integrated into an OpenAM authentication chain.
+
+a|You want to deploy SAML v2.0 SSO and SLO using the easiest technique.
+a|Use integrated mode.
+
+a|You want to integrate SAML v2.0 authentication into an authentication chain, letting you configure an added layer of login security by using additional authentication modules.
+a|Use integrated mode.
+
+a|You want to trigger SAML v2.0 IdP-initiated SSO.
+a|Use standalone mode.
+
+a|You want to use the SAML v2.0 Enhanced Client or Proxy (ECP) SSO profile.
+a|Use standalone mode.
+|===
+
+
+[#saml2-integrated-mode]
+==== Implementing SAML v2.0 SSO and SLO in Integrated Mode
+
+This section covers the following topics:
+
+* xref:#saml2-integrated-mode-flow["SAML v2.0 Integrated Mode Authentication Flow"]
+
+* xref:#saml2-integrated-mode-example["SAML v2.0 Integrated Mode Example"]
+
+* xref:#saml2-integrated-mode-sso["Implementing SAML v2.0 Single Sign-On in Integrated Mode"]
+
+* xref:#saml2-integrated-mode-slo["Configuring Single Logout in an Integrated Mode Implementation"]
+
+
+[#saml2-integrated-mode-flow]
+===== SAML v2.0 Integrated Mode Authentication Flow
+
+The following sequence diagram outlines the flow of SAML v2.0 authentication and persistent federation in an integrated mode implementation:
+
+[#saml2-integrated-mode-flow-sequence-diagram]
+image::images/saml2-integrated-flow.svg[]
+The following describes the sequence of actions in the diagram:
+
+. An unauthenticated user initiates authentication to an OpenAM SAML v2.0 service provider. The login URL references an authentication chain that includes a SAML2 authentication module. For example, `\http://openam.example.com:8080/openam/XUI/#login/&service=mySAMLChain`.
+
+. If there are any authentication modules that precede the SAML2 module in the authentication chain, OpenAM executes them.
+
+. SAML2 authentication module processing begins.
+
+. The authentication module requests an assertion from the identity provider. The SAML2 module's configuration determines the details of the request.
+
+If the user is currently unauthenticated on the identity provider, the following three steps occur:
+
+. The identity provider requests credentials from the user.
+
+. The user provides their credentials.
+
+. Authentication succeeds (assuming the user provided valid credentials).
+
+Processing continues as follows:
+
+. The identity provider responds to the service provider with a SAML assertion.
+
+. If the SAML assertion contains a persistent name ID, OpenAM searches the user datastore, attempting to locate a user with the same name ID.
+
+The flow varies here.
+
+The following event occurs if the name ID for the user is not found in the datastore, if dynamic profile creation is configured in the Core Authentication Service, and if auto-federation is enabled on the service provider:
+
+. OpenAM adds an entry for the user to the user datastore. Even if a linking authentication chain has been configured, it is not invoked. The user is not prompted to authenticate to the service provider.
+
+The following two events occur if the name ID for the user is not found in the datastore, if a linking authentication chain has been configured in the SAML2 authentication module, if dynamic profile creation is not configured in the Core Authentication Service, and if auto-federation is not enabled on the service provider:
+
+. The SAML2 authentication module invokes the linking authentication chain, requiring the user to authenticate to the service provider.
+
+. After successfully completing the linking authentication chain, OpenAM writes the persistent name ID obtained in the SAML assertion sent by the identity provider into the user's profile.
+
+At this point, SAML2 authentication module processing ends. The remaining events comprise completion of the primary authentication chain:
+
+. If there are any authentication modules remaining in the chain, OpenAM executes them.
+
+. Authentication is complete.
+
+
+
+[#saml2-integrated-mode-example]
+===== SAML v2.0 Integrated Mode Example
+
+This section describes a SAML v2.0 implementation scenario that provides an example of how you might use integrated mode to satisfy complex authentication requirements.
+
+[#saml2-integrated-mode-example-auth-requirements]
+====== Authentication Requirements
+
+The example scenario has the following requirements:
+
+* Users must authenticate with an identity provider using SAML v2.0.
+
+* Users' identities are federated on the identity and service providers.
+
+* Users without federated identities must perform two-step verification at the service provider before their identities can be federated.
+
+* Device fingerprinting for risk-based authentication must be performed for all authenticated users.
+
+
+
+[#saml2-integrated-mode-example-auth-chains]
+====== Authentication Chains and Modules
+
+Implementation of the example scenario requires the following authentication chains and authentication modules:
+
+* A primary authentication chain, which implements SAML v2.0 single sign-on and device fingerprinting.
++
+This chain includes three authentication modules, ordered as follows:
++
+
+. A SAML2 authentication module with the `Required` flag.
+
+. A Device ID (Match) authentication module with the `Sufficient` flag.
+
+. A Device ID (Save) authentication module with the `Required` flag.
+
+
+* A linking authentication chain, which identifies the user by user ID and password and requires two-step verification.
++
+This chain includes two authentication modules, ordered as follows:
++
+
+. A Data Store authentication module with the `Required` flag.
+
+. A ForgeRock Authenticator (OATH) authentication module with the `Required` flag.
+
+
+
+
+[#saml2-integrated-mode-example-first-time]
+====== How It Works: First Authentication to the Service Provider
+
+This section describes the sequence of events that occurs the first time a user successfully attempts to authenticate to the OpenAM service provider by using the primary authentication chain.
+
+*Accessing the service provider.* A user authenticates to the OpenAM server acting as a SAML v2.0 service provider, specifying the primary authentication chain in the login URL. For example, `\http://www.sp.com:28080/openam/XUI/#login/&service=mySAMLChain`.
+
+*Authentication at the identity provider.* OpenAM redirects the user to the identity provider. The user authenticates successfully at the identity provider. The identity provider returns a SAML assertion with a persistent name ID to OpenAM.
+
+*Service provider attempts to access a federated identity.* OpenAM attempts to locate the name ID in its user store. Because this is the first time the user has attempted to authenticate to the OpenAM service provider, the name ID has not yet been associated with any OpenAM user. The search for the name ID fails.
+
+*Invocation of the linking chain.* Therefore, OpenAM invokes the linking authentication chain. The Data Store authentication module executes first, requiring the user to provide a user ID and password. The ForgeRock Authenticator (OATH) module executes next, requiring the user to provide a one-time password from an authenticator app on the user's mobile device.
+
+*Identity federation.* OpenAM then writes the name ID into the user's profile in the OpenAM user store. This completes the SAML2 authentication module's processing.
+
+*Device fingerprinting (save).* Next in sequence is the Device ID (Match) authentication module. Because this is the first time that the user has authenticated to OpenAM, this device profile has not been saved to OpenAM yet and the Device ID (Match) authentication module fails. As a result, control passes to the Device ID (Save) module, which saves the device profile.
+
+
+[#saml2-integrated-mode-example-second-time]
+====== How It Works: Subsequent Authentication to the Service Provider
+
+This section describes the sequence of events that occurs during subsequent successful authentication attempts after the user's identities on the identity and service providers have been federated.
+
+*Accessing the service provider.* A user authenticates to the OpenAM server acting as a SAML v2.0 service provider specifying the primary authentication chain in the login URL. For example, `\http://www.sp.com:28080/openam/XUI/#login/&service=mySAMLChain`.
+
+*Authentication at the identity provider.* OpenAM redirects the user to the identity provider, and the user authenticates successfully at the identity provider. The identity provider returns a SAML asserting with a persistent name ID to OpenAM.
+
+*Service provider attempts to access a federated identity.* OpenAM attempts to locate the name ID in its user store. The search for the name ID succeeds. Therefore, OpenAM does not invokes the linking authentication chain.
+
+*Device fingerprinting (match).* The Device ID (Match) authentication module then executes. Because the user previously authenticated to OpenAM from this device profile, the Device ID (Match) authentication module succeeds, and authentication is complete.
+
+
+
+[#saml2-integrated-mode-sso]
+===== Implementing SAML v2.0 Single Sign-On in Integrated Mode
+
+The following list is an overview of the activities you perform when implementing SAML v2.0 SSO in integrated mode:
+
+* Preparing entity providers and a circle of trust.
+
+* Changing several endpoints in the service provider configuration.
+
+* Configuring a SAML2 authentication module and include it in an authentication chain.
+
+* Deciding if and how you want to federate identities during authentication. In integrated mode, you can either create user entries dynamically, or you can configure a linking authentication chain that authenticates users at the service provider after successful authentication at the identity provider, and then federates the identity.
+
+The following procedure provides step-by-step instructions for performing these activities:
+
+[#saml2-integrated-mode-sso-procedure]
+.To Implement SAML v2.0 SSO in Integrated Mode
+====
+
+. If you have not already done so, prepare for SAML v2.0 implementation by performing the tasks listed in xref:#saml-preparation["Preparing for Configuring SAML v2.0 on OpenAM"].
+
+. Log in to the OpenAM console on the service provider as a top-level administrative user, such as `amadmin`.
+
+. Create a hosted service provider by following the steps in xref:#create-hosted-sp["To Create a Hosted Service Provider"].
+
+. Configure a remote identity provider by following the steps in xref:#configure-remote-idp["To Configure a Remote Identity Provider"]. When you specify the circle of trust for the IdP, use the Add to Existing option and specify the circle of trust that you created when you created the hosted service provider.
+
+. If you want to use dynamic profile creation with auto-federation to federate identities, configure the required options:
++
+
+* To configure dynamic profile creation under Configure > Authentication > Core Attributes.
+
+* To configure auto-federation under Federation > Entity Providers > __Service Provider Name__ > Assertion Processing > Auto Federation.
+
+
+. Change the Assertion Consumer Service locations in the service provider configuration. The default locations support standalone mode. Therefore, you must change the locations when implementing integrated mode.
++
+Change the locations as follows:
++
+
+.. In the OpenAM console, navigate to Federation > Entity Providers > __Service Provider Name__ > Services > Assertion Consumer Service.
+
+.. Change the location of the HTTP-Artifact consumer service to use `AuthConsumer` rather than `Consumer`. For example, if the location is `\http://www.sp.com:28080/openam/Consumer/metaAlias/sp`, change it to `\http://www.sp.com:28080/openam/AuthConsumer/metaAlias/sp`.
+
+.. Similarly, change the location for the HTTP-POST consumer service to use `AuthConsumer` rather than `Consumer`.
++
+Note that you do not need to change the location for the PAOS service because integrated mode does not support the PAOS binding.
+
+.. Click Save to save the changes to the endpoints.
+
+
+. If the OpenAM server configured as the service provider runs as part of an OpenAM site, enable SAML v2.0 failover. In the OpenAM console, navigate to Configure > Global Services, click SAML v2 Service Configuration, check the Enable SAMLv2 failover checkbox, and then save your changes.
+
+. Create a SAML2 authentication module:
++
+
+.. In the OpenAM console, navigate to Realms > __Realm Name__ > Authentication > Modules.
+
+.. Specify a name for the module, and specify the module type as SAML2.
+
+.. Click Create.
+
+.. Configure the SAML2 authentication module options. See xref:chap-auth-services.adoc#saml2-module-conf-hints["Hints for the SAML2 Authentication Module"] for detailed information about the configuration options.
++
+If you want to use a linking authentication chain to authenticate users at the service provider and then federate users' identities on the identity and service providers, be sure to specify the name of this chain in the Linking Authentication Chain field.
+
+.. Save your changes.
+
+
+. Create an authentication chain that includes the SAML2 authentication module that you created in the previous step.
+
+. If you specified a linking authentication chain in the SAML2 module configuration, create the linking chain. A linking chain is an authentication chain that authenticates the user on the service provider, enabling OpenAM to persistently federate a user on the identity and service providers.
+
+. Test your configuration. First, clear your browser's cache and cookies. Then, attempt to log in to OpenAM using a login URL that references the authentication chain that includes the SAML2 module. For example, `\http://www.sp.com:28080/openam/XUI/#login/&service=mySAMLChain`.
++
+OpenAM should redirect you to the identity provider for authentication. Authenticate to the identity provider.
++
+If you configured a linking authentication chain, OpenAM should prompt you to authenticate to that chain next. When authentication is complete, try logging out of the service provider, then navigate to the same login URL that you used earlier. Because you are still logged in at the identity provider, you should not be prompted to reauthenticate to the identity provider. And because your identity at the service provider is now federated with your identity at the identity provider, you should not be prompted to reauthenticate at the service provider either.
+
+====
+
+
+[#saml2-integrated-mode-slo]
+===== Configuring Single Logout in an Integrated Mode Implementation
+
+Use the following two options to control single logout in integrated mode:
+
+* The post-authentication processing class for the authentication chain that includes the SAML2 authentication module. You configure post-authentication processing classes under Realms > __Realm Name__ > Authentication > Chains > __Chain Name__ > Settings
+
+* The Single Logout Enabled option in the SAML2 authentication module configuration.
+
+Configure these options as follows:
+
+[#saml2-table-configuring-slo-options]
+.Configuring Single Logout Options
+[cols="50%,50%"]
+|===
+|Requirement |Configuration 
+
+a|Single logout occurs when a user initiates logout at the identity provider or at the service provider.
+a|Set the post-authentication processing class for the authentication chain that contains the SAML2 authentication module to `org.forgerock.openam.authentication.modules.saml2.SAML2PostAuthenticationPlugin`.
+
+ Set the Single Logout Enabled option to `true` in the SAML2 authentication module configuration.
+
+a|Single logout occurs only when the user initiates logout at the identity provider.
+a|Set the post-authentication processing class for the authentication chain that contains the SAML2 authentication module to `org.forgerock.openam.authentication.modules.saml2.SAML2PostAuthenticationPlugin`.
+
+ Set the Single Logout Enabled option to `false` in the SAML2 authentication module configuration.
+
+a|Single logout occurs only when the user initiates logout at the service provider.
+a|Not available.
+
+a|Single logout never occurs.
+a|Do not set the post-authentication processing class for the authentication chain that contains the SAML2 authentication module to `org.forgerock.openam.authentication.modules.saml2.SAML2PostAuthenticationPlugin`.
+|===
+
+
+
+[#saml2-standalone-mode]
+==== Implementing SAML v2.0 SSO and SLO in Standalone Mode
+
+This section describes how to implement SSO and SLO using standalone mode.
+
+[#saml2-federation-auth-module]
+===== Verifying That the Federation Authentication Module Is Present
+
+Standalone mode requires that a Federation authentication module instance is present in the realm in which you define your circle of trust, identity providers, and service providers.
+
+Not only must the module be of type Federation, its __name__ must be `Federation` as well.
+
+OpenAM creates a Federation authentication module when you create a new realm, so the required module is already available unless you explicitly deleted it. If you deleted the Federation authentication module and need to restore it to a realm, just create an authentication module named `Federation` of module type Federation. No additional configuration is needed.
+
+Do __not__ add the Federation authentication module to an authentication chain. The module is used for internal purposes.
+
+
+[#using-saml2-sso-slo]
+===== JSP Pages for SSO and SLO
+
+With standalone mode, OpenAM SAML v2.0 Federation provides JSPs that let you direct users to do single sign-on (SSO) and single logout (SLO) across providers in a circle of trust. OpenAM has two JSPs for SSO and two JSPs for SLO, allowing you to initiate both processes either from the identity provider side, or from the service provider side.
+
+SSO lets users sign in once and remain authenticated as they access services in the circle of trust.
+
+SLO attempts to log out all session participants:
+
+* For hosted IdPs, SLO attempts to log out of all SPs with which the session established SAML federation.
+
+* For hosted SPs, SLO attempts to log out of the IdP that was source of the assertion for the user's session.
+
+--
+The JSP pages are found under the context root where you deployed OpenAM, in `saml2/jsp/`.
+
+`spSSOInit.jsp`::
+Used to initiate SSO from the service provider side, so call this on the service provider not the identity provider. This is also mapped to the endpoint `spssoinit` under the context root.
+
++
+Examples: `\http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp`, `\http://www.sp.example:8080/openam/spssoinit`
+
+`idpSSOInit.jsp`::
+Used to initiate SSO from the identity provider side, so call this on the identity provider not the service provider. This is also mapped to the endpoint `idpssoinit` under the context root.
+
++
+Examples: `\http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp`, `\http://www.idp.example:8080/openam/idpssoinit`
+
+`spSingleLogoutInit.jsp`::
+Used to initiate SLO from the service provider side, so call this on the service provider not the identity provider.
+
++
+Example: `\http://www.sp.example:8080/openam/saml2/jsp/spSingleLogoutInit.jsp`, `\http://www.sp.example:8080/openam/SPSloInit`
+
+`idpSingleLogoutInit.jsp`::
+Used to initiate SLO from the identity provider side, so call this on the identity provider not the service provider.
+
++
+Example: `\http://www.idp.example:8080/openam/saml2/jsp/idpSingleLogoutInit.jsp`, `\http://www.idp.example:8080/openam/IDPSloInit`
+
+--
+When you invoke these JSPs, there are several parameters to specify. Which parameters you can use depends on the JSP. When setting parameters in the JSPs, make sure the parameter values are correctly URL-encoded.
+[#idpssoinit-parameters]
+.idpSSOInit.jsp Parameters
+--
+
+`metaAlias`::
+(Required) Use this parameter to specify the local alias for the provider, such as `metaAlias=/myRealm/idp`. This parameter takes the format `/realm-name/provider-name` as described in xref:#idp-meta-alias[MetaAlias]. You do not repeat the slash for the Top Level Realm, for example `metaAlias=/idp`.
+
+`spEntityID`::
+(Required) Use this parameter to indicate the remote service provider. Make sure you URL-encode the value. For example, specify `spEntityID=http://www.sp.example:8080/openam` as `spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam`.
+
+`affiliationID`::
+(Optional) Use this parameter to specify a SAML affiliation identifier.
+
+`binding`::
+(Optional) Use this parameter to indicate what binding to use for the operation. For example, specify `binding=HTTP-POST` to use HTTP POST binding with a self-submitting form. In addition to `binding=HTTP-POST`, you can also use `binding=HTTP-Artifact`.
+
+`NameIDFormat`::
+(Optional) Use this parameter to specify a SAML Name Identifier format identifier, such as `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`, or `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+
+`RelayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `RelayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+`RelayStateAlias`::
+(Optional) Use this parameter to specify the parameter to use as the `RelayState`. For example, if your query string has `target=http%3A%2F%2Fforgerock.com&RelayStateAlias=target`, this is like setting `RelayState=http%3A%2F%2Fforgerock.com`.
+
+--
+[#spssoinit-parameters]
+.spSSOInit.jsp Parameters
+--
+
+`idpEntityID`::
+(Required) Use this parameter to indicate the remote identity provider. Make sure you URL-encode the value. For example, specify `idpEntityID=http://www.idp.example:8080/openam` as `idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam`.
+
+`metaAlias`::
+(Required) Use this parameter to specify the local alias for the provider, such as `metaAlias=/myRealm/sp`. This parameter takes the format `/realm-name/provider-name` as described in xref:#sp-meta-alias[MetaAlias]. You do not repeat the slash for the Top Level Realm, `metaAlias=/sp`.
+
+`affiliationID`::
+(Optional) Use this parameter to specify a SAML affiliation identifier.
+
+`AllowCreate`::
+(Optional) Use this parameter to indicate whether the identity provider can create a new identifier for the principal if none exists (`true`) or not (`false`).
+
+`AssertionConsumerServiceIndex`::
+(Optional) Use this parameter to specify an integer that indicates the location to which the Response message should be returned to the requester.
+
+`AuthComparison`::
+(Optional) Use this parameter to specify a comparison method to evaluate the requested context classes or statements. OpenAM accepts the following values:
++
+
+* *better*. Specifies that the authentication context statement in the assertion must be better (stronger) than any of the other provided authentication contexts.
+
+* *exact*. Specifies that the authentication context statement in the assertion must exactly match at least one of the provided authentication contexts.
+
+* *maximum*. Specifies that the authentication context statement in the assertion must not be stronger than any of the other provided authentication contexts.
+
+* *minimum*. Specifies that the authentication context statement in the assertion must be at least as strong as one of the provided authentication contexts.
+
+
+`AuthnContextClassRef`::
+(Optional) Use this parameter to specify authentication context class references. Separate multiple values with pipe characters (`|`). When hosted Idp and SP entities are saved in the console, any custom authentication contexts are also saved as long as they are included in the extended metadata. You can load custom authentication contexts in the extended metadata using the `ssoadm` command.
+
+`AuthnContextDeclRef`::
+(Optional) Use this parameter to specify authentication context declaration references. Separate multiple values with pipe characters (`|`).
+
+`AuthLevel`::
+(Optional) Use this parameter to specify the authentication level of the authentication context that OpenAM should use to authenticate the user.
+
+`binding`::
+(Optional) Use this parameter to indicate what binding to use for the operation. For example, specify `binding=HTTP-POST` to use HTTP POST binding with a self-submitting form. In addition to `binding=HTTP-POST`, you can also use `binding=HTTP-Artifact`.
+
+`Destination`::
+(Optional) Use this parameter to specify a URI Reference indicating the address to which the request is sent.
+
+`ForceAuthn`::
+(Optional) Use this parameter to indicate whether the identity provider should force authentication (`true`) or can reuse existing security contexts (`false`).
+
+`isPassive`::
+(Optional) Use this parameter to indicate whether the identity provider should authenticate passively (`true`) or not (`false`).
+
+`NameIDFormat`::
+(Optional) Use this parameter to specify a SAML Name Identifier format identifier, such as `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`, or `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+
+`RelayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `RelayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+`RelayStateAlias`::
+(Optional) Use this parameter to specify the parameter to use as the `RelayState`. For example, if your query string has `target=http%3A%2F%2Fforgerock.com&RelayStateAlias=target`, this is like setting `RelayState=http%3A%2F%2Fforgerock.com`.
+
+`reqBinding`::
+(Optional) Use this parameter to indicate what binding to use for the authentication request. Valid values in include `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect` (default) and `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST`.
+
+`sunamcompositeadvice`::
+(Optional) Use this parameter to specify a URL-encoded XML blob that specifies the authentication level advice. For example, the following XML indicates a requested authentication level of 1. Notice the required `:` before the 1:
++
+
+[source, xml]
+----
+<Advice>
+        <AttributeValuePair>
+        <Attribute name="AuthLevelConditionAdvice"/>
+        <Value>/:1</Value>
+        </AttributeValuePair>
+        </Advice>
+----
+
+--
+[#idpsloinit-parameters]
+.idpSingleLogoutInit.jsp Parameters
+--
+
+`binding`::
+(Required) Use this parameter to indicate what binding to use for the operation. The full, long name format is required for this parameter to work.
++
+The value must be one of the following:
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect` (default)
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST`
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:SOAP`
+
+
+`Consent`::
+(Optional) Use this parameter to specify a URI that is a SAML Consent Identifier.
+
+`Destination`::
+(Optional) Use this parameter to specify a URI Reference indicating the address to which the request is sent.
+
+`Extension`::
+(Optional) Use this parameter to specify a list of Extensions as string objects.
+
+`goto`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. `RelayState` takes precedence over this parameter.
+
+`logoutAll`::
+(Optional) Use this parameter to specify that the identity provider should send single logout requests to service providers without indicating a session index.
+
+`RelayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `RelayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+--
+[#spsloinit-parameters]
+.spSingleLogoutInit.jsp Parameters
+--
+
+`binding`::
+(Required) Use this parameter to indicate what binding to use for the operation. The full, long name format is required for this parameter to work. For example, specify `binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST` to use HTTP POST binding with a self-submitting form rather than the default HTTP redirect binding. In addition, you can use `binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact`.
+
+`idpEntityID`::
+(Required for Fedlets) Use this parameter to indicate the remote identity provider. If the `binding` is not set, then OpenAM uses this parameter to find the default binding. Make sure you URL encode the value. For example, specify `idpEntityID=http://www.idp.example:8080/openam` as `idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam`.
+
+`NameIDValue`::
+(Required for Fedlets) Use this parameter to indicate the SAML Name Identifier for the user.
+
+`SessionIndex`::
+(Required for Fedlets) Use this parameter to indicate the `sessionIndex` of the user session to terminate.
+
+`Consent`::
+(Optional) Use this parameter to specify a URI that is a SAML Consent Identifier.
+
+`Destination`::
+(Optional) Use this parameter to specify a URI Reference indicating the address to which the request is sent.
+
+`Extension`::
+(Optional) Use this parameter to specify a list of Extensions as string objects.
+
+`goto`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. `RelayState` takes precedence over this parameter.
+
+`RelayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `RelayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+`spEntityID`::
+(Optional, for Fedlets) Use this parameter to indicate the Fedlet entity ID. When missing, OpenAM uses the first entity ID in the metadata.
+
+--
+
+[#example-saml2-sso-slo]
+.SSO and SLO From the Service Provider
+====
+The following URL takes the user from the service provider side to authenticate at the identity provider and then come back to the end user profile page at the service provider after successful SSO. Lines are folded to show you the query string parameters:
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?metaAlias=/sp
+      &idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+      &RelayState=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam%2Fidm%2FEndUser
+----
+The following URL initiates SLO from the service provider side, leaving the user at `\http://forgerock.com`:
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spSingleLogoutInit.jsp?
+      &idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+      &RelayState=http%3A%2F%2Fforgerock.com
+----
+====
+
+[#show-saml2-sso-login-progress]
+.To Indicate Progress During SSO
+====
+During SSO login, OpenAM presents users with a self-submitting form when access has been validated. This page is otherwise blank. If you want to present users with something to indicate that the operation is in progress, then customize the necessary templates.
+
+. Modify the templates to add a clue that SSO is in progress, such as an image.
++
+Edit the source of the OpenAM Java Server Page, `saml2/jsp/autosubmitaccessrights.jsp`, under the file system directory where the OpenAM .war has been unpacked.
++
+When you add an image or other presentation element, make sure that you retain the form and Java code as is.
+
+. Unpack OpenAM-13.5.2.war, and add your modified template files under `WEB-INF/classes/` where you unpacked the .war.
++
+Also include any images you reference in the page.
+
+. Pack up your custom version of OpenAM, and then deploy it in your web container.
+
+====
+
+
+[#using-saml2-with-policy-agents]
+===== Using Policy Agents With Standalone Mode
+
+You can use policy agents in a SAML v2.0 Federation deployment.
+
+[#policy-agent-with-saml2]
+.To Use a Policy Agent with a SAML v2.0 Service Provider
+====
+The following procedure applies when OpenAM is configured as an IdP in one domain, and a policy agent protects resources on behalf of a second OpenAM server configured as an SP on a second domain:
+
+. Install the policy agent.
++
+The basic process for installing policy agents is available in the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[Web Policy Agent User's Guide, window=\_blank] and the link:../../../openam-jee-policy-agents/jee-users-guide/#jee-users-guide[Java EE Policy Agent User's Guide, window=\_blank].
+
+. Replace the given OpenAM Login URL and OpenAM Logout URLs with SAML v2.0 URLs described in xref:#using-saml2-sso-slo["JSP Pages for SSO and SLO"].
++
+The following steps explain how to do this for web policy agents:
++
+
+* If you have configured the Web policy agents to store their properties centralized on an OpenAM server, navigate to the URL for the OpenAM console. Select Realms > __Realm Name__ > Agents > Web > __Agent Name__ > OpenAM Services.
++
+For the Web Agent, under the OpenAM Services tab, in the Agent Logout URL section, set up a list of application logout URLs. In the Logout Redirect URL text box, enter an appropriate URL to redirect the user after logout.
+
+* Alternatively, if the Web policy agents are set up to store properties on local systems, find the `OpenSSOAgentConfiguration.properties` file in the `/path/to/agent/config/` directory.
++
+You can specify OpenAM Login and Logout URLs with the `com.sun.identity.agents.config.login.url` and `com.sun.identity.agents.config.logout.url` attributes, respectively.
+
+
+====
+
+
+[#saml2-ecp-config]
+===== Configuring OpenAM for the ECP Profile
+
+The SAML v2.0 Enhanced Client or Proxy (ECP) profile is intended for use when accessing services over devices like simple phones, medical devices, and set-top boxes that lack the capabilities needed to use the more widely used SAML v2.0 Web Browser SSO profile.
+
+The ECP knows which identity provider to contact for the user, and is able to use the reverse SOAP (PAOS) SAML v2.0 binding for the authentication request and response. The PAOS binding uses HTTP and SOAP headers to pass information about processing SOAP requests and responses, starting with a PAOS HTTP header that the ECP sends in its initial request to the server. The PAOS messages continue with a SOAP authentication request in the server's HTTP response to the ECP's request for a resource, followed by a SOAP response in an HTTP request from the ECP.
+
+An enhanced client, such as a browser with a plugin or an extension, can handle these communications on its own. An enhanced proxy is an HTTP server, such as a WAP gateway that can support the ECP profile on behalf of client applications.
+
+OpenAM supports the SAML v2.0 ECP profile on the server side for identity providers and service providers. You must build the ECP.
+
+By default, an OpenAM identity provider uses the `com.sun.identity.saml2.plugins.DefaultIDPECPSessionMapper` class to find a user session for requests to the IdP from the ECP. The default session mapper uses OpenAM cookies as it would for any other client application. If for some reason you must change the mapping after writing and installing your own session mapper, you can change the class under Federation > Entity Providers > __IdP Name__ > IDP > Advanced > ECP Configuration.
+
+By default, an OpenAM service provider uses the `com.sun.identity.saml2.plugins.ECPIDPFinder` class to return identity providers from the list under Federation > Entity Providers > __SP Name__ > SP > Advanced > ECP Configuration > Request IDP List. You must populate the list with identity provider entity IDs.
+--
+The endpoint for the ECP to contact on the OpenAM service provider is `/SPECP` as in `\http://www.sp.example:8080/openam/SPECP`. The ECP provides two query string parameters to identify the service provider and to specify the URL of the resource to access.
+
+`metaAlias`::
+This specifies the service provider, by default `metaAlias=/realm-name/sp`, as described in xref:#sp-meta-alias[MetaAlias].
+
+`RelayState`::
+This specifies the resource the client aims to access, such as `RelayState=http%3A%2F%2Fforgerock.org%2Findex.html`. Make sure this parameter is correctly URL-encoded.
+
+--
+For example, the URL to access the service provider and finally the resource at `\http://forgerock.org/index.html` could be `\http://www.sp.example:8080/openam/SPECP?metaAlias=/sp&RelayState=http%3A%2F%2Fforgerock.org%2Findex.html`.
+
+
+[#transient-federation]
+===== Using Transient Federation Identifiers
+
+Identity providers and service providers must be able to communicate about users. Yet, in some cases the identity provider can choose to communicate a minimum of information about an authenticated user, with no user account maintained on the service provider side. In other cases, the identity provider and service provider can choose to link user accounts in a persistent way, in a more permanent way, or even in automatic fashion by using some shared value in the user's profiles, such as an email address or by dynamically creating accounts on the service provider when necessary. OpenAM supports all these alternatives.
+
+OpenAM allows you to link accounts using transient name identifiers, where the identity provider shares a temporary identifier with the service provider for the duration of the user session. Nothing is written to the user profile.
+
+Transient identifiers are useful where the service is anonymous, and all users have similar access on the service provider side.
+
+To use transient name identifiers, specify the name ID format `urn:oasis:names:tc:SAML:2.0:nameid-format:transient` when initiating single sign-on.
+
+The examples below work in an environment where the identity provider is `www.idp.example` and the service provider is `www.sp.example`. Both providers have deployed OpenAM on port 8080 under deployment URI `/openam`.
+
+To initiate single sign-on from the service provider, access the following URL with at least the query parameters shown:
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+     idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+     &metaAlias=/sp
+     &NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+----
+For a complete list of query parameters, see xref:#spssoinit-parameters[spSSOInit.jsp Parameters].
+
+To initiate single sign-on from the identity provider, access the following URL with at least the query parameters shown:
+
+[source]
+----
+http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp?
+     spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
+     &metaAlias=/idp
+     &NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+----
+For a complete list of query parameters, see xref:#idpssoinit-parameters[idpSSOInit.jsp Parameters].
+
+The accounts are only linked for the duration of the session. Once the user logs out, for example, the accounts are no longer linked.
+
+
+[#persistent-federation]
+===== Using Persistent Federation Identifiers
+
+OpenAM lets you use persistent pseudonym identifiers to federate user identities, linking accounts on the identity provider and service provider with a SAML persistent identifier.
+
+Persistent identifiers are useful for establishing links between otherwise unrelated accounts.
+
+The examples below work in an environment where the identity provider is `www.idp.example` and the service provider is `www.sp.example`. Both providers have deployed OpenAM on port 8080 under deployment URI `/openam`.
+
+To initiate single sign-on from the service provider, access the following URL with at least the query parameters shown:
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+     idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+     &metaAlias=/sp
+     &NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+----
+For a complete list of query parameters, see xref:#spssoinit-parameters[spSSOInit.jsp Parameters].
+
+To initiate single sign-on from the identity provider, access the following URL with at least the query parameters shown:
+
+[source]
+----
+http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp?
+     spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
+     &metaAlias=/idp
+     &NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+----
+For a complete list of query parameters, see xref:#idpssoinit-parameters[idpSSOInit.jsp Parameters].
+
+On successful login, the accounts are persistently linked, with persistent identifiers stored in the user's accounts on the identity provider and the service provider.
+
+
+
+
+[#federation-linking-accounts]
+=== Managing Federated Accounts
+
+Both integrated and standalone SAML v2.0 implementations allow you to persistently link accounts:
+
+* In integrated mode deployments, you specify the value `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent` in the nameIDFormat field of the SAML2 authentication module.
+
+* In standalone mode, when you initiate single sign-on with either the `spSSOInit.jsp` or `idpSSOInit.jsp` JSP page, you specify the `NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent` parameter.
+
+This section covers the following topics:
+
+* xref:#change-federation["Changing Federation of Persistently Linked Accounts"]
+
+* xref:#terminate-federation["Terminating Federation of Persistently Linked Accounts"]
+
+* xref:#auto-federation["Configuring How Remote Accounts Map To Local Accounts"]
+
+* xref:#bulk-federation["Linking Federated Accounts in Bulk"]
+
+* xref:#saml2-authentication["Authentication and Linked Accounts"]
+
+
+[#change-federation]
+==== Changing Federation of Persistently Linked Accounts
+
+OpenAM implements the SAML v2.0 Name Identifier Management profile, allowing you to change a persistent identifier that has been set to federate accounts, and also to terminate federation for an account.
+
+When user accounts are stored in an LDAP directory server, name identifier information is stored on the `sun-fm-saml2-nameid-info` and `sun-fm-saml2-nameid-infokey` attributes of a user's entry. footnote:d19490e31404[To configure these attribute types, in the OpenAM console navigate to Configure > Global Services, and then click SAMLv2 Service Configuration.]
+
+You can retrieve the name identifier value on the IdP side by checking the value of `sun-fm-saml2-nameid-infokey`. For example, if the user's entry in the directory shows `sun-fm-saml2-nameid-infokey: http://www.idp.example:8080/openam|http://www.sp.example:8080/openam| XyfFEsr6Vixbnt0BSqIglLFMGjR2`, then the name identifier on the IdP side is `XyfFEsr6Vixbnt0BSqIglLFMGjR2`.
+
+You can use this identifier to initiate a change request from the service provider as in the following example.
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+ &metaAlias=/sp
+ &requestType=NewID
+ &IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2
+----
+If desired, you can substitute `openam/SPMniInit` for `openam/saml2/jsp/spMNIRequestInit.jsp`
+
+You can also initiate the change request from the identity provider as in the following example.
+
+[source]
+----
+http://www.idp.example:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
+ &metaAlias=/idp
+ &requestType=NewID
+ &IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2
+----
+If desired, you can substitute `openam/IDPMniInit` for `openam/saml2/jsp/idpMNIRequestInit.jsp`
+
+You can retrieve the name identifier value on the SP side by checking the value of `sun-fm-saml2-nameid-info`. For example, if the user's entry in the directory shows `sun-fm-saml2-nameid-info: http://www.sp.example:8080/openam| http://www.idp.example:8080/openam| ATo9TSA9Y2Ln7DDrAdO3HFfH5jKD| http://www.idp.example:8080/openam| urn:oasis:names:tc:SAML:2.0:nameid-format:persistent| 9B1OPy3m0ejv3fZYhlqxXmiGD24c| http://www.sp.example:8080/openam| SPRole| false`, then the name identifier on the SP side is `9B1OPy3m0ejv3fZYhlqxXmiGD24c`.
+
+The JSP parameters are listed below. When setting parameters in the JSPs, make sure the parameter values are correctly URL-encoded.
+[#idpmnirequestinit-parameters]
+.idpMNIRequestInit.jsp Parameters
+--
+
+`spEntityID`::
+(Required) Use this parameter to indicate the remote service provider. Make sure you URL-encode the value. For example, specify `spEntityID=http://www.sp.example:8080/openam` as `spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam`.
+
+`metaAlias`::
+(Required) Use this parameter to specify the local alias for the provider, such as `metaAlias=/myRealm/idp`. This parameter takes the format `/realm-name/provider-name` as described in xref:#idp-meta-alias[MetaAlias]. You do not repeat the slash for the Top Level Realm, for example `metaAlias=/idp`.
+
+`requestType`::
+(Required) Type of manage name ID request, either `NewID` to change the ID, or `Terminate` to remove the information that links the accounts on the identity provider and service provider.
+
+`SPProvidedID`::
+(Required if `requestType=NewID`) Name identifier in use as described above.
+
+`affiliationID`::
+(Optional) Use this parameter to specify a SAML affiliation identifier.
+
+`binding`::
+(Optional) Use this parameter to indicate what binding to use for the operation. The full, long name format is required for this parameter to work.
++
+The value must be one of the following:
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST`
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect`
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:SOAP`
+
+
+`relayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `relayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+--
+[#spmnirequestinit-parameters]
+.spMNIRequestInit.jsp Parameters
+--
+
+`idpEntityID`::
+(Required) Use this parameter to indicate the remote identity provider. Make sure you URL-encode the value. For example, specify `idpEntityID=http://www.idp.example:8080/openam` as `idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam`.
+
+`metaAlias`::
+(Required) Use this parameter to specify the local alias for the provider, such as `metaAlias=/myRealm/sp`. This parameter takes the format `/realm-name/provider-name` as described in xref:#sp-meta-alias[MetaAlias]. You do not repeat the slash for the Top Level Realm, `metaAlias=/sp`.
+
+`requestType`::
+(Required) Type of manage name ID request, either `NewID` to change the ID, or `Terminate` to remove the information that links the accounts on the identity provider and service provider.
+
+`IDPProvidedID`::
+(Required if `requestType=NewID`) Name identifier in use as described above.
+
+`affiliationID`::
+(Optional) Use this parameter to specify a SAML affiliation identifier.
+
+`binding`::
+(Optional) Use this parameter to indicate what binding to use for the operation. The full, long name format is required for this parameter to work.
++
+The value must be one of the following:
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST`
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect`
+
+* `urn:oasis:names:tc:SAML:2.0:bindings:SOAP`
+
+
+`relayState`::
+(Optional) Use this parameter to specify where to redirect the user when the process is complete. Make sure you URL-encode the value. For example, `relayState=http%3A%2F%2Fforgerock.com` takes the user to `\http://forgerock.com`.
+
+--
+You can terminate federation as described in xref:#terminate-federation["Terminating Federation of Persistently Linked Accounts"].
+
+
+[#terminate-federation]
+==== Terminating Federation of Persistently Linked Accounts
+
+OpenAM lets you terminate account federation, where the accounts have been linked with a persistent identifier as described in xref:#persistent-federation["Using Persistent Federation Identifiers"].
+
+The examples below work in an environment where the identity provider is `www.idp.example` and the service provider is `www.sp.example`. Both providers have deployed OpenAM on port 8080 under deployment URI `/openam`.
+
+To initiate the process of terminating account federation from the service provider, access the following URL with at least the query parameters shown.
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+ &metaAlias=/sp
+ &requestType=Terminate
+----
+To initiate the process of terminating account federation from the identity provider, access the following URL with at least the query parameters shown.
+
+[source]
+----
+http://www.idp.example:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
+ &metaAlias=/idp
+ &requestType=Terminate
+----
+
+
+[#auto-federation]
+==== Configuring How Remote Accounts Map To Local Accounts
+
+OpenAM lets you configure the service provider to link an account based on an attribute value from the identity provider. When you know the user accounts on both the identity provider and the service provider share a common attribute value, such as an email address or other unique user identifier, you can use this method to link accounts without user interaction. See xref:#auto-federate-based-on-attribute["To Map Accounts Based on an Attribute Value"].
+
+OpenAM also lets you map users on the identity provider temporarily to a single anonymous user account on the service provider, in order to exchange attributes about the user without a user-specific account on the service provider. This approach can be useful when the service provider either needs no user-specific account to provide a service, or when you do not want to retain a user profile on the service provider but instead you make authorization decisions based on attribute values from the identity provider. See xref:#auto-federate-using-anonymous["To Map Remote Accounts to a Single-Service Provider Account"].
+
+OpenAM further allows you to use attributes from the identity provider to create accounts dynamically on the service provider. When using this method, you should inform the user and obtain consent to create the account if necessary. See xref:#auto-federate-with-dynamic-creation["To Map Accounts With Dynamic Service Provider Account Creation"].
+
+[#auto-federate-based-on-attribute]
+.To Map Accounts Based on an Attribute Value
+====
+The following steps demonstrate how to map accounts based on an attribute value that is the same in both accounts.
+
+Perform the following steps on the hosted identity provider(s), and again on the hosted service provider(s):
+
+. Log in to the OpenAM console as administrator.
+
+. Browse to Federation > __Hosted Provider Name__ > Assertion Processing.
+
+. If the attribute to use when linking accounts is not yet included in the attribute map, add the attribute mapping, and then save your work.
+
+. On the hosted service provider, under Auto Federation, select Enabled and enter the local attribute name in the Attribute field, and then save your work.
+
+====
+
+[#auto-federate-using-anonymous]
+.To Map Remote Accounts to a Single-Service Provider Account
+====
+The following steps demonstrate how to auto-federate using a single anonymous user account on the service provider.
+
+Perform the following steps on the hosted identity provider(s), and again on the hosted service provider(s):
+
+. Log in to the OpenAM console as administrator.
+
+. Browse to Federation > __Hosted Provider Name__ > Assertion Processing.
+
+. If you want to get attributes from the identity provider and the attributes are not yet in the attribute map, add the attribute mappings, and then save your work.
+
+. On the hosted service provider, under Transient User, set the single account to which to map all users, such as `anonymous`, and then save your work.
+
+. After completing configuration on the providers, use transient identifiers to federate as described in xref:#transient-federation["Using Transient Federation Identifiers"].
+
+====
+
+[#auto-federate-with-dynamic-creation]
+.To Map Accounts With Dynamic Service Provider Account Creation
+====
+The following steps demonstrate how to map accounts with dynamic creation of missing accounts on the service provider side:
+
+. Set up a mapping based on an attribute value as described in xref:#auto-federate-based-on-attribute["To Map Accounts Based on an Attribute Value"]. The attributes you map from the identity provider are those that the service provider sets on the dynamically created accounts.
+
+. On the service provider console, browse to Realms > __Realm Name__ > Authentication > Settings > User Profile. For the User Profile field, select Dynamic or Dynamic with User Alias, which are described in xref:chap-auth-services.adoc#core-module-conf-hints["Configuring Core Authentication Attributes"], and then save your work.
+
+. To test your work, create a user on the identity provider, log out of the console, and initiate SSO by logging in as the user you created.
++
+To initiate SSO, browse to one of the OpenAM SAML v2.0 JSPs with the appropriate query parameters. The following is an example URL for service provider initiated SSO.
++
+
+[source]
+----
+http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+ &metaAlias=/sp
+----
++
+On success, check `\http://www.sp.example:8080/openam/idm/EndUser` to see the new user account.
+
+====
+
+
+[#bulk-federation]
+==== Linking Federated Accounts in Bulk
+
+If you manage both the identity provider and service provider, you can link accounts out-of-band, in bulk. You make permanent connections for a list of identity provider and service provider by using the `ssoadm` bulk federation commands.
+
+Before you can run the bulk federation commands, first establish the relationship between accounts, set up the providers as described in xref:#saml2-providers-and-cots["Configuring Identity Providers, Service Providers, and Circles of Trust"], and install the `ssoadm` command as described in xref:../install-guide/chap-install-tools.adoc#install-openam-admin-tools["To Set Up Administration Tools"] in the __Installation Guide__.
+
+To understand the relationships between accounts, consider an example where the identity provider is at `idp.example.org` and the service provider is at `sp.example.com`. A demo user account has the Universal ID, `id=demo,ou=user,dc=example,dc=org`, on the identity provider. That maps to the Universal ID, `id=demo,ou=user,dc=example,dc=com`, on the service provider.
+
+The `ssoadm` command then needs a file that maps local user IDs to remote user IDs, one per line, separated by the vertical bar character `|`. Each line of the file appears as follows:
+
+[source]
+----
+local-user-ID|remote-user-ID
+----
+In the example, starting on the service provider side, the line for the demo user reads as follows.
+
+[source]
+----
+id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org
+----
+All the user accounts mapped in your file must exist at the identity provider and the service provider when you run the commands to link them.
+Link the accounts using the `ssoadm` bulk federation commands:
+
+. Prepare the data with the `ssoadm do-bulk-federation` command.
++
+The following example starts on the service provider side:
++
+
+[source, console]
+----
+$ cat /tmp/user-map.txt
+id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org
+$ ssoadm  \
+ do-bulk-federation \
+ --metaalias /sp \
+ --remoteentityid http://idp.example.org:8080/openam \
+ --useridmapping /tmp/user-map.txt \
+ --nameidmapping /tmp/name-map.txt \
+ --adminid amadmin  \
+ --password-file /tmp/pwd.txt \
+ --spec saml2
+
+Bulk Federation for this host was completed. To complete the
+federation, name Id mapping file should be loaded to remote
+provider.
+----
+
+. Copy the name ID mapping output file to the other provider:
++
+
+[source, console]
+----
+$ scp /tmp/name-map.txt openam@idp.example.org:/tmp/name-map.txt
+openam@idp.example.org's password:
+name-map.txt                     100%  177     0.2KB/s   00:00
+----
+
+. Import the name ID mapping file with the `ssoadm import-bulk-fed-data` command.
++
+The following example is performed on the identity provider side:
++
+
+[source, console]
+----
+$ ssoadm \
+ import-bulk-fed-data \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --metaalias /idp \
+ --bulk-data-file /tmp/name-map.txt
+
+Bulk Federation for this host was completed.
+----
+
+At this point the accounts are linked.
+
+
+[#saml2-authentication]
+==== Authentication and Linked Accounts
+
+In a SAML v2.0 federation where accounts are durably linked, authentication is required only on the identity provider side.
+
+Authentication is also required, however, on the service provider side when the OpenAM account mapper on the service provider is not able to map the user identified in the SAML assertion from the identity provider to a local user account.
+
+This can happen, for example, the first time accounts are linked as described in xref:#persistent-federation["Using Persistent Federation Identifiers"], after which the persistent identifier establishes the mapping.
+
+This also happens when transient identifiers are used to map accounts. When accounts are linked as described in xref:#transient-federation["Using Transient Federation Identifiers"], then the service provider must locally authenticate the user for every SAML assertion received. This is because the identifier used to link the accounts is transient; it does not provide a durable means to link the accounts.
+
+
+
+[#saml2-and-session-state]
+=== SAML v2.0 and Session State
+
+ForgeRock recommends that you configure OpenAM to use stateful sessions when deploying OpenAM as a SAML v2.0 IdP or SP.
+
+The following SAML v2.0 profiles are not supported when you configure OpenAM to use stateless sessions:
+
+* Single logout
+
+* Single sign-on with the HTTP POST binding
+
+The other SAML v2.0 single sign-on profiles are not guaranteed to work with stateless sessions.
+
+For more information about stateful and stateless sessions, see xref:chap-session-state.adoc#chap-session-state["Configuring Session State"].
+
+

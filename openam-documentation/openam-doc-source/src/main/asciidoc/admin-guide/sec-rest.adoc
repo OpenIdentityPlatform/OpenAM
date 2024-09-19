@@ -1,0 +1,96 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#sec-rest]
+== Configuring REST APIs
+
+You can configure the default behavior OpenAM will take when a REST call does not specify explicit version information using either of the following procedures:
+
+* xref:#configure-versioning-ui["Configure Versioning Behavior by using the Web-based Console"]
+
+* xref:#configure-versioning-ssoadm["Configure Versioning Behavior by using SSOADM"]
+
+The available options for default behavior are as follows:
+--
+
+__Latest__::
+The latest available supported version of the API is used.
+
++
+This is the preset default for new installations of OpenAM.
+
+__Oldest__::
+The oldest available supported version of the API is used.
+
++
+This is the preset default for upgraded OpenAM instances.
+
+__None__::
+No version will be used. When a REST client application calls a REST API without specifying the version, OpenAM returns an error and the request fails.
+
+--
+
+[#configure-versioning-ui]
+.Configure Versioning Behavior by using the Web-based Console
+====
+
+. Log in as OpenAM administrator, `amadmin`.
+
+. Click Configure > Global Services, and then click REST APIs.
+
+. In Default Version, select the required response to a REST API request that does not specify an explicit version: `Latest`, `Oldest`, or `None`.
+
+
+[#figure-rest-api-default-version-config]
+image::images/rest-api-default-version-config.png[]
+
+
+. (Optional) Optionally, enable `Warning Header` to include warning messages in the headers of responses to requests.
+
+. Save your work.
+
+====
+
+[#configure-versioning-ssoadm]
+.Configure Versioning Behavior by using SSOADM
+====
+
+* Use the `ssoadm set-attr-defs` command with the `openam-rest-apis-default-version` attribute set to either `LATEST`, `OLDEST` or `NONE`, as in the following example:
++
+
+[source, console]
+----
+$ ssh openam.example.com
+     $ cd /path/to/openam-tools/admin/openam/bin
+     $ ./ssoadm \
+     set-attr-defs \
+     --adminid amadmin \
+     --password-file /tmp/pwd.txt \
+     --servicename RestApisService \
+     --schematype Global \
+     --attributevalues openam-rest-apis-default-version=NONE
+
+     Schema attribute defaults were set.
+----
+
+====
+
