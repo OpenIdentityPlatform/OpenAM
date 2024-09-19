@@ -38,7 +38,7 @@ jobs:
       id: maven-profile-flag
     - name: Build with Maven
       env:
-        MAVEN_OPTS: -Xmx2g -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
+        MAVEN_OPTS: -Xmx4g -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
       run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
