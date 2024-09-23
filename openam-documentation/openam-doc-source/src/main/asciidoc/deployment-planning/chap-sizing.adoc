@@ -1,0 +1,152 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-sizing]
+== Sizing Hardware and Services For Deployment
+
+This chapter covers sizing servers, network, storage, and service levels required by your OpenAM deployment.
+
+[#size-for-availability]
+=== Sizing For Availability
+
+Any part of a system that can fail eventually will fail. Keeping your service available means tolerating failure in any part of the system without interrupting the service. You make OpenAM services highly available through good maintenance practices and by removing single points of failure from your architectures.
+
+Removing single points of failure involves replicating each system component, so that when one component fails, another can take its place. Replicating components comes with costs not only for the deployment and maintenance of more individual components, but also for the synchronization of anything those components share. Due to necessary synchronization between components, what you spend on availability is never fully recovered as gains in capacity. (Two servers cannot do quite twice the work of one server.) Instead you must determine the right trade offs for the deployment.
+To start thinking about the trade offs, answer the following questions.
+
+* What is the impact of the OpenAM service becoming unavailable?
++
+In an online system this could be a severe problem, interrupting all access to protected resources. Most deployments fall into this category.
++
+In an embedded system protecting local resources, it might be acceptable to restart the service.
++
+Deployments that require always-on service availability require some sort of load balancing solution at minimum between OpenAM and OpenAM client applications. The load balancer itself must be redundant, too, so that it does not become a single point of failure. Illustrations in xref:../deployment-planning/chap-topologies.adoc#chap-topologies["Example Deployment Topology"], show multiple levels of load balancing for availability and firewalls for security.
+
+* Is the service critical enough to warrant deployment across multiple sites?
++
+OpenAM allows you to deploy replicated configurations in different physical locations, so that if the service experiences complete failure at one site, you can redirect client traffic to another site and continue operation. The question is whether the benefit in reducing the likelihood of failure outweighs the costs of maintaining multiple sites.
++
+When you need failover across sites, one of the costs is (redundant) WAN links scaled for inter-site traffic. OpenAM synchronizes configuration and policy data across sites, and by default also synchronizes session data as well. OpenAM also expects profiles in identity data stores to remain in sync. As shown in xref:../deployment-planning/chap-topologies.adoc#chap-topologies["Example Deployment Topology"], the deployment involves directory service replication between sites.
+
+* What happens if individual session information is lost?
++
+In OpenAM session failover is different from service failover. Session failover consists of maintaining redundant information for stateful sessions, so that if a server fails, another server recovers the session information, preventing the user from having to authenticate again. Service failover alone consists of maintaining redundant servers, so that if one server fails, another server can take the load. With service failover alone, users who authenticated with a failed server must authenticate again to start a new session.
++
+In deployments where an interruption in access to a protected resource could cause users to lose valuable information, session failover can prevent the loss. To provide for session failover, OpenAM replicates the session information held by the CTS, relying on the underlying directory service to perform the replication. Session information can be quite volatile, certainly more volatile than configuration and policy data. Session failover across sites can therefore call for more WAN bandwidth, as more information is shared across sites.
+
+Once you have the answers to these questions for the deployment, you can draw a diagram of the deployment, checking for single points of failure to avoid. In the end, you should have a count of the number of load balancers, network links, and servers that you need, with the types of clients and an estimated numbers of clients that access the OpenAM service.
+
+Also, you must consider the requirements for non-functional testing, covered in xref:../deployment-planning/chap-deployments.adoc#plan-tests["Planning Tests"]. While you might be able to perform functional testing by using a single OpenAM server with the embedded OpenDJ server for user data store, other tests require a more complete environment with multiple servers, secure connections, and so forth. Performance testing should reveal any scalability issues. Performance testing should also run through scenarios where components fail, and check that critical functionality remains available and continues to provide acceptable levels of service.
+
+
+[#size-for-service-levels]
+=== Sizing For Service Levels
+
+Beyond service availability, your aim is to provide some level of service. You can express service levels in terms of throughput and response times. For example, the service level goal could be to handle an average of 10,000 authentications per hour with peaks of 25,000 authentications per hour, and no more than 1 second wait for 95% of users authenticating, with an average of 100,000 live SSO sessions at any given time. Another service level goal could be to handle an average of 500 policy requests per minute per policy agent with an average response time of 0.5 seconds.
+
+When you have established your service level goals, you can create load tests for each key service as described in xref:../deployment-planning/chap-deployments.adoc#plan-service-performance-tests["Planning Service Performance Testing"]. Use the load tests to check your sizing assumptions.
+To estimate sizing based on service levels, take some initial measurements and extrapolate from those measurements.
+
+* For a service that handles policy decision (authorization) requests, what is the average policy size? What is the total size of all expected policies?
++
+To answer these questions, you can measure the current disk space and memory occupied by the configuration directory data. Next, create a representative sample of the policies that you expect to see in the deployment, and measure the difference. Then, derive the average policy size, and use it to estimate total size.
++
+To measure rates of policy evaluations, you can monitor policy evaluation counts over SNMP. For details, see xref:../admin-guide/chap-monitoring.adoc#snmp-policy-evaluation["SNMP Monitoring for Policy Evaluation"] in the __Administration Guide__.
+
+* For a service that stores stateful sessions, access, and refresh tokens, or other authentication-related data in the CTS backing store, what is the average session or access/refresh token size? What is the average total size of CTS data?
++
+As for policy data, you can estimate the size of CTS data by measuring the CTS directory data.
++
+The average total size depends on the number of live CTS entries, which in turn depends on session and token lifetimes. The lifetimes are configurable and depend also on user actions like logout, that are specific to the deployment.
++
+For example, suppose that the deployment only handles stateful SSO sessions, session entries occupy on average 20 KB of memory, and that you anticipate on average 100,000 active sessions. In that case, you would estimate the need for 2 GB (100,000 x 20,000) RAM on average to hold the session data in memory. If you expect that sometimes the number of active sessions could rise to 200,000, then you would plan for 4 GB RAM for session data. Keep in mind that this is the extra memory needed in addition to memory needed for everything else that the system does including running OpenAM server.
++
+Session data is relatively volatile, as the CTS creates sessions entries when sessions are created. CTS deletes session entries when sessions are destroyed due to logout or timeout. Sessions are also modified regularly to update the idle timeout. Suppose the rate of session creation is about 5 per second, and the rate of session destruction is also about 5 per second. Then you know that the underlying directory service must handle on average 5 adds and 5 deletes per second. The added entries generate on the order of 100 KB replication traffic per second (5/s x 20 KB plus some overhead). The deleted entries generate less replication traffic, as the directory service only needs to know the distinguished name (DN) of the entry to delete, not its content.
++
+You can also gather statistics about CTS operations over SNMP. For details, see xref:../admin-guide/chap-monitoring.adoc#cts-monitoring["Monitoring CTS Tokens"] in the __Administration Guide__.
+
+* What level of network traffic do you expect for notifications and crosstalk?
++
+When sizing the network, you must account both for inter-site replication traffic and also for notifications and crosstalk in high-throughput deployments.
++
+In OpenAM deployments using stateful sessions, much of the network traffic between OpenAM servers consists of notifications and crosstalk. When the session state changes on session creation and destruction, the OpenAM server performing the operations can notify other servers.
++
+Crosstalk between OpenAM servers arises either when configured (i.e., in OpenAM 12.0 or later), where you enable crosstalk to resolve non-local sessions instead of having OpenAM rely on the session persistence mechanism, or when a client is not routed to the OpenAM server that originally authenticated the client. In an OpenAM site, the server that originally authenticates a client deals with the session, unless that server becomes unavailable. If the client is routed to another server, then the other server communicates with the first, resulting in local crosstalk network traffic. Sticky load balancing can limit crosstalk by routing clients to the same server with which they started their session.
++
+When the OpenAM servers are all on the same LAN, and even on the same rack, notifications and crosstalk are less likely to adversely affect performance. If the servers are on different networks or communicating across the WAN, the network could become a bottleneck.
+
+* What increase in user and group profile size should you expect?
++
+OpenAM stores data in user profile attributes. OpenAM can use or provision many profile attributes, as described in xref:../admin-guide/chap-realms.adoc#realm-data-store["To Configure a Data Store"] in the __Administration Guide__.
++
+When you know which attributes are used, you can estimate the average increase in size by measuring the identity data store as you did for configuration and CTS-related data. If you do not manage the identity data store as part of the deployment, you can communicate this information with the maintainers. For a large deployment, the increase in profile size can affect sizing for the underlying directory service.
+
+* How does the number of realms affect the configuration data size?
++
+In a centrally managed deployment with only a few realms, the size of realm configuration data might not be consequential. Also, you might have already estimated the size of policy data. For example, each new realm might add about 1 MB of configuration data to the configuration directory, not counting the policies added to the realm.
++
+In a multi-tenant deployment or any deployment where you expect to set up many new realms, the realm configuration data and the additional policies for the realm can add significantly to the size of the configuration data overall. You can measure the configuration directory data as you did previously, but specifically for realm creation and policy configuration, so that you can estimate an average for a new realm with policies and the overall size of realm configuration data for the deployment.
+
+
+
+[#size-systems]
+=== Sizing Systems
+
+Given availability requirements and estimates on sizing for services, estimate the required capacity for individual systems, networks, and storage. This section considers the OpenAM server systems, not the load balancers, firewalls, independent directory services, and client applications.
+
+Although you can start with a rule of thumb, you see from the previous sections that the memory and storage footprints for the deployment depend in large part on the services you plan to provide. With that in mind, to performance test a basic deployment providing SSO, you can start with OpenAM systems having at least 4 GB free RAM, 4 CPU cores (not throughput computing cores, but normal modern cores), plenty of local storage for configuration, policy, and CTS data, and LAN connections to other OpenAM servers. This rule of thumb assumes the identity data stores are sized separately, and that the service is housed on a single local site. Notice that this rule of thumb does not take into account anything particular to the service levels you expect to provide. Consider it a starting point when you lack more specific information.
+
+[#size-cpu-memory]
+==== Sizing System CPU and Memory
+
+OpenAM services use CPU resources to process requests and responses, and essentially to make policy decisions. Encryption, decryption, signing, and checking signatures can absorb CPU resources when processing requests and responses. Policy decision evaluation depends both on the number of policies configured and on their complexity.
+
+Memory depends on space for OpenAM code, on the number of live connections OpenAM maintains, on caching of configuration data, user profile data, and stateful session data, and importantly, on holding embedded directory server data in memory. The OpenAM code in memory probably never changes while the server is running, as JSPs deployed are unlikely ever to change in production.
+
+The number of connections and data caching depending on server tuning, as described in xref:../admin-guide/chap-tuning.adoc#chap-tuning["Tuning OpenAM"] in the __Administration Guide__.
+
+If OpenAM uses the embedded OpenDJ directory server, then the memory needed depends on what you store in the embedded directory and what you calculated as described in xref:#size-for-service-levels["Sizing For Service Levels"]. The embedded OpenDJ directory server shares memory with the OpenAM server process. By default, the directory server takes half of the available heap as database cache for directory data. That setting is configurable as described in the OpenDJ directory server documentation.
+
+
+[#size-network-connections]
+==== Sizing Network Connections
+
+When sizing network connections, you must account for the requests and notifications from other servers and clients, as well as the responses. This depends on the service levels that the deployment provides, as described in xref:#size-for-service-levels["Sizing For Service Levels"]. Responses for browser-based authentication can be quite large if each time a new user visits the authentication UI pages, OpenAM must respond with the UI page, plus all images and JavaScript logic and libraries included to complete the authentication process. Inter-server synchronization and replication can also require significant bandwidth.
+
+For deployments with sites in multiple locations, be sure to account for configuration, CTS, and identity directory data over WAN links, as this is much more likely to be an issue than replication traffic over LAN links.
+
+Make sure to size enough bandwidth for peak throughput, and do not forget redundancy for availability.
+
+
+[#size-io-storage]
+==== Sizing Disk I/O and Storage
+
+As described in xref:../deployment-planning/chap-hw-sw-requirements.adoc#storage-requirements["Disk Storage Requirements"], the largest disk I/O loads for OpenAM servers arise from logging and from the embedded OpenDJ directory server writing to disk. You can estimate your storage requirements as described in that section.
+
+I/O rates depend on the service levels that the deployment provides, as described in xref:#size-for-service-levels["Sizing For Service Levels"]. When you size disk I/O and disk space, you must account for peak rates and leave a safety margin when you must briefly enable debug logging to troubleshoot any issues that arise.
+
+Also, keep in mind the possible sudden I/O increases that can arise in a highly available service when one server fails and other servers must take over for the failed server temporarily.
+
+Another option is to consider placing log, configuration, and database files on a different file system to maximize throughput and minimize service disruption due to a file system full or failure scenarios.
+
+
+

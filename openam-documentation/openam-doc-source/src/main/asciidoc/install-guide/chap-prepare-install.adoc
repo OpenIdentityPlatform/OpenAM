@@ -1,0 +1,1610 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-prepare-install]
+== Preparing For Installation
+
+This chapter covers prerequisites for installing OpenAM software, including how to prepare your application server to run OpenAM, how to prepare directory servers to store configuration data, and how to prepare an identity repository to handle OpenAM identities.
+
+[NOTE]
+====
+If a Java Security Manager is enabled for your application server, add permissions before installing OpenAM.
+====
+
+[#prepare-networking]
+=== Preparing a Fully Qualified Domain Name
+
+OpenAM requires that you provide the fully qualified domain name (FQDN) when you configure it. Before you set up OpenAM, be sure that your system has an FQDN, such as `openam.example.com`. For evaluation purposes, you can give your system an alias using the `/etc/hosts` file on UNIX systems or `%SystemRoot%\system32\drivers\etc\hosts` on Windows. For deployment, make sure the FQDN is properly assigned for example using DNS.
+
+Do not use the hostname `localhost` for OpenAM, not even for testing purposes. OpenAM relies on browser cookies, which are returned based on domain name. You can set the cookie domain name value to an empty string for host-only cookies or to any non-top level domain. For example, if you install OpenAM and use `openam.example.com` as the host, you can set the cookie domain name as `example.com`.
+
+[IMPORTANT]
+====
+Do not configure a top-level domain as your cookie domain as browsers will reject them.
+
+Top-level domains are browser-specific. Some browsers, like Firefox, also consider special domains like Amazon's web service (for example, ap-southeast-2.compute.amazonaws.com) to be a top-level domain.
+
+Check the effective top-level domain list at link:https://publicsuffix.org/list/effective_tld_names.dat[https://publicsuffix.org/list/effective_tld_names.dat, window=\_blank] to ensure that you do not set your cookie to a domain in the list.
+====
+
+
+[#prepare-java]
+=== Preparing a Java Environment
+
+OpenAM software depends on a Java runtime environment. Check the output of `java -version` to make sure your the version is supported. The current OpenAM release supports Java Development Kit 8, 11, 17 or 21 LTS version.
+
+[#prepare-java-sun]
+==== Settings For Sun/Oracle Java Environments
+
+--
+When using a Sun or Oracle Java environment set at least the following options.
+
+`-server`::
+Use `-server` rather than `-client`.
+
+`-Xmx1g` (minimum)::
+OpenAM requires at least a 1 GB heap. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. Higher volume and higher performance deployments require additional heap space.
+
+`-XX:PermSize=256m` (when using JDK 7)::
+Set the permanent generation size to 256 MB.
+
+`-XX:MaxPermSize=256m` (when using JDK 7)::
+Set the maximum permanent generation size to 256 MB.
+
+`-XX:MetaspaceSize=256m` (when using JDK 8)::
+Set the metaspace memory size to 256 MB.
+
+`-XX:MaxMetaspaceSize=256m` (when using JDK 8)::
+Set the maximum metaspace memory size to 256 MB.
+
+--
+For additional JVM tuning and security recommendations, see link:../admin-guide/index.html#tuning-jvm-for-openam[Java Virtual Machine Settings] in the __Administration Guide__.
+
+
+[#prepare-java-ibm]
+==== Settings For IBM Java Environments
+
+--
+When using an IBM Java environment set at least the following options.
+
+`-DamCryptoDescriptor.provider=IBMJCE`,`-DamKeyGenDescriptor.provider=IBMJCE`::
+Use the IBM Java Cryptography Extensions.
+
+`-Xmx1024m` (minimum)::
+OpenAM requires at least a 1 GB heap. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. Higher volume and higher performance deployments require additional heap space.
+
+--
+
+
+
+[#prerequisites-file-descriptors]
+=== Setting Maximum File Descriptors
+
+If you use the embedded OpenDJ directory, verify that OpenDJ has enough file descriptors set in the operating system to open many files, especially when handling multiple client connections. For example, Linux systems in particular often set a limit of 1024 per user, which is too low for OpenDJ.
+
+In general, do not set up file descriptors to a same value or higher than the maximum number allowed in the system itself. Please consult your operating system documentation for your particular deployment.
+
+OpenDJ should have access to at least 64K (65536) file descriptors. The embedded OpenDJ directory runs inside the OpenAM process space. When running OpenAM as user `openam` on a Linux system that uses `/etc/security/limits.conf` to set user limits, you can set soft and hard limits by adding these lines to the file.
+
+[source]
+----
+openam soft nofile 65536
+openam hard nofile 131072
+----
+You can verify the new soft limit the next time you log in as user `openam` with the `ulimit -n` command.
+
+[source, console]
+----
+$ ulimit -n
+65536
+----
+You can check the Linux system overall maximum as follows.
+
+[source, console]
+----
+$ cat /proc/sys/fs/file-max
+204252
+----
+If the overall maximum is too low, you can increase it as follows.
+
+. As superuser, edit `/etc/sysctl.conf` to set the kernel parameter `fs.file-max` to a higher maximum.
+
+. Run the `sysctl -p` command to reload the settings in `/etc/sysctl.conf`.
+
+. Open `/proc/sys/fs/file-max` again to confirm that it now corresponds to the new maximum.
+
+. If you are running a daemon process on some Linux systems, you may need to add a `LimitNOFILE` directive. For example, if running Tomcat, under the Services section in `/usr/lib/systemd/system/tomcat.service`, add the line:
++
+
+[source, console]
+----
+LimitNOFILE=65536
+----
+
+. To reload the daemon, run:
++
+
+[source, console]
+----
+$ systemctl daemon-reload
+----
+
+. Restart Tomcat:
++
+
+[source, console]
+----
+$ systemctl start tomcat && journalctl --follow -u tomcat
+----
+
+. Check the file descriptors:
++
+
+[source, console]
+----
+$ cat /proc/<tomcat pid>/limit | grep 'open files'
+----
++
+Again, consult your operating system documentation for specifics to your deployment.
+
+
+
+[#prepare-identity-repository]
+=== Preparing an External Identity Repository
+
+OpenAM accesses user identity data from one or more identity repositories. OpenAM ships with an embedded OpenDJ directory server that you can install as part of the OpenAM configuration process. You can use the embedded directory server as your identity repository for smaller deployments, and avoid the additional overhead of maintaining a separate directory server.
+
+In most deployments, OpenAM connects to existing LDAP directory servers for user identity data, as it shares data in an identity repository with other applications.
+
+If you are configuring OpenAM to share data with other applications, or if you expect your deployment will have a large amount of users, connect OpenAM to an external identity repository.
+
+[#prepare-idrepo-considerations]
+==== Important Considerations for Using External Identity Repositories
+
+OpenAM connects to an external directory by binding to it as a user that you specify in the OpenAM data store configuration. This user is known as the __OpenAM data store administrator__.
+
+Specifying the directory administrator, for example, `cn=Directory Manager` as the OpenAM data store administrator is not recommended for production deployments as it will give OpenAM directory administrator privileges to the identity repository. Instead, create a separate OpenAM administrator account with fewer access privileges than the directory administrator so that you can assign the appropriate level of privileges for the OpenAM data store administrator.
+
+You need to consider two areas of privileges for the OpenAM data store administrator:
+--
+
+Schema Update Privileges::
+OpenAM needs to update the directory schema when you configure a new identity repository and when you upgrade OpenAM software. If the OpenAM data store administrator has schema update privileges, OpenAM can update the schema dynamically during data store configuration and during OpenAM upgrades. If the OpenAM data store administrator does not have schema update privileges, you must update the schema manually before configuring a new identity repository and before upgrading OpenAM.
+
+Directory Read and Write Access Privileges::
+If you want OpenAM to create, update, and delete user entries, then the OpenAM data store administrator must have full read and write access to the identity data in the directory. If you are using an external identity repository as a read-only user directory, then the OpenAM data store administrator needs read privileges only.
+
+--
+The level of access privileges you give the OpenAM data store administrator is specific to each OpenAM deployment. Work with your directory server administrator to determine the appropriate level of privileges as part of the process of preparing an external identity repository.
+
+
+[#prepare-idrepo]
+==== Preparing Your External Identity Repository
+
+The steps for preparing an external identity repository vary depending on the schema update privileges given to the OpenAM data store administrator.
+
+* If the OpenAM data store administrator has schema update privileges, follow the procedure in xref:#prepare-idrepo-dynamic-schema["Preparing an Identity Repository With Dynamic Schema Updates"].
+
+* If the OpenAM data store administrator does not have schema update privileges, follow the procedure in xref:#prepare-idrepo-manual-schema["Preparing an Identity Repository With Manual Schema Updates"].
+
+After you have completed one of these two procedures, continue by configuring your external identity repository as an OpenAM data store as described in xref:#prepare-idrepo-datastore["Configuring OpenAM Data Stores That Access External Identity Repositories"].
+
+[NOTE]
+====
+Example commands throughout this section use default values for user IDs and port numbers. When running similar commands, be sure to use appropriate values for your directory server.
+
+When running the `ldapmodify` command, you might need to specify the `--trustAll` argument to trust server certificates if your directory server uses self-signed certificates and StartTLS or SSL.
+====
+
+[#prepare-idrepo-dynamic-schema]
+===== Preparing an Identity Repository With Dynamic Schema Updates
+
+If the OpenAM data store administrator has schema update privileges, you can configure the OpenAM data store using dynamic schema updates. With dynamic schema updates, OpenAM automatically updates the directory server schema of the external identity repository as needed. Schema updates might occur when you configure a data store as part of initial OpenAM configuration, when you configure a data store after initial OpenAM configuration, or when you upgrade OpenAM.
+
+The following procedure shows you how to prepare an identity repository with dynamic schema updates. The procedure assumes that you have already created an OpenDJ identity repository and populated it with user data. The instructions that follow do not include steps to install OpenDJ, configure directory server backends, and implement replication. For external identity repositories other than OpenDJ, you must perform tasks that are analogous to the ones in the example procedure. Consult the documentation for your directory server software to determine the appropriate actions to take.
+
+[#prepare-idrepo-dynamic-schema-steps]
+.To Prepare an External OpenDJ Identity Repository with Dynamic Schema Updates
+====
+
+. Create the OpenAM data store administrator account.
++
+This example uses `uid=openam,ou=admins,dc=example,dc=com` as the OpenAM data store administrator. It is assumed that the `dc=example,dc=com` suffix already exists in the directory.
++
+First, create an LDIF file that defines the OpenAM data store administrator account and gives the account the following privileges:
++
+
+* `update-schema`. Allows the account to update the directory schema.
+
+* `subentry-write`. Allows the account to make directory subentry updates.
+
+* `password-reset`. Allows the account to reset other users' passwords. Required for the OpenAM forgotten password feature. This privilege is not required for deployments where the OpenAM data store will not modify user entries.
+
++
+
+[source, ldif]
+----
+dn: ou=admins,dc=example,dc=com
+objectClass: top
+objectClass: organizationalunit
+ou: OpenAM Administrator
+
+dn: uid=openam,ou=admins,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: OpenAM Administrator
+sn: OpenAM
+userPassword: changeMe
+ds-privilege-name: update-schema
+ds-privilege-name: subentry-write
+ds-privilege-name: password-reset
+----
++
+Then, run the `ldapmodify` command to create the user.
++
+
+[source, console]
+----
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename openam-ds-admin-account.ldif
+
+Processing ADD request for ou=admins,dc=example,dc=com
+ADD operation successful for DN ou=admins,dc=example,dc=com
+Processing ADD request for uid=openam,ou=admins,dc=example,dc=com
+ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com
+----
+
+. Add a global ACI that lets the OpenAM administrator account modify the directory schema.
++
+
+[source, console]
+----
+$ dsconfig set-access-control-handler-prop \
+  --hostname opendj.example.com \
+  --port 4444 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --no-prompt \
+  --add \
+  'global-aci:(target="ldap:///cn=schema")(targetattr="attributeTypes||objectClasses")
+    (version 3.0; acl "Modify schema"; allow (write)
+    userdn="ldap:///uid=openam,ou=admins,dc=example,dc=com";)'
+----
++
+If you copy the text from the preceding example, make sure that the value starting with `'global-aci` is all on a single line.
++
+To verify that you have added the global ACI correctly, list the global ACIs.
++
+
+[source, console]
+----
+$ dsconfig get-access-control-handler-prop \
+  --port 4444 \
+  --hostname opendj.example.com \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --property global-aci
+----
++
+The global ACI that allows the OpenAM administrator account to modify schema definitions should appear in the list of global ACIs:
++
+
+[source, console]
+----
+"(target="ldap:///cn=schema")(targetattr="attributeTypes||
+ objectClasses") (version 3.0; acl "Modify schema"; allow
+ (write) userdn="ldap:///uid=openam,ou=admins,dc=example,dc=com");"
+----
+
+. Allow OpenAM to read the directory schema. OpenAM needs to read the directory schema to ensure that changes made to identities stored in identity repositories remain compliant with the directory schema.
++
+For OpenDJ, no actions are required. Simply retain the default "User-Visible Schema Operational Attributes" global ACI.
+
+. Give the OpenAM data store administrator appropriate access rights on the directory. When OpenAM connects to an external identity repository, it binds as the OpenAM data store administrator.
++
+For deployments in which OpenAM will read and write user entries, the OpenAM data store administrator needs privileges to create, modify, delete, search, read, and perform persistent searches on user entries in the directory. For deployments in which OpenAM only reads user entries, the OpenAM data store administrator needs privileges to only read, search, and perform persistent searches on user entries in the directory.
++
+To grant the OpenAM data store administrator account privileges to read and write user entries in OpenDJ, create a file with the following LDIF:
++
+
+[source, ldif]
+----
+dn: dc=example,dc=com
+changetype: modify
+add: aci
+aci: (targetattr="* || aci")(version 3.0;acl "Allow identity modification";
+   allow (write)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr!="userPassword||authPassword")(version 3.0;
+   acl "Allow identity search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+   persistent search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add or delete identities"; allow (add, delete)
+   (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="1.3.6.1.4.1.42.2.27.8.5.1")(version 3.0;acl "Allow behera draft control"; allow (read)
+   (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+----
++
+To grant the OpenAM data store administrator account privileges to read (but not write) user entries in OpenDJ, create a file with the following LDIF:
++
+
+[source, ldif]
+----
+dn: dc=example,dc=com
+changetype: modify
+add: aci
+aci: (targetattr!="userPassword||authPassword")(version 3.0;
+   acl "Allow identity search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+   persistent search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+----
++
+Then run the `ldapmodify` command to implement the ACIs:
++
+
+[source, console]
+----
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename add-acis-for-openam-ds-admin-access.ldif
+
+Processing MODIFY request for dc=example,dc=com
+MODIFY operation successful for DN dc=example,dc=com
+----
+
+====
+Continue by configuring your external identity repository as an OpenAM data store as described in xref:#prepare-idrepo-datastore["Configuring OpenAM Data Stores That Access External Identity Repositories"].
+
+
+[#prepare-idrepo-manual-schema]
+===== Preparing an Identity Repository With Manual Schema Updates
+
+If the OpenAM data store administrator does not have schema update privileges, you must configure the OpenAM data store by using manual schema updates. To do this, update the directory server schema of the external identity repository manually before you configure a data store as part of initial OpenAM configuration, before you configure a data store after initial OpenAM configuration, and whenever you upgrade OpenAM.
+
+The following procedure shows you how to prepare an identity repository with manual schema updates. The procedure assumes that you have already created an OpenDJ identity repository and populated it with user data. It therefore does not include steps to install OpenDJ, configure directory server backends, and implement replication. For external identity repositories other than OpenDJ, you must perform tasks that are analogous to the ones in the example procedure. Consult the documentation for your directory server software to determine the appropriate actions to take.
+
+[#prepare-idrepo-manual-schema-steps]
+.To Prepare an External OpenDJ Identity Repository With Manual Schema Updates
+====
+
+. Create the OpenAM data store administrator account.
++
+This example uses uses `uid=openam,ou=admins,dc=example,dc=com` as the OpenAM data store administrator. It is assumed that the `dc=example,dc=com` suffix already exists in the directory.
++
+First, create an LDIF file that defines the OpenAM data store administrator account and gives the account the following privilege:
++
+
+* `password-reset`. Allows the account to reset other users' passwords. Required for the OpenAM forgotten password feature. For deployments in which OpenAM will not modify user entries, the OpenAM data store administrator does not require this privilege.
+
++
+
+[source, ldif]
+----
+dn: ou=admins,dc=example,dc=com
+objectClass: top
+objectClass: organizationalunit
+ou: OpenAM Administrator
+
+dn: uid=openam,ou=admins,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: OpenAM Administrator
+sn: OpenAM
+userPassword: changeMe
+ds-privilege-name: password-reset
+----
++
+Then run the `ldapmodify` command to create the user:
++
+
+[source, console]
+----
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename openam-ds-admin-account.ldif
+
+Processing ADD request for ou=admins,dc=example,dc=com
+ADD operation successful for DN ou=admins,dc=example,dc=com
+Processing ADD request for uid=openam,ou=admins,dc=example,dc=com
+ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com
+----
+
+. Using the directory administrator account, add the OpenAM schema extensions to your external identity repository.
++
+First, identify the path that contains LDIF file for OpenAM schema extensions. The path is `/path/to/openam/ldif/directory_type`, where `directory_type` is one of the following:
++
+
+* `ad` for Microsoft Active Directory
+
+* `adam` for Microsoft Active Directory Lightweight Directory Services
+
+* `odsee` for Oracle Directory Server Enterprise Edition
+
+* `opendj` for OpenDJ and Oracle Unified Directory
+
+* `tivoli` for IBM Tivoli Directory Server
+
++
+Then run the `ldapmodify` command to import the user, device print, and dashboard schema extensions. For example, to add schema extensions for an OpenDJ directory server, run the following `ldapmodify` commands:
++
+
+[source, console]
+----
+$ cd /path/to/openam/ldif/opendj
+
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename opendj_user_schema.ldif
+
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename opendj_deviceprint.ldif
+
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename opendj_dashboard.ldif
+----
+
+. Allow OpenAM to read the directory schema. OpenAM needs to read the directory schema to ensure that changes made to identities stored in identity repositories remain compliant with the directory schema.
++
+For OpenDJ, no actions are required. Simply retain the default User-Visible Schema Operational Attributes global ACI.
+
+. Give the OpenAM data store administrator appropriate access rights on the directory. When OpenAM connects to an external identity repository, it binds as the OpenAM data store administrator.
++
+For deployments in which OpenAM will read and write user entries, the OpenAM data store administrator needs privileges to create, modify, delete, search, read, and perform persistent searches on user entries in the directory. For deployments in which OpenAM only reads user entries, the OpenAM data store administrator needs privileges to only read, search, and perform persistent searches on user entries in the directory.
++
+To grant the OpenAM data store administrator account privileges to read and write user entries in OpenDJ, create a file with the following LDIF:
++
+
+[source, ldif]
+----
+dn: dc=example,dc=com
+changetype: modify
+add: aci
+aci: (targetattr="* || aci")(version 3.0;acl "Allow identity modification";
+   allow (write)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr!="userPassword||authPassword")(version 3.0;
+   acl "Allow identity search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+   persistent search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add or delete identities"; allow (add, delete)
+   (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="1.3.6.1.4.1.42.2.27.8.5.1")(version 3.0;acl "Allow behera draft control"; allow (read)
+   (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+----
++
+To grant the OpenAM data store administrator account privileges to read (but not write) user entries in OpenDJ, create a file with the following LDIF:
++
+
+[source, ldif]
+----
+dn: dc=example,dc=com
+changetype: modify
+add: aci
+aci: (targetattr!="userPassword||authPassword")(version 3.0;
+   acl "Allow identity search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+   persistent search"; allow (search, read)(userdn = "ldap:///
+   uid=openam,ou=admins,dc=example,dc=com");)
+----
++
+Then run the `ldapmodify` command to implement the ACIs:
++
+
+[source, console]
+----
+$ ldapmodify \
+  --defaultAdd \
+  --hostname opendj.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename add-acis-for-openam-ds-admin-access.ldif
+
+Processing MODIFY request for dc=example,dc=com
+MODIFY operation successful for DN dc=example,dc=com
+----
+
+====
+
+
+
+[#prepare-idrepo-datastore]
+==== Configuring OpenAM Data Stores That Access External Identity Repositories
+
+Now that you have prepared your external identity repository, you can configure the directory as an OpenAM data store by using one of the following methods:
+
+* By specifying your user directory in the User Data Store Settings dialog box when installing OpenAM core services.
++
+If you are using dynamic schema updates, the OpenAM configurator loads required schema definitions into your user directory. If you are using manual schema updates, you already loaded the required schema definitions into your user directory.
++
+For more information about running the OpenAM configurator, see xref:chap-install-core.adoc#chap-install-core["Installing OpenAM Core Services"].
+
+* By defining a data store after you have installed OpenAM core services.
++
+If you are using dynamic schema updates and you specify the Load schema when finished option, OpenAM loads required schema definitions into your user directory. If you are using manual schema updates, you will have already loaded the required schema definitions into your user directory.
++
+For more information about defining OpenAM data stores, see xref:../admin-guide/chap-realms.adoc#config-data-store["Configuring Data Stores"] in the __Administration Guide__.
+
+
+
+[#prepare-idrepo-indexing]
+==== Indexing External Identity Repositories Attributes
+
+After you have configured a data store to access an external identity repository, you must complete identity repository preparation by indexing several attributes.
+
+[#install-index-opendj-external-idrepo]
+.To Index External Identity Repository Attributes
+====
+
+* Create equality indexes for the `iplanet-am-user-federation-info-key` and `sun-fm-saml2-nameid-infokey` attributes. To create the indexes, run the `dsconfig` command twice. Bind to your user directory as the directory administrator.
++
+The `dsconfig` subcommand used to create the index depends on the version of OpenDJ directory server.
++
+
+** Use the following commands with OpenDJ 2.6:
++
+
+[source, console]
+----
+$ dsconfig \
+ create-local-db-index \
+ --port 4444 \
+ --hostname opendj.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backend-name userRoot \
+ --index-name iplanet-am-user-federation-info-key \
+ --set index-type:equality \
+ --no-prompt
+
+$ dsconfig \
+ create-local-db-index \
+ --port 4444 \
+ --hostname opendj.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backend-name userRoot \
+ --index-name sun-fm-saml2-nameid-infokey \
+ --set index-type:equality \
+ --no-prompt
+----
+
+** Use the following commands with OpenDJ 3 and later:
++
+
+[source, console]
+----
+$ dsconfig \
+ create-backend-index \
+ --port 4444 \
+ --hostname opendj.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backend-name userRoot \
+ --index-name iplanet-am-user-federation-info-key \
+ --set index-type:equality \
+ --no-prompt
+
+$ dsconfig \
+ create-backend-index \
+ --port 4444 \
+ --hostname opendj.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backend-name userRoot \
+ --index-name sun-fm-saml2-nameid-infokey \
+ --set index-type:equality \
+ --no-prompt
+----
+
+
+====
+
+
+[#prepare-idrepo-testing]
+==== Testing External Identity Repository Access from OpenAM
+
+Prior to working actively with external identity repositories, you should verify that you have configured the repository and administrator privileges correctly. You can test configuration as follows:
+
+* Attempt to create an OpenAM user from the Realms > __Realm Name__ > Subjects tab in the OpenAM console. Run this test only if you have given the OpenAM data store administrator write privileges to your identity repository.
+
+* Attempt to access an OpenAM user from the Realms > __Realm Name__ > Subjects tab in the OpenAM console.
+
+If you receive an LDAP error code 65 while attempting to create a user, it indicates that you did not correctly prepare the external identity repository. Error code 65 is an LDAP object class violation and often indicates a problem with the directory schema. Common reasons for this error while attempting to create a user include the following:
+
+* If you configured the external data store after initial configuration, you might have simply forgotten to check the "Load schema when finished" option. In this case, select this option and resave the data store configuration.
+
+* The OpenAM administrator account might not have adequate rights to update the directory schema. Review the OpenDJ `access` log and locate the log records for the schema update operation to determine OpenDJ's access rights.
+
+
+
+
+[#prepare-configuration-store]
+=== Preparing an External Configuration Data Store
+
+OpenAM stores its configuration in an LDAP directory server. OpenAM ships with an embedded OpenDJ directory server that you can install as part of the OpenAM configuration process. By default, OpenAM installs the embedded directory server and its configuration settings in the `$HOME` directory of the user running OpenAM and runs the embedded directory server in the same JVM memory space as OpenAM.
+
+OpenAM connects to the embedded OpenDJ directory as directory superuser, bypassing access control evaluation because OpenAM manages the directory as its private store. Be aware that you cannot configure directory failover and replication when using the embedded store.
+
+By default, OpenAM also stores data managed by the Core Token Service (CTS) pertaining to user logins—OpenAM stateful sessions, logout blacklists, and several types of authentication tokens—in the same embedded OpenDJ directory that holds the OpenAM configuration. You can choose to create a separate directory store for CTS data. For information about creating a separate directory store for CTS data, see the chapter, xref:chap-cts.adoc#chap-cts["Configuring the Core Token Service"].
+
+Before deploying OpenAM in production, measure the impact of using the embedded directory not only for relatively static configuration data, but also for volatile session and token data. Your tests should subject OpenAM to the same load patterns you expect in production. If it looks like a better choice to use an external directory server, then deploy OpenAM with an external configuration store.
+
+[TIP]
+====
+If you are the directory administrator and do not yet know directory servers very well, take some time to read the documentation for your directory server, especially the sections covering directory schema and procedures on how to configure access to directory data.
+====
+
+[#install-prepare-opendj-external-config-store]
+.To Install an External OpenDJ Directory Server
+====
+The following example procedure shows how to prepare a single OpenDJ directory server instance as an external configuration data store. The OpenDJ instance implements a single backend for the OpenAM configuration data. The procedure assumes that you have also prepared an external identity repository and an external CTS store, separate from the configuration data store.
+
+[NOTE]
+======
+Example commands throughout this section use example values for user IDs and port numbers. When running similar commands, be sure to use appropriate values for your directory server.
+
+When running the `ldapmodify` or `dsconfig` commands, you might need to specify the `--trustAll` argument to trust server certificates if your directory server uses self-signed certificates and StartTLS or SSL.
+======
+
+. Prepare your OpenDJ installation, then download the OpenDJ software. See the OpenDJ documentation about link:https://backstage.forgerock.com/docs/opendj/3.5/install-guide#chap-install[Installing OpenDJ Servers, window=\_blank].
++
+
+[source, console]
+----
+$ cd /path/to/opendj
+$ ./setup --cli
+----
++
+Example options are as follows:
++
+
+[#prepare-configuration-store-ds]
+.Example OpenDJ Setup Parameters
+[cols="50%,50%"]
+|===
+|Parameter |Example Inputs 
+
+a|`Accept License`
+a|Yes
+
+a|`Root User DN`
+a|cn=Directory Manager
+
+a|`Root User DN Password`
+a|(arbitrary)
+
+a|`Fully Qualified Domain Name`
+a|opendj.example.com
+
+a|`LDAP Port`
+a|1389
+
+a|`Administration Connector Port`
+a|4444
+
+a|`Create Base DN`
+a|No. This will be created in a later step.
+
+a|`Enable SSL`
+a|If you choose this option, make sure that OpenAM can trust the OpenDJ certificate.
+
+a|`Enable TLS`
+a|If you choose this option, make sure that OpenAM can trust the OpenDJ certificate.
+
+a|`Start Server After Config`
+a|Yes
+|===
++
+
+. Change to the OpenDJ directory.
++
+
+[source, console]
+----
+$ cd /path/to/opendj
+----
+
+. Create a directory server backend, and call it `cfgStore`.
++
+The `dsconfig` command used to create the backend depends on the version of OpenDJ directory server.
++
+
+* Use the following command with OpenDJ 2.6:
++
+
+[source, console]
+----
+$ dsconfig create-backend \
+--backend-name cfgStore \
+--set base-dn:dc=example,dc=com \
+--set enabled:true \
+--type local-db \
+--port 4444 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--no-prompt
+----
+
+* Use the following command with OpenDJ 3 and later, where the value of the `--type` option depends on the backend database type to use, such as `je` or `pdb`. This example creates a JE backend:
++
+
+[source, console]
+----
+$ dsconfig create-backend \
+--backend-name cfgStore \
+--set base-dn:dc=example,dc=com \
+--set enabled:true \
+--type je \
+--port 4444 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--no-prompt
+----
+
+
+. Create an LDIF file to add the initial entries for the configuration store, and save the file as `add-config-entries.ldif`. The entries include the base DN suffix, an organizational unit entry, and the OpenAM user entry needed to access the directory server.
++
+When OpenAM connects as `uid=openam,ou=admins,dc=example,dc=com` to an external directory server to store its data, it requires read, write, persistent search, and server-side sorting access privileges. You add these privileges by setting access control instructions (ACIs) on the base distinguished name (DN) entry (`dc=example,dc=com`). If your OpenAM user has a DN other than `uid=openam,ou=admins,dc=example,dc=com`, adjust the ACIs where appropriate.
++
+You must also give privileges to the OpenAM user to modify the schema and write to subentries, such as the schema entry. To grant these privileges, you include the following attributes on the OpenAM user entry: `ds-privilege-name: subentry-write` and `ds-privilege-name: update-schema`.
++
+
+[source, ldif]
+----
+dn: dc=example,dc=com
+objectclass: top
+objectclass: domain
+dc: example
+aci: (targetattr="*")(version 3.0;acl "Allow CRUDQ operations";
+ allow (search, read, write, add, delete)
+ (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+ persistent search"; allow (search, read)(userdn = "ldap:///uid=openam
+ ,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="1.2.840.113556.1.4.473")(version 3.0;acl "Allow
+ server-side sorting"; allow (read)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+
+dn: ou=admins,dc=example,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: admins
+
+dn: uid=openam,ou=admins,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: openam
+sn: openam
+uid: openam
+userPassword: secret12
+ds-privilege-name: subentry-write
+ds-privilege-name: update-schema
+----
+
+. Add the initial entries LDIF file using the `ldapmodify` command.
++
+If you are having trouble with the preceding LDIF file, consider removing the line feeds for the ACI attributes and let it wrap to the next line. If you are still having trouble using the `ldapmodify` command, you can use the `import-ldif` command, although you may have to re-apply the `targetcontrol` ACI attribute.
++
+
+[source, console]
+----
+$ bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--defaultAdd \
+--filename add-config-entries.ldif
+----
+
+. Add the Global Access Control Instruction (ACI) to the access control handler. The Global ACI gives OpenAM the privileges to modify the schema definitions for the custom configuration where the OpenAM entry has DN `uid=openam,ou=admins,dc=example,dc=com`.
++
+
+[NOTE]
+======
+These access rights are only required during configuration, and only if the directory administrator does not add the OpenAM directory schema definitions manually.
+======
++
+If you copy the text from the following example, make sure that the value of `global-aci` is all on a single line.
++
+
+[source, console]
+----
+$ bin/dsconfig set-access-control-handler-prop \
+--add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes ||
+     objectClasses")(version 3.0; acl "Modify schema"; allow (write)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)'
+--port 4444 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--no-prompt
+----
+
+. At this point, deploy the OpenAM server if you have not done so already. For additional details on deploying OpenAM, see xref:chap-install-core.adoc#deploy-openam["To Deploy OpenAM"].
+
+. OpenAM requires additional schema definitions for attributes used to search for user and configuration data:
++
+
+[#prepare-configuration-store-attributes]
+.Configuration Data Store Attributes
+[cols="40%,20%,40%"]
+|===
+|Attribute |Index Type |Description 
+
+a|CTS attributes
+a|
+a|Specifies the CTS attributes required for stateful session high availability and persistence. Located in the `WEB-INF/template/ldif/sfha/cts-add-schema.ldif` file.
+
+a|`iplanet-am-user-federation-info-key`
+a|equality
+a|Specifies a configuration setting to store an account's federation information key, which is used internally. Located in `WEB-INF/template/ldif/opendj/opendj_user_schema.ldif` file.
+
+a|`sun-fm-saml2-nameid-infokey`
+a|equality
+a|Specifies an information key common to an IdP and SP to link accounts. Located in `WEB-INF/template/ldif/opendj/opendj_user_schema.ldif` file.
+
+a|`sunxmlkeyvalue`
+a|equality, substring
+a|Stores configuration values that may be looked up through searches. Located in `WEB-INF/template/ldif/opendj/opendj_config_schema.ldif`.
+|===
++
+Add the required CTS schema definitions. You can find the CTS schema definitions at `/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif`.
++
+
+[source, console]
+----
+$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif /tmp
+----
+
+. Add the schema file to the directory server.
++
+
+[source, console]
+----
+$ bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--fileName /tmp/cts-add-schema.ldif
+----
+
+. Add the required user store schema definitions. You can find the schema definitions at `/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/opendj/opendj_user_schema.ldif`.
++
+
+[source, console]
+----
+$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/opendj/opendj_user_schema.ldif /tmp
+----
+
+. Add the schema file to the directory server.
++
+
+[source, console]
+----
+$ bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--fileName /tmp/opendj_user_schema.ldif
+----
+
+. Add the schema definitions to the configuration repository. You can find the schema definitions at `/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/opendj/opendj_config_schema.ldif`.
++
+
+[source, console]
+----
+$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/opendj/opendj_config_schema.ldif /tmp
+----
+
+. Add the schema file to the directory server.
++
+
+[source, console]
+----
+$ bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--fileName /tmp/opendj_config_schema.ldif
+----
+
+. OpenAM uses the attributes in xref:#prepare-configuration-store-attributes["Configuration Data Store Attributes"] to search for configuration data. On the OpenDJ directory server, use the `dsconfig` command to add these indexes to your external configuration store. Repeat this step to index the `iplanet-am-user-federation-info-key` and `sun-fm-saml2-nameid-infokey` attributes if you are deploying federation.
++
+The `dsconfig` subcommand used to create the index depends on the version of OpenDJ directory server.
++
+
+* Use the following commands with OpenDJ 2.6:
++
+
+[source, console]
+----
+$ dsconfig create-local-db-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name sunxmlkeyvalue \
+--set index-type:equality \
+--set index-type:substring \
+--no-prompt
+
+$ dsconfig create-local-db-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name iplanet-am-user-federation-info-key \
+--set index-type:equality \
+--no-prompt
+
+$ dsconfig create-local-db-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name sun-fm-saml2-nameid-infokey \
+--set index-type:equality \
+--no-prompt
+----
+
+* Use the following commands with OpenDJ 3 and later:
++
+
+[source, console]
+----
+$ dsconfig create-backend-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name sunxmlkeyvalue \
+--set index-type:equality \
+--set index-type:substring \
+--no-prompt
+
+$ dsconfig create-backend-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name iplanet-am-user-federation-info-key \
+--set index-type:equality \
+--no-prompt
+
+$ dsconfig create-backend-index \
+--port 4444 \
+--hostname opendj.example.com \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--backend-name cfgStore \
+--index-name sun-fm-saml2-nameid-infokey \
+--set index-type:equality \
+--no-prompt
+----
+
+
+. Rebuild the indexes using the `rebuild-index` command. You can stop the server and run `rebuild-index` in offline mode, or you can run `rebuild-index` online using a task as follows:
++
+
+[source, console]
+----
+$ bin/rebuild-index --port 4444 --hostname opendj.example.com \
+--bindDN "cn=Directory Manager" --bindPassword password \
+--baseDN dc=example,dc=com --rebuildAll \
+--start 0
+----
+
+. Verify the indexes. Note that if you are running OpenDJ 3 and later, you need to stop OpenDJ before running this command.
++
+
+[source, console]
+----
+$ bin/verify-index --baseDN dc=example,dc=com
+----
++
+You have successfully installed and prepared the directory server for an external configuration store. When installing the OpenAM server, you need to specify the host name, port and root suffix of the external directory server on the Configuration Data Store Settings screen of the OpenAM Configurator. See xref:chap-install-core.adoc#configure-openam-custom["To Custom Configure OpenAM"] for more information.
+
+====
+
+[#config-store-prevent-anonymous-access]
+==== Preventing Anonymous Access to an External Configuration Store
+
+By default, OpenDJ allows unauthenticated or anonymous connections to directory servers. For external configuration stores, this default is a security vulnerability.
+
+In production deployments, you want to allow unauthenticated connections to the root entry only, so that LDAP clients can obtain server information for the OpenDJ server, while at the same time, denying anonymous connections to all directory server instances.
+
+You can prevent anonymous access from LDAP clients to the OpenDJ server while allowing unauthenticated access to the root entry by configuring access control instructions (ACIs) and removing global ACIs from the directory server instances.
+
+[#to-prevent-anonymous-access]
+.To Prevent Anonymous Access in External Configuration Stores
+====
+
+. To allow unauthenticated access to the OpenDJ root entry, set the `global-aci` using the `dsconfig` command:
++
+
+[source, console]
+----
+$ ./dsconfig set-access-control-handler-prop --add 'global-aci:(target="ldap:///")(targetscope="base")(targetattr="objectClass||namingContexts||supportedAuthPasswordSchemes||supportedControl||supportedExtension||supportedFeatures||supportedLDAPVersion||supportedSASLMechanisms||vendorName||vendorVersion")(version 3.0; acl "User-Visible Root DSE Operational Attributes"; allow (read,search,compare) userdn="ldap:///anyone";)' --hostname server.example.com --port 4444 --bindDN "cn=Directory Manager" --bindPassword password --trustAll --no-prompt
+----
++
+
+. Remove the default access to anonymous users using the `dsconfig` command:
++
+
+* On OpenDJ 3.x or later:
++
+
+[source, console]
+----
+$ ./dsconfig set-access-control-handler-prop --remove 'global-aci:(targetattr!="userPassword||authPassword||debugsearchindex||changes||changeNumber||changeType||changeTime||targetDN||newRDN||newSuperior||deleteOldRDN")(version 3.0; acl "Anonymous read access"; allow (read,search,compare) userdn="ldap:///anyone";)' --hostname server.example.com --port 4444 --bindDN "cn=Directory Manager" --bindPassword password --trustAll --no-prompt
+----
+
+* On OpenDJ 2.6.x:
++
+
+[source, console]
+----
+$ ./dsconfig set-access-control-handler-prop --remove 'global-aci:(targetattr!="userPassword||authPassword||changes||changeNumber||changeType||changeTime||targetDN||newRDN||newSuperior||deleteOldRDN")(version 3.0; acl "Anonymous read access"; allow (read,search,compare) userdn="ldap:///anyone";)' --hostname server.example.com --port 4444 --bindDN "cn=Directory Manager" --bindPassword password --trustAll --no-prompt
+----
+
+
+. If you have other custom ACIs that affect anonymous users, review them and update as necessary. To generate a list of ACIs, run the following command:
++
+
+[source, console]
+----
+$ ./ldapsearch --hostname openam.example.com --port 1389 --bindDN "cn=Directory manager" \
+  --bindPassword "password" --baseDN "cn=config" --searchScope sub "cn=Access Control Handler"
+----
+
+. Repeat these steps for all appropriate OpenDJ instances.
+
+====
+For additional information, see link:https://backstage.forgerock.com/knowledge/kb/article/a97304600[How do I prevent anonymous access in DS/OpenDJ (All version), window=\_blank] in the __ForgeRock Knowledge Base__.
+
+
+
+[#download-openam-software]
+=== Obtaining OpenAM Software
+
+Download OpenAM releases from the link:https://github.com/OpenIdentityPlatform/OpenAM/releases[releases page, window=\_blank] on the GitHub.
+
+For each release of the OpenAM core services, you can download the entire package as a `.zip` file, only the OpenAM `.war` file, or only the administrative tools as a `.zip` archive. The Archives also have only the OpenAM source code used to build the release.
+
+After you download the `.zip` file, create a new openam folder, and unzip the `.zip` file to access the content.
+
+[source, console]
+----
+$ cd ~/Downloads
+$ mkdir openam ; cd openam
+$ unzip ~/Downloads/OpenAM-13.5.2.zip
+----
+--
+When you unzip the archive of the entire package, you get ldif, license, and legal directories in addition to the following files.
+
+`ClientSDK-13.5.2.jar`::
+The OpenAM Java client SDK library
+
+`ExampleClientSDK-CLI-13.5.2.zip`::
+The .zip file containing the Java client SDK command-line examples, and .jar files needed to run the examples
+
+`ExampleClientSDK-WAR-13.5.2.war`::
+The `.war` file containing Java client SDK examples in a web application.
+
+`IDPDiscovery-13.5.2.war`::
+The IDP discovery `.war` file, deployed as a service to service providers that must discover which identity provider corresponds to a SAML v2.0 request.
+
++
+For details, see xref:../admin-guide/chap-federation.adoc#deploy-idp-discovery["Deploying the Identity Provider Discovery Service"] in the __Administration Guide__.
+
+`Fedlet-13.5.2.zip`::
+The `.zip` file that contains the lightweight service provider implementations that you can embed in your Java EE applications to enable it to use federated access management.
+
+`OpenAM-13.5.2.war`::
+The deployable `.war` file.
+
+`SSOAdminTools-13.5.2.zip`::
+The .zip file that contains tools to manage OpenAM from the command line
+
+`SSOConfiguratorTools-13.5.2.zip`::
+The .zip file that contains tools to configure OpenAM from the command line
+
+`openam-soap-sts-server-13.5.2.war`::
+A pre-built SOAP STS server `.war` file.
+
++
+For details, see xref:../admin-guide/chap-sts.adoc#sts-deploy-soap-sts["Deploying SOAP STS Instances"] in the __Administration Guide__.
+
+--
+
+
+[#enable-cors-support]
+=== Enabling CORS Support
+
+Cross-origin resource sharing (CORS) allows requests to be made across domains from user agents. OpenAM supports CORS, but CORS is not configured out of the box.
+Instead, you must edit the deployment descriptor file before deploying OpenAM. CORS support is implemented as a Servlet filter, and so you add the filter's configuration to the deployment descriptor file.
+
+. Unpack the OpenAM `.war` file.
++
+
+[source, console]
+----
+$ mkdir /tmp/openam
+$ cd /tmp/openam/
+$ jar -xf ~/Downloads/openam/OpenAM-13.5.2.war
+----
+
+. Edit the deployment descriptor file, `WEB-INF/web.xml`, to add a CORS filter configuration.
++
+First, add a `<filter-mapping>` element to name the filter and to indicate the URL pattern for the filter. The URL pattern matches the endpoints to support CORS. The following example adds CORS support for all OpenAM endpoints.
++
+
+[source, xml]
+----
+<filter-mapping>
+    <filter-name>CORSFilter</filter-name>
+    <url-pattern>/*</url-pattern><!-- CORS support for all endpoints -->
+</filter-mapping>
+----
++
+Next, add a `<filter>` element to configure the filter. The following excerpt describes and demonstrates all of the required and optional configuration parameters.
++
+
+[source, xml]
+----
+<filter>
+    <filter-name>CORSFilter</filter-name>
+    <filter-class>org.forgerock.openam.cors.CORSFilter</filter-class>
+    <init-param>
+        <description>
+            Accepted Methods - (Required) -
+            A list of HTTP methods to accept CORS requests
+        </description>
+        <param-name>methods</param-name>
+        <param-value>POST,PUT</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Accepted Origins - (Required) -
+            A list of origins from which to accept CORS requests
+        </description>
+        <param-name>origins</param-name>
+        <param-value>www.example.net,example.org</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Allow Credentials - (Optional) -
+            Whether to include the allow Vary (Origin)
+            and Access-Control-Allow-Credentials headers
+            in the response [default false]
+        </description>
+        <param-name>allowCredentials</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Allowed Headers - (Optional) -
+            A list of HTTP headers which if included in the request
+            DO NOT make it abort
+        </description>
+        <param-name>headers</param-name>
+        <param-value>headerOne,headerTwo,headerThree</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Expected Hostname - (Optional) -
+            The name of the host expected in the request Host header
+        </description>
+        <param-name>expectedHostname</param-name>
+        <param-value>http://openam.example.com</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Exposed Headers - (Optional) -
+            The list of headers which the user-agent can expose
+            to its CORS client
+        </description>
+        <param-name>exposeHeaders</param-name>
+        <param-value>exposeHeaderOne,exposeHeaderTwo</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Maximum Cache Age - (Optional) -
+            The maximum time that the CORS client can cache
+            the pre-flight response, in seconds [default 600]
+        </description>
+        <param-name>maxAge</param-name>
+        <param-value>600</param-value>
+    </init-param>
+</filter>
+----
++
+For details on CORS, see the link:http://www.w3.org/TR/cors/[Cross-Origin Resource Sharing, window=\_blank] specification.
++
+
+[CAUTION]
+====
+If you need to allow the use of `Access-Control-Allowed-Origin=*` headers, do not allow `Content-Type` headers. Allowing the use of both types of headers exposes OpenAM to cross-site request forgery (CSRF) attacks.
+====
+
+. Pack up the OpenAM `.war` file to deploy.
++
+
+[source, console]
+----
+$ jar -cf ../openam.war *
+----
+
+. Deploy the new `.war` file.
++
+In this example, the `.war` file to deploy is `/tmp/openam.war`.
+
+
+
+[#sec-enable-securid]
+=== Enabling RSA SecurID Support
+
+To use the SecurID authentication module, you must first build an OpenAM war file that includes the supporting library, for example `authapi-2005-08-12.jar`, which you must obtain from RSA. The `authapi-2005-08-12.jar` file also requires a dependency file, `crypto.jar`, which you can also obtain from RSA.
+
+. Unpack the OpenAM .war file.
++
+
+[source, console]
+----
+$ mkdir /tmp/openam
+$ cd /tmp/openam/
+$ jar -xf ~/Downloads/openam/OpenAM-13.5.2.war
+----
+
+. Obtain the `authapi.jar` (for example, `authapi-2005-08-12.jar`) and its dependency file, `crypto.jar` from RSA. Then, copy `authapi-2005-08-12.jar` into the `WEB-INF/lib` directory.
++
+
+[source, console]
+----
+$ cp /path/to/authapi-2005-08-12.jar WEB-INF/lib/
+----
+
+. Pack up the OpenAM .war file to deploy.
++
+
+[source, console]
+----
+$ jar -cf ../openam.war *
+----
+
+. Deploy the new .war file. See xref:../install-guide/chap-install-core.adoc#deploy-openam["To Deploy OpenAM"].
++
+In this example the .war file to deploy is `/tmp/openam.war`.
+
+
+
+[#prepare-apache-tomcat]
+=== Preparing Apache Tomcat
+
+OpenAM examples often use Apache Tomcat (Tomcat) as the deployment container. Tomcat is installed on `openam.example.com`, and listens on the default ports without a Java Security Manager enabled.
+
+OpenAM core services require a minimum JVM heap size of 1 GB, and a permanent generation size of 256 MB. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. See xref:#prepare-java["Preparing a Java Environment"] for details.
+
+ForgeRock recommends that you edit the Tomcat <Connector> configuration to set `URIEncoding="UTF-8"`. UTF-8 URI encoding ensures that URL-encoded characters in the paths of URIs are correctly decoded by the container. This is particularly useful when applications use the OpenAM REST APIs, and some identifiers, such as user names can contain special characters.
+
+You should also ensure `sslProtocol` is set to `TLS`, which disables the potentially vulnerable SSL v3.0 protocol.
+
+<Connector> configuration elements are found in the configuration file, `/path/to/tomcat/conf/server.xml`. The following excerpt shows an example <Connector> with the `URIEncoding` attribute set appropriately.
+
+[source, xml]
+----
+<Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+              maxThreads="150" scheme="https" secure="true"
+              clientAuth="false" sslProtocol="TLS" URIEncoding="UTF-8" />
+----
+The following example script, `/etc/init.d/tomcat`, manages the service at system startup and shutdown. This script assumes you run OpenAM as the user `openam` and that you use Oracle JDK 7.
+
+[source, shell]
+----
+#!/bin/sh
+#
+# tomcat
+#
+# chkconfig: 345 95 5
+# description: Manage Tomcat web application container
+CATALINA_HOME="/path/to/tomcat"
+export CATALINA_HOME
+JAVA_HOME=/path/to/jdk
+export JAVA_HOME
+# For JDK 7, use:
+CATALINA_OPTS="-server -Xmx2g -XX:PermSize=256m -XX:MaxPermSize=256m"
+# For JDK 8, use:
+# CATALINA_OPTS="-server -Xmx2g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m"
+export CATALINA_OPTS
+
+case "${1}" in
+start)
+  /bin/su openam -c "${CATALINA_HOME}/bin/startup.sh"
+  exit ${?}
+  ;;
+stop)
+  /bin/su openam -c "${CATALINA_HOME}/bin/shutdown.sh"
+  exit ${?}
+  ;;
+*)
+  echo "Usage:  $0 { start | stop }"
+  exit 1
+  ;;
+esac
+----
+*Slashes in Resource Names*
+
+Some OpenAM resources have names that can contain slash characters (*/*), for example, in policy names, application names, and SAML v2.0 entities. These slash characters can cause unexpected behavior when running OpenAM on Tomcat.
+
+One possible workaround is to configure Tomcat to allow encoded slash characters by adding the `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true` property to the `CATALINA_OPTS` variable; however, this is not recommended for production deployments (see the warning below). For example:
+
+[source]
+----
+CATALINA_OPTS= "-server -Xmx2g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m \
+               -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
+----
+
+[WARNING]
+====
+It is strongly recommended that you do __not__ enable `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH` when running OpenAM in production as it introduces a security risk.
+====
+*Cookie Domains*
+
+You can set the cookie domain name value to an empty string for host-only cookies or to any non-top level domain. For example, if you install OpenAM and use `openam.example.com` as the host, you can set the cookie domain name as `example.com`. For information about configuring the cookie domain during installation, see xref:chap-install-core.adoc#configure-openam-custom["To Custom Configure OpenAM"].
+
+[#d14351e1971]
+==== Tuning Apache Multi-Processing Modules
+
+Apache 2.0 and later comes with Multi-Processing Modules (MPMs) that extend the basic functionality of a web server to support the wide variety of operating systems and customizations for a particular site.
+
+The key area of performance tuning for Apache is to run in worker mode ensuring that there are enough processes and threads available to service the expected number of client requests. Apache performance is configured in the `conf/extra/http-mpm.conf` file.
+
+The key properties in this file are `ThreadsPerChild` and `MaxClients`. Together the properties control the maximum number of concurrent requests that can be processed by Apache. The default configuration allows for 150 concurrent clients spread across 6 processes of 25 threads each.
+
+[source, console]
+----
+<IfModule mpm_worker_module>
+   StartServers          2
+   MaxClients          150
+   MinSpareThreads      25
+   MaxSpareThreads      75
+   ThreadsPerChild      25
+   MaxRequestsPerChild   0
+</IfModule>
+----
+
+[IMPORTANT]
+====
+For the policy agent notification feature, the `MaxSpareThreads`, `ThreadLimit` and `ThreadsPerChild` default values must __not__ be altered; otherwise the notification queue listener thread cannot be registered.
+
+Any other values apart from these three in the worker MPM can be customized. For example, it is possible to use a combination of `MaxClients` and `ServerLimit` to achieve a high level of concurrent clients.
+====
+
+
+
+[#prepare-jboss]
+=== Preparing OpenAM for JBoss and WildFly
+
+You can deploy OpenAM on JBoss AS, JBoss EAP, and WildFly. Some preparation is required to deploy on these application servers.
+
+The procedures listed here provide steps for configuring JBoss AS, JBoss EAP, and WildFly for OpenAM.
+
+After configuring JBoss or WildFly, you then prepare OpenAM for deployment by making a few changes to the contents of the OpenAM `.war` archive.
+
+* xref:#prep-jboss-for-openam["To Prepare JBoss or WildFly for OpenAM"]
+
+* xref:#prep-openam-for-jboss["To Prepare OpenAM for JBoss and WildFly"]
+
+
+[#prep-jboss-for-openam]
+.To Prepare JBoss or WildFly for OpenAM
+====
+
+. Stop JBoss or WildFly.
+
+. The default JVM settings do not allocate sufficient memory to OpenAM. This step shows one method that you can use to modify the JVM settings. For other methods, see either the link:https://developer.jboss.org/wiki/JBossapplicationserverofficialdocumentationpage[JBoss Application Server Official Documentation Page, window=\_blank] or the link:https://docs.jboss.org/author/display/WFLY9/JVM+settings[JVM Settings, window=\_blank] page in the WildFly documentation
++
+
+.. Open the `standalone.conf` file in the `/path/to/jboss/bin` directory for JBoss or WildFly in standalone mode.
+
+.. Check the JVM settings associated with `JAVA_OPTS`.
++
+Change the JVM heap size to `-Xmx1024m`. The default JVM heap size for some versions of JBoss might already exceed the recommended value. If you are using the embedded version of OpenDJ, the minimum heap size may be higher. For details on the JVM options to use, see xref:#prepare-java["Preparing a Java Environment"].
++
+When using JDK 7, change the permanent generation size to `-XX:MaxPermSize=256m` if the default size does not exceed this amount.
++
+When using JDK 8, change the metaspace size to `-XX:MaxMetaspaceSize=256m` if the default size does not exceed this amount.
+
+.. Set the following JVM `JAVA_OPTS` setting in the same file:
++
+
+[source]
+----
+-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true
+----
++
+Verify that the headers include the `Expires` attribute rather than only `Max-Age`, as some versions of Internet Explorer and Microsoft Edge do not support `Max-Age`.
+
+
+. Now deploy the `openam.war` file into the appropriate deployment directory. The directory varies depending on whether you are running in standalone or domain mode.
+
+====
+
+[#prep-openam-for-jboss]
+.To Prepare OpenAM for JBoss and WildFly
+====
+To prepare OpenAM to run with JBoss or WildFly, you should make a change to the OpenAM `war` file. JBoss and WildFly deploy applications from different temporary directories every time you restart the container, which would require reconfiguring OpenAM. To avoid problems, change the OpenAM `war` file as follows:
+
+. If you have not already done so, create a temporary directory and expand the `OpenAM-13.5.2.war` file.
++
+
+[source, console]
+----
+$ cd /tmp
+$ mkdir /tmp/openam ; cd /tmp/openam
+$ jar xvf ~/Downloads/OpenAM-13.5.2.war
+----
+
+. Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` archive. Update the `# configuration.dir=` line in this file to specify a path with read and write permissions, and then save the change.
++
+
+[source, ini]
+----
+# This property should also be used when the system user that
+# is running the web/application server process does not have
+# a home directory. i.e. System.getProperty("user.home") returns
+# null.
+
+configuration.dir=/my/readwrite/config/dir
+----
+
+. If you are deploying OpenAM on JBoss AS or JBoss EAP, remove the `jboss-all.xml` file from the `WEB-INF` directory of the expanded `war` archive.
++
+Be sure __not__ to remove this file if you are deploying OpenAM on WildFly.
+
+. Rebuild the `openam.war` file.
++
+
+[source, console]
+----
+$ jar cvf ../openam.war *
+----
+
+. If you plan to deploy multiple cookie domains with WildFly, you must configure the `com.sun.identity.authentication.setCookieToAllDomains` property after you have installed the OpenAM server. See xref:chap-install-multiple.adoc#handle-multiple-cookie-domains-wildfly["Handling Multiple Cookie Domains When Using Wildfly"] for more information.
+
+====
+
+
+[#prepare-oracle-weblogic]
+=== Preparing Oracle WebLogic
+
+To deploy OpenAM in WebLogic, perform the following steps:
+
+. Update the JVM options as described in xref:#prepare-java["Preparing a Java Environment"].
+
+. Customize the `OpenAM-13.5.2.war` file as described in xref:#prep-openam-for-weblogic["To Prepare OpenAM for Oracle WebLogic"].
+
+
+[#prep-openam-for-weblogic]
+.To Prepare OpenAM for Oracle WebLogic
+====
+To prepare OpenAM to run in WebLogic, change the OpenAM `war` file to ensure that the OpenAM upgrade process is able to find the OpenAM configuration files. Be sure to make this change whenever you deploy a new `war` file as part of an OpenAM upgrade.
+
+Change the OpenAM `war` file as follows:
+
+. Create a temporary directory and expand the `OpenAM-13.5.2.war` file:
++
+
+[source, console]
+----
+$ cd /tmp
+$ mkdir /tmp/openam ; cd /tmp/openam
+$ jar xvf ~/Downloads/OpenAM-13.5.2.war
+----
+
+. Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` file.
+
+. Update the `# configuration.dir=` line in the `bootstrap.properties` file to specify a path with read and write permissions. For example:
++
+
+[source, ini]
+----
+# This property should also be used when the system user that
+# is running the web/application server process does not have
+# a home directory. i.e. System.getProperty("user.home") returns
+# null.
+
+  configuration.dir=/my/readwrite/config/dir
+----
++
+If installing on Windows, the specified path should have slashes */* and not backslashes *\*.
+
+. Rebuild the `openam.war` file:
++
+
+[source, console]
+----
+$ jar cvf ../openam.war *
+----
+
+====
+
+
+[#prepare-ibm-websphere]
+=== Preparing IBM WebSphere
+
+Before you deploy OpenAM, use the Administrator console to update JVM options as described in xref:#prepare-java["Preparing a Java Environment"].
+In addition, configure WebSphere to load classes from OpenAM bundled libraries before loading classes from libraries delivered with WebSphere. The following steps must be completed after you deploy OpenAM into WebSphere.
+
+. In WebSphere administration console, browse to Application > Application Type > WebSphere enterprise applications > __OpenAM Name__ > Class loading and update detection.
+
+. Set Class loader order > Classes loaded with local class loader first (parent last).
+
+. Ensure that the value of the __WAR class loader policy__ property is set to the default value: `Class loader for each WAR file in application`.
+
+. Save your work.
+
+
+

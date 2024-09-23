@@ -1,0 +1,89 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-xui-parameters]
+== XUI Configuration Parameters
+
+The configuration of the XUI is based on settings in the `ThemeConfiguration.js` file. This file can be found in the `/path/to/webapps/openam/XUI/config/` directory. The file contains a full configuration for the mandatory `default` theme. Additional themes should use a duplicate of the default theme's configuration. Any parameters that are not configured will inherit values from the mandatory `default` theme.
+
+The available parameters for each theme in the file are as follows:
+
+* `themes`: Title; also represents an array of theme objects.
++
+
+** __name__: Theme title.
++
+
+*** `stylesheets`: An ordered array of URLs to CSS stylesheet files that are applied to every page. It is highly recommended to include `"css/structure.css"` as one of the entries to provide default styles for layout and structure.
++
+For example: `["css/myTheme.css", "css/structure.css"]`
+
+*** `path`: A relative path to a directory containing `templates` or `partials` directories, used for customizing the default layout of XUI pages.
++
+For more information, see xref:../install-guide/chap-custom-ui.adoc#xui-customizing-layout["Customizing XUI Layout"] in the __Installation Guide__.
+
+*** `icon`: URL to a resource to use as a favicon.
+
+*** `settings`: Configuration settings for the theme. Missing parameters inherit their value from the mandatory `default` theme.
++
+
+**** `logo`: Parameters for the logo displayed on user profile pages.
++
+
+***** `src`: Filename of the logo.
+
+***** `title`: HTML `title` attribute of the logo.
+
+***** `alt`: HTML `alt` attribute of the logo.
+
+***** `height`: Logo height in CSS notation. For example: `75px` or `10%`.
+
+***** `width`: Logo width in CSS notation. For example: `150px` or `25%`.
+
+
+**** `loginLogo`: Parameters for the logo displayed on login pages.
++
+
+***** `src`: Filename of the logo.
+
+***** `title`: HTML `title` attribute of the logo.
+
+***** `alt`: HTML `alt` attribute of the logo.
+
+***** `height`: Logo height in CSS notation. For example: `75px` or `10%`.
+
+***** `width`: Logo width in CSS notation. For example: `150px` or `25%`.
+
+
+**** `footer`: Parameters to display in the footer of each XUI page.
++
+
+***** `mailto`: Email address.
+
+***** `phone`: Telephone number.
+
+
+
+
+
+For more information, see xref:../install-guide/chap-custom-ui.adoc#xui-themes["Theming the XUI"] in the __Installation Guide__.
+

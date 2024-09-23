@@ -1,0 +1,248 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-securing]
+== Securing OpenAM
+
+This chapter identifies best practices for securing your OpenAM deployment.
+
+[#avoid-obvious-defaults]
+=== Avoiding Obvious Defaults
+
+OpenAM includes default settings to make it easier for you to evaluate the software. Avoid these default settings in production deployments:
+
+* When connecting to LDAP, bind with a specific administrative account rather than a root DN account, if possible.
+
+* Change the default `iPlanetDirectoryPro` cookie name both in OpenAM (`com.iplanet.am.cookie.name`) and in your policy agent profiles (`com.sun.identity.agents.config.cookie.name`).
+
+* When installing OpenAM, do not use `/openam` or `/opensso` as the deployment URI.
+
+* Create an administrator in the Top Level Realm with a different ID than the default `amadmin`.
+
+* Create specific administrator users to track better who makes configuration changes.
+
+* Remove the demo user account. For example, if you configure the embedded OpenDJ directory server as a configuration and CTS store, the default demo user account gets created during the installation process. You should remove the user using the OpenAM console under Realms > Top Level Realm > Subjects > User.
+
+* Set the list of Valid `goto` URL Resources. By default, OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL.
++
+To increase security against possible phishing attacks through open redirect, you can specify a list of valid URL resources against which OpenAM validates these URLs. OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting. If no setting is present, it is assumed that the `goto` or `gotoOnFail` URL is valid.
++
+To set the Valid `goto` URL Resources, use the OpenAM console, and navigate to Realms > __Realm Name__ > Services. Click Add a Service, select Validation Service, and add one or more valid `goto` URLs, and then click Create.
++
+When setting valid `goto` URLs, you can use the "*" wildcard, where "*" matches all characters except "?". For more specific patterns, use resource names with wildcards as described in the procedure, xref:chap-auth-services.adoc#configure-valid-goto-url-resources["Configuring Valid goto URL Resources"].
+
+* Disable module based authentication for all OpenAM realms. Module based authentication lets users authenticate using the `module=module-name` login parameter. To disable module based authentication for a realm, select the realm in the OpenAM console, then select Authentication > Settings > Security and clear the Module Based Authentication check box.
+
+
+
+[#protect-network-access]
+=== Protecting Network Access
+
+Anytime users interact with a web service, there are risks. With OpenAM, you can reduce those risks by limiting what is exposed through the firewall using the following strategy:
+
+* Use a reverse proxy in front of OpenAM to allow access only to the necessary URLs. A reverse proxy exposes only those endpoints needed for an application. For example, if you need to expose the OAuth2/OpenID Connect endpoints and REST interface, then you should implement a reverse proxy.
++
+The following figure shows the recommended architecture with a reverse proxy.
+
+
+[#figure-securing-openam-rp]
+image::images/securing-openam-rp.png[]
+
+
+* Leave `ssoadm.jsp` disabled in production. (Advanced property: `ssoadm.disabled=true`).
+
+* If possible in your deployment, control access to OpenAM console by network address, such that administrators can only connect from well-known systems and networks.
+
+* Restrict access to URIs that you do not use, and prevent internal endpoints, such as `/sessionservice` from being reachable over the Internet.
++
+For a full list of endpoints, see xref:../reference/chap-endpoints.adoc#chap-endpoints["Service Endpoints"] in the __Reference__.
+
+
+
+[#secure-openam-administration]
+=== Securing OpenAM Administration
+
+Create realms for your organization(s) and separate administrative users from end users. For instructions, see xref:chap-realms.adoc#chap-realms["Configuring Realms"].
+
+* To direct relevant users to the correct realms, you can then either:
++
+
+** Use the `realm=realm-name` query string parameter.
+
+** Create fully qualified domain name DNS aliases for the realms.
+
+
+* When customizing `config/auth/default*/Login.jsp`, make sure that you do not introduce any security vulnerabilities, such as cross-site scripting due to unvalidated input.
+
+* Create a policy agent profile for each policy agent. See xref:chap-agents.adoc#chap-agents["Configuring Policy Agent Profiles"] for instructions.
+
+
+
+[#secure-communications]
+=== Securing Communications
+
+Keep communications secure by using encryption, properly configured cookies, and request and response signatures:
+
+* Protect network traffic by using HTTPS and LDAPS where possible.
+
+* When using HTTPS, use secure cookies, which are transmitted only over secured connections.
++
+To configure OpenAM server to use secure cookies, in the OpenAM console, navigate to Configure > Server Defaults > Security. On the Cookie tab, select Secure Cookie, and then click Save Changes.
++
+HttpOnly cookies are meant to be transmitted only over HTTP and HTTPS, and not through non-HTTP methods, such as JavaScript functions.
++
+If you are using the classic UI, you can configure the OpenAM server to use HttpOnly cookies by navigating to Configure > Server Defaults > Advanced, and setting the `com.sun.identity.cookie.httponly` property's value to `true`. Save your changes. Note that the XUI does not currently support HttpOnly cookies.
+
+* Where possible, use subdomain cookies, and control subdomains in a specific DNS master.
+
+* Use cookie hijacking protection with restricted tokens, where each policy agent uses different SSO tokens for the same user. See xref:chap-cdsso.adoc#enable-cdsso-cookie-hijacking-protection["To Protect Against Cookie Hijacking"] for instructions.
+
+* Use your own key, not the `test` key provided with OpenAM, to sign:
++
+
+** SAML 2.0 authentication requests, authentication responses, and single logout requests
+
+** XUI authentication IDs
+
++
+See xref:chap-certs-keystores.adoc#change-signing-key["To Change OpenAM Default test Signing Key "] for instructions.
+
+* When using SAML v2.0, if the other entities in your circle of trust can handle encryption, then use encryption in addition to signing requests and responses.
+
+
+
+[#amadmin-changes]
+=== Administering the amadmin Account
+
+The built-in `amadmin` account cannot be disabled, deleted, or renamed, since it is hard-coded in the source code of several files.
+
+If you want a user to have administration rights in OpenAM other than `amadmin`, delegate realm administration privileges to the new user. For more information about delegating realm administration privileges, see xref:chap-realms.adoc#delegating-realm-administration-privileges["Delegating Realm Administration Privileges"].
+
+[#change-amadmin-password]
+==== Changing the amadmin User's Password
+
+In this section you will find procedures to change the password of the top-level administrator `amadmin`, when:
+
+* OpenAM is configured using an external configuration store.
++
+See xref:#external-config-external-datastore["To Change the amadmin User's Password: External Configuration Store"].
+
+* OpenAM is configured using the embedded OpenDJ instance as the configuration store. It may be configured with an external data store, or with the embedded OpenDJ instance as a data store.
++
+See xref:#embedded-config["To Change the amadmin User's Password: Embedded Configuration Store"].
+
+
+[#external-config-external-datastore]
+.To Change the amadmin User's Password: External Configuration Store
+====
+If OpenAM is configured to use an external configuration store, perform the following steps to change the `amadmin` user's password:
+
+. Log in to the OpenAM console as the administrator, `amadmin`.
+
+. Navigate to Realms > Top Level Realm > Subjects, and then click `amAdmin`.
+
+. On the Edit User page, select Edit next to Password.
+
+. On the Change Password page, enter the new password in the New Password field.
+
+. Click OK to save your changes.
++
+If your deployment has multiple OpenAM servers, the new password replicates across all servers.
+
+====
+
+[#embedded-config]
+.To Change the amadmin User's Password: Embedded Configuration Store
+====
+If OpenAM is configured to use the embedded OpenDJ instance for the configuration store, you must change the passwords of the following two users in the embedded OpenDJ accounts to match the new `amadmin` password:
+You must change these two passwords in the embedded OpenDJ instance regardless of whether you use an external or embedded data store.
+
+* The `cn=Directory Manager` user, created during installation.
+
+* The global administrator, created in OpenDJ by OpenAM after a second OpenAM server has been added to the deployment.
+
+Some functionality might not work if the OpenDJ directory manager, OpenAM administrator `amadmin`, and OpenDJ global administrator passwords are not identical. For example, adding new servers to the deployment.
+
+To change the OpenAM `amadmin`, OpenDJ directory manager, and OpenDJ global administrator passwords and the required bindings, perform the following steps:
+
+. Back up your deployment as described in xref:chap-backup-restore.adoc#chap-backup-restore["Backing Up and Restoring OpenAM Configurations"].
+
+. Log in to the OpenAM console as the administrator, `amadmin`.
+
+. Navigate to Realms > Top Level Realm > Subjects, and then click `amAdmin`.
+
+. On the Edit User page, select Edit next to Password.
+
+. On the Change Password page, enter the new password in the New Password field.
+
+. Click OK to save your changes.
++
+If your deployment has multiple OpenAM servers, the new password replicates across all servers.
+
+. OpenAM binds to the embedded OpenDJ server using the `cn=Directory Manager` account. Change the `cn=Directory Manager` account's bind password in the OpenAM configuration as follows:
++
+
+.. Change the password for the configuration store binding:
++
+
+... Navigate to Deployment > Servers > __Server Name__ > Directory Configuration.
+
+... Enter the new bind password, which is the new `amadmin` password, and save your changes.
++
+Make this change for each of your OpenAM servers.
+
+
+.. (Optional) If you use the embedded OpenDJ instance as a data store, change the following bind passwords:
++
+
+... Navigate to Realms > __Realm Name__ > Data Stores > embedded:
++
+
+.... Enter the new bind password, which is the new `amadmin` password, and save your changes.
++
+Make this change in every OpenAM realm that uses the embedded OpenDJ as a data store.
+
+
+... Navigate to Realms > __Realm Name__ > Services > Policy Configuration:
++
+
+.... Enter the new bind password, which is the new `amadmin` password, and save your changes.
++
+Make this change in every OpenAM realm that uses the embedded OpenDJ as a data store.
+
+
+... Navigate to Realms > __Realm Name__ > Authentication > Modules, and select LDAP:
++
+
+.... Enter the new bind password, which is the new `amadmin` password, and save your changes.
++
+Make this change in every OpenAM realm that uses the embedded OpenDJ as a data store.
+
+
+
+
+. To change the `cn=Directory Manager` and the global administrator passwords in the embedded OpenDJ, see link:https://backstage.forgerock.com/#!/docs/opendj/3.5/admin-guide#troubleshoot-reset-admin-passwords[Resetting Administrator Passwords, window=\_blank] in the __OpenDJ Administration Guide__.
+
+====
+
+
+

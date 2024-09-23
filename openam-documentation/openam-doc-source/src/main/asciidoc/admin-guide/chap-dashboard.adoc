@@ -1,0 +1,138 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-dashboard]
+== Configuring the Dashboard Service
+
+This chapter shows how to configure the OpenAM Dashboard service.
+
+[#about-the-dashboard]
+=== About the Dashboard Service
+
+The Dashboard Service provides the end user with an interface to access applications secured by OpenAM, both cloud-based applications like SalesForce and internal applications protected by policy agents. The Dashboard Service uses SSO to login to the applications when the user clicks on the application icon. For some apps, like SalesForce, you will want to limit access to only a few users. Other apps, like Google Mail or Drive, you will probably want to make available to all users.
+
+[#figure-user-dashboard]
+image::images/user-dashboard.png[]
+The Dashboard Service is meant to give users a single place to access their applications. Keep in mind that this does not limit user access, only what appears on the user dashboard.
+There are three stages to setting up the Dashboard Service:
+
+* Setup the Dashboard Service and add applications.
+
+* Add the service to the realms.
+
+* Assign users applications so that they appear on the users' dashboards. This can be done manually or through a provisioning solution.
+
+User dashboard pages require the XUI, which is enabled by default in OpenAM. To verify that XUI is enabled, log in to the OpenAM console as administrator and navigate to Configure > Authentication, click Core Attributes, and then enable XUI Interface.
+
+Once the Dashboard Service is configured for a user, the user can access their dashboard after logging in through the XUI under `/XUI/#dashboard/`. For example, the full URL depending on the deployment might be at `\https://openam.example.com:8443/openam/XUI/#dashboard/`.
+
+
+[#dashboard-setup]
+=== Setting Up the Dashboard Service
+
+Making some applications universally available ensures that all users have the same basic applications. However, some of your applications should be protected from the majority of your users. You will need to single out which users will include the application on their dashboard.
+
+There are three default applications in the Dashboard Service: Google, SalesForce, and ZenDesk.
+
+[#dashboard-add]
+.To Add Applications from the Dashboard Service
+====
+You can add applications to the Dashboard Service with the following steps. All fields except the dashboard class name and ICF Identifier are required for the application to work properly from the dashboard:
+
+. Log in to the OpenAM console as OpenAM Administrator, `amadmin`.
+
+. Navigate to Configure > Global Services, click Dashboard, and then click New to add a new application to the Dashboard Service and to provide the information needed to connect to the app.
+
+. Provide a unique name for the application.
+
+. Add a Dashboard Class Name that identifies how the end user will access the app, such as `SAML2ApplicationClass` for a SAML v2.0 application.
+
+. Add a Dashboard Name for the application.
+
+. Add a Dashboard Display Name. This name is what the end user will see, such as Google.
+
+. Add the Dashboard Icon you would like the end user to see for the application. Either use a fully-qualified URL or an appropriate relative URL so that the icon is rendered properly on the user dashboard.
+
+. Add the Dashboard Login URL to point to the location the end user will go to once they click on the icon.
+
+. Leave the ICF Identifier blank.
+
+. Click Add when you are done.
+
+====
+
+
+[#dashboard-realms]
+=== Configuring Dashboard Service for a Realm
+
+
+[#dashboard-single-realm]
+.To Add the Application Dashboard Service to a Realm
+====
+You must add the Dashboard Service to a realm before it will be available. The following instructions show you how to add an application to a single realm. Before you begin, make sure you have the name of the application as it appears on the Secondary Configuration Instance table under Configure > Global Services > Dashboard:
+
+. Select Realms > __Realm Name__ > Services, and then click Add a Service.
+
+. Select the Dashboard service, and then click Create.
+
+. Add or remove the applications you would like to appear on the Dashboard service for the realm.
+
+. Click Save Changes when you are done.
+
+====
+
+
+[#dashboard-users]
+=== Adding Applications to a User's Dashboard
+
+
+[#assign-app-to-user]
+.To Add an Application to a User's Dashboard
+====
+Use the following steps to add an application to a user's dashboard:
+
+. Select Realms > __Realm Name__ > Subjects and click the user identifier to edit the user's profile.
+
+. Under Services, click Dashboard.
+
+. Add the application beside the user name under the user's Assigned Dashboard list.
+
+. Click Save.
+
+====
+
+[#dashboard-remove-user-access]
+.Removing User Access to an Application
+====
+You may need to remove an application from user's dashboard, but you do not want to entirely delete the user. The following steps walk you through removing an application from a user's dashboard:
+
+. Select Realms > __Realm Name__ > Subjects and click the user identifier to edit the user's profile.
+
+. Under Services, click Dashboard.
+
+. Delete the application beside the user name under the user's Assigned Dashboard list.
+
+. Click Save.
+
+====
+
+

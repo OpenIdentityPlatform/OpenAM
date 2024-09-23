@@ -1,0 +1,397 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-high-level-start]
+== Getting Started for Architects and Deployers
+
+The following section provides general instructions to get started with an OpenAM deployment.
+
+[#plan-the-deployment]
+=== Plan the Deployment
+
+The initial process is the planning phase of your project.
+
+* *Learn about OpenAM*. You can access online information, meet with your ForgeRock Sales representative, go to a seminar, or call ForgeRock about OpenAM's capabilities.
++
+The following are some general questions that you may want to have answered:
++
+
+[#table-openam-initial-tasks]
+.OpenAM Initial Questions
+[cols="85%,7%,8%"]
+|===
+|OpenAM Initial Tasks 2+|Done ? 
+
+a|Understand the access management problems that OpenAM helps to solve
+a|Y
+a|N
+
+a|Learn how to protect a Web site with OpenAM
+a|Y
+a|N
+
+a|Get to know the OpenAM software deliverables
+a|Y
+a|N
+
+a|Get to know the tools for administering OpenAM
+a|Y
+a|N
+
+a|Get to know the APIs for OpenAM client applications
+a|Y
+a|N
+
+a|Find out how to get help and support from ForgeRock and partners
+a|Y
+a|N
+
+a|Find out how to get training from ForgeRock and partners
+a|Y
+a|N
+
+a|Find out how to keep up to date on new development and new releases
+a|Y
+a|N
+
+a|Find out how to report problems
+a|Y
+a|N
+|===
++
+
+* *Set up a Demo or Pilot*. View an OpenAM demo or set up a pilot to determine how you want to use OpenAM to protect your site(s). ForgeRock Sales representatives can assist you with a demo or pilot.
+
+* *Attend a Training Class*. ForgeRock presents effective training classes to deploy OpenAM in your environment. See link:https://www.forgerock.com/services/university-training[ForgeRock University, window=\_blank] for more information.
+
+* *Complete the Accreditation Program*. Complete the product-specific ForgeRock Accreditation Program to gain in-depth design and deployment expertise or seek partners who are ForgeRock Accredited Partners.
+
+* *Determine Your Service Level Agreements*. ForgeRock provides a set of standard service level agreements that you can sign up for. ForgeRock also provides custom service level agreements if the standard set does not meet your needs.
++
+
+[#table-openam-standard-slas]
+.OpenAM Standard SLAs
+[cols="25%,25%,25%,25%"]
+|===
+|Priority |Gold |Silver |Bronze 
+
+a|Urgent (P1)
+a|2 Hour
+a|4 Hour
+a|Next Business Day
+
+a|High (P2)
+a|4 Hour
+a|8 Hour
+a|2 Business Days
+
+a|Normal (P3)
+a|6 Hour
+a|Next Business Day
+a|3 Business Days
+
+a|Low (P4)
+a|Next Business Day
+a|2 Business Days
+a|4 Business Days
+|===
++
+
+* *Determine Your Services*. ForgeRock provides a full, proven-production Identity Management stack to meet your requirements.
++
+
+[#table-openam-services]
+.OpenAM Services
+[cols="85%,7%,8%"]
+|===
+|Services Task 2+|Done ? 
+
+a|Understand the services OpenAM software provides
+a|Y
+a|N
+
+a|Determine which services to deploy
+a|Y
+a|N
+
+a|Determine which services the deployment consumes (load balancing, application container, authentication services, configuration storage, profile storage, token/session storage, policy storage, log storage)
+a|Y
+a|N
+
+a|Determine which services the deployment provides (SSO, CDSSO, SAML Federation IDP/SP, XACML PDP, REST STS, OAuth 2.0/OpenID Connect 1.0, and so forth)
+a|Y
+a|N
+
+a|Determine which resources OpenAM protects (who consumes OpenAM services)
+a|Y
+a|N
+|===
++
+
+* *Determine Your Deployment Objectives*. OpenAM provides proven performance and security in many production deployments. You should determine your overall deployment objectives.
++
+
+[#table-openam-deployment-objectives]
+.OpenAM Deployment Objectives
+[cols="85%,7%,8%"]
+|===
+|Deployment Objectives 2+|Done ? 
+
+a|Define deployment objectives in terms of service levels (expectations for authentication rates, active sessions maintained, session life cycles, policies managed, authorization decision rates, response times, throughput, and so forth)
+a|Y
+a|N
+
+a|Define deployment objectives in terms of service availability (OpenAM service availability, authentication availability, authorization decision availability, session availability, elasticity)
+a|Y
+a|N
+
+a|Understand how OpenAM services scale for high availability
+a|Y
+a|N
+
+a|Understand the restrictions in an OpenAM deployment that uses stateless sessions
+a|Y
+a|N
+
+a|Plan for availability (number of sites and servers, load balancing and OpenAM software configuration)
+a|Y
+a|N
+
+a|Define the domains managed and domains involved in the deployment
+a|Y
+a|N
+
+a|Define deployment objectives for delegated administration
+a|Y
+a|N
+
+a|Agree with partners for federated deployments on circles of trust and terms
+a|Y
+a|N
+|===
++
+
+* *Plan Sizing*. At this stage, you should determine the sizing estimates for your deployment. ForgeRock Sales Engineers can assist you in this task.
++
+
+[#table-openam-sizing]
+.OpenAM Sizing
+[cols="85%,7%,8%"]
+|===
+|Sizing 2+|Done ? 
+
+a|Derive sizing estimates from service levels and availability
+a|Y
+a|N
+
+a|Understand how to test sizing estimates (load generation tools?)
+a|Y
+a|N
+
+a|Size servers for OpenAM deployment: CPU
+a|Y
+a|N
+
+a|Size servers for OpenAM deployment: Memory
+a|Y
+a|N
+
+a|Size servers for OpenAM deployment: Network
+a|Y
+a|N
+
+a|Size servers for OpenAM deployment: I/O
+a|Y
+a|N
+
+a|Size servers for OpenAM deployment: Storage
+a|Y
+a|N
+
+a|Quantify impact on external services consumed (LDAP, other auth services, load balancing, and so forth)
+a|Y
+a|N
+
+a|Plan testing and acceptance criteria for sizing
+a|Y
+a|N
+|===
++
+
+* *Plan the Topology*. Plan your logical and physical deployment.
++
+
+[#table-plan-the-topology]
+.OpenAM Topology Planning
+[cols="85%,7%,8%"]
+|===
+|Topology 2+|Done ? 
+
+a|Specify the logical and physical deployment topology (show examples of each)
+a|Y
+a|N
+
+a|Determine whether to use the embedded or external directory service for configuration, CTS, and user data
+a|Y
+a|N
+
+a|Plan installation of OpenAM services (including external dependencies)
+a|Y
+a|N
+
+a|Plan installation of OpenAM policy agents, Fedlets, and OpenIG (might be done by partner service providers)
+a|Y
+a|N
+
+a|Plan integration with client applications
+a|Y
+a|N
+
+a|Plan customization of OpenAM (classic UI or XUI, user profile attributes, authentication modules, identity repositories, OAuth 2.0 scope handling, OAuth 2.0 response types, post-authentication actions, policy evaluation, session quota exhaustion actions, policy evaluation, identity data storage, OpenAM service, custom logger, custom Web policy agents).
+a|Y
+a|N
+|===
++
+
+* *Plan Security*. At this stage, you must plan how to secure your deployment.
++
+
+[#table-plan-security]
+.OpenAM Security
+[cols="85%,7%,8%"]
+|===
+|Security 2+|Done ? 
+
+a|Understand security guidelines, including legal requirements
+a|Y
+a|N
+
+a|Change default settings and administrative user credentials
+a|Y
+a|N
+
+a|Protect service ports (Firewall, Dist Auth UI, reverse proxy)
+a|Y
+a|N
+
+a|Turn off unused service endpoints
+a|Y
+a|N
+
+a|Separate administrative access from client access
+a|Y
+a|N
+
+a|Secure communications (HTTPS, LDAPS, secure cookies, cookie hijacking protection, key management for signing and encryption)
+a|Y
+a|N
+
+a|Determine if components handle SSL acceleration or termination
+a|Y
+a|N
+
+a|Securing processes and files (e.g. with SELinux, dedicated non-privileged user and port forwarding, and so forth)
+a|Y
+a|N
+|===
++
+
+* *Post-Deployment Tasks*. At this stage, you should plan your post-deployment tasks to sustain and monitor your system.
++
+
+[#table-post-deployment]
+.OpenAM Post-Deployment Tasks
+[cols="85%,7%,8%"]
+|===
+|Post Deployment Tasks 2+|Done ? 
+
+a|Plan administration following OpenAM deployment (services, agents/OpenIG, delegated administration)
+a|Y
+a|N
+
+a|Plan monitoring following deployment
+a|Y
+a|N
+
+a|Plan how to expand the deployment
+a|Y
+a|N
+
+a|Plan how to upgrade the deployment
+a|Y
+a|N
+|===
++
+
+
+
+[#install-openam]
+=== Install the Components
+
+The installation process requires that you implement your deployment plan.
+
+* *Plan the Overall Deployment*. The initial planning step involves establishing the overall deployment. You should determine who is responsible for each task and any external dependencies.
+
+* *Determine What To Install*. Based on your deployment plan, determine what you need to install.
+
+* *Determine Your System Requirements*. Based on your deployment plan, determine your system requirements.
+
+* *Prepare the Operating System*. Prepare your operating system, depending on the OS: Linux, Solaris, Windows, Cloud (Amazon EC2, OpenStack, and so forth), Virtual Machines (VMWare, Xen, Hyper-V, and so forth)
+
+* *Prepare the Java Environment*. Prepare your Java environment, depending on your vendor type: Oracle, IBM, OpenJDK.
+
+* *Prepare the App Server*. Prepare your application server, depending on type: Apache Tomcat, JBoss 4/5, WildFly, Jetty, Oracle WebLogic, IBM WebSphere. Also, prepare each app server for HTTPS.
+
+* *Prepare the Directory Servers*. Prepare the configuration directory server, OpenDJ for the core token service (CTS), and the LDAP identity repository. For information on installing data repositories, see xref:../install-guide/chap-prepare-install.adoc#chap-prepare-install["Preparing For Installation"] in the __Installation Guide__.
+
+* *Obtain the OpenAM Software*. You should obtain a supported ForgeRock release of OpenAM or an archive build. For the latest stable version of OpenAM, click link:https://backstage.forgerock.com/#!/downloads/[Enterprise Downloads, window=\_blank].
+
+* *Configure OpenAM*. Install and configure OpenAM with or without the console, the setup tools (configurator), configuration tools (`ssoadm`, `ampassword`, `amverifyarchive`), or set up your scripted install and configuration of OpenAM. For information on installing OpenAM, see the xref:../install-guide/index.adoc[Installation Guide].
+
+* *Set up your Realms*. Within OpenAM, set up your realms and realm administrators if any. For more information on realms, see xref:../admin-guide/chap-realms.adoc#chap-realms["Configuring Realms"] in the __Administration Guide__.
+
+* *Configure Session State*. Configure sessions as stateful or stateless. For more information on session state, see xref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"] in the __Administration Guide__.
+
+* *Install Another OpenAM Instance*. Set up an identical instance of your first OpenAM instance. For information on installing multiple OpenAM servers, see xref:../install-guide/chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"] in the __Installation Guide__.
+
+* *Secure OpenAM*. Configure OpenAM to access external resources over HTTPS and LDAPS. Set up secure cookies and certificates. For more information, see xref:../admin-guide/chap-securing.adoc#chap-securing["Securing OpenAM"] in the __Administration Guide__.
+
+* *Configure High Availability*. Configure the load balancers, reverse proxies, and site(s). Configure OpenAM for session failover and server failover. For simple instructions to deploy OpenAM behind a load balancer, see link:https://wikis.forgerock.org/confluence/display/openam/Deploying+OpenAM+behind+a+load+balancer[Deploying OpenAM behind a load balancer, window=\_blank]. For an example of a reverse proxy with OpenAM, see link:https://wikis.forgerock.org/confluence/display/openam/Simple+Apache+Reverse+Proxy+For+OpenAM+With+Certificate-Based+Authentication[Simple Apache Reverse Proxy for OpenAM with Certificate-Based Authentication, window=\_blank]. For information on configuring sites, see xref:../install-guide/chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"] in the __Installation Guide__.
+
+* *Prepare the Policy Agent Profiles*. Prepare the policy agent profile, agent authenticator, policy agent configuration, bootstrap configuration for a Java EE or Web policy agent. For more information, see xref:../admin-guide/chap-agents.adoc#chap-agents["Configuring Policy Agent Profiles"] in the __Administration Guide__.
+
+* *Install the Policy Agents*. Install the policy agents depending on the app server or Web server type. For app servers, Apache Tomcat, JBoss, Jetty, Oracle WebLogic, IBM WebSphere. For Web servers, Apache , Microsoft IIS. Set up any script installations of the policy agents. For more information, see the OpenAM Web Policy Agent documentation.
+
+* *Customizing OpenAM*. Customize OpenAM for your organization. For information on customizing the OpenAM end-user pages, see xref:../install-guide/chap-custom-ui.adoc#chap-custom-ui["Customizing the OpenAM End User Pages"] in the __Installation Guide__.
+
+* *Install OpenIG*. Determine which OpenIG deliverable to install (whether federation is involved). Prepare the Apache Tomcat, JBoss, Jetty, Oracle WebLogic app servers for installation. Install OpenIG. See the OpenIG documentation for details.
+
+* *Plan Application and Host Backup*. Determine your backup strategy including LDIF exports, file system backups, tar files, and so forth. Also, consider log rotation and retention policies. For more information on backups, see xref:../admin-guide/chap-backup-restore.adoc#chap-backup-restore["Backing Up and Restoring OpenAM Configurations"] in the __Administration Guide__.
+
+* *Plan an OpenAM Upgrade*. You should know what is new or fixed in an upgrade version as well as the differences and compatibility between the current version and an upgrade. Know the limitations of an upgrade version. Plan a live upgrade without service interruption. Plan an offline upgrade with service interruption. Plan the test of the upgrade and revert a failed upgrade. For more information on upgrades, see the xref:../upgrade-guide/index.adoc[Upgrade Guide].
+
+* *Upgrade OpenAM*. Upgrade OpenAM and other instances with or without the console. Upgrade the setup tools (configurator), configuration tools (`ssoadm`, `ampassword`, `amverifyarchive`), and the Java EE and/or Web policy agents. Upgrade OpenIG. For more information on upgrades, see the xref:../upgrade-guide/index.adoc[Upgrade Guide].
+
+* *Remove OpenAM*. If required, remove OpenAM with or without the console. Remove setup and configuration tools. Remove the Java EE and/or Web policy agents. Remove OpenIG. For more information on removing OpenAM, see xref:../install-guide/chap-uninstall.adoc#chap-uninstall["Removing OpenAM Software"] in the __Installation Guide__.
+
+
+

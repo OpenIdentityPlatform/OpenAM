@@ -1,0 +1,71 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-about-web-agents]
+== About OpenAM Web Policy Agents
+
+OpenAM web policy agents provide light touch integration for web applications running on supported web servers. This chapter covers what web policy agents do and how they work.
+
+A __policy agent__ enforces policy for OpenAM and protects all resources on the web server. The policy agent intercepts requests from users trying to access a protected web resource and denies access until the user has authorization from OpenAM to access the resource.
+
+[#one-agent-per-server]
+[NOTE]
+====
+A single policy agent can work with multiple applications. You therefore install only one policy agent per web server.
+
+Installing more than one policy agent in a web server is not supported.
+====
+
+[#web-agent-components]
+=== Web Policy Agent Components
+
+The web policy agent provides fast installation and light touch integration to protect the resources on the supported web server. The web agent consists of a web server plugin matching the API requirements of the particular web server and a native module that interfaces with OpenAM for its services.
+
+[#figure-web-policy-agent]
+image::images/web-policy-agent.png[]
+
+
+[#example-agent-interaction]
+=== How the User, Web Policy Agent, and OpenAM Interact
+
+Imagine that a user attempts to access a protected resource before having authenticated by pointing the user's browser to a web page. Assume that you have configured OpenAM to protect the web page. Then, the web policy agent intercepting the user's browser's request finds no session token in the request, and so redirects the user's browser to the OpenAM login page for authentication. After the user has successfully authenticated, OpenAM sets a session token in a browser cookie, and redirects the browser back to the page the user tried to access initially.
+
+When the user's browser reiterates the request, the policy agent again checks that the request has a session token, finds a session token this time, and validates the session token with OpenAM. Given the valid session token, the policy agent gets a policy decision from OpenAM concerning whether the user can access the page. If OpenAM's Policy Service determines that the user is allowed to access the page, OpenAM responds to the policy agent that access should be granted. The web policy agent then permits the web page to be returned to the user's browser.
+
+The following diagram shows how the pieces fit together when a web client accesses a web page protected by a policy agent. This diagram is simplified to show only the essential principals rather than to describe every possible case.
+
+[#figure-web-pa-interaction]
+image::images/wpa-interaction.png[]
+A web policy agent is a library installed in the web server and configured to be called by the web server when a client requests access to a protected resource in a web site. Here is how it works:
+
+. The web client requests access to a protected resource.
+
+. The web server runs the request through the policy agent that protects the resource according to OpenAM policy. The policy agent acts to enforce policy, whereas the policy configuration and decisions are handled by OpenAM.
+
+. The policy agent communicates with OpenAM to get the policy decision to enforce.
+
+. For a resource to which OpenAM approves access, the policy agent allows access.
+
+. The web server returns the requested access to the web client.
+
+
+

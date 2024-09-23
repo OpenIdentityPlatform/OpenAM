@@ -1,0 +1,77 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-ports-used]
+== Ports Used
+
+OpenAM software uses a number of ports by default.
+
+Default ports are shown in the following table:
+
+[#openam-default-ports]
+.Default Ports Used by OpenAM
+[cols="20%,20%,60%"]
+|===
+|Port Number |Protocol |Description 
+
+a|1689
+a|TCP/IP
+a|Port for Java Management eXtension traffic, disabled by default
+
+a|1812
+a|UDP
+a|Port for OpenAM's RADIUS server, disabled by default
+
+a|4444
+a|TCP/IP
+a|Port for the embedded administration connector, enabled by default.
+
+a|8080
+a|TCP/IP
+a|Web application container port number
+
+a|8082
+a|TCP/IP
+a|HTTP port for monitoring OpenAM, disabled by default
+
+a|8085
+a|TCP/IP
+a|SNMP port for monitoring OpenAM, disabled by default
+
+a|9999
+a|TCP/IP
+a|RMI port for monitoring OpenAM, disabled by default.
+
+a|50389, 50899, 58989
+a|TCP/IP
+a|Supports LDAP communication between embedded OpenAM data stores.
+
+a|57943, 58943
+a|Used by the xref:../admin-guide/chap-auth-services.adoc#securid-module-conf-hints["Hints For the SecurID Authentication Module"] in the __Administration Guide__.
+a|
+|===
+Sometimes multiple services are configured on a single system with slightly different port numbers. For example, while the default port number for a servlet container such as Tomcat is 8080, a second instance of Tomcat might be configured with a port number of 18080. In all cases shown, communications proceed using the protocol shown in the table.
+
+When you configure a firewall for OpenAM, make sure to include open ports for any installed and related components, including web services (80, 443), servlet containers (8009, 8080, 8443), and external applications.
+
+Additional ports may be used, depending on other components of your deployment. If you are using external OpenDJ servers, refer to the link:https://backstage.forgerock.com/docs/opendj/3.5/reference/#appendix-ports-used[Ports Used, window=\_blank] appendix of the __OpenDJ Reference__.
+

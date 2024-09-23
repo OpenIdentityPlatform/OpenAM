@@ -1,0 +1,54 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-l10n]
+== Localization
+
+This chapter lists languages and locales supported for OpenAM.
+OpenAM console and end user pages are being updated from the classic user interface (legacy) to the XUI user interface.
+
+The XUI interface pages are localized for the following languages:
+
+* English
+
+You can localize the XUI for other languages as you require. For more information, see xref:../install-guide/chap-custom-ui.adoc#xui-text["Localizing the XUI"] in the __Installation Guide__.
+
+The classic user interface (legacy) pages are localized for the following languages:
+
+* English
+
+* French
+
+* German
+
+* Japanese
+
+* Korean
+
+* Simplified Chinese
+
+* Spanish
+
+* Traditional Chinese
+
+For more information about localizing the classic user interface (legacy), see xref:../install-guide/chap-custom-ui.adoc#update-classic-ui["Customizing the Classic User Interface (Legacy)"] in the __Installation Guide__ and xref:../install-guide/chap-custom-ui.adoc#lookup-for-ui-files["How OpenAM Looks Up UI Files"] in the __Installation Guide__.
+

@@ -132,8 +132,8 @@ jobs:
           export REPO_NAME_LC=$(echo '${{github.event.repository.name}}' | tr '[:upper:]' '[:lower:]')
           export SITE_DOC_FOLDER=openam-documentation/openam-doc-source
           cd doc.openidentityplatform.org
-          rm -rf ${REPO_NAME_LC}
-          cp -R ../${SITE_DOC_FOLDER}/target/docbkx/bootstrap ../doc.openidentityplatform.org/${REPO_NAME_LC}
+          rm -rf ${REPO_NAME_LC}/modules
+          cp -R ../${SITE_DOC_FOLDER}/target/asciidoc/antora/modules ../doc.openidentityplatform.org/${REPO_NAME_LC}
           git add -A
           git commit -a -m "upload ${{github.event.repository.name}} docs after deploy ${{ github.sha }}"
           git push --force https://github.com/OpenIdentityPlatform/doc.openidentityplatform.org.git

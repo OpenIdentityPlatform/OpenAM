@@ -1,0 +1,271 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#tools-reference]
+== Command-Line Tool Reference
+
+[#agentadmin]
+=== agentadmin — manage OpenAM web policy agent installation
+
+==== Synopsis
+`agentadmin` {options}
+
+[#d183e6440]
+==== Description
+This command manages OpenAM policy agent installations.
+
+[#d183e6445]
+==== Options
+The following options are supported:
+--
+
+`--i`::
+Perform an interactive install of a new agent instance.
+
++
+Usage: `agentadmin --i`
+
++
+For more information, see:
++
+
+* xref:chap-apache.adoc#install-apache-web-agent[Installing Apache Web Policy Agents]
+
+* xref:chap-msiis-7.adoc#install-iis-web-agent[Installing IIS Web Policy Agents]
+
+
+`--s`::
+Perform a silent, non-interactive install of a new agent instance.
+
++
+Usage: `agentadmin --s web-server-config-file openam-url agent-url realm agent-profile-name agent-profile-password [--changeOwner] [--acceptLicense] [--forceInstall]`
++
+[open]
+====
+
+__web-server-config-file__::
+When installing in Apache HTTP Server, enter the full path to the Apache HTTP server configuration file. The installer modifies this file to include the web policy agent configuration and module.
+
++
+When installing in Microsoft IIS, enter the ID number of the IIS site in which to install the web policy agent. To list the available sites in an IIS server and the relevant ID numbers, run `agentadmin.exe --n`.
+
+__openam-url__::
+Enter the full URL of the OpenAM instance that the web policy agents will use. Ensure the deployment URI is specified.
+
++
+Example:
+
++
+`\https://openam.example.com:8443/openam`
+
+__agent-url__::
+Enter the full URL of the server on which the agent is running.
+
++
+Example:
+
++
+`\http://www.example.com:80`
+
+__realm__::
+Enter the OpenAM realm containing the agent profile.
+
+__agent-profile-name__::
+Enter the name of the agent profile in OpenAM.
+
+__agent-profile-password__::
+Enter the full path to the agent profile password file.
+
+`--changeOwner`::
+Use this option to change the ownership of the created directories to be the same user and group as specified in the Apache HTTP Server configuration, or the user that is running the selected IIS site.
+
+`--acceptLicense`::
+When you run certain commands, you will be prompted to read and accept the software license agreement. You can suppress the license agreement prompt by including the optional `--acceptLicence` parameter. Specifying this options indicates that you have read and accepted the terms stated in the license.
+
++
+To view the license agreement, open `/path/to/web_agents/agent_type/legal/Forgerock_License.txt`.
+
+`--forceInstall`::
+Add this option to proceed with a silent installation even if it cannot connect to the specified OpenAM server during installation, rather than exiting.
+
+====
++
+For more information, see:
++
+
+* xref:chap-apache.adoc#silent-apache-agent-installation[Installing Apache Web Policy Agents Silently]
+
+* xref:chap-msiis-7.adoc#silent-iis-agent-installation[Installing IIS Web Policy Agents Silently]
+
+
+`--n`::
+List the sites available in an IIS server.
+
++
+Example:
++
+
+[source, console]
+----
+c:\web_agents\iis_agent\bin> agentadmin.exe --n
+
+ IIS Server Site configuration:
+
+ Number of Sites: 2
+
+ id: 1   name: "DEFAULT WEB SITE"
+ id: 2   name: "CUSTOMERPORTAL"
+----
+
+`--l`::
+List existing configured agent instances.
+
++
+Usage: `agentadmin --l`
+
++
+Example:
++
+
+[source, console]
+----
+$ ./agentadmin --l
+OpenAM Web Agent configuration instances:
+
+ id:            agent_1
+ configuration: /opt/web_agents/apache24_agent/bin/../instances/agent_1
+ server/site:   /etc/httpd/conf/httpd.conf
+
+ id:            agent_2
+ configuration: /opt/web_agents/apache24_agent/bin/../instances/agent_2
+ server/site:   /etc/httpd/conf/httpd.conf
+
+ id:            agent_3
+ configuration: /opt/web_agents/apache24_agent/bin/../instances/agent_3
+ server/site:   /etc/httpd/conf/httpd.conf
+----
+
+`--r`::
+Remove an existing agent instance.
+
++
+Usage: `agentadmin --r agent-instance`
++
+[open]
+====
+
+__agent-instance__::
+The ID of the web policy agent configuration instance to remove.
+
++
+Respond `yes` when prompted to confirm removal.
+
+====
++
+For more information, see:
++
+
+* xref:chap-apache.adoc#uninstall-apache-agent[Removing Apache Web Policy Agents]
+
+* xref:chap-msiis-7.adoc#manage-iis-agents[Managing IIS Web Policy Agents]
+
+
+`--k`::
+Generate a new signing key.
+
++
+Usage: `agentadmin --k`
+
++
+Examples:
++
+
+* UNIX:
++
+
+[source, console]
+----
+$ cd /web_agents/apache24_agent/bin/
+$ ./agentadmin --k
+Encryption key value: YWM0OThlMTQtMzMxOS05Nw==
+----
+
+* Windows:
++
+
+[source, console]
+----
+C:\> cd web_agents\apache24_agent\bin
+C:\web_agents\apache24_agent\bin> agentadmin --k
+Encryption key value: YWM0OThlMTQtMzMxOS05Nw==
+----
+
++
+For more information, see xref:chap-web-agents.adoc#web-agent-encryption-properties[Encryption Properties].
+
+`--p`::
+Use a generated encryption key to encrypt a new password.
+
++
+Usage: `agentadmin --p encryption-key password`
++
+[open]
+====
+
+__encryption-key__::
+An encryption key, generated by the `agentadmin --k` command.
+
+__password__::
+The password to encrypt.
+
+====
++
+Examples:
++
+
+* UNIX:
++
+
+[source, console]
+----
+$ ./agentadmin --p "YWM0OThlMTQtMzMxOS05Nw==" "newpassword"
+Encrypted password value: 07bJOSeM/G8ydO4=
+----
+
+* Windows:
++
+
+[source, console]
+----
+C:\web_agents\apache24_agent\bin> agentadmin --p "YWM0OThlMTQtMzMxOS05Nw==" "newpassword"
+Encrypted password value: 07bJOSeM/G8ydO4=
+----
+
++
+For more information, see xref:chap-web-agents.adoc#web-agent-encryption-properties[Encryption Properties].
+
+`--v`::
+Display `agentadmin` build and version information.
+
+--
+
+

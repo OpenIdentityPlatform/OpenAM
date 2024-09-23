@@ -1,0 +1,515 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-tuning]
+== Tuning OpenAM
+
+This chapter covers key OpenAM tunings to ensure smoothly performing access and federation management services, and to maximize throughput while minimizing response times.
+
+[NOTE]
+====
+The recommendations provided here are guidelines for your testing rather than hard and fast rules for every situation. Said another way, the fact that a given setting is configurable implies that no one setting is right in all circumstances.
+
+The extent to which performance tuning advice applies depends to a large extent on your requirements, on your workload, and on what resources you have available. Test suggestions before rolling them out into production.
+====
+The suggestions in this chapter pertain to OpenAM deployments with the following characteristics:
+
+* The host running the OpenAM server has a large amount of memory.
+
+* The deployment has a dedicated OpenDJ directory server for the Core Token Service. The host running this directory server is a high-end server with a large amount of memory and multiple CPUs.
+
+* The OpenAM server is configured to use stateful sessions.
+
+As a rule of thumb, an OpenAM server in production with a 3 GB heap configured to use stateful sessions can handle 100,000 sessions. Although you might be tempted to use a larger heap with a 64-bit JVM, smaller heaps are easier to manage. Thus, rather than scaling single servers up to increase the total number of simultaneous sessions, consider scaling out by adding more servers instead.
+
+[#tuning-openam-server]
+=== OpenAM Server Settings
+
+OpenAM has a number of settings that can be tuned to increase performance.
+
+[#tuning-general-settings]
+==== General Settings
+
+The following general points apply:
+
+* Set debug level to `error`.
+
+* Set container-level logging to a low level, such as `error` or `severe`.
+
+
+
+[#tuning-ldap-settings]
+==== LDAP Settings
+
+Tune your LDAP data stores, your LDAP authentication modules, and connection pools for CTS and configuration stores.
+
+[#tuning-ldap-settings-data-stores]
+===== Tuning LDAP Data Store Settings
+
+To change LDAP data store settings, navigate to Realms > __Realm Name__ > Data Stores > __Data Store Name__ in the OpenAM console. Each data store has its own connection pool and therefore each data store needs its own tuning:
+
+[#tuning-ldap-data-store-settings]
+.LDAP Data Store Settings
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|LDAP Connection Pool Minimum Size
+a|1
+a|The minimum LDAP connection pool size; a good tuning value for this property is 10.
+
+ (`sun-idrepo-ldapv3-config-connection_pool_min_size`)
+
+a|LDAP Connection Pool Maximum Size
+a|10
+a|The maximum LDAP connection pool size; a high tuning value for this property is 65, though you might well be able to reduce this for your deployment. Ensure your LDAP server can cope with the maximum number of clients across all the OpenAM servers.
+
+ (`sun-idrepo-ldapv3-config-connection_pool_max_size`)
+|===
+
+
+[#tuning-ldap-settings-auth-modules]
+===== Tuning LDAP Authentication Module Settings
+
+To change connection pool settings for the LDAP authentication module, in the OpenAM console, navigate to Configure > Authentication, and then click Core Attributes.
+
+[#tuning-ldap-authentication-module-settings]
+.LDAP Authentication Module Setting
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|Default LDAP Connection Pool Size
+a|1:10
+a|The minimum and maximum LDAP connection pool used by the LDAP authentication module. This should be tuned to 10:65 for production.
+
+ (`iplanet-am-auth-ldap-connection-pool-default-size`)
+|===
+
+
+[#tuning-ldap-settings-cts]
+===== Tuning LDAP CTS and Configuration Store Settings
+
+When tuning LDAP connection pool settings for the Core Token Service (CTS), what you change depends on whether the directory service backing the CTS is the same directory service backing OpenAM configuration.
+
+When the same directory service backs both the CTS and also OpenAM configuration (the default), then the same connection pool is shared for any LDAP operations requested by the CTS or by a service accessing the OpenAM configuration. In this case, one connection is reserved for cleanup of expired CTS tokens. Roughly half of the connections are allocated for CTS operations, to the nearest power of two.footnote:d19490e46732[To be precise, the number of connections allocated for CTS operations is equal to the power of two that is nearest to half the maximum number of connections in the pool.] The remaining connections are allocated to services accessing the OpenAM configuration. For a default configuration, where the maximum number of connections in the pool is ten, one connection is allocated for cleanup of expired CTS tokens, four connections are allocated for other CTS operations, and five connections are allocated for services accessing the configuration. If the Maximum Connection Pool size is 20, one connection is allocated for cleanup of expired CTS tokens, eight connections are allocated for other CTS operations, and 11 connections are allocated for services accessing the configuration. If the pool size is 65, then the numbers are 1, 32, and 32, and so on.
+
+The minimum number of connections is 6.
+
+When the directory service backing the CTS is external (differs from the directory service backing the OpenAM configuration) then the connection pool used to access the directory service for the CTS is separate from the pool used to access the directory service for the OpenAM configuration. One connection is reserved for cleanup of expired CTS tokens. Remaining connections are allocated for CTS operations such that the number of connections allocated is equal to a power of two. In this case, set the maximum number of connections to 2^n+1, as in 9, 17, 33, 65, and so forth.
+
+If the same directory service backs both the CTS and also OpenAM configuration, then set the Maximum Connection Pool property size under Deployment > Servers > __Server Name__ > Directory Configuration.
+
+If the directory service backing the CTS is external (differs from the directory service backing the OpenAM configuration), then set the Maximum Connection property size under Deployment > Servers > __Server Name__ > CTS > CTS Token Store.
+
+In both cases, if you must change the default connection timeouts, set the following advanced properties under Deployment > Servers > __Server Name__ > Advanced:
+
+[#tuning-ldap-cts-settings]
+.CTS Store LDAP Connection Pool Settings
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|Maximum Connection Pool
+a|10
+a|Find this setting in OpenAM console under Deployment > Servers > __Server Name__ > Directory Configuration.
+
+ When the same directory service backs both the CTS and also OpenAM configuration, consider increasing this to at least 19 to allow 9 connections for the CTS, and 10 connections for access to the OpenAM configuration (including for example looking up policies).
+
+a|Max Connections
+a|10
+a|Find this setting in OpenAM console under Deployment > Servers > __Server Name__ > CTS > External Store Configuration.
+
+ When the directory service backing the CTS is external and the load on the CTS is high, consider setting this to 2^n+1, where n = 4, 5, 6, and so on. In other words, try setting this to 17, 33, 65, and so on when testing performance under load.
+
+ (`org.forgerock.services.cts.store.max.connections`)
+
+a|CTS connection timeout (advanced property)
+a|10 (seconds)
+a|Most CTS requests to the directory server are handled quickly, so the default timeout is fine for most cases.
+
+ If you choose to vary this setting for performance testing, set the advanced property, `org.forgerock.services.datalayer.connection.timeout.cts.async`, under Deployment > Servers > __Server Name__ > Advanced.
+
+ You must restart OpenAM or the container in which it runs for changes to take effect.
+
+a|CTS reaper timeout (advanced property)
+a|None
+a|The CTS token cleanup connection generally should not time out as it is used to request long-running queries that can return many results.
+
+ If you choose to vary this setting for performance testing, set the advanced property, `org.forgerock.services.datalayer.connection.timeout.cts.reaper`, to the number of seconds desired under Deployment > Servers > __Server Name__ > Advanced.
+
+ You must restart OpenAM or the container in which it runs for changes to take effect.
+
+a|Configuration management connection timeout (advanced property)
+a|10 (seconds)
+a|Most configuration management requests to the directory server are handled quickly, so the default timeout is fine for most cases.
+
+ If you choose to vary this setting for performance testing, set the advanced property, `org.forgerock.services.datalayer.connection.timeout`, under Deployment > Servers > __Server Name__ > Advanced.
+
+ You must restart OpenAM or the container in which it runs for changes to take effect.
+|===
+
+
+
+[#tuning-notification-settings]
+==== Notification Settings
+
+OpenAM has two thread pools used to send notifications to clients. The Service Management Service (SMS) thread pool can be tuned in the OpenAM console under Configure > Server Defaults > SDK > Data Store:
+
+[#tuning-sms-notifications]
+.SMS Notification Setting
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|Notification Pool Size
+a|10
+a|This is the size of the thread pool used to send notifications. In production this value should be fine unless lots of clients are registering for SMS notifications.
+
+ (`com.sun.identity.sm.notification.threadpool.size`)
+|===
+The session service has its own thread pool to send notifications to listeners about changes to stateful sessions. This is configured under Configure > Server Defaults > Session > Notification:
+
+[#tuning-session-service-notifications]
+.Session Service Notification Settings
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|Notification Pool Size
+a|10
+a|This is the size of the thread pool used to send notifications. In production this should be around 25-30.
+
+ (`com.iplanet.am.notification.threadpool.size`)
+
+a|Notification Thread Pool Threshold
+a|5000
+a|This is the maximum number of notifications in the queue waiting to be sent. The default value should be fine in the majority of installations.
+
+ (`com.iplanet.am.notification.threadpool.threshold`)
+|===
+
+
+[#tuning-session-settings]
+==== Session Settings
+
+The session service has additional properties to tune, which are configured under Configure > Server Defaults > Session > Session Limits. The following suggestions apply to deployments using stateful sessions:
+
+[#tuning-session-service-settings]
+.Session Settings
+[cols="33%,16%,51%"]
+|===
+|Property |Default Value |Suggestions 
+
+a|Maximum Sessions
+a|5000
+a|In production, this value can safely be set into the 100,000s. The maximum session limit is really controlled by the maximum size of the JVM heap which must be tuned appropriately to match the expected number of concurrent sessions.
+
+ (`com.iplanet.am.session.maxSessions`)
+
+a|Sessions Purge Delay
+a|0
+a|This should be zero to ensure sessions are purged immediately.
+
+ (`com.iplanet.am.session.purgedelay`)
+|===
+
+
+
+[#tuning-jvm-for-openam]
+=== Java Virtual Machine Settings
+
+This section gives some initial guidance on configuring the JVM for running OpenAM. These settings provide a strong foundation to the JVM before a more detailed garbage collection tuning exercise, or as best practice configuration for production:
+
+[#tuning-heap-size]
+.Heap Size Settings
+[cols="42%,29%,29%"]
+|===
+|JVM Parameters |Suggested Value |Description 
+
+a|`-Xms` & `-Xmx`
+a|At least 1 GB (2 GB with embedded OpenDJ), in production environments at least 2 GB to 3 GB. This setting depends on the available physical memory, and on whether a 32- or 64-bit JVM is used.
+a|-
+
+a|`-server`
+a|-
+a|Ensures the server JVM is used
+
+a|`-XX:PermSize` & `-XX:MaxPermSize` (JDK 7)
+a|Set both to 256 MB
+a|Controls the size of the permanent generation in the JVM
+
+a|`-XX:MetaspaceSize` & `-XX:MaxMetaspaceSize` (JDK 8)
+a|Set both to 256 MB
+a|Controls the size of the metaspace in the JVM
+
+a|`-Dsun.net.client.defaultReadTimeout`
+a|60000
+a|Controls the read timeout in the Java HTTP client implementation
+
+ This applies only to the Sun/Oracle HotSpot JVM.
+
+a|`-Dsun.net.client.defaultConnectTimeout`
+a|High setting: 30000
+ (30 seconds)
+a|Controls the connect timeout in the Java HTTP client implementation
+
+ When you have hundreds of incoming requests per second, reduce this value to avoid a huge connection queue.
+
+ This applies only to the Sun/Oracle HotSpot JVM.
+|===
+
+[#tuning-security]
+.Security Settings
+[cols="42%,29%,29%"]
+|===
+|JVM Parameters |Suggested Value |Description 
+
+a|`-Dhttps.protocols`
+a|`TLSv1,TLSv1.1,TLSv1.2`
+a|Controls the protocols used for outbound HTTPS connections from OpenAM.
+
+ This applies only to Sun/Oracle Java environments.
+|===
+
+[#tuning-garbage-collection]
+.Garbage Collection Settings
+[cols="42%,29%,29%"]
+|===
+|JVM Parameters |Suggested Value |Description 
+
+a|`-verbose:gc`
+a|-
+a|Verbose garbage collection reporting
+
+a|`-Xloggc:`
+a|`$CATALINA_HOME/logs/gc.log`
+a|Location of the verbose garbage collection log file
+
+a|`-XX:+PrintClassHistogram`
+a|-
+a|Prints a heap histogram when a SIGTERM signal is received by the JVM
+
+a|`-XX:+PrintGCDetails`
+a|-
+a|Prints detailed information about garbage collection
+
+a|`-XX:+PrintGCTimeStamps`
+a|-
+a|Prints detailed garbage collection timings
+
+a|`-XX:+HeapDumpOnOutOfMemoryError`
+a|-
+a|Out of Memory errors generate a heap dump automatically
+
+a|`-XX:HeapDumpPath`
+a|`$CATALINA_HOME/logs/heapdump.hprof`
+a|Location of the heap dump
+
+a|`-XX:+UseConcMarkSweepGC`
+a|-
+a|Use the concurrent mark sweep garbage collector
+
+a|`-XX:+UseCMSCompactAtFullCollection`
+a|-
+a|Aggressive compaction at full collection
+
+a|`-XX:+CMSClassUnloadingEnabled`
+a|-
+a|Allow class unloading during CMS sweeps
+|===
+
+
+[#caching]
+=== Caching in OpenAM
+
+OpenAM caches data to avoid having to query user and configuration data stores each time it needs the information. By default, OpenAM makes use of LDAP persistent search to receive notification of changes to cached data. For this reason, caching works best when data are stored in a directory server that supports LDAP persistent search.
+
+OpenAM has two kinds of cache on the server side that you can configure, one for configuration data and the other for user data. Generally use the default settings for configuration data cache. This section mainly covers the configuration choices you have for caching user data.
+
+OpenAM implements the global user data cache for its user data stores. Prior to OpenAM 11.0, OpenAM supported a secondary Time-to-Live (TTL) data store caching layer, which has since been removed in OpenAM 11.0 and later versions.
+
+The user data store also supports a DN Cache, used to cache DN lookups that tend to occur in bursts during authentication. The DN Cache can become out of date when a user is moved or renamed in the underlying LDAP store, events that are not always reflected in a persistent search result. You can enable the DN cache when the underlying LDAP store supports persistent search and `mod DN` operations (that is, move or rename DN).
+
+The following diagram depicts the two kinds of cache, and also the two types of caching available for user data:
+
+[#figure-openam-caches]
+image::images/openam-caches.png[]
+The rest of this section concerns mainly settings for global user data cache and for SDK clients. For a look at data store cache settings, see xref:#tuning-ldap-data-store-settings["LDAP Data Store Settings"].
+
+[#caching-server-settings]
+==== Overall Server Cache Settings
+
+By default OpenAM has caching enabled both for configuration data and also for user data. This setting is governed by the server property `com.iplanet.am.sdk.caching.enabled`, which by default is `true`. When you set this advanced property to `false`, then you can enable caching independently for configuration data and for user data.
+
+[#turn-off-global-user-data-caching]
+.To Turn Off Global User Data Caching
+====
+*Disabling caching can have a severe negative impact on performance. This is because when caching is disabled, OpenAM must query a data store each time it needs data.
+*
+
+If, however, you have at least one user data store that does not support LDAP persistent search, such as a relational database or an LDAP directory server that does not support persistent search, then you must disable the __global__ cache for user data. Otherwise user data caches cannot stay in sync with changes to user data entries:
+
+. In the OpenAM console, navigate to Deployment > Servers > __Server Name__ > Advanced.
+
+. Set the value of the `com.iplanet.am.sdk.caching.enabled` property to `false` to disable caching overall.
+
+. Set the value of the`com.sun.identity.sm.cache.enabled` property to `true` to enable configuration data caching.
++
+All supported configuration data stores support LDAP persistent search, so it is safe to enable configuration data caching.
++
+You must explicitly set this property to `true`, because setting the value of the property `com.iplanet.am.sdk.caching.enabled` to `false` in the previous step disables both user and configuration data caching.
+
+. Save your work.
+
+. OpenAM starts persistent searches on user data stores when possible footnote:d19490e47406[OpenAM starts persistent searches on user data stores on directory servers that support the`psearch`control.] in order to monitor changes. With user data store caching disabled, OpenAM still starts the persistent searches, even though it no longer uses the results.
++
+Therefore, if you disable user data store caching, you should also disable persistent searches on user data stores in your deployment to improve performance. To disable persistent search on a user data store, remove the value of the Persistent Search Base DN configuration property and leave it blank. Locate this property under Realms > __Realm Name__ > Data Stores > __Data Store Name__ > Persistent Search Controls.
+
+====
+
+[#change-max-cache-size]
+.To Change the Maximum Size of Global User Data Cache
+====
+With a large user data store and active user base, the number of user entries in cache can grow large.
+
+. In the OpenAM console, navigate to Configuration > Server Defaults > SDK.
+
+. Change the value of SDK Caching Maximum Size.
++
+There is no corresponding setting for configuration data, as the number of configuration entries in a large deployment is not likely to grow nearly as large as the number of user entries.
+
+====
+
+
+[#java-ee-policy-agent-and-sdk-caching]
+==== Caching Properties For Java EE Policy Agents and SDK Clients
+
+Policy agents and other OpenAM SDK clients can also cache user data, using most of the same properties as OpenAM server as described in xref:#table-cache-properties["OpenAM Cache Properties"] . Clients, however, can receive updates by notification from OpenAM or, if notification fails, by polling OpenAM for changes.
+
+[#notify-sdk-cache-updates]
+.To Enable Notification and Polling For Client Cache Updates
+====
+This procedure describes how to enable change notification and polling for policy agent user data cache updates. When configuring a custom OpenAM SDK client using a .properties file, use the same properties as for the policy agent configuration:
+
+. In the OpenAM console, navigate to Realms > __Realm Name__ > Agents > __Agent Type__ > __Agent Name__ to view and edit the policy agent profile.
+
+. On the Global tab page, check that the Agent Notification URL is set.
++
+When notification is enabled, the agent registers a notification listener with OpenAM for this URL.
++
+The corresponding property is `com.sun.identity.client.notification.url`.
+
+. For any changes you make, Save your work.
++
+You must restart the policy agent for the changes to take effect.
+
+====
+
+
+[#caching-properties]
+==== Cache Settings
+
+The table below provides a quick reference, primarily for user data cache settings.
+
+Notice that many properties for configuration data cache have `sm` (for Service Management) in their names, whereas those for user data have `idm` (for Identity Management) in their names:
+
+[#table-cache-properties]
+.OpenAM Cache Properties
+[cols="37%,38%,12%,13%"]
+|===
+|Property |Description |Default |Applies To 
+
+a|`com.iplanet.am.sdk.cache.maxSize`
+a|Maximum number of user entries cached.
+a|10000
+a|Server and SDK
+
+a|`com.iplanet.am.sdk.caching.enabled`
+a|Whether to enable caching for both configuration data and also for user data.
+
+ If `true`, this setting overrides `com.sun.identity.idm.cache.enabled` and `com.sun.identity.sm.cache.enabled`.
+
+ If `false`, you can enable caching independently for configuration data and for user data using the aforementioned properties.
+a|`true`
+a|Server & SDK
+
+a|`com.iplanet.am.sdk.remote.pollingTime`
+a|How often in minutes the SDK client, such as a policy agent should poll OpenAM for modified user data entries.
+
+ The SDK also uses this value to determine the age of the oldest changes requested. The oldest changes requested are 2 minutes older than this setting. In other words, by default the SDK polls for entries changed in the last 3 minutes.
+
+ Set this to 0 or a negative integer to disable polling.
+a|1 (minute)
+a|SDK
+
+a|`com.sun.am.event.notification.expire.time`
+a|How long OpenAM stores a given change to a cached entry, so that clients polling for changes do not miss the change.
+a|30 (minutes)
+a|Server only
+
+a|`com.sun.identity.idm.cache.enabled`
+a|If `com.iplanet.am.sdk.caching.enabled` is `true`, this property is ignored.
+
+ Otherwise, set this to `true` to enable caching of user data.
+a|`false`
+a|Server & SDK
+
+a|`com.sun.identity.idm.cache.entry.default.expire.time`
+a|How many minutes to store a user data entry in the global user data cache.
+a|30 (minutes)
+a|Server & SDK
+
+a|`com.sun.identity.idm.cache.entry.expire.enabled`
+a|Whether user data entries in the global user data cache should expire over time.
+a|`false`
+a|Server & SDK
+
+a|`com.sun.identity.idm.remote.notification.enabled`
+a|Whether the SDK client, such as a policy agent should register a notification listener for user data changes with the OpenAM server.
+
+ The SDK client uses the URL specified by `com.sun.identity.client.notification.url` to register the listener so that OpenAM knows where to send notifications.
+
+ If notifications cannot be enabled for some reason, then the SDK client falls back to polling for changes.
+a|`true`
+a|SDK
+
+a|`com.sun.identity.sm.cache.enabled`
+a|If `com.iplanet.am.sdk.caching.enabled` is `true`, this property is ignored.
+
+ Otherwise, set this to `true` to enable caching of configuration data. It is recommended that you always set this to `true`.
+a|`false`
+a|Server & SDK
+
+a|`sun-idrepo-ldapv3-dncache-enabled`
+a|Set this to `true` to enable DN caching of user data.
+a|`false`
+a|Server & SDK
+
+a|`sun-idrepo-ldapv3-dncache-size`
+a|Sets the cache size.
+a|`1500`
+a|Server & SDK
+|===
+
+
+

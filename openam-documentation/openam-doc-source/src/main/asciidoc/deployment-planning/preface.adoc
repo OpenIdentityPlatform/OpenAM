@@ -1,0 +1,69 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[preface]
+[#preface]
+== Preface
+
+This guide helps you plan an OpenAM deployment, including performing the following high-level tasks:
+
+* Choose OpenAM software features for your deployment. OpenAM offers a wide-variety of features to meet the needs of any deployment.
+
+* Plan any customizations or extensions that are absolutely required.
+
+* Gather information about the services that your OpenAM deployment uses, and define what those services must provide for your deployment.
+
+* Gather information about the resources that OpenAM protects as well as the consumers of your OpenAM deployment.
+
+* Reach agreement with partners concerning federation and other deployments where multiple actors share control.
+
+* Define your objectives in terms of service levels including availability and security for different services.
+
+* Determine performance requirements and testing procedures to assure performance requirements are met.
+
+* Specify logical and physical deployment topologies, including site and multiple data center deployments.
+
+* Plan the deployment process, including implementing training teams and partners, customization and hardening, and development of a proof-of-concept implementation. Other tasks include performing integration with client applications, integration with auditing tools, automation and continuous integration when necessary, running functional and non-functional testing, documenting procedures and tracking changes, acceptance in production, maintaining and supporting the solution in production, and planning for expansion and upgrade.
+
+
+[#who-should-use]
+=== Who Should Use This Guide
+
+This guide is written for access management architects and project managers who plan OpenAM software deployments within their organizations.
+
+This guide focuses on the tasks that need to be completed for successful OpenAM deployment. It does not show how to accomplish each individual technical task, such as installation, configuration, and maintenance.
+
+Before using this guide, you should have a firm grounding in software deployment, in access management, and in OpenAM software itself. OpenAM deployment training from ForgeRock can help you get started.
+
+
+[#where-to-get-help]
+=== Getting Deployment Training, Help, and Support
+
+Formal training can help you and your colleagues come up to speed quickly on OpenAM deployment, development, administration, maintenance, and tuning. ForgeRock University regularly offers training courses for OpenAM topics, including OpenAM deployment. For a current list of available courses, see link:http://forgerock.com/services/university/[http://forgerock.com/services/university/, window=\_blank].
+
+ForgeRock Professional Services offers the support plans for every deployment. For more information about ForgeRock Support offerings, see link:http://forgerock.com/services/professional-services/[http://forgerock.com/services/professional-services/, window=\_blank].
+
+When your success depends on OpenAM access management services, you want to know that product experts are standing by ready to help should anything go wrong. ForgeRock offers the right support plans for every deployment. For more information about ForgeRock Support offerings, see link:http://forgerock.com/services/support/[http://forgerock.com/services/support/, window=\_blank].
+
+For more information, email us at link:mailto:info\@forgerock.com[info@forgerock.com, window=\_top].
+
+

@@ -1,0 +1,81 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-troubleshooting]
+== Troubleshooting
+
+This chapter offers solutions to issues during installation of OpenAM policy agents.
+[#solutions-to-common-issues]
+=== Solutions to Common Issues
+This section offers solutions to common problems when installing OpenAM policy agents:
+I am trying to install a policy agent on Windows, which will connect to an OpenAM server running over HTTPS, but the installer reports the following:::
++
+--
+If OpenSSL is correctly installed and you are using a Windows 7 or Windows Server 2008 R2 system, apply the update provided in Microsoft knowledge base article KB2533623. See link:https://support.microsoft.com/en-us/kb/2533623[Microsoft Security Advisory: Insecure library loading could allow remote code execution, window=\_top].
+
+--
+
+I am trying to install the policy agent on SELinux and I am getting error messages after installation. What happened?::
++
+--
+SELinux must be properly configured to connect the web policy agent and OpenAM nodes. Either re-configure SELinux or disable it, then reinstall the policy agent.
+
+--
+
+My Apache HTTP server is not using port 80. But when I install the web policy agent it defaults to port 80. How do I fix this?::
++
+--
+You probably set `ServerName` in the Apache HTTP Server configuration to the host name, but did not specify the port number.
+
+Instead you must set both the host name and port number for `ServerName` in the configuration. For example, if you have Apache HTTP Server configured to listen on port 8080, then set `ServerName` appropriately as in the following excerpt:
+
+[source]
+----
+<VirtualHost *:8080>
+ServerName www.localhost.example:8080
+----
+
+--
+
+My web server and web policy agent are installed as root, and the agent cannot rotate logs. I am seeing this error:::
++
+--
+First, avoid installing the web server (and therefore also the web policy agent) as root, but instead create a web server user and install as that user.
+
+If however you cannot avoid installing the web server and policy agent as root, the you must give all users read and write permissions to the `logs/` directory under the agent instance directory (`/web_agents/agent_version/instances/agent_nnn/logs/`). Otherwise, the web policy agent fails to rotate log files with the error you observed.
+
+--
+
+How do I increase security against possible phishing attacks through open redirect?::
++
+--
+You can specify a list of valid URL resources against which OpenAM validates the `goto` and `gotoOnFail` URL using the Valid `goto` URL Resource service.
+
+OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting. If no setting is present, it is assumed that the `goto` and `gotoOnFail` URL is valid.
+
+To set the Valid `goto` URL Resources, use the OpenAM console, and navigate to Realms > __Realm Name__ > Services. Click Add, select Validation Service, and then add one or more valid `goto` URLs.
+
+You can use the "*" wildcard to define resources, where "*" matches all characters except "?". For example, you can use the wildcards, such as `\https://website.example.com/*` or `\https://website.example.com/*?*`. For more specific patterns, use resource names with wildcards as described in the procedure, link:../../../docs/openam/13/admin-guide/#configure-valid-goto-url-resources[Configuring Valid goto URL Resources, window=\_blank].
+
+--
+
+

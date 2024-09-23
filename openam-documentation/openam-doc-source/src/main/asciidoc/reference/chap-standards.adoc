@@ -1,0 +1,141 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-standards]
+== Supported Standards
+
+OpenAM implements the following RFCs, Internet-Drafts, and standards:
+--
+
+[#oauth-2]
+link:http://oauth.net/2/[OAuth 2.0, window=\_top]::
++
+link:http://tools.ietf.org/html/rfc6749[The OAuth 2.0 Authorization Framework, window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc6750[The OAuth 2.0 Authorization Framework: Bearer Token Usage, window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7009[OAuth 2.0 Token Revocation, window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS), window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7517[JSON Web Key (JWK), window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7518[JSON Web Algorithms (JWA), window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7519[JSON Web Token (JWT), window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7522[Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants, window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7523[JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants, window=\_blank]
+
++
+link:http://tools.ietf.org/html/rfc7662[OAuth 2.0 Token Introspection, window=\_blank]
+
+[#openid-connect-1]
+link:http://openid.net/connect/[OpenID Connect 1.0, window=\_top]::
++
+OpenAM can be configured to play the role of OpenID provider. The OpenID Connect specifications depend on OAuth 2.0, JSON Web Token, Simple Web Discovery and related specifications. The following specifications make up OpenID Connect 1.0.
++
+
+* link:http://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect Core 1.0, window=\_blank] defines core OpenID Connect 1.0 features.
++
+
+[NOTE]
+======
+In section 5.6 of the specification, OpenAM supports __Normal Claims__. The optional __Aggregated Claims__ and __Distributed Claims__ representations are not supported by OpenAM.
+======
+
+* link:http://openid.net/specs/openid-connect-discovery-1_0.html[OpenID Connect Discovery 1.0, window=\_blank] defines how clients can dynamically recover information about OpenID providers.
+
+* link:http://openid.net/specs/openid-connect-registration-1_0.html[OpenID Connect Dynamic Client Registration 1.0, window=\_blank] defines how clients can dynamically register with OpenID providers.
+
+* link:http://openid.net/specs/openid-connect-session-1_0.html[OpenID Connect Session Management 1.0, window=\_blank] describes how to manage OpenID Connect sessions, including logout.
+
+* link:http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html[OAuth 2.0 Multiple Response Type Encoding Practices, window=\_blank] defines additional OAuth 2.0 response types used in OpenID Connect.
+
+* link:http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html[OAuth 2.0 Form Post Response Mode, window=\_blank] defines how OpenID providers return OAuth 2.0 Authorization Response parameters in auto-submitting forms.
+
++
+OpenID Connect 1.0 also provides implementer's guides for client developers.
++
+
+* link:http://openid.net/specs/openid-connect-basic-1_0.html[OpenID Connect Basic Client Implementer's Guide 1.0, window=\_blank]
+
+* link:http://openid.net/specs/openid-connect-implicit-1_0.html[OpenID Connect Implicit Client Implementer's Guide 1.0, window=\_blank]
+
+
+[#uma-1_0]
+link:https://kantarainitiative.org/confluence/display/uma/Home[User-Managed Access (UMA) 1.0, window=\_top]::
++
+link:https://tools.ietf.org/html/draft-hardjono-oauth-umacore-13[User-Managed Access (UMA) Profile of OAuth 2.0 (Draft), window=\_blank], in which OpenAM can play the role of authorization server.
+
++
+link:https://docs.kantarainitiative.org/uma/draft-oauth-resource-reg-v1_0_1.html[OAuth 2.0 Resource Set Registration, window=\_blank], in which OpenAM plays the role of authorization server.
+
+[#rest]
+link:http://en.wikipedia.org/wiki/Representational_state_transfer[Representational State Transfer (REST), window=\_top]::
++
+Style of software architecture for web-based, distributed systems.
+
+[#saml]
+link:http://saml.xml.org/[Security Assertion Markup Language (SAML), window=\_blank]::
++
+Standard, XML-based framework for creating and exchanging security information between online partners. OpenAM supports multiple versions of SAML including 2.0, 1.1, and 1.0.
+
++
+Specifications are available from the link:https://www.oasis-open.org/standards[OASIS standards page, window=\_blank].
+
+[#liberty-id-ff]
+link:http://projectliberty.org/resource_center/specifications/liberty_alliance_id_ff_1_2_specifications/?f=resource_center/specifications/liberty_alliance_id_ff_1_2_specifications[Liberty Alliance Project Identity Federation Framework (Liberty ID-FF), window=\_top]::
++
+Federation standard, whose concepts and capabilities contributed to SAML v2.0.
+
+[#soap]
+link:http://www.w3.org/TR/soap/[Simple Object Access Protocol, window=\_top]::
++
+Lightweight protocol intended for exchanging structured information in a decentralized, distributed environment.
+
+[#wsdl]
+link:http://www.w3.org/TR/wsdl[Web Services Description Language (WSDL), window=\_top]::
++
+XML format for describing network services as a set of endpoints operating on messages containing either document-oriented or procedure-oriented information.
+
+[#ws-federation]
+link:http://en.wikipedia.org/wiki/WS-Federation[Web Services Federation Language (WS-Federation), window=\_blank]::
++
+Identity federation standard, part of the Web Services Security framework.
+
+[#xacml]
+link:http://wiki.oasis-open.org/xacml/[eXtensible Access Control Markup Language (XACML), window=\_top]::
++
+Declarative access control policy language implemented in XML, and also a processing model, describing how to interpret policies.
+
+--
+

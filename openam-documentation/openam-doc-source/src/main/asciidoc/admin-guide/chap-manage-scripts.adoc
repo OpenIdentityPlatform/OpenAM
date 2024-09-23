@@ -1,0 +1,197 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-manage-scripts]
+== Managing Scripts
+
+This chapter shows you how to manage scripts used for client-side and server-side scripted authentication, custom policy conditions, and handling OpenID Connect claims using the OpenAM console and the `ssoadm` command.
+
+For information on managing scripts by using the OpenAM REST API, see xref:../dev-guide/chap-client-dev.adoc#sec-manage-scripts-rest["RESTful Script Management"] in the __Developer's Guide__. For information on configuring Scripting Service settings, see xref:../reference/chap-config-ref.adoc#scripting-configuration["Scripting"] in the __Reference__.
+
+[#managing-scripts-console]
+=== Managing Scripts With the OpenAM Console
+
+The following procedures describe how to create, modify, and delete scripts using the OpenAM console:
+
+* xref:#create-scripts-with-console["To Create Scripts by Using the OpenAM Console"]
+
+* xref:#modify-scripts-with-console["To Modify Scripts by Using the OpenAM Console"]
+
+* xref:#delete-scripts-with-console["To Delete Scripts by Using the OpenAM Console"]
+
+
+[#create-scripts-with-console]
+.To Create Scripts by Using the OpenAM Console
+====
+
+. Log in to the console as an OpenAM administrator, for example, `amadmin`.
+
+. Navigate to Realms > __Realm Name__ > Scripts.
+
+. Click New Script.
++
+The New Script page appears:
++
+
+[#figure-new-script]
+image::images/new-script.png[]
+
+. Specify a name for the script.
+
+. Select the type of script from the Script Type drop-down list.
+
+. Click Create.
++
+The __Script Name__ page appears:
++
+
+[#figure-script-editor-page]
+image::images/script-editor.png[]
+
+. Enter values on the __Script Name__ page as follows:
++
+
+.. Enter a description of the script.
+
+.. Choose the script language, either JavaScript or Groovy. Note that not every script type supports both languages.
+
+.. Enter the source code in the Script field.
++
+On supported browsers, you can click Upload, navigate to the script file, and then click Open to upload the contents to the Script field.
+
+.. Click Validate to check for compilation errors in the script.
++
+Correct any compilation errors, and revalidate the script until all errors have been fixed.
+
+.. Save your changes.
+
+
+====
+
+[#modify-scripts-with-console]
+.To Modify Scripts by Using the OpenAM Console
+====
+
+. Log in to the console as an OpenAM administrator, for example, `amadmin`.
+
+. Navigate to Realms > __Realm Name__ > Scripts.
+
+. Select the script you want to modify from the list of scripts.
++
+The __Script Name__ page appears.
+
+. Modify values on the __Script Name__ page as needed. Note that if you change the Script Type, existing code in the script is replaced.
+
+. If you modified the code in the script, click Validate to check for compilation errors.
++
+Correct any compilation errors, and revalidate the script until all errors have been fixed.
+
+. Save your changes.
+
+====
+
+[#delete-scripts-with-console]
+.To Delete Scripts by Using the OpenAM Console
+====
+
+. Log in to the console as an OpenAM administrator, for example, `amadmin`.
+
+. Navigate to Realms > __Realm Name__ > Scripts.
+
+. Choose one or more scripts to delete by activating the checkboxes in the relevant rows. Note that you can only delete user-created scripts—you cannot delete the global sample scripts provided with OpenAM.
+
+. Click Delete.
+
+====
+
+
+[#managing-scripts-cli]
+=== Managing Scripts With the ssoadm Command
+
+Use the `ssoadm` command's `create-sub-cfg`, `get-sub-cfg`, and `delete-sub-cfg` subcommands to manage OpenAM scripts.
+
+Create an OpenAM script as follows:
+
+. Create a script configuration file as follows:
++
+
+[source]
+----
+script-file=/path/to/script-file
+language=JAVASCRIPT|GROOVY
+name=myScript
+context=AUTHENTICATION_SERVER_SIDE|AUTHENTICATION_CLIENT_SIDE|POLICY_CONDITION|OIDC_CLAIMS
+----
+
+. Run the `ssoadm create-sub-cfg` command. The `--datafile` argument references the script configuration file you created in the previous step:
++
+
+[source, console]
+----
+$ ssoadm \
+create-sub-cfg \
+--realm /myRealm \
+--adminid amadmin \
+--password-file /tmp/pwd.txt \
+--servicename ScriptingService \
+--subconfigname scriptConfigurations/scriptConfiguration \
+--subconfigid myScript \
+--datafile /path/to/myScriptConfigurationFile
+Sub Configuration scriptConfigurations/scriptConfiguration was added to realm /myRealm
+----
+
+To list the properties of a script, run the `ssoadm get-sub-cfg` command:
+
+[source, console]
+----
+$ ssoadm \
+get-sub-cfg \
+--realm /myRealm \
+--adminid amadmin \
+--password-file /tmp/pwd.txt \
+--servicename ScriptingService \
+--subconfigname scriptConfigurations/myScript
+createdBy=
+lastModifiedDate=
+lastModifiedBy=
+name=myScript
+context=POLICY_CONDITION
+description=
+language=JAVASCRIPT
+creationDate=
+script=...Script output follows...
+----
+To delete a script, run the `ssoadm delete-sub-cfg` command:
+
+[source, console]
+----
+$ ssoadm \
+delete-sub-cfg \
+--realm /myRealm \
+--adminid amadmin \
+--password-file /tmp/pwd.txt \
+--servicename ScriptingService \
+--subconfigname scriptConfigurations/myScript
+Sub Configuration scriptConfigurations/myScript was deleted from realm /myRealm
+----
+
+

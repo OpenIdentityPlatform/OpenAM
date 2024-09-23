@@ -1,0 +1,803 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-apache]
+== Installing Web Policy Agents in Apache HTTP Server
+
+This chapter covers prerequisites and installation procedures for Web Policy Agents 4 into Apache HTTP Servers 2.2.x and 2.4.x.
+
+[#apache-before-you-install]
+=== Before You Install
+
+This section describes the prerequisite steps you should take before installing the web policy agents into Apache HTTP servers.
+
+* Avoid installing the web server and the web policy agent as root. Instead, create a web server user and install as that user.
++
+If you cannot avoid installing the web server and web policy agent as root, then you must give all users read and write permissions to the `logs` and `logs/debug` directories under the agent instance directory (`/web_agents/type/Agent_nnn/logs/`). Otherwise, the web policy agent fails with an error when attempting to rotate log files.
++
+
+[TIP]
+====
+The installer can automatically set permissions on folders that require write access, by reading the Apache config file to determine the correct group and user to grant privileges to. Answer `yes` when prompted:
+
+[source, console]
+----
+Change ownership of created directories using
+User and Group settings in httpd.conf
+[ q or 'ctrl+c' to exit ]
+(yes/no): [no]: yes
+----
+====
+
+* The __SELinux__ OS feature can prevent the agents from being able to write to audit and debug logs. See xref:chap-troubleshooting.adoc#chap-troubleshooting[Troubleshooting].
+
+* Ensure OpenAM is installed and running, so that you can contact OpenAM from the system running the policy agent.
+
+* Create a profile for your policy agent as described in xref:chap-web-agents.adoc#chap-web-agents[Configuring Web Policy Agents].
+
+* Create at least one policy in OpenAM to protect resources with the agent, as described in the section on link:../../../docs/openam/13/admin-guide/#configure-authz-policy[Configuring Policies, window=\_blank]. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources. This allows you to test your policy agent after installation.
+
+* If the OpenAM server uses SSL, you must install OpenSSL on the agent machine.
++
+
+** On UNIX systems, ensure the OpenSSL libraries `libcrypto.so` and `libssl.so` are available in the path specified by either the `LD_LIBRARY_PATH` or `LD_LIBRARY_PATH_64` environment variables.
+
+** On Windows systems, ensure the OpenSSL libraries `libeay32.dll` and `ssleay32.dll` are available in the `lib` folder of your agent installation, for example `c:\path\to\web_agents\iis_agent\lib\`.
+
+
+* Install Apache HTTP Server before you install the policy agent. You must stop the server during installation.
+
+* See the OpenAM __Installation Guide__ section, link:../../../docs/openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also, verify the checksum of the file you download against the checksum posted on the download page.
++
+Unzip the file in the directory where you plan to install the web policy agent. The agent stores its configuration and logs under this directory.
++
+When you unzip the policy agent .zip download, you find the following directories:
++
+--
+
+`bin`::
+The installation and configuration program `agentadmin`.
+
+`config`::
+Configuration templates used by the `agentadmin` command during installation.
+
+`instances`::
+Configuration files, and audit and debug logs for individual instances of the web policy agents will be created here. The folder is empty when first extracted.
+
+`legal`::
+Contains licensing information including third-party licenses.
+
+`lib`::
+Shared libraries used by the policy agent.
+
+`log`::
+Location for log files written during installation. The folder is empty when first extracted.
+
+--
+
+
+[#d183e4385]
+==== Tuning Apache Multi-Processing Modules
+
+Apache 2.0 and later comes with Multi-Processing Modules (MPMs) that extend the basic functionality of a web server to support the wide variety of operating systems and customizations for a particular site.
+
+The key area of performance tuning for Apache is to run in worker mode ensuring that there are enough processes and threads available to service the expected number of client requests. Apache performance is configured in the `conf/extra/http-mpm.conf` file.
+
+The key properties in this file are `ThreadsPerChild` and `MaxClients`. Together the properties control the maximum number of concurrent requests that can be processed by Apache. The default configuration allows for 150 concurrent clients spread across 6 processes of 25 threads each.
+
+[source, console]
+----
+<IfModule mpm_worker_module>
+   StartServers          2
+   MaxClients          150
+   MinSpareThreads      25
+   MaxSpareThreads      75
+   ThreadsPerChild      25
+   MaxRequestsPerChild   0
+</IfModule>
+----
+
+[IMPORTANT]
+====
+For the policy agent notification feature, the `MaxSpareThreads`, `ThreadLimit` and `ThreadsPerChild` default values must __not__ be altered; otherwise the notification queue listener thread cannot be registered.
+
+Any other values apart from these three in the worker MPM can be customized. For example, it is possible to use a combination of `MaxClients` and `ServerLimit` to achieve a high level of concurrent clients.
+====
+
+
+
+[#install-apache-web-agent]
+=== Installing Apache Web Policy Agents
+
+Complete the following procedures to install Web Policy Agents 4 into Apache HTTP Servers.
+
+[TIP]
+====
+Check that you have completed any prerequisite steps before proceeding. See xref:#apache-before-you-install[Before You Install].
+====
+There are two web policy agents packages available for Apache installs:
+--
+
+Apache 2.2::
+Available in 32-bit and 64-bit. By default, extracts to a folder named `./web_agents/apache22_agent/`.
+
+Apache 2.4::
+Available in 32-bit and 64-bit. By default, extracts to a folder named `./web_agents/apache24_agent/`.
+
+--
+
+[TIP]
+====
+The following procedures show how to install into Apache 2.4. If installing into Apache 2.2, alter the path names accordingly.
+====
+
+[#d183e4479]
+.To Create the Agent Profile
+====
+Regardless of whether you store configurations centrally in OpenAM or locally with your agents, the agent requires a profile so that it can connect to and communicate with OpenAM.
+
+. In the OpenAM console, browse to Realms > __Realm Name__ > Agents > Web, and then click the New... button in the Agent table.
+
+. Complete the web form using the following hints.
++
+--
+
+Name::
+The name for the agent profile used when you install the agent
+
+Password::
+Password the agent uses to authenticate to OpenAM
+
+Configuration::
+Centralized configurations are stored in the OpenAM configuration store. You can manage the centralized configuration through the OpenAM console. Local configurations are stored in a file alongside the agent.
+
+Server URL::
+The full URL to an OpenAM instance, or if OpenAM is deployed in a site configuration (behind a load balancer) then the site URL
++
+In centralized configuration mode, the Server URL is used to populate the agent profile for services, such as Login, Logout, Naming, and Cross Domain SSO.
+
+Agent URL::
+The URL to the web agent application, such as `\http://www.example.com:80`
++
+In centralized configuration mode, the Agent URL is used to populate the Agent Profile for services, such as notifications.
+
+--
+
+====
+
+[#d183e4536]
+.To Create a Password File
+====
+
+. Create a text file containing only the password specified when creating the agent profile.
++
+UNIX example:
++
+
+[source, console]
+----
+$ echo password > /tmp/pwd.txt
+----
++
+Windows example:
++
+
+[source, console]
+----
+C:\> echo password > pwd.txt
+----
+
+. Protect the password file you create as appropriate for your operating system:
++
+UNIX example:
++
+
+[source, console]
+----
+$ chmod 400 /tmp/pwd.txt
+----
++
+Windows example:
++
+In Windows Explorer, right-click the created password file, for example `pwd.txt`, select Read-Only, and then click OK.
+
+====
+
+[#install-agent-into-apache]
+.To Install the Web Policy Agent into Apache
+====
+
+. Shut down the Apache server where you plan to install the agent.
+
+. Make sure OpenAM is running.
+
+. Run `agentadmin --i` to install the agent. You will be prompted to read and accept the software license agreement for the agent installation.
++
+
+* UNIX example:
++
+
+[source, console]
+----
+$ cd /web_agents/apache24_agent/bin/
+$ ./agentadmin --i
+----
+
+* Windows example:
++
+
+[source, console]
+----
+C:\> cd web_agents\apache24_agent\bin
+C:\path\to\web_agents\apache24_agent\bin> agentadmin.exe --i
+----
+
+
+. When prompted for information, enter the inputs appropriate for your deployment.
++
+
+[TIP]
+======
+You can cancel web policy agent installation at anytime by pressing *CTRL*+*C*
+======
++
+
+.. Enter the full path to the Apache HTTP Server configuration file. The installer modifies this file to include the web policy agent configuration and module.
++
+
+[source, console]
+----
+Enter the complete path to the httpd.conf file which is used by Apache HTTPD
+Server to store its configuration.
+[ q or 'ctrl+c' to exit ]
+Configuration file [/opt/apache/conf/httpd.conf]: /etc/httpd/conf/httpd.conf
+----
+
+.. The installer can change the directory ownership to the same User and Group specified in the Apache configuration. Enter `yes` to alter directory ownership, press *Enter* to accept the default: `no`.
++
+
+[source, console]
+----
+Change ownership of created directories using
+User and Group settings in httpd.conf
+[ q or 'ctrl+c' to exit ]
+(yes/no): [no]: yes
+----
+
+.. The installer can import settings from an existing web policy agent into the new installation and skips prompts for any values present in the existing configuration file. You will be required to re-enter the agent profile password.
++
+Enter the full path to an existing agent configuration file to import the settings, or press *Enter* to skip the import.
++
+
+[source, console]
+----
+To set properties from an existing configuration enter path to file
+[ q or 'ctrl+c' to exit, return to ignore ]
+Existing agent.conf file:
+----
+
+.. Enter the full URL of the OpenAM instance the web policy agents will be using. Ensure that the deployment URI is specified.
++
+
+[source, console]
+----
+Enter the URL where the OpenAM server is running. Please include the
+deployment URI also as shown below:
+(http://openam.sample.com:58080/openam)
+[ q or 'ctrl+c' to exit ]
+OpenAM server URL: http://openam.example.com:8080/openam
+----
+
+.. Enter the full URL of the server the agent is running on.
++
+
+[source, console]
+----
+Enter the Agent URL as shown below:
+(http://agent.sample.com:1234)
+[ q or 'ctrl+c' to exit ]
+Agent URL: http://www.example.com:80
+----
+
+.. Enter the name given to the agent profile created in OpenAM.
++
+
+[source, console]
+----
+Enter the Agent profile name
+[ q or 'ctrl+c' to exit ]
+Agent Profile name: webagent4
+----
+
+.. Enter the OpenAM realm containing the agent profile.
++
+
+[source, console]
+----
+Enter the Agent realm/organization
+[ q or 'ctrl+c' to exit ]
+Agent realm/organization name: [/]: /
+----
+
+.. Enter the full path to the file containing the agent profile password created earlier.
++
+
+[source, console]
+----
+Enter the path to a file that contains the password to be used
+for identifying the Agent
+[ q or 'ctrl+c' to exit ]
+The path to the password file: /tmp/pwd.txt
+----
+
+.. The installer displays a summary of the configuration settings you specified.
++
+
+* If a setting is incorrect, type `no`, or press *Enter*. The installer loops through the configuration prompts again, using your provided settings as the default. Press *Enter* to accept each one, or enter a replacement setting.
+
+* If the settings are correct, type `yes` to proceed with installation.
++
+
+[source, console]
+----
+Installation parameters:
+
+   OpenAM URL: http://openam.example.com:8080/openam
+   Agent URL: http://www.example.com:80
+   Agent Profile name: webagent4
+   Agent realm/organization name: /
+   Agent Profile password source: /tmp/pwd.txt
+
+Confirm configuration (yes/no): [no]: yes
+Validating...
+Validating... Success.
+Cleaning up validation data...
+Creating configuration...
+Installation complete.
+----
+
+
++
+Upon successful completion, the installer adds the agent as a module to the Apache HTTP Server configuration file. You can find a backup configuration file in the Apache HTTP Server configuration directory, called `http.conf_amagent_date_and_time_of_installation`.
++
+The installer also sets up configuration and log directories for the agent instance. Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are located under the directory `web_agents/apache24_agent/instances/agent_1/`.
++
+The configuration files and log locations are as follows:
++
+--
+
+`config/agent.conf`::
+Contains the bootstrap properties the web policy agent requires to connect to OpenAM and download its configuration. Also contains properties that are only used if you configure the web policy agent to use local configuration.
+
+`logs/audit/`::
+Operational audit log directory, only used if remote logging to OpenAM is disabled.
+
+`logs/debug/`::
+Debug directory where the `amAgent` debug file resides. Useful in troubleshooting policy agent issues.
+
+--
+
+. Start the Apache server in which you installed the web policy agent.
+
+====
+
+[#d183e4783]
+.To Check the Policy Agent Installation
+====
+
+. Check the Apache HTTP server error log after you start the server to make sure startup completed successfully:
++
+
+[source, console]
+----
+[Tue Sep 08 15:51:27.667625 2015] AH00163:
+ Apache/2.4.6 (CentOS) OpenAM Web Agent/4 configured
+ -- resuming normal operations
+----
+
+. Check the `/web_agents/apache24_agent/instances/Agent_1/logs/debug/debug.log` file to verify that no errors occurred on startup. Expected output should resemble the following:
++
+
+[source, console]
+----
+2015-09-08 16:02:24.573 -0700 INFO [0x7f7470064840:5748]
+
+######################################################
+  OpenAM Web Agent
+  Version: 4
+  Revision: 15441
+  Build date: Aug 29 2015 02:48:01
+######################################################
+----
+
+. (Optional)  If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM redirects you back to the resource you tried to access.
+
+====
+
+
+[#install-apache-web-agent-vhost]
+=== Installing Apache Web Policy Agents into a Virtual Host
+
+Complete the following procedures to install Web Policy Agents 4 into Apache HTTP Server virtual hosts.
+
+Installing into an Apache virtual host is a manual process, which involves copying an instance directory created by the `agentadmin` installer and adding to the Apache configuration file of the virtual host.
+
+[TIP]
+====
+Check that you have completed the prerequisite steps before proceeding. See xref:#apache-before-you-install[Before You Install].
+====
+You will also need to have installed a web policy agent into the default root Apache configuration file before installing into a virtual host. See xref:#install-apache-web-agent[Installing Apache Web Policy Agents].
+
+[#d183e4846]
+.To Create the Agent Profile
+====
+Regardless of whether you store configurations centrally in OpenAM or locally with your agents, the agent requires a profile so that it can connect to and communicate with OpenAM.
+
+. In the OpenAM console, browse to Realms > __Realm Name__ > Agents > Web, and then click the New... button in the Agent table.
+
+. Complete the web form using the following hints.
++
+--
+
+Name::
+The name for the agent profile used when you install the agent
+
+Password::
+Password the agent uses to authenticate to OpenAM
+
+Configuration::
+Centralized configurations are stored in the OpenAM configuration store. You can manage the centralized configuration through the OpenAM console. Local configurations are stored in a file alongside the agent.
+
+Server URL::
+The full URL to an OpenAM instance, or if OpenAM is deployed in a site configuration (behind a load balancer) then the site URL
++
+In centralized configuration mode, the Server URL is used to populate the agent profile for services, such as Login, Logout, Naming, and Cross Domain SSO.
+
+Agent URL::
+The URL to the web agent application, such as `\http://www.example.com:80`
++
+In centralized configuration mode, the Agent URL is used to populate the Agent Profile for services, such as notifications.
+
+--
+
+====
+
+[#install-agent-into-apache-vhost]
+.To Install the Web Policy Agent into Apache Virtual Hosts
+====
+This procedure assumes you have installed a web policy agent into the default root configuration of your Apache HTTP Server installation, with configuration in `/web_agents/apache24_agent/instances/agent_1`. To install into a virtual host, copy this configuration folder, modify required settings, and enable the web policy agent in the virtual host configuration file.
+
+. Shut down the Apache server where you plan to install the agent.
+
+. Locate the web policy agent configuration instance to duplicate, and make a copy, for example `agent_2`:
++
+
+* UNIX example:
++
+
+[source, console]
+----
+$ cd /web_agents/apache24_agent/instances
+$ cp -r agent_1 agent_2
+----
+
+* Windows example:
++
+
+[source, console]
+----
+c:\> cd c:\web_agents\apache24_agent\instances
+c:\path\to\web_agents\apache24_agent\instances> xcopy /E /I agent_1 agent_2
+----
+
+
+. Give the user that runs the virtual host modify privileges to the new instance folder. The following examples demonstrate giving privileges to the `agent_2` configuration instance to a user named __apache__:
++
+
+* UNIX example:
++
+
+[source, console]
+----
+$ cd /web_agents/apache24_agent/instances
+$ chown -hR apache agent_2
+----
+
+* Windows example:
++
+
+[source, console]
+----
+c:\> cd c:\web_agents\apache24_agent\instances
+c:\path\to\web_agents\apache24_agent\instances> icacls "agent_2" /grant apache:M
+----
+
+
+. In the new instance folder, edit the `/config/agent.conf` configuration file as follows:
++
+
+.. Alter the value of `com.sun.identity.agents.config.username` to be the name of the agent profile you created in OpenAM for the virtual host.
+
+.. (Optional) If you used a different password when creating the new agent profile in OpenAM, you will need to configure the encryption key and password value in the agent configuration file.
++
+Generate a new signing key, by running `agentadmin --k`.
++
+Use the generated encryption key to encrypt the new password, by running `agentadmin --p`, specifying the encryption key and the new password:
++
+
+* UNIX example:
++
+
+[source, console]
+----
+$ ./agentadmin --p "YWM0OThlMTQtMzMxOS05Nw==" "newpassword"
+Encrypted password value: 07bJOSeM/G8ydO4=
+----
+
+* Windows example:
++
+
+[source, console]
+----
+C:\path\to\web_agents\apache24_agent\bin>
+  agentadmin --p "YWM0OThlMTQtMzMxOS05Nw==" "newpassword"
+Encrypted password value: 07bJOSeM/G8ydO4=
+----
+
++
+In the agent configuration file of the new instance, set the following properties:
++
+
+* `com.sun.identity.agents.config.key` to be the generated encryption key value.
++
+For example:
++
+
+[source]
+----
+com.sun.identity.agents.config.key = YWM0OThlMTQtMzMxOS05Nw==
+----
+
+* `com.sun.identity.agents.config.password` to be the generated encrypted password value.
++
+For example:
++
+
+[source]
+----
+com.sun.identity.agents.config.password = 07bJOSeM/G8ydO4=
+----
+
+
+.. Replace any references to the original instance directory with the new instance directory. For example, replace the string `agent_1` with `agent_2` wherever it occurs in the configuration file.
++
+Configuration options that are likely to require alterations include:
++
+
+* `com.sun.identity.agents.config.local.logfile`
+
+* `com.sun.identity.agents.config.local.audit.logfile`
+
+
+.. Replace any references to the original website being protected with the new website being protected. For example, replace `\http://www.example.com:80/amagent` with `\http://customers.example.com:80/amagent`.
++
+Configuration options that are likely to require alterations include:
++
+
+* `com.sun.identity.client.notification.url`
+
+* `com.sun.identity.agents.config.agenturi.prefix`
+
+* `com.sun.identity.agents.config.fqdn.default`
+
+
+.. Save and close the configuration file.
+
+
+. Edit the Apache HTTP Server configuration file. This is the same file specified when installing the web policy agent into the default Apache website. For example, `/etc/httpd/conf/httpd.conf`.
++
+
+.. At the end of the file the installer will have added three new lines of settings, for example:
++
+
+[source, console]
+----
+LoadModule amagent_module /web_agents/apache24_agent/lib/mod_openam.so
+AmAgent On
+AmAgentConf /web_agents/apache24_agent/bin/../instances/agent_1/config/agent.conf
+----
++
+Leave the first line, `LoadModule ...`, and move the other two lines into the virtual host configuration element of the default site, for example:
++
+
+[source, console]
+----
+<VirtualHost *:80>
+# This first-listed virtual host is also the default for *:80
+ServerName www.example.com
+ServerAlias example.com
+DocumentRoot "/var/www/html"
+AmAgent On
+AmAgentConf /web_agents/apache24_agent/instances/agent_1/config/agent.conf
+</VirtualHost>
+----
+
+.. Copy the same two lines into the new virtual host, and replace `agent_1` with the new agent configuration instance folder, for example `agent_2`:
++
+
+[source, console]
+----
+<VirtualHost *:80>
+ServerName customers.example.com
+DocumentRoot "/var/www/customers"
+AmAgent On
+AmAgentConf /web_agents/apache24_agent/instances/agent_2/config/agent.conf
+</VirtualHost>
+----
++
+
+[TIP]
+======
+If the new virtual host configuration is in a separate file, copy the two configuration lines into the `VirtualHost` element within that file.
+======
+
+
+. Save and close the Apache HTTP Server configuration file.
+
+. Start the Apache HTTP server in which you installed the web policy agent.
+
+====
+
+[#d183e5147]
+.To Check the Policy Agent Installation
+====
+
+. Check the Apache HTTP server error log after you start the server to make sure startup completed successfully:
++
+
+[source, console]
+----
+[Tue Sep 08 15:51:27.667625 2015] AH00163:
+ Apache/2.4.6 (CentOS) OpenAM Web Agent/4 configured
+ -- resuming normal operations
+----
+
+. Check the `/web_agents/apache24_agent/instances/Agent_1/logs/debug/debug.log` file to verify that no errors occurred on startup. Expected output should resemble the following:
++
+
+[source, console]
+----
+2015-09-08 16:02:24.573 -0700 INFO [0x7f7470064840:5748]
+
+######################################################
+  OpenAM Web Agent
+  Version: 4
+  Revision: 15441
+  Build date: Aug 29 2015 02:48:01
+######################################################
+----
+
+. (Optional)  If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM redirects you back to the resource you tried to access.
+
+====
+
+
+[#silent-apache-agent-installation]
+=== Installing Apache Web Policy Agents Silently
+
+You can run a silent, non-interactive installation by running `agentadmin --s`, along with arguments used to configure the instance.
+
+[TIP]
+====
+Check that you have completed the prerequisite steps before proceeding. See xref:#apache-before-you-install[Before You Install].
+====
+The required arguments, and the order in which to specify them are:
+--
+
+Web server configuration file::
+Enter the full path to the Apache HTTP server configuration file. The installer modifies this file to include the web policy agent configuration and module.
+
+OpenAM URL::
+Enter the full URL of the OpenAM instance the web policy agents will be using. Ensure the deployment URI is specified.
+
+Agent URL::
+Enter the full URL of the server the agent is running on.
+
+Realm::
+Enter the OpenAM realm containing the agent profile.
+
+Agent profile name::
+Enter the name given to the agent profile created in OpenAM.
+
+Agent profile password::
+Enter the full path to the file containing the agent profile password.
+
+`--changeOwner`::
+To have the installer change the ownership of created directories to be the same User and Group as specified in the Apache configuration, specify the optional `--changeOwner` switch.
+
+`--acceptLicence`::
+You can suppress the license agreement prompt during a silent, non-interactive install by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `/path/to/web_agents/agent_type/legal/Forgerock_License.txt`.
+
+`--forceInstall`::
+Optionally have the installer proceed with a silent installation even if it cannot connect to the specified OpenAM server during installation, rather than exiting.
+
+--
+For example:
+
+[source, console]
+----
+$ agentadmin --s \
+  "/etc/httpd/conf/httpd.conf" \
+  "http://openam.example.com:8080/openam" \
+  "http://www.example.com:80" \
+  "/" \
+  "webagent4" \
+  "/tmp/pwd.txt" \
+  --changeOwner \
+  --acceptLicence
+
+OpenAM Web Agent for Apache Server installation.
+
+Validating...
+Validating... Success.
+Cleaning up validation data...
+Creating configuration...
+Installation complete.
+----
+
+
+[#uninstall-apache-agent]
+=== Removing Apache Web Policy Agents
+
+
+[#proc-removing-apache-web-policy-agent]
+.To remove Web Policy Agents from Apache HTTP Server
+====
+
+. Shut down the Apache server where the agent is installed.
+
+. Run `agentadmin --l` to output a list of the installed web policy agent configuration instances.
++
+Make a note of the ID value of the configuration instance you want to remove.
+
+. Run `agentadmin --r`, and specify the ID of the web policy agent configuration instance to remove. A warning is displayed. Type `yes` to proceed with removing the configuration instance.
++
+
+[source, console]
+----
+$ ./agentadmin --r agent_3
+
+Warning! This procedure will remove all OpenAM Web Agent references from
+a Web server configuration. In case you are running OpenAM Web Agent in a
+multi-virtualhost mode, an uninstallation must be carried out manually.
+
+Continue (yes/no): [no]: yes
+
+Removing agent_3 configuration...
+Removing agent_3 configuration... Done.
+----
+
+. Restart the Apache HTTP Server.
+
+====
+
+

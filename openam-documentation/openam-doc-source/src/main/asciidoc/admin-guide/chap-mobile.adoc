@@ -1,0 +1,127 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-mobile]
+== Working with Mobile Devices and Applications
+
+When building applications that run on mobile devices, you can use the same OpenAM service that you also use for access management in your web, cloud, and other applications. OpenAM has features that make it particularly well-suited to the mobile world, too.
+
+[#mobile-oauth]
+=== Simplifying Access on Mobile Devices
+
+On many mobile devices, users want to avoid repeatedly entering credentials, such as an email address or user name and a password. They do not want new credentials to manage for every application they try. They do not want to share their credentials across applications. Instead, users want single sign-on with few identity providers. They want to authorize access for applications rather than share their credentials.
+
+OpenAM supports modern web standards including xref:chap-oauth2.adoc#chap-oauth2["Managing OAuth 2.0 Authorization"], xref:chap-openid-connect.adoc#chap-openid-connect["Managing OpenID Connect 1.0 Authorization"], and link:http://www.gsma.com/personaldata/mobile-connect[GSMA Mobile Connect, window=\_blank]. After registering an application with OpenAM as an OAuth/OpenID Connect client, the application can then redirect a user to OpenAM to authenticate and to authorize access to resources that the user owns, such as profile data. The application gets an access token that can be used to gain authorized access without requiring the user to share credentials. OpenID Connect extends OAuth, standardizing how client applications discover and register with identity providers, and also defining how applications can manage user sessions and handle logout when they no longer want to authorize access.
+
+[#figure-mobile-oauth]
+image::images/mobile-oauth.png[]
+An OAuth 2.0 client application can thus simplify the user experience on the phone to authorizing access.
+
+[#figure-oauth2-phone]
+image::images/oauth2-phone-xui.png[]
+In addition to serving as an identity provider, OpenAM can also function as an OAuth 2.0 client, protecting access to resources within your control based on authorization granted by an identity provider who users already know and use, such as Facebook, Google, MSN, and so forth. OpenAM's built in authorization policy management makes it straightforward to integrate this capability into your applications.
+
+The OAuth and OpenID Connect standards specify REST interfaces, making them essentially programming language-independent and accessible for web applications and mobile applications alike.
+
+Mobile Connect is an application of OpenID Connect that enables authentication to work through a mobile phone, regardless of the service provided or the device consuming the service. Mobile Connect therefore allows Mobile Network Operators to act as an identity provider for their customers. OpenAM fits well in Mobile Connect deployments as it can play both the role of OpenID Provider and also of Authenticator, with many authentication modules built in as described in xref:#mobile-oath["Protecting Access for Mobile Users"]. For details on using OpenAM in a Mobile Connect installation, see xref:chap-openid-connect.adoc#mobile-connect["Using OpenAM with Mobile Connect"].
+
+OpenAM also supports link:http://www.openauthentication.org/[Open Authentication, window=\_blank] architecture with the OATH module mentioned in the next section.
+
+
+[#mobile-oath]
+=== Protecting Access for Mobile Users
+
+You must give users access to your organization's resources while they are on the go. At the same time, you must manage risk. OpenAM supports risk-based adaptive authentication, device fingerprints, one-time passwords, and other multi-factor authentication capabilities that help you do both. As OpenAM handles authentication through plugin modules that you can chain, your OpenAM service can meet a variety of requirements.
+
+The Adaptive Risk authentication module lets you add risk assessment to any authentication chain, dynamically requiring stronger authentication when circumstances require it (new location, ancient last login time, new device, new IP address, specific application, and so forth). For more information about the Adaptive Risk module, see xref:chap-auth-services.adoc#adaptive-auth-module-conf-hints["Hints for the Adaptive Risk Authentication Module"].
+
+[#figure-adaptive-auth-module-again]
+image::images/adaptive-auth-module.png[]
+You can add the Device ID (Match) authentication module to an authentication chain to fingerprint users' devices for additional risk assessment, making it easier to handle sign-on when users authenticate from their own devices. For more information about the Device ID (Match) module, see xref:chap-auth-services.adoc#device-id-match-hints["Hints for the Device ID (Match) Authentication Module"].
+
+OpenAM also lets you decide exactly what stronger authentication means in your situation. You can, for example, add multi-factor authentication involving mobile devices using one-time passwords:
+
+* Users can generate one-time passwords with ForgeRock's authenticator mobile app. See xref:chap-auth-services.adoc#sec-mfa["Multi-Factor Authentication"] for more information.
+
+* OpenAM can generate one-time passwords and then send them to mobile phones using a text message or e-mail. See xref:chap-auth-services.adoc#hotp-module-conf-hints["Hints for the HOTP Authentication Module"] for more information.
+
+In addition to capabilities supporting new applications, OpenAM integrates well with existing systems needed by users on the move. Whether users are authenticating from a mobile device through a gateway using an MSISDN, starting single sign-on by logging on to a laptop, or connecting to a VPN with certificate-based authentication, OpenAM has an authentication module for that.
+
+
+[#mobile-rest]
+=== Simplifying Access With REST APIs
+
+Representational State Transfer (REST) is a architectural style designed in parallel with HTTP. REST simplifies integration and deployment while enabling layered, web-scale services. REST APIs in OpenAM implement REST in a way that reuses common HTTP verbs and decouples APIs from the programming languages that developers use to interact with them. OpenAM exposes REST APIs for many capabilities, such as those in the following list:
+
+* Authentication (including a callback mechanism so applications can work with all OpenAM authentication modules)
+
+* Logout
+
+* Managing groups
+
+* Managing policy agent profiles
+
+* Managing realms
+
+* Managing user profiles
+
+* OAuth 2.0 authorization
+
+* OpenAM native authorization
+
+* OpenID Connect 1.0 authorization
+
+* Resetting forgotten passwords
+
+* Token validation
+
+* User self-registration
+
+
+[#figure-openam-single]
+image::images/openam-single.png[]
+As xref:../dev-guide/chap-client-dev.adoc#sec-rest["Using the REST API"] in the __Developer's Guide__ provide language-independent access, they make it easier to build cross-device applications. Developers can use the same APIs to access OpenAM both from web applications and also from native mobile applications.
+
+Furthermore, OpenAM REST APIs are built on an underlying common REST framework designed to provide common access to resource providers. The common REST framework standardizes how resource providers serve standard requests (create, read, update, delete, query, patch), and also how resource providers offer extended operations in a managed way (using actions). Applications built to interact with OpenAM REST APIs increasingly can interoperate with other products in the ForgeRock stack, such as link:http://forgerock.com/what-we-offer/open-identity-stack/openidm/[OpenIDM for identity management, window=\_blank] and link:http://forgerock.com/what-we-offer/open-identity-stack/opendj/[OpenDJ for highly available data, window=\_blank].
+
+
+[#get-mobile-sample-apps]
+=== Getting Source Code for Sample Mobile Applications
+
+Source code for the sample mobile applications is available in sample repositories in the link:https://stash.forgerock.org/projects/COMMONS[ForgeRock commons project, window=\_blank]. Get local clones of one or more of the following repositories so that you can try these sample applications on your system:
+
+* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-android-openam-apps/browse[OpenAM OAuth2.0 Android sample app, window=\_blank]
+
+* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-ios-oauth2-sample-app/browse[OpenAM OAuth 2.0 iOS sample app, window=\_blank]
+
+* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-ios-rest-sdk/browse[OpenAM access from iOS by using OpenAM's REST SDK, window=\_blank]
+
+* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-sso-sample-app/browse[OpenAM single sign-on from iOS, window=\_blank]
+
+* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-phonegap/browse[PhoneGap sample app, window=\_blank]
+
+For example, if you have a Mac running OS X 10.8 or later with Xcode installed, try the link:http://commons.forgerock.org/samples/mobile/ios/openam-ios-oauth2-sample-app/[OpenAM OAuth 2.0 iOS Sample App, window=\_blank].
+
+[#figure-ios-oauth2-sample-app]
+image::images/ios-oauth2-sample-app.png[]
+
+

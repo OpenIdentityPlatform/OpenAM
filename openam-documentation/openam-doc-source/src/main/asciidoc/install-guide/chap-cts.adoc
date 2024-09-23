@@ -1,0 +1,758 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-cts]
+== Configuring the Core Token Service
+
+The Core Token Service (CTS) provides a persistent and highly available token storage for OpenAM session, OAuth 2.0, SAML v2.0, and UMA tokens. CTS is set up in a generalized token storage format, which by default is always used for OAuth 2.0 and UMA tokens. If configured, it can also be used to persist session, session blacklist, and SAML v2.0 tokens.
+
+OpenAM's Session Failover (SFO) mechanism uses the Core Token Service (CTS) to store its __stateful__ session datafootnote:d14351e4776[OpenAM also supports__stateless__sessions, which are not stored in memory but are sent to the client, typically, in a browser-based cookie. For more information, seexref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"]in the__Administration Guide__.]. During SFO, OpenAM sends an SSO token to its clients, either as a cookie in a browser or in a JSON response to the `authentication` endpoint. This allows OpenAM to retrieve the session object from memory to resume the session.
+
+[#cts-general-recommend]
+=== General Recommendations for CTS Configuration
+
+CTS helps your deployment avoid single points of failure (SPOF). To reduce the impact of any given failure, consider the following recommendations:
+
+* *Only Use the Embedded Configuration Store for Limited, Single-Server Test Cases*. By default, OpenAM writes CTS entries in the OpenAM configuration store: either an embedded or external configuration store. If you configured OpenAM to use an embedded configuration store, limit your use of this default deployment to very small-scale, single-server test deployments—in multi-server deployments with load balancing, the active/active topology used by multiple embedded configuration stores can lead to write collisions.
+
+* *Isolate the Different Stores*. CTS entries are large, around 5KB, but are short-lived, whereas configuration data is static and long-lived. User entries are more dynamic than configuration data but much less volatile than CTS data. Therefore, isolating the user, configuration, and CTS data from OpenAM into separate stores allow for different tuning and storage settings per token store type.
+
+* *Configure External CTS Stores for High Volumes*. If you require a higher-level performance threshold, you may want to move the CTS token storage to one or more dedicated systems, as CTS generally causes much more replication traffic than less volatile configuration data. Note that CTS data are highly volatile with high writes (about 90%) and low reads (about 10%).
++
+Also, a requirement for global replication of the tokens stored in CTS justifies a move to dedicated systems, which provide an extra level of control over the amount of replication that is occurring.
+
+* *Properly Tune Your OpenDJ Servers*. To improve performance, ensure that you have properly-sized directory servers for your external CTS stores. In addition, you can enable token compression as discussed in xref:#cts-token-managing["Managing CTS Tokens"]. When enabled, token compression reduces load requirements on the network connection between token stores in exchange for processing time-compressing tokens.
+
+* *Determine the CTS Deployment Architecture*. There are two options for deploying CTS token stores:
++
+
+** Active/passive deployments, in which OpenAM's connection to the CTS token store is limited to a single master instance with failover instances.
++
+Active/passive deployments are slightly simpler to deploy. Active/passive deployments are a good fit for deployments with only a couple of OpenAM servers.
+
+** Affinity deployments, in which OpenAM connects to one or more writable directory server instances. Each instance acts as the master for a subset of CTS tokens. In this architecture, CTS tokens are described as having an __affinity__ for a given directory server instance. Specifically, OpenAM routes requests with the same target DN to the same directory server.
++
+Affinity deployments allow you to spread requests to the CTS token store across multiple directory master instances. Affinity deployments are a good fit for deployments with many OpenAM servers.
++
+For more information on CTS affinity deployments, see link:https://backstage.forgerock.com/knowledge/kb/article/a94140799[Best practice for using Core Token Service (CTS) Affinity based load balancing in AM (All versions) and OpenAM 13.5.1, window=\_top] in the __ForgeRock Knowledge Base__.
++
+Do not deploy CTS token stores behind a load balancer. Instead, specify connections to the directory server instances that comprise the CTS token store by using the Connection String(s) property in the CTS configuration.
+
++
+Performance depends on the characteristics of your deployment, but generally is comparable for both architectures.
+
+* *Do Not Use a Load Balancer in Front of the CTS Stores*. To connect OpenAM to the CTS store, specify the main external OpenDJ server for the CTS store on the OpenAM console and designate additional OpenDJ instances for failover using the Connection String(s) property. This property allows you to configure multiple OpenDJ servers for your CTS token stores without a load balancer.
++
+The following diagram shows a simple OpenAM deployment with the following characteristics:
++
+
+** A single load balancer receives requests for a cluster of two OpenAM servers.
+
+** Four OpenDJ servers provide services for the OpenAM servers.
+
+** Two of the OpenDJ servers act as the configuration store. Either OpenAM server can write to either configuration store server. The two OpenDJ servers use multimaster replication for consistency.
+
+** The other two OpenDJ servers, deployed in an active/passive topology, serve as the Core Token Service store. Changes from either OpenAM server are written to the primary OpenDJ CTS server (on the left) and then replicated to the other OpenDJ CTS server (on the right).
+
++
+
+
+[#cts-deploy]
+image::images/cts-deploy.png[]
+
+When OpenAM writes to a directory server in the external CTS store, directory server replication pushes the write to other directory servers in the same replication group. Under load, operations in an OpenAM server can happen more quickly than the network can push replication updates. Therefore, balancing the LDAP traffic from OpenAM to the CTS store using a random or round robin algorithm leads to errors where a read operation arrives at a replica before the expected write operation can cross the network.
+
+* *Consider Dedicated Replication Servers*. Once configured, the OpenDJ server replicates CTS data transmitted from OpenAM servers to connected OpenDJ servers. The amount of replication traffic can be significant, especially if replication proceeds over a WAN. You can limit this replication traffic by separating OpenDJ instances into directory and replication servers. For more information on how this is done with OpenDJ, see the OpenDJ documentation on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide#repl-dedicated-servers[Standalone Replication Servers, window=\_blank].
+
+* *Replicate CTS Across Sites to Support Global Session Availability*. CTS supports uninterrupted session availability in deployments with multiple sites if all sites use the same global underlying CTS store replicated across all sites. If an entire site fails or becomes unavailable, OpenAM servers in another site can detect the failure of the site's load balancer and attempt to use sessions from the global Core Token Service.
++
+In the event of a failure, client applications can connect to an OpenAM server in an active data center as shown in xref:chap-session-failover.adoc#figure-global-cts["Core Token Service For Global Session Failover"]:
++
+For more information on CTS for global session high availability with OpenDJ server, see xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] and the OpenDJ documentation on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide#chap-replication[Managing Data Replication, window=\_blank].
+
+
+
+[#cts-deployment-steps]
+=== CTS Deployment Steps
+
+The Default Configuration option installs OpenAM with an embedded OpenDJ directory server that stores both configuration and CTS data. The default option is suitable for OpenAM evaluation purposes, or for single site or smaller-scale environments where lower volume write loads and replication traffic occur.
+
+In general, CTS causes more volatile replication traffic due to the nature of its short-lived tokens compared to regular configuration data. To handle the data volatility, you can configure OpenAM to use the embedded directory server as a dedicated configuration data store, while using an external OpenDJ directory server instance as a CTS store. This type of deployment is useful if you have multiple OpenAM instances in a fully-replicated topology communicating with an external CTS data store over a WAN.
+
+You can deploy CTS using an external directory server by running the instructions in the following sections:
+
+xref:#cts-opendj-preparation["Prepare the OpenDJ Directory Service for CTS"]
+
+xref:#cts-import-schema["Import CTS Files"]
+
+xref:#cts-nonadmin-creation["Non-Admin User Creation and ACI Import"]
+
+xref:#cts-index-import-rebuild["CTS Index Import and Build"]
+
+xref:#cts-openam-config["OpenAM CTS Configuration"]
+
+xref:#cts-testing-failover["Testing Failover"]
+
+This section assumes that you have deployed two OpenAM instances in a site. If you have not completed these steps, see xref:../install-guide/chap-install-multiple.adoc#configure-site-load-balancing["To Configure Site Load Balancing for Deployments With Stateful Sessions"]. It is also assumed that both OpenAM instances communicate with the CTS instance, `cts.example.com` on port 1389.
+
+[#cts-opendj-preparation]
+==== Prepare the OpenDJ Directory Service for CTS
+
+The following instructions show how to download, install, and set up the OpenDJ directory server.
+
+[#cts-download-opendj]
+.To Download and Install OpenDJ
+====
+
+. Go to the ForgeRock link:https://backstage.forgerock.com/#!/downloads[Enterprise Downloads, window=\_top] page, click OpenDJ, and then download a supported version of OpenDJ directory server.
+
+. Unzip the OpenDJ distribution and run `setup`, which launches a GUI application called the QuickSetup Wizard. If you want to run `setup` interactively from the command line, use `setup --cli`.
+
+. Install OpenDJ with the installation parameters necessary for your deployment. Note, however, that SSL may be required in production deployments. This example uses the following parameters:
++
+
+[source, console]
+----
+Accept license?: yes
+Initial Root User DN for the Directory Server: cn=Directory Manager
+Password for the Initial Root User: <password value>
+Fully Qualified Hostname: cts.example.com
+LDAP Listening Port: 1389
+Administration Connector Port: 4444
+Create Base DNs: yes
+Backend Type*: JE Backend ([1])
+Base DN for Directory Data: dc=cts,dc=example,dc=com
+Option for Populating Database: Option 2 - Only create base entry
+Do You Want to Enable SSL: no (may be required for your deployment)
+Do You Want to Enable StartTLS: no (may be required for your deployment)
+Do You Want To Start The Server: yes
+What Would You Like To Do: 1 - Set up server with parameters above
+----
++
+* The Backend Type choice is available for OpenDJ 3.0 directory server and later.
+
+====
+
+
+[#cts-import-schema]
+==== Import CTS Files
+
+Once the OpenDJ installation is complete and the instance is operational, import the schema, index, and container files for CTS as shown in the procedure below.
+
+[#cts-import-config]
+.To Import the CTS Configuration
+====
+
+. Copy the CTS schema and then add it the repository.
++
+
+[source, console]
+----
+$ TOMCAT_OPENAM_WEBAPP=/path/to/tomcat/webapps/openam
+$ T=/tmp/ldif
+$ rm -rf $T
+$ mkdir $T
+$ cp $TOMCAT_OPENAM_WEBAPP/WEB-INF/template/ldif/sfha/cts-add-schema.ldif $T/cts-add-schema.ldif
+----
++
+If you are using OpenDJ 4.0 or later:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+$T/cts-add-schema.ldif
+----
++
+If you are using OpenDJ 3.5 or earlier:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--filename $T/cts-add-schema.ldif
+----
++
+The output should be:
++
+
+[source, console]
+----
+Processing MODIFY request for cn=schema
+MODIFY operation successful for DN cn=schema
+----
++
+
+. Copy the CTS index file, and then replace the `@DB_NAME@` variable with your repository in the file. Then, add the file to the repository.
++
+
+[source, console]
+----
+$ cat $TOMCAT_OPENAM_WEBAPP/WEB-INF/template/ldif/sfha/cts-indices.ldif \
+  | sed -e 's/@DB_NAME@/userRoot/' > $T/cts-indices.ldif
+----
++
+If you are using OpenDJ 4.0 or later:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+$T/cts-indices.ldif
+----
++
+If you are using OpenDJ 3.5 or earlier:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--filename $T/cts-indices.ldif
+----
++
+
+. Copy the container file, and then replace the `@SM_CONFIG_ROOT_SUFFIX@` variable with the base DN defined during the external OpenDJ installation procedure, for example, `dc=example,dc=com`. Then, add the file to the repository.
++
+
+[source, console]
+----
+$ ROOT_SUFFIX="dc=example,dc=com"
+$ cat $TOMCAT_OPENAM_WEBAPP/WEB-INF/template/ldif/sfha/cts-container.ldif | sed -e 's/@SM_CONFIG_ROOT_SUFFIX@/$ROOT_SUFFIX/' > $T/cts-container.ldif
+----
++
+If you are using OpenDJ 4.0 or later:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+$T/cts-container.ldif
+----
++
+If you are using OpenDJ 3.5 or earlier:
++
+
+[source, console]
+----
+$ ./ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword password \
+--filename $T/cts-container.ldif
+----
++
+The output should be:
++
+
+[source, console]
+----
+Processing ADD request for ou=tokens,dc=cts,dc=example,dc=com
+ADD operation successful for DN ou=tokens,dc=cts,dc=example,dc=com
+Processing ADD request for ou=openam-session,ou=tokens,dc=cts,dc=example,dc=com
+ADD operation successful for DN ou=openam-session,ou=tokens,dc=cts,dc=example,dc=com
+Processing ADD request for ou=famrecords,ou=openam-session,ou=tokens,dc=cts,dc=example,dc=com
+ADD operation successful for DN ou=famrecords,ou=openam-session,ou=tokens,dc=cts,dc=example,dc=com
+----
++
+
+. If OpenAM is binding to CTS as the Directory Manager user, you can jump to section xref:#cts-index-import-rebuild["CTS Index Import and Build"].
++
+To create a non-admin user, follow the instructions in the next section.
+
+====
+
+
+[#cts-nonadmin-creation]
+==== Non-Admin User Creation and ACI Import
+
+As a best practice, the use of `cn=Directory Manager` is not recommended. Instead, you can create a new user with limited privileges as shown below.
+
+[#ct-non-admin-user]
+.To Create a Non-Admin User
+====
+
+. Create an LDIF file called `cts_user.ldif` that defines the CTS non-admin user. The following sample LDIF creates a user called `openam_cts` and assigns the `update-schema`, `subentry-write`, and `password-reset` privileges.
++
+The LDIF file also overrides the default lookthrough limit of 5000 for this non-admin user to unlimited (0) and sets the maximum number of entries returned for a search to 5000 (default, 1000). The `ds-rlim-size-limit: 5000` is arbitrary and can be any value larger than the default maximum number of entries returned for a search, for example, value >= 1001. Setting the max number of entries for a search to 5000 ensures that the CTS reaper can properly delete returned tokens when large bursts of CTS tokens (> 5000 per interval between CTS reaping) are returned. For more information on OpenDJ resource limits, see link:https://backstage.forgerock.com/#!/docs/opendj/2.6.0/admin-guide/chap-resource-limits[Setting Resource Limits, window=\_top] on the __OpenDJ Administration Guide__.
++
+If there are more than 100K of expired tokens in the CTS, the search from the CTS reaper will be treated as non-indexed and will fail if the non-admin user does not have the `unindexed-search` privilege. Therefore, you should add the `unindexed-search` privilege to the user's entry.
++
+Finally, make sure that you replace the __password__ tag with your actual password:
++
+
+[source, console]
+----
+dn: ou=admins,dc=cts,dc=example,dc=com
+objectClass: top
+objectClass: organizationalunit
+ou: OpenAM Administrator
+
+dn: uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: OpenAM Non-Admin-User
+sn: OpenAM
+userPassword: password
+ds-privilege-name: update-schema
+ds-privilege-name: subentry-write
+ds-privilege-name: password-reset
+ds-privilege-name: unindexed-search
+ds-rlim-lookthrough-limit: 0
+ds-rlim-size-limit: 5000
+----
+
+. Add the new user to the CTS repository:
++
+
+[source, console]
+----
+./ldapmodify \
+  --defaultAdd \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename cts_user.ldif
+----
++
+The output should be:
++
+
+[source, console]
+----
+Processing ADD request for ou=admins,dc=cts,dc=example,dc=com
+ADD operation successful for DN ou=admins,dc=cts,dc=example,dc=com
+Processing ADD request for uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com
+ADD operation successful for DN uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com
+----
+
+. Add a global ACI to allow the `openam_cts` user to modify schema:
++
+
+[source, console]
+----
+./dsconfig \
+  set-access-control-handler-prop \
+  --no-prompt \
+  --hostname cts.example.com \
+  --port 4444 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --add 'global-aci:(target = "ldap:///cn=schema")(targetattr = "attributeTypes ||
+    objectClasses")(version 3.0; acl "Modify schema"; allow (write)
+    userdn = "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com";)'
+----
+
+. Use `dsconfig` to check that the global ACI has been applied:
++
+
+[source, console]
+----
+./dsconfig \
+   get-access-control-handler-prop \
+   --hostname cts.example.com \
+   --port 4444 \
+   --bindDN "cn=Directory Manager" \
+   --bindPassword password \
+   --no-prompt \
+   --property global-aci
+----
++
+Verify that the following entry is present:
++
+
+[source, console]
+----
+"(target = "ldap:///cn=schema")(targetattr = "attributeTypes || objectClasses")
+   (version 3.0; acl "Modify schema"; allow (write) userdn =
+   "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com";)",
+----
+
+. Create an LDIF file called `cts_acis.ldif` to add the ACIs to allow the CTS user to create, search, modify, delete, and allow persistent search to the CTS repository:
++
+
+[source, console]
+----
+dn: dc=cts,dc=example,dc=com
+changetype: modify
+add: aci
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
+ (userdn = "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify entries"; allow (write)(userdn=
+ "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow persistentsearch";
+ allow (search, read)(userdn = "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,
+ dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)(userdn =
+ "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete entries"; allow (delete)(userdn =
+ "ldap:///uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com");)
+----
+
+. Import the ACIs into the CTS repository:
++
+
+[source, console]
+----
+./ldapmodify \
+  --defaultAdd \
+  --hostname cts.example.com \
+  --port 1389 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --filename cts_acis.ldif
+----
++
+The output should be:
++
+
+[source, console]
+----
+Processing MODIFY request for dc=cts,dc=example,dc=com
+MODIFY operation successful for DN dc=cts,dc=example,dc=com
+----
+
+====
+
+
+[#cts-index-import-rebuild]
+==== CTS Index Import and Build
+
+
+[#cts-index-setup]
+.To Import and Rebuild the CTS Indexes
+====
+
+. Open the `/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif` file. Apply each index to the CTS repository using the `dsconfig` command. Note that these indexes may require further tuning depending on environmental load testing.
++
+For example, you can apply the first index `coreTokenExpirationDate` as shown below. Then, apply the other indexes individually in the same manner:
++
+
+[source, console]
+----
+./dsconfig  \
+  --port 4444 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --backend-name userRoot \
+  --index-name coreTokenExpirationDate \
+  --set index-type:ordering \
+  --trustAll \
+  --no-prompt
+----
++
+Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your indexes to the CTS repository at one time. Obtain a copy of link:../resources/cts-add-indexes.txt[cts-add-indexes.txt, window=\_blank], save it locally, then run `dsconfig` in batch mode:
++
+
+[source, console]
+----
+./dsconfig  \
+  --port 4444 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --batchFilePath cts-add-indexes.txt \
+  --trustAll \
+  --no-prompt
+----
+
+. Rebuild all indexes and then verify them:
++
+
+[source, console]
+----
+./rebuild-index \
+  --port 4444 \
+  --bindDN "cn=Directory Manager" \
+  --bindPassword password \
+  --baseDN "dc=cts,dc=example,dc=com" \
+  --rebuildAll
+  --start 0
+
+./verify-index --baseDN "dc=cts,dc=example,dc=com"
+----
+
+. Restart the OpenDJ instance.
+
+====
+
+
+[#cts-openam-config]
+==== OpenAM CTS Configuration
+
+At this stage, you have successfully set up the external OpenDJ directory server. You must now set up the CTS repository on OpenAM using the OpenAM console.
+
+[#cts-openam-gui]
+.To Configure CTS in OpenAM
+====
+
+. Open the OpenAM console and navigate to Configure > Server Defaults, and then click CTS.
+
+. On the CTS Token Store tab, configure the parameters as follows:
++
+
+[#cts-store-settings]
+.CTS Token Store Parameters
+[cols="25%,37%,38%"]
+|===
+|Parameter |Value |Notes 
+
+a|Store Mode
+a|`External Token Store`
+a|
+
+a|Root Suffix
+a|`dc=cts,dc=example,d=com`
+a|
+
+a|Max Connections
+a|`17`
+a|For production, this value needs to be tuned. Consider 2^n+1, where n=4, 5, 6, and so on. For example, try setting this to 17, 33, 65, and test performance under load.
+|===
++
+
+. On the External Store Configuration tab, configure the parameters as follows:
++
+
+[#cts-external-store-settings]
+.External Store Configuration Parameters
+[cols="25%,37%,38%"]
+|===
+|Parameter |Value |Notes 
+
+a|SSL/TLS Enabled
+a|False
+a|
+
+a|Connection String(s)
+a|`cts.example.com:1389`
+a|
+
+a|Login ID
+a|`uid=openam_cts,ou=admins,dc=cts,dc=example,dc=com`
+a|
+
+a|Password
+a|__password__
+a|
+
+a|Heartbeat
+a|`10`
+a|For production, this value needs to be tuned.
+|===
++
+
+. Click Save Changes
+
+. On the OpenAM console, navigate to Configure > Global Services, and then click Session.
+
+. In Secondary Configuration Instance, click New, select the site from the drop-down list, and then click Add.
+
+. In the Global Attributes section, configure the parameters as follows:
++
+
+[#cts-global-attribute-settings]
+.Global Attributes Parameters
+[cols="60%,40%"]
+|===
+|Parameter |Value 
+
+a|Session persistence and High Availability Failover Enabled
+a|True
+
+a|Reduce Crosstalk Enabled
+a|True
+
+a|Session Logout/Destroy Broadcast
+a|`Disabled`
+
+a|Reduced Crosstalk Purge Delay
+a|`1`
+|===
++
+
+[NOTE]
+======
+When using the Reduce Crosstalk feature, OpenAM goes to the CTS data store to retrieve session information, rather than poll the other OpenAM servers in the pool, which may hold the sessions in memory. Therefore, you must consider the load, latency, and characteristics of the target environment to decide if the Reduce Crosstalk option should be enabled.
+======
+
+. Click Save.
+
+. Restart all OpenAM servers in the site and test the configuration.
+
+====
+
+
+[#cts-testing-failover]
+==== Testing Failover
+
+To test failover, use two browsers: Chrome and Firefox. You can use any two browser types, or run the browsers in incognito mode. You can also view tokens using an LDAP browser.
+
+[#cts-test-failover]
+.To Test Failover
+====
+
+. In Chrome, log in to the second OpenAM instance with the `amadmin` user, and click on `sessions`.
+
+. In Firefox, log in to the first OpenAM instance with a test user.
+
+. In Chrome, verify that the test user exists in the first OpenAM instance's session list and not in the second instance.
+
+. Shut down the first OpenAM instance.
+
+. In Firefox, rewrite the URL to point to the second OpenAM instance. If successful, the browser should not prompt for login.
+
+. Confirm the session has failed over. In Chrome, list the sessions on the second instance, the test user's session should be present.
+
+. Restart the first OpenAM instance to complete the testing.
+
+====
+
+
+
+[#cts-backup-repl-purge-delay]
+=== CTS Backups and OpenDJ Replication Purge Delay
+
+Replication is the process of copying updates between directory servers to help all servers converge to identical copies of directory, token, and session / SAML v2.0 / OAuth 2.0 data. OpenDJ uses advanced data replication methods to ensure that directory services remain available in the event of a server crash or network interruption.
+
+The historical information needed to resolve the latest changes is periodically purged to prevent it from becoming an unmanageable size. The age at which the information is purged is known as the `replication-purge-delay`.
+
+With CTS, the default `replication-purge-delay` for OpenDJ is 3 days. Unless you have configured a separate OpenDJ server for CTS data, you may have to balance the needs for backups, the requirements for replication, disk space, and different useful lifetimes for CTS tokens and other OpenDJ data. Adjustments may be required. One way to set a new period for `replication-purge-delay` of __n__ hours is with the following command:
+
+[source, console]
+----
+./dsconfig \
+ set-replication-server-prop \
+ --port 4444 \
+ --hostname opendj-cts.example.org \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --provider-name "Multimaster Synchronization" \
+ --set replication-purge-delay:n \
+ --no-prompt \
+ --trustStorePath /path/to/truststore
+----
+At this point, you need to understand whether CTS data backups are important in your deployment. Session, SAML v2.0, and OAuth 2.0 token data is often short-lived. In some deployments, the worst-case scenario is that users have to log in again.
+
+If CTS data backups are important in your deployment, note that OpenDJ backups that are older than the `replication-purge-delay` are useless and must be discarded. You can use the OpenDJ `backup` to schedule backups. For example, the following command uses `crontab` format to configure daily backups for a hypothetical Base DN of `ctsData` at x minutes after every hour:
+
+[source, console]
+----
+./backup \
+ --port 4444 \
+ --bindDN "cn="Directory Manager" \
+ --bindPassword password \
+ --backendID ctsData \
+ --backupDirectory /path/to/opendj/backup \
+ --recurringTask "x * * * *" \
+ --completionNotify backupadmin@example.com \
+ --errorNotify backupadmin@example.com
+----
+If you adjust the time periods associated with `replication-purge-delay` and backups, you need to backup more frequently so that the change log records required to restore date are not lost.
+
+
+[#cts-token-managing]
+=== Managing CTS Tokens
+
+The following properties are associated with token encryption, compression, and token cleanup frequency, which are disabled by default. The properties are as follows:
+--
+
+`com.sun.identity.session.repository.enableEncryption`::
+Supports encryption of CTS tokens. Default: `false`.
+
+`com.sun.identity.session.repository.enableCompression`::
+Enables GZip-based compression of CTS tokens. Default: `false`.
+
+`com.sun.identity.session.repository.enableAttributeCompression`::
+Supports compression over and above the GZip-based compression of CTS tokens. Default: `false`.
+
+`com.sun.identity.session.repository.cleanupRunPeriod`::
+Specifies a minimum CTS token lifetime. If there is no activity in the specified time period, the token is erased. Default: 300000 ms.
+
+`com.sun.identity.session.repository.healthCheckRunPeriod`::
+Sets a period of time when requests are sent to make sure the current instance of OpenAM is running. Default: 60000 ms.
+
+--
+To enable the encryption/compression options, navigate to Configure > Server Defaults > Advanced. On the Advanced page, you will see these entries in the `Property Name` column with the corresponding value in the `Property Value` column. To enable them, change `false` to `true` in the Property Value column associated with the desired property, and click Save.
+
+[NOTE]
+====
+If you want to enable compression or encryption, you must enable the same property on every OpenAM instance within the site, otherwise they will not function correctly together. You must also restart the servers for the changes to take effect.
+====
+
+[WARNING]
+====
+When encryption or compression properties are changed, all previous tokens in the LDAP store will be unreadable; thus, invalidating any user's sessions. As a result, the user will be required to log in again.
+====
+
+
+[#cts-tuning-considerations]
+=== CTS Tuning Considerations
+
+The following OpenAM components make CTS requests:
+
+* Session service for stateful session failover
+
+* Session service for stateless session blacklisting
+
+* OAuth 2.0 for token persistence
+
+* SAML v2.0 for token persistence
+
+* UMA for token persistence
+
+* REST API for functions like forgotten passwords
+
+All create, update, and delete requests to CTS are placed into an asynchronous buffer before being handled by an asynchronous processor. This ensures that callers performing write operations can continue without waiting for CTS to complete processing.
+
+Once the queue is full, all operations are "blocked" before an operation can be placed in the queue. Once in the queue, the caller can continue as normal.
+
+CTS is designed to automatically throttle throughput when the buffer fills up with requests. Therefore, if you require a balance between performance versus system memory, OpenAM provides two properties that can be used to tune CTS—queue size and queue timeout.
+--
+
+`org.forgerock.services.cts.async.queue.size`::
+Default size: 5000. Determines the amount of request operations that can be buffered before the queue size becomes full, after which the caller will be required to wait for the buffered requests to complete processing. All CRUDQ operations are converted to tasks, which are placed on the queue, ensuring that operations happen in the correct sequence.
+
+`org.forgerock.services.cts.async.queue.timeout`::
+Default timeout is 120 seconds. Determines the length of time a caller will wait when the buffer is full. If the timeout expires, the caller receives an error. The timeout property is used in any system configuration where the LDAP server throughput is considerably slower than the OpenAM server, which can result in blocked requests as the backlog increases.
+
+--
+To set the queue size and timeout properties, in the OpenAM Console, navigate to Configure > Server Defaults > Advanced, enter the key name and value, and then click Add.
+
+For additional information on tuning CTS, see xref:../admin-guide/chap-tuning.adoc#tuning-ldap-settings-cts["Tuning LDAP CTS and Configuration Store Settings"] in the __Administration Guide__ in the xref:../admin-guide/chap-tuning.adoc#tuning-ldap-settings-cts[OpenAM Administration Guide] in the __Administration Guide__.
+
+

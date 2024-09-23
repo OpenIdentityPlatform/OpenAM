@@ -1,0 +1,152 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-sae]
+== Using Secure Attribute Exchange
+
+Most deployments can rely on OpenAM to handle authentication and provide identity assertions. OpenAM supports a wide variety of authentication scenarios out of the box, but OpenAM also makes it possible to add custom authentication modules. Furthermore, OpenIG lets you integrate legacy systems into your access management deployment.
+
+In a deployment where you need OpenAM to act as a SAML v2.0 gateway to a legacy application that serves as an identity provider, you can use OpenAM Secure Attribute Exchange (SAE). On the identity provider side, SAE lets OpenAM retrieve the information needed to create assertions from an external authentication service, bypassing OpenAM authentication and trusting the external service as the authoritative source of authentication. On the service provider side, SAE lets OpenAM securely provide attributes to an application that makes its own policy decision based on the attributes rather than rely on OpenAM for the policy decision.
+
+[#figure-sae]
+image::images/sae.png[]
+When you use SAE on the identity provider side, an external application acts as the authoritative source of authentication. After a user authenticates successfully, the application tells OpenAM to create a session by sending a secure HTTP GET or POST to OpenAM that asserts the identity of the user. OpenAM processes the assertion to create a session for the user. If the user is already authenticated and comes back to access the application, the application sends a secure HTTP POST to OpenAM to assert both the user's identity and also any necessary attributes related to the user. OpenAM processes the assertion to create the session for the user and populate the attributes in the user's session. When the user logs out, the external authentication application can initiate single logout from the identity provider OpenAM server by sending the `sun.cmd=logout` attribute to OpenAM using SAE.
+
+On the service provider side, OpenAM communicates using SAML v2.0 with OpenAM on the identity provider side. OpenAM can use SAE to transmit attributes to an application through a secure HTTP POST.
+
+SAE relies either on shared keys and symmetric encryption, or on public and private keys and asymmetric encryption to protect attributes communicated between OpenAM and external applications.
+
+OpenAM ships with sample JSPs that demonstrate secure attribute exchange. To try the sample, you must set up an OpenAM Circle of Trust to include an identity provider and a service provider, install the SDK sample web application on each provider, and then configure the providers appropriately as described in this chapter to secure communications with the sample SAE applications on both the identity provider and service provider sides.
+
+[#sae-install-prerequisites]
+=== Installing the Samples
+
+Set up an OpenAM server as an identity provider, and another as a service provider, connecting the two in a circle of trust called `samplesaml2cot`. Configure both the hosted providers and also the remote providers as described in xref:../admin-guide/chap-federation.adoc#saml2-providers-and-cots["Configuring Identity Providers, Service Providers, and Circles of Trust"] in the __Administration Guide__. This chapter assumes you set up the hosted identity provider at `\http://idp.example.com:8080/openam` and the hosted service provider at `\http://sp.example.com:8080/openam`. Use Realms > __Realm Name__ > Test Federation Connectivity in the OpenAM console to make sure Federation is working before you add secure attribute exchange applications that rely on functioning SAML v2.0 communications between the providers.
+
+Set up the sample web application as described in xref:chap-client-dev.adoc#install-sdk-samples["Installing OpenAM Client SDK Samples"], both on the identity provider side and also on the service provider side. The SAE samples are found under `/saml2/sae` where you installed the samples. `saeIDPApp.jsp` is the identity provider side external application. `saeSPApp.jsp` is the service provider side external application.
+
+
+[#sae-security-prerequisites]
+=== Preparing to Secure SAE Communications
+
+In order for SAE to be secure, you must both set up a trust relationship between the application on the identity provider side and the OpenAM server acting as identity provider, and sets up a trust relationship between the application on the service provider side and the OpenAM server acting as the service provider. These trust relationships can be based on a shared secret and symmetric encryption, or on public and private key pairs and asymmetric encryption. The trust relationships on either side are independent. For example, you can use a shared secret on the identity provider side and certificates on the service provider side if you chose.
+
+When using symmetric encryption, you must define a shared secret string used both for the application and the provider. The sample uses `secret12` as the shared secret. To simplify configuration, the sample uses the same shared secret, and thus symmetric encryption, for both trust relationships.
+
+When using symmetric encryption, you must also use the encoded version of your shared secret. To get the encoded version of a shared secret string, use the `encode.jsp` page on the provider, as in `\http://idp.example.com:8080/openam/encode.jsp` and `\http://sp.example.com:8080/openam/encode.jsp`. An encoded version of `secret12` looks something like `AQICEcFhDWmb6sVmMuCJuVh43306HVacDte9`.
+
+When using asymmetric encryption, you must obtain a public-private key pair for the application, and store the keys in a keystore on the application side. Also store the public key from OpenAM which is acting as the provider in the application's keystore. Make note of the certificate aliases for your application's private key, and for OpenAM's public key. Also note the path to the keystore for your application, the keystore password, and the private key password.
+
+
+[#sae-secure-idp]
+=== Securing the Identity Provider Side
+
+This configuration uses the default sample settings with a shared secret of `secret12`, without encryption of the attributes:
+
+. Log in as `amadmin` to the OpenAM server console where you set up the hosted identity provider (IDP).
+
+. The sample includes a `branch` attribute not found in user profiles by default. Therefore, under Realms > __Realm Name__ > Authentication > Settings > User Profile, set User Profile to Ignored, and then save your work.
+
+. Under Federation > Entity Providers, click the name for the Hosted IDP in order to access the IDP configuration:
+
+* Under Assertion Processing > Attribute Mapper, add both `mail=mail` and `branch=branch` to the attribute map, and then Save your work.
+
+* Under Advanced > SAE Configuration, make sure the IDP URL reflects an endpoint on the IDP such as `\http://idp.example.com:8080/openam/idpsaehandler/metaAlias/idp`, and then Save your work.
+
+* Also under Advanced > SAE Configuration > Application Security Configuration, add the URL value for the kind of encryption you are using, and then Save your work.
++
+When using the defaults, the value is something like `url=http://idp.example.com:8080/samples/saml2/sae/saeIDPApp.jsp|type=symmetric|secret=encoded-secret`, where the OpenAM SDK sample web application is deployed on the IDP side with context root `/samples` and the __encoded-secret__ is something like `AQICEcFhDWmb6sVmMuCJuVh43306HVacDte9`.
++
+If you use a different mechanism to secure the communications between the SAE application and the provider, read the online help in the console to see how to construct your URL value.
+
+
+. Under Federation > Entity Providers, click the name for the Remote SP in order to access the SP configuration on the IDP side:
+
+* Under Assertion Processing > Attribute Mapper, add both `mail=mail` and `branch=branch` to the attribute map, and then Save your work.
+
+* Under Advanced > SAE Configuration, make sure the SP URL reflects an endpoint on the SP, such as `\http://sp.example.com:8080/openam/spsaehandler/metaAlias/sp`, and then Save your work.
+
+* Also under Advanced > SAE Configuration, add the URL to the sample SAE application as the SP Logout URL, such as `\http://sp.example.com:8080/samples/saml2/sae/saeSPApp.jsp`, and then Save your work.
+
+
+
+
+[#sae-secure-sp]
+=== Securing the Service Provider Side
+
+This configuration uses the default sample setting of symmetric encryption, with a shared secret of `secret12`.
+Login as `amadmin` to the OpenAM server console where you set up the hosted service provider (SP):
+
+. The sample includes a `branch` attribute not found in user profiles by default. Therefore, under Realms > __Realm Name__ > Authentication > Settings > User Profile, set User Profile to Ignored, and then Save your work.
+
+. Under Federation > Entity Providers, click the name for the Hosted SP in order to access the SP configuration:
+
+* Under Assertion Processing > Attribute Mapper, add both `mail=mail` and `branch=branch` to the attribute map, and then Save your work.
+
+* Also under Assertion Processing > Attribute Mapper > Auto Federation, select Enabled, set the Attribute to `mail`, and then Save your work.
+
+* Under Advanced > SAE Configuration, make sure the SP URL reflects an endpoint on the SP such as `\http://sp.example.com:8080/openam/spsaehandler/metaAlias/sp`, and then Save your work.
+
+* Furthermore, under Advanced > SAE Configuration, add the URL to the sample SAE application as the SP Logout URL such as `\http://sp.example.com:8080/samples/saml2/sae/saeSPApp.jsp`, and then Save your work.
+
+* Also under Advanced > SAE Configuration > Application Security Configuration, add the URL value for the kind of encryption you are using, and then Save your work.
++
+When using the defaults, the value is something like `url=http://sp.example.com:8080/samples/saml2/sae/saeSPApp.jsp|type=symmetric|secret=encoded-secret`, where the OpenAM SDK sample web application is deployed on the IDP side with context root `/samples` and the __encoded-secret__ is something like `AQICkX24RbZboAVgr2FG1kWoqRv1zM2a6KEH`.
++
+If you use a different mechanism to secure the communications between the SAE application and the provider, read the online help in the console to see how to construct your URL value.
+
+
+
+
+[#sae-trying-it-out]
+=== Trying It Out
+
+After completing the setup described above, navigate to the IDP side SAE application, for example at `\http://idp.example.com:8080/samples/saml2/sae/saeIDPApp.jsp`.
+--
+Make sure you set at least the "SP App URL" and "SAE URL on IDP end" to fit your configuration. For example if you used the settings above then use the following values:
+
+SP App URL::
+`\http://sp.example.com:8080/samples/saml2/sae/saeSPApp.jsp`
+
+SAE URL on IDP end::
+`\http://idp.example.com:8080/openam/idpsaehandler/metaAlias/idp`
+
+--
+Check the settings, and then click Generate URL to open the Secure Attributes Exchange IDP APP SAMPLE page.
+
+Click the `ssourl` link in the page to start the exchange.
+
+The resulting web page shows the attributes exchanged, including the mail and branch values used. The text of that page is something like the following:
+
+[source]
+----
+SAE SP APP SAMPLE
+
+Secure Attrs :
+mail            testuser@foo.com
+sun.idpentityid http://idp.example.com:8080/openam
+sun.spentityid  http://sp.example.com:8080/openam
+branch          mainbranch
+sun.authlevel   0
+----
+
+

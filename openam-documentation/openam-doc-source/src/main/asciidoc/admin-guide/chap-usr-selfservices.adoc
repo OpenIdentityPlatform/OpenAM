@@ -1,0 +1,412 @@
+////
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+ 
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+ 
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+ 
+  Copyright 2017 ForgeRock AS.
+  Portions Copyright 2024 3A Systems LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+
+[#chap-usr-selfservices]
+== Configuring User Self-Service Features
+
+OpenAM provides user self-service features that enable your customers to self-register to your web site, securely reset forgotten passwords, and retrieve their usernames. OpenAM's user self-service capabilities greatly reduces help desk costs and offers a rich online experience that strengthens customer loyalty.
+
+[NOTE]
+====
+The Password Reset service, located on the OpenAM console at Configure > Global Services, is deprecated for OpenAM 13.5.2-15 and will no longer be supported in a future OpenAM release.
+====
+
+[#about-user-self-service]
+=== About User Self-Service
+
+OpenAM's User Self-Service feature supports automated account registration for new users, forgotten password reset, and forgotten username retrieval for your existing customer base. The User Self-Service features include the following capabilities:
+
+* *User self-registration*. Allows non-authenticated users to register to your site on their own. You can add additional security features like email verification, knowledge-based authentication (KBA) security questions, Google reCAPTCHA, and custom plugins to add to your user self-registration process.
+
+* *Knowledge-based authentication security questions*. Supports the capability to present security questions during the registration process. When enabled, the user is prompted to enter answers to pre-configured or custom security questions. Then, during the forgotten password or forgotten username process, the user is presented with the security questions and must answer them correctly to continue the process.
+
+* *Forgotten password reset*. Allows registered users already in your system to reset their passwords. The default password policy is set in the underlying directory server and requires a minimum password length of eight characters by default. If security questions are enabled, users must also correctly answer their pre-configured security questions before resetting their passwords.
+
+* *Forgotten username support*. Allows users to retrieve their forgotten usernames. If security questions are enabled, users must also correctly answer their pre-configured security questions before retrieving their usernames.
+
+* *Google reCAPTCHA plugin*. Supports the ability to add a Google reCAPTCHA plugin to the registration page. This plug-in protects against any software bots that may be used against your site.
+
+* *Configurable plugins*. Supports the ability to add plugins to customize the user services process flow. You can develop your custom code and drop the `.jar` file into your container.
+
+* *Customizable confirmation emails*. Supports the ability to customize or localize confirmation email in plain text or HTML.
+
+* *Password policy configuration*. Supports password policy configuration, which is enforced by the underlying OpenDJ directory server and manually aligned with frontend UI templates. The default password policy requires a password with a minimum length of eight characters.
+
+* *Self registration user attribute whitelist*. Supports attribute whitelisting, which allows you to specify which attributes can be set by the user during account creation.
+
+
+
+[#user-self-service-flows]
+=== User Self-Service Process Flows
+
+User Self-Service features support various user flows depending on how you configure your security options, which include email verification, security questions, Google reCAPTCHA, and any custom plugins that you create.
+
+The following diagram shows the basic user self-registration flow without the optional features:
+
+[#figure-user-self-registration-basic]
+image::images/user-self-registration-basic-flow.png[]
+The following diagrams show the possible flows for user self-registration flow with the optional features:
+
+[#figure-user-self-registration]
+image::images/user-self-registration-flow.png[]
+Forgotten username retrieval and forgotten password reset support various user flows depending on how you configure your security options. If you enabled security questions and the user entered responses to each question during self-registration, the security questions are presented to the user in random order.
+
+The following diagram shows the possible flows for forgotten username:
+
+[#figure-forgotten-username-flow]
+image::images/forgotten-username-flow.png[]
+The following diagram shows the possible flows for forgotten password reset:
+
+[#figure-forgotten-password-flow]
+image::images/forgotten-password-flow.png[]
+
+
+[#configuring-user-self-service-features]
+=== Configuring the User Self-Service Features
+
+You can configure the user self-service features to use email address verification, which sends an email containing a link for user self-registration and forgotten password reset via OpenAM's email service. You can also send the forgotten username to the user by email if configured.
+
+[TIP]
+====
+For information on the RESTful API for the user self-service features, see xref:../dev-guide/chap-client-dev.adoc#sec-rest-user-services["RESTful User Self-Service"] in the __Developer's Guide__.
+====
+Follow the steps in the sections below:
+
+* xref:#before-you-begin-configuring-jceks-keystore["Configuring the Signing and Encryption Key Aliases"]
+
+* xref:#configuring-email-service["Configuring the Email Service"]
+
+* xref:#configuring-recaptcha["Configuring the Google reCAPTCHA Plugin"]
+
+* xref:#configuring-kba["Configuring Knowledge-Based Security Questions"]
+
+* xref:#configuring-user-self-registration["Configuring User Self-Registration"]
+
+* xref:#configuring-forgotten-password["Configuring the Forgotten Password Reset Feature"]
+
+* xref:#configuring-forgotten-username["Configuring the Forgotten Username Feature"]
+
+
+[#before-you-begin-configuring-jceks-keystore]
+==== Configuring the Signing and Encryption Key Aliases
+
+OpenAM's user self service feature requires two key aliases: one secret key alias for signing and one key pair alias for encryption. OpenAM is pre-configured with a JCEKS keystore with three key aliases that you can use for testing purposes. For more information about keystores and key aliases in OpenAM, see xref:chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"].
+
+Unlike a JKS keystore that supports asymmetric keys, the JCEKS keystore supports both asymmetric keys for encryption and symmetric keys for signing. In an OpenAM site with multiple OpenAM servers deployed behind a load balancer, the JCEKS keystore allows one server to decrypt and validate a JSON Web Token (JWT) from the other server.
+
+The key aliases __must__ exist in the JCEKS keystore before the user self service feature can be configured, since they need to be specified at configuration time.
+
+[#configuring-self-service-keys]
+.To Configure Self Service Key Aliases
+====
+To provide user self-service features, you must configure suitable key aliases.Perform the following steps to populate the values of the Encryption Key Pair Alias and the Signing Secret Key Alias properties:
+
+. Log in to the OpenAM console as an administrator, for example, `amadmin`.
+
+. Navigate to Configure > Global Services > User Self Service.
+
+. Populate the values of the Encryption Key Pair Alias and the Signing Secret Key Alias properties with the names of the key pair aliases in your JCEKS keystore. For example, if you are using the demo keys in the default `keystore.jceks` file, set the properties as follows:
++
+
+* Encryption Key Pair Alias to `selfserviceenctest`.
+
+* Signing Secret Key Alias to `selfservicesigntest`.
+
+
+
+[#figure-self-service-keys]
+image::images/self-service-keys.png[]
+
+
+. Save your changes.
+
+====
+
+
+[#configuring-email-service]
+==== Configuring the Email Service
+
+The user self-service feature lets you send confirmation emails via OpenAM's SMTP Email Service to users who are registering at your site or resetting forgotten passwords. If you choose to send confirmation emails, you can configure the Email Service globally.
+
+[#configure-email-service]
+.To Configure the Email Service
+====
+By default, OpenAM expects the SMTP service to listen on `localhost:465`. You can change this setting.
+
+. Log in to the OpenAM console as the administrator.
+
+. On the Realms page, click the realm in which you will install the Email Service, and then click Services.
+
+. Click Services, and then click Add a Service.
+
+. On the Choose a Service drop-down list, select Email Service, and then enter the following:
++
+
+.. Enter the Mail Server Hostname. If you are using the Google SMTP server, you must also configure the Google Mail settings to enable access for less secure applications.
+
+.. Enter the Mail Server Authentication Username. The default is `amadmin`. If you are testing on a Google account, you can enter a known Gmail address.
+
+.. Enter the Mail Server Authentication Password property value.
+
+.. Enter the Email From Address. The default is `no-reply@example.com`.
+
+.. Click Create.
+
+
+====
+
+
+[#configuring-recaptcha]
+==== Configuring the Google reCAPTCHA Plugin
+
+The user self-service feature supports the Google reCAPTCHA plugin, which can be placed on the Register Your Account, Reset Your Password, and Retrieve Your Username pages. The Google reCAPTCHA plugin protects your user self-service implementation from software bots.
+
+[NOTE]
+====
+Google reCAPTCHA is the only supported plugin for user self-service. Any other Captcha service will require a custom plugin.
+====
+
+[#configure-recaptcha]
+.To Configure the Google reCAPTCHA Plugin
+====
+
+. Register your web site at a Captcha provider, such as link:https://www.google.com/recaptcha/intro/index.html[Google reCAPTCHA, window=\_top], to get your site and secret key.
++
+When you register your site for Google reCAPTCHA, you only need to obtain the site and secret key, which you enter in the user self-service configuration page in the OpenAM console. You do not have to do anything with client-side integration and server-side integration. The Google reCAPTCHA plugin appears automatically on the Register Your Account, Reset Your Password, and Retrieve Your Username pages after you configure it in the OpenAM console.
+
+
+[#figure-google-recaptcha]
+image::images/google-recaptcha.png[]
+
+
+. Log in to the OpenAM console as an administrator.
+
+. Click Configure > Global Services > User Self Service.
+
+. In the Google Recaptcha Site Key field, enter the site key that you obtained from the Google reCAPTCHA site.
+
+. In the Google Recaptcha Secret Key field, enter the secret key that you obtained from the Google reCAPTCHA site.
+
+. In the Google Recaptcha Verification URL field, keep the default.
+
+====
+
+
+[#configuring-kba]
+==== Configuring Knowledge-Based Security Questions
+
+Knowledge-based authentication (KBA) is an authentication mechanism in which the user must correctly answer a number of pre-configured security questions that are set during the initial registration setup. If successful, the user is granted the privilege to carry out an action, such as registering an account, resetting a password, or retrieving a username. The security questions are presented in a random order to the user during the user self-registration, forgotten password reset, and forgotten username processes.
+
+OpenAM provides a default set of security questions and easily allows OpenAM administrators and users to add their own custom questions.
+
+[#configure-kba]
+.To Configure Security Questions
+====
+
+. Log in to the OpenAM console as the administrator.
+
+. Click Configure > Global Services > User Self Service.
+
+. On the User Self Service page, scroll to the Security Questions section. Enter your own security question in the New Value field, and then click Add. The syntax is: `OrderNum|ISO-3166-2 Country Code|Security Question`. For example, `5|en|What is your dog's name?`. Make sure that order numbers are unique.
++
+
+[WARNING]
+======
+You should never remove any security questions as a user may have reference to a given question.
+======
+
+. In the Minimum Answers to Define field, enter the number of security questions that will be presented to the user during the registration process.
+
+. In the Minimum Answers to Verify field, enter the number of security questions that must be answered during the Forgotten Password and Forgotten Username services.
+
+. Click Finish to save your changes.
+
+====
+
+
+[#configuring-user-self-registration]
+==== Configuring User Self-Registration
+
+OpenAM provides a self-registration feature that allows users to create an account to your web site. Although you can configure user self registration without any additional security mechanisms, such as email verification or KBA security questions, we recommend configuring the email verification service with user self registration at a minimum.
+
+[#configure-user-self-registration]
+.To Configure User Self-Registration
+====
+
+. Log in to the OpenAM console as the administrator.
+
+. Configure the email service presented in xref:#configuring-email-service["Configuring the Email Service"].
+
+. Click Configure > Global Services > User Self Service.
+
+. On the User Self Service page, click Enabled next to User Registration.
+
+. For Captcha, click Enabled to turn on the Google reCAPTCHA plugin. Make sure you configured the plugin as presented in xref:#configuring-recaptcha["Configuring the Google reCAPTCHA Plugin"].
+
+. For Email Verification, clear the Enabled box if you want to turn off the email verification service. We recommend that you keep it selected.
+
+. For Security Questions, click Enabled to display security questions to the user during the self registration, after which the user must enter their answers to the questions. During the forgotten password or forgotten username services, the user will be presented with the security questions to be able to reset their passwords or retrieve their usernames if Security Questions is enabled.
+
+. In the Token LifeTime field, enter an appropriate number of seconds for the token lifetime. If the token lifetime expires before the user self-registers, then the user will need to restart the registration process over again.
++
+Default: 900 seconds.
+
+. To customize the Self Registration outgoing email, run the following steps:
++
+
+.. In the Outgoing Email Subject field, enter the Subject line of your email in the New Value field, and then click Add.
++
+The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line values could be: *`en|Registration Email`
+* and *`fr|Inscription E-mail`
+*.
+
+.. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
++
+The email body text format is `lang|email-text`, where `lang` is the ISO-639 language code. Note that email body text must be all on one line and can contain any HTML tags within the body of the text.
++
+For example, the email body text could be: *`en|Thank you for registration to our site! Click <a href="%link%">here</a> to register to the site.`
+*
+
+
+. In the Valid Creation Attributes field, enter the user attributes the user can set during the user self-registration. The attributes are based on the OpenAM identity repository.
+
+. For Destination After Successful Registration, select one of the following:
++
+
+* User is automatically logged in and sent to the appropriate page within the system.
+
+* User is sent to a success page without being logged in. In this case, OpenAM displays a "You have successfully registered" page. The user can then click the Login link to log in to OpenAM. This is the default selection.
+
+* User is sent to the login page to authenticate.
+
+
+. Under Advanced Configuration, configure the User Registration Confirmation Email URL for your deployment. The default is: `\http://openam.example.com:8080/openam/XUI/#register/`.
+
+. Click Finish to apply your changes.
+
+====
+
+
+[#configuring-forgotten-password]
+==== Configuring the Forgotten Password Reset Feature
+
+The forgotten password feature allows existing users to reset their passwords when they cannot remember them.
+
+[#configure-forgotten-password]
+.To Configure the Forgotten Password Feature
+====
+
+. Log in to the OpenAM console as the administrator.
+
+. Click Configure > Global Services > User Self Service.
+
+. On the User Self Service page, click Enabled next to Forgotten Passwords.
+
+. For Captcha, click Enabled to turn on the Google reCAPTCHA plugin. Make sure you configured the plugin as presented in xref:#configuring-recaptcha["Configuring the Google reCAPTCHA Plugin"].
+
+. For Email Verification, clear the Enabled box if you want to turn off the email verification service. We recommend that you keep it selected.
+
+. For Security Questions, click Enabled to display security questions to the user during the forgotten password reset process. The user must correctly answer the security questions to be able to reset passwords.
+
+. In the Forgotten Password Token LifeTime field, enter an appropriate number of seconds for the token lifetime. If the token lifetime expires before the user resets their password, then the user will need to restart the forgotten password process over again.
++
+Default: 900 seconds.
+
+. To customize the Forgotten Password outgoing email, run the following steps:
++
+
+.. In the Outgoing Email Subject field, enter the subject line of your email in the New Value field, and then click Add.
++
+The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: *`en|Forgotten Password Email`
+*.
+
+.. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
++
+The email body text format is `lang|email-text`, where `lang` is the ISO-639 language code. Note that email body text must be all on one line and can contain any HTML tags within the body of the text.
++
+For example, the email body text could be: *`en|Thank you for request! Click <a href="%link%">here</a> to reset your password.`
+*
+
+
+. Under Advanced Configuration, change the default Forgotten Password Confirmation Email URL for your deployment. The default is: `\http://openam.example.com:8080/openam/XUI/#passwordReset/`.
+
+====
+
+
+[#configuring-forgotten-username]
+==== Configuring the Forgotten Username Feature
+
+The forgotten username feature allows existing users to retrieve their usernames when they cannot remember them.
+
+[#configure-forgotten-username]
+.To Configure the Forgotten Username Feature
+====
+
+. Log in to the OpenAM console as the administrator.
+
+. Click Configure > Global Services > User Self Service.
+
+. On the User Self Service page, click Enabled next to Forgotten Username.
+
+. For Captcha, click Enabled to turn on the Google reCAPTCHA plugin. Make sure you configured the plugin as presented in xref:#configuring-recaptcha["Configuring the Google reCAPTCHA Plugin"].
+
+. For Security Questions, click Enabled to display security questions to the user during the forgotten username process. The users must correctly answer the security questions to be able to retrieve their usernames.
+
+. For Email Username, click Enabled if you want the user to receive the retrieved username by email.
+
+. For Show Username, click Enabled if you want the user to see their retrieved username on the browser.
+
+. In the Forgotten Username Token LifeTime field, enter an appropriate number of seconds for the token lifetime. If the token lifetime expires before the user retrieves their username, then the user will need to restart the forgotten username process.
++
+Default: 900 seconds.
+
+. To customize the Forgotten Username outgoing email, run the following steps:
++
+
+.. In the Outgoing Email Subject field, enter the subject line of your email in the New Value field, and then click Add.
++
+The subject Line format is `lang|subject-text`, where `lang` is the ISO 639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: *`en|Forgotten username email`
+*.
+
+.. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
++
+The email body text format is `lang|email-text`, where `lang` is the ISO 639 language code. Note that email body text must be all on one line and can contain any HTML tags within the body of the text.
++
+For example, the email body text could be: `en|Thank you for your inquiry! Your username is %username%.`
+
+
+====
+
+
+
+[#user-mgmt-pwd-sec-questions]
+=== User Management of Passwords and Security Questions
+
+Once the user has self-registered to your system, the user can change their password and security questions at any time on the user profile page. The user profile page provides tabs to carry out these functions.
+
+[#figure-user-profile-page-pwd-tab]
+image::images/user-profile-page-pwd-tab.png[]
+
+[#figure-user-profile-page-sec-questions-tab]
+image::images/user-profile-page-sec-questions-tab.png[]
+
+
