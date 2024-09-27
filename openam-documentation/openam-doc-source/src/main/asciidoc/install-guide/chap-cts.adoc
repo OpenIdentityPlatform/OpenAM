@@ -476,7 +476,7 @@ For example, you can apply the first index `coreTokenExpirationDate` as shown be
   --no-prompt
 ----
 +
-Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your indexes to the CTS repository at one time. Obtain a copy of link:../resources/cts-add-indexes.txt[cts-add-indexes.txt, window=\_blank], save it locally, then run `dsconfig` in batch mode:
+Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your indexes to the CTS repository at one time. Obtain a copy of link:../attachments/cts-add-indexes.txt[cts-add-indexes.txt, window=\_blank], save it locally, then run `dsconfig` in batch mode:
 +
 
 [source, console]

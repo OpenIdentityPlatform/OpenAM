@@ -237,7 +237,7 @@ OpenAM also supports another level of tamper evident security by periodically ad
 
 .. Click Is Enabled to turn on the tamper evident feature for CSV logs.
 
-.. In the Certificate Store Location field, enter the location of the keystore. You must manually create the keystore and place it in this location. You can use a simple script to create your Java keystore: link:../resources/create-keystore.sh[create-keystore.sh, window=\_blank].
+.. In the Certificate Store Location field, enter the location of the keystore. You must manually create the keystore and place it in this location. You can use a simple script to create your Java keystore: link:../attachments/create-keystore.sh[create-keystore.sh, window=\_blank].
 +
 Default: `%BASE_DIR%/%SERVER_URI%/Logger.jks`
 

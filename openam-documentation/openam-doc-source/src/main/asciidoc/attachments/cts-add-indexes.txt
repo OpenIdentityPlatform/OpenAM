@@ -1,0 +1,82 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2011-2018 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+
+# dsconfig batch file to add CTS indexes
+# 1. Save this file locally.
+# 2. On OpenDJ server, run:
+#    dsconfig -p 4444 -D "cn=Directory Manager" -w password \
+#    -F cts-add-indexes.txt -X -n
+
+create-backend-index --backend-name userRoot --index-name coreTokenExpirationDate \
+  --set index-type:ordering
+create-backend-index --backend-name userRoot --index-name coreTokenUserId \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString01 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString02 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString03 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString05 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString08 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString09 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString10 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString14 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenString15 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger01 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger02 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger03 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger04 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger05 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger06 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger07 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger08 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger09 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenInteger10 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenDate01 \
+  --set index-type:ordering
+create-backend-index --backend-name userRoot --index-name coreTokenDate02 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenDate03 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenDate04 \
+  --set index-type:equality
+create-backend-index --backend-name userRoot --index-name coreTokenDate05 \
+  --set index-type:equality
