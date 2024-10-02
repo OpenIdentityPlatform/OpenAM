@@ -83,15 +83,6 @@
                         <artifactId>doc-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>build-man-pages</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>process</goal>
-                                    <goal>build</goal>
-                                    <goal>release</goal>
-                                </goals>
-                            </execution>
-                            <execution>
                                 <id>build-man-pages-asciidoc</id>
                                 <phase>package</phase>
                                 <goals>
@@ -118,53 +109,7 @@
                             <projectName>OpenAM</projectName>
                             <projectVersion>${project.version}</projectVersion>
                             <releaseVersion>${project.version}</releaseVersion>
-                            <buildReleaseZip>true</buildReleaseZip>
-                            <googleAnalyticsId />
-                            <isDraftMode>no</isDraftMode>
-                            <formats combine.self="override">
-                                <format>man</format>
-                                <format>epub</format>
-                                <format>html</format>
-                                <format>pdf</format>
-                                <format>webhelp</format>
-                                <format>xhtml5</format>
-                                <format>bootstrap</format>
-                            </formats>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>zip-docs</id>
-                                <phase>package</phase>
-                                <configuration>
-                                    <target>
-                                        <property name="compress_formats" value="webhelp,xhtml,html" />
-                                        <ant antfile="${basedir}/src/main/ant/zip.xml">
-                                            <target name="docs" />
-                                        </ant>&gt;
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>ant-contrib</groupId>
-                                <artifactId>ant-contrib</artifactId>
-                                <version>${ant.contrib.version}</version>
-                                <exclusions>
-                                    <exclusion>
-                                        <groupId>ant</groupId>
-                                        <artifactId>ant</artifactId>
-                                    </exclusion>
-                                </exclusions>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
