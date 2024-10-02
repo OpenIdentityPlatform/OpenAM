@@ -108,7 +108,7 @@ If you are adding an existing attribute that is already allowed on user profile 
 
 [TIP]
 ======
-If you are using OpenDJ as the identity repository, you can update the schema through OpenDJ Control Panel > Schema > Manage Schema, as described in the link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#update-schema[OpenDJ documentation, window=\_blank].
+If you are using OpenDJ as the identity repository, you can update the schema through OpenDJ Control Panel > Schema > Manage Schema, as described in the link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-schema#update-schema[OpenDJ documentation, window=\_blank].
 ======
 
 . Prepare the attribute type object class definitions in LDIF format.

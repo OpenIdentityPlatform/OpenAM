@@ -35,7 +35,7 @@ In the event of a failure, client applications can connect to an OpenAM server i
 
 [#figure-global-cts]
 image::images/global-cts.png[]
-For more information on CTS for global session failover with OpenDJ directory server, see the OpenDJ documentation on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#chap-replication[Managing Data Replication, window=\_blank].
+For more information on CTS for global session failover with OpenDJ directory server, see the OpenDJ documentation on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication[Managing Data Replication, window=\_blank].
 
 [NOTE]
 ====

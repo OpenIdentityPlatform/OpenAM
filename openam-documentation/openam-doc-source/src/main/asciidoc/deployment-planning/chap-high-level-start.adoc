@@ -363,7 +363,7 @@ The installation process requires that you implement your deployment plan.
 
 * *Prepare the Directory Servers*. Prepare the configuration directory server, OpenDJ for the core token service (CTS), and the LDAP identity repository. For information on installing data repositories, see xref:../install-guide/chap-prepare-install.adoc#chap-prepare-install["Preparing For Installation"] in the __Installation Guide__.
 
-* *Obtain the OpenAM Software*. You should obtain a supported ForgeRock release of OpenAM or an archive build. For the latest stable version of OpenAM, click link:https://backstage.forgerock.com/#!/downloads/[Enterprise Downloads, window=\_blank].
+* *Obtain the OpenAM Software*. You should obtain a supported release of OpenAM or an archive build. For the latest stable version of OpenAM, click link:https://github.com/OpenIdentityPlatform/OpenAM/releases[Releases, window=\_blank].
 
 * *Configure OpenAM*. Install and configure OpenAM with or without the console, the setup tools (configurator), configuration tools (`ssoadm`, `ampassword`, `amverifyarchive`), or set up your scripted install and configuration of OpenAM. For information on installing OpenAM, see the xref:../install-guide/index.adoc[Installation Guide].
 

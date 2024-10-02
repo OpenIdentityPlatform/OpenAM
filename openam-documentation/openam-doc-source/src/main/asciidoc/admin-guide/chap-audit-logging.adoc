@@ -33,7 +33,7 @@ The Audit Logging Service uses a structured message format that adheres to a con
 
 [IMPORTANT]
 ====
-By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators must manually enable audit logging in the directory server. For more information, see link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#log-common-audit-ldap-csv[To Enable LDAP CSV Access Logs, window=\_blank] in the __OpenDJ Administration Guide__.
+By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators must manually enable audit logging in the directory server. For more information, see link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-monitoring#log-common-audit-ldap-csv[To Enable LDAP CSV Access Logs, window=\_blank] in the __OpenDJ Administration Guide__.
 ====
 
 [#about-audit-logs]

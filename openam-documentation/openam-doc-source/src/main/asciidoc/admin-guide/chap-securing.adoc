@@ -240,7 +240,7 @@ Make this change in every OpenAM realm that uses the embedded OpenDJ as a data s
 
 
 
-. To change the `cn=Directory Manager` and the global administrator passwords in the embedded OpenDJ, see link:https://backstage.forgerock.com/#!/docs/opendj/3.5/admin-guide#troubleshoot-reset-admin-passwords[Resetting Administrator Passwords, window=\_blank] in the __OpenDJ Administration Guide__.
+. To change the `cn=Directory Manager` and the global administrator passwords in the embedded OpenDJ, see link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-troubleshooting#troubleshoot-reset-admin-passwords[Resetting Administrator Passwords, window=\_blank] in the __OpenDJ Administration Guide__.
 
 ====
 

@@ -702,7 +702,7 @@ Example commands throughout this section use example values for user IDs and por
 When running the `ldapmodify` or `dsconfig` commands, you might need to specify the `--trustAll` argument to trust server certificates if your directory server uses self-signed certificates and StartTLS or SSL.
 ======
 
-. Prepare your OpenDJ installation, then download the OpenDJ software. See the OpenDJ documentation about link:https://backstage.forgerock.com/docs/opendj/3.5/install-guide#chap-install[Installing OpenDJ Servers, window=\_blank].
+. Prepare your OpenDJ installation, then download the OpenDJ software. See the OpenDJ documentation about link:https://doc.openidentityplatform.org/opendj/install-guide/chap-install[Installing OpenDJ Servers, window=\_blank].
 +
 
 [source, console]
