@@ -27,7 +27,7 @@ OpenAM stores configuration data in an LDAP directory server and in files. The d
 
 This chapter shows how to backup and restore OpenAM configuration data by backing up and restoring local configuration files and local (embedded) configuration directory server data. If your deployment uses an external configuration directory server, then refer to the documentation for your external directory server or work with your directory server administrator to back up and restore configuration data stored in the external directory service.
 
-For OpenDJ directory server you can find more information in the chapter on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
+For OpenDJ directory server you can find more information in the chapter on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
 This chapter aims to cover the following uses of backup data.
 
 . Recovery from server failure:
@@ -56,7 +56,7 @@ Have the following points in mind when using this procedure:
 
 * Use this procedure __only__ when OpenAM stores configuration data in the embedded OpenDJ directory server, which means that the embedded OpenDJ directory server files are co-located with other OpenAM configuration files.
 +
-If your deployment uses an external configuration directory server, then refer to the documentation for your external directory server or work with your directory server administrator to back up and restore configuration data stored in the external directory service. For OpenDJ directory server you can find more information in the chapter on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
+If your deployment uses an external configuration directory server, then refer to the documentation for your external directory server or work with your directory server administrator to back up and restore configuration data stored in the external directory service. For OpenDJ directory server you can find more information in the chapter on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
 
 * Do not restore configuration data from a backup of a different release of OpenAM. The structure of the configuration data can change from release to release.
 
@@ -73,7 +73,7 @@ Replication relies on historical data to resolve any conflicts that arise. If di
 +
 When the directory server encounters a gap in historical data it cannot correctly complete replication operations. You must make sure, therefore, that any data you restore from backup is not older than the replication purge delay. Otherwise your restoration operation could break replication with the likely result that you must restore all servers from backup, losing any changes that occurred in the meantime.
 +
-For more information about purge delay, see the OpenDJ __Administration Guide__ section on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#restore-replica[To Restore a Replica, window=\_blank].
+For more information about purge delay, see the OpenDJ __Administration Guide__ section on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-backup-restore#restore-replica[To Restore a Replica, window=\_blank].
 
 
 Follow these steps for each OpenAM server that you want to back up:
@@ -116,7 +116,7 @@ Have the following points in mind when using this procedure:
 
 * Use this procedure __only__ when OpenAM stores configuration data in the embedded OpenDJ directory server, which means that the embedded OpenDJ directory server files are co-located with other OpenAM configuration files.
 +
-If your deployment uses an external configuration directory server, then refer to the documentation for your external directory server or work with your directory server administrator to back up and restore configuration data stored in the external directory service. For OpenDJ directory server, you can find more information in the chapter on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
+If your deployment uses an external configuration directory server, then refer to the documentation for your external directory server or work with your directory server administrator to back up and restore configuration data stored in the external directory service. For OpenDJ directory server, you can find more information in the chapter on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-backup-restore[Backing Up and Restoring Data, window=\_blank].
 
 * Do not restore configuration data from a backup of a different release of OpenAM. The structure of the configuration data can change from release to release.
 
@@ -137,7 +137,7 @@ Replication relies on historical data to resolve any conflicts that arise. If di
 +
 When the directory server encounters a gap in historical data it cannot correctly complete replication operations. You must make sure, therefore, that any data you restore from backup is not older than the replication purge delay. Otherwise your restoration operation could break replication with the likely result that you must restore all servers from backup, losing any changes that occurred in the meantime.
 +
-For more information about purge delay, see the OpenDJ __Administration Guide__ section on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#restore-replica[To Restore a Replica, window=\_blank].
+For more information about purge delay, see the OpenDJ __Administration Guide__ section on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-backup-restore#restore-replica[To Restore a Replica, window=\_blank].
 
 
 Follow these steps for each OpenAM server to restore. If you are restoring OpenAM after a failure, make sure you make a copy of any configuration and log files that you need to investigate the problem before restoring OpenAM from backup:
@@ -216,7 +216,7 @@ Use this procedure to recover from a serious configuration error by manually res
 +
 The OpenDJ change log provides an external change log mechanism that allows you to read changes made to directory data for replicated directory servers.
 +
-For instructions on reading the change log, see the OpenDJ __Administration Guide__ section on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#repl-change-notification[Change Notification For Your Applications, window=\_blank].
+For instructions on reading the change log, see the OpenDJ __Administration Guide__ section on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication#repl-change-notification[Change Notification For Your Applications, window=\_blank].
 
 . Based on the data in the change log, determine what changes would reverse the configuration error.
 +
@@ -228,7 +228,7 @@ For changes that resulted in one attribute value being replaced by another, you 
 
 . Use the OpenDJ `ldapmodify` command to apply the modification.
 +
-For instructions on making changes to directory data see the section on link:https://backstage.forgerock.com/docs/opendj/3.5/server-dev-guide/#write-ldap[Updating the Directory, window=\_blank] in the __OpenDJ Directory Server Developer's Guide__.
+For instructions on making changes to directory data see the section on link:https://doc.openidentityplatform.org/opendj/server-dev-guide/chap-ldap-operations#write-ldap[Updating the Directory, window=\_blank] in the __OpenDJ Directory Server Developer's Guide__.
 
 ====
 

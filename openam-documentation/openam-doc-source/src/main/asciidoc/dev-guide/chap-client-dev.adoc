@@ -7271,7 +7271,7 @@ This section shows how to create, read, update, delete, and list identities usin
 
 [IMPORTANT]
 ====
-OpenAM is not primarily an identity data store, nor is it provisioning software. For storing identity data, consider link:http://forgerock.com/what-we-offer/open-identity-stack/opendj/[OpenDJ, window=\_blank]. For provisioning, consider link:http://forgerock.com/what-we-offer/open-identity-stack/openidm/[OpenIDM, window=\_blank]. Both of these products provide REST APIs as well.
+OpenAM is not primarily an identity data store, nor is it provisioning software. For storing identity data, consider link:https://github.com/OpenIdentityPlatform/OpenDJ[OpenDJ, window=\_blank]. For provisioning, consider link:https://github.com/OpenIdentityPlatform/OpenIDM[OpenIDM, window=\_blank]. Both of these products provide REST APIs as well.
 ====
 OpenAM has two REST APIs for managing identities:
 
@@ -10275,7 +10275,7 @@ testProcessRequest():xacmlResponse:
 [#sec-csdk]
 === Using the OpenAM C SDK
 
-This section introduces OpenAM C SDK, which is available for selected platforms. Contact link:mailto:info\@forgerock.com[info@forgerock.com, window=\_top] if you need OpenAM C SDK support.
+This section introduces OpenAM C SDK, which is available for selected platforms. Contact an link:https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List[approved vendor, window=\_top] if you need OpenAM C SDK support.
 
 To prepare to install OpenAM C SDK, first download the version for your platform and unpack the archive as in the following example.
 

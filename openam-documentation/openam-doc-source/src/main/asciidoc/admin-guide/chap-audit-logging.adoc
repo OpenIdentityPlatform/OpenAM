@@ -33,7 +33,7 @@ The Audit Logging Service uses a structured message format that adheres to a con
 
 [IMPORTANT]
 ====
-By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators must manually enable audit logging in the directory server. For more information, see link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#log-common-audit-ldap-csv[To Enable LDAP CSV Access Logs, window=\_blank] in the __OpenDJ Administration Guide__.
+By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators must manually enable audit logging in the directory server. For more information, see link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-monitoring#log-common-audit-ldap-csv[To Enable LDAP CSV Access Logs, window=\_blank] in the __OpenDJ Administration Guide__.
 ====
 
 [#about-audit-logs]
@@ -237,7 +237,7 @@ OpenAM also supports another level of tamper evident security by periodically ad
 
 .. Click Is Enabled to turn on the tamper evident feature for CSV logs.
 
-.. In the Certificate Store Location field, enter the location of the keystore. You must manually create the keystore and place it in this location. You can use a simple script to create your Java keystore: link:../resources/create-keystore.sh[create-keystore.sh, window=\_blank].
+.. In the Certificate Store Location field, enter the location of the keystore. You must manually create the keystore and place it in this location. You can use a simple script to create your Java keystore: link:../attachments/create-keystore.sh[create-keystore.sh, window=\_blank].
 +
 Default: `%BASE_DIR%/%SERVER_URI%/Logger.jks`
 

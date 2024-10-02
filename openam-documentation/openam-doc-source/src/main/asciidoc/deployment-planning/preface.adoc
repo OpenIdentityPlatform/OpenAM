@@ -52,18 +52,10 @@ This guide is written for access management architects and project managers who 
 
 This guide focuses on the tasks that need to be completed for successful OpenAM deployment. It does not show how to accomplish each individual technical task, such as installation, configuration, and maintenance.
 
-Before using this guide, you should have a firm grounding in software deployment, in access management, and in OpenAM software itself. OpenAM deployment training from ForgeRock can help you get started.
+Before using this guide, you should have a firm grounding in software deployment, in access management, and in OpenAM software itself.
 
+include::../partials/sec-accessing-doc-online.adoc[]
 
-[#where-to-get-help]
-=== Getting Deployment Training, Help, and Support
+include::../partials/sec-joining-the-community.adoc[]
 
-Formal training can help you and your colleagues come up to speed quickly on OpenAM deployment, development, administration, maintenance, and tuning. ForgeRock University regularly offers training courses for OpenAM topics, including OpenAM deployment. For a current list of available courses, see link:http://forgerock.com/services/university/[http://forgerock.com/services/university/, window=\_blank].
-
-ForgeRock Professional Services offers the support plans for every deployment. For more information about ForgeRock Support offerings, see link:http://forgerock.com/services/professional-services/[http://forgerock.com/services/professional-services/, window=\_blank].
-
-When your success depends on OpenAM access management services, you want to know that product experts are standing by ready to help should anything go wrong. ForgeRock offers the right support plans for every deployment. For more information about ForgeRock Support offerings, see link:http://forgerock.com/services/support/[http://forgerock.com/services/support/, window=\_blank].
-
-For more information, email us at link:mailto:info\@forgerock.com[info@forgerock.com, window=\_top].
-
-
+include::../partials/sec-support-contact.adoc[]

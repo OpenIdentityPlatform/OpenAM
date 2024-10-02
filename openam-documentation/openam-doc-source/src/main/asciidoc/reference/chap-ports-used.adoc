@@ -73,5 +73,5 @@ Sometimes multiple services are configured on a single system with slightly diff
 
 When you configure a firewall for OpenAM, make sure to include open ports for any installed and related components, including web services (80, 443), servlet containers (8009, 8080, 8443), and external applications.
 
-Additional ports may be used, depending on other components of your deployment. If you are using external OpenDJ servers, refer to the link:https://backstage.forgerock.com/docs/opendj/3.5/reference/#appendix-ports-used[Ports Used, window=\_blank] appendix of the __OpenDJ Reference__.
+Additional ports may be used, depending on other components of your deployment. If you are using external OpenDJ servers, refer to the link:https://doc.openidentityplatform.org/opendj/reference/appendix-ports-used[Ports Used, window=\_blank] appendix of the __OpenDJ Reference__.
 

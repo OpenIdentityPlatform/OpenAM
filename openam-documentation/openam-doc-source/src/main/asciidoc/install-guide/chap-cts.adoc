@@ -81,13 +81,13 @@ image::images/cts-deploy.png[]
 
 When OpenAM writes to a directory server in the external CTS store, directory server replication pushes the write to other directory servers in the same replication group. Under load, operations in an OpenAM server can happen more quickly than the network can push replication updates. Therefore, balancing the LDAP traffic from OpenAM to the CTS store using a random or round robin algorithm leads to errors where a read operation arrives at a replica before the expected write operation can cross the network.
 
-* *Consider Dedicated Replication Servers*. Once configured, the OpenDJ server replicates CTS data transmitted from OpenAM servers to connected OpenDJ servers. The amount of replication traffic can be significant, especially if replication proceeds over a WAN. You can limit this replication traffic by separating OpenDJ instances into directory and replication servers. For more information on how this is done with OpenDJ, see the OpenDJ documentation on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide#repl-dedicated-servers[Standalone Replication Servers, window=\_blank].
+* *Consider Dedicated Replication Servers*. Once configured, the OpenDJ server replicates CTS data transmitted from OpenAM servers to connected OpenDJ servers. The amount of replication traffic can be significant, especially if replication proceeds over a WAN. You can limit this replication traffic by separating OpenDJ instances into directory and replication servers. For more information on how this is done with OpenDJ, see the OpenDJ documentation on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication#repl-dedicated-servers[Standalone Replication Servers, window=\_blank].
 
 * *Replicate CTS Across Sites to Support Global Session Availability*. CTS supports uninterrupted session availability in deployments with multiple sites if all sites use the same global underlying CTS store replicated across all sites. If an entire site fails or becomes unavailable, OpenAM servers in another site can detect the failure of the site's load balancer and attempt to use sessions from the global Core Token Service.
 +
 In the event of a failure, client applications can connect to an OpenAM server in an active data center as shown in xref:chap-session-failover.adoc#figure-global-cts["Core Token Service For Global Session Failover"]:
 +
-For more information on CTS for global session high availability with OpenDJ server, see xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] and the OpenDJ documentation on link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide#chap-replication[Managing Data Replication, window=\_blank].
+For more information on CTS for global session high availability with OpenDJ server, see xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"] and the OpenDJ documentation on link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication[Managing Data Replication, window=\_blank].
 
 
 
@@ -123,7 +123,7 @@ The following instructions show how to download, install, and set up the OpenDJ 
 .To Download and Install OpenDJ
 ====
 
-. Go to the ForgeRock link:https://backstage.forgerock.com/#!/downloads[Enterprise Downloads, window=\_top] page, click OpenDJ, and then download a supported version of OpenDJ directory server.
+. Go to the ForgeRock link:https://github.com/OpenIdentityPlatform/OpenIDM/releases[Releases, window=\_top] page, click and then download the recent version of OpenDJ directory server.
 
 . Unzip the OpenDJ distribution and run `setup`, which launches a GUI application called the QuickSetup Wizard. If you want to run `setup` interactively from the command line, use `setup --cli`.
 
@@ -307,7 +307,7 @@ As a best practice, the use of `cn=Directory Manager` is not recommended. Instea
 
 . Create an LDIF file called `cts_user.ldif` that defines the CTS non-admin user. The following sample LDIF creates a user called `openam_cts` and assigns the `update-schema`, `subentry-write`, and `password-reset` privileges.
 +
-The LDIF file also overrides the default lookthrough limit of 5000 for this non-admin user to unlimited (0) and sets the maximum number of entries returned for a search to 5000 (default, 1000). The `ds-rlim-size-limit: 5000` is arbitrary and can be any value larger than the default maximum number of entries returned for a search, for example, value >= 1001. Setting the max number of entries for a search to 5000 ensures that the CTS reaper can properly delete returned tokens when large bursts of CTS tokens (> 5000 per interval between CTS reaping) are returned. For more information on OpenDJ resource limits, see link:https://backstage.forgerock.com/#!/docs/opendj/2.6.0/admin-guide/chap-resource-limits[Setting Resource Limits, window=\_top] on the __OpenDJ Administration Guide__.
+The LDIF file also overrides the default lookthrough limit of 5000 for this non-admin user to unlimited (0) and sets the maximum number of entries returned for a search to 5000 (default, 1000). The `ds-rlim-size-limit: 5000` is arbitrary and can be any value larger than the default maximum number of entries returned for a search, for example, value >= 1001. Setting the max number of entries for a search to 5000 ensures that the CTS reaper can properly delete returned tokens when large bursts of CTS tokens (> 5000 per interval between CTS reaping) are returned. For more information on OpenDJ resource limits, see link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-resource-limits[Setting Resource Limits, window=\_top] on the __OpenDJ Administration Guide__.
 +
 If there are more than 100K of expired tokens in the CTS, the search from the CTS reaper will be treated as non-indexed and will fail if the non-admin user does not have the `unindexed-search` privilege. Therefore, you should add the `unindexed-search` privilege to the user's entry.
 +
@@ -476,7 +476,7 @@ For example, you can apply the first index `coreTokenExpirationDate` as shown be
   --no-prompt
 ----
 +
-Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your indexes to the CTS repository at one time. Obtain a copy of link:../resources/cts-add-indexes.txt[cts-add-indexes.txt, window=\_blank], save it locally, then run `dsconfig` in batch mode:
+Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your indexes to the CTS repository at one time. Obtain a copy of link:../attachments/cts-add-indexes.txt[cts-add-indexes.txt, window=\_blank], save it locally, then run `dsconfig` in batch mode:
 +
 
 [source, console]

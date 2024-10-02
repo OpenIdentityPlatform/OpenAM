@@ -23,7 +23,7 @@
 [#chap-change-hosts]
 == Changing Host Names
 
-When you change the OpenAM host name, you must make manual changes to the configuration. This chapter describes what to do. If you must also move an embedded configuration directory from one host to another, see the OpenDJ __Administration Guide__ chapter, link:https://backstage.forgerock.com/docs/opendj/3.5/admin-guide/#chap-mv-servers[Moving Servers, window=\_blank].
+When you change the OpenAM host name, you must make manual changes to the configuration. This chapter describes what to do. If you must also move an embedded configuration directory from one host to another, see the OpenDJ __Administration Guide__ chapter, link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-mv-servers[Moving Servers, window=\_blank].
 Changing OpenAM host names involves the following high-level steps.
 
 * Adding the new host name to the Realm/DNS Aliases list.
