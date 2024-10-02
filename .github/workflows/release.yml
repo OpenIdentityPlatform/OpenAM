@@ -91,8 +91,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run:   |
           cd ${{ github.event.repository.name }}.wiki
-          rm -rf docbkx
-          cp -R ../openam-documentation/openam-doc-source/target/docbkx ../${{ github.event.repository.name }}.wiki
+          rm -rf asciidoc
+          mkdir asciidoc
+          cp -R ../openam-documentation/openam-doc-source/target/asciidoc/pdf ../${{ github.event.repository.name }}.wiki/asciidoc 
           git add -A
           git commit -a -m "upload docs after release ${{ github.event.inputs.releaseVersion }}"
           git tag -f ${{ github.event.inputs.releaseVersion }}
