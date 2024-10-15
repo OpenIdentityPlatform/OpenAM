@@ -159,9 +159,6 @@
       <activation>
         <jdk>[9,)</jdk>
       </activation>
-      <properties>
-        <maven0.compiler.release>8</maven0.compiler.release>
-      </properties>
       <build>
         <pluginManagement>
           <plugins>
