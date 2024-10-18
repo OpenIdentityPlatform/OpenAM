@@ -19,7 +19,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.1.1-SNAPSHOT</version>
+        <version>15.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,7 +41,7 @@
                                 <!--
                                     package sun.security.x509 does not exist
                                    -->
-                                <release combine.self="override"/>
+                                <release combine.self="override" />
                             </configuration>
                         </plugin>
                     </plugins>

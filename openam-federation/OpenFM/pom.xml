@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-federation</artifactId>
-        <version>15.1.1-SNAPSHOT</version>
+        <version>15.1.1</version>
     </parent>
 
     <!-- Component Definition -->
@@ -49,7 +49,7 @@
                                 <!--
                                     package sun.security.krb5 does not exist
                                    -->
-                                <release combine.self="override"/>
+                                <release combine.self="override" />
                             </configuration>
                         </plugin>
                     </plugins>
