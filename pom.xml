@@ -139,6 +139,7 @@
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.2.3</logback.version>
     <netty.version>4.1.115.Final</netty.version>
+    <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
   </properties>
   <!-- Profiles -->
   <profiles>
@@ -1866,6 +1867,11 @@
 			<artifactId>netty-transport-classes-kqueue</artifactId>
 			<version>${netty.version}</version>
 		</dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-tcnative-boringssl-static</artifactId>
+          <version>${netty-tcnative-boringssl.version}</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
