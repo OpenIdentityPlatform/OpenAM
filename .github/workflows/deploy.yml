@@ -54,6 +54,12 @@ jobs:
           MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!=''}}
         run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} deploy --file pom.xml
+      - name: Build Javadoc
+        run: |
+          mvn javadoc:aggregate -pl '-:openam-server,-:openam-server-only' \
+            -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api' \
+            -pl '-:openam-server-auth-ui,-:openam-doc-ssoadm-ref,-:openam-liberty-schema' \
+            -pl '-:openam-example-api-descriptor,-:openam-example-clientsdk-cli,-:openam-example-clientsdk-war'
       - name: Upload artifacts OpenAM Distribution Kit, containing all distributable artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -135,6 +141,8 @@ jobs:
           cd doc.openidentityplatform.org
           rm -rf ${REPO_NAME_LC}/modules
           cp -R ../${SITE_DOC_FOLDER}/target/asciidoc/antora/modules ../doc.openidentityplatform.org/${REPO_NAME_LC}
+          rm -rf ${REPO_NAME_LC}/apidocs
+          cp -R ../target/reports/apidocs ../doc.openidentityplatform.org/${REPO_NAME_LC}
           git add -A
           if ! git diff-index --quiet HEAD; then
             echo "committing changes to the docs repository"           
