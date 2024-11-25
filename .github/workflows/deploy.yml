@@ -55,6 +55,7 @@ jobs:
         if: ${{ github.event.workflow_run.event=='push' && env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!=''}}
         run: mvn --batch-mode --errors --update-snapshots -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} deploy --file pom.xml
       - name: Build Javadoc
+        continue-on-error: true
         run: |
           mvn javadoc:aggregate -pl '-:openam-server,-:openam-server-only' \
             -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api' \
