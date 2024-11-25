@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>15.1.2</version>
+        <version>15.1.3-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM Server Documentation Sources</name>
