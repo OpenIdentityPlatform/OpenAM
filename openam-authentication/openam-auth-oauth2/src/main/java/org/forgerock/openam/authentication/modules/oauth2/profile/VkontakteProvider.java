@@ -1,3 +1,19 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2018-2024 3A Systems LLC.
+ */
+
 package org.forgerock.openam.authentication.modules.oauth2.profile;
 
 import java.util.HashMap;
@@ -16,6 +32,8 @@ import com.sun.identity.shared.debug.Debug;
 public class VkontakteProvider implements ProfileProvider {
 	
 	private static Debug DEBUG = Debug.getInstance("amAuthOAuth2");
+
+	public static final String VK_API_VERSION = "[vk-api-version]";
 
 	private static final ProfileProvider INSTANCE = new VkontakteProvider();
 	
@@ -40,7 +58,10 @@ public class VkontakteProvider implements ProfileProvider {
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put("fields", PROFILE_FIELDS);
 		parameters.put("access_token", token);
-		parameters.put("v", "5.74");
+		parameters.put("v", "5.199");
+		if(config.getCustomProperties().get(VK_API_VERSION) != null) {
+			parameters.put("v", config.getCustomProperties().get(VK_API_VERSION));
+		}
 		String jsonResponse = HttpRequestContent.getInstance().getContentUsingGET(config.getProfileServiceUrl(), null,
 				parameters);
 		
