@@ -32,6 +32,8 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 
 import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConfig.*;
@@ -68,7 +70,7 @@ public class JwtHandler {
         final SignedJwt signedJwt = getSignedJwt(jwtValue);
         JwtClaimsSet jwtClaimSet = signedJwt.getClaimsSet();
         final String jwtClaimSetIssuer = jwtClaimSet.getIssuer();
-        if (!config.getConfiguredIssuer().equals(jwtClaimSetIssuer)) {
+        if (!config.getConfiguredIssuer().equals(jwtClaimSetIssuer) && !isJwtFromIssuerFormat(jwtClaimSet)) {
             logger.error("The issuer configured for the module, " + config.getConfiguredIssuer() + ", and the " +
                     "issuer found in the token, " + jwtClaimSetIssuer + ", do not match. This means that the token " +
                     "authentication was directed at the wrong module, or the targeted module is mis-configured.");
@@ -134,6 +136,30 @@ public class JwtHandler {
             throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWS_SIGNING_EXCEPTION, null);
         }
         return jwtClaimSet;
+    }
+
+    /**
+     * Indicates whether the JWT token is issued by configured issuer, with parameterized substitution from the claims set.
+     * Example: <tt>https://login.microsoftonline.com/{tid}/v2.0</tt> shall have <tt>{tid}</tt> replaced with the iss claim's value.
+     *
+     * @param jwtClaimSet The JWT claims.
+     * @return Whether the JWT token is issued by the configured issuer.
+     */
+    private boolean isJwtFromIssuerFormat(JwtClaimsSet jwtClaimSet) {
+        /* Since the OpenID Connect Core says "The Issuer Identifier [...] MUST exactly match the value of the iss (issuer) Claim.",
+           allow only parameterized matching. */
+        final Matcher m = Pattern.compile("\\{[^\\}]+\\}").matcher(config.getConfiguredIssuer());
+        final StringBuffer issuer = new StringBuffer();
+        while (m.find()) {
+            final String group = m.group();
+            final String key = group.substring(1, group.length() - 1);
+            final Object value = jwtClaimSet.getClaim(key);
+            if (value != null)
+                m.appendReplacement(issuer, value.toString());
+        }
+        m.appendTail(issuer);
+
+        return issuer.toString().equals(jwtClaimSet.getIssuer());
     }
 
     /**
