@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.oauth2.rest;
 
@@ -27,7 +29,7 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;

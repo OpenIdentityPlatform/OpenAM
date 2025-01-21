@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.services.push;
 
@@ -19,7 +20,7 @@ import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.json.resource.Resources.newHandler;
 import static org.forgerock.openam.rest.Routers.none;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.rest.AbstractRestRouteProvider;
 import org.forgerock.openam.rest.ResourceRouter;

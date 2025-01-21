@@ -25,6 +25,7 @@
  * $Id: FedletSessionProvider.java,v 1.4 2008/08/06 17:28:17 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.plugin.session.impl;
@@ -33,8 +34,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionListener;
 import com.sun.identity.plugin.session.SessionProvider;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 

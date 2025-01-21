@@ -13,11 +13,12 @@
  *
  * Copyright 2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.entitlement.rest;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javax.security.auth.Subject;
 
 import com.sun.identity.entitlement.Application;

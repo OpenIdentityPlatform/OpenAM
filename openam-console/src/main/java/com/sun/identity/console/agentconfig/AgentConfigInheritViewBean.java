@@ -24,6 +24,8 @@
  *
  * $Id: AgentConfigInheritViewBean.java,v 1.8 2008/08/08 17:34:45 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 /*
@@ -62,7 +64,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Servers and Sites Management main page.

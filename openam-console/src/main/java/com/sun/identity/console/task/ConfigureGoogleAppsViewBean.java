@@ -24,6 +24,7 @@
  *
  * $Id: ConfigureGoogleAppsViewBean.java,v 1.2 2009/05/07 21:33:07 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.task;
 
@@ -46,7 +47,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Create Fedlet UI.

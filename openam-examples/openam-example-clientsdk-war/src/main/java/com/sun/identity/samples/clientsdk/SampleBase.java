@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SampleBase.java,v 1.2 2008/06/25 05:41:09 qcheng Exp $
- *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.samples.clientsdk;
@@ -33,7 +33,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import java.io.PrintWriter;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 public abstract class SampleBase extends HttpServlet {
 

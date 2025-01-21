@@ -24,6 +24,8 @@
  *
  * $Id: IDRepoViewBean.java,v 1.3 2008/07/07 20:39:20 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm;
@@ -54,7 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class IDRepoViewBean
     extends RealmPropertiesBase

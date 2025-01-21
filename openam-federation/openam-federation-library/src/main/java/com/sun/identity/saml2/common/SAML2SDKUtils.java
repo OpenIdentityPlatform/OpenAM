@@ -25,6 +25,7 @@
  * $Id: SAML2SDKUtils.java,v 1.12 2008/08/31 05:49:48 bina Exp $
  *
  * Portions copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  *
  */
 
@@ -52,8 +53,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.soap.SOAPException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.xml.soap.SOAPException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;

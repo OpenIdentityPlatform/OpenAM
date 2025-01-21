@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2025 3A Systems LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
@@ -80,9 +80,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
+            <groupId>org.openidentityplatform.openam.shaded</groupId>
             <artifactId>activemq-client</artifactId>
             <scope>test</scope>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

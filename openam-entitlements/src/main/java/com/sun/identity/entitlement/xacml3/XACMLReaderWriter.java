@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -29,8 +30,6 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.xacml.v3.XACMLApplicationUtils;
-import org.forgerock.openam.xacml.v3.XACMLResourceTypeUtils;
 import org.json.JSONException;
 
 import com.sun.identity.entitlement.Application;

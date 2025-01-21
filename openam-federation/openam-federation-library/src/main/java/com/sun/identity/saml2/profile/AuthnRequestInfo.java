@@ -25,6 +25,7 @@
  * $Id: AuthnRequestInfo.java,v 1.2 2008/06/25 05:47:53 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -33,8 +34,8 @@ import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class stores information about the request made to

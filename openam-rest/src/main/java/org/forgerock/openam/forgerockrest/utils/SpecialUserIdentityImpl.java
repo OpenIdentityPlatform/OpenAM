@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.forgerockrest.utils;
@@ -21,8 +22,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.shared.debug.Debug;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * @see org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity

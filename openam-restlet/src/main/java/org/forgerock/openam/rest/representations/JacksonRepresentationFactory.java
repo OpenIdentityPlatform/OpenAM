@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.representations;
 
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;

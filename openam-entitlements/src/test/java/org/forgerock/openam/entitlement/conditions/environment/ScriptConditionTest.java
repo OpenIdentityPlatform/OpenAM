@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.entitlement.conditions.environment;
 
@@ -52,7 +53,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import javax.script.Bindings;
 import javax.security.auth.Subject;
 import java.util.HashMap;

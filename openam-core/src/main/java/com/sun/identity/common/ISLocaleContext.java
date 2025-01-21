@@ -25,6 +25,7 @@
  * $Id: ISLocaleContext.java,v 1.14 2008/08/19 19:09:00 veiming Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.common;
@@ -50,7 +51,7 @@ import org.forgerock.json.resource.http.HttpContext;
 
 import java.security.AccessController;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Sets the locale suitable for the given situation. Each response to end-user

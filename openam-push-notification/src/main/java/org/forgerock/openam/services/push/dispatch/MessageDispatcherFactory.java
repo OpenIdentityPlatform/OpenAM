@@ -12,12 +12,13 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.services.push.dispatch;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 

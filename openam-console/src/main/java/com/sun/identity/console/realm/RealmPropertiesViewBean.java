@@ -25,6 +25,7 @@
  * $Id: RealmPropertiesViewBean.java,v 1.2 2008/06/25 05:43:12 qcheng Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.realm;
@@ -50,7 +51,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
 import java.text.MessageFormat;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.http.util.Uris;
 

@@ -3,7 +3,7 @@ package com.sun.identity.console.task;
 import java.text.MessageFormat;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildContentDisplayEvent;

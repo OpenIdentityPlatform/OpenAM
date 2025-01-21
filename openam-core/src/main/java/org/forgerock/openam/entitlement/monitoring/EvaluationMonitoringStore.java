@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.monitoring;
 
 import java.util.concurrent.atomic.AtomicLong;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.forgerock.openam.shared.monitoring.RateTimer;
 import org.forgerock.openam.shared.monitoring.RateWindow;
 

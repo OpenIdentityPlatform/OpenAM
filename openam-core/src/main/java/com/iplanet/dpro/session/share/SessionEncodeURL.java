@@ -25,6 +25,7 @@
  * $Id: SessionEncodeURL.java,v 1.7 2008/08/19 19:08:41 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.dpro.session.share;
 
@@ -34,7 +35,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.session.util.SessionUtils;
 import java.util.Hashtable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** 
  * <code>SessionEncodeURL</code> class encodes the </code>URL</code> 

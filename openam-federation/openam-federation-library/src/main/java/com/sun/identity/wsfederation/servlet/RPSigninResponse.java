@@ -24,6 +24,7 @@
  *
  * $Id: RPSigninResponse.java,v 1.8 2009/12/14 23:42:48 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -54,8 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class handles the sign-in response from the identity provider

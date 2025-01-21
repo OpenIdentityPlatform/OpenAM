@@ -29,16 +29,17 @@
 /*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.idsvcs.rest;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -89,7 +90,7 @@ public class IdentityServicesHandler extends HttpServlet {
     /**
      * Loads the init parameters for use in the HTTP methods.
      *
-     * @see javax.servlet.GenericServlet#init()
+     * @see jakarta.servlet.GenericServlet#init()
      */
     public void init() throws ServletException {
         super.init();
@@ -114,7 +115,7 @@ public class IdentityServicesHandler extends HttpServlet {
      * Determines unmarshalls the request and executes the proper method based
      * on the request parameters.
      *
-     * @see javax.servlet.http.HttpServlet#service(HttpServletRequest request,
+     * @see jakarta.servlet.http.HttpServlet#service(HttpServletRequest request,
      *      HttpServletResponse response)
      */
     protected void service(HttpServletRequest request,

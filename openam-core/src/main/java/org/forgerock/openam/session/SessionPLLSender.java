@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.session;
@@ -32,7 +33,7 @@ import static org.forgerock.openam.session.SessionConstants.*;
 import java.net.URL;
 import java.util.Vector;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;

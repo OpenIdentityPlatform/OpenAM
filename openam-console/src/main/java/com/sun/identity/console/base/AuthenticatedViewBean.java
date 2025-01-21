@@ -24,6 +24,8 @@
  *
  * $Id: AuthenticatedViewBean.java,v 1.2 2008/06/25 05:42:48 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.base;
@@ -35,7 +37,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.web.ui.view.alert.CCAlert;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This view just display a message indicating that user has authenticated.

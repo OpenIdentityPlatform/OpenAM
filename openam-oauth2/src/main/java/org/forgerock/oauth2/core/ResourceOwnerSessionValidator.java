@@ -17,6 +17,7 @@
  * Copyright 2014 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
 >>>>>>> 675e7a8ddd... Issue #42  acr_values not working if the user is login in more than one chain (#101)
+* Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -33,9 +34,9 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.openidconnect.Client.CONFIRMED_MAX_AGE;
 import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.io.StringWriter;

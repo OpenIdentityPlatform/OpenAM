@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.operation;
@@ -29,8 +30,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.forgerock.services.context.Context;
@@ -66,7 +67,7 @@ import org.slf4j.Logger;
  * @see TokenRequestMarshaller
  */
 public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
-    private static final String X509_CERTIFICATE_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+    private static final String X509_CERTIFICATE_ATTRIBUTE = "jakarta.servlet.request.X509Certificate";
     private static final String ANY_HOST = "any";
     private final String offloadedTlsClientCertKey;
     /*
@@ -374,14 +375,14 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     /**
      * For token transformations with x509 certificates as an input token type, a client's identity can only be asserted
      * via x509 certificates presented via two-way-tls. This certificate can be obtained via the attribute referenced by
-     * the javax.servlet.request.X509Certificate key (if the container is deployed with two-way-tls), or from the header
+     * the jakarta.servlet.request.X509Certificate key (if the container is deployed with two-way-tls), or from the header
      * referenced by offloadedTlsClientCertKey, in case OpenAM is deployed behind infrastructure which performs tls-offloading.
      * This method will consult header value if configured for this rest-sts instance, and if not configured, the
-     * ClientInfoContxt will be consulted, which contains the state corresponding to the javax.servlet.request.X509Certificate attribute.
+     * ClientInfoContxt will be consulted, which contains the state corresponding to the jakarta.servlet.request.X509Certificate attribute.
      * An exception will be thrown if the client cert cannot be obtained.
      * @param context The Context instance corresponding to this invocation
      * @throws org.forgerock.openam.sts.TokenMarshalException if the client's X509 token cannot be obtained from the
-     * javax.servlet.request.X509Certificate attribute, or from the header referenced by the offloadedTlsClientCertKey value.
+     * jakarta.servlet.request.X509Certificate attribute, or from the header referenced by the offloadedTlsClientCertKey value.
      * @return a RestTokenTransformValidatorParameters instance with a X509Certificate[] generic type.
      */
     private RestTokenTransformValidatorParameters<X509Certificate[]> buildX509CertTokenTransformValidatorParameters(
@@ -417,7 +418,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST, "A token transformation specifying an " +
                         "x509 token as input must be consumed via two-way-tls. No header was specified referencing the " +
                         "certificate, and the client's certificate was not found in the " +
-                        "javax.servlet.request.X509Certificate attribute.");
+                        "jakarta.servlet.request.X509Certificate attribute.");
             } else {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST, "A token transformation specifying an " +
                         "x509 token as input must be consumed via two-way-tls. The " + offloadedTlsClientCertKey +

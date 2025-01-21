@@ -25,6 +25,7 @@
  * $Id: SetApplication.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;

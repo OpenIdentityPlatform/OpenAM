@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
 
 import java.text.MessageFormat;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.sm.ConnectionConfig;

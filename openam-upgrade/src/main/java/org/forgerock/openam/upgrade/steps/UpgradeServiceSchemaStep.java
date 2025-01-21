@@ -16,6 +16,7 @@
 
 /*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;

@@ -13,12 +13,13 @@
  *
  * Copyright 2015 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.selfservice;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.http.routing.UriRouterContext;

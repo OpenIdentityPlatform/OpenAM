@@ -24,6 +24,7 @@
  *
  * $Id: FSSSOWMLPostProfileHandler.java,v 1.2 2008/06/25 05:46:59 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -47,8 +48,8 @@ import com.sun.identity.shared.xml.XMLUtils;
 
 import java.io.PrintWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.w3c.dom.Document;
 

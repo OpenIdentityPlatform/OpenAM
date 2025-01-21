@@ -25,6 +25,7 @@
  * $Id: FSSSOAndFedHandler.java,v 1.12 2009/11/04 00:06:11 exu Exp $ 
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -79,8 +80,8 @@ import com.sun.identity.saml2.xmlsig.SigManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;

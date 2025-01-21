@@ -12,12 +12,13 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 
 package com.sun.identity.saml2.profile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Interface to describe an object that can check a cookie and then perform SAML2 Redirect based on the result.

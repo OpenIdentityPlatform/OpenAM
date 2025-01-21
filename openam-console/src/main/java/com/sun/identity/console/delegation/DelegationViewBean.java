@@ -24,6 +24,8 @@
  *
  * $Id: DelegationViewBean.java,v 1.4 2009/08/11 18:17:09 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.delegation;
@@ -58,7 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class DelegationViewBean
     extends RealmPropertiesBase

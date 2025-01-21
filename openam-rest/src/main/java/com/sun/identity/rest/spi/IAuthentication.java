@@ -24,11 +24,12 @@
  *
  * $Id: IAuthentication.java,v 1.1 2009/10/21 01:11:02 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest.spi;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 /**
  * Implements this interface to do REST permission check.

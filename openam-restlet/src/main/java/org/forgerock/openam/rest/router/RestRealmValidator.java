@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.router;
@@ -22,7 +23,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 
 import java.security.AccessController;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * Validates that realms are configured.

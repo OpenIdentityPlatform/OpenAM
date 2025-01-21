@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -63,9 +64,9 @@ import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import org.forgerock.openam.utils.ClientUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPMessage;
 
 import java.security.cert.X509Certificate;
 import java.util.Set;

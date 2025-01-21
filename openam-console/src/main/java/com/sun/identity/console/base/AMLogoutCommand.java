@@ -24,6 +24,8 @@
  *
  * $Id: AMLogoutCommand.java,v 1.2 2008/06/25 05:42:47 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.base;
@@ -32,7 +34,7 @@ import com.iplanet.jato.command.Command;
 import com.iplanet.jato.command.CommandEvent;
 import com.iplanet.jato.command.CommandException;
 import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import com.sun.identity.console.base.model.AMModelBase;
 
 /**

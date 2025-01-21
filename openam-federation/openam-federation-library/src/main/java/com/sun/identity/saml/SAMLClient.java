@@ -25,6 +25,7 @@
  * $Id: SAMLClient.java,v 1.6 2008/08/19 19:11:11 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml; 
@@ -32,7 +33,7 @@ package com.sun.identity.saml;
 import java.io.*;
 import java.util.*;
 import java.net.URL;
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.plugin.session.SessionException;

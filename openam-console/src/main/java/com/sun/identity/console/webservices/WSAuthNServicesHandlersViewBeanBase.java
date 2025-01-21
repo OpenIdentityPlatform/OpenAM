@@ -24,6 +24,7 @@
  *
  * $Id: WSAuthNServicesHandlersViewBeanBase.java,v 1.3 2008/11/26 18:21:43 farble1670 Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.webservices;
@@ -46,7 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class WSAuthNServicesHandlersViewBeanBase
     extends AMPrimaryMastHeadViewBean

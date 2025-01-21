@@ -24,6 +24,7 @@
  *
  * $Id: ClientDetectionDefaultImpl.java,v 1.5 2008/06/25 05:41:32 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.services.cdm;
@@ -31,7 +32,7 @@ package com.iplanet.services.cdm;
 import com.iplanet.am.util.AMClientDetector;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Iterator;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The <code>ClientDetectionInterface</code> interface needs to be implemented

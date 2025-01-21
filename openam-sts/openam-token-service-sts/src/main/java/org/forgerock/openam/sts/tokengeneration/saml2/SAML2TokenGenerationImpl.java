@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -46,7 +47,7 @@ import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProvider;
 import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
 import java.security.PublicKey;

@@ -24,6 +24,7 @@
  *
  * $Id: STSUtils.java,v 1.10 2008/11/17 23:57:03 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.sts;
@@ -38,15 +39,15 @@ import java.util.ResourceBundle;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import org.w3c.dom.NodeList;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.MimeHeader;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPPart;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.MimeHeaders;
+import jakarta.xml.soap.MimeHeader;
+import jakarta.xml.soap.SOAPEnvelope;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPPart;
         
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wss.security.WSSUtils;

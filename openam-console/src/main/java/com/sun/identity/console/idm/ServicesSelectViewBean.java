@@ -24,6 +24,8 @@
  *
  * $Id: ServicesSelectViewBean.java,v 1.4 2009/03/16 18:28:45 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.idm;
@@ -54,8 +56,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ServicesSelectViewBean
     extends AMPrimaryMastHeadViewBean

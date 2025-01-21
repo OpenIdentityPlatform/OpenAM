@@ -25,6 +25,7 @@
  * $Id: RemoveApplicationPrivilegeSubjects.java,v 1.1 2009/11/10 19:01:04 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -46,7 +47,7 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import java.text.MessageFormat;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 
 /**

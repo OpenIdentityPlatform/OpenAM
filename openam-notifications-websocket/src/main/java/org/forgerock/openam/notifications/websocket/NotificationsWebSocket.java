@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.notifications.websocket;
@@ -27,17 +28,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.websocket.DecodeException;
-import javax.websocket.EncodeException;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.PongMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.Consumer;
@@ -202,7 +203,7 @@ public final class NotificationsWebSocket {
     }
 
     /**
-     * See {@link javax.websocket.Endpoint#onError(Session, Throwable)}.
+     * See {@link jakarta.websocket.Endpoint#onError(Session, Throwable)}.
      *
      * @param session The WebSocket session.
      * @param error The error.

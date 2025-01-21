@@ -24,6 +24,8 @@
  *
  * $Id: FSAuthDomainsOpViewBeanBase.java,v 1.2 2008/06/25 05:49:34 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -39,7 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class FSAuthDomainsOpViewBeanBase
     extends AMPrimaryMastHeadViewBean

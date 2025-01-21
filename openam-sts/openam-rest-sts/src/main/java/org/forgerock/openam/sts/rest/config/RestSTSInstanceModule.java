@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.config;
@@ -22,9 +23,9 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -400,7 +401,7 @@ public class RestSTSInstanceModule extends AbstractModule {
      * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
      * instance must be invoked via a two-way TLS exchange (i.e. where the client presents their certificate). If OpenAM
      * is deployed behind a tls-offloading engine, the client certificate won't be set as a HttpServetRequest attribute
-     * referenced by the javax.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
+     * referenced by the jakarta.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
      * with the name of the http header where the tls-offloading engine will store the client certificate prior to invoking
      * OpenAM.
      *

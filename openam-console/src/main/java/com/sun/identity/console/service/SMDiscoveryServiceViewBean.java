@@ -24,6 +24,7 @@
  *
  * $Id: SMDiscoveryServiceViewBean.java,v 1.8 2008/12/17 07:30:34 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -67,7 +68,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SMDiscoveryServiceViewBean
     extends AMServiceProfileViewBeanBase

@@ -25,6 +25,7 @@
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -64,7 +65,7 @@ import java.util.zip.ZipFile;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import com.google.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPArtifactResolutionServiceSOAP.java,v 1.1 2008/11/22 01:57:39 hengming Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.servlet;
@@ -30,10 +32,10 @@ package com.sun.identity.saml2.servlet;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.profile.IDPArtifactResolution;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
 
 /**
  * This class <code>IDPArtifactResolutionServiceSOAP</code> receives and

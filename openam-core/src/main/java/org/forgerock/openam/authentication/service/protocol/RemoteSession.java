@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -36,9 +37,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 
 /**
@@ -172,17 +172,6 @@ public class RemoteSession implements HttpSession, Serializable {
     }
 
     /**
-     * Returns the session context, either from local object
-     * pre serialization or the stored value post serialization.
-     *
-     * @deprecated
-     * @return The session context
-     */
-    public HttpSessionContext getSessionContext() {
-        return (session != null) ? session.getSessionContext() : null;
-    }
-
-    /**
      * Fetch the value of a given session attribute, either from local object
      * pre serialization or the stored value post serialization.
      *
@@ -225,11 +214,6 @@ public class RemoteSession implements HttpSession, Serializable {
      * @deprecated
      * @return The value names
      */
-    public String[] getValueNames() {
-        return (session != null) ? session.getValueNames() :
-             (String[]) internalAttributeNames.toArray(new String[1]);
-    }
-
     /**
      * Sets an attribute on the session, either from local object
      * pre serialization or the stored value post serialization.

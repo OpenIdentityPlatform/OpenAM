@@ -25,6 +25,7 @@
  * $Id: WSSUtils.java,v 1.23 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
  *  Portions Copyrighted 2012-2014 ForgeRock AS
+ *  Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security;
@@ -52,7 +53,7 @@ import java.security.cert.CertificateFactory;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import javax.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPConstants;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -85,9 +86,9 @@ import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.xmlenc.XMLEncryptionManager;
 import com.sun.identity.shared.encode.Base64;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.MimeHeaders;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MimeHeaders;
 import javax.xml.namespace.QName;
 import javax.crypto.spec.SecretKeySpec;
 import com.sun.identity.wss.xmlsig.WSSSignatureProvider;

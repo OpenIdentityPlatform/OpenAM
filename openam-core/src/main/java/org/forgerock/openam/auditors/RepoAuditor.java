@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Copyright 2019 3A-Systems LLC
+ * Portions copyright 2019-2025 3A Systems LLC.
  */
 package org.forgerock.openam.auditors;
 
@@ -23,14 +23,13 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
@@ -45,7 +44,6 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.debug.Debug;
 

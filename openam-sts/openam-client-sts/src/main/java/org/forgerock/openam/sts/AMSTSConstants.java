@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS. All rights reserved.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts;
@@ -367,7 +368,7 @@ public class AMSTSConstants {
      * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
      * instance must be invoked via a two-way TLS exchange (i.e. where the client presents their certificate). If OpenAM
      * is deployed behind a tls-offloading engine, the client certificate won't be set as a HttpServetRequest attribute
-     * referenced by the javax.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
+     * referenced by the jakarta.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
      * with the name of the http header where the tls-offloading engine will store the client certificate prior to invoking
      * OpenAM.
      */
@@ -377,7 +378,7 @@ public class AMSTSConstants {
      * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
      * instance must be invoked via a two-way TLS exchange (i.e. where the client presents their certificate). If OpenAM
      * is deployed behind a tls-offloading engine, the client certificate won't be set as a HttpServetRequest attribute
-     * referenced by the javax.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
+     * referenced by the jakarta.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
      * with the name of the http header where the tls-offloading engine will store the client certificate prior to invoking
      * OpenAM. The rest-sts instance will undertake the further check to determine if the ip address invoking the rest-sts
      * corresponds to the set of IP-addresses corresponding to the TLS-offload-engine hosts.

@@ -27,6 +27,7 @@
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2023 Open Identity Platform Community.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service;
@@ -43,9 +44,9 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
 import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;

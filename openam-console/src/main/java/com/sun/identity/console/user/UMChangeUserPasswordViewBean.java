@@ -25,6 +25,7 @@
  * $Id: UMChangeUserPasswordViewBean.java,v 1.6 2009/12/12 01:34:11 babysunil Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.user;
@@ -54,7 +55,7 @@ import org.forgerock.openam.ldap.LDAPUtils;
 
 import java.text.MessageFormat;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class UMChangeUserPasswordViewBean
     extends RMRealmViewBeanBase

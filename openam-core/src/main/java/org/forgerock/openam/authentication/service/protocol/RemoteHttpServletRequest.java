@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -37,13 +38,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
+
+import jakarta.servlet.ServletConnection;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 
 /**
  * This class encapsulates a HttpServletRequest extending from RemoteServletRequest.
@@ -416,7 +419,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
      * @return true if the session id is from a URL, false otherwise.
      */
     public boolean isRequestedSessionIdFromUrl() {
-	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromUrl();
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromURL();
     }
 
     @Override
@@ -459,4 +462,18 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
 		return this._getHttpServletRequest() != null ? this._getHttpServletRequest().upgrade(handlerClass) : null;
 	}
 
+    @Override
+    public String getRequestId() {
+        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getRequestId() : null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getProtocolRequestId() : null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getServletConnection() : null;
+    }
 }

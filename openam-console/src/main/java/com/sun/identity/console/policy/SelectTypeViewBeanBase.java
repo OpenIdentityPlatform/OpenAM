@@ -24,6 +24,8 @@
  *
  * $Id: SelectTypeViewBeanBase.java,v 1.2 2008/06/25 05:43:05 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.policy;
@@ -46,7 +48,7 @@ import com.sun.identity.console.policy.model.PolicyModelImpl;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.html.CCRadioButton;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class SelectTypeViewBeanBase
     extends AMPrimaryMastHeadViewBean

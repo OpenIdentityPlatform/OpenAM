@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation;
@@ -73,7 +74,7 @@ import java.util.Set;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public  class FederationViewBean
     extends AMPrimaryMastHeadViewBean {

@@ -12,11 +12,12 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.audit.servlet;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @since 13.0.0
@@ -83,17 +84,6 @@ public class AuditableHttpServletResponseTest {
         verify(delegate, times(1)).setStatus(SC_BAD_REQUEST);
         assertThat(auditableHttpServletResponse.getStatusCode()).isEqualTo(SC_BAD_REQUEST);
         assertThat(auditableHttpServletResponse.getMessage()).isEqualTo("");
-    }
-
-    @Test
-    public void capturesStatusCodeAndMessageWhenSetStatusCalled() throws Exception {
-        // Given setUp()
-        // When
-        auditableHttpServletResponse.setStatus(SC_BAD_REQUEST, "message");
-        // Then
-        verify(delegate, times(1)).setStatus(SC_BAD_REQUEST, "message");
-        assertThat(auditableHttpServletResponse.getStatusCode()).isEqualTo(SC_BAD_REQUEST);
-        assertThat(auditableHttpServletResponse.getMessage()).isEqualTo("message");
     }
 
 }

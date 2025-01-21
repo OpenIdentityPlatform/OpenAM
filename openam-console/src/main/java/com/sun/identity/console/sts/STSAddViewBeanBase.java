@@ -16,6 +16,7 @@
 
 /*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.sts;
 
@@ -37,7 +38,7 @@ import com.sun.identity.console.sts.model.SoapSTSInstanceModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Set;
 

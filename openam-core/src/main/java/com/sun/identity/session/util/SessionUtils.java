@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.session.util;
 
@@ -56,7 +57,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.utils.ClientUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;

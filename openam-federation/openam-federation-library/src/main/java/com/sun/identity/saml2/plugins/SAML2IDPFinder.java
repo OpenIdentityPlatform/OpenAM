@@ -24,6 +24,7 @@
  *
  * $Id: SAML2IDPFinder.java,v 1.3 2008/12/03 00:34:10 hengming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -31,8 +32,8 @@ package com.sun.identity.saml2.plugins;
 import java.util.List;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.AuthnRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This interface <code>SAML2IDPFinder</code> is used to find a list of 

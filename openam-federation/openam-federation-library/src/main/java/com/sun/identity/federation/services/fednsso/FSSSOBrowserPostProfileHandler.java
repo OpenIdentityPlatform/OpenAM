@@ -24,6 +24,7 @@
  *
  * $Id: FSSSOBrowserPostProfileHandler.java,v 1.3 2008/12/19 06:50:46 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -48,8 +49,8 @@ import com.sun.identity.shared.xml.XMLUtils;
 
 import java.io.PrintWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.w3c.dom.Document;
 

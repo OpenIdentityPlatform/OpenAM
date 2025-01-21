@@ -24,6 +24,7 @@
  *
  * $Id: FSSignatureUtil.java,v 1.3 2008/07/17 16:56:39 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -34,8 +35,8 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.saml.common.*;
 import com.sun.identity.saml.xmlsig.*;
 import com.sun.identity.federation.common.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.*;
 import java.security.cert.X509Certificate;
 import java.util.*;

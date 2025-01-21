@@ -24,6 +24,7 @@
  *
  * $Id: SCPlatform30ViewBean.java,v 1.2 2008/06/25 05:43:15 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -41,7 +42,7 @@ import com.sun.identity.console.service.model.SCPlatformModel;
 import com.sun.identity.console.service.model.SCPlatformModelImpl;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.text.MessageFormat;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * View bean for platform server revision 30.

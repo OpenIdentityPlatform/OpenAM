@@ -24,6 +24,7 @@
  *
  * $Id: FSAuthnDecisionHandler.java,v 1.4 2008/06/25 05:46:53 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -42,7 +43,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Used by <code>IDP</code> to decide which authentication to use to meet the

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2025 3A Systems LLC
  */
 
 package org.forgerock.openam.core.rest;
@@ -29,7 +29,7 @@ import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;

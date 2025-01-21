@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.LdapAdapter;
@@ -85,7 +86,7 @@ public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionM
      * {@link org.forgerock.openam.sm.datalayer.providers.DataLayerConnectionFactoryCache}.
      * @return Returns the provider of {@link org.forgerock.openam.sm.datalayer.api.ConnectionFactory}.
      */
-    protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
+    protected Class<? extends jakarta.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
         return DataLayerConnectionFactoryCache.class;
     }
 
