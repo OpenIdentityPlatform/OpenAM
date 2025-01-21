@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.soap.token.validator;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.forgerock.openam.sts.TokenIdGenerationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;

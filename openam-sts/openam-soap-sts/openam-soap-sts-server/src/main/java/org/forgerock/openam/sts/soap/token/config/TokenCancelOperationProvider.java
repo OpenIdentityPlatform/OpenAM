@@ -34,8 +34,11 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.xml.ws.WebServiceContext;
+
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,9 +61,9 @@ public class TokenCancelOperationProvider implements Provider<CancelOperation> {
         }
 
         @Override
-        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request, Principal context, Map<String, Object> map) {
             try {
-                return cancelDelegate.cancel(request, context);
+                return cancelDelegate.cancel(request, context, map);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }
@@ -73,7 +76,9 @@ public class TokenCancelOperationProvider implements Provider<CancelOperation> {
      */
     static class UnsupportedCancelOperation implements CancelOperation {
         @Override
-        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request,
+                                                       Principal principal,
+                                                       Map<String, Object> messageContext) {
             throw new STSException("Soap STS instance not configured to persist issued tokens in the CoreTokenService, and " +
                     "thus the CancelOperation cannot be implemented. If the cancellation of issued tokens is desired, " +
                     "republish the soap-sts instance, with configuration which indicates that issued tokens should be " +

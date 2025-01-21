@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 

@@ -44,7 +44,7 @@
     </build>
 
     <properties>
-        <cxf.version>2.7.18</cxf.version>
+        <cxf.version>4.0.6</cxf.version>
     </properties>
 
     <dependencies>
@@ -70,10 +70,45 @@
 		</dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>apache-cxf</artifactId>
-            <version>${project.version}</version>
-            <classifier>jakarta</classifier>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.geronimo.genesis</groupId>
+                    <artifactId>genesis-java5-flava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-policy</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.sts</groupId>
+            <artifactId>cxf-services-sts-core</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
 
         <!--

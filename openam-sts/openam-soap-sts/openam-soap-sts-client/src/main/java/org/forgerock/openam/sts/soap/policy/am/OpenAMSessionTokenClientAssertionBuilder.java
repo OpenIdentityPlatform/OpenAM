@@ -17,8 +17,8 @@
 package org.forgerock.openam.sts.soap.policy.am;
 
 import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.forgerock.openam.sts.soap.OpenAMSessionTokenCallback;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
@@ -72,7 +72,7 @@ public class OpenAMSessionTokenClientAssertionBuilder implements AssertionBuilde
             throw new IllegalStateException("CallbackHandler registered with OpenAMSessionTokenClientAssertionBuilder " +
                     "cannot handle OpenAMSessionTokenCallback: " + e, e);
         }
-        return new OpenAMSessionAssertion(SP12Constants.INSTANCE, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+        return new OpenAMSessionAssertion(SPConstants.SPVersion.SP12, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
                 nestedPolicyElement, ((OpenAMSessionTokenCallback)callbacks[0]).getSessionId());
     }
 

@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.soap.token.provider.saml2;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import java.util.List;
 

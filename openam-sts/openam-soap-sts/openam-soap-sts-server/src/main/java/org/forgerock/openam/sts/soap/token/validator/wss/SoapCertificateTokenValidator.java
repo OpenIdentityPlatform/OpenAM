@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.validate.Credential;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -74,7 +74,7 @@ public class SoapCertificateTokenValidator implements Validator {
             return credential;
         } catch (TokenValidationException e) {
             logger.error("Exception caught authenticating X509Certificate with OpenAM: " + e, e);
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, e.getMessage());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e.getMessage());
         }
     }
 }

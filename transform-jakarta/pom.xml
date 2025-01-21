@@ -31,8 +31,7 @@
         <module>click</module>
         <module>restlet</module>
         <module>activemq-client</module>
-        <module>apache-cxf</module>
-        <!--        <module>jaxb1-impl</module>-->
+<!--        <module>apache-cxf</module>-->
     </modules>
     <build>
         <pluginManagement>

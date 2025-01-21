@@ -25,7 +25,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;

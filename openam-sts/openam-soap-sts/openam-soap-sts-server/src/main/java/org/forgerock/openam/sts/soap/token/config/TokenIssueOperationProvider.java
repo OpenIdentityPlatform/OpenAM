@@ -41,8 +41,10 @@ import jakarta.xml.ws.WebServiceContext;
 
 import org.forgerock.openam.sts.TokenType;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
@@ -72,18 +74,20 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
         }
 
         @Override
-        public RequestSecurityTokenResponseCollectionType issue(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseCollectionType issue(RequestSecurityTokenType request,
+                                                                Principal principal,
+                                                                Map<String, Object> messageContext) {
             try {
-                return issueDelegate.issue(request, context);
+                return issueDelegate.issue(request, principal, messageContext);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }
         }
 
         @Override
-        public RequestSecurityTokenResponseType issueSingle(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType issueSingle(RequestSecurityTokenType request, Principal principal, Map<String, Object> messageContext) {
             try {
-                return issueDelegate.issueSingle(request, context);
+                return issueDelegate.issueSingle(request, principal, messageContext);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }

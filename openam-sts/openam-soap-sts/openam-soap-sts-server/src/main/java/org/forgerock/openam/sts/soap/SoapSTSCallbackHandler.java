@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap;
 
-import org.apache.ws.security.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.forgerock.openam.sts.AMSTSConstants;
 
 import javax.security.auth.callback.Callback;

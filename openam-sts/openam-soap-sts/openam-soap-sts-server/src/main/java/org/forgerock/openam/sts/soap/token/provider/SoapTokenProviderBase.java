@@ -21,8 +21,8 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -93,7 +93,7 @@ public abstract class SoapTokenProviderBase implements TokenProvider {
 
     private List<WSHandlerResult> getHandlerResults(TokenProviderParameters tokenProviderParameters) {
         return CastUtils.cast((List<?>)
-                tokenProviderParameters.getWebServiceContext().getMessageContext().get(WSHandlerConstants.RECV_RESULTS));
+                tokenProviderParameters.getMessageContext().get(WSHandlerConstants.RECV_RESULTS));
     }
 
     /*

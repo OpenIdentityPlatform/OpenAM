@@ -22,8 +22,8 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
@@ -144,7 +144,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
          * @param oidcToken the OpenIdConnect token to-be-included in the BST.
          */
         void setToken(String oidcToken) {
-            getFirstNode().setData(oidcToken);
+            setRawToken(oidcToken.getBytes());
         }
     }
 

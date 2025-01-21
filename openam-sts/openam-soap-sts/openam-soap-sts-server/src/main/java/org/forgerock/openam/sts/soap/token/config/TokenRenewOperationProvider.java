@@ -35,7 +35,9 @@ import org.forgerock.openam.sts.TokenType;
 
 import jakarta.xml.ws.WebServiceContext;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -66,9 +68,11 @@ public class TokenRenewOperationProvider implements Provider<RenewOperation> {
         }
 
         @Override
-        public RequestSecurityTokenResponseType renew(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType renew(RequestSecurityTokenType request,
+                                                      Principal principal,
+                                                      Map<String, Object> messageContext) {
             try {
-                return renewDelegate.renew(request, context);
+                return renewDelegate.renew(request, principal, messageContext);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }
