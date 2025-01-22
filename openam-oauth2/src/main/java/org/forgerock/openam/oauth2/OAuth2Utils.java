@@ -43,7 +43,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;

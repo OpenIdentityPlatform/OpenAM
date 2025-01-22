@@ -79,12 +79,12 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.openidentityplatform.openam.shaded</groupId>-->
-<!--            <artifactId>activemq-client</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--            <classifier>jakarta</classifier>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.openidentityplatform.openam.shaded</groupId>
+            <artifactId>activemq-client</artifactId>
+            <scope>test</scope>
+            <classifier>jakarta</classifier>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

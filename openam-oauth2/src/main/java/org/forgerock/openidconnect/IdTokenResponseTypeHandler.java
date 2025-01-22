@@ -35,7 +35,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 /**
  * Implementation of the ResponseTypeHandler for handling OpenId Connect token response types.

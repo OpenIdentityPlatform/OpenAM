@@ -35,7 +35,7 @@ import org.restlet.Restlet;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.engine.adapter.HttpRequest;
-import org.restlet.ext.servlet.internal.ServletCall;
+import org.forgerock.openam.rest.jakarta.servlet.internal.ServletCall;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;

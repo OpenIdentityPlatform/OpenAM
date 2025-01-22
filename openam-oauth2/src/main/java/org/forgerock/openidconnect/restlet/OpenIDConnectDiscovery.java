@@ -28,7 +28,7 @@ import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openidconnect.OpenIDConnectProviderDiscovery;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;

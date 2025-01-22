@@ -42,7 +42,7 @@ import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;

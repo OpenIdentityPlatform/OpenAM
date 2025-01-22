@@ -87,7 +87,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.

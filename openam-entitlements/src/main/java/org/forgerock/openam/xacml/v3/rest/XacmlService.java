@@ -47,7 +47,7 @@ import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.data.Disposition;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;

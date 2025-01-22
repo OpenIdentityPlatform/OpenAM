@@ -25,7 +25,7 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.forgerock.openam.utils.Time.*;
-import static org.restlet.ext.servlet.ServletUtils.getRequest;
+import static org.forgerock.openam.rest.jakarta.servlet.ServletUtils.getRequest;
 
 import java.util.Set;
 

@@ -95,7 +95,7 @@ import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 /**
  * Validates whether a resource owner has a current authenticated session.

@@ -64,7 +64,7 @@ import org.restlet.Request;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
 import org.restlet.ext.freemarker.TemplateRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;

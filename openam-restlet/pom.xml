@@ -31,6 +31,13 @@
     <artifactId>openam-restlet</artifactId>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>maven-restlet</id>
+            <url>https://maven.restlet.talend.com</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Java EE -->
         <dependency>
@@ -38,11 +45,29 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>restlet</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.jackson</artifactId>
+        </dependency>
+
 
         <!-- OpenAM Shared -->
         <dependency>

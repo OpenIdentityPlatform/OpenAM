@@ -27,7 +27,7 @@ import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 import com.sun.identity.shared.debug.Debug;
 

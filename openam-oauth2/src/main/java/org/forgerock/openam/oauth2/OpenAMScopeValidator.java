@@ -74,7 +74,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.SystemProperties;

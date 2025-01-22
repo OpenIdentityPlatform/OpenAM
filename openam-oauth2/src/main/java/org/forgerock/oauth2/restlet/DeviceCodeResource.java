@@ -42,7 +42,7 @@ import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;

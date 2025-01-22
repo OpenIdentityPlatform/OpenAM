@@ -37,7 +37,7 @@ import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.services.baseurl.InvalidBaseUrlException;
 import org.forgerock.services.context.Context;
 import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 /**
  * <p>A factory for creating/retrieving UmaUris instances.</p>

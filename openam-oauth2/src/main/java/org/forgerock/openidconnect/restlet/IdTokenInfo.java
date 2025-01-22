@@ -54,7 +54,7 @@ import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;

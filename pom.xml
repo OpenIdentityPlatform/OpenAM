@@ -1522,13 +1522,8 @@
         <artifactId>org.restlet.ext.slf4j</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>restlet</artifactId>
-        <version>${project.version}</version>
-        <classifier>jakarta</classifier>
-      </dependency>
-      <!-- Commons Dependencies -->
+
+       <!-- Commons Dependencies -->
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>

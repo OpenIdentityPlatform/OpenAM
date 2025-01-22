@@ -29,7 +29,7 @@ import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.mockito.ArgumentCaptor;
 import org.restlet.engine.adapter.HttpRequest;
-import org.restlet.ext.servlet.internal.ServletCall;
+import org.forgerock.openam.rest.jakarta.servlet.internal.ServletCall;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

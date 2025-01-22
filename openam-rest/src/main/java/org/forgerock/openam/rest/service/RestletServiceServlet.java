@@ -17,7 +17,7 @@
 
 package org.forgerock.openam.rest.service;
 
-import org.restlet.ext.servlet.ServerServlet;
+import org.forgerock.openam.rest.jakarta.servlet.ServerServlet;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;

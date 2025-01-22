@@ -47,7 +47,7 @@ import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.resource.ResourceException;
 
 /**
