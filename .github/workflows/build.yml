@@ -35,7 +35,6 @@ jobs:
         echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
-        export OPENSSL_CONF=/dev/null
       id: maven-profile-flag
     - name: Build with Maven
       env:
