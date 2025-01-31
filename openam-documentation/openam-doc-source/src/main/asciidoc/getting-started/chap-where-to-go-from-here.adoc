@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -101,7 +101,7 @@ For details about web policy agents also see the link:../../../openam-web-policy
 
 For details about Java EE policy agents also see the link:../../../openam-jee-policy-agents/jee-users-guide/#jee-users-guide[Java EE Policy Agent User's Guide, window=\_blank].
 
-Furthermore link:http://openig.forgerock.org[OpenIG Identity Gateway, window=\_blank] works with applications where you want to protect access, but you cannot install a policy agent. For example, you might have a web application running in a server for which no policy agent has been developed. Or you might be protecting an application where you simply cannot install a policy agent. In that case, OpenIG functions as a flexible reverse proxy with standard SAML v2.0 capabilities. For details see the link:http://docs.forgerock.org/en/openig/[OpenIG documentation, window=\_blank].
+Furthermore link:https://github.com/OpenIdentityPlatform/OpenIG[OpenIG Identity Gateway, window=\_blank] works with applications where you want to protect access, but you cannot install a policy agent. For example, you might have a web application running in a server for which no policy agent has been developed. Or you might be protecting an application where you simply cannot install a policy agent. In that case, OpenIG functions as a flexible reverse proxy with standard SAML v2.0 capabilities. For details see the link:https://doc.openidentityplatform.org/openig/[OpenIG documentation, window=\_blank].
 
 
 [#modern-api]

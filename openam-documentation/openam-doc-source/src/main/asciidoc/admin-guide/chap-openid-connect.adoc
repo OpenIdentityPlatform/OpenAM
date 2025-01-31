@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -417,7 +417,7 @@ Ensure that you provide a `client_name` when registering the client. Without the
 For an example written in JavaScript, see the registration page in the link:https://github.com/ForgeRock/openid[OpenID Connect examples, window=\_blank]. Successful registration shows a response that includes the client ID and client secret. Lines are folded in the following example:
 +
 
-[source, javascript]
+[source, json]
 ----
 {
   "issued_at": 1392364349,
@@ -732,9 +732,9 @@ OpenAM supports __stateless__ access and refresh tokens for OpenID Connect 1.0 (
 . Generate some OIDC tokens using the REST API. Notice how each token is larger than a non-stateless example:
 +
 
-[source, json]
+[source, console]
 ----
-curl --request POST --user "MyClient:password" \
+$ curl --request POST --user "MyClient:password" \
 --data "grant_type=password&username=demo&password=changeit&scope=cn%20openid%20profile"\
 http://openam.example.com:8080/openam/oauth2/access_token
 {
@@ -778,9 +778,9 @@ http://openam.example.com:8080/openam/oauth2/access_token
 . Decode the stateless access token to view its contents:
 +
 
-[source, json]
+[source, console]
 ----
-curl http://openam.example.com:8080/openam/oauth2/tokeninfo?access_token=eyAid...1knJDs
+$ curl http://openam.example.com:8080/openam/oauth2/tokeninfo?access_token=eyAid...1knJDs
 {
      "tokenName":"access_token",
      "sub":"demo",

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1612,7 +1612,7 @@ This section covers version 2.2 policy agent properties. Version 2.2 agents stor
 
 [WARNING]
 ====
-ForgeRock no longer supports 2.2 policy agents. Documentation exists only for legacy systems. Do not use 2.2 policy agents for new deployments.
+Open Identity Platform Community no longer supports 2.2 policy agents. Documentation exists only for legacy systems. Do not use 2.2 policy agents for new deployments.
 ====
 After creating the agent profile, you access agent properties in the OpenAM console under Realms > __Realm Name__ > Agents > 2.2 Agents > __Agent Name__. Properties include:
 --

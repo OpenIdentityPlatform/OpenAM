@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -27,7 +27,7 @@
 === agentadmin — manage OpenAM policy agent installation
 
 ==== Synopsis
-`agentadmin` {options}
+`agentadmin` \{options\}
 
 [#d981e297]
 ==== Description
@@ -175,7 +175,7 @@ Install log file location:
 === ampassword — change passwords for the OpenAM Administrator
 
 ==== Synopsis
-`ampassword` {options}
+`ampassword` \{options\}
 
 [#d981e557]
 ==== Description
@@ -224,7 +224,7 @@ $ ampassword -e $HOME/.pwd.txt
 === amverifyarchive — check OpenAM log archives for tampering
 
 ==== Synopsis
-`amverifyarchive` {options}
+`amverifyarchive` \{options\}
 
 [#d981e685]
 ==== Description
@@ -267,7 +267,7 @@ $ amverifyarchive \
 === configurator.jar — install or upgrade OpenAM using a configuration file
 
 ==== Synopsis
-`configurator.jar` {options}
+`configurator.jar` \{options\}
 
 [#d981e773]
 ==== Description
@@ -367,7 +367,7 @@ USERSTORE_TYPE::
 The type of directory server used. Valid values include the following.
 +
 
-* `LDAPv3ForOpenDS`: ForgeRock 0penDJ or Sun OpenDS
+* `LDAPv3ForOpenDS`: 0penDJ or Sun OpenDS
 
 * `LDAPv3ForAD`: Active Directory with host and port settings
 
@@ -565,7 +565,7 @@ $ java \
 === upgrade.jar — upgrade OpenAM using a configuration file
 
 ==== Synopsis
-`upgrade.jar` {options}
+`upgrade.jar` \{options\}
 
 [#d981e1307]
 ==== Description

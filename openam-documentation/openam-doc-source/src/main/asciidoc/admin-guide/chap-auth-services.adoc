@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -579,21 +579,21 @@ For more information about session state, see xref:chap-session-state.adoc#chap-
 `ssoadm` attribute: `openam-auth-stateless-sessions`
 
 Two Factor Authentication Mandatory::
-When selected, specifies that users authenticating to a chain that includes a ForgeRock Authenticator (OATH) module will always be required to perform authentication using a registered device before they can access OpenAM. When not selected, users can opt to forego registering a device and providing a token and still successfully authenticate.
+When selected, specifies that users authenticating to a chain that includes a Authenticator (OATH) module will always be required to perform authentication using a registered device before they can access OpenAM. When not selected, users can opt to forego registering a device and providing a token and still successfully authenticate.
 
 +
-Letting users choose not to provide a verification token while authenticating carries implications beyond the `required`, `optional`, `requisite`, or `sufficient` flag settings on the ForgeRock Authenticator (OATH) module in the authentication chain. For example, suppose you configured authentication as follows:
+Letting users choose not to provide a verification token while authenticating carries implications beyond the `required`, `optional`, `requisite`, or `sufficient` flag settings on the Authenticator (OATH) module in the authentication chain. For example, suppose you configured authentication as follows:
 +
 
-* The ForgeRock Authenticator (OATH) module is in an authentication chain.
+* The Authenticator (OATH) module is in an authentication chain.
 
-* The ForgeRock Authenticator (OATH) module has the `required` flag set.
+* The Authenticator (OATH) module has the `required` flag set.
 
 * Two Factor Authentication Mandatory is not selected.
 
 +
 +
-Users authenticating to the chain can authenticate successfully __without__ providing tokens from their devices. The reason for successful authentication in this case is that the `required` setting relates to the execution of the ForgeRock Authenticator (OATH) module itself. Internally, the ForgeRock Authenticator (OATH) module has the ability to forego processing a token while still returning a passing status to the authentication chain.
+Users authenticating to the chain can authenticate successfully __without__ providing tokens from their devices. The reason for successful authentication in this case is that the `required` setting relates to the execution of the Authenticator (OATH) module itself. Internally, the ForgeRock Authenticator (OATH) module has the ability to forego processing a token while still returning a passing status to the authentication chain.
 
 +
 `ssoadm` attribute: `forgerockTwoFactorAuthMandatory`
@@ -610,7 +610,7 @@ Module Based Authentication::
 Enables users to authenticate using module-based authentication. Otherwise, all attempts at authentication using the `module=module-name` login parameter result in failure.
 
 +
-ForgeRock recommends disabling module-based authentication in production environments.
+Open Identity Platform Community recommends disabling module-based authentication in production environments.
 
 +
 `ssoadm` attribute: `sunEnableModuleBasedAuth`
@@ -1783,7 +1783,7 @@ Sets the authentication level used to indicate the level of security associated 
 
 
 [#fr-authenticator-oath-conf-hints]
-==== Hints for the ForgeRock Authenticator (OATH) Authentication Module
+==== Hints for the Authenticator (OATH) Authentication Module
 
 The ForgeRock Authenticator (OATH) module provides a more secure method for users to access their accounts with the help of a device such as a mobile phone. For detailed information about two-step verification with the ForgeRock Authenticator (OATH) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
 
@@ -1791,13 +1791,13 @@ The ForgeRock Authenticator (OATH) module provides a more secure method for user
 ====
 OpenAM provides two authentication modules that support OATH:
 
-* The ForgeRock Authenticator (OATH) authentication module, which is optimized for use with the ForgeRock Authenticator app and provides device profile encryption.
+* The Authenticator (OATH) authentication module, which is optimized for use with the Authenticator app and provides device profile encryption.
 
 * The OATH authentication module, which is a raw OATH implementation requiring more configuration for users and the OpenAM administrator.
 
-We recommend using the ForgeRock Authenticator (OATH) authentication module when possible.
+We recommend using the Authenticator (OATH) authentication module when possible.
 
-Also, the ForgeRock Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
+Also, the Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
 ====
 `ssoadm` service name: `iPlanetAMAuthAuthenticatorOATHService`
 --
@@ -1874,7 +1874,7 @@ A value that appears as an identifier on the user's device. Common choices are a
 [#fr-authenticator-push-conf-hints]
 ==== Hints for the ForgeRock Authenticator (Push) Authentication Module
 
-The ForgeRock Authenticator (Push) module provides a way to send push notification messages to a device such as a mobile phone, enabling multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
+The Authenticator (Push) module provides a way to send push notification messages to a device such as a mobile phone, enabling multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
 
 `ssoadm` service name: `iPlanetAMAuthAuthenticatorPushService`
 --
@@ -1900,15 +1900,15 @@ Text content of the push message, which is used for the notification displayed o
 [open]
 ====
 
-`{{user}}`::
+`{\{user\}}`::
 Replaced with the username value of the account registered in the ForgeRock Authenticator app, for example __Demo__.
 
-`{{issuer}}`::
+`{\{issuer\}}`::
 Replaced with the issuer value of the account registered in the ForgeRock Authenticator app, for example __ForgeRock__.
 
 ====
 +
-Default: `Login attempt from {{user}} at {{issuer}}`
+Default: `Login attempt from \{\{user\}} at \{\{issuer\}}`
 
 +
 `ssoadm` attribute: `forgerock-am-auth-push-message`
@@ -1917,9 +1917,9 @@ Default: `Login attempt from {{user}} at {{issuer}}`
 
 
 [#fr-authenticator-push-reg-conf-hints]
-==== Hints for the ForgeRock Authenticator (Push) Registration Authentication Module
+==== Hints for the Authenticator (Push) Registration Authentication Module
 
-The ForgeRock Authenticator (Push) Registration module provides a way to register a device such as a mobile phone for multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa-devices["Managing Devices for Multi-Factor Authentication"].
+The Authenticator (Push) Registration module provides a way to register a device such as a mobile phone for multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa-devices["Managing Devices for Multi-Factor Authentication"].
 
 `ssoadm` service name: `iPlanetAMAuthAuthenticatorPushRegistrationService`
 --
@@ -1964,7 +1964,7 @@ App Store App URL::
 URL of the app to download on the App Store.
 
 +
-Default: `\https://itunes.apple.com/app/forgerock-authenticator /id1038442926` (the ForgeRock Authenticator app)
+Default: `\https://itunes.apple.com/app/forgerock-authenticator/id1038442926` (the ForgeRock Authenticator app)
 
 +
 `ssoadm` attribute: `forgerock-am-auth-apple-link`
@@ -1992,7 +1992,7 @@ You can set the HOTP module to automatically generate a password when users begi
 
 [NOTE]
 ====
-The ForgeRock Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
+The Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
 ====
 `ssoadm` service name: `sunAMAuthHOTPService`
 --
@@ -2495,13 +2495,13 @@ An authentication chain can be created to generate an OTP from either HOTP or TO
 ====
 OpenAM provides two authentication modules that support OATH:
 
-* The ForgeRock Authenticator (OATH) authentication module, which is optimized for use with the ForgeRock Authenticator app and provides device profile encryption.
+* The Authenticator (OATH) authentication module, which is optimized for use with the ForgeRock Authenticator app and provides device profile encryption.
 
 * The OATH authentication module, which is a raw OATH implementation requiring more configuration for users and the OpenAM administrator.
 
-We recommend using the ForgeRock Authenticator (OATH) authentication module when possible.
+We recommend using the Authenticator (OATH) authentication module when possible.
 
-Also, the ForgeRock Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
+Also, the Authenticator (OATH), HOTP, and OATH authentication modules all support HOTP passwords, but the way that users obtain passwords differs. See xref:#authn-mfa-differences-HOTP["Differences Among OpenAM Authentication Modules That Support HOTP"] for more information.
 ====
 `ssoadm` service name: `iPlanetAMAuthOATHService`
 --
@@ -4218,7 +4218,7 @@ Note that the word __device__ is used in this section to mean a piece of equipme
 
 The following is an example scenario of multi-factor authentication in OpenAM:
 
-. An OpenAM administrator configures an authentication chain with the Data Store and ForgeRock Authenticator (OATH) authentication modules.
+. An OpenAM administrator configures an authentication chain with the Data Store and Authenticator (OATH) authentication modules.
 
 . An end user authenticates to OpenAM using that authentication chain.
 
@@ -4230,14 +4230,14 @@ The following is an example scenario of multi-factor authentication in OpenAM:
 
 . The user provides the one-time password to OpenAM to successfully complete authentication—the second factor in multi-factor authentication.
 
-Administrators set up multi-factor authentication by creating authentication chains with two or more authentication modules. The initial module in the chain defines the first authentication module for multi-factor authentication. In the preceding scenario, the first authentication module is the Data Store authentication module. Subsequent modules in the chain define the additional factors required to log in, for example the ForgeRock Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules.
+Administrators set up multi-factor authentication by creating authentication chains with two or more authentication modules. The initial module in the chain defines the first authentication module for multi-factor authentication. In the preceding scenario, the first authentication module is the Data Store authentication module. Subsequent modules in the chain define the additional factors required to log in, for example the Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules.
 
 OpenAM supports the Open AuTHentication (OATH) protocols, and also push notification for multi-factor authentication.
 
 [#authn-mfa-about-oath]
 ===== About Open AuTHentication (OATH)
 
-The ForgeRock Authenticator (OATH) module supports HMAC one-time password (HOTP) and time-based one-time password (TOTP) authentication as defined in the link:http://www.openauthentication.org/about/[OATH, window=\_blank] standard protocols for HOTP (link:http://tools.ietf.org/html/rfc4226[RFC 4226, window=\_blank]) and TOTP (link:http://tools.ietf.org/html/rfc6238[RFC 6238, window=\_blank]). Both HOTP and TOTP authentication require an OATH-compliant device that can provide the password.
+The Authenticator (OATH) module supports HMAC one-time password (HOTP) and time-based one-time password (TOTP) authentication as defined in the link:http://www.openauthentication.org/about/[OATH, window=\_blank] standard protocols for HOTP (link:http://tools.ietf.org/html/rfc4226[RFC 4226, window=\_blank]) and TOTP (link:http://tools.ietf.org/html/rfc6238[RFC 6238, window=\_blank]). Both HOTP and TOTP authentication require an OATH-compliant device that can provide the password.
 
 HOTP authentication generates the one-time password every time the user requests a new password on their device. The device tracks the number of times the user requests a new one-time password with a counter. The one-time password displays for a period of time you designate in the setup, so the user may be further in the counter on their device than on their account.
 
@@ -4248,23 +4248,23 @@ TOTP authentication constantly generates a new one-time password based on a time
 [#authn-mfa-differences-HOTP]
 ====== Differences Among OpenAM Authentication Modules That Support HOTP
 
-The ForgeRock Authenticator (OATH), OATH, and HOTP authentication modules all let you configure authentication that prompts users to enter HMAC one-time passwords. It is important that administrators understand the differences among these authentication modules:
+The Authenticator (OATH), OATH, and HOTP authentication modules all let you configure authentication that prompts users to enter HMAC one-time passwords. It is important that administrators understand the differences among these authentication modules:
 
-* The ForgeRock Authenticator (OATH) and OATH authentication modules accept one-time passwords generated by the end user's device, while the HOTP authentication module generates passwords and sends them to users by e-mail or SMS.
+* The Authenticator (OATH) and OATH authentication modules accept one-time passwords generated by the end user's device, while the HOTP authentication module generates passwords and sends them to users by e-mail or SMS.
 
-* All three of the authentication modules support HOTP passwords. The ForgeRock Authenticator (OATH) and OATH authentication modules also support TOTP passwords.
+* All three of the authentication modules support HOTP passwords. The Authenticator (OATH) and OATH authentication modules also support TOTP passwords.
 
-* The ForgeRock Authenticator (OATH) and OATH authentication modules require users to register their devices, and store the device registration details in the user profile. The HOTP authentication module requires the presence of mobile phone numbers and/or e-mail addresses in user profiles.
+* The Authenticator (OATH) and OATH authentication modules require users to register their devices, and store the device registration details in the user profile. The HOTP authentication module requires the presence of mobile phone numbers and/or e-mail addresses in user profiles.
 
-* The ForgeRock Authenticator (OATH) authentication module can encrypt stored device registration details.
+* The Authenticator (OATH) authentication module can encrypt stored device registration details.
 
 Before deciding on an implementation strategy, assess your requirements against the following capabilities in OpenAM:
 
 [#authn-mfa-differences-HOTP-table]
-.Comparing the ForgeRock Authenticator (OATH) to the HOTP Authentication Module
+.Comparing the Authenticator (OATH) to the HOTP Authentication Module
 [cols="42%,29%,29%"]
 |===
-|Requirement |Available With the ForgeRock Authenticator (OATH) Authentication Module? |Available With the HOTP Authentication Module? 
+|Requirement |Available With the Authenticator (OATH) Authentication Module? |Available With the HOTP Authentication Module?
 
 a|End users can authenticate using a HOTP password
 a|Yes
@@ -4371,14 +4371,14 @@ OpenAM provides a number of services that must be configured to provide multi-fa
 The service for customizing one-time password implementation is:
 --
 
-ForgeRock Authenticator (OATH) Service::
+Authenticator (OATH) Service::
 Specifies the attribute in which to store information about a registered device, and whether to encrypt that information.
 
 +
 Also specifies the attribute used to indicate if a user has opted out of one-time passwords.
 
 +
-For detailed information about the available properties, see xref:../reference/chap-config-ref.adoc#fr-authenticator-oath-service-configuration["ForgeRock Authenticator (OATH) Service"] in the __Reference__.
+For detailed information about the available properties, see xref:../reference/chap-config-ref.adoc#authenticator-oath-service-configuration["Authenticator (OATH) Service"] in the __Reference__.
 
 --
 The services required for implementing push notifications are:
@@ -4410,7 +4410,7 @@ To configure these services for a realm, navigate to Realms > __Realm Name__, an
 
 Letting users opt out of providing one-time passwords when they perform multi-factor authentication is an important implementation decision. The Two Factor Authentication Mandatory setting under Realms > __Realm Name__ > Authentication > Settings > General configures whether users can opt out.
 
-When the Two Factor Authentication Mandatory setting is enabled, users must provide a one-time password every time they authenticate to a chain that includes a ForgeRock Authenticator (OATH) authentication module. When the setting is disabled, the user can optionally skip one-time passwords.
+When the Two Factor Authentication Mandatory setting is enabled, users must provide a one-time password every time they authenticate to a chain that includes a Authenticator (OATH) authentication module. When the setting is disabled, the user can optionally skip one-time passwords.
 
 By default, OpenAM lets users opt out of providing one-time passwords. Users authenticating with one-time passwords for the first time are prompted with a screen that lets them opt out of providing one-time passwords.
 
@@ -4418,9 +4418,9 @@ With the Two Factor Authentication Mandatory setting enabled, the user experienc
 
 [#authn-mfa-initial-screen-noskip]
 image::images/authn-2sv-initial-screen-noskip.png[]
-When configuring an authentication chain that implements one-time passwords, you need to be aware that a user's decision to opt out affects the authentication process. When a user who has opted out of providing one-time passwords authenticates to a chain that includes a ForgeRock Authenticator (OATH) authentication module, that module __always__ passes authentication.
+When configuring an authentication chain that implements one-time passwords, you need to be aware that a user's decision to opt out affects the authentication process. When a user who has opted out of providing one-time passwords authenticates to a chain that includes a Authenticator (OATH) authentication module, that module __always__ passes authentication.
 
-Consider the example authentication chain in xref:#authn-mfa-chain-oath["Creating Authentication Chains for One-Time Password Authentication"]. The first authentication module is a Data Store module and the second authentication module is a ForgeRock Authenticator (OATH) module. Both authentication modules have the Requisite flag setting.
+Consider the example authentication chain in xref:#authn-mfa-chain-oath["Creating Authentication Chains for One-Time Password Authentication"]. The first authentication module is a Data Store module and the second authentication module is a Authenticator (OATH) module. Both authentication modules have the Requisite flag setting.
 
 A user who has opted out of providing one-time passwords might experience the following sequence of events when authenticating to the chain:
 
@@ -4428,11 +4428,11 @@ A user who has opted out of providing one-time passwords might experience the fo
 
 . The user provides a valid user ID and password.
 
-. Data Store authentication passes, and authentication proceeds to the next module in the chain—the ForgeRock Authenticator (OATH) module.
+. Data Store authentication passes, and authentication proceeds to the next module in the chain—the Authenticator (OATH) module.
 
-. The ForgeRock Authenticator (OATH) authentication module determines that the user has opted out of providing one-time passwords.
+. The Authenticator (OATH) authentication module determines that the user has opted out of providing one-time passwords.
 
-. ForgeRock Authenticator (OATH) authentication passes. Because it is the last authentication module in the chain, OpenAM considers authentication to have completed successfully.
+. Authenticator (OATH) authentication passes. Because it is the last authentication module in the chain, OpenAM considers authentication to have completed successfully.
 
 Contrast the preceding sequence of events to the experience of a user who has not opted out of providing one-time passwords, or who is required to provide one-time passwords, while authenticating to the same chain:
 
@@ -4440,13 +4440,13 @@ Contrast the preceding sequence of events to the experience of a user who has no
 
 . The user provides a valid user ID and password.
 
-. Data Store authentication passes, and authentication proceeds to the next module in the chain—the ForgeRock Authenticator (OATH) module.
+. Data Store authentication passes, and authentication proceeds to the next module in the chain—the Authenticator (OATH) module.
 
-. The ForgeRock Authenticator (OATH) authentication module determines that the user has not opted out of providing one-time passwords, and prompts the user for a one-time password.
+. The Authenticator (OATH) authentication module determines that the user has not opted out of providing one-time passwords, and prompts the user for a one-time password.
 
 . The user obtains a one-time password from the authenticator app on their mobile phone.
 
-. If the one-time password is valid, ForgeRock Authenticator (OATH) authentication passes. Because it is the last authentication module in the chain, OpenAM considers authentication to have completed successfully. However, if the one-time password is not valid, ForgeRock Authenticator (OATH) authentication fails, and OpenAM considers authentication to have failed.
+. If the one-time password is valid, Authenticator (OATH) authentication passes. Because it is the last authentication module in the chain, OpenAM considers authentication to have completed successfully. However, if the one-time password is not valid, Authenticator (OATH) authentication fails, and OpenAM considers authentication to have failed.
 
 
 
@@ -4716,7 +4716,7 @@ The procedure assumes the following:
 
 * Users can opt out of one-time password authentication.
 
-To create a multi-factor authentication chain that uses the ForgeRock Authenticator (OATH) module, follow these steps:
+To create a multi-factor authentication chain that uses the Authenticator (OATH) module, follow these steps:
 
 . Log in to the console as an OpenAM administrator, for example `amadmin`.
 
@@ -4734,7 +4734,7 @@ See xref:#auth-core-general["Core Authentication Attributes - General"] for deta
 +
 For information about how letting users skip multi-factor authentication impacts the behavior of authentication chains, see xref:#authn-mfa-skip-option["Letting Users Opt Out of One-Time Password Authentication"].
 
-. Create a ForgeRock Authenticator (OATH) authentication module as follows:
+. Create a Authenticator (OATH) authentication module as follows:
 +
 
 .. Select Authentication > Modules, and then click Add Module.
@@ -4746,7 +4746,7 @@ The New Module page appears.
 
 * Name: Specify a module name of your choosing.
 
-* Type: Select ForgeRock Authenticator (OATH).
+* Type: Select Authenticator (OATH).
 
 +
 
@@ -4754,9 +4754,9 @@ The New Module page appears.
 +
 A page that lets you configure the authentication module appears.
 
-.. Configure the ForgeRock Authenticator authentication module to meet your organization's requirements.
+.. Configure the Authenticator authentication module to meet your organization's requirements.
 +
-For more information about the authentication module's configuration settings, see xref:#fr-authenticator-oath-conf-hints["Hints for the ForgeRock Authenticator (OATH) Authentication Module"].
+For more information about the authentication module's configuration settings, see xref:#fr-authenticator-oath-conf-hints["Hints for the Authenticator (OATH) Authentication Module"].
 
 
 . Create the authentication chain as follows:
@@ -4785,18 +4785,18 @@ See xref:#what-is-authn["About Authentication in OpenAM"] for information about 
 +
 A graphic showing an authentication chain with a single Data Store module appears on the page.
 
-.. Add the ForgeRock Authenticator (OATH) authentication module to the authentication chain as follows:
+.. Add the Authenticator (OATH) authentication module to the authentication chain as follows:
 +
 
 ... Click Add a Module.
 +
 The New Module dialog box appears.
 
-... Fill in the New Module dialog box, specifying the ForgeRock Authenticator (OATH) authentication module that you just created. For this example, specify the `Requisite` flag.
+... Fill in the New Module dialog box, specifying the Authenticator (OATH) authentication module that you just created. For this example, specify the `Requisite` flag.
 
 ... Click OK.
 +
-The graphic showing your authentication chain now includes the Data Store and ForgeRock Authenticator (OATH) authentication module.
+The graphic showing your authentication chain now includes the Data Store and Authenticator (OATH) authentication module.
 
 +
 
@@ -4813,7 +4813,7 @@ image::images/authn-mfa-oath-chain-modules.png[]
 +
 A login screen prompting you to enter your user ID and password appears.
 
-.. Follow the procedure described in xref:#sec-mfa-authenticating-oath["To Perform Authentication using a One-Time Password"] to verify that you can use the ForgeRock Authenticator app to perform multi-factor authentication. If the chain is correctly configured, authentication is successful and OpenAM displays the user profile page.
+.. Follow the procedure described in xref:#sec-mfa-authenticating-oath["To Perform Authentication using a One-Time Password"] to verify that you can use the Authenticator app to perform multi-factor authentication. If the chain is correctly configured, authentication is successful and OpenAM displays the user profile page.
 
 
 ====
@@ -4946,11 +4946,11 @@ See xref:#authn-mfa-using-lost["Recovering After Replacing a Lost Device"] for t
 [#authn-mfa-skip]
 ===== Opting Out of One-Time Password Authentication
 
-Unless the OpenAM administrator has made one-time password authentication mandatory, users can choose to opt out of using one-time passwords by clicking the Skip This Step button on the ForgeRock Authenticator (OATH) screen. footnote:d19490e10169[For information about making the usage of one-time passwords mandatory in OpenAM, seexref:#authn-mfa-skip-option["Letting Users Opt Out of One-Time Password Authentication"].] This button appears:
+Unless the OpenAM administrator has made one-time password authentication mandatory, users can choose to opt out of using one-time passwords by clicking the Skip This Step button on the Authenticator (OATH) screen. footnote:d19490e10169[For information about making the usage of one-time passwords mandatory in OpenAM, see xref:#authn-mfa-skip-option["Letting Users Opt Out of One-Time Password Authentication"].] This button appears:
 
 * When users are prompted to register their mobile devices during their initial login from a new device.
 
-* Every time users are prompted by the ForgeRock Authenticator (OATH) authentication module to enter one-time passwords.
+* Every time users are prompted by the Authenticator (OATH) authentication module to enter one-time passwords.
 
 Users who decide to opt out of using one-time passwords are not prompted to enter one-time passwords when authenticating to OpenAM.
 
@@ -5064,9 +5064,9 @@ This section provides an example of how end users might authenticate with OpenAM
 ====
 This example uses the authentication chain as created in xref:#authn-mfa-chain-oath["Creating Authentication Chains for One-Time Password Authentication"].
 
-Because the first module in the authentication chain is a Data Store module, OpenAM presents you with a page for entering your user ID and password. After you provide those credentials, OpenAM verifies them. If your credentials are valid, OpenAM proceeds to the ForgeRock Authenticator (OATH) authentication module.
+Because the first module in the authentication chain is a Data Store module, OpenAM presents you with a page for entering your user ID and password. After you provide those credentials, OpenAM verifies them. If your credentials are valid, OpenAM proceeds to the Authenticator (OATH) authentication module.
 
-On the ForgeRock Authenticator (OATH) screen, follow these steps to complete one-time password authentication:
+On the Authenticator (OATH) screen, follow these steps to complete one-time password authentication:
 
 . On your registered device, open the ForgeRock Authenticator app, and then tap the account matching the user ID you entered earlier. The registered authentication methods for that account are displayed:
 +
@@ -5080,7 +5080,7 @@ image::images/authn-mfa-app-authmethods.png[]
 [#authn-mfa-app-authmethods-otp]
 image::images/authn-mfa-app-authmethods-otp.png[]
 
-. On the ForgeRock Authenticator (OATH) page in OpenAM, enter the one-time password that the authenticator app generated on your phone, and then click Submit:
+. On the Authenticator (OATH) page in OpenAM, enter the one-time password that the authenticator app generated on your phone, and then click Submit:
 +
 
 [#authn-mfa-enter-code]

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -599,7 +599,7 @@ This section describes the following sets of properties:
 
 * xref:#email-service-configuration["Email Service"]
 
-* xref:#fr-authenticator-oath-service-configuration["ForgeRock Authenticator (OATH) Service"]
+* xref:#authenticator-oath-service-configuration["Authenticator (OATH) Service"]
 
 * xref:#fr-authenticator-push-service-configuration["ForgeRock Authenticator (Push) Service"]
 
@@ -1942,8 +1942,8 @@ Specifies content for notification messages. If you do not set this OpenAM inclu
 --
 
 
-[#fr-authenticator-oath-service-configuration]
-==== ForgeRock Authenticator (OATH) Service
+[#authenticator-oath-service-configuration]
+==== Authenticator (OATH) Service
 
 --
 `ssoadm` service name: `AuthenticatorOATH`
@@ -2006,7 +2006,7 @@ Password to unlock the private key.
 +
 `ssoadm` attribute: `openam-authenticator-oath-device-settings-encryption-privatekey-password`
 
-ForgeRock Authenticator (OATH) Device Skippable Attribute Name::
+Authenticator (OATH) Device Skippable Attribute Name::
 The data store attribute that holds the user's decision to enable or disable obtaining a providing a password obtained from a ForgeRock OATH authenticator app. This attribute must be writeable. The default attribute is `oath2faEnabled`.
 
 +

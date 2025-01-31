@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -137,7 +137,7 @@ The general deployment planning steps can be summarized as follows:
 
 * *Non-Functional Testing*. The Non-Functional Testing phase tests failover and disaster recovery procedures. Run load testing to determine the demand of the system and measure its responses. You can anticipate peak load conditions during the phase.
 
-* *Supportability*. The Supportability Phase involves creating the runbook for system administrators including procedures for backup and restores, debugging, change control, and other processes. If you have a ForgeRock Support contract, it ensures everything is in place prior to your deployment.
+* *Supportability*. The Supportability Phase involves creating the runbook for system administrators including procedures for backup and restores, debugging, change control, and other processes. If you have a Open Identity Platform Approved Vendor Support contract, it ensures everything is in place prior to your deployment.
 
 
 
@@ -162,11 +162,11 @@ OpenAM not only offers a broad set of features with many choices, but the access
 
 * Team members who have already had been trained in the past might need to refresh their knowledge if your project deploys newer or significantly changed features, or if they have not worked with OpenAM for some time.
 
-ForgeRock University regularly offers training courses for OpenAM topics, including OpenAM development and deployment. For a current list of available courses, see link:http://forgerock.com/services/university/[http://forgerock.com/services/university/, window=\_blank].
+Open Identity Platform Approved Vendors offer training courses for OpenAM topics, including OpenAM development and deployment. For a current list of available courses, contact https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List[Approved Vendor List, window=\_blank].
 
 When you have determined who needs training and the timing of the training during the project, prepare a training schedule based on team member and course availability. Include the scheduled training plans in your deployment project plan.
 
-ForgeRock also offers an accreditation program for partners, offering an in-depth assessment of business and technical skills for each ForgeRock product. This program is open to the partner community and ensures that best practices are followed during the design and deployment phases.
+Open Identity Platform Approved Vendors also offer an accreditation program for partners, offering an in-depth assessment of business and technical skills for each Open Identity Platform product. This program is open to the partner community and ensures that best practices are followed during the design and deployment phases.
 
 
 [#plan-customization]
@@ -342,7 +342,7 @@ In addition to planning tests for each customized component, test the functional
 
 Functional testing validates that specified test cases work with the software considered as a black box.
 
-As ForgeRock already tests OpenAM and policy agents functionally, focus your functional testing on customizations and service-level functions. For each key service, devise automated functional tests. Automated tests make it easier to integrate new deliveries to take advantage of recent bug fixes and to check that fixes and new features do not cause regressions.
+As Open Identity Platform Community already tests OpenAM and policy agents functionally, focus your functional testing on customizations and service-level functions. For each key service, devise automated functional tests. Automated tests make it easier to integrate new deliveries to take advantage of recent bug fixes and to check that fixes and new features do not cause regressions.
 
 Tools for running functional testing include link:http://jmeter.apache.org/[Apache JMeter, window=\_blank] and link:http://seleniumhq.org/[Selenium, window=\_blank]. Apache JMeter is a load testing tool for Web applications. Selenium is a test framework for Web applications, particularly for UIs.
 
@@ -376,7 +376,7 @@ Penetration testing involves attacking a system to expose security issues before
 
 When planning penetration testing, consider both white box and black box scenarios. Attackers can know something about how OpenAM works internally, and not only how it works from the outside. Also, consider both internal attacks from within your organization, and external attacks from outside your organization.
 
-As for other testing, take time to define acceptance criteria. Know that ForgeRock has performed penetration testing on the software for each enterprise release. Any customization, however, could be the source of security weaknesses, as could configuration to secure OpenAM.
+As for other testing, take time to define acceptance criteria. Know that Open Identity Platform Community has performed penetration testing on the software for each enterprise release. Any customization, however, could be the source of security weaknesses, as could configuration to secure OpenAM.
 
 You can also plan to perform penetration tests against the same hardened, pre-production test environment also used for performance testing.
 
@@ -420,7 +420,7 @@ Start by considering the service owners' acceptance criteria. If they have defin
 
 * Do they have any additional acceptance criteria for deployment tests, as described in xref:#plan-deployment-tests["Planning Deployment Testing"]?
 
-Also, plan back line support with ForgeRock or a qualified partner. The aim is to define clearly who handles production issues, and how production issues are escalated to a product specialist if necessary.
+Also, plan back line support with Open Identity Platform Community Approved Vendor. The aim is to define clearly who handles production issues, and how production issues are escalated to a product specialist if necessary.
 
 Include a task in the overall plan to define the hand off to production, making sure there is clarity on who handles monitoring and issues.
 

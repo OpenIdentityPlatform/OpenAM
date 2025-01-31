@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -25,7 +25,7 @@
 
 When you deploy OpenAM to protect your web-based applications, users can be redirected to OpenAM pages for login and logout.
 
-The end user pages have ForgeRock styling and branding by default. You likely want to change at least the images to reflect your organization. You might want different customizations for different realms. This chapter addresses how to get started customizing OpenAM end user pages for your organizations and supported locales.
+The end user pages have Open Identity Platform styling and branding by default. You likely want to change at least the images to reflect your organization. You might want different customizations for different realms. This chapter addresses how to get started customizing OpenAM end user pages for your organizations and supported locales.
 You may want to change the default styling and branding as well as customize different realms.
 
 * By default, end users see the XUI pages.

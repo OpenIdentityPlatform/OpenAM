@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -23,7 +23,7 @@
 [#chap-audit-log-messages]
 == OpenAM Audit Logging
 
-OpenAM writes log messages generated from audit events triggered by its components, instances, and other ForgeRock-based stack products.
+OpenAM writes log messages generated from audit events triggered by its components, instances, and other Open Identity Platform-based stack products.
 
 [#audit-log-format]
 === Audit Log Format
@@ -52,7 +52,7 @@ a|Specifies the name of the audit event. For example, `AM-ACCESS-ATTEMPT` and `A
 a|`transactionId`
 a|Specifies the UUID of the transaction, which identifies an external request when it comes into the system boundary. Any events generated while handling that request will be assigned that transaction ID, so that you may see the same transaction ID even for different audit event topics. For example, `9c9e8d5c-2941-4e61-9c3c-8a990088e801`.
 
- OpenAM supports a feature where trusted OpenAM deployment with multiple instances, components, and ForgeRock stack products can propagate the transaction ID through each call across the stack. OpenAM reads the `X-ForgeRock-TransactionId` HTTP header and appends an integer to the transaction ID. Note that this feature is disabled by default. When enabled, this feature should filter the `X-ForgeRock-TransactionId` HTTP header for connections from untrusted sources.
+ OpenAM supports a feature where trusted OpenAM deployment with multiple instances, components, and Open Identity Platform stack products can propagate the transaction ID through each call across the stack. OpenAM reads the `X-ForgeRock-TransactionId` HTTP header and appends an integer to the transaction ID. Note that this feature is disabled by default. When enabled, this feature should filter the `X-ForgeRock-TransactionId` HTTP header for connections from untrusted sources.
 
 a|`userid`
 a|Specifies the universal identifier for authenticated users. For example, `id=scarter,ou=user,o=shop,ou=services,dc=example,dc=com`.

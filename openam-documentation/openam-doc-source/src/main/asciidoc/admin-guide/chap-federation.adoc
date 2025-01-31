@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1686,7 +1686,7 @@ This chain includes two authentication modules, ordered as follows:
 
 . A Data Store authentication module with the `Required` flag.
 
-. A ForgeRock Authenticator (OATH) authentication module with the `Required` flag.
+. A Authenticator (OATH) authentication module with the `Required` flag.
 
 
 
@@ -1702,7 +1702,7 @@ This section describes the sequence of events that occurs the first time a user 
 
 *Service provider attempts to access a federated identity.* OpenAM attempts to locate the name ID in its user store. Because this is the first time the user has attempted to authenticate to the OpenAM service provider, the name ID has not yet been associated with any OpenAM user. The search for the name ID fails.
 
-*Invocation of the linking chain.* Therefore, OpenAM invokes the linking authentication chain. The Data Store authentication module executes first, requiring the user to provide a user ID and password. The ForgeRock Authenticator (OATH) module executes next, requiring the user to provide a one-time password from an authenticator app on the user's mobile device.
+*Invocation of the linking chain.* Therefore, OpenAM invokes the linking authentication chain. The Data Store authentication module executes first, requiring the user to provide a user ID and password. The Authenticator (OATH) module executes next, requiring the user to provide a one-time password from an authenticator app on the user's mobile device.
 
 *Identity federation.* OpenAM then writes the name ID into the user's profile in the OpenAM user store. This completes the SAML2 authentication module's processing.
 
@@ -2574,7 +2574,7 @@ This also happens when transient identifiers are used to map accounts. When acco
 [#saml2-and-session-state]
 === SAML v2.0 and Session State
 
-ForgeRock recommends that you configure OpenAM to use stateful sessions when deploying OpenAM as a SAML v2.0 IdP or SP.
+Open Identity Platform Community recommends that you configure OpenAM to use stateful sessions when deploying OpenAM as a SAML v2.0 IdP or SP.
 
 The following SAML v2.0 profiles are not supported when you configure OpenAM to use stateless sessions:
 

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1386,7 +1386,7 @@ $ mkdir soapstsdeployment
 
 .. If you have not already done so, download the git repository containing the OpenAM source code.
 +
-You can find information about downloading and compiling the OpenAM source code on the link:https://forgerock.org/projects/getting-the-source-code/[forgerock.org, window=\_blank] website. The website also lists prerequisites for compiling the source code. Make sure that your system meets these prerequisites before proceeding.
+You can find information about downloading and compiling the OpenAM source code on the link:https://github.com/OpenIdentityPlatform/OpenAM[GitHub, window=\_blank]. The readme.md file also lists prerequisites for compiling the source code. Make sure that your system meets these prerequisites before proceeding.
 
 .. Check out the tag in the source code repository for this release of OpenAM.
 

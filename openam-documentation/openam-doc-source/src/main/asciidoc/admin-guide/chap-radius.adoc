@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -88,7 +88,7 @@ The following example shows the flow of a successful simple user name and passwo
 
 [#radius-support-radius-server-simple-flow]
 image::images/radius-server-flow-simple.svg[]
-The following example shows the flow of a successful multi-factor authentication scenario in which the RADIUS Server service is backed by an authentication chain that includes the LDAP and the ForgeRock Authenticator (OATH) authentication modules. First, the LDAP authentication module requires the user to provide a user name and password. Then the ForgeRock Authenticator (OATH) module requires the user to enter a one-time password obtained from the authenticator app on a mobile phone:
+The following example shows the flow of a successful multi-factor authentication scenario in which the RADIUS Server service is backed by an authentication chain that includes the LDAP and the Authenticator (OATH) authentication modules. First, the LDAP authentication module requires the user to provide a user name and password. Then the Authenticator (OATH) module requires the user to enter a one-time password obtained from the authenticator app on a mobile phone:
 
 [#radius-support-radius-server-multi-factor-flow]
 image::images/radius-server-flow-multi-factor.svg[]
@@ -418,7 +418,7 @@ As a result, some OpenAM authentication modules cannot be used with RADIUS clien
 +
 RADIUS clients are unable to process HTTP cookies. Therefore, although RADIUS clients can support a `ChoiceCallback`, the customized feature described in the previous paragraph would not function correctly for RADIUS clients and therefore should not be deployed with RADIUS clients. As a result, some callback sets within an authentication module will differ depending on the type of client being authenticated.
 
-* The RADIUS Server service logs __only__ to the ForgeRock common audit logger introduced in OpenAM 13. It does __not__ log to the classic OpenAM audit logs that were available prior to OpenAM 13.
+* The RADIUS Server service logs __only__ to the common audit logger introduced in OpenAM 13. It does __not__ log to the classic OpenAM audit logs that were available prior to OpenAM 13.
 
 When building custom authentication modules, consider their suitability to handle the types of clients that might use them, and make adjustments to callbacks as needed.
 
