@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -102,7 +102,7 @@ Use this option to change the ownership of the created directories to be the sam
 When you run certain commands, you will be prompted to read and accept the software license agreement. You can suppress the license agreement prompt by including the optional `--acceptLicence` parameter. Specifying this options indicates that you have read and accepted the terms stated in the license.
 
 +
-To view the license agreement, open `/path/to/web_agents/agent_type/legal/Forgerock_License.txt`.
+To view the license agreement, open `/path/to/web_agents/agent_type/legal/CDDLv1.0.txt`.
 
 `--forceInstall`::
 Add this option to proceed with a silent installation even if it cannot connect to the specified OpenAM server during installation, rather than exiting.

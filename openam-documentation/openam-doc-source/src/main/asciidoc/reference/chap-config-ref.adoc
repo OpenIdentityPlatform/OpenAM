@@ -1949,7 +1949,7 @@ Specifies content for notification messages. If you do not set this OpenAM inclu
 `ssoadm` service name: `AuthenticatorOATH`
 
 Profile Storage Attribute::
-Attribute for storing ForgeRock Authenticator OATH profiles. The default attribute, `oathDeviceProfiles`, is added to the user store during OpenAM installation. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying two-step verification with a ForgeRock OATH authenticator app in OpenAM. OpenAM must be able to write to the attribute.
+Attribute for storing Authenticator OATH profiles. The default attribute, `oathDeviceProfiles`, is added to the user store during OpenAM installation. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying two-step verification with a ForgeRock OATH authenticator app in OpenAM. OpenAM must be able to write to the attribute.
 
 +
 Default: `oathDeviceProfiles`

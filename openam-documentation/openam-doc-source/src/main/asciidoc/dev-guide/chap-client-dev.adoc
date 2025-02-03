@@ -41,7 +41,7 @@ link:http://en.wikipedia.org/wiki/Representational_state_transfer[Representation
 
 As an architectural style, REST has very broad applications. The designs of both HTTP 1.1 and URIs follow RESTful principles. The World Wide Web is no doubt the largest and best known REST application. Many other web services also follow the REST architectural style. Examples include OAuth 2.0, OpenID Connect 1.0, and User-Managed Access (UMA) 1.0.
 
-ForgeRock Common REST (CREST) applies RESTful principles to define common verbs for HTTP-based APIs that access web resources and collections of web resources.
+Open Identity Platform Common REST (CREST) applies RESTful principles to define common verbs for HTTP-based APIs that access web resources and collections of web resources.
 
 Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs. (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their respective standards.) APIs covered in link:../dev-guide/index.html#appendix-deprecated-apis[Deprecated REST APIs] predate CREST, do not use the CREST verbs, and are deprecated in OpenAM 13.5.2-15.
 

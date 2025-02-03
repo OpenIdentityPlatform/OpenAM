@@ -593,7 +593,7 @@ Letting users choose not to provide a verification token while authenticating ca
 
 +
 +
-Users authenticating to the chain can authenticate successfully __without__ providing tokens from their devices. The reason for successful authentication in this case is that the `required` setting relates to the execution of the Authenticator (OATH) module itself. Internally, the ForgeRock Authenticator (OATH) module has the ability to forego processing a token while still returning a passing status to the authentication chain.
+Users authenticating to the chain can authenticate successfully __without__ providing tokens from their devices. The reason for successful authentication in this case is that the `required` setting relates to the execution of the Authenticator (OATH) module itself. Internally, the Authenticator (OATH) module has the ability to forego processing a token while still returning a passing status to the authentication chain.
 
 +
 `ssoadm` attribute: `forgerockTwoFactorAuthMandatory`
@@ -1544,7 +1544,7 @@ The Device ID (Match) module comes pre-configured with default client-side and s
 ====
 The Device ID (Match) module's default JavaScript client-side and server-side scripts are fully functional. If you change the client-side script, you must also make a corresponding change to the server-side script. For a safer option, if you want to change the behavior of the module, you can make a copy of the scripts, customize the behavior, and update the Device ID (Match) modules to use the new scripts.
 ====
-The Device ID (Match) does not stand on its own within an authentication chain and requires additional modules. For example, you can have any module that identifies the user (for example, DataStore, Active Directory or others), Device ID (Match), any module that provides two-factor authentication, for example the ForgeRock Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules, and Device ID (Save) within your authentication chain.
+The Device ID (Match) does not stand on its own within an authentication chain and requires additional modules. For example, you can have any module that identifies the user (for example, DataStore, Active Directory or others), Device ID (Match), any module that provides two-factor authentication, for example the Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules, and Device ID (Save) within your authentication chain.
 
 As an example, you can configure the following modules with the specified criteria:
 
