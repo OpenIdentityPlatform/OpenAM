@@ -1544,7 +1544,7 @@ The Device ID (Match) module comes pre-configured with default client-side and s
 ====
 The Device ID (Match) module's default JavaScript client-side and server-side scripts are fully functional. If you change the client-side script, you must also make a corresponding change to the server-side script. For a safer option, if you want to change the behavior of the module, you can make a copy of the scripts, customize the behavior, and update the Device ID (Match) modules to use the new scripts.
 ====
-The Device ID (Match) does not stand on its own within an authentication chain and requires additional modules. For example, you can have any module that identifies the user (for example, DataStore, Active Directory or others), Device ID (Match), any module that provides two-factor authentication, for example the Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules, and Device ID (Save) within your authentication chain.
+The Device ID (Match) does not stand on its own within an authentication chain and requires additional modules. For example, you can have any module that identifies the user (for example, DataStore, Active Directory or others), Device ID (Match), any module that provides two-factor authentication, for example the Authenticator (OATH) or Authenticator (Push) authentication modules, and Device ID (Save) within your authentication chain.
 
 As an example, you can configure the following modules with the specified criteria:
 
@@ -1785,7 +1785,7 @@ Sets the authentication level used to indicate the level of security associated 
 [#fr-authenticator-oath-conf-hints]
 ==== Hints for the Authenticator (OATH) Authentication Module
 
-The ForgeRock Authenticator (OATH) module provides a more secure method for users to access their accounts with the help of a device such as a mobile phone. For detailed information about two-step verification with the ForgeRock Authenticator (OATH) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
+The Authenticator (OATH) module provides a more secure method for users to access their accounts with the help of a device such as a mobile phone. For detailed information about two-step verification with the Authenticator (OATH) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
 
 [NOTE]
 ====
@@ -1872,9 +1872,9 @@ A value that appears as an identifier on the user's device. Common choices are a
 
 
 [#fr-authenticator-push-conf-hints]
-==== Hints for the ForgeRock Authenticator (Push) Authentication Module
+==== Hints for the Authenticator (Push) Authentication Module
 
-The Authenticator (Push) module provides a way to send push notification messages to a device such as a mobile phone, enabling multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
+The Authenticator (Push) module provides a way to send push notification messages to a device such as a mobile phone, enabling multi-factor authentication. For detailed information about multi-factor authentication with the Authenticator (Push) module in OpenAM, see xref:#sec-mfa["Multi-Factor Authentication"].
 
 `ssoadm` service name: `iPlanetAMAuthAuthenticatorPushService`
 --
@@ -1919,7 +1919,7 @@ Default: `Login attempt from \{\{user\}} at \{\{issuer\}}`
 [#fr-authenticator-push-reg-conf-hints]
 ==== Hints for the Authenticator (Push) Registration Authentication Module
 
-The Authenticator (Push) Registration module provides a way to register a device such as a mobile phone for multi-factor authentication. For detailed information about multi-factor authentication with the ForgeRock Authenticator (Push) module in OpenAM, see xref:#sec-mfa-devices["Managing Devices for Multi-Factor Authentication"].
+The Authenticator (Push) Registration module provides a way to register a device such as a mobile phone for multi-factor authentication. For detailed information about multi-factor authentication with the Authenticator (Push) module in OpenAM, see xref:#sec-mfa-devices["Managing Devices for Multi-Factor Authentication"].
 
 `ssoadm` service name: `iPlanetAMAuthAuthenticatorPushRegistrationService`
 --
@@ -4230,7 +4230,7 @@ The following is an example scenario of multi-factor authentication in OpenAM:
 
 . The user provides the one-time password to OpenAM to successfully complete authentication—the second factor in multi-factor authentication.
 
-Administrators set up multi-factor authentication by creating authentication chains with two or more authentication modules. The initial module in the chain defines the first authentication module for multi-factor authentication. In the preceding scenario, the first authentication module is the Data Store authentication module. Subsequent modules in the chain define the additional factors required to log in, for example the Authenticator (OATH) or ForgeRock Authenticator (Push) authentication modules.
+Administrators set up multi-factor authentication by creating authentication chains with two or more authentication modules. The initial module in the chain defines the first authentication module for multi-factor authentication. In the preceding scenario, the first authentication module is the Data Store authentication module. Subsequent modules in the chain define the additional factors required to log in, for example the Authenticator (OATH) or Authenticator (Push) authentication modules.
 
 OpenAM supports the Open AuTHentication (OATH) protocols, and also push notification for multi-factor authentication.
 
@@ -4322,7 +4322,7 @@ A pending record using the same message ID is also written to the CTS store, pro
 +
 OpenAM uses cloud-based push notification services to deliver the messages to the devices. Depending on the registered device, OpenAM uses either Apple Push Notification Services (APNS) or Google Cloud Messaging (GCM) to deliver the push notification.
 +
-The ForgeRock Authenticator (Push) authentication module begins to poll OpenAM and the CTS for an accepted response from the registered device.
+The Authenticator (Push) authentication module begins to poll OpenAM and the CTS for an accepted response from the registered device.
 
 . The user responds to the notification on the registered device, which will open the ForgeRock Authenticator app. In the ForgeRock Authenticator app, the user approves the authentication request with either a swipe, or by using a fingerprint on supported hardware.
 +
@@ -4332,13 +4332,13 @@ The app returns the response to the OpenAM cluster.
 
 . OpenAM verifies the message is from the correct registered phone and has not been tampered with, and marks the pending record as accepted if valid.
 +
-The ForgeRock Authenticator (Push) module detects the accepted record and redirects the user to their profile page, completing the authentication.
+The Authenticator (Push) module detects the accepted record and redirects the user to their profile page, completing the authentication.
 
 
 [#mfa-push-passwordless-limitations]
 ====== Limitations When Using Passwordless Push Authentication
 
-The ForgeRock Authenticator (Push) authentication module operates in passwordless mode if not preceded by a Data Store module in an authentication chain. When authenticating using such a chain, the user will be asked to enter their user ID, but not their password. A push notification is then sent to their registered device to complete the authentication by using the ForgeRock Authenticator app.
+The Authenticator (Push) authentication module operates in passwordless mode if not preceded by a Data Store module in an authentication chain. When authenticating using such a chain, the user will be asked to enter their user ID, but not their password. A push notification is then sent to their registered device to complete the authentication by using the ForgeRock Authenticator app.
 
 You should be aware of the following potential limitations before deciding to implement passwordless push authentication:
 
@@ -4384,11 +4384,11 @@ For detailed information about the available properties, see xref:../reference/c
 The services required for implementing push notifications are:
 --
 
-ForgeRock Authenticator (Push) Service::
+Authenticator (Push) Service::
 Specifies the attribute in which to store information about a registered device, and whether to encrypt the data.
 
 +
-For detailed information about the available properties, see xref:../reference/chap-config-ref.adoc#fr-authenticator-push-service-configuration["ForgeRock Authenticator (Push) Service"] in the __Reference__.
+For detailed information about the available properties, see xref:../reference/chap-config-ref.adoc#fr-authenticator-push-service-configuration["Authenticator (Push) Service"] in the __Reference__.
 
 Push Notification Service::
 Configures how OpenAM sends push notifications to registered devices, including endpoints, and access credentials.
@@ -4460,13 +4460,13 @@ The following procedures provide steps for creating authentication chains that i
 
 Push authentication uses two separate authentication modules:
 
-* A module to register a device to receive push notifications called __ForgeRock Authenticator (Push) Registration__.
+* A module to register a device to receive push notifications called __Authenticator (Push) Registration__.
 
-* A module to perform the actual authentication itself, called __ForgeRock Authenticator (Push)__.
+* A module to perform the actual authentication itself, called __Authenticator (Push)__.
 
 You can insert both modules into a single chain to register devices and then authenticate with push notifications. See xref:#proc-authn-mfa-chain-push["To Create an Authentication Chain for Push Registration and Authentication"].
 
-The ForgeRock Authenticator (Push) module can also be used for passwordless authentication using push notifications. If the module is placed at the start of a chain, it will ask the user to enter their user ID, but not their password. A push notification is then sent to their registered device to complete the authentication by using the ForgeRock Authenticator app.
+The Authenticator (Push) module can also be used for passwordless authentication using push notifications. If the module is placed at the start of a chain, it will ask the user to enter their user ID, but not their password. A push notification is then sent to their registered device to complete the authentication by using the ForgeRock Authenticator app.
 
 For information on configuring an authentication chain for passwordless authentication, see xref:#proc-authn-mfa-chain-push-passwordless["To Create an Authentication Chain for Push Registration and Passwordless Authentication"].
 
@@ -4483,13 +4483,13 @@ The procedure assumes the following:
 
 * A push notification will be sent to the device as a second factor to complete authentication.
 
-To create a multi-factor authentication chain that uses the ForgeRock Authenticator (Push) Registration and ForgeRock Authenticator (Push) modules, follow these steps:
+To create a multi-factor authentication chain that uses the Authenticator (Push) Registration and ForgeRock Authenticator (Push) modules, follow these steps:
 
 . Log in to the console as an OpenAM administrator, for example `amadmin`.
 
 . Select the realm that will contain the authentication chain.
 
-. Create a ForgeRock Authenticator (Push) Registration authentication module as follows:
+. Create a Authenticator (Push) Registration authentication module as follows:
 +
 
 .. Select Authentication > Modules, and then click Add Module.
@@ -4501,7 +4501,7 @@ The New Module page appears.
 
 * Name: Specify a module name of your choosing, for example __push-reg__.
 
-* Type: Select ForgeRock Authenticator (Push) Registration.
+* Type: Select Authenticator (Push) Registration.
 
 +
 
@@ -4511,10 +4511,10 @@ A page that lets you configure the authentication module appears.
 
 .. Configure the module to meet your organization's requirements.
 +
-For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-reg-conf-hints["Hints for the ForgeRock Authenticator (Push) Registration Authentication Module"].
+For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-reg-conf-hints["Hints for the Authenticator (Push) Registration Authentication Module"].
 
 
-. Create a ForgeRock Authenticator (Push) authentication module as follows:
+. Create a Authenticator (Push) authentication module as follows:
 +
 
 .. Select Authentication > Modules, and then click Add Module.
@@ -4526,7 +4526,7 @@ The New Module page appears.
 
 * Name: Specify a module name of your choosing, for example __push-authn__.
 
-* Type: Select ForgeRock Authenticator (Push).
+* Type: Select Authenticator (Push).
 
 +
 
@@ -4536,7 +4536,7 @@ A page that lets you configure the authentication module appears.
 
 .. Configure the module to meet your organization's requirements.
 +
-For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-conf-hints["Hints for the ForgeRock Authenticator (Push) Authentication Module"].
+For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-conf-hints["Hints for the Authenticator (Push) Authentication Module"].
 
 
 . Create the authentication chain as follows:
@@ -4564,32 +4564,32 @@ The New Module dialog box appears.
 The graphic showing your authentication chain now includes a Data Store authentication module.
 
 
-.. Add the ForgeRock Authenticator (Push) Registration authentication module to the authentication chain as follows:
+.. Add the Authenticator (Push) Registration authentication module to the authentication chain as follows:
 +
 
 ... Click Add a Module.
 +
 The New Module dialog box appears.
 
-... Fill in the New Module dialog box, specifying the ForgeRock Authenticator (Push) Registration authentication module that you just created. For this example, specify the `Required` flag.
+... Fill in the New Module dialog box, specifying the Authenticator (Push) Registration authentication module that you just created. For this example, specify the `Required` flag.
 
 ... Click OK.
 +
-The graphic showing your authentication chain now includes a Data Store, and a ForgeRock Authenticator (Push) Registration authentication module.
+The graphic showing your authentication chain now includes a Data Store, and a Authenticator (Push) Registration authentication module.
 
 
-.. Add the ForgeRock Authenticator (Push) authentication module to the authentication chain as follows:
+.. Add the Authenticator (Push) authentication module to the authentication chain as follows:
 +
 
 ... Click Add a Module.
 +
 The New Module dialog box appears.
 
-... Fill in the New Module dialog box, specifying the ForgeRock Authenticator (Push) authentication module that you created. For this example, specify the `Required` flag.
+... Fill in the New Module dialog box, specifying the Authenticator (Push) authentication module that you created. For this example, specify the `Required` flag.
 
 ... Click OK.
 +
-The graphic showing your authentication chain now includes a Data Store, a ForgeRock Authenticator (Push) Registration, and a ForgeRock Authenticator (Push) authentication module.
+The graphic showing your authentication chain now includes a Data Store, a Authenticator (Push) Registration, and a Authenticator (Push) authentication module.
 
 +
 
@@ -4622,13 +4622,13 @@ The procedure assumes the following:
 
 * A push notification will be sent to the device as a second factor, to complete authentication without the need to enter a password.
 
-To create a multi-factor authentication chain that uses the ForgeRock Authenticator (Push) module for passwordless authentication, follow these steps:
+To create a multi-factor authentication chain that uses the Authenticator (Push) module for passwordless authentication, follow these steps:
 
 . Log in to the console as an OpenAM administrator, for example `amadmin`.
 
 . Select the realm that will contain the authentication chain.
 
-. Create a ForgeRock Authenticator (Push) authentication module as follows:
+. Create a Authenticator (Push) authentication module as follows:
 +
 
 .. Select Authentication > Modules, and then click Add Module.
@@ -4640,7 +4640,7 @@ The New Module page appears.
 
 * Name: Specify a module name of your choosing, for example __push-authn__.
 
-* Type: Select ForgeRock Authenticator (Push).
+* Type: Select Authenticator (Push).
 
 +
 
@@ -4650,7 +4650,7 @@ A page that lets you configure the authentication module appears.
 
 .. Configure the module to meet your organization's requirements.
 +
-For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-conf-hints["Hints for the ForgeRock Authenticator (Push) Authentication Module"].
+For more information about the authentication module's configuration settings, see xref:#fr-authenticator-push-conf-hints["Hints for the Authenticator (Push) Authentication Module"].
 
 
 . Create the authentication chain as follows:
@@ -4664,18 +4664,18 @@ The Add Chain page appears.
 +
 A page appears with the Edit Chain tab selected.
 
-.. Add the ForgeRock Authenticator (Push) authentication module to the authentication chain as follows:
+.. Add the Authenticator (Push) authentication module to the authentication chain as follows:
 +
 
 ... Click Add a Module.
 +
 The New Module dialog box appears.
 
-... Fill in the New Module dialog box, specifying the ForgeRock Authenticator (Push) authentication module that you created. For this example, specify the `Requisite` flag.
+... Fill in the New Module dialog box, specifying the Authenticator (Push) authentication module that you created. For this example, specify the `Requisite` flag.
 
 ... Click OK.
 +
-The graphic showing your authentication chain now includes a ForgeRock Authenticator (Push) authentication module.
+The graphic showing your authentication chain now includes a Authenticator (Push) authentication module.
 
 +
 
@@ -5095,7 +5095,7 @@ OpenAM will display the user's profile page.
 ====
 This example uses one of the authentication chains as created in xref:#authn-mfa-chains-push["Creating Authentication Chains for Push Authentication"].
 
-OpenAM presents you with a page for entering only your user ID, or user ID and password. After you provide those credentials, OpenAM verifies them. If your credentials are valid and the account has a device registered for push notifications, OpenAM proceeds to the ForgeRock Authenticator (Push) authentication module, and a push notification is sent to the registered device.
+OpenAM presents you with a page for entering only your user ID, or user ID and password. After you provide those credentials, OpenAM verifies them. If your credentials are valid and the account has a device registered for push notifications, OpenAM proceeds to the Authenticator (Push) authentication module, and a push notification is sent to the registered device.
 
 [NOTE]
 ======
@@ -5151,7 +5151,7 @@ After a timeout has passed, OpenAM will report that authentication has failed an
 
 [NOTE]
 ======
-If you do not approve or deny the request on the registered device, the OpenAM Push Authentication page will timeout and the authentication will fail. The timeout can be configured in the ForgeRock Authenticator (Push) authentication module settings. See xref:#fr-authenticator-push-conf-hints["Hints for the ForgeRock Authenticator (Push) Authentication Module"].
+If you do not approve or deny the request on the registered device, the OpenAM Push Authentication page will timeout and the authentication will fail. The timeout can be configured in the Authenticator (Push) authentication module settings. See xref:#fr-authenticator-push-conf-hints["Hints for the Authenticator (Push) Authentication Module"].
 ======
 
 
