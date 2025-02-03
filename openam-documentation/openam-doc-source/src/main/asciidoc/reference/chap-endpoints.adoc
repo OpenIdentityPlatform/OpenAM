@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1038,7 +1038,7 @@ This simple endpoint includes a redirection of the ServiceURI, and specifies Ope
 This endpoint is called with the `PWResetInvalidURLViewBean` class, when a module servlet gets an invalid URL.
 
 `PWResetQuestion.jsp`::
-Starts the password reset process by prompting for the User ID. For more information on the process, see the method for the associated `PWResetQuestionModel`, available from the link:http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/password/ui/model/PWResetQuestionModel.html                         [Interface PWResetQuestionModel specification page, window=\_blank].
+Starts the password reset process by prompting for the User ID. For more information on the process, see the method for the associated `PWResetQuestionModel`, available from the link:http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/password/ui/model/PWResetQuestionModel.html[Interface PWResetQuestionModel specification page, window=\_blank].
 
 `PWResetSuccess.jsp`::
 Specifies the endpoint that is called when an account password is successfully reset.

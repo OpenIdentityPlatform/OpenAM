@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -32,7 +32,7 @@ xref:#figure-active-openam-deployment["OpenAM Deployment Example"] presents an e
 
 [NOTE]
 ====
-The example components in this chapter are presented for illustrative purposes. ForgeRock does not recommend specific products, such as reverse proxies, load balancers, switches, firewalls, and so forth, as OpenAM can be deployed within your existing networking infrastructure.
+The example components in this chapter are presented for illustrative purposes. Open Identity Platform Community does not recommend specific products, such as reverse proxies, load balancers, switches, firewalls, and so forth, as OpenAM can be deployed within your existing networking infrastructure.
 ====
 
 [#figure-active-openam-deployment]
@@ -75,7 +75,7 @@ xref:#figure-active-frontend-lbs-detailed["OpenAM Frontend Load Balancer Reverse
 image::images/active-frontend-lbs-detailed.png[]
 Another advantage to reverse proxies is that they allow access to only those endpoints required for your applications. If you need the authentication user interface and OAuth2/OpenID Connect endpoints, then you can expose only those endpoints and no others. A good rule of thumb is to check which functionality is required for your public interface and then use the reverse proxy to expose only those endpoints.
 
-A third advantage to reverse proxies is when you have applications that sit on non-standard containers for which ForgeRock does not provide a native agent. In this case, you can implement a reverse proxy in your Web tier, and deploy a policy agent on the reverse proxy to filter any requests.
+A third advantage to reverse proxies is when you have applications that sit on non-standard containers for which Open Identity Platform does not provide a native agent. In this case, you can implement a reverse proxy in your Web tier, and deploy a policy agent on the reverse proxy to filter any requests.
 
 xref:#figure-active-frontend-lbs-rp-with-agent["OpenAM Frontend Load Balancers and Reverse Proxies with Agent"] shows a simple topology diagram of your Web tier with agents deployed on your reverse proxies. The dotted policy agents indicate that they can be optionally deployed in your network depending on your configuration, container type, and application.
 
@@ -86,7 +86,7 @@ image::images/active-frontend-lbs-rp-with-agent.png[]
 [#openig]
 ==== OpenIG
 
-The ForgeRock IRM platform includes an open-source application gateway product, OpenIG, a versatile, Java EE servlet-based reverse proxy server. OpenIG allows you to integrate your applications into existing networks using current standards, such as SAML 2.0 federation, OAuth 2.0 and OpenID Connect 1.0, custom or legacy applications, or other vendor solutions without altering native applications. With OpenIG, you can extend OpenAM's authentication and authorization (policy) services to provide SSO across your mobile, social, partner, and Web applications.
+The Open Identity IRM platform includes an open-source application gateway product, OpenIG, a versatile, Java EE servlet-based reverse proxy server. OpenIG allows you to integrate your applications into existing networks using current standards, such as SAML 2.0 federation, OAuth 2.0 and OpenID Connect 1.0, custom or legacy applications, or other vendor solutions without altering native applications. With OpenIG, you can extend OpenAM's authentication and authorization (policy) services to provide SSO across your mobile, social, partner, and Web applications.
 
 OpenIG provides a set of servlet filters that you can use as-is or chained together with other filters to provide complex operations processing on HTTP requests and responses. You can also write your own custom filters for legacy or custom applications. For more information, see the OpenIG documentation.
 
@@ -256,7 +256,7 @@ xref:#figure-site-deployment-ext-datastores["OpenAM Site Deployment With Externa
 
 [NOTE]
 ====
-ForgeRock recommends that you use the OpenAM's embedded OpenDJ directory server as the configuration data store and only set up an external configuration store if necessary.
+Open Identity Platform Community recommends that you use the OpenAM's embedded OpenDJ directory server as the configuration data store and only set up an external configuration store if necessary.
 ====
 
 [#figure-site-deployment-ext-datastores]

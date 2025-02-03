@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -123,7 +123,7 @@ The following instructions show how to download, install, and set up the OpenDJ 
 .To Download and Install OpenDJ
 ====
 
-. Go to the ForgeRock link:https://github.com/OpenIdentityPlatform/OpenIDM/releases[Releases, window=\_top] page, click and then download the recent version of OpenDJ directory server.
+. Go to the GitHub link:https://github.com/OpenIdentityPlatform/OpenIDM/releases[Releases, window=\_top] page, click and then download the recent version of OpenDJ directory server.
 
 . Unzip the OpenDJ distribution and run `setup`, which launches a GUI application called the QuickSetup Wizard. If you want to run `setup` interactively from the command line, use `setup --cli`.
 

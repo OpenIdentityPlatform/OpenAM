@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -152,7 +152,7 @@ When traffic to and from the load balancer is protected with HTTPS, the approach
 [#lb-and-crosstalk]
 ===== Request Forwarding Caveats
 
-Sticky load balancing based on the value of the `amlbcookie` cookie does not guarantee request forwarding to the corresponding OpenAM server in all cases. For example, ForgeRock Common REST API calls do not typically use cookies. Therefore, load balancers are not able to route these calls to the OpenAM server on which a user's session resides.
+Sticky load balancing based on the value of the `amlbcookie` cookie does not guarantee request forwarding to the corresponding OpenAM server in all cases. For example, Common REST API calls do not typically use cookies. Therefore, load balancers are not able to route these calls to the OpenAM server on which a user's session resides.
 
 The OpenAM server that does not hold the user's session can attempt to locate the user's session by retrieving it from the Core Token Service's token store, or by communicating with other OpenAM servers in an OpenAM site using back-channel communication over the network. This back-channel communication is called __crosstalk__.
 

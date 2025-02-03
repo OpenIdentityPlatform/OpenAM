@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -599,9 +599,9 @@ This section describes the following sets of properties:
 
 * xref:#email-service-configuration["Email Service"]
 
-* xref:#fr-authenticator-oath-service-configuration["ForgeRock Authenticator (OATH) Service"]
+* xref:#authenticator-oath-service-configuration["Authenticator (OATH) Service"]
 
-* xref:#fr-authenticator-push-service-configuration["ForgeRock Authenticator (Push) Service"]
+* xref:#fr-authenticator-push-service-configuration["Authenticator (Push) Service"]
 
 * xref:#legacy-user-self-service["Legacy User Self Service"]
 
@@ -1942,14 +1942,14 @@ Specifies content for notification messages. If you do not set this OpenAM inclu
 --
 
 
-[#fr-authenticator-oath-service-configuration]
-==== ForgeRock Authenticator (OATH) Service
+[#authenticator-oath-service-configuration]
+==== Authenticator (OATH) Service
 
 --
 `ssoadm` service name: `AuthenticatorOATH`
 
 Profile Storage Attribute::
-Attribute for storing ForgeRock Authenticator OATH profiles. The default attribute, `oathDeviceProfiles`, is added to the user store during OpenAM installation. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying two-step verification with a ForgeRock OATH authenticator app in OpenAM. OpenAM must be able to write to the attribute.
+Attribute for storing Authenticator OATH profiles. The default attribute, `oathDeviceProfiles`, is added to the user store during OpenAM installation. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying two-step verification with a ForgeRock OATH authenticator app in OpenAM. OpenAM must be able to write to the attribute.
 
 +
 Default: `oathDeviceProfiles`
@@ -2006,7 +2006,7 @@ Password to unlock the private key.
 +
 `ssoadm` attribute: `openam-authenticator-oath-device-settings-encryption-privatekey-password`
 
-ForgeRock Authenticator (OATH) Device Skippable Attribute Name::
+Authenticator (OATH) Device Skippable Attribute Name::
 The data store attribute that holds the user's decision to enable or disable obtaining a providing a password obtained from a ForgeRock OATH authenticator app. This attribute must be writeable. The default attribute is `oath2faEnabled`.
 
 +
@@ -2016,13 +2016,13 @@ The data store attribute that holds the user's decision to enable or disable obt
 
 
 [#fr-authenticator-push-service-configuration]
-==== ForgeRock Authenticator (Push) Service
+==== Authenticator (Push) Service
 
 --
 `ssoadm` service name: `AuthenticatorPush`
 
 Profile Storage Attribute::
-Attribute for storing ForgeRock Authenticator Push device profiles. The default attribute, `pushDeviceProfiles`, is added to the schema when you prepare a user store for use with OpenAM. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying push notifications with the ForgeRock Authenticator app in OpenAM. OpenAM must be able to write to the attribute.
+Attribute for storing Authenticator Push device profiles. The default attribute, `pushDeviceProfiles`, is added to the schema when you prepare a user store for use with OpenAM. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying push notifications with the ForgeRock Authenticator app in OpenAM. OpenAM must be able to write to the attribute.
 
 +
 Default: `pushDeviceProfiles`
@@ -3311,7 +3311,7 @@ The minimum lifetime (in seconds) to keep unanswered message records in the mess
 To keep unanswered message records indefinitely, set this property to `0`.
 
 +
-Should be tuned so that it is applicable to the use case of this service. For example, the ForgeRock Authenticator (Push) authentication module has a default timeout of 120 seconds.
+Should be tuned so that it is applicable to the use case of this service. For example, the Authenticator (Push) authentication module has a default timeout of 120 seconds.
 
 +
 Default: `120`

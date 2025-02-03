@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -65,7 +65,7 @@ If the server is not part of a site, or if the configuration server does not sup
 
 . To ensure that local OpenAM instances resolve sessions from the Core Token Service session store instead of crosstalk, check the Reduce Crosstalk Enabled box. For more information about crosstalk, see the section, xref:chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"].
 +
-Do not disable reduced crosstalk unless advised to do so by ForgeRock Technical Support.
+Do not disable reduced crosstalk unless advised to do so by Open Identity Platform Approved Vendors Technical Support.
 
 . Set reduced crosstalk options.
 +
