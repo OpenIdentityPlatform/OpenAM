@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -160,7 +160,7 @@ When the JWT is used for authentication, this is the OpenAM access token endpoin
 
 Also for validation, the issuer must digitally sign the JWT or apply a keyed message digest. When the issuer is also the client, the client can sign the JWT by using a private key, and include the public key in its profile registered with OpenAM.
 
-A sample Java-based client is link:https://github.com/ForgeRock/jwt-bearer-client[available online, window=\_blank].
+A sample Java-based client is link:https://github.com/OpenIdentityPlatform/jwt-bearer-client[available online, window=\_blank].
 
 
 [#oauth2-saml2-bearer]

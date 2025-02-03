@@ -4842,13 +4842,13 @@ Android::
 Download: link:https://play.google.com/store/apps/details?id=com.forgerock.authenticator[Google Play, window=\_top]
 
 +
-Source code: link:https://stash.forgerock.org/projects/OPENAM/repos/forgerock-authenticator-android[https://stash.forgerock.org/projects/OPENAM/repos/forgerock-authenticator-android, window=\_top]
+Source code: link:https://github.com/OpenIdentityPlatform/openam-authenticator-android[https://github.com/OpenIdentityPlatform/openam-authenticator-android, window=\_top]
 
 iOS::
 Download: link:https://geo.itunes.apple.com/us/app/forgerock-authenticator/id1038442926?mt=8[App Store, window=\_top]
 
 +
-Source code: link:https://stash.forgerock.org/projects/OPENAM/repos/forgerock-authenticator-ios[https://stash.forgerock.org/projects/OPENAM/repos/forgerock-authenticator-ios, window=\_top]
+Source code: link:https://github.com/OpenIdentityPlatform/openam-authenticator-ios[https://github.com/OpenIdentityPlatform/openam-authenticator-ios, window=\_top]
 
 --
 

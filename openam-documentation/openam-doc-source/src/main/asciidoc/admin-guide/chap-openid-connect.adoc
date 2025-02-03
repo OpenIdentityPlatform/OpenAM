@@ -414,7 +414,7 @@ $ curl \
 +
 Ensure that you provide a `client_name` when registering the client. Without the `client_name` value the auto-generated `client_id` will be used on consent screens. The client ID is a UUID string and may not be desirable on end-user facing pages.
 +
-For an example written in JavaScript, see the registration page in the link:https://github.com/ForgeRock/openid[OpenID Connect examples, window=\_blank]. Successful registration shows a response that includes the client ID and client secret. Lines are folded in the following example:
+For an example written in JavaScript, see the registration page in the link:https://github.com/OpenIdentityPlatform/openam-openid[OpenID Connect examples, window=\_blank]. Successful registration shows a response that includes the client ID and client secret. Lines are folded in the following example:
 +
 
 [source, json]
@@ -454,7 +454,7 @@ When registering your relying party that uses session management, you set the OA
 
 OpenID Connect Authorization Code Flow and Implicit Flow define how clients interact with the provider to obtain end user authorization and profile information. Although you can run the simple example relying parties that are mentioned in this section without setting up Transport Layer Security, do not deploy relying parties in production without securing the transport.
 
-Code for the relying party examples shown here is link:https://github.com/ForgeRock/openid[available online, window=\_blank]. Clone the example project to deploy it in the same web container as OpenAM. Edit the configuration at the outset of the `.js` files in the project, register a corresponding profile for the example relying party as described in xref:#register-openid-connect-clients["Registering OpenID Connect Relying Parties"], and browse the deployment URL to see the initial page.
+Code for the relying party examples shown here is link:https://github.com/OpenIdentityPlatform/openam-openid[available online, window=\_blank]. Clone the example project to deploy it in the same web container as OpenAM. Edit the configuration at the outset of the `.js` files in the project, register a corresponding profile for the example relying party as described in xref:#register-openid-connect-clients["Registering OpenID Connect Relying Parties"], and browse the deployment URL to see the initial page.
 
 [#figure-openid-connect-example-start-page]
 image::images/openid-connect-example-start-page.png[]
@@ -705,7 +705,7 @@ In addition, you must also add these attributes to the list of LDAP User Attribu
 . Click Save to complete the process.
 
 ====
-A simple, non-secure GSMA Mobile Connect relying party example is link:https://github.com/ForgeRock/openid[available online, window=\_blank].
+A simple, non-secure GSMA Mobile Connect relying party example is link:https://github.com/OpenIdentityPlatform/openam-openid[available online, window=\_blank].
 
 
 [#stateless-oidc]

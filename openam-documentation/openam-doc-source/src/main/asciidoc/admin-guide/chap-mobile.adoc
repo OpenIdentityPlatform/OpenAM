@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -107,19 +107,19 @@ Furthermore, OpenAM REST APIs are built on an underlying common REST framework d
 [#get-mobile-sample-apps]
 === Getting Source Code for Sample Mobile Applications
 
-Source code for the sample mobile applications is available in sample repositories in the link:https://stash.forgerock.org/projects/COMMONS[ForgeRock commons project, window=\_blank]. Get local clones of one or more of the following repositories so that you can try these sample applications on your system:
+Source code for the sample mobile applications is available in sample repositories on the link:hhttps://github.com/OpenIdentityPlatform/[GitHub, window=\_blank]. Get local clones of one or more of the following repositories so that you can try these sample applications on your system:
 
-* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-android-openam-apps/browse[OpenAM OAuth2.0 Android sample app, window=\_blank]
+* link:https://github.com/OpenIdentityPlatform/mobile-samples-android-openam-apps[OpenAM OAuth2.0 Android sample app, window=\_blank]
 
-* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-ios-oauth2-sample-app/browse[OpenAM OAuth 2.0 iOS sample app, window=\_blank]
+* link:https://github.com/OpenIdentityPlatform/mobile-samples-ios-openam-ios-oauth2-sample-app[OpenAM OAuth 2.0 iOS sample app, window=\_blank]
 
-* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-ios-rest-sdk/browse[OpenAM access from iOS by using OpenAM's REST SDK, window=\_blank]
+* link:https://github.com/OpenIdentityPlatform/mobile-samples-ios-openam-ios-rest-sdk[OpenAM access from iOS by using OpenAM's REST SDK, window=\_blank]
 
-* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-ios-openam-sso-sample-app/browse[OpenAM single sign-on from iOS, window=\_blank]
+* link:https://github.com/OpenIdentityPlatform/mobile-samples-ios-openam-sso-sample-app[OpenAM single sign-on from iOS, window=\_blank]
 
-* link:https://stash.forgerock.org/projects/COMMONS/repos/mobile-samples-phonegap/browse[PhoneGap sample app, window=\_blank]
+* link:https://github.com/OpenIdentityPlatform/mobile-samples-phonegap[PhoneGap sample app, window=\_blank]
 
-For example, if you have a Mac running OS X 10.8 or later with Xcode installed, try the link:http://commons.forgerock.org/samples/mobile/ios/openam-ios-oauth2-sample-app/[OpenAM OAuth 2.0 iOS Sample App, window=\_blank].
+For example, if you have a Mac running OS X 10.8 or later with Xcode installed, try the link:https://github.com/OpenIdentityPlatform/mobile-samples-ios-openam-ios-oauth2-sample-app/tree/master/openam-ios-oauth2-sample-app[OpenAM OAuth 2.0 iOS Sample App, window=\_blank].
 
 [#figure-ios-oauth2-sample-app]
 image::images/ios-oauth2-sample-app.png[]

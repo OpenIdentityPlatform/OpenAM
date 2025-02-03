@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -385,7 +385,7 @@ public class CustomScopeValidator implements ScopeValidator {
 [#build-oauth2-scopes-plugin]
 ==== Building the OAuth 2.0 Scope Validator Sample Plugin
 
-The link:https://github.com/ForgeRock/openam-scope-sample/tree/13.0.0[sample scope validator plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
+The link:https://github.com/OpenIdentityPlatform/openam-scope-sample[sample scope validator plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
 --
 
 `pom.xml`::
@@ -1218,7 +1218,7 @@ public class SampleQuotaExhaustionAction implements QuotaExhaustionAction {
     }
 }
 ----
-The link:https://github.com/ForgeRock/openam-examples-quotaexhaustionaction/[sample plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
+The link:https://github.com/OpenIdentityPlatform/openam-examples-quotaexhaustionaction[sample plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
 --
 
 `pom.xml`::
