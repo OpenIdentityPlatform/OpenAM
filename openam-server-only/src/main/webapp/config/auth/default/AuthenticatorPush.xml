@@ -21,10 +21,10 @@
 
 <ModuleProperties moduleName="AuthenticatorPush" version="1.0" >
     <!-- LOGIN_START -->
-    <Callbacks length="0" order="1" timeout="120" header="ForgeRock Authenticator (Push)">
+    <Callbacks length="0" order="1" timeout="120" header="Authenticator (Push)">
     </Callbacks>
     <!-- USERNAME_STATE -->
-    <Callbacks length="1" order="2" timeout="120" header="ForgeRock Authenticator (Push)">
+    <Callbacks length="1" order="2" timeout="120" header="Authenticator (Push)">
         <NameCallback>
             <Prompt>User Name:</Prompt>
         </NameCallback>
@@ -41,7 +41,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="4" timeout="120" header="Use ForgeRock Authenticator (Push) Recovery Code">
+    <Callbacks length="2" order="4" timeout="120" header="Use Authenticator (Push) Recovery Code">
         <NameCallback>
             <Prompt>Recovery Code</Prompt>
         </NameCallback>
@@ -54,7 +54,7 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="5" timeout="120" header="ForgeRock Authenticator (Push) Recovery Code Used">
+    <Callbacks length="2" order="5" timeout="120" header="Authenticator (Push) Recovery Code Used">
         <TextOutputCallback>
             You have used one of your Recovery Codes. Please make sure you have a note of any remaining Recovery Codes.
         </TextOutputCallback>

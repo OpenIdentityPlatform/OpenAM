@@ -21,10 +21,10 @@
 
 <ModuleProperties moduleName="AuthenticatorPushRegistration" version="1.0" >
     <!-- LOGIN_START -->
-    <Callbacks length="0" order="1" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+    <Callbacks length="0" order="1" timeout="120" header="Authenticator (Push) Registration">
     </Callbacks>
     <!-- OPTIONS_PAGE -->
-    <Callbacks length="1" order="2" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+    <Callbacks length="1" order="2" timeout="120" header="Authenticator (Push) Registration">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -38,7 +38,7 @@
     </Callbacks>
     <!-- GET_THE_APP_INFO_PAGE -->
     <!-- For links to app store -->
-    <Callbacks length="3" order="3" timeout="120" header="ForgeRock Authenticator (Push) Registration">
+    <Callbacks length="3" order="3" timeout="120" header="Authenticator (Push) Registration">
         <TextOutputCallback>#REPLACE#</TextOutputCallback>
         <TextOutputCallback>#REPLACE#</TextOutputCallback>
         <ConfirmationCallback>
