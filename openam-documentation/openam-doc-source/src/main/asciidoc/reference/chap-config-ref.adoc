@@ -601,7 +601,7 @@ This section describes the following sets of properties:
 
 * xref:#authenticator-oath-service-configuration["Authenticator (OATH) Service"]
 
-* xref:#fr-authenticator-push-service-configuration["ForgeRock Authenticator (Push) Service"]
+* xref:#fr-authenticator-push-service-configuration["Authenticator (Push) Service"]
 
 * xref:#legacy-user-self-service["Legacy User Self Service"]
 
@@ -2016,13 +2016,13 @@ The data store attribute that holds the user's decision to enable or disable obt
 
 
 [#fr-authenticator-push-service-configuration]
-==== ForgeRock Authenticator (Push) Service
+==== Authenticator (Push) Service
 
 --
 `ssoadm` service name: `AuthenticatorPush`
 
 Profile Storage Attribute::
-Attribute for storing ForgeRock Authenticator Push device profiles. The default attribute, `pushDeviceProfiles`, is added to the schema when you prepare a user store for use with OpenAM. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying push notifications with the ForgeRock Authenticator app in OpenAM. OpenAM must be able to write to the attribute.
+Attribute for storing Authenticator Push device profiles. The default attribute, `pushDeviceProfiles`, is added to the schema when you prepare a user store for use with OpenAM. If you want to use a different attribute, you must make sure to add it to your user store schema prior to deploying push notifications with the ForgeRock Authenticator app in OpenAM. OpenAM must be able to write to the attribute.
 
 +
 Default: `pushDeviceProfiles`
@@ -3311,7 +3311,7 @@ The minimum lifetime (in seconds) to keep unanswered message records in the mess
 To keep unanswered message records indefinitely, set this property to `0`.
 
 +
-Should be tuned so that it is applicable to the use case of this service. For example, the ForgeRock Authenticator (Push) authentication module has a default timeout of 120 seconds.
+Should be tuned so that it is applicable to the use case of this service. For example, the Authenticator (Push) authentication module has a default timeout of 120 seconds.
 
 +
 Default: `120`
