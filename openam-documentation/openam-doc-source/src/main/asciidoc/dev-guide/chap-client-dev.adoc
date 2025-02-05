@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-client-dev]
@@ -43,7 +44,7 @@ As an architectural style, REST has very broad applications. The designs of both
 
 Open Identity Platform Common REST (CREST) applies RESTful principles to define common verbs for HTTP-based APIs that access web resources and collections of web resources.
 
-Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs. (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their respective standards.) APIs covered in link:../dev-guide/index.html#appendix-deprecated-apis[Deprecated REST APIs] predate CREST, do not use the CREST verbs, and are deprecated in OpenAM 13.5.2-15.
+Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs. (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their respective standards.) APIs covered in link:../dev-guide/index.html#appendix-deprecated-apis[Deprecated REST APIs] predate CREST, do not use the CREST verbs, and are deprecated in OpenAM {openam-version}.
 
 When using a CREST API, you use the common verbs as query string parameters in resource and resource collection URIs.
 --
@@ -168,17 +169,17 @@ Any changes to the methods used to make REST API calls will incur a __protocol__
 [#rest-api-versioning-supported-versions]
 ===== Supported REST API Versions
 
-The REST API version numbers supported in OpenAM 13.5.2-15 are as follows:
+The REST API version numbers supported in OpenAM {openam-version} are as follows:
 --
 
 __Supported protocol versions__::
-The __protocol__ versions supported in OpenAM 13.5.2-15 are:
+The __protocol__ versions supported in OpenAM {openam-version} are:
 +
 [none]
 * `1.0`
 
 __Supported resource versions__::
-The __resource__ versions supported in OpenAM 13.5.2-15 are shown in the following table.
+The __resource__ versions supported in OpenAM {openam-version} are shown in the following table.
 +
 
 [#rest-api-supported-resource-versions]
@@ -1307,7 +1308,7 @@ http://openam.example.com:8080/openam/json/users?_action=validateGoto
 [#rest-api-logging]
 ==== Logging
 
-OpenAM 13.5.2-15 supports two Audit Logging Services: a new common REST-based Audit Logging Service, and the legacy Logging Service, which is based on a Java SDK and is available in OpenAM versions prior to OpenAM 13. The legacy Logging Service is deprecated in OpenAM 13.5.2-15.
+OpenAM {openam-version} supports two Audit Logging Services: a new common REST-based Audit Logging Service, and the legacy Logging Service, which is based on a Java SDK and is available in OpenAM versions prior to OpenAM 13. The legacy Logging Service is deprecated in OpenAM {openam-version}.
 
 Both audit facilities log OpenAM REST API calls.
 
@@ -9065,12 +9066,12 @@ If there is an active recording event, output similar to the following appears:
 [#sec-sdk]
 === Using the OpenAM Java SDK
 
-This section introduces OpenAM Java SDK. OpenAM Java SDK is delivered with the full version of OpenAM, `OpenAM-13.5.2.zip`.
+This section introduces OpenAM Java SDK. OpenAM Java SDK is delivered with the full version of OpenAM, `OpenAM-{openam-version}.zip`.
 
 [#install-sdk-samples]
 ==== Installing OpenAM Client SDK Samples
 
-The full OpenAM download, `OpenAM-13.5.2.zip`, contains the Java Client SDK library, `ClientSDK-13.5.2.jar`, as well as samples for use on the command line in `ExampleClientSDK-CLI-13.5.2.zip`, and samples in a web application, `ExampleClientSDK-WAR-13.5.2.war`. The link:../apidocs[OpenAM Java SDK API Specification, window=\_blank] provides a reference to the public APIs.
+The full OpenAM download, `OpenAM-{openam-version}.zip`, contains the Java Client SDK library, `ClientSDK-{openam-version}.jar`, as well as samples for use on the command line in `ExampleClientSDK-CLI-{openam-version}.zip`, and samples in a web application, `ExampleClientSDK-WAR-{openam-version}.war`. The link:../apidocs[OpenAM Java SDK API Specification, window=\_blank] provides a reference to the public APIs.
 
 [#deploy-client-sdk-war]
 .To Deploy the Sample Web Application
@@ -9082,7 +9083,7 @@ The sample web application deploys in your container to show you the client SDK 
 
 [source, console]
 ----
-$ cp ExampleClientSDK-WAR-13.5.2.war /path/to/tomcat/webapps/client.war
+$ cp ExampleClientSDK-WAR-{openam-version}.war /path/to/tomcat/webapps/client.war
 ----
 
 . If you have run this procedure before, make sure to deploy a fresh copy of the .war file to a different location, such as `/path/to/tomcat/webapps/client1.war`
@@ -9156,10 +9157,10 @@ Follow these steps to set up the command-line examples.
 . Unpack the sample applications and related libraries.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir sdk && cd sdk
-$ unzip ~/Downloads/ExampleClientSDK-CLI-13.5.2.zip
+$ unzip ~/Downloads/ExampleClientSDK-CLI-{openam-version}.zip
 ----
 
 . Configure the samples to access OpenAM.

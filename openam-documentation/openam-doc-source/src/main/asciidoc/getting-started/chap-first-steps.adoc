@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -25,17 +25,10 @@
 
 This guide shows you how to quickly set up OpenAM and get started with access management. In reading and following the instructions in this guide, you will learn how to protect a Web page using OpenAM and a Web policy agent.
 
-[IMPORTANT]
-====
-You need a Linux, Solaris, or Windows system that can run the OpenAM Web policy agent with a minimum of 1 GB of available RAM memory, a few hundred MB of free disk space, a web browser, and an Internet connection to download software.
-
-If you are using Mac OS X, set up a virtual machine running Linux to try these procedures because the web policy agent is not built for Apache HTTP Server on Mac OS X.
-====
-
 [#how-openam-helps-manage-access]
 === About OpenAM
 
-OpenAM provides a service called __access management__, which manages access to resources, such as a web page, an application, or web service, available over the network. Once it is set up, OpenAM provides an infrastructure for managing users, roles, and access to resources. In this chapter, you manage access to a single web page.
+OpenAM provides a service called __access management__, which manages access to resources, such as a web page, an application, or a web service, available over the network. Once it is set up, OpenAM provides an infrastructure for managing users, roles, and access to resources. In this chapter, you manage access to a single web page.
 
 OpenAM centralizes access control by handling both __authentication__ and __authorization__. Authentication is the process of identifying an individual, for example, by confirming a successful login. Authorization is the process of granting access to resources to authenticated individuals.
 
@@ -51,31 +44,11 @@ The rest of this chapter has you demonstrate OpenAM access management by install
 [#software-you-need]
 === Software Requirements To Try Out OpenAM
 
-This chapter shows you how to install the software OpenAM needs to protect a web page. You will learn how to install Apache HTTP Server, Apache Tomcat, OpenAM core server with OpenAM Console, and OpenAM Apache Policy Agent. Installation instructions for Java Development Kit (JDK) are not included in this chapter, as OpenAM is a Java web application, and the JDK is pre-installed.
+The only software you need to install is Docker. If you don't have Docker on your computer follow the instructions from the following link: link:https://docs.docker.com/get-started/get-docker/#supported-platforms[https://docs.docker.com/get-started/get-docker/#supported-platforms, target=_blank].
 
-* Java Development Kit
-+
-OpenAM is a Java web application, and requires a Java Development Kit installed on the system where it runs.
-+
-The OpenAM web policy agent installer is also a Java program.
+You will learn how to run OpenAM docker container, and how to install OpenAM Apache Policy Agent for the Apache HTTP Server.
 
-* Apache HTTP Server
-+
-Apache HTTP Server serves the web page OpenAM protects.
-
-* Apache Tomcat
-+
-Because OpenAM is a Java web application, it runs in a web container, in this case, Apache Tomcat.
-
-* OpenAM core server with OpenAM Console
-+
-This is the main web application for OpenAM. OpenAM sets up an OpenDJ directory server at configuration time to use, in this case, to hold OpenAM's configuration and to serve as an identity store and authentication service.
-
-* OpenAM Apache Policy Agent
-+
-Install a policy agent in Apache HTTP Server to intercept requests from users and enforce access policy decisions OpenAM makes. The policy agent intercepts requests from users, and enforces access policy decisions made by OpenAM. The policy agent enforces policy by redirecting users to OpenAM for authentication and by contacting OpenAM to get authorization decisions for resources, such as the web page to protect.
-
-Follow the steps in the following sections of this chapter to learn how OpenAM protects a web site without changing the web site itself.
+'''
 
 
 [#software-setup]
@@ -85,11 +58,9 @@ This section includes the following procedures that detail how to set up OpenAM 
 
 * xref:#prepare-etc-hosts["To Prepare Your Hosts File"]
 
-* xref:#install-apache-http["To Install Apache HTTP Server"]
+* xref:#install-openam["To Run OpenAM Docker Image"]
 
-* xref:#install-apache-tomcat["To Install Apache Tomcat"]
-
-* xref:#install-openam["To Install OpenAM"]
+* xref:#configure-cookie-domain[To Configure Cookie Domain in OpenAM]
 
 * xref:#configure-policy["To Configure a Policy in OpenAM"]
 
@@ -101,6 +72,7 @@ The procedures in this section are written for use on a Linux system. If you are
 
 [#prepare-etc-hosts]
 .To Prepare Your Hosts File
+
 ====
 OpenAM requires that you use fully qualified domain names when protecting web resources. This is because OpenAM uses link:http://en.wikipedia.org/wiki/HTTP_cookie[HTTP cookies, window=\_blank] to keep track of sessions for single sign-on (SSO), and setting and reading cookies depends on the server name and domain.
 
@@ -124,220 +96,26 @@ $ cat /etc/hosts | grep openam
 
 ====
 
-[#install-apache-http]
-.To Install Apache HTTP Server
-====
-Apache HTTP Server is a popular web server that is supported by OpenAM's web policy agents. Apache HTTP Server might already be installed on your system, but since you are installing software for the sole purpose of getting started with OpenAM, install the web server separately instead of modifying any existing installations.
 
-Full installation instructions are available link:http://httpd.apache.org/docs/2.2/install.html[online, window=\_blank].
-
-. Verify the correct tools are installed to build Apache HTTP Server 2.2 from source.
-+
-For Linux distributions, you need development tools including the C compiler. How you install these depends on your distribution.
-+
-For Red Hat and CentOS distributions:
-+
-
-[source, console]
-----
-# yum groupinstall 'Development Tools'
-----
-+
-For Ubuntu distributions:
-+
-
-[source, console]
-----
-$ sudo apt-get install build-essential checkinstall
-----
-
-. Download Apache HTTP Server 2.2 sources from link:http://httpd.apache.org/download.cgi[the Apache download page, window=\_blank].
-+
-The OpenAM web policy agent requires Apache Portable Runtime 1.3 or later, so make sure you download Apache HTTP Server 2.2.9 or later.
-
-. Extract the download.
-
-. Configure the sources for compilation.
-+
-The `--prefix` option can be used to install the Web server in a location where you can write files.
-+
-
-[source, console]
-----
-$ cd ~/Downloads/httpd-2.2.25
-$ ./configure --prefix=/path/to/apache
-----
-
-. Compile Apache HTTP Server.
-+
-
-[source, console]
-----
-$ make
-----
-
-. Install Apache HTTP Server.
-+
-
-[source, console]
-----
-$ make install
-----
-
-. Edit the configuration to set the server name to `www.example.com` and the port to one, such as 8000 that the web server process can use when starting with your user ID.
-+
-
-[source, console]
-----
-$ vi /path/to/apache/conf/httpd.conf
-$ grep 8000 /path/to/apache/conf/httpd.conf
-Listen 8000
-ServerName www.example.com:8000
-----
-
-. Test the installation to ensure Apache HTTP Server is working.
-+
-
-.. Make sure that your system's firewall does not block the port that Apache HTTP Server uses.
-+
-See the documentation for your version of your system regarding how to allow traffic through the firewall on a specific port. A variety of firewalls are in use on Linux systems. The one in use depends on your specific distribution.
-
-.. Start the web server.
-+
-
-[source, console]
-----
-$ /path/to/apache/bin/apachectl -k start
-----
-
-.. Point your browser to following URL: link:http://www.example.com:8000[http://www.example.com:8000, window=\_blank].
-+
-
-[#figure-web-server-home-page]
-image::images/web-server-home-page.png[]
-+
-This is the page to protect with OpenAM. Do not proceed with the next steps unless this page appears.
-
-
-====
-
-[#install-apache-tomcat]
-.To Install Apache Tomcat
-====
-OpenAM runs as a Java web application inside an application container. Apache Tomcat is an application container that runs on a variety of platforms. The following instructions are loosely based on the `RUNNING.txt` file delivered with Tomcat.
-
-. Make sure you have a recent JDK LTS release installed.
-+
-One way of checking the version of the JDK is to list the version of the `javac` compiler.
-+
-
-[source, console]
-----
-$ javac -version
-----
-+
-If the `javac` compiler is not found, then either you do not have a Java Development Kit installed, or it is installed, but not on your `PATH`.
-
-. Download Apache Tomcat 9 from its link:http://tomcat.apache.org/download-90.cgi[download page, window=\_blank].
-
-. Extract the download.
-+
-
-[source, console]
-----
-$ cd /path/to
-$ unzip ~/Downloads/apache-tomcat-9.0.93.zip
-$ mv apache-tomcat-9.0.93 tomcat
-----
-
-. On UNIX-like systems, make the scripts in Tomcat's `bin/` directory executable.
-+
-
-[source, console]
-----
-$ chmod +x /path/to/tomcat/bin/*.sh
-----
-
-. Set the `JAVA_HOME` environment variable to the file system location of the Java Development Kit.
-+
-On Linux, set `JAVA_HOME` as follows.
-+
-
-[source]
-----
-export JAVA_HOME=/path/to/jdk
-----
-
-. Create a Tomcat `setenv.sh` (Unix/Linux) or `setenv.bat` (Windows) script to set the `JAVA_HOME` environment variable to the file system location of the Java Development Kit, and to set the heap and permanent generation size or metaspace size appropriately.
-+
-If you are using JDK 7:
-+
-
-[source, console]
-----
-export JAVA_HOME="/path/to/usr/jdk"
-export CATALINA_OPTS="$CATALINA_OPTS -Xmx2g -XX:MaxPermSize=256m"
-----
-+
-If you are using JDK 8:
-+
-
-[source, console]
-----
-export JAVA_HOME="/path/to/usr/jdk"
-export CATALINA_OPTS="$CATALINA_OPTS -Xmx2g -XX:MaxMetaspaceSize=256m"
-----
-
-. If you have a custom installation that differs from the documented Tomcat installation, make sure to set Tomcat's `CATALINA_TMPDIR` to a writable directory to ensure the installation succeeds. This temporary directory is used by the JVM (`java.io.tmpdir`) to write disk-based storage policies and other temporary files.
-
-. Make sure that your system's firewall does not block the port that Apache Tomcat uses.
-+
-See the Apache documentation for instructions for allowing traffic through the firewall on a specific port for the version of Tomcat on your system. A variety of firewalls are in use on Linux systems. The version your system uses depends on your specific distribution.
-
-. Start Tomcat.
-+
-
-[source, console]
-----
-$ /path/to/tomcat/bin/startup.sh
-----
-+
-It might take Tomcat several seconds to start. When Tomcat has successfully started, you should see information indicating how long startup took in the `/path/to/tomcat/logs/catalina.out` log file.
-+
-
-[source]
-----
-INFO: Server startup in 4655 ms
-----
-
-. Browse to Tomcat's home page, such as `\http://openam.example.com:8080`.
-+
-
-[#figure-tomcat-home-page]
-image::images/tomcat-home-page.png[]
-+
-Tomcat will serve the OpenAM web application. Make sure you have successfully gotten to this point before you proceed.
-
-====
 
 [#install-openam]
 .To Install OpenAM
 ====
-Deploy OpenAm into Tomcat and then configure it for use.
 
-. Download the OpenAM `.war` file from the OpenAM link:https://github.com/OpenIdentityPlatform/OpenAM/releases[releases page, window=\_blank] on the GitHub.
-
-. Deploy the `.war` file in Tomcat as `openam.war`.
-+
-
+Create a Docker network for OpenAM.
 [source, console]
 ----
-$ mv ~/Downloads/OpenAM-13.5.2.war /path/to/tomcat/webapps/openam.war
+$ docker network create openam-quickstart
 ----
-+
-Tomcat deploys OpenAM under the `/path/to/tomcat/webapps/openam/` directory. You can access the web application in a browser at `\http://openam.example.com:8080/openam/`.
 
-. Browse to OpenAM where it is deployed in Tomcat, in this example, `\http://openam.example.com:8080/openam/`, to configure the application.
+Run the OpenAM Docker image.
+[source, console]
+----
+$ docker run -h openam.example.com -p 8080:8080 --network openam-quickstart --name openam openidentityplatform/openam
+----
+You can access the web application in a browser at `\http://openam.example.com:8080/openam/`.
+
+. Browse to OpenAM in this example, `\http://openam.example.com:8080/openam/`, to configure the application.
 
 . On the OpenAM home page, click Create Default Configuration.
 +
@@ -362,8 +140,6 @@ image::images/openam-default-configuration.png[]
 ======
 If you were configuring OpenAM for real-world use, you would not use either of those passwords, but this is only to get started with OpenAM. The `amadmin` user is the OpenAM administrator, who is like a superuser in that `amadmin` has full control over the OpenAM configuration.
 ======
-+
-The `UrlAccessAgent` is not used in this guide.
 
 . Click the Proceed to Login link, then log in as `amadmin` with the password specified in the previous step, `changeit`.
 +
@@ -375,8 +151,16 @@ image::images/openam-realms.png[]
 +
 OpenAM stores its configuration, including the embedded OpenDJ directory server in the folder named `~/openam/` in your home directory. The folder shares the same name as your server instance. It also has a hidden folder, `~/.openamcfg/`, with a file used by OpenAM when it starts up. If you ruin your configuration of OpenAM somehow, the quickest way to start over is to stop Tomcat, delete these two folders, and configure OpenAM again.
 +
-OpenAM core server and OpenAM Console are now configured. Make sure you have successfully logged in to OpenAM Console before you proceed.
+The OpenAM core server and OpenAM Console are now configured. Make sure you have successfully logged in to OpenAM Console before you proceed.
 
+====
+
+[#configure-cookie-domain]
+.To Configure Cookie Domain in OpenAM
+====
+Navigate to Configure -> Global Services -> Platform -> Cookie Domain.
+
+Set the cookie domain to .example.com, and save your settings.
 ====
 
 [#configure-policy]
@@ -454,7 +238,7 @@ Next, you must create a web policy agent profile before installing the agent in 
 ====
 OpenAM stores profile information about policy agents centrally by default. You can manage the policy agent profile through OpenAM Console. The policy agent retrieves its configuration from its OpenAM profile at installation and start up, and OpenAM notifies the policy agent of changes to its configuration. Follow these steps before installing the policy agent itself.
 
-. In OpenAM Console, browse to Realms > / Top Level Realm > Agents > Web, and then click New in the Agents table.
+. In OpenAM Console, browse to Realms > / Top Level Realm > Applications > Web Agents, and then click New in the Agents table.
 
 . In the page to configure your new web policy agent, set the following values.
 +
@@ -491,89 +275,59 @@ Next, install a policy agent in Apache HTTP Server to enforce your new policy.
 
 [#install-web-policy-agent]
 .To Install OpenAM Web Policy Agent
-====
-OpenAM policy agents enforce policies defined in OpenAM. While the policy agent's job is to verify that users have the appropriate privileges to the resources they request, the policy agents do not make policy decisions. They call on OpenAM to make policy decisions using information presented by the user (or the user's client application), such as the SSO token in the HTTP cookie, which OpenAM uses to manage user sessions. A policy agent is, in essence, a gatekeeper for OpenAM.
-
-The agent runs inside of Apache HTTP Server as a library, which the server loads at startup time. When a request comes in, the agent redirects users to OpenAM for authentication and calls on OpenAM for policy decisions as necessary.
-
-. Download the OpenAM policy agent for your version of Apache HTTP Server from the Web Agent link:https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases[releases, window=\_blank] page on the GitHub.
-
-. Create a password file, for example `$HOME/.pwd.txt`, that the agent installer reads when first connecting to OpenAM to read its profile. The file should only contain the password string, on a single line.
-+
-The password file should be read-only by the user who installs the policy agent.
-+
-
-[source, console]
-----
-$ chmod 400 $HOME/.pwd.txt
-----
-+
-The password is stored encrypted after installation.
-
-. Make sure OpenAM is running.
-+
-You can verify this by logging into OpenAM Console.
-
-. Stop Apache HTTP Server while you install the policy agent.
-+
-
-[source, console]
-----
-$ /path/to/apache/bin/apachectl stop
-----
-
-. Extract the download.
-+
-
-[source, console]
-----
-$ cd /path/to
-$ unzip ~/Downloads/Apache-v22-Linux-64-Agent-4.1.zip
-----
-
-. Install the web policy agent in Apache HTTP Server, making sure that you provide the correct information to the installer as shown in the following example.
-+
-When you run the command, you will be prompted to read and accept the software license agreement for the agent installation. You can suppress the license agreement prompt by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
-+
-
-[source, console]
-----
-$ cd /path/to/web_agents/apache22_agent/bin
-$ ./agentadmin --install --acceptLicense
-...
-
------------------------------------------------
-SUMMARY OF YOUR RESPONSES
------------------------------------------------
-Apache Server Config Directory : /path/to/apache/conf
-OpenAM server URL : http://openam.example.com:8080/openam
-Agent URL : http://www.example.com:8000
-Agent Profile name : WebAgent
-Agent Profile Password file name : $HOME/.pwd.txt
-
-...
-----
-
-. Start Apache HTTP Server, and verify that the web policy agent is configured correctly.
-+
-
-[source, console]
-----
-$ /path/to/apache/bin/apachectl -k start
-$ tail /path/to/apache/logs/error_log
-...[notice] Apache/2.2.25 (Unix) OpenAM WPA/4.1 configured -- resuming
- normal operations
-----
-+
-You can now try your installation to see OpenAM in action.
 
 ====
+Create a Dockerfile on your machine folder with the following contents:
+
+[source, dockerfile]
+----
+FROM httpd:2.4.34
+
+ENV PA_PASSWORD secret12
+
+#Install pre-requisite packages
+RUN echo "deb [trusted=yes] http://archive.kernel.org/debian-archive/debian/ jessie main" >> /etc/apt/sources.list
+
+RUN apt-get update || true
+
+RUN apt-get install -y curl unzip
+
+#Install OpenAM Apache Agent
+RUN curl -L -o /tmp/Apache_v24_Linux_64bit_4.1.1.zip https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases/download/4.1.1/Apache_v24_Linux_64bit_4.1.1.zip
+
+RUN unzip /tmp/Apache_v24_Linux_64bit_4.1.1.zip -d /usr/
+
+RUN rm /tmp/Apache_v24_Linux_64bit_4.1.1.zip
+
+RUN echo $PA_PASSWORD > /tmp/pwd.txt
+
+RUN cat /tmp/pwd.txt
+
+RUN cat /etc/issue
+
+#Configure OpenAM Apache Agent
+RUN /usr/web_agents/apache24_agent/bin/agentadmin --s "/usr/local/apache2/conf/httpd.conf" "http://openam.example.com:8080/openam" "http://example.com:80" "/" "WebAgent" "/tmp/pwd.txt" --acceptLicence --changeOwner
+----
+
+Build Apache Docker image with the preconfigured OpenAM Apache Policy Agent.
+
+[source, console]
+----
+docker build --network=host -t apache_agent -f Dockerfile .
+----
+
+Run the image:
+
+[source, console]
+----
+docker run -it --name apache_agent -p 8000:80 -h www.example.com --shm-size 2G --network openam-quickstart  apache_agent
+----
 
 
 [#try-it-out]
 === Trying It Out
 
-Now that you have completed xref:#software-setup["Setting Up the Software"], you can access the protected web page to see OpenAM at work.
+Now that you have completed the steps above, you can access the protected web page to see OpenAM at work.
 
 . Log out of OpenAM Console.
 
@@ -587,7 +341,7 @@ At this point, the policy agent intercepts your request for the page. Your brows
 [#figure-openam-login]
 image::images/openam-login.png[]
 +
-On successful login, OpenAM sets a session cookie named `iPlanetDirectoryPro` in your browser for the domain `.example.com`. The cookie is then returned to servers in the `example.com` domain, such as, `openam.example.com` and `www.example.com`.
+On successful login, OpenAM sets a session cookie named `iPlanetDirectoryPro` in your browser for the domain `.example.com`. The cookie is then returned to servers in the `example.com` domain, such as `openam.example.com` and `www.example.com`.
 +
 If you examine this cookie in your browser, you see that it has a value, such as `AQIC5wM2LY4SfcwciyfvJcQDUIB7kIWEH187Df_txqLdAVc.*AAJTSQACMDEAAlNLABMxMDYwNzY1MjQ0NTE0ODI2NTkx*`. This is the SSO Token value. The value is in fact an encrypted reference to the session that is stored only by OpenAM. So, only OpenAM can determine whether you are actually logged in, or instead, that the session is no longer valid and you need to authenticate again.
 +

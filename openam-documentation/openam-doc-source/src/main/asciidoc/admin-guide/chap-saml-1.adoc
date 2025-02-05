@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-saml-1]
@@ -163,12 +164,12 @@ If you have multiple servers in an OpenAM site set up behind a load balancer, yo
 This example is for an asserting party where the site load balancer host is `ap.example.net`. The command is bundled with OpenAM server, shown with lines folded to fit on the printed page:
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/tomcat/webapps/openam/WEB-INF/lib/
 $ java \
- -cp forgerock-util-20.0.0.jar:openam-shared-13.5.2.jar:\
-    openam-federation-library-13.5.2.jar com.sun.identity.saml.common.SAMLSiteID \
+ -cp forgerock-util-20.0.0.jar:openam-shared-{openam-version}.jar:\
+    openam-federation-library-{openam-version}.jar com.sun.identity.saml.common.SAMLSiteID \
     https://ap.example.net/openam
 9BAg4UmVS6IbjccsSj9gAFYGO9Y=
 ----

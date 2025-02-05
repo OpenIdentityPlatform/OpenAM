@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -48,7 +48,7 @@ Also back up the configuration if it is stored centrally in OpenAM.
 
 . Stop the web server where the policy agent is installed.
 
-. Remove the old policy agent as described in the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[OpenAM Web Policy Agent User's Guide, window=\_blank].
+. Remove the old policy agent as described in the xref:../web-users-guide/index.adoc[OpenAM Web Policy Agent User's Guide, window=\_blank].
 +
 If the uninstallation process has changed, refer to the version of the __Web Policy Agent Installation Guide__ that corresponds to your web policy agent.
 

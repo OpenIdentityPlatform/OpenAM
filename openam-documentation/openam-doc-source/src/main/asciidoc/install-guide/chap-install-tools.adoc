@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-install-tools]
@@ -26,13 +27,13 @@
 OpenAM tools are found in `.zip` files where you unpacked the archive of the entire package, such as `~/Downloads/openam`. A list and description of these files follows.
 --
 
-`SSOAdminTools-13.5.2.zip`::
+`SSOAdminTools-{openam-version}.zip`::
 Administration tools: `ampassword`, `ssoadm`, and `amverifyarchive`
 
 +
 See xref:#install-openam-admin-tools["To Set Up Administration Tools"].
 
-`SSOConfiguratorTools-13.5.2.zip`::
+`SSOConfiguratorTools-{openam-version}.zip`::
 Configuration and upgrade tools, alternatives to using the GUI configuration wizard
 
 +
@@ -69,7 +70,7 @@ $ mkdir -p /path/to/openam-tools/admin
 [source, console]
 ----
 $ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/openam/SSOAdminTools-13.5.2.zip
+$ unzip ~/Downloads/openam/SSOAdminTools-{openam-version}.zip
 ----
 
 . Add `--acceptLicense` to the `java` command at the end of the `setup` or `setup.bat` script if you want to auto-accept the license agreement and suppress the license acceptance screen to the user:
@@ -252,26 +253,26 @@ $ mkdir -p /path/to/openam-tools/config
 . Unpack the tools from where you unzipped OpenAM.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/openam-tools/config
-$ unzip ~/Downloads/openam/SSOConfiguratorTools-13.5.2.zip
-Archive:  ~/Downloads/openam/SSOConfiguratorTools-13.5.2.zip
+$ unzip ~/Downloads/openam/SSOConfiguratorTools-{openam-version}.zip
+Archive:  ~/Downloads/openam/SSOConfiguratorTools-{openam-version}.zip
    creating: legal-notices/
   inflating: legal-notices/LICENSE.DOM-software.html
   inflating: legal-notices/NOTICE.resolver.txt
   inflating: legal-notices/LICENSE.DOM-documentation.html
         ... (more output) ...
  extracting: lib/xml-apis-2.11.0.jar
- extracting: openam-configurator-tool-13.5.2.jar
+ extracting: openam-configurator-tool-{openam-version}.jar
  extracting: lib/servlet-api-2.5.jar
 ----
 
-. Configure OpenAM server in a silent mode by using the openam-configurator-tool-13.5.2.jar tool after you deploy the `.war` file.
+. Configure OpenAM server in a silent mode by using the openam-configurator-tool-{openam-version}.jar tool after you deploy the `.war` file.
 +
 OpenAM server must be deployed and running, but not configured yet, when you use the tool.
 +
-The openam-configurator-tool-13.5.2.jar relies on a properties file to specify the configuration for the OpenAM server. The following example shows the equivalent of a default configuration, which installs OpenAM to run as HTTP.
+The openam-configurator-tool-{openam-version}.jar relies on a properties file to specify the configuration for the OpenAM server. The following example shows the equivalent of a default configuration, which installs OpenAM to run as HTTP.
 +
 If you want implement HTTPS, see the next step.
 +
@@ -307,7 +308,7 @@ When the OpenAM server `.war` file is deployed and running, you can configure it
 
 [source, console]
 ----
-$ java -jar openam-configurator-tool-13.5.2.jar --file config.properties
+$ java -jar openam-configurator-tool-{openam-version}.jar --file config.properties
 Checking license acceptance...License terms accepted.
 Checking configuration directory /home/openam/openam....Success.
 Installing OpenAM configuration store...Success RSA/ECB/OAEPWithSHA1AndMGF1...
@@ -367,13 +368,13 @@ DS_DIRMGRDN=cn=Directory Manager
 DS_DIRMGRPASSWD=password
 ----
 
-. Then, when the OpenAM `.war` file is deployed and the server is running, configure the server to use HTTPS using the openam-configurator-tool-13.5.2.jar tool with the properties file as follows.
+. Then, when the OpenAM `.war` file is deployed and the server is running, configure the server to use HTTPS using the openam-configurator-tool-{openam-version}.jar tool with the properties file as follows.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 java '-Djavax.net.ssl.trustStore=PATH_TO_JKS_TRUSTSTORE' \
-      -jar openam-configurator-tool-13.5.2.jar \
+      -jar openam-configurator-tool-{openam-version}.jar \
       --file config.properties
 ----
 

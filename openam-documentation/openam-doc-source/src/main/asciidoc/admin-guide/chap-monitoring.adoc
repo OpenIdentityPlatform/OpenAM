@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-monitoring]
@@ -149,7 +150,7 @@ To enable SNMP, see xref:#monitoring-snmp["SNMP Monitoring"]
 
 Once activated, SNMP monitoring works over UDP by default. You may want to install one of many available network monitoring tools. For the purpose of this section, basic SNMP service and monitoring tools have been installed on a GNU/Linux system. The same commands should work on a Mac OS X system.
 
-SNMP depends on labels known as Object Identifiers (OIDs). These are uniquely defined labels, organized in tree format. For OpenAM, they are configured in a `.mib` file named `FORGEROCK-OPENAM-CTS.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment.
+SNMP depends on labels known as Object Identifiers (OIDs). These are uniquely defined labels, organized in tree format. For OpenAM, they are configured in a `.mib` file named `FORGEROCK-OPENAM-CTS.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-{openam-version}.jar` file of the OpenAM deployment.
 
 For detailed information on configured OIDs, see xref:../reference/chap-cts-oids.adoc#chap-cts-oids["Core Token Service (CTS) Object Identifiers"] in the __Reference__.
 
@@ -185,7 +186,7 @@ You can monitor policy evaluation performance over SNMP. OpenAM records statisti
 
 Interface Stability: link:#interface-stability[Evolving]
 
-As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in the `.mib` file, `FORGEROCK-OPENAM-POLICY.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment. This file specifies the statistics OpenAM keeps for policy evaluation operations. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about policy evaluation on the command line.
+As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in the `.mib` file, `FORGEROCK-OPENAM-POLICY.mib`, found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-{openam-version}.jar` file of the OpenAM deployment. This file specifies the statistics OpenAM keeps for policy evaluation operations. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about policy evaluation on the command line.
 
 When monitoring is active, OpenAM records statistics about both the numbers and rates of policy evaluations performed, and also the times taken to process policy evaluations.
 
@@ -260,7 +261,7 @@ SNMP monitoring is not available for stateless sessions.
 
 Interface Stability: link:#interface-stability[Evolving]
 
-As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in a `.mib` file that specifies the statistics OpenAM keeps for policy evaluation operations, the `FORGEROCK-OPENAM-SESSION.mib` file. This file is found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-13.5.2-15.jar` file of the OpenAM deployment. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about sessions on the command line.
+As described in xref:#cts-monitor-commands["CTS SNMP Monitoring"], SNMP uses OIDs defined in a `.mib` file that specifies the statistics OpenAM keeps for policy evaluation operations, the `FORGEROCK-OPENAM-SESSION.mib` file. This file is found inside the `/path/to/tomcat/webapps/openam/WEB-INF/lib/openam-mib-schema-{openam-version}.jar` file of the OpenAM deployment. Adapt the examples in xref:#cts-monitor-commands["CTS SNMP Monitoring"] to read monitoring statistics about sessions on the command line.
 
 When monitoring is active, OpenAM records statistics about both the numbers of internal, remote, and CTS sessions, and also the times taken to process sessions.
 

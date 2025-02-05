@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-realms]
@@ -93,7 +94,7 @@ Delegating administration privileges in the top-level realm allows members of th
 
 * (Optional)  To grant users in the group access to the administration console for the realm, select Read and write access to all realm and policy properties.
 +
-In OpenAM 13.5.2-15, administrators can use the OpenAM administration console as follows:
+In OpenAM {openam-version}, administrators can use the OpenAM administration console as follows:
 +
 
 ** Delegated administrators with the `RealmAdmin` privilege can access full administration console functionality within the realms they can administer.

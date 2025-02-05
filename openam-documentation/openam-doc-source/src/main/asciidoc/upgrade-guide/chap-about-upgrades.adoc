@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-about-upgrades]
@@ -30,7 +31,7 @@ Release levels, and how much change to expect in a maintenance, minor, or major 
 [#sec-supported-upgrades]
 === Supported Upgrade Paths
 
-The following table contains information about the supported upgrade paths to OpenAM 13.5.2-15:
+The following table contains information about the supported upgrade paths to OpenAM {openam-version}:
 
 [#am-supported-upgrades]
 .Upgrade Paths
@@ -55,14 +56,14 @@ a|Yes
 
 a|OpenAM 13.x.x
 a|Yes
+
+a|OpenAM 14.x.x
+a|Yes
+
+a|OpenAM 15.x.x
+a|Yes
+
 |===
-
-[NOTE]
-====
-Upgrading between OpenAM Enterprise and OpenAM OEM versions is not supported.
-====
-For more information, see link:https://backstage.forgerock.com/#!/knowledge/kb/article/a18529200[Checking your product versions are supported, window=\_blank] in the __ForgeRock Knowledge Base__.
-
 
 [#upgrade-planning]
 === Planning the Upgrade
@@ -75,7 +76,7 @@ How much you must do to upgrade OpenAM software depends on the magnitude of the 
 
 * These suggestions are true both for OpenAM server components, and also for policy agents.
 
-To upgrade from an OpenAM server, use the Upgrade wizard. The OpenAM server Upgrade wizard appears when you replace a deployed OpenAM server `.war` file with a newer version and browse to the deployment URL. The Upgrade wizard brings the OpenAM configuration, including the version number, up to date with the new version. The CLI counterpart of the Upgrade wizard is openam-upgrade-tool-13.5.2.jar, which you install as described in xref:../install-guide/chap-install-tools.adoc#install-openam-config-tools["To Set Up Configuration Tools"] in the __Installation Guide__.
+To upgrade from an OpenAM server, use the Upgrade wizard. The OpenAM server Upgrade wizard appears when you replace a deployed OpenAM server `.war` file with a newer version and browse to the deployment URL. The Upgrade wizard brings the OpenAM configuration, including the version number, up to date with the new version. The CLI counterpart of the Upgrade wizard is openam-upgrade-tool-{openam-version}.jar, which you install as described in xref:../install-guide/chap-install-tools.adoc#install-openam-config-tools["To Set Up Configuration Tools"] in the __Installation Guide__.
 
 
 [#upgrade-policies]
@@ -148,8 +149,7 @@ These are described in the xref:../install-guide/chap-custom-ui.adoc#chap-custom
 
 * Any changes to OpenAM classes
 
-* Any changes or additional Java class libraries (such as .jar files in `WEB-INF/lib`
-
+* Any changes or additional Java class libraries (such as .jar files in `WEB-INF/lib`)
 
 
 [#post-upgrade-rollback]
