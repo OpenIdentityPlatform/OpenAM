@@ -12,20 +12,20 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
-
+:openam-version: 15.1.3
 
 [#chap-install-core]
 == Installing OpenAM Core Services
 
 This chapter covers tasks required for a full install of OpenAM server with or without OpenAM Console.
 
-This chapter does not cover installation for enforcing policies on resource servers. To manage access to resources on other servers, you can use OpenIG or OpenAM policy agents.
+This chapter does not cover installation for enforcing policies on resource servers. To manage access to resources on other servers, you can use OpenIG (recommended) or OpenAM policy agents.
 
 link:https://github.com/OpenIdentityPlatform/OpenIG[OpenIG, window=\_blank] is a high-performance reverse proxy server with specialized session management and credential replay functionality. It can function as a standards-based policy enforcement point.
 
@@ -40,7 +40,7 @@ OpenAM policy agents provide policy enforcement on supported web servers and Jav
 a|Install quickly for evaluation using default settings
 a|xref:#deploy-openam["To Deploy OpenAM"] and xref:#configure-openam-defaults["To Configure OpenAM With Defaults"]
 
- Alternatively, follow the full example in xref:../getting-started/index.adoc[Getting Started With OpenAM].
+Alternatively, follow the full example in xref:../getting-started/index.adoc[Getting Started With OpenAM].
 
 a|Install OpenAM server, choosing settings
 a|xref:#deploy-openam["To Deploy OpenAM"] and xref:#configure-openam-custom["To Custom Configure OpenAM"]
@@ -71,16 +71,16 @@ Select the `.war` file based on the type of deployment you need, as defined in t
 [#deploy-openam]
 .To Deploy OpenAM
 ====
-The `OpenAM-13.5.2.war` file contains OpenAM server with OpenAM Console. How you deploy the `.war` file depends on your web application container.
+The `OpenAM-{openam-version}.war` file contains OpenAM server with OpenAM Console. How you deploy the `.war` file depends on your web application container.
 
 . Deploy the `.war` file on your container.
 +
 For example, copy the file to deploy on Apache Tomcat.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ cp OpenAM-13.5.2.war /path/to/tomcat/webapps/openam.war
+$ cp OpenAM-{openam-version}.war /path/to/tomcat/webapps/openam.war
 ----
 +
 You change the file name to `openam.war` when deploying in Tomcat so that the deployment URI is `/openam`.
@@ -288,7 +288,7 @@ Password for the directory administrator user.
 
 . In the Site Configuration screen, you can set up OpenAM as part of a site where the load is balanced across multiple OpenAM servers.
 +
-If you have a site configuration with a load balancer, you can enable session high availability persistence and failover.footnote:d14351e2811[You can configure OpenAM to store sessions__statefully__or__statelessly__. Stateful sessions are stored in memory on the OpenAM server. They are also written to disk by thexref:chap-cts.adoc#chap-cts["Configuring the Core Token Service"]if you select the Enable Session HA and Persistence and Failover option in the Site Configuration screen. Stateless sessions are stored in HTTP cookies. The Enable Session HA and Persistence and Failover setting does not apply to stateless sessions. For more information about stateful and stateless sessions, seexref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"]in the__Administration Guide__.] OpenAM then stores sessions across server restarts, so that users do not have to login again.
+If you have a site configuration with a load balancer, you can enable session high availability persistence and failover.footnote:d14351e2811[You can configure OpenAM to store sessions __statefully__ or __statelessly__. Stateful sessions are stored in memory on the OpenAM server. They are also written to disk by thexref:chap-cts.adoc#chap-cts["Configuring the Core Token Service"]if you select the Enable Session HA and Persistence and Failover option in the Site Configuration screen. Stateless sessions are stored in HTTP cookies. The Enable Session HA and Persistence and Failover setting does not apply to stateless sessions. For more information about stateful and stateless sessions, seexref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"]in the__Administration Guide__.] OpenAM then stores sessions across server restarts, so that users do not have to login again.
 +
 If you then add additional servers to this OpenAM site, OpenAM performs __session failover__, storing session data in a directory service that is shared by different OpenAM servers. The shared storage means that if an OpenAM server fails, other OpenAM servers in the site have access to the user's session data and can serve requests about that user. As a result, the user does not have to log in again. If session failover is important for your deployment, also follow the instructions in xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"].
 +

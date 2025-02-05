@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-federation]
@@ -407,12 +408,12 @@ Deploying the identity provider discovery service involves the following stages:
 ====
 How you deploy the discovery service `.war` file depends on your web application container. The procedure in this section shows how to deploy on Apache Tomcat.
 
-. Copy the `IDPDiscovery-13.5.2.war` file to the `webapps/` directory.
+. Copy the `IDPDiscovery-{openam-version}.war` file to the `webapps/` directory.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ cp ~/Downloads/openam/IDPDiscovery-13.5.2.war \
+$ cp ~/Downloads/openam/IDPDiscovery-{openam-version}.war \
  /path/to/tomcat/webapps/disco.war
 ----
 
@@ -1560,7 +1561,7 @@ The following table provides information to help you decide whether to implement
 |===
 |Deployment Task or Requirement |Implementation Mode 
 
-a|You are migrating an existing OpenAM SAML v2.0 deployment from OpenAM 12 (or earlier) to OpenAM 13.5.2-15. Note that all OpenAM SAML v2.0 deployments prior to OpenAM 13 are standalone mode deployments.
+a|You are migrating an existing OpenAM SAML v2.0 deployment from OpenAM 12 (or earlier) to OpenAM {openam-version}. Note that all OpenAM SAML v2.0 deployments prior to OpenAM 13 are standalone mode deployments.
 a|Do not modify your deployment to integrated mode unless you want to change your authentication scenario to have SAML v2.0 authentication integrated into an OpenAM authentication chain.
 
 a|You want to deploy SAML v2.0 SSO and SLO using the easiest technique.
@@ -2110,7 +2111,7 @@ Edit the source of the OpenAM Java Server Page, `saml2/jsp/autosubmitaccessright
 +
 When you add an image or other presentation element, make sure that you retain the form and Java code as is.
 
-. Unpack OpenAM-13.5.2.war, and add your modified template files under `WEB-INF/classes/` where you unpacked the .war.
+. Unpack OpenAM-{openam-version}.war, and add your modified template files under `WEB-INF/classes/` where you unpacked the .war.
 +
 Also include any images you reference in the page.
 

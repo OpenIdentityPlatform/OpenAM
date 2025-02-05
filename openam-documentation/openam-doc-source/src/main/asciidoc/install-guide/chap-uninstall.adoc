@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -54,29 +54,29 @@ A full uninstall of OpenAM core services and configuration files consists of rem
 * The configuration directory, by default `$HOME/openam`. If you did not use the default configuration location, check the value of the Base installation directory property under Deployment > Servers > __Server Name__ > General > System.
 
 * The hidden directory that holds a file pointing to the configuration directory. For example, if you are using Apache Tomcat as the web container, this file could be `$HOME/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_` OR `$HOME/.openssocfg/AMConfig_path_to_tomcat_webapps_openam_`.
-
 +
+--
 
 [source, console]
 ----
 $ rm -rf $HOME/openam $HOME/.openamcfg
 ----
-+
+
 Or:
-+
 
 [source, console]
 ----
 $ rm -rf $HOME/openam $HOME/.openssocfg
 ----
-+
+
 If you used an external configuration store, you must remove the configuration manually from your external directory server. The default base DN for the OpenAM configuration is `dc=openam,dc=forgerock,dc=org`.
-+
+
 
 [NOTE]
 ======
 At this point, you can restart the web container and configure OpenAM anew if you only want to start over with a clean configuration rather than removing OpenAM completely.
 ======
+--
 
 . Undeploy the OpenAM web application.
 +

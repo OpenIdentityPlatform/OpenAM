@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-prepare-install]
@@ -1135,43 +1136,43 @@ For each release of the OpenAM core services, you can download the entire packag
 
 After you download the `.zip` file, create a new openam folder, and unzip the `.zip` file to access the content.
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd ~/Downloads
 $ mkdir openam ; cd openam
-$ unzip ~/Downloads/OpenAM-13.5.2.zip
+$ unzip ~/Downloads/OpenAM-{openam-version}.zip
 ----
 --
 When you unzip the archive of the entire package, you get ldif, license, and legal directories in addition to the following files.
 
-`ClientSDK-13.5.2.jar`::
+`ClientSDK-{openam-version}.jar`::
 The OpenAM Java client SDK library
 
-`ExampleClientSDK-CLI-13.5.2.zip`::
+`ExampleClientSDK-CLI-{openam-version}.zip`::
 The .zip file containing the Java client SDK command-line examples, and .jar files needed to run the examples
 
-`ExampleClientSDK-WAR-13.5.2.war`::
+`ExampleClientSDK-WAR-{openam-version}.war`::
 The `.war` file containing Java client SDK examples in a web application.
 
-`IDPDiscovery-13.5.2.war`::
+`IDPDiscovery-{openam-version}.war`::
 The IDP discovery `.war` file, deployed as a service to service providers that must discover which identity provider corresponds to a SAML v2.0 request.
 
 +
 For details, see xref:../admin-guide/chap-federation.adoc#deploy-idp-discovery["Deploying the Identity Provider Discovery Service"] in the __Administration Guide__.
 
-`Fedlet-13.5.2.zip`::
+`Fedlet-{openam-version}.zip`::
 The `.zip` file that contains the lightweight service provider implementations that you can embed in your Java EE applications to enable it to use federated access management.
 
-`OpenAM-13.5.2.war`::
+`OpenAM-{openam-version}.war`::
 The deployable `.war` file.
 
-`SSOAdminTools-13.5.2.zip`::
+`SSOAdminTools-{openam-version}.zip`::
 The .zip file that contains tools to manage OpenAM from the command line
 
-`SSOConfiguratorTools-13.5.2.zip`::
+`SSOConfiguratorTools-{openam-version}.zip`::
 The .zip file that contains tools to configure OpenAM from the command line
 
-`openam-soap-sts-server-13.5.2.war`::
+`openam-soap-sts-server-{openam-version}.war`::
 A pre-built SOAP STS server `.war` file.
 
 +
@@ -1189,11 +1190,11 @@ Instead, you must edit the deployment descriptor file before deploying OpenAM. C
 . Unpack the OpenAM `.war` file.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir /tmp/openam
 $ cd /tmp/openam/
-$ jar -xf ~/Downloads/openam/OpenAM-13.5.2.war
+$ jar -xf ~/Downloads/openam/OpenAM-{openam-version}.war
 ----
 
 . Edit the deployment descriptor file, `WEB-INF/web.xml`, to add a CORS filter configuration.
@@ -1311,11 +1312,11 @@ To use the SecurID authentication module, you must first build an OpenAM war fil
 . Unpack the OpenAM .war file.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir /tmp/openam
 $ cd /tmp/openam/
-$ jar -xf ~/Downloads/openam/OpenAM-13.5.2.war
+$ jar -xf ~/Downloads/openam/OpenAM-{openam-version}.war
 ----
 
 . Obtain the `authapi.jar` (for example, `authapi-2005-08-12.jar`) and its dependency file, `crypto.jar` from RSA. Then, copy `authapi-2005-08-12.jar` into the `WEB-INF/lib` directory.
@@ -1373,10 +1374,7 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk
 export JAVA_HOME
-# For JDK 7, use:
-CATALINA_OPTS="-server -Xmx2g -XX:PermSize=256m -XX:MaxPermSize=256m"
-# For JDK 8, use:
-# CATALINA_OPTS="-server -Xmx2g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m"
+CATALINA_OPTS="-server -Xmx2g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m"
 export CATALINA_OPTS
 
 case "${1}" in
@@ -1473,9 +1471,7 @@ After configuring JBoss or WildFly, you then prepare OpenAM for deployment by ma
 +
 Change the JVM heap size to `-Xmx1024m`. The default JVM heap size for some versions of JBoss might already exceed the recommended value. If you are using the embedded version of OpenDJ, the minimum heap size may be higher. For details on the JVM options to use, see xref:#prepare-java["Preparing a Java Environment"].
 +
-When using JDK 7, change the permanent generation size to `-XX:MaxPermSize=256m` if the default size does not exceed this amount.
-+
-When using JDK 8, change the metaspace size to `-XX:MaxMetaspaceSize=256m` if the default size does not exceed this amount.
+Change the metaspace size to `-XX:MaxMetaspaceSize=256m` if the default size does not exceed this amount.
 
 .. Set the following JVM `JAVA_OPTS` setting in the same file:
 +
@@ -1497,14 +1493,14 @@ Verify that the headers include the `Expires` attribute rather than only `Max-Ag
 ====
 To prepare OpenAM to run with JBoss or WildFly, you should make a change to the OpenAM `war` file. JBoss and WildFly deploy applications from different temporary directories every time you restart the container, which would require reconfiguring OpenAM. To avoid problems, change the OpenAM `war` file as follows:
 
-. If you have not already done so, create a temporary directory and expand the `OpenAM-13.5.2.war` file.
+. If you have not already done so, create a temporary directory and expand the `OpenAM-{openam-version}.war` file.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /tmp
 $ mkdir /tmp/openam ; cd /tmp/openam
-$ jar xvf ~/Downloads/OpenAM-13.5.2.war
+$ jar xvf ~/Downloads/OpenAM-{openam-version}.war
 ----
 
 . Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` archive. Update the `# configuration.dir=` line in this file to specify a path with read and write permissions, and then save the change.
@@ -1544,7 +1540,7 @@ To deploy OpenAM in WebLogic, perform the following steps:
 
 . Update the JVM options as described in xref:#prepare-java["Preparing a Java Environment"].
 
-. Customize the `OpenAM-13.5.2.war` file as described in xref:#prep-openam-for-weblogic["To Prepare OpenAM for Oracle WebLogic"].
+. Customize the `OpenAM-{openam-version}.war` file as described in xref:#prep-openam-for-weblogic["To Prepare OpenAM for Oracle WebLogic"].
 
 
 [#prep-openam-for-weblogic]
@@ -1554,14 +1550,14 @@ To prepare OpenAM to run in WebLogic, change the OpenAM `war` file to ensure tha
 
 Change the OpenAM `war` file as follows:
 
-. Create a temporary directory and expand the `OpenAM-13.5.2.war` file:
+. Create a temporary directory and expand the `OpenAM-{openam-version}.war` file:
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /tmp
 $ mkdir /tmp/openam ; cd /tmp/openam
-$ jar xvf ~/Downloads/OpenAM-13.5.2.war
+$ jar xvf ~/Downloads/OpenAM-{openam-version}.war
 ----
 
 . Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` file.

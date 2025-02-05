@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-customizing]
@@ -36,7 +37,7 @@ Adding a custom attribute involves both updating the `iPlanetAMUserService`, and
 
 [IMPORTANT]
 ====
-In OpenAM 13.5.2-15, the ability to edit custom profile attributes is limited to the classic UI. Custom profile attributes do not appear in the user profile when users log in to OpenAM using the XUI.
+In OpenAM {openam-version}, the ability to edit custom profile attributes is limited to the classic UI. Custom profile attributes do not appear in the user profile when users log in to OpenAM using the XUI.
 ====
 This section includes the following procedures.
 
@@ -1282,12 +1283,12 @@ org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction
 
 Choice Values were set.
 ----
-Extract `amSession.properties` and if necessary the localized versions of this file from `openam-core-13.5.2.jar` to `WEB-INF/classes/` where OpenAM is deployed. For example, if OpenAM is deployed under `/path/to/tomcat/webapps/openam`, then you could run the following commands.
+Extract `amSession.properties` and if necessary the localized versions of this file from `openam-core-{openam-version}.jar` to `WEB-INF/classes/` where OpenAM is deployed. For example, if OpenAM is deployed under `/path/to/tomcat/webapps/openam`, then you could run the following commands.
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
-$ jar -xvf ../lib/openam-core-13.5.2.jar amSession.properties
+$ jar -xvf ../lib/openam-core-{openam-version}.jar amSession.properties
  inflated: amSession.properties
 ----
 Add the following line to `amSession.properties`.
@@ -1418,7 +1419,7 @@ For information on downloading and building OpenAM sample source code, see link:
 . Build the module using Apache Maven:
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/openam-source/openam-samples
 $ cd policy-evaluation-plugin
@@ -1426,7 +1427,7 @@ $ mvn install
 [INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
-[INFO] Building policy-evaluation-plugin 13.5.2-15
+[INFO] Building policy-evaluation-plugin {openam-version}
 [INFO] ------------------------------------------------------------------------
 [INFO]
 [INFO] --- maven-resources-plugin:2.6:resources (default-resources) @
@@ -1434,7 +1435,7 @@ $ mvn install
 
 ...
 
-[INFO] Building jar: .../target/policy-evaluation-plugin-13.5.2-15.jar
+[INFO] Building jar: .../target/policy-evaluation-plugin-{openam-version}.jar
 [INFO]
 
 ...
@@ -2010,7 +2011,7 @@ The `IdOperation.SERVICE` operation is rarely used in recent OpenAM deployments.
 [#idrepo-plugin-deployment]
 ==== Identity Repository Plugin Deployment
 
-When you build your IdRepo plugin, include `openam-core-13.5.2.jar` in the classpath. This file is found under `WEB-INF/lib/` where OpenAM is deployed.
+When you build your IdRepo plugin, include `openam-core-{openam-version}.jar` in the classpath. This file is found under `WEB-INF/lib/` where OpenAM is deployed.
 
 You can either package your plugin as a .jar, and then add it to `WEB-INF/lib/`, or add the classes under `WEB-INF/classes/`.
 
@@ -2047,12 +2048,12 @@ Also include the `AttributeSchema` required to configure your IdRepo plugin.
 
 Notice the `i18nKey` attributes on `SubSchema` elements. The `i18nKey` attribute values correspond to properties in the `amIdRepoService.properties` file under `WEB-INF/classes/` where OpenAM is deployed. OpenAM console displays the label for the configuration user interface that it retrieves from the value of the `i18nKey` property in the `amIdRepoService.properties` file.
 
-To make changes to the properties, first extract `amIdRepoService.properties` and if necessary the localized versions of this file from `openam-core-13.5.2.jar` to `WEB-INF/classes/` where OpenAM is deployed. For example, if OpenAM is deployed under `/path/to/tomcat/webapps/openam`, then you could run the following commands.
+To make changes to the properties, first extract `amIdRepoService.properties` and if necessary the localized versions of this file from `openam-core-{openam-version}.jar` to `WEB-INF/classes/` where OpenAM is deployed. For example, if OpenAM is deployed under `/path/to/tomcat/webapps/openam`, then you could run the following commands.
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
-$ jar -xvf ../lib/openam-core-13.5.2.jar amIdRepoService.properties
+$ jar -xvf ../lib/openam-core-{openam-version}.jar amIdRepoService.properties
  inflated: amIdRepoService.properties
 ----
 Register your plugin using the `ssoadm` command after copy the files into place.

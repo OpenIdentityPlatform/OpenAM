@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-audit-logging]
@@ -27,7 +28,7 @@ OpenAM supports a comprehensive Audit Logging Service that captures key auditing
 
 Audit logs gather operational information about events occurring within an OpenAM deployment to track processes and security data, such as authentication mechanisms, system access, user and administrator activity, error messages, and configuration changes.
 
-This chapter describes the new, common REST-based Audit Logging Service available in OpenAM 13.5.2-15. OpenAM 13.5.2-15 also supports a legacy Logging Service, based on a Java SDK and available in OpenAM versions prior to OpenAM 13.5.2-15. The legacy Logging Service will be deprecated in a future release of OpenAM.
+This chapter describes the new, common REST-based Audit Logging Service available in OpenAM {openam-version}. OpenAM {openam-version} also supports a legacy Logging Service, based on a Java SDK and available in OpenAM versions prior to OpenAM {openam-version}. The legacy Logging Service will be deprecated in a future release of OpenAM.
 
 The Audit Logging Service uses a structured message format that adheres to a consistent and documented log structure common across the Open Identity Platform stack, including OpenAM, OpenIDM, OpenDJ, and OpenIG.
 
@@ -45,7 +46,7 @@ OpenAM's Audit Logging Service provides a versatile and rich feature set as foll
 
 * *Global and Realm-Based Log Configuration*. You can configure audit logging globally, which ensures that all realms inherit your global log settings. You can also configure audit logging by realm, which allows you to set different log settings for each realm.
 
-* *Audit Event Handlers*. The Audit Logging Service supports a variety of audit event handlers that allow you to write logs to different types of data stores. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"] for a list of event handlers available in OpenAM 13.5.2-15.
+* *Audit Event Handlers*. The Audit Logging Service supports a variety of audit event handlers that allow you to write logs to different types of data stores. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"] for a list of event handlers available in OpenAM {openam-version}.
 
 * *Audit Event Buffering*. By default, OpenAM writes each log message separately as they are generated. OpenAM supports message buffering, a type of batch processing, that stores log messages in memory and flushes the buffer after a preconfigured time interval or after a certain number of log messages reaches the configured threshold value.
 

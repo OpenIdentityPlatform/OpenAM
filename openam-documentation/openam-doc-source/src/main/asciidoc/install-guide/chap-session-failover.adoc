@@ -77,12 +77,12 @@ Without session logout/destroy broadcasting, it is possible for a user to log ou
 * Select Disabled if you do not want the OpenAM server to broadcast session logout/destroy messages. Session logout/destroy broadcasting is disabled by default. Disabling broadcasting is suitable when you do not need the highest level of security. Disable broadcasting when you do not expect users to maliciously attempt to access logged out or destroyed sessions.
 
 * Specify one of the two broadcast options to achieve a higher level of security, at a cost of incurring additional network I/O. Select "Broadcast only to local site servers" if your session store supports a single OpenAM site. Select "Broadcast to servers in all sites" if your session store supports multiple OpenAM sites.
-
 +
+--
 The Reduced Crosstalk Purge Delay option specifies the amount of time (in minutes) before sessions are purged from OpenAM servers after the server receives session logout/destroy broadcast notification. The delay ensures that sessions are in memory during the time between session logout/destruction and session store replication.
-+
-The default purge delay is 1 minute, which should be adequate unless session store replication is abnormally slow on your network.
 
+The default purge delay is 1 minute, which should be adequate unless session store replication is abnormally slow on your network.
+--
 . Click Add to save your work.
 +
 OpenAM enables session failover immediately after you save the configuration changes. It is not necessary to restart the servers in your site.

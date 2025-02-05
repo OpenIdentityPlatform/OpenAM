@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-radius]
@@ -155,7 +156,7 @@ You can also configure the RADIUS Server service to log the packets sent between
 [#radius-troubleshooting-client]
 ==== Running the Sample RADIUS Client
 
-The `openam-radius-server-13.5.2-15.jar` includes a sample client that you can use to test simple connectivity to the RADIUS Server service.
+The `openam-radius-server-{openam-version}.jar` includes a sample client that you can use to test simple connectivity to the RADIUS Server service.
 
 The following procedure describes how to set up and run the sample client:
 
@@ -193,9 +194,9 @@ show-traffic=true
 . Make sure that your current working directory is the directory in which you created the `radius.properties` file, then execute the sample client. Messages from the sample client indicate success or failure authenticating. If you specify `show-traffic=true` in the `radius.properties` file, the packets to and from the OpenAM RADIUS server appear in standard output:
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ java -jar //path/to/tomcat/webapps/openam/WEB-INF/lib/openam-radius-server-13.5.2-15.jar
+$ java -jar //path/to/tomcat/webapps/openam/WEB-INF/lib/openam-radius-server-{openam-version}.jar
 ? Username: demo
 ? Password: changeit
 Packet To openam.example.com:1812

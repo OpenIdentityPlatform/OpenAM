@@ -18,6 +18,7 @@
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-custom-ui]
@@ -405,15 +406,15 @@ image::images/modified-fr-login.png[]
 ====
 To customize classic UI elements, such as button text on the login screen, follow these steps.
 
-. Unpack the core OpenAM library, `openam-core-13.5.2.jar`, that contains the text in Java properties files.
+. Unpack the core OpenAM library, `openam-core-{openam-version}.jar`, that contains the text in Java properties files.
 +
 This library is available under `WEB-INF/lib/` where OpenAM is unpacked for deployment. In the following example OpenAM is deployed on Apache Tomcat.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir openam-core && cd openam-core
-$ jar xf /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-13.5.2.jar
+$ jar xf /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-{openam-version}.jar
 ----
 
 . Edit only property values in the appropriate properties files.
@@ -421,9 +422,9 @@ $ jar xf /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-13.5.2.jar
 . Prepare a new core OpenAM library with your modifications.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ jar cf ../openam-core-13.5.2.jar *
+$ jar cf ../openam-core-{openam-version}.jar *
 ----
 
 . Replace the existing core OpenAM library with your modified version.
@@ -431,12 +432,12 @@ $ jar cf ../openam-core-13.5.2.jar *
 The following example replaces the library only in a deployed OpenAM server.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ cp openam-core-13.5.2.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/
+$ cp openam-core-{openam-version}.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/
 ----
 +
-When preparing for production deployment make the modification in the OpenAM war file, `OpenAM-13.5.2.war`, instead.
+When preparing for production deployment make the modification in the OpenAM war file, `OpenAM-{openam-version}.war`, instead.
 
 . Restart OpenAM or the container in which it runs to load the changes.
 

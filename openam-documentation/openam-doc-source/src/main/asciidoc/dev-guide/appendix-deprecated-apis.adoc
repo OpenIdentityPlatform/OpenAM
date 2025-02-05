@@ -12,19 +12,20 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [appendix]
 [#appendix-deprecated-apis]
 == Deprecated REST APIs
 
-This appendix provides information about REST APIs deprecated in OpenAM 13.5.2-15.
+This appendix provides information about REST APIs deprecated in OpenAM {openam-version}.
 
 [#deprecated-session-apis-auth]
 === Deprecated Session Information APIs
