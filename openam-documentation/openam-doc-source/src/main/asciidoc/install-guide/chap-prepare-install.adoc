@@ -77,6 +77,23 @@ Set the metaspace memory size to 256 MB.
 `-XX:MaxMetaspaceSize=256m` (when using JDK 8)::
 Set the maximum metaspace memory size to 256 MB.
 
+
+[IMPORTANT]
+====
+If you are using Java 11 and above, add additional options to provide OpenAM access to the encapsulated Java modules:
+
+`--add-exports java.base/sun.security.util=ALL-UNNAMED`
+
+`--add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED`
+
+`--add-exports java.base/sun.security.x509=ALL-UNNAMED`
+
+`--add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED`
+
+`--add-exports java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED`
+
+====
+
 --
 For additional JVM tuning and security recommendations, see link:../admin-guide/index.html#tuning-jvm-for-openam[Java Virtual Machine Settings] in the __Administration Guide__.
 
