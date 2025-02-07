@@ -57,13 +57,10 @@ OpenAM software depends on a Java runtime environment. Check the output of `java
 ==== Settings For Sun/Oracle Java Environments
 
 --
-When using a Sun or Oracle Java environment set at least the following options.
+When using an Adoptium, Azul or Oracle Java environment set at least the following options.
 
 `-server`::
 Use `-server` rather than `-client`.
-
-`-Xmx1g` (minimum)::
-OpenAM requires at least a 1 GB heap. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. Higher volume and higher performance deployments require additional heap space.
 
 
 [IMPORTANT]
@@ -94,9 +91,6 @@ When using an IBM Java environment set at least the following options.
 
 `-DamCryptoDescriptor.provider=IBMJCE`,`-DamKeyGenDescriptor.provider=IBMJCE`::
 Use the IBM Java Cryptography Extensions.
-
-`-Xmx1024m` (minimum)::
-OpenAM requires at least a 1 GB heap. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. Higher volume and higher performance deployments require additional heap space.
 
 --
 
@@ -1379,7 +1373,7 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk
 export JAVA_HOME
-CATALINA_OPTS="-server -Xmx2g"
+CATALINA_OPTS="-server"
 export CATALINA_OPTS
 
 case "${1}" in
@@ -1405,7 +1399,7 @@ One possible workaround is to configure Tomcat to allow encoded slash characters
 
 [source]
 ----
-CATALINA_OPTS= "-server -Xmx2g \
+CATALINA_OPTS= "-server \
                -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true"
 ----
 
@@ -1473,8 +1467,6 @@ After configuring JBoss or WildFly, you then prepare OpenAM for deployment by ma
 .. Open the `standalone.conf` file in the `/path/to/jboss/bin` directory for JBoss or WildFly in standalone mode.
 
 .. Check the JVM settings associated with `JAVA_OPTS`.
-+
-Change the JVM heap size to `-Xmx1024m`. The default JVM heap size for some versions of JBoss might already exceed the recommended value. If you are using the embedded version of OpenDJ, the minimum heap size may be higher. For details on the JVM options to use, see xref:#prepare-java["Preparing a Java Environment"].
 
 .. Set the following JVM `JAVA_OPTS` setting in the same file:
 +
