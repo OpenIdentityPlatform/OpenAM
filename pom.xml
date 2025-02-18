@@ -14,7 +14,7 @@
  *
  * Copyright 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Agile Digital Engineering
- * Portions copyright 2017-2024 3A Systems, LLC
+ * Portions copyright 2017-2025 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -2105,6 +2105,7 @@
 			  <configuration>
                 <source>8</source>
 			  	<doclint>none</doclint>
+                <notimestamp>true</notimestamp>
 			  </configuration>
 			</plugin>
       <plugin>
