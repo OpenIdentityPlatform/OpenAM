@@ -101,8 +101,31 @@ jobs:
       - name: Docker test
         shell: bash
         run: |
-          docker run --rm -it -d --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          docker run --rm -it -d -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
+          docker exec -w '/usr/openam/ssoconfiguratortools' test bash -c \
+          'echo "ACCEPT_LICENSES=true
+          SERVER_URL=http://openam.example.org:8080
+          DEPLOYMENT_URI=/$OPENAM_PATH
+          BASE_DIR=$OPENAM_DATA_DIR
+          locale=en_US
+          PLATFORM_LOCALE=en_US
+          AM_ENC_KEY=
+          ADMIN_PWD=passw0rd
+          AMLDAPUSERPASSWD=p@passw0rd
+          COOKIE_DOMAIN=example.org
+          ACCEPT_LICENSES=true
+          DATA_STORE=embedded
+          DIRECTORY_SSL=SIMPLE
+          DIRECTORY_SERVER=openam.example.org
+          DIRECTORY_PORT=50389
+          DIRECTORY_ADMIN_PORT=4444
+          DIRECTORY_JMX_PORT=1689
+          ROOT_SUFFIX=dc=openam,dc=example,dc=org
+          DS_DIRMGRDN=cn=Directory Manager
+          DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+          sleep 35
+          docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
   build-docker-alpine:
     runs-on: 'ubuntu-latest'
     services:
@@ -150,5 +173,28 @@ jobs:
       - name: Docker test
         shell: bash
         run: |
-          docker run --rm -it -d --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-alpine
+          docker run --rm -it -d -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-alpine
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
+          docker exec -w '/usr/openam/ssoconfiguratortools' test bash -c \
+          'echo "ACCEPT_LICENSES=true
+          SERVER_URL=http://openam.example.org:8080
+          DEPLOYMENT_URI=/$OPENAM_PATH
+          BASE_DIR=$OPENAM_DATA_DIR
+          locale=en_US
+          PLATFORM_LOCALE=en_US
+          AM_ENC_KEY=
+          ADMIN_PWD=passw0rd
+          AMLDAPUSERPASSWD=p@passw0rd
+          COOKIE_DOMAIN=example.org
+          ACCEPT_LICENSES=true
+          DATA_STORE=embedded
+          DIRECTORY_SSL=SIMPLE
+          DIRECTORY_SERVER=openam.example.org
+          DIRECTORY_PORT=50389
+          DIRECTORY_ADMIN_PORT=4444
+          DIRECTORY_JMX_PORT=1689
+          ROOT_SUFFIX=dc=openam,dc=example,dc=org
+          DS_DIRMGRDN=cn=Directory Manager
+          DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+          sleep 35
+          docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
