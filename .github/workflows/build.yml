@@ -101,7 +101,7 @@ jobs:
       - name: Docker test
         shell: bash
         run: |
-          docker run --rm -it -d -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          docker run --rm -it -d --memory="1g" -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
           docker exec -w '/usr/openam/ssoconfiguratortools' test bash -c \
           'echo "ACCEPT_LICENSES=true
@@ -173,7 +173,7 @@ jobs:
       - name: Docker test
         shell: bash
         run: |
-          docker run --rm -it -d -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-alpine
+          docker run --rm -it -d --memory="1g" -h openam.example.org --name=test localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-alpine
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"; do sleep 10; done'
           docker exec -w '/usr/openam/ssoconfiguratortools' test bash -c \
           'echo "ACCEPT_LICENSES=true
