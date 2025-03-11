@@ -27,7 +27,7 @@ RUN rm -rf  $CATALINA_HOME/webapps/* \
  && chmod -R g=u /usr/openam/ \
  && adduser -S -u 1001 -G root $OPENAM_USER \
  && install -d -o $OPENAM_USER $OPENAM_DATA_DIR \
- && chown -R $OPENAM_USER:root $CATALINA_HOME/webapps
+ && chown -R $OPENAM_USER:root $CATALINA_HOME
 
 RUN  apk del unzip && rm -rf /var/cache/apk/* 
  
