@@ -28,7 +28,8 @@ RUN rm -rf  $CATALINA_HOME/webapps/* \
  && chmod -R g=u /usr/openam/ \
  && useradd -m -r -u 1001 -g root $OPENAM_USER \
  && install -d -o $OPENAM_USER $OPENAM_DATA_DIR \
- && chown -R $OPENAM_USER:root $CATALINA_HOME
+ && chown -R $OPENAM_USER:root $CATALINA_HOME \
+ && sed -i '/<\/Host>/i \ \ \ \ <Valve className=\"org.apache.catalina.valves.RemoteIpValve\" httpServerPort=\"8080\" httpsServerPort=\"443\" />' $CATALINA_HOME/conf/server.xml
 
 RUN  apt-get remove -y --purge unzip \
  && rm -rf /var/lib/apt/lists/*
