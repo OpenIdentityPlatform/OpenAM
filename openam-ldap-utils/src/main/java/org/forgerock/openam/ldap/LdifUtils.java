@@ -99,9 +99,9 @@ public final class LdifUtils {
     public static void createSchemaFromLDIF(LDIFChangeRecordReader ldif, final Connection ld) throws IOException {
         while (ldif.hasNext()) {
             final ChangeRecord changeRecord = ldif.readChangeRecord();
-            changeRecord.accept(new ChangeRecordVisitor<Void, Void>() {
+            final IOException resultException = changeRecord.accept(new ChangeRecordVisitor<IOException, Void>() {
                 @Override
-                public Void visitChangeRecord(Void aVoid, AddRequest change) {
+                public IOException visitChangeRecord(Void aVoid, AddRequest change) {
                     try {
                         change.addControl(TransactionIdControl.newControl(
                                 AuditRequestContext.createSubTransactionIdValue()));
@@ -114,41 +114,51 @@ public final class LdifUtils {
                                 try {
                                     ld.modify(modifyRequest);
                                 } catch (LdapException ex) {
-                                    DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}",
+                                    DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}",
                                             modifyRequest, ex);
+                                    return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                                            "Could not modify schema: %s; ex: %s", modifyRequest, ex));
                                 }
                             }
                         } else {
-                            DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not add to schema: {}", change, e);
+                            DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not add to schema: {}", change, e);
+                            return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                                    "Could not add to schema: %s; ex: %s", change, e));
                         }
                     }
                     return null;
                 }
 
                 @Override
-                public Void visitChangeRecord(Void aVoid, ModifyRequest change) {
+                public IOException visitChangeRecord(Void aVoid, ModifyRequest change) {
                     try {
                         change.addControl(TransactionIdControl.newControl(
                                 AuditRequestContext.createSubTransactionIdValue()));
                         ld.modify(change);
                     } catch (LdapException e) {
-                        DEBUG.warning("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}", change, e);
+                        DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}", change, e);
+                        return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                                "Could not modify schema: %s; ex: %s", change, e));
                     }
                     return null;
                 }
 
                 @Override
-                public Void visitChangeRecord(Void aVoid, ModifyDNRequest change) {
+                public IOException visitChangeRecord(Void aVoid, ModifyDNRequest change) {
                     return null;
                 }
 
                 @Override
-                public Void visitChangeRecord(Void aVoid, DeleteRequest change) {
+                public IOException visitChangeRecord(Void aVoid, DeleteRequest change) {
                     DEBUG.message("Delete request ignored: {}", changeRecord);
                     return null;
                 }
 
             }, null);
+
+            if (resultException != null) {
+                throw resultException;
+            }
         }
     }
 
