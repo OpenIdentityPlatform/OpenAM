@@ -8,7 +8,7 @@ ENV CATALINA_HOME=/usr/local/tomcat \
     OPENAM_DATA_DIR="/usr/openam/config" 
 ENV PATH=$CATALINA_HOME/bin:$PATH \
  	JAVA_OPTS="--add-exports java.base/sun.security.util=ALL-UNNAMED --add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED --add-exports java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED" \
- 	MEMORY="-server -XX:+UseG1GC -XX:+UseContainerSupport" \
+ 	MEMORY="-server" \
     CATALINA_OPTS="$MEMORY -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
 WORKDIR $CATALINA_HOME

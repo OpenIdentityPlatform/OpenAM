@@ -7,7 +7,7 @@ ENV CATALINA_HOME=/usr/local/tomcat \
     OPENAM_USER="openam" \
     OPENAM_DATA_DIR="/usr/openam/config"    
 ENV PATH=$CATALINA_HOME/bin:$PATH \
-    MEMORY="-server -XX:+UseG1GC -XX:-UseContainerSupport" \
+    MEMORY="-server" \
     CATALINA_OPTS="$MEMORY -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
 WORKDIR $CATALINA_HOME
