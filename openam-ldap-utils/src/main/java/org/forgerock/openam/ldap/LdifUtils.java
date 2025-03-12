@@ -26,6 +26,7 @@
  * $Id: LDAPUtils.java,v 1.9 2009/08/05 20:39:01 hengming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 //@Checkstyle:on
 
