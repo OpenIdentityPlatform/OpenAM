@@ -25,6 +25,7 @@
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 
 package com.sun.identity.setup;
@@ -468,7 +469,7 @@ public class EmbeddedOpenDS {
         debug.message("...EmbeddedOpenDS.startServer:DS Server started.");
 
         int sleepcount = 0;
-        while (!EmbeddedUtils.isRunning() && (sleepcount < 60)) {
+        while ((!EmbeddedUtils.isRunning() || !com.sun.identity.setup.AMSetupDSConfig.getInstance().isDServerUp()) && (sleepcount < 60)) {
             sleepcount++;
             SetupProgress.reportStart("emb.waitingforstarted", null);
             Thread.sleep(1000);
