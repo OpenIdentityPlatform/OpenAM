@@ -83,7 +83,7 @@
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>3.0</guice.version>
-    <restlet.version>2.4.0</restlet.version>
+    <restlet.version>2.4.4</restlet.version>
     <powermock.version>2.0.9</powermock.version>
 <!--     <slf4j.version>1.7.25</slf4j.version> -->
     <click.version>2.3.0</click.version>
