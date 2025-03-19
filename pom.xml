@@ -1612,7 +1612,7 @@
       <dependency>
 	    <groupId>net.bytebuddy</groupId>
 	    <artifactId>byte-buddy</artifactId>
-	    <version>1.15.3</version>
+	    <version>1.17.2</version>
 	    <scope>test</scope>
 	  </dependency>
       <dependency>
