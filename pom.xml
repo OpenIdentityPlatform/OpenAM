@@ -1971,7 +1971,7 @@
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <updateBranchVersions>true</updateBranchVersions>
-          <goals>install javadoc:aggregate-jar deploy</goals>
+          <!--goals>install javadoc:aggregate-jar deploy</goals-->
           <signTag>true</signTag>
   		  <tagNameFormat>@{project.version}</tagNameFormat>
   		  <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
