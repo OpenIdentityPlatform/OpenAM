@@ -32,7 +32,7 @@ jobs:
     - name: Set Integration Test Environment
       if: matrix.os == 'ubuntu-latest'
       run:  | 
-        echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
+        echo "MAVEN_PROFILE_FLAG=-P \!man-pages -DskipTests=true" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
@@ -208,6 +208,11 @@ jobs:
         ports:
           - 5000:5000
     steps:
+      - name: Get latest release version
+        shell: bash
+        run:   |
+          export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
+          echo "release_version=$git_version_last" >> $GITHUB_ENV
       - name: Download OpenAM war File
         uses: actions/download-artifact@v4
         with:
