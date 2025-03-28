@@ -98,7 +98,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+          outputs: type=docker,dest=${{ runner.temp }}/openam-tmp-image.tar
       - name: Docker test
         shell: bash
         run: |
@@ -131,7 +131,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: openam-image
-          path: ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+          path: ${{ runner.temp }}/openam-tmp-image.tar
 
   build-docker-alpine:
     runs-on: 'ubuntu-latest'
@@ -229,10 +229,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: openam-image
-          path: ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+          path: ${{ runner.temp }}/openam-tmp-image.tar
       - name: Load image
         run: |
-          docker load --input ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+          docker load --input ${{ runner.temp }}/openam-tmp-image.tar
           docker image ls -a
 
       - name: Build test Docker image
