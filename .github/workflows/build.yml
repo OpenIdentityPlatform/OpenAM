@@ -98,9 +98,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs:
-            - type=docker,dest=${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
-            - type=registry
+          outputs: type=docker,dest=${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
       - name: Docker test
         shell: bash
         run: |
