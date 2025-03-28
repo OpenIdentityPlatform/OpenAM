@@ -252,7 +252,7 @@ jobs:
         shell: bash
         run: |
           docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ${{ runner.temp }}/Dockerfile.tmp ${{ runner.temp }}
-          
+          docker create network test-openam
           echo "starting containers"
           docker run --rm -it -d --hostname opendj --name test-opendj --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test
           docker run --rm -it -d --hostname openam.example.org --name test-openam --network test-openam -p 8080:8080 test-openam-image
