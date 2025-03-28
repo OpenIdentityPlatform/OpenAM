@@ -245,12 +245,12 @@ jobs:
         run: |
           echo \
           "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
-          COPY ${{ runner.temp }}/*.war /usr/local/tomcat/webapps/openam.war" > Dockerfile.tmp
-          cat Dockerfile.tmp
+          COPY ${{ runner.temp }}/openam-server/target/*.war /usr/local/tomcat/webapps/openam.war" > ${{ runner.temp }}/Dockerfile.tmp
+          cat ${{ runner.temp }}/Dockerfile.tmp
       - name: Run Integration Test
         shell: bash
         run: |
-          docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ./Dockerfile.tmp .
+          docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ${{ runner.temp }}/Dockerfile.tmp ${{ runner.temp }}
           
           echo "starting containers"
           docker run --rm -it -d --hostname opendj --name test-opendj --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test
