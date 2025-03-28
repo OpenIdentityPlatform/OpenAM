@@ -101,6 +101,7 @@ jobs:
       - name: Export image to file
         shell: bash
         run: |
+          docker pull localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           docker image ls -a
           docker save -o ${{ runner.temp }}/openam-tmp-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
       - name: Docker test
