@@ -229,14 +229,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ubuntu-latest-8
-          path: openam-server/target/*.war
+          path: ${{ runner.temp }}
       - name: Download OpenAM Docker image
         uses: actions/download-artifact@v4
         with:
           name: openam-image
-          path: ${{ runner.temp }}/openam-tmp-image.tar
+          path: ${{ runner.temp }}
       - name: Load image
         run: |
+          ls ${{ runner.temp }}
           docker load --input ${{ runner.temp }}/openam-tmp-image.tar
           docker image ls -a
 
@@ -244,7 +245,8 @@ jobs:
         run: |
           echo \
           "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
-          COPY openam-server/target/*.war /usr/local/tomcat/webapps/openam.war" > Dockerfile.tmp
+          COPY ${{ runner.temp }}/*.war /usr/local/tomcat/webapps/openam.war" > Dockerfile.tmp
+          cat Dockerfile.tmp
       - name: Run Integration Test
         shell: bash
         run: |
