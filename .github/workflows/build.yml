@@ -135,6 +135,7 @@ jobs:
       - name: Upload docker image
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: openam-image
           path: ${{ runner.temp }}/openam-tmp-image.tar
 
