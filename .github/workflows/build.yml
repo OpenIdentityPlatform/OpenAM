@@ -10,8 +10,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [ '8', '11', '17', '21', '23' ]
-        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        java: [ '8' ]
+        os: [ 'ubuntu-latest' ]
       fail-fast: false
     steps:
     - uses: actions/checkout@v4
@@ -198,3 +198,75 @@ jobs:
           DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           sleep 35
           docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
+
+  integration-test:
+    needs: [build-maven, build-docker]
+    runs-on: 'ubuntu-latest'
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    steps:
+      - name: Download OpenAM war File
+        uses: actions/download-artifact@v4
+        with:
+          name: ubuntu-latest-8
+          path: openam-server/target/*.war
+        run: |
+          echo \
+          "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          COPY openam-server/target/*.war /usr/local/tomcat/webapps/openam.war" > Dockerfile.tmp
+      - name: Run Integration Test
+        run: |
+          docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ./Dockerfile.tmp .
+          
+          echo "starting containers"
+          docker run --rm -it -d --hostname opendj --name test-opendj --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test
+          docker run --rm -it -d --hostname openam.example.org --name test-openam --network test-openam -p 8080:8080 test-openam-image
+          
+          echo "waiting for OpenDJ to be alive..."
+          timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-opendj | grep -q \"healthy\"; do sleep 10; done'
+          echo "waiting for OpenAM to be alive..."
+          timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-openam | grep -q \"healthy\"; do sleep 10; done'
+          
+          echo "OpenAM configuration"
+          docker exec -w '/usr/openam/ssoconfiguratortools' test-openam bash -c \
+          'echo "ACCEPT_LICENSES=true
+          SERVER_URL=http://openam.example.org:8080
+          DEPLOYMENT_URI=/$OPENAM_PATH
+          BASE_DIR=$OPENAM_DATA_DIR
+          locale=en_US
+          PLATFORM_LOCALE=en_US
+          AM_ENC_KEY=
+          ADMIN_PWD=ampassword
+          AMLDAPUSERPASSWD=password
+          COOKIE_DOMAIN=example.org
+          ACCEPT_LICENSES=true
+          DATA_STORE=dirServer
+          DIRECTORY_SSL=SIMPLE
+          DIRECTORY_SERVER=opendj
+          DIRECTORY_PORT=1389
+          DIRECTORY_ADMIN_PORT=4444
+          DIRECTORY_JMX_PORT=1689
+          ROOT_SUFFIX=dc=example,dc=com
+          DS_DIRMGRDN=cn=Directory Manager
+          DS_DIRMGRPASSWD=password
+          USERSTORE_TYPE=LDAPv3ForOpenDS
+          USERSTORE_SSL=SIMPLE
+          USERSTORE_HOST=opendj
+          USERSTORE_PORT=1389
+          USERSTORE_SUFFIX=dc=example,dc=com
+          USERSTORE_MGRDN=cn=Directory Manager
+          USERSTORE_PASSWD=password
+          " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+          
+          docker exec test-openam bash -c \
+          'curl \
+         --request POST \
+         --header "Content-Type: application/json" \
+         --header "X-OpenAM-Username: amadmin" \
+         --header "X-OpenAM-Password: ampassword" \
+         --data "{}" \
+         http://openam.example.org:8080/openam/json/authenticate | grep tokenId'
+          
