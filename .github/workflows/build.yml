@@ -94,12 +94,15 @@ jobs:
           file: ./openam-distribution/openam-distribution-docker/Dockerfile
           build-args: |
             VERSION=${{ env.release_version }}
-          platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x
+          platforms: linux/amd64, linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Export image to file
-        run: docker save -o ${{ runner.temp }}/openam-tmp-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+        shell: bash
+        run: |
+          docker image ls -a
+          docker save -o ${{ runner.temp }}/openam-tmp-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
       - name: Docker test
         shell: bash
         run: |
