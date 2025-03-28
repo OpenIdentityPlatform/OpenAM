@@ -263,10 +263,10 @@ jobs:
           
           docker exec test-openam bash -c \
           'curl \
-         --request POST \
-         --header "Content-Type: application/json" \
-         --header "X-OpenAM-Username: amadmin" \
-         --header "X-OpenAM-Password: ampassword" \
-         --data "{}" \
-         http://openam.example.org:8080/openam/json/authenticate | grep tokenId'
+           --request POST \
+           --header "Content-Type: application/json" \
+           --header "X-OpenAM-Username: amadmin" \
+           --header "X-OpenAM-Password: ampassword" \
+           --data "{}" \
+           http://openam.example.org:8080/openam/json/authenticate | grep tokenId'
           
