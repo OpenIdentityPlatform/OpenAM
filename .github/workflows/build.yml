@@ -213,6 +213,7 @@ jobs:
         with:
           name: ubuntu-latest-8
           path: openam-server/target/*.war
+      - name: Build test Docker image
         run: |
           echo \
           "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
