@@ -32,7 +32,7 @@ jobs:
     - name: Set Integration Test Environment
       if: matrix.os == 'ubuntu-latest'
       run:  | 
-        echo "MAVEN_PROFILE_FLAG=-P \!man-pages -DskipTests=true" >> $GITHUB_OUTPUT 
+        echo "MAVEN_PROFILE_FLAG=-P \!man-pages -DskipTests=true -Dcargo.maven.skip=true" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
@@ -87,7 +87,7 @@ jobs:
         with:
           driver-opts: network=host
       - name: Build image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
@@ -98,6 +98,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          outputs:
+            - type=docker,dest=${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+            - type=registry
       - name: Docker test
         shell: bash
         run: |
@@ -126,6 +129,12 @@ jobs:
           DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           sleep 35
           docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openam-image
+          path: ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+
   build-docker-alpine:
     runs-on: 'ubuntu-latest'
     services:
@@ -218,6 +227,16 @@ jobs:
         with:
           name: ubuntu-latest-8
           path: openam-server/target/*.war
+      - name: Download OpenAM Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: openam-image
+          path: ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+      - name: Load image
+        run: |
+          docker load --input ${{ runner.temp }}/${GITHUB_REPOSITORY,,}-image.tar
+          docker image ls -a
+
       - name: Build test Docker image
         run: |
           echo \
