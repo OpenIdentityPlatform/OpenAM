@@ -98,7 +98,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=${{ runner.temp }}/openam-tmp-image.tar
+      - name: Export image to file
+        run: docker save -o ${{ runner.temp }}/openam-tmp-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
       - name: Docker test
         shell: bash
         run: |
@@ -127,7 +128,7 @@ jobs:
           DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           sleep 35
           docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
-      - name: Upload artifact
+      - name: Upload docker image
         uses: actions/upload-artifact@v4
         with:
           name: openam-image
@@ -241,6 +242,7 @@ jobs:
           "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           COPY openam-server/target/*.war /usr/local/tomcat/webapps/openam.war" > Dockerfile.tmp
       - name: Run Integration Test
+        shell: bash
         run: |
           docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ./Dockerfile.tmp .
           
