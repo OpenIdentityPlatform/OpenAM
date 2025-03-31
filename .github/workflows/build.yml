@@ -61,16 +61,20 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.release_version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Get latest release version
+        id: get_release_version
         shell: bash
         run:   |
           export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
           echo "release_version=$git_version_last" >> $GITHUB_ENV
+          echo "release_version=$git_version_last" >> $GITHUB_OUTPUT
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -224,8 +228,8 @@ jobs:
       - name: Get latest release version
         shell: bash
         run:   |
-          export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
-          echo "release_version=$git_version_last" >> $GITHUB_ENV
+          echo "last release: ${{needs.build-docker.outputs.release_version}}"
+          echo "release_version=${{needs.build-docker.outputs.release_version}}" >> $GITHUB_ENV
       - name: Download OpenAM war File
         uses: actions/download-artifact@v4
         with:
