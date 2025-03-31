@@ -10,8 +10,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [ '8' ]
-        os: [ 'ubuntu-latest' ]
+        java: [ '8', '11', '17', '21', '23' ]
+        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
       fail-fast: false
     steps:
     - uses: actions/checkout@v4
@@ -31,8 +31,8 @@ jobs:
          restore-keys: ${{ runner.os }}-m2-repository
     - name: Set Integration Test Environment
       if: matrix.os == 'ubuntu-latest'
-      run:  | 
-        echo "MAVEN_PROFILE_FLAG=-P \!man-pages -DskipTests=true -Dcargo.maven.skip=true" >> $GITHUB_OUTPUT 
+      run:  |
+        echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
@@ -94,7 +94,7 @@ jobs:
           file: ./openam-distribution/openam-distribution-docker/Dockerfile
           build-args: |
             VERSION=${{ env.release_version }}
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
