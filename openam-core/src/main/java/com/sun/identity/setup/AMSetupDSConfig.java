@@ -25,6 +25,7 @@
  * $Id: AMSetupDSConfig.java,v 1.20 2009/11/20 23:52:55 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.setup;
 
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPSchemaModificationException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Connection;
@@ -245,24 +247,27 @@ public class AMSetupDSConfig {
      */
     public void loadSchemaFiles(List schemaFiles)
         throws ConfiguratorException {
-        try {
-            for (Iterator i = schemaFiles.iterator(); i.hasNext(); ) {
-                String file = (String)i.next();
-                int idx = file.lastIndexOf("/");
-                String schemaFile = (idx != -1) ? file.substring(idx+1) : file;
-                Object[] params = {schemaFile};
-                SetupProgress.reportStart("emb.loadingschema", params);
+
+        for (Iterator i = schemaFiles.iterator(); i.hasNext(); ) {
+            String file = (String) i.next();
+            int idx = file.lastIndexOf("/");
+            String schemaFile = (idx != -1) ? file.substring(idx + 1) : file;
+            Object[] params = {schemaFile};
+            SetupProgress.reportStart("emb.loadingschema", params);
+            try {
                 LdifUtils.createSchemaFromLDIF(basedir + "/" + schemaFile, ld.getConnection());
                 SetupProgress.reportEnd("emb.success", null);
+            } catch (IOException e) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                        "AMSetupDSConfig.loadSchemaFiles:failed", e);
+                SetupProgress.reportEnd("emb.failed", null);
+                InstallLog.getInstance().write(
+                        "AMSetupDSConfig.loadSchemaFiles:failed", e);
+                if(!(e instanceof LDAPSchemaModificationException)) {
+                    throw new ConfiguratorException("configurator.ldiferror",
+                            null, locale);
+                }
             }
-        } catch (IOException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                 "AMSetupDSConfig.loadSchemaFiles:failed", e);
-            SetupProgress.reportEnd("emb.failed", null);
-            InstallLog.getInstance().write(
-                 "AMSetupDSConfig.loadSchemaFiles:failed", e);
-            throw new ConfiguratorException("configurator.ldiferror",
-                null, locale);
         }
     }
   
