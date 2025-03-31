@@ -117,13 +117,13 @@ public final class LdifUtils {
                                 } catch (LdapException ex) {
                                     DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}",
                                             modifyRequest, ex);
-                                    return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                                    return new LDAPSchemaModificationException(String.format("LDAPUtils.createSchemaFromLDIF - " +
                                             "Could not modify schema: %s; ex: %s", modifyRequest, ex));
                                 }
                             }
                         } else {
                             DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not add to schema: {}", change, e);
-                            return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                            return new LDAPSchemaModificationException(String.format("LDAPUtils.createSchemaFromLDIF - " +
                                     "Could not add to schema: %s; ex: %s", change, e));
                         }
                     }
@@ -138,7 +138,7 @@ public final class LdifUtils {
                         ld.modify(change);
                     } catch (LdapException e) {
                         DEBUG.error("LDAPUtils.createSchemaFromLDIF - Could not modify schema: {}", change, e);
-                        return new IOException(String.format("LDAPUtils.createSchemaFromLDIF - " +
+                        return new LDAPSchemaModificationException(String.format("LDAPUtils.createSchemaFromLDIF - " +
                                 "Could not modify schema: %s; ex: %s", change, e));
                     }
                     return null;
