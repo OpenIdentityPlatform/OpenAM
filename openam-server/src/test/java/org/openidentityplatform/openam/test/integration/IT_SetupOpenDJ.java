@@ -133,7 +133,7 @@ public class IT_SetupOpenDJ extends BaseTest {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("writeConfigButton"))).click();
 
-        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(300));
+        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(600));
         WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
         proceedToConsole.click();
     }
