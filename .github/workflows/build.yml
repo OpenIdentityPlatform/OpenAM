@@ -103,7 +103,7 @@ jobs:
         run: |
           docker network create test-openam
           docker run --rm -it -d --hostname opendj -p 1389:1389 -p 4444:4444 --name test-opendj --network test-openam openidentityplatform/opendj:latest
-          docker run --rm -it -d --memory="2g" -h openam.example.org --name=test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          docker run --rm -it -d --memory="2g" -h openam.example.org --name=test-openam --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           
           echo "waiting for OpenDJ to be alive..."
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-opendj | grep -q \"healthy\"; do sleep 10; done'
