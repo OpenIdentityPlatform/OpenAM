@@ -30,6 +30,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,8 +48,8 @@ public abstract class BaseTest {
     @BeforeClass
     public void webdriverSetup() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
-        //options.addArguments("--remote-allow-origins=*", "--verbose");
+        //options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
+        options.addArguments("--remote-allow-origins=*", "--verbose");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
@@ -68,6 +70,24 @@ public abstract class BaseTest {
             FileUtils.deleteDirectory(testConfig.toFile());
         }
     }
+
+    protected void printInstallLogFile() {
+        String testConfigPath = System.getProperty("test.config.path");
+        Path installLog = Paths.get(testConfigPath, "install.log");
+        if(installLog.toFile().exists()) {
+            System.err.println("install.log file:");
+            try (BufferedReader reader = new BufferedReader(new FileReader(installLog.toFile()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.err.println(line);
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading file: " + e.getMessage());
+            }
+        }
+
+    }
+
     WebElement waitForElement(By by) {
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }

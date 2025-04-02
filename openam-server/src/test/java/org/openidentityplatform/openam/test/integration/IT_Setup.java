@@ -18,11 +18,11 @@ package org.openidentityplatform.openam.test.integration;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -32,13 +32,9 @@ import static org.testng.Assert.assertTrue;
 public class IT_Setup extends BaseTest {
 
     @Test
-    @Ignore
-    public void test1() {
-        driver.get("https://ya.ru");
-    }
-
-    @Test
     public void testSetup() {
+
+
 
         final String openamUrl = "http://openam.local:8207/openam";
 
@@ -68,8 +64,19 @@ public class IT_Setup extends BaseTest {
 
         //wait for setup complete
         WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(300));
-        WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
-        proceedToConsole.click();
+        try {
+            WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
+            proceedToConsole.click();
+        } catch (TimeoutException e) {
+            System.err.println("error occurred during install: " + e);
+            WebElement progressIframe = waitForElement(By.id("progressIframe"));
+            driver.switchTo().frame(progressIframe);
+            System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            printInstallLogFile();
+            throw e;
+        } finally {
+            driver.switchTo().defaultContent();
+        }
 
         waitForElement(By.id("IDToken1")).sendKeys("amadmin");
         waitForElement(By.id("IDToken2")).sendKeys(AM_PASSWORD);

@@ -18,6 +18,7 @@ package org.openidentityplatform.openam.test.integration;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,20 +28,14 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import org.testng.SkipException;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
 
 import static org.testng.Assert.assertTrue;
 
-public class IT_SetupOpenDJ extends BaseTest {
+public class IT_SetupWithOpenDJ extends BaseTest {
 
-    @Test
-    @Ignore
-    public void test1() {
-        driver.get("https://ya.ru");
-    }
     @Test
     public void testSetupWithOpendj() throws Exception {
 
@@ -57,13 +52,9 @@ public class IT_SetupOpenDJ extends BaseTest {
 
             opendj.start();
 
-
             System.out.println("containers started");
 
             Integer opendjPort = opendj.getMappedPort(1389);
-//            Integer opendjAdminPort = opendj.getMappedPort(4444);
-//            Integer opendjPort = 1389;
-//            Integer opendjAdminPort = 4444;
 
             testOpenAmInstallation(openamUrl, opendjPort);
 
@@ -101,9 +92,9 @@ public class IT_SetupOpenDJ extends BaseTest {
         //DS configuration
         waitForElement(By.id("configStoreCustom")).click();
 
-        WebElement configStoreHost = waitForElement(By.id("configStoreHost"));
-        configStoreHost.clear();
-        configStoreHost.sendKeys("localhost");
+//        WebElement configStoreHost = waitForElement(By.id("configStoreHost"));
+//        configStoreHost.clear();
+//        configStoreHost.sendKeys("localhost");
 
         WebElement storePort = waitForElement(By.id("configStorePort"));
         storePort.clear();
@@ -112,6 +103,7 @@ public class IT_SetupOpenDJ extends BaseTest {
         WebElement rootSuffix = waitForElement(By.id("rootSuffix"));
         rootSuffix.clear();
         rootSuffix.sendKeys("dc=example,dc=com");
+        Thread.sleep(1000);
 
         waitForElement(By.id("configStorePassword")).sendKeys("password");
 
@@ -133,9 +125,20 @@ public class IT_SetupOpenDJ extends BaseTest {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("writeConfigButton"))).click();
 
-        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(600));
-        WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
-        proceedToConsole.click();
+        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(300));
+        try {
+            WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
+            proceedToConsole.click();
+        } catch (TimeoutException e) {
+            System.err.println("error occurred during install: " + e);
+            WebElement progressIframe = waitForElement(By.id("progressIframe"));
+            driver.switchTo().frame(progressIframe);
+            System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            printInstallLogFile();
+            throw e;
+        } finally {
+            driver.switchTo().defaultContent();
+        }
     }
 
     private void testOpenAmLogin(String openamUrl) {
