@@ -1,45 +1,48 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2022-2025 3A Systems LLC.
+ */
+
 package org.openidentityplatform.openam.test.integration;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
-import java.util.List;
 
 import static org.testng.Assert.assertTrue;
 
-public class IT_Setup {
+public class IT_Setup extends BaseTest {
 
-    WebDriver driver;
-    WebDriverWait wait;
-
-    final static String OPENAM_URL = "http://openam.local:8207/openam";
-    final static String AM_PASSWORD = "AMp@ssw0rd";
-    final static String PA_PASSWORD = "PAp@ssw0rd";
-
-    @BeforeTest
-    public void webdriverSetup() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    @Test
+    @Ignore
+    public void test1() {
+        driver.get("https://ya.ru");
     }
 
     @Test
     public void testSetup() {
-        driver.get(OPENAM_URL);
+
+        final String openamUrl = "http://openam.local:8207/openam";
+
+        driver.get(openamUrl);
 
         //wait for setup page is loaded
         waitForElement(By.id("pushConfigDialog_c"));
@@ -79,7 +82,7 @@ public class IT_Setup {
         assertTrue(isTextPresent("You are logged out."));
 
         //check XUI
-        driver.get(OPENAM_URL.concat("/XUI"));
+        driver.get(openamUrl.concat("/XUI"));
         waitForElement(By.id("idToken1")).sendKeys("amadmin");
         waitForElement(By.id("idToken2")).sendKeys(AM_PASSWORD);
         waitForElement(By.id("loginButton_0")).click();
@@ -88,47 +91,5 @@ public class IT_Setup {
         waitForElementVisible(By.id("mainNavBar"));
     }
 
-    @AfterTest
-    public void webDriverTearDown() {
-        if(driver != null) {
-            driver.quit();
-        }
-    }
 
-    WebElement waitForElement(By by) {
-        return wait.until(ExpectedConditions.presenceOfElementLocated(by));
-    }
-
-    WebElement waitForElementVisible(By by) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-    }
-
-    public static ExpectedCondition<WebElement> visibilityOfAnyElement(final By locator) {
-        return new ExpectedCondition<WebElement>() {
-
-            @Override
-            public WebElement apply(WebDriver webDriver) {
-                List<WebElement> elements = webDriver.findElements(locator);
-                return elements.stream().filter(WebElement::isDisplayed).findFirst().orElse(null);
-            }
-
-            @Override
-            public String toString() {
-                return "visibility of any element " + locator;
-            }
-        };
-    }
-
-    public boolean isTextPresent(String str) {
-        Exception lastException = new Exception();
-        for(int i = 0; i < 3; i++) {
-            try {
-                WebElement bodyElement  = new WebDriverWait(driver,Duration.ofSeconds(20)).until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-                return bodyElement.getText().toLowerCase().contains(str.toLowerCase());
-            } catch (StaleElementReferenceException e) {
-                lastException = e;
-            }
-        }
-        throw new RuntimeException(lastException);
-    }
 }
