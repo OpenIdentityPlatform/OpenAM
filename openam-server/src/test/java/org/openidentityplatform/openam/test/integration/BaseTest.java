@@ -48,8 +48,8 @@ public abstract class BaseTest {
     @BeforeClass
     public void webdriverSetup() {
         ChromeOptions options = new ChromeOptions();
-        //options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
-        options.addArguments("--remote-allow-origins=*", "--verbose");
+        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
+        //options.addArguments("--remote-allow-origins=*", "--verbose");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
