@@ -31,7 +31,7 @@ jobs:
          restore-keys: ${{ runner.os }}-m2-repository
     - name: Set Integration Test Environment
       if: matrix.os == 'ubuntu-latest'
-      run:  | 
+      run:  |
         echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
         echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
@@ -61,16 +61,20 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.release_version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Get latest release version
+        id: get_release_version
         shell: bash
         run:   |
           export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
           echo "release_version=$git_version_last" >> $GITHUB_ENV
+          echo "release_version=$git_version_last" >> $GITHUB_OUTPUT
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -87,7 +91,7 @@ jobs:
         with:
           driver-opts: network=host
       - name: Build image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
@@ -98,6 +102,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Export image to file
+        shell: bash
+        run: |
+          docker pull localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          docker image ls -a
+          docker save -o ${{ runner.temp }}/openam-tmp-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
       - name: Docker test
         shell: bash
         run: |
@@ -126,6 +136,13 @@ jobs:
           DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           sleep 35
           docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
+      - name: Upload docker image
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: openam-image
+          path: ${{ runner.temp }}/openam-tmp-image.tar
+
   build-docker-alpine:
     runs-on: 'ubuntu-latest'
     services:
@@ -198,3 +215,94 @@ jobs:
           DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           sleep 35
           docker inspect --format="{{json .State.Health.Status}}" test | grep -q \"healthy\"
+
+  integration-test:
+    needs: [build-maven, build-docker]
+    runs-on: 'ubuntu-latest'
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    steps:
+      - name: Get latest release version
+        shell: bash
+        run:   |
+          echo "last release: ${{needs.build-docker.outputs.release_version}}"
+          echo "release_version=${{needs.build-docker.outputs.release_version}}" >> $GITHUB_ENV
+      - name: Download OpenAM war File
+        uses: actions/download-artifact@v4
+        with:
+          name: ubuntu-latest-8
+          path: ${{ runner.temp }}
+      - name: Download OpenAM Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: openam-image
+          path: ${{ runner.temp }}
+      - name: Load image
+        run: |
+          ls ${{ runner.temp }}
+          docker load --input ${{ runner.temp }}/openam-tmp-image.tar
+          docker image ls -a
+
+      - name: Build test Docker image
+        run: |
+          echo \
+          "FROM localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          COPY ./openam-server/target/*.war /usr/local/tomcat/webapps/openam.war" > ${{ runner.temp }}/Dockerfile.tmp
+          cat ${{ runner.temp }}/Dockerfile.tmp
+      - name: Run Integration Test
+        shell: bash
+        run: |
+          docker build -t localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test -f ${{ runner.temp }}/Dockerfile.tmp ${{ runner.temp }}
+          docker network create test-openam
+          echo "starting containers"
+          docker run --rm -it -d --hostname opendj --name test-opendj --network test-openam openidentityplatform/opendj
+          docker run --rm -it -d --hostname openam.example.org --name test-openam --network test-openam -p 8080:8080 localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}-test
+          
+          echo "waiting for OpenDJ to be alive..."
+          timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-opendj | grep -q \"healthy\"; do sleep 10; done'
+          echo "waiting for OpenAM to be alive..."
+          timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-openam | grep -q \"healthy\"; do sleep 10; done'
+          
+          echo "OpenAM configuration"
+          docker exec -w '/usr/openam/ssoconfiguratortools' test-openam bash -c \
+          'echo "ACCEPT_LICENSES=true
+          SERVER_URL=http://openam.example.org:8080
+          DEPLOYMENT_URI=/$OPENAM_PATH
+          BASE_DIR=$OPENAM_DATA_DIR
+          locale=en_US
+          PLATFORM_LOCALE=en_US
+          AM_ENC_KEY=
+          ADMIN_PWD=ampassword
+          AMLDAPUSERPASSWD=password
+          COOKIE_DOMAIN=example.org
+          ACCEPT_LICENSES=true
+          DATA_STORE=dirServer
+          DIRECTORY_SSL=SIMPLE
+          DIRECTORY_SERVER=opendj
+          DIRECTORY_PORT=1389
+          DIRECTORY_ADMIN_PORT=4444
+          DIRECTORY_JMX_PORT=1689
+          ROOT_SUFFIX=dc=example,dc=com
+          DS_DIRMGRDN=cn=Directory Manager
+          DS_DIRMGRPASSWD=password
+          USERSTORE_TYPE=LDAPv3ForOpenDS
+          USERSTORE_SSL=SIMPLE
+          USERSTORE_HOST=opendj
+          USERSTORE_PORT=1389
+          USERSTORE_SUFFIX=dc=example,dc=com
+          USERSTORE_MGRDN=cn=Directory Manager
+          USERSTORE_PASSWD=password
+          " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+          
+          docker exec test-openam bash -c \
+          'curl \
+           --request POST \
+           --header "Content-Type: application/json" \
+           --header "X-OpenAM-Username: amadmin" \
+           --header "X-OpenAM-Password: ampassword" \
+           --data "{}" \
+           http://openam.example.org:8080/openam/json/authenticate | grep tokenId'
+          
