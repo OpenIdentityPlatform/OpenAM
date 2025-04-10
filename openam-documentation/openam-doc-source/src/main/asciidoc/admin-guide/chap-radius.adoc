@@ -170,7 +170,7 @@ For more information on the RADIUS Server service configuration properties, see 
 
 . Create a file named `radius.properties` in the current working directory. The file consists of the following key-value pairs:
 +
-
+--
 * `secret` - Mandatory property specifying the RADIUS client's shared secret. This property's value must be identical to the value of the Client Secret property for the RADIUS client in the OpenAM RADIUS Server service configuration.
 
 * `host` - Mandatory property specifying the host name or IP address of the OpenAM server.
@@ -179,9 +179,7 @@ For more information on the RADIUS Server service configuration properties, see 
 
 * `show-traffic` - Optional property specifying whether to show traffic packet during client operation. Valid values are `true` and `false`. Packet traffic is not shown if this property is not specified.
 
-+
 The following is an example `radius.properties` file:
-+
 
 [source, console]
 ----
@@ -190,10 +188,9 @@ host=openam.example.com
 port=1812
 show-traffic=true
 ----
-
+--
 . Make sure that your current working directory is the directory in which you created the `radius.properties` file, then execute the sample client. Messages from the sample client indicate success or failure authenticating. If you specify `show-traffic=true` in the `radius.properties` file, the packets to and from the OpenAM RADIUS server appear in standard output:
 +
-
 [source, console, subs="attributes"]
 ----
 $ java -jar //path/to/tomcat/webapps/openam/WEB-INF/lib/openam-radius-server-{openam-version}.jar
@@ -219,7 +216,6 @@ Packet From openam.example.com:1812
 ==== Solutions to Common RADIUS Server Service Issues
 
 This section offers solutions to issues that you might encounter when configuring communication between RADIUS clients and the RADIUS Server service. The solutions assume that you have enabled message-level debugging for the RADIUS Server service in OpenAM and have access to the debug logs.
---
 
 Client Cannot Connect::
 When a RADIUS client connects to OpenAM's RADIUS server and hangs without receiving a response, the problem could be one of four possible issues:
@@ -358,14 +354,12 @@ To fix this problem, correct the client configuration in the RADIUS Server servi
 Configuration Is Correct but Authentication Fails::
 In this case, you might have a client-specific problem. OpenAM provides a tool that you can use to eliminate OpenAM and its configuration as the cause of the problem. You can declare an alternate handler class implementation in the RADIUS Server service configuration. Two test handlers are available for troubleshooting purposes:
 +
-
+--
 * The `org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler` handler always returns an `Access-Accept` packet, indicating successful authentication for all requests.
 
 * The `org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler` handler always returns an `Access-Reject` packet, indicating failed authentication for all requests.
 
-+
 In a case where you believe that configuration is correct but authentication always fails, you could specify the `org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler` handler class in the RADIUS Server service configuration for your client. With packet logging enabled, all requests received from the client should log packet contents traffic similar to the following even if the password is incorrect:
-+
 
 [source, console]
 ----
@@ -377,10 +371,8 @@ Packet from TestClient:
     - NAS_IP_ADDRESS : /127.0.0.1
     - NAS_PORT : 0
 ----
-+
-+
+
 This is followed by:
-+
 
 [source, console]
 ----
@@ -388,18 +380,15 @@ WARNING:
 Packet to TestClient:
   ACCESS_ACCEPT [1]
 ----
-+
-+
+
 If the client still indicates that authentication has failed, refer to the documentation for the client to determine why the `Access-Accept` response is rejected. Most likely, the client expects specific fields in the `Access-Accept` response that are not provided by OpenAM. There is currently no facility in OpenAM to return fields in `Access-Accept` responses.
+--
 
 Authentication Always Succeeds, Even With a Bad Password::
 This would be a very unusual situation, probably due to the `org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler` handler being left in place after troubleshooting an error scenario in which authentication always suceeds.
 
 +
 To resolve the problem, verify that the correct handler class is specified in the RADIUS Server service configuration for the client. If it is not specified, review the authentication modules in the chain that authenticates users and determine whether one of the modules might be accepting all authentication requests. This situation could also occur because of incorrectly-specified module criteria in the chain's definition.
-
---
-
 
 
 [#radius-limitations]

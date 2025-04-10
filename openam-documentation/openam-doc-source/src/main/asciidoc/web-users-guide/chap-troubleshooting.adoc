@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -27,7 +27,8 @@ This chapter offers solutions to issues during installation of OpenAM policy age
 [#solutions-to-common-issues]
 === Solutions to Common Issues
 This section offers solutions to common problems when installing OpenAM policy agents:
-I am trying to install a policy agent on Windows, which will connect to an OpenAM server running over HTTPS, but the installer reports the following:::
+
+I am trying to install a policy agent on Windows, which will connect to an OpenAM server running over HTTPS, but the installer reports the following: ::
 +
 --
 If OpenSSL is correctly installed and you are using a Windows 7 or Windows Server 2008 R2 system, apply the update provided in Microsoft knowledge base article KB2533623. See link:https://support.microsoft.com/en-us/kb/2533623[Microsoft Security Advisory: Insecure library loading could allow remote code execution, window=\_top].
