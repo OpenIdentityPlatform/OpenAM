@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -295,18 +295,20 @@ Installation complete.
 
 
 +
+[open]
+======
 Upon successful completion, the installer adds the agent as a module to the IIS site configuration.
-+
+
 The installer also sets up configuration and log directories for the agent instance. Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are located under the directory `web_agents\iis_agent\instances\agent_1\`.
-+
 
 [NOTE]
-======
+========
 The installer grants full access permissions on the created instance folder to the user that the selected IIS site is running under, so that log files can be written correctly.
-======
-+
+========
+
 The configuration files and log locations are as follows:
-+
+
+======
 --
 
 `config/agent.conf`::

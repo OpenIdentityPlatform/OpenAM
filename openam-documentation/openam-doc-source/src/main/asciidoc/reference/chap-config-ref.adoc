@@ -690,10 +690,10 @@ Default: `true`
 
 Topics::
 Specifies the topics for the CSV handler.
-
 +
+[open]
+====
 Possible values:
-+
 
 * `Access`
 
@@ -703,10 +703,8 @@ Possible values:
 
 * `Configuration`
 
-+
-+
+
 Default:
-+
 
 * `Access`
 
@@ -715,11 +713,9 @@ Default:
 * `Authentication`
 
 * `Configuration`
-
-+
-+
 `ssoadm` attribute: `topics`
 
+====
 Log Directory::
 Specifies the location of the CSV audit log.
 
@@ -1961,16 +1957,15 @@ Default: `oathDeviceProfiles`
 Device Profile Encryption Scheme::
 Encryption scheme for securing device profiles stored on the server. You can choose not to encrypt the device profiles, or to use one of the following encryption schemes:
 +
-
+[open]
+====
 * AES-128/HMAC-SHA-256 with RSA key wrapping
-
 * AES-256/HMAC-SHA-512 with RSA key wrapping
 
-+
 Default: no encryption.
 
-+
 `ssoadm` attribute: `openam-authenticator-oath-device-settings-encryption-scheme`
+====
 
 Encryption Key Store::
 Path to the keystore from which to load encryption keys.
@@ -2034,17 +2029,16 @@ Default: `pushDeviceProfiles`
 Device Profile Encryption Scheme::
 Encryption scheme for securing device profiles stored on the server. You can choose not to encrypt the device profiles, or to use one of the following encryption schemes:
 +
-
+[open]
+====
 * AES-128/HMAC-SHA-256 with RSA key wrapping
 
 * AES-256/HMAC-SHA-512 with RSA key wrapping
 
-+
-+
 Default: no encryption.
 
-+
 `ssoadm` attribute: `openam-auth-authenticator-push-device-settings-encryption-scheme`
+====
 
 Encryption Key Store::
 Path to the keystore from which to load encryption keys.
@@ -2359,7 +2353,6 @@ a|`locale`
 a|A space-separated list of locales, ordered by preference.
 |===
 +
-+
 The following example template redirects users to a non-OpenAM front end to handle login, which will then redirect back to the `/oauth2/authorize` endpoint with any required parameters:
 +
 
@@ -2481,7 +2474,7 @@ Each client receives the same `sub` (subject) value.
 Each client receives a different `sub` (subject) value, to prevent correlation between clients.
 
 ====
-+
+
 +
 Default: `public`
 
@@ -3676,7 +3669,6 @@ ssoadm set-sub-cfg \
   --attributevalues maxThreads=300 queueSize=-1
 ----
 +
-+
 
 [NOTE]
 ========
@@ -4322,10 +4314,10 @@ Default:
 
 Destination After Successful Registration::
 Specifies the action to be taken after a user successfully registers a new account.
-
 +
+[open]
+====
 Valid values:
-+
 
 * `default`. User is sent to a success page without being logged in.
 
@@ -4333,14 +4325,12 @@ Valid values:
 
 * `autologin`. User is sent to the login page to authenticate.
 
-+
-+
 Default: `default`
 
-+
 `ssoadm` attribute: `selfServiceUserRegistrationSuccessDestination`
-
+====
 --
+
 --
 The following are forgotten password options:
 
@@ -5219,7 +5209,7 @@ Server 1 site 1 and any server not specified will open new connections to any se
 
 ====
 +
-+
+
 Example for affinity deployments:
 +
 [open]

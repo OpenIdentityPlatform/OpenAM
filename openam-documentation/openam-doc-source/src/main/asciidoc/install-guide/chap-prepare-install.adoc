@@ -228,18 +228,16 @@ The following procedure shows you how to prepare an identity repository with dyn
 
 . Create the OpenAM data store administrator account.
 +
+--
 This example uses `uid=openam,ou=admins,dc=example,dc=com` as the OpenAM data store administrator. It is assumed that the `dc=example,dc=com` suffix already exists in the directory.
-+
+
 First, create an LDIF file that defines the OpenAM data store administrator account and gives the account the following privileges:
-+
 
 * `update-schema`. Allows the account to update the directory schema.
 
 * `subentry-write`. Allows the account to make directory subentry updates.
 
 * `password-reset`. Allows the account to reset other users' passwords. Required for the OpenAM forgotten password feature. This privilege is not required for deployments where the OpenAM data store will not modify user entries.
-
-+
 
 [source, ldif]
 ----
@@ -260,9 +258,8 @@ ds-privilege-name: update-schema
 ds-privilege-name: subentry-write
 ds-privilege-name: password-reset
 ----
-+
+
 Then, run the `ldapmodify` command to create the user.
-+
 
 [source, console]
 ----
@@ -279,6 +276,7 @@ ADD operation successful for DN ou=admins,dc=example,dc=com
 Processing ADD request for uid=openam,ou=admins,dc=example,dc=com
 ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com
 ----
+--
 
 . Add a global ACI that lets the OpenAM administrator account modify the directory schema.
 +
@@ -402,14 +400,13 @@ The following procedure shows you how to prepare an identity repository with man
 
 . Create the OpenAM data store administrator account.
 +
+--
 This example uses uses `uid=openam,ou=admins,dc=example,dc=com` as the OpenAM data store administrator. It is assumed that the `dc=example,dc=com` suffix already exists in the directory.
-+
+
 First, create an LDIF file that defines the OpenAM data store administrator account and gives the account the following privilege:
-+
+
 
 * `password-reset`. Allows the account to reset other users' passwords. Required for the OpenAM forgotten password feature. For deployments in which OpenAM will not modify user entries, the OpenAM data store administrator does not require this privilege.
-
-+
 
 [source, ldif]
 ----
@@ -428,9 +425,8 @@ sn: OpenAM
 userPassword: changeMe
 ds-privilege-name: password-reset
 ----
-+
+
 Then run the `ldapmodify` command to create the user:
-+
 
 [source, console]
 ----
@@ -447,11 +443,11 @@ ADD operation successful for DN ou=admins,dc=example,dc=com
 Processing ADD request for uid=openam,ou=admins,dc=example,dc=com
 ADD operation successful for DN uid=openam,ou=admins,dc=example,dc=com
 ----
-
+--
 . Using the directory administrator account, add the OpenAM schema extensions to your external identity repository.
 +
+--
 First, identify the path that contains LDIF file for OpenAM schema extensions. The path is `/path/to/openam/ldif/directory_type`, where `directory_type` is one of the following:
-+
 
 * `ad` for Microsoft Active Directory
 
@@ -463,9 +459,9 @@ First, identify the path that contains LDIF file for OpenAM schema extensions. T
 
 * `tivoli` for IBM Tivoli Directory Server
 
-+
+
 Then run the `ldapmodify` command to import the user, device print, and dashboard schema extensions. For example, to add schema extensions for an OpenDJ directory server, run the following `ldapmodify` commands:
-+
+
 
 [source, console]
 ----
@@ -495,7 +491,7 @@ $ ldapmodify \
   --bindPassword password \
   --filename opendj_dashboard.ldif
 ----
-
+--
 . Allow OpenAM to read the directory schema. OpenAM needs to read the directory schema to ensure that changes made to identities stored in identity repositories remain compliant with the directory schema.
 +
 For OpenDJ, no actions are required. Simply retain the default User-Visible Schema Operational Attributes global ACI.

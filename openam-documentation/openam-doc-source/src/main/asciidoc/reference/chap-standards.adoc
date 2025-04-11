@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -84,7 +84,6 @@ In section 5.6 of the specification, OpenAM supports __Normal Claims__. The opti
 
 +
 OpenID Connect 1.0 also provides implementer's guides for client developers.
-+
 
 * link:http://openid.net/specs/openid-connect-basic-1_0.html[OpenID Connect Basic Client Implementer's Guide 1.0, window=\_blank]
 

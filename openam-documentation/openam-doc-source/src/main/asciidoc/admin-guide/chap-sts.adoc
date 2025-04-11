@@ -535,6 +535,7 @@ Specify the custom transform using three values separated by the vertical bar ch
 For example, a value of `CUSTOM|SAML2|TRUE` configures a token transformation that transforms a `CUSTOM` token to a SAML v2.0 assertion and then invalidates the created OpenAM session.
 
 --
+
 .Deployment Configuration Properties
 --
 The following are deployment configuration properties for REST STS instances:
@@ -547,10 +548,10 @@ The Deployment Url Element is a component of the REST STS instance's endpoint. F
 
 Authentication Target Mappings::
 Specifies one or more mappings that define how the REST STS instance authenticates input tokens.
-
 +
+[open]
+====
 Each mapping is a set of arguments separated by the vertical bar character *|* as follows:
-+
 
 . (Required) The input token type: `USERNAME`, `OPENAM`, `X509`, `OPENIDCONNECT`, or a custom token type.
 
@@ -559,25 +560,21 @@ Each mapping is a set of arguments separated by the vertical bar character *|* a
 . (Required) The name of an OpenAM authentication chain or module to which the input token is authenticated.
 
 . (Optional) The name of the header to place the token in when authenticating to OpenAM. Specify this parameter for input `X509` and `OPENIDCONNECT` tokens as follows:
-+
 
 * For `X509` input tokens, the format is `x509_token_auth_target_header_key=Header Name`.
 
 * For `OPENIDCONNECT` input tokens, the format is `oidc_id_token_auth_target_header_key=Header Name`.
 
-+
 Be sure to specify the header names configured in the Certificate or OpenID Connect id_token bearer authentication module properties as the __Header Name__ argument.
-+
+
 This argument can also be used with custom token types to specify the name of a header or cookie from which to obtain a token. When using this argument with a custom token type, its format is determined by the custom validator class that validates the custom token type.
 
-+
 The following are example mappings:
-+
 
 * `USERNAME|service|myLDAPChain` configures STS to authenticate input `USERNAME` tokens to the `myLDAPChain` authentication chain.
 
 * `X509|module|CertModule|x509_token_auth_target_header_key=ClientCert` configures STS to obtain an X.509 certificate from the `ClientCert` header, use it as the input token, and authenticate it using the `CertModule` authentication module.
-
+====
 
 Client Certificate Header Key::
 Specifies the name of a header that a TLS offloader should use to use to transmit client certificates.
@@ -680,28 +677,22 @@ By default, OpenAM generates the `AuthnContext` element based on the input token
 
 * For input X.509 tokens: `urn:oasis:names:tc:SAML:2.0:ac:classes:X509`
 
-+
-
 Attribute Mappings::
 Configures mappings between SAML v2.0 attribute names—__map keys__—and OpenAM user profile attributes or session properties in order to generate `Attribute` elements in the SAML v2.0 assertion.
-
 +
+[open]
+====
 OpenAM's default attribute mapper generates `Attribute` elements as follows:
-+
 
 * The map key populates the `Attribute` element's `Name` property.
 
 * The user profile or session property value populates the `Attribute` element's `AttributeValue` property.
 
-+
 When specifying map keys in the Attribute Mappings property, use the following format: `[NameFormatURI]|SAML_ATTRIBUTE_NAME`.
 
-+
 Map values enclosed in quotes are included in the attribute without mapping. Specify `';binary'` at the end of a map value for attributes that have binary values.
 
-+
 The following are examples of attribute mappings:
-+
 
 * `EmailAddress=mail`
 
@@ -716,7 +707,7 @@ The following are examples of attribute mappings:
 * `photo=photo;binary`
 
 * `urn:oasis:names:tc:SAML:2.0:attrname-format:uri|photo=photo;binary`
-
+====
 
 Sign Assertion::
 Specifies whether or not to sign the SAML v2.0 assertion.
@@ -942,7 +933,6 @@ Each mapping is a set of arguments separated by the *|* character as follows:
 . (Optional) The name of the header in which to place the token when authenticating to OpenAM. For `X509` input tokens, the format is `x509_token_auth_target_header_key=Header Name`.
 +
 Be sure to specify the header name configured in the Certificate authentication module properties as the __Header Name__ argument.
-
 +
 The following are example mappings:
 +
@@ -1098,24 +1088,21 @@ By default, OpenAM generates the `AuthnContext` element based on the input token
 
 Attribute Mappings::
 Configures mappings between SAML v2.0 attribute names—__map keys__—and OpenAM user profile attributes or session properties in order to generate `Attribute` elements in the SAML v2.0 assertion.
-
 +
+[open]
+====
 OpenAM's default attribute mapper generates `Attribute` elements as follows:
-+
 
 * The map key populates the `Attribute` element's `Name` property.
 
 * The user profile or session property value populates the `Attribute` element's `AttributeValue` property.
 
-+
 When specifying map keys in the Attribute Mappings property, use the following format: `[NameFormatURI]|SAML_ATTRIBUTE_NAME`.
 
-+
+
 Map values enclosed in quotes are included in the attribute without mapping. Specify `';binary'` at the end of a map value for attributes that have binary values.
 
-+
 The following are examples of attribute mappings:
-+
 
 * `EmailAddress=mail`
 
@@ -1130,7 +1117,7 @@ The following are examples of attribute mappings:
 * `photo=photo;binary`
 
 * `urn:oasis:names:tc:SAML:2.0:attrname-format:uri|photo=photo;binary`
-
+====
 
 Sign Assertion::
 Specifies whether or not to sign the SAML v2.0 assertion.

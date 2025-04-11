@@ -159,31 +159,28 @@ See xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store[
 
 . Referral policies are not supported in OpenAM {openam-version}. If your OpenAM deployment has referral policies, the following warning message will appear when you upgrade your OpenAM server to OpenAM {openam-version}:
 +
-
+--
 [source]
 ----
 Referrals found that require removing
 ----
-+
+
 OpenAM will take the following actions during the upgrade:
-+
 
 * Removing all referral policies from your OpenAM configuration.
 
 * Copying resource types and policy sets associated with removed referral policies to the realms targeted by the referral policies.
 
-+
 For example, suppose you had an OpenAM 12 deployment with a referral policy in realm A, and that referral policy referred to policies in realm B. During an upgrade, OpenAM would delete the referral policy in realm A and copy all the resource types and policy sets associated with the deleted referral policy from realm A to realm B.
-+
+
 After upgrading to OpenAM {openam-version}, you are responsible for reconfiguring OpenAM so that policy evaluation that previously depended upon referrals continues to function correctly. You might need to take one or both of the following actions:
-+
 
 * Reconfiguring your policy agent with the realm and policy set footnote:d0e728[The agent configuration UI refers to a policy set as an application.] that contain policies to be evaluated when that agent requests a policy decision from OpenAM. Previously, you might have configured the agent to use a realm that contained a referral policy. Because referral policies are not supported in OpenAM {openam-version}, this is no longer possible.
-+
+
 For more information about configuring an agent with a realm and policy set, see xref:../admin-guide/chap-realms.adoc#realms-agents["Working With Realms and Policy Agents"] in the __Administration Guide__.
 
 * Copying or moving a policy or a group of policies. OpenAM {openam-version} has new REST API endpoints that let you copy and move policies. This functionality might be helpful when migrating away from policy deployments that use referral policies. For more information about the REST endpoints that let you copy and move policies, see xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-policies-copy-move-policies["Copying and Moving Policies"] in the __Developer's Guide__.
-
+--
 
 . Validate that the service is performing as expected.
 
@@ -195,7 +192,7 @@ For more information about configuring an agent with a realm and policy set, see
 .To Complete Upgrade from OpenAM 11.0.x
 ====
 After upgrade from OpenAM 11.0.x, all OAuth 2.0 client configurations inherit the default response types:
-
+--
 * `code`
 
 * `token`
@@ -209,7 +206,7 @@ After upgrade from OpenAM 11.0.x, all OAuth 2.0 client configurations inherit th
 * `code id_token`
 
 * `code token id_token`
-
+--
 
 . For each OAuth 2.0 client configuration, edit the list of response types to remove any that are not supported or not required.
 

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -832,13 +832,12 @@ The Data Store authentication module checks the user credentials, whereas the Sc
 .. In the Select Criteria drop-down menu, select `Required`.
 
 .. Click OK.
-
 +
+--
 The resulting chain resembles the following:
-+
 
 image::images/scripting-sample-chain.png[]
-
+--
 . On the Edit Chain tab, click Save Changes.
 
 ====

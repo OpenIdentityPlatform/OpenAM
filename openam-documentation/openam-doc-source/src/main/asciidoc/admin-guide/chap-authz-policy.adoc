@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -65,7 +65,6 @@ To help with the creation of policies, OpenAM uses __resource types__ and __poli
 
 Resource types::
 Resource types define a template for the resources that policies apply to, and the actions that could be performed on those resources.
-
 +
 For example, the `URL` resource type that is included by default in OpenAM acts as a template for protecting web pages or applications. It contains resource patterns, such as `*://*:*/*?*`, which can be made more specific when used in the policy. The actions that the resource supports are also defined, as follows:
 +
@@ -86,7 +85,6 @@ For example, the `URL` resource type that is included by default in OpenAM acts 
 
 +
 OpenAM also includes a resource type to protect REST endpoints, with patterns including `https://*:*/*?*` and the CRUDPAQ actions:
-+
 
 * `CREATE`
 
@@ -362,7 +360,7 @@ image::images/policy-editor-valid-drop-points.png[]
 image::images/policy-subjects.png[]
 
 The available subject condition types are:
-+
+
 --
 
 Authenticated Users::
