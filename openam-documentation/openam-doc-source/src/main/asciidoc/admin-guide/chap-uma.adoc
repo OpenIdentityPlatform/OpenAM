@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -35,38 +35,34 @@ image::images/uma-workflow-overview.png[]
 The actions that form the UMA workflow are as follows:
 --
 
-1. Manage::
+Manage::
 The resource owner manages their resources on the resource server.
 
-2. Protect::
+Protect::
 The resource owner links their resource server and chosen authorization server, for example an OpenAM instance.
-
 +
-The authorization server provides a protection API so that the resource server can register sets of resources. Use of the protection API requires a protection API token (PAT) - an OAuth 2.0 token with a specific scope.
 
+The authorization server provides a protection API so that the resource server can register sets of resources. Use of the protection API requires a protection API token (PAT) - an OAuth 2.0 token with a specific scope.
 +
 For more information, see xref:#managing-uma-resource-sets["Managing UMA Resource Sets"].
 
-3. Control::
+Control::
 The resource owner controls who has access to their registered resources by creating policies on the authorization server.
-
 +
 For more information, see xref:#sec-uma-policies["Managing UMA Policies"].
 
-4. Authorize::
+Authorize::
 The client, acting on behalf of the requesting party, uses the authorization server's authorization API to acquire a requesting party token (RPT). The requesting party or client may need further interaction with the authorization server at this point, for example to supply identity claims. Use of the authorization API requires an authorization API token (AAT) - an OAuth 2.0 token with a specific scope.
 
 +
 For more information, see xref:#accessing-uma-protected-resources["Accessing UMA-Protected Resources"].
 
-5. Access::
+Access::
 The client presents the RPT to the resource server, which verifies its validity with the authorization server and, if both valid and containing sufficient permissions, returns the protected resource to the requesting party.
 
 +
 For more information, see xref:#accessing-uma-protected-resources["Accessing UMA-Protected Resources"].
-
 --
-
 
 [#sec-uma-users]
 === Using OpenAM for UMA
@@ -910,7 +906,6 @@ Only the `labels` field can be updated by using PUT. All other fields are read-o
 Apply labels to resources to help organize and locate them more easily. Resources can have multiple labels applied to them, and labels can apply to multiple resources.
 
 Resources support three types of label:
---
 
 User Labels::
 
@@ -926,7 +921,8 @@ User Labels::
 You can manage user labels by using the OpenAM console, or by using a REST interface. For more information, see xref:#managing-uma-labels-with-REST-users["UMA Labels Endpoint for Users"] and xref:#to-apply-user-labels-to-resource-sets["To Apply User Labels to a Resource"].
 
 System Labels::
-
++
+--
 * Created by the resource server when registering a resource set.
 
 * Cannot be deleted.
@@ -935,22 +931,19 @@ System Labels::
 
 * Are only visible to the owner of the resource.
 
-+
-
 [NOTE]
 ======
 Each resource set is automatically assigned a system label containing the name of the resource server that registered it, as well as a system label allowing users to add the resource to a list of favorites.
 ======
-+
+
 For information on creating system labels, see xref:#to-register-an-uma-resource-set["To Register an UMA Resource Set"].
+--
 
 Favourite Labels::
 Each user can assign the builtin __star__ label to a resource to mark it as a favorite.
-
 +
 For more information, see xref:#to-apply-star-label-to-resource-set["To Mark a Resource as a Favorite"].
 
---
 
 [#managing-uma-labels-with-REST-users]
 ==== UMA Labels Endpoint for Users
@@ -1376,7 +1369,7 @@ In this example, the user is `demo`.
 +
 Use the following query string parameters to affect the returned results:
 +
---
+
 
 `_sortKeys=[+-]field[,field...]`::
 Sort the results returned, where __field__ represents a field in the JSON policy objects returned.
@@ -1394,16 +1387,15 @@ Start the returned results from the specified index.
 `_queryFilter`::
 The _queryFilter parameter can take `true` to match every policy, `false` to match no policies, or a filter of the following form to match field values: `field operator value` where __field__ represents the field name, __operator__ is the operator code, __value__ is the value to match, and the entire filter is URL-encoded. Only the equals (`eq`) operator is supported by the `/uma/policies` endpoint.
 +
+--
 The __field__ value can take the following values:
-+
 
 ** `resourceServer` - the resource server that created the resource set.
 
 ** `permissions/subject` - the list of subjects that are assigned scopes in the policy.
 
-+
+
 Filters can be composed of multiple expressions by a using boolean operator `AND`, and by using parentheses, `(expression)`, to group expressions.
-+
 
 [NOTE]
 ========
@@ -1412,11 +1404,7 @@ You must URL-encode the filter expression in `_queryFilter=filter`. So, for exam
 When URL-encoded becomes:
 `resourceServer+eq+%22UMA-Resource-Server%22+AND+permissions%2Fsubject+eq+%22user.1%22`
 ========
-
---
-+
 The following example uses an SSO token to query the policies belonging to user __demo__, which have a subject `user.1` in the permissions:
-+
 
 [source, console]
 ----
@@ -1456,11 +1444,9 @@ $ curl \
  "remainingPagedResults": 0
 }
 ----
-+
 On success, an HTTP 200 OK status code is returned, with a JSON body representing the policies that match the query.
-+
+
 If the query is not formatted correctly, for example, an incorrect field is used in the `_queryFilter`, an HTTP 500 Server Error is returned, as follows:
-+
 
 [source, console]
 ----
@@ -1470,7 +1456,7 @@ If the query is not formatted correctly, for example, an incorrect field is used
     "message": "'/badField' not queryable"
 }
 ----
-
+--
 ====
 
 

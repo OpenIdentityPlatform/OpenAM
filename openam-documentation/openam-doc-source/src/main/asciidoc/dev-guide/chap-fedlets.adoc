@@ -195,14 +195,14 @@ Under IDP > Attribute Mapper, add the following values to the Attribute Map if t
 * `uid=uid`
 
 +
-
+--
 [NOTE]
 ======
 Make sure to use thread-safe code if you implement the AttributeAuthorityMapper. You can use the attributes on the HttpRequest instead of synchronizing them. The default AttributeAuthorityMapper uses an attribute on the HttpServletRequest to pass information to the AttributeQueryUtil.
 ======
-+
-Click Save to save your changes.
 
+Click Save to save your changes.
+--
 . Generate the Fedlet configuration files as described in xref:#create-config-files-for-a-java-fedlet["To Create Configuration Files for a Fedlet"], making sure you map the attributes.
 +
 
