@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.6-SNAPSHOT</version>
+        <version>15.1.6</version>
     </parent>
 
     <artifactId>openam-ldap-utils</artifactId>
