@@ -25,7 +25,7 @@
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 
 package com.sun.identity.setup;
@@ -65,7 +65,7 @@ import java.util.zip.ZipFile;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import jakarta.servlet.ServletContext;
+import javax.servlet.ServletContext;
 
 import com.google.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;
@@ -469,7 +469,7 @@ public class EmbeddedOpenDS {
         debug.message("...EmbeddedOpenDS.startServer:DS Server started.");
 
         int sleepcount = 0;
-        while (!EmbeddedUtils.isRunning() && (sleepcount < 60)) {
+        while ((!EmbeddedUtils.isRunning() || !com.sun.identity.setup.AMSetupDSConfig.getInstance().isDServerUp()) && (sleepcount < 60)) {
             sleepcount++;
             SetupProgress.reportStart("emb.waitingforstarted", null);
             Thread.sleep(1000);

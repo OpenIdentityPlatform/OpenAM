@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.4-SNAPSHOT</version>
+        <version>15.1.7-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM Cassandra</name>
@@ -49,7 +49,7 @@
 			<dependency>
 			    <groupId>org.apache.cassandra</groupId>
 			    <artifactId>cassandra-all</artifactId>
-			    <version>4.0.11</version>
+			    <version>4.0.16</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.lz4</groupId>

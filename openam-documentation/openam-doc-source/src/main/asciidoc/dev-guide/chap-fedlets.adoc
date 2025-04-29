@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-fedlets]
@@ -108,15 +109,15 @@ $ mkdir fedlet
 
 . Move all the files under `$HOME/fedlet/conf` to `$HOME/fedlet`.
 
-. Obtain the `Fedlet-13.5.2.zip` file from the full OpenAM distribution file, `OpenAM-13.5.2.zip`.
+. Obtain the `Fedlet-{openam-version}.zip` file from the full OpenAM distribution file, `OpenAM-{openam-version}.zip`.
 
-. Unzip the `Fedlet-13.5.2.zip` file:
+. Unzip the `Fedlet-{openam-version}.zip` file:
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ cd /path/to/openam-distribution/openam
-$ unzip Fedlet-13.5.2.zip
+$ unzip Fedlet-{openam-version}.zip
 ----
 +
 
@@ -194,14 +195,14 @@ Under IDP > Attribute Mapper, add the following values to the Attribute Map if t
 * `uid=uid`
 
 +
-
+--
 [NOTE]
 ======
 Make sure to use thread-safe code if you implement the AttributeAuthorityMapper. You can use the attributes on the HttpRequest instead of synchronizing them. The default AttributeAuthorityMapper uses an attribute on the HttpServletRequest to pass information to the AttributeQueryUtil.
 ======
-+
-Click Save to save your changes.
 
+Click Save to save your changes.
+--
 . Generate the Fedlet configuration files as described in xref:#create-config-files-for-a-java-fedlet["To Create Configuration Files for a Fedlet"], making sure you map the attributes.
 +
 
@@ -1073,7 +1074,7 @@ Another JSP file, `fedletXACMLResp.jsp`, sends the query to the XACML PDP using 
 
 An OpenAM Fedlet is a small web application that makes it easy to add SAML v2.0 Service Provider (SP) capabilities to your Java web application. The OpenAM console offers a wizard for configuring a Java Fedlet as a SAML v2.0 Service Provider with OpenAM as the Identity Provider (IDP). If that fits your purposes, then read the chapter xref:#sec-fedlet-java["Using Fedlets in Java Web Applications"] instead.
 
-The full distribution file, `OpenAM-13.5.2.zip`, also includes a Java Fedlet, `Fedlet-13.5.2.zip`, that you can configure by hand. This chapter covers how to configure a Java Fedlet using that distribution, by manually editing the Circle of Trust, Java properties, and IDP and SP XML configuration templates.
+The full distribution file, `OpenAM-{openam-version}.zip`, also includes a Java Fedlet, `Fedlet-{openam-version}.zip`, that you can configure by hand. This chapter covers how to configure a Java Fedlet using that distribution, by manually editing the Circle of Trust, Java properties, and IDP and SP XML configuration templates.
 Seen from a high level, what you must do is this:
 
 * Determine the roles that the IDP(s) and Fedlet play in SAML v2.0 Circles of Trust.
@@ -1100,15 +1101,15 @@ An IDP relies on the standard SAML v2.0 metadata to communicate with the Fedlet.
 
 Unpack the Java Fedlet distribution into a working directory.
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir fedlet && cd fedlet
-$ unzip ../Fedlet-13.5.2.zip
+$ unzip ../Fedlet-{openam-version}.zip
 ----
 --
-When you unpack the `Fedlet-13.5.2.zip` file, you find the following files.
+When you unpack the `Fedlet-{openam-version}.zip` file, you find the following files.
 
-`Fedlet-13.5.2.war`::
+`Fedlet-{openam-version}.war`::
 This file contains a Java Fedlet web application that serves as an example, and that you can embed in your applications.
 
 `README`::
@@ -2057,7 +2058,7 @@ Default: `fedletcot`
 [#unconfigured-fedlet-embedding]
 ==== Embedding the Java Fedlet in a Web Application
 
-The Fedlet war file, `Fedlet-13.5.2.war`, serves both as an example and also to provide the code needed to embed the Fedlet in your web application.
+The Fedlet war file, `Fedlet-{openam-version}.war`, serves both as an example and also to provide the code needed to embed the Fedlet in your web application.
 The basic steps for using the Fedlet in your application are as follows.
 
 * Unpack the Fedlet war file to a working directory, remove any files you do not want to keep such as `index.jsp` or `fedletEncode.jsp`, and overlay the Fedlet files with those of your web application.

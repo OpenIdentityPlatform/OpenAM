@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -30,7 +30,7 @@ The following section provides general instructions to get started with an OpenA
 
 The initial process is the planning phase of your project.
 
-* *Learn about OpenAM*. You can access online information, meet with your ForgeRock Sales representative, go to a seminar, or call ForgeRock about OpenAM's capabilities.
+* *Learn about OpenAM*. You can access online information, meet with your Open Identity Platform Approved Vendor Sales representative, go to a seminar, or call it about OpenAM's capabilities.
 +
 The following are some general questions that you may want to have answered:
 +
@@ -61,11 +61,11 @@ a|Get to know the APIs for OpenAM client applications
 a|Y
 a|N
 
-a|Find out how to get help and support from ForgeRock and partners
+a|Find out how to get help and support from Open Identity Platform Approved Vendors
 a|Y
 a|N
 
-a|Find out how to get training from ForgeRock and partners
+a|Find out how to get training from Open Identity Platform Approved Vendors
 a|Y
 a|N
 
@@ -79,44 +79,16 @@ a|N
 |===
 +
 
-* *Set up a Demo or Pilot*. View an OpenAM demo or set up a pilot to determine how you want to use OpenAM to protect your site(s). ForgeRock Sales representatives can assist you with a demo or pilot.
+* *Set up a Demo or Pilot*. View an OpenAM demo or set up a pilot to determine how you want to use OpenAM to protect your site(s). Open Identity Platform Approved Vendors Sales representatives can assist you with a demo or pilot.
 
-* *Attend a Training Class*. ForgeRock presents effective training classes to deploy OpenAM in your environment. See link:https://www.forgerock.com/services/university-training[ForgeRock University, window=\_blank] for more information.
+* *Attend a Training Class*. Open Identity Platform Approved Vendors present effective training classes to deploy OpenAM in your environment.
 
-* *Complete the Accreditation Program*. Complete the product-specific ForgeRock Accreditation Program to gain in-depth design and deployment expertise or seek partners who are ForgeRock Accredited Partners.
+* *Complete the Accreditation Program*. Complete the product-specific Accreditation Program to gain in-depth design and deployment expertise.
 
-* *Determine Your Service Level Agreements*. ForgeRock provides a set of standard service level agreements that you can sign up for. ForgeRock also provides custom service level agreements if the standard set does not meet your needs.
+* *Determine Your Service Level Agreements*. Open Identity Platform Approved Vendors provide a set of standard service level agreements that you can sign up for. Open Identity Platform Approved Vendors also provide custom service level agreements if the standard set does not meet your needs.
 +
 
-[#table-openam-standard-slas]
-.OpenAM Standard SLAs
-[cols="25%,25%,25%,25%"]
-|===
-|Priority |Gold |Silver |Bronze 
-
-a|Urgent (P1)
-a|2 Hour
-a|4 Hour
-a|Next Business Day
-
-a|High (P2)
-a|4 Hour
-a|8 Hour
-a|2 Business Days
-
-a|Normal (P3)
-a|6 Hour
-a|Next Business Day
-a|3 Business Days
-
-a|Low (P4)
-a|Next Business Day
-a|2 Business Days
-a|4 Business Days
-|===
-+
-
-* *Determine Your Services*. ForgeRock provides a full, proven-production Identity Management stack to meet your requirements.
+* *Determine Your Services*. Open Identity Platform Approved Vendors provide a full, proven-production Identity Management stack to meet your requirements.
 +
 
 [#table-openam-services]
@@ -190,7 +162,7 @@ a|N
 |===
 +
 
-* *Plan Sizing*. At this stage, you should determine the sizing estimates for your deployment. ForgeRock Sales Engineers can assist you in this task.
+* *Plan Sizing*. At this stage, you should determine the sizing estimates for your deployment. Open Identity Platform Approved Vendors Sales Engineers can assist you in this task.
 +
 
 [#table-openam-sizing]
@@ -375,7 +347,7 @@ The installation process requires that you implement your deployment plan.
 
 * *Secure OpenAM*. Configure OpenAM to access external resources over HTTPS and LDAPS. Set up secure cookies and certificates. For more information, see xref:../admin-guide/chap-securing.adoc#chap-securing["Securing OpenAM"] in the __Administration Guide__.
 
-* *Configure High Availability*. Configure the load balancers, reverse proxies, and site(s). Configure OpenAM for session failover and server failover. For simple instructions to deploy OpenAM behind a load balancer, see link:https://wikis.forgerock.org/confluence/display/openam/Deploying+OpenAM+behind+a+load+balancer[Deploying OpenAM behind a load balancer, window=\_blank]. For an example of a reverse proxy with OpenAM, see link:https://wikis.forgerock.org/confluence/display/openam/Simple+Apache+Reverse+Proxy+For+OpenAM+With+Certificate-Based+Authentication[Simple Apache Reverse Proxy for OpenAM with Certificate-Based Authentication, window=\_blank]. For information on configuring sites, see xref:../install-guide/chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"] in the __Installation Guide__.
+* *Configure High Availability*. Configure the load balancers, reverse proxies, and site(s). Configure OpenAM for session failover and server failover. For information on configuring sites, see xref:../install-guide/chap-install-multiple.adoc#chap-install-multiple["Installation Considerations for Multiple Servers"] in the __Installation Guide__.
 
 * *Prepare the Policy Agent Profiles*. Prepare the policy agent profile, agent authenticator, policy agent configuration, bootstrap configuration for a Java EE or Web policy agent. For more information, see xref:../admin-guide/chap-agents.adoc#chap-agents["Configuring Policy Agent Profiles"] in the __Administration Guide__.
 

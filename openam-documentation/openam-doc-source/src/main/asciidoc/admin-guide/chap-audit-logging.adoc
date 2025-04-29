@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-audit-logging]
@@ -27,9 +28,9 @@ OpenAM supports a comprehensive Audit Logging Service that captures key auditing
 
 Audit logs gather operational information about events occurring within an OpenAM deployment to track processes and security data, such as authentication mechanisms, system access, user and administrator activity, error messages, and configuration changes.
 
-This chapter describes the new, common REST-based Audit Logging Service available in OpenAM 13.5.2-15. OpenAM 13.5.2-15 also supports a legacy Logging Service, based on a Java SDK and available in OpenAM versions prior to OpenAM 13.5.2-15. The legacy Logging Service will be deprecated in a future release of OpenAM.
+This chapter describes the new, common REST-based Audit Logging Service available in OpenAM {openam-version}. OpenAM {openam-version} also supports a legacy Logging Service, based on a Java SDK and available in OpenAM versions prior to OpenAM {openam-version}. The legacy Logging Service will be deprecated in a future release of OpenAM.
 
-The Audit Logging Service uses a structured message format that adheres to a consistent and documented log structure common across the ForgeRock stack, including OpenAM, OpenIDM, OpenDJ, and OpenIG.
+The Audit Logging Service uses a structured message format that adheres to a consistent and documented log structure common across the Open Identity Platform stack, including OpenAM, OpenIDM, OpenDJ, and OpenIG.
 
 [IMPORTANT]
 ====
@@ -39,13 +40,13 @@ By default, OpenDJ 3.0 does not have audit logging enabled; thus, administrators
 [#about-audit-logs]
 === About the Audit Logging Service
 
-OpenAM writes log messages generated from audit events triggered by its instances, policy agents, the `ssoadm` tool, and connected ForgeRock stack implementations.
+OpenAM writes log messages generated from audit events triggered by its instances, policy agents, the `ssoadm` tool, and connected Open Identity Platform stack implementations.
 
 OpenAM's Audit Logging Service provides a versatile and rich feature set as follows:
 
 * *Global and Realm-Based Log Configuration*. You can configure audit logging globally, which ensures that all realms inherit your global log settings. You can also configure audit logging by realm, which allows you to set different log settings for each realm.
 
-* *Audit Event Handlers*. The Audit Logging Service supports a variety of audit event handlers that allow you to write logs to different types of data stores. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"] for a list of event handlers available in OpenAM 13.5.2-15.
+* *Audit Event Handlers*. The Audit Logging Service supports a variety of audit event handlers that allow you to write logs to different types of data stores. See xref:#configuring-audit-event-handlers["Configuring Audit Event Handlers"] for a list of event handlers available in OpenAM {openam-version}.
 
 * *Audit Event Buffering*. By default, OpenAM writes each log message separately as they are generated. OpenAM supports message buffering, a type of batch processing, that stores log messages in memory and flushes the buffer after a preconfigured time interval or after a certain number of log messages reaches the configured threshold value.
 
@@ -483,7 +484,7 @@ Default: 1800 (seconds)
 
 OpenAM supports audit logging to Elasticsearch 5.0. When you store OpenAM's audit logs in an Elasticsearch data store, you can use Kibana to perform data discovery and visualization on your logs.
 
-You can experiment with an Elasticsearch audit handler without enabling any Elasticsearch security features. However, for a more secure deployment, ForgeRock recommends that you use Elasticsearch Shield to require authentication to Elasticshield. Depending on your network topology, you might also want to configure SSL for Elasticsearch Shield.
+You can experiment with an Elasticsearch audit handler without enabling any Elasticsearch security features. However, for a more secure deployment, Open Identity Platform Community recommends that you use Elasticsearch Shield to require authentication to Elasticshield. Depending on your network topology, you might also want to configure SSL for Elasticsearch Shield.
 
 Before configuring the Elasticsearch audit event handler, you must configure an Elasticsearch index with OpenAM's audit schema:
 
@@ -797,7 +798,7 @@ The purpose of this feature is to allow customers to perform two kinds of filter
 [#configuring-trusttransactionheader-system-property]
 === Configuring the Trust Transaction Header System Property
 
-OpenAM supports the propagation of the transaction ID across the ForgeRock platform, such as from OpenDJ or OpenIDM to OpenAM, using the HTTP header `X-ForgeRock-TransactionId`. The `X-ForgeRock-TransactionId` header is automatically set in all outgoing HTTP calls from one ForgeRock product to another. Customers can also set this header themselves from their own applications or scripts calling into the ForgeRock platform.
+OpenAM supports the propagation of the transaction ID across the Open Identity Platform, such as from OpenDJ or OpenIDM to OpenAM, using the HTTP header `X-ForgeRock-TransactionId`. The `X-ForgeRock-TransactionId` header is automatically set in all outgoing HTTP calls from one ForgeRock product to another. Customers can also set this header themselves from their own applications or scripts calling into the ForgeRock platform.
 
 You can set a new property `org.forgerock.http.TrustTransactionHeader` to `true`, which will trust any incoming `X-ForgeRock-TransactionId` headers. By default, the `org.forgerock.http.TrustTransactionHeader` is set to `false`, so that a malicious actor cannot flood the system with requests using the same transaction ID header to hide their tracks.
 

@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2017-2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -22,8 +22,11 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.4-SNAPSHOT</version>
+        <version>15.1.7-SNAPSHOT</version>
     </parent>
+    <properties>
+        <test.config.path>${basedir}/target/config</test.config.path>
+    </properties>
 
     <!-- Component Definition -->
     <name>OpenAM Server</name>
@@ -90,14 +93,14 @@
                         </manifest>
                     </archive>
                     <container>
-	                    <containerId>tomcat10x</containerId>
+	                    <containerId>tomcat9x</containerId>
 <!--	                    <type>embedded</type>-->
 <!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
 	                    <systemProperties>
 	                    	<file.encoding>UTF-8</file.encoding>
 							<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
-							<com.iplanet.services.configpath>${basedir}/target/config</com.iplanet.services.configpath>
-							<com.sun.identity.configuration.directory>${basedir}/target/config</com.sun.identity.configuration.directory>
+							<com.iplanet.services.configpath>${test.config.path}</com.iplanet.services.configpath>
+							<com.sun.identity.configuration.directory>${test.config.path}</com.sun.identity.configuration.directory>
 							<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
 							<ssoadm.disabled>false</ssoadm.disabled>
 							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
@@ -115,6 +118,13 @@
 	                        </properties>
 	                        <pingURL>http://localhost:8207/openam</pingURL>
 	                    </deployable>
+                        <deployable>
+                            <type>war</type>
+                            <properties>
+                                <context>am</context>
+                            </properties>
+                            <pingURL>http://localhost:8207/am</pingURL>
+                        </deployable>
 	                </deployables>
 	                <configuration>
 				    	<properties>
@@ -158,6 +168,12 @@
             <version>4.13.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.20.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -180,6 +196,9 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <skip>false</skip>
+                            <systemProperties>
+                                <test.config.path>${test.config.path}</test.config.path>
+                            </systemProperties>
                         </configuration>
                         <executions>
                             <execution>

@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>15.1.4-SNAPSHOT</version>
+  <version>15.1.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -75,15 +75,14 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-	<maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
+	<maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>4.8.3-SNAPSHOT</opendj.version>
+    <opendj.version>4.9.4</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
-    <guice.version>7.0.0</guice.version>
-    <guice.multibindings.version>4.2.3</guice.multibindings.version>
+    <guice.version>3.0</guice.version>
     <restlet.version>2.4.4</restlet.version>
     <powermock.version>2.0.9</powermock.version>
 <!--     <slf4j.version>1.7.25</slf4j.version> -->
@@ -98,6 +97,7 @@
     <commons-logging-api.version>1.1</commons-logging-api.version>
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
     <geoip.version>2.0.0</geoip.version>
+    <jaxb.version>2.2.11</jaxb.version>
     <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
     <!--         <jaxrpc-impl.version>1.1.3_01-20160905</jaxrpc-impl.version> -->
@@ -111,7 +111,7 @@
     <rhino.version>1.7.12</rhino.version>
     <saaj-api.version>1.3.4</saaj-api.version>
     <saaj-impl.version>1.3.19</saaj-impl.version>
-    <jsp-api.version>3.1.1</jsp-api.version>
+    <jsp-api.version>2.1</jsp-api.version>
     <xsdlib.version>20060615</xsdlib.version>
     <authapi.version>2005-08-12</authapi.version>
     <FastInfoset.version>2006-26-09</FastInfoset.version>
@@ -122,10 +122,10 @@
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
     <activemq.version>[5.15.9,5.17)</activemq.version>
-    <jakarta.inject.version>2.0.1</jakarta.inject.version>
+    <javax.inject.version>1_2</javax.inject.version>
     <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
-    <jakarta.websocket-api.version>2.1.1</jakarta.websocket-api.version>
+    <javax.websocket-api.version>1.1</javax.websocket-api.version>
     <openam.version>OpenAM ${project.version}</openam.version>
     <!--  Project web site -->
     <siteDistributionURL>scp://community.internal.forgerock.com/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
@@ -138,15 +138,27 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.2.3</logback.version>
-    <netty.version>4.1.115.Final</netty.version>
+    <netty.version>4.1.118.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
   </properties>
   <!-- Profiles -->
   <profiles>
     <profile>
+      <id>jdk8.options</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <properties>
+        <!-- Disable Doclint on JDK8+ -->
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xmx2g</javadoc.options>
+      </properties>
+    </profile>
+    <profile>
       <id>set-compiler-release</id>
       <activation>
-        <jdk>[11,)</jdk>
+        <jdk>[9,)</jdk>
       </activation>
       <build>
         <pluginManagement>
@@ -156,17 +168,10 @@
               <artifactId>maven-compiler-plugin</artifactId>
               <configuration>
                 <fork>true</fork>
+                <release>8</release>
                 <compilerArgs>
                   <arg>-XDignore.symbol.file</arg>
                   <arg>-Xlint:unchecked</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.net.www.protocol.https=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.security.jgss/sun.security.krb5=ALL-UNNAMED</arg>
                 </compilerArgs>
               </configuration>
             </plugin>
@@ -360,7 +365,6 @@
     <module>openam-cassandra</module>
     <!-- shaded libraries -->
     <module>jato-shaded</module>
-    <module>transform-jakarta</module>
   </modules>
   <!-- Mailing Lists -->
   <mailingLists>
@@ -1066,12 +1070,6 @@
         <version>${click.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>click</artifactId>
-        <classifier>jakarta</classifier>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>${commons-beanutils.version}</version>
@@ -1187,21 +1185,15 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>jakarta.websocket</groupId>
-        <artifactId>jakarta.websocket-api</artifactId>
-        <version>${jakarta.websocket-api.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.websocket</groupId>
-        <artifactId>jakarta.websocket-client-api</artifactId>
-        <version>${jakarta.websocket-api.version}</version>
+        <groupId>javax.websocket</groupId>
+        <artifactId>javax.websocket-api</artifactId>
+        <version>${javax.websocket-api.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.glassfish.metro</groupId>
         <artifactId>wsit-impl</artifactId>
-        <version>3.0.3</version>
+        <version>2.4.4</version>
       </dependency>
       <dependency>
         <groupId>javax.xml</groupId>
@@ -1219,23 +1211,16 @@
         <artifactId>jaxrpc-spi</artifactId>
         <version>${jaxrpc-spi.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>jaxrpc</artifactId>
-        <classifier>jakarta</classifier>
-        <version>${project.version}</version>
-      </dependency>
       <!-- TODO jmx -->
 	<dependency>
 	    <groupId>org.glassfish.jersey.bundles</groupId>
 	    <artifactId>jaxrs-ri</artifactId>
-	    <version>3.1.9</version>
+	    <version>2.37</version>
 	</dependency>
       <dependency>
         <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
         <artifactId>jato</artifactId>
         <version>2005-05-04</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.shaded</groupId>
@@ -1246,7 +1231,6 @@
         <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
         <artifactId>cc</artifactId>
         <version>2008-08-08</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
@@ -1326,8 +1310,8 @@
       </dependency>
       <dependency>
         <groupId>com.sun.mail</groupId>
-        <artifactId>jakarta.mail</artifactId>
-        <version>2.0.1</version>
+        <artifactId>javax.mail</artifactId>
+        <version>1.6.2</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -1360,8 +1344,8 @@
         <version>${saaj-impl.version}</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.servlet.jsp</groupId>
-        <artifactId>jakarta.servlet.jsp-api</artifactId>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
         <version>${jsp-api.version}</version>
         <scope>provided</scope>
       </dependency>
@@ -1522,8 +1506,7 @@
         <artifactId>org.restlet.ext.slf4j</artifactId>
         <version>${restlet.version}</version>
       </dependency>
-
-       <!-- Commons Dependencies -->
+      <!-- Commons Dependencies -->
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
@@ -1551,22 +1534,23 @@
         <artifactId>guice</artifactId>
         <version>${guice.version}</version>
         <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
+        <classifier>no_aop</classifier>
         <exclusions>
-           <!-- Exclude javax.inject in favour of servicemix OSGi-compatible version -->
+          <exclusion>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+          </exclusion>
+          <!-- Exclude javax.inject in favour of servicemix OSGi-compatible version -->
           <exclusion>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>com.google.inject.extensions</groupId>
         <artifactId>guice-multibindings</artifactId>
-        <version>${guice.multibindings.version}</version>
+        <version>${guice.version}</version>
         <exclusions>
           <exclusion>
             <groupId>com.google.inject</groupId>
@@ -1587,9 +1571,9 @@
       </dependency>
       <dependency>
         <!-- Use OSGi-compatible javax.inject to satisfy commons dependencies -->
-        <groupId>jakarta.inject</groupId>
-        <artifactId>jakarta.inject-api</artifactId>
-        <version>${jakarta.inject.version}</version>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+        <version>${javax.inject.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jgrapht</groupId>
@@ -1628,7 +1612,7 @@
       <dependency>
 	    <groupId>net.bytebuddy</groupId>
 	    <artifactId>byte-buddy</artifactId>
-	    <version>1.15.3</version>
+	    <version>1.17.2</version>
 	    <scope>test</scope>
 	  </dependency>
       <dependency>
@@ -1722,11 +1706,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>${project.version}</version>
+        <version>${activemq.version}</version>
         <scope>test</scope>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
@@ -1925,8 +1908,7 @@
 					<artifactId>jato</artifactId>
 					<version>2005-05-04</version>
 					<packaging>jar</packaging>
-                    <classifier>jakarta</classifier>
-					<downloadUrl>${basedir}/extlib/output_jato-2005-05-04.jar</downloadUrl>
+					<downloadUrl>${basedir}/extlib/jato-2005-05-04.jar</downloadUrl>
 					<deploy>false</deploy>
 				</artifactItem>
 				<artifactItem>
@@ -1934,8 +1916,7 @@
                 	<artifactId>cc</artifactId>
                 	<version>2008-08-08</version>
                 	<packaging>jar</packaging>
-                    <classifier>jakarta</classifier>
-                	<downloadUrl>${basedir}/extlib/output_cc-2008-08-08.jar</downloadUrl>
+                	<downloadUrl>${basedir}/extlib/cc-2008-08-08.jar</downloadUrl>
                 	<deploy>false</deploy>
                 	<force>true</force>
               	</artifactItem>
@@ -1990,7 +1971,7 @@
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <updateBranchVersions>true</updateBranchVersions>
-          <goals>install javadoc:aggregate-jar deploy</goals>
+          <!--goals>install javadoc:aggregate-jar deploy</goals-->
           <signTag>true</signTag>
   		  <tagNameFormat>@{project.version}</tagNameFormat>
   		  <allowTimestampedSnapshots>false</allowTimestampedSnapshots>
@@ -2124,6 +2105,7 @@
 			  <configuration>
                 <source>8</source>
 			  	<doclint>none</doclint>
+                <notimestamp>true</notimestamp>
 			  </configuration>
 			</plugin>
       <plugin>
@@ -2296,7 +2278,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>1.3.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -2366,7 +2348,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.15.1</version>
+				<version>3.3</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

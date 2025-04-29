@@ -14,6 +14,6 @@
   "dependencies": {
     "swagger-ui-dist": ">=3.24.0",
     "swagger-ui-themes": "3.0.0",
-    "swagger-ui": ">=5.17.14"
+    "swagger-ui": ">=5.20.1"
   }
 }

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -160,7 +160,7 @@ When the JWT is used for authentication, this is the OpenAM access token endpoin
 
 Also for validation, the issuer must digitally sign the JWT or apply a keyed message digest. When the issuer is also the client, the client can sign the JWT by using a private key, and include the public key in its profile registered with OpenAM.
 
-A sample Java-based client is link:https://github.com/ForgeRock/jwt-bearer-client[available online, window=\_blank].
+A sample Java-based client is link:https://github.com/OpenIdentityPlatform/jwt-bearer-client[available online, window=\_blank].
 
 
 [#oauth2-saml2-bearer]
@@ -194,34 +194,27 @@ If OpenAM is already a SAML v2.0 service provider, you can configure OpenAM as O
 [#oauth2-endpoints]
 ===== OpenAM OAuth 2.0 Endpoints
 
---
 In addition to the standard authorization and token endpoints described in RFC 6749, OpenAM also exposes a token information endpoint for resource servers to get information about access tokens so they can determine how to respond to requests for protected resources, and an introspection endpoint to retrieve metadata about a token, such as approved scopes and the context in which the token was issued. OpenAM as authorization server exposes the following endpoints for clients and resource servers.
 
 `/oauth2/authorize`::
 Authorization endpoint defined in RFC 6749, used to obtain an authorization grant from the resource owner.
-
 +
+--
 The `/oauth2/authorize` endpoint is protected by the policy you created after OAuth 2.0 authorization server configuration, which grants all authenticated users access.
 
-+
 The following is an example URL for obtaining consent:
 
-+
 `\https://openam.example.com:8443/openam/oauth2/realms/root/authorize\ ?client_id=myClient\ &response_type=code\ &scope=profile\ &redirect_uri=https://www.example.com`
 
-+
 After logging in, the URL above presents the OAuth 2.0 consent screen, similar to the following:
-+
 
 [#figure-oauth2-consent-screen-xui]
 image::images/oauth2-authz-page-xui.png[]
-+
-+
+
 If creating your own consent page, you can create a POST request to the endpoint with the following additional parameters:
-+
+
 [open]
 ====
-
 `decision`::
 Whether the resource owner consents to the requested access, or denies consent.
 
@@ -231,13 +224,10 @@ Valid values are `allow` or `deny`.
 `save_consent`::
 Updates the resource owner's profile to avoid having to prompt the resource owner to grant authorization when the client issues subsequent authorization requests.
 
-+
 To save consent, set the `save_consent` property to `on`.
 
-+
 You must provide the __Saved Consent Attribute Name__ property with a profile attribute in which to store the resource owner's consent decision.
 
-+
 For more information on setting this property in the OAuth2 Provider service, see xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 
 `csrf`::
@@ -247,9 +237,8 @@ Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the 
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
 
 ====
-+
+
 Example:
-+
 
 [source, console]
 ----
@@ -267,32 +256,28 @@ $ curl \
  "https://openam.example.com:8443/openam/oauth2/authorize?response_type=code&client_id=myClient"\
  "&realm=/&scope=profile&redirect_uri=http://www.example.net"
 ----
-+
+
 You must specify the realm if the OpenAM OAuth 2.0 provider is configured for a subrealm rather than the top-level realm. For example, if the OAuth 2.0 provider is configured for the `/customers` realm, then use `/oauth2/customers/authorize`.
 
-+
+
 The `/oauth2/authorize` endpoint can take additional parameters, such as:
-+
 
 * `module` and `service`. Use either as described in xref:../admin-guide/chap-auth-services.adoc#authn-from-browser["Authenticating To OpenAM"], where `module` specifies the authentication module instance to use or `service` specifies the authentication chain to use when authenticating the resource owner.
 
 * `response_mode=form_post`. Use this parameter to return a self-submitting form that contains the code instead of redirecting to the redirect URL with the code as a string parameter. For more information, see the link:https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html[OAuth 2.0 Form Post Response Mode, window=\_blank] spec.
 
 * `code_challenge`. Use this parameter when __Proof Key for Code Exchange__ (PKCE) support is enabled in the OAuth2 Provider service. To configure it, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
-
+--
 
 `/oauth2/access_token`::
 Token endpoint defined in RFC 6749, used to obtain an access token from the authorization server.
-
 +
+--
 Example: `\https://openam.example.com:8443/openam/oauth2/access_token`
 
-+
 The `/oauth2/access_token` endpoint can take an additional parameter, `auth_chain=authentication-chain`, which allows client to specify the authentication chain to use for Password Grant Type.
 
-+
 The following example shows how a client can specify the authentication chain, `myAuthChain`:
-+
 
 [source, console]
 ----
@@ -302,24 +287,25 @@ $ curl \
 --data "grant_type=password&username=amadmin&password=cangetinam&scope=profile&auth_chain=myAuthChain" \
 https://openam.example.com:8443/openam/oauth2/access_token
 ----
-+
+
 The `/oauth2/access_token` endpoint can take additional parameters. In particular, you must specify the realm if the OpenAM OAuth 2.0 provider is configured for a subrealm rather than the top-level realm.
 
-+
 For example, if the OAuth 2.0 provider is configured for the `/customers` realm, then use `/oauth2/customers/access_token`.
+--
 
 `/oauth2/device`::
 Device flow endpoint as defined by the link:https://datatracker.ietf.org/doc/draft-denniss-oauth-device-flow/[Internet-Draft OAuth 2.0 Device Flow, window=\_top], used by a client device to obtain a device code or an access token.
-
 +
+--
 Example: `\https://openam.example.com:8443/openam/oauth2/device/code`
 
-+
 For more information, see xref:../dev-guide/chap-client-dev.adoc#rest-api-oauth2-device-flow["Using Endpoints for OAuth 2.0 Device Flow"] in the __Developer's Guide__.
+--
 
 `/oauth2/token/revoke`::
 When a user logs out of an application, the application revokes any OAuth 2.0 tokens (access and refresh tokens) that are associated with the user. The client can also revoke a token without the need of an `SSOToken` by sending a request to the `/oauth2/token/revoke` endpoint as follows:
 +
+--
 
 [source, console]
 ----
@@ -330,28 +316,23 @@ $ curl \
 --data "client_secret=password" \
 https://openam.example.com:8443/openam/oauth2/token/revoke
 ----
-+
-+
+
 If you are revoking an access token, then that token will be revoked. If you are revoking a refresh token, then both the refresh token and any other associated access tokens will also be revoked. __Associated access tokens__ means that any other tokens that have come out of the same authorization grant will also be revoked. For cases where a client has multiple access tokens for a single user that were obtained via different authorization grants, then the client will have to make multiple calls to the `/oauth2/token/revoke` endpoint to invalidate each token.
+--
 
 `/oauth2/tokeninfo`::
 Endpoint __not__ defined in RFC 6749, used to validate tokens, and to retrieve information, such as scopes.
-
 +
+--
 The `/oauth2/tokeninfo` endpoint takes an HTTP GET on `/oauth2/tokeninfo?access_token=token-id`, and returns information about the token.
 
-+
 Resource servers — or any party having the token ID — can get token information through this endpoint without authenticating. This means any application or user can validate the token without having to be registered with OpenAM.
 
-+
 Given an access token, a resource server can perform an HTTP GET on `/oauth2/tokeninfo?access_token=token-id` to retrieve a JSON object indicating `token_type`, `expires_in`, `scope`, and the `access_token` ID.
 
-+
 Example: `\https://openam.example.com:8443/openam/oauth2/tokeninfo`
 
-+
 The following example shows OpenAM issuing an access token, and then returning token information:
-+
 
 [source, console]
 ----
@@ -394,7 +375,6 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
   "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
 }
 ----
-+
 
 [NOTE]
 ======
@@ -408,15 +388,16 @@ $ curl \
 "https://openam.example.com:8443/openam/oauth2/tokeninfo"
 ----
 ======
-+
+
 The resource server making decisions about whether the token is valid can thus use the `/oauth2/tokeninfo` endpoint to retrieve expiration information about the token. Depending on the scopes implementation, the JSON response about the token can also contain scope information. As described in xref:../admin-guide/chap-oauth2.adoc#oauth2-byo-client["Using Your Own Client and Resource Server"], the default scopes implementation in OpenAM considers scopes to be names of attributes in the resource owner's user profile. Notice that the JSON response contains the values for those attributes from the user's profile, as in the preceding example, with scopes set to `mail` and `cn`.
+--
 
 `/oauth2/introspect`::
 Endpoint defined in link:http://tools.ietf.org/html/draft-ietf-oauth-introspection-04[draft-ietf-oauth-introspection-04, window=\_top], used to retrieve metadata about a token, such as approved scopes and the context in which the token was issued.
-
 +
+--
 Given an access token, a client can perform an HTTP POST on `/oauth2/introspect?token=access_token` to retrieve a JSON object indicating the following:
-+
+
 [open]
 ====
 
@@ -445,12 +426,10 @@ Subject of the token.
 Issuer of the token.
 
 ====
-+
+
 The `/oauth2/introspect` endpoint requires authentication, and supports basic authorization (a base64-encoded string of `client_id:client_secret`), `client_id` and `client_secret` passed as header values, or a JWT bearer token.
 
-+
 The following example demonstrates the `/oauth2/introspect` endpoint with basic authorization:
-+
 
 [source, console]
 ----
@@ -470,7 +449,6 @@ $ curl \
   "iss": "https://openam.example.com/"
   }
 ----
-+
 
 [NOTE]
 ======
@@ -485,11 +463,9 @@ $ curl \
 "https://openam.example.com:8443/openam/oauth2/introspect"
 ----
 ======
-
 --
+
 For examples, and information about OAuth 2.0 token administration and client administration endpoints that are specific to OpenAM, see xref:../dev-guide/chap-client-dev.adoc#rest-api-oauth2["OAuth 2.0"] in the __Developer's Guide__.
-
-
 
 [#openam-oauth2-client]
 ==== OpenAM as OAuth 2.0 Client and Resource Server Solution

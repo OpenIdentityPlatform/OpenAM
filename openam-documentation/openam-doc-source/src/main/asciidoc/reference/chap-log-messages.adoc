@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-log-messages]
@@ -27,7 +28,7 @@ This chapter gives information about the different log files and messages for Op
 
 [NOTE]
 ====
-OpenAM 13.0.0 introduces a new Audit Logging Service, which is an audit logging framework common across all ForgeRock products. Both logging services are available in OpenAM 13.5.2-15, but the classic Logging Service will be deprecated in a future release.
+OpenAM 13.0.0 introduces a new Audit Logging Service, which is an audit logging framework common across all Open Identity Platform products. Both logging services are available in OpenAM {openam-version}, but the classic Logging Service will be deprecated in a future release.
 ====
 
 [#log-files]

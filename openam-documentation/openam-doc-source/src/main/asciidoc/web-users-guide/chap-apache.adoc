@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -375,15 +375,15 @@ Creating configuration...
 Installation complete.
 ----
 
-
 +
+[open]
+======
 Upon successful completion, the installer adds the agent as a module to the Apache HTTP Server configuration file. You can find a backup configuration file in the Apache HTTP Server configuration directory, called `http.conf_amagent_date_and_time_of_installation`.
-+
+
 The installer also sets up configuration and log directories for the agent instance. Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are located under the directory `web_agents/apache24_agent/instances/agent_1/`.
-+
+
 The configuration files and log locations are as follows:
-+
---
+
 
 `config/agent.conf`::
 Contains the bootstrap properties the web policy agent requires to connect to OpenAM and download its configuration. Also contains properties that are only used if you configure the web policy agent to use local configuration.
@@ -394,7 +394,7 @@ Operational audit log directory, only used if remote logging to OpenAM is disabl
 `logs/debug/`::
 Debug directory where the `amAgent` debug file resides. Useful in troubleshooting policy agent issues.
 
---
+======
 
 . Start the Apache server in which you installed the web policy agent.
 
@@ -565,7 +565,6 @@ Encrypted password value: 07bJOSeM/G8ydO4=
 
 +
 In the agent configuration file of the new instance, set the following properties:
-+
 
 * `com.sun.identity.agents.config.key` to be the generated encryption key value.
 +
@@ -735,7 +734,7 @@ Enter the full path to the file containing the agent profile password.
 To have the installer change the ownership of created directories to be the same User and Group as specified in the Apache configuration, specify the optional `--changeOwner` switch.
 
 `--acceptLicence`::
-You can suppress the license agreement prompt during a silent, non-interactive install by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `/path/to/web_agents/agent_type/legal/Forgerock_License.txt`.
+You can suppress the license agreement prompt during a silent, non-interactive install by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `/path/to/web_agents/agent_type/legal/CDDLv1.0.txt`.
 
 `--forceInstall`::
 Optionally have the installer proceed with a silent installation even if it cannot connect to the specified OpenAM server during installation, rather than exiting.

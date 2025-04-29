@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.4-SNAPSHOT</version>
+        <version>15.1.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-slf4j</artifactId>

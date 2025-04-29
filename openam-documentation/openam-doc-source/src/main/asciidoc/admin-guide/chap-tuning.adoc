@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -253,14 +253,6 @@ a|-
 a|`-server`
 a|-
 a|Ensures the server JVM is used
-
-a|`-XX:PermSize` & `-XX:MaxPermSize` (JDK 7)
-a|Set both to 256 MB
-a|Controls the size of the permanent generation in the JVM
-
-a|`-XX:MetaspaceSize` & `-XX:MaxMetaspaceSize` (JDK 8)
-a|Set both to 256 MB
-a|Controls the size of the metaspace in the JVM
 
 a|`-Dsun.net.client.defaultReadTimeout`
 a|60000

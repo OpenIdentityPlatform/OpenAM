@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -89,7 +89,7 @@ image::images/j2ee-components.png[]
 
 [IMPORTANT]
 ====
-Do not install the Java EE policy agent in the same container as OpenAM. OpenAM must be up and running before the Java EE policy agent starts. This cannot be guaranteed when both run in the same container. ForgeRock does not support configurations where OpenAM and the Java EE policy agent are installed in the same container.
+Do not install the Java EE policy agent in the same container as OpenAM. OpenAM must be up and running before the Java EE policy agent starts. This cannot be guaranteed when both run in the same container. Open Identity Platform Community does not support configurations where OpenAM and the Java EE policy agent are installed in the same container.
 ====
 The following sequence diagram shows how the pieces fit together when a Java EE client accesses a resource protected by a policy agent. This diagram is simplified to show only the Java EE policy agent steps rather than to describe every possible case.
 
@@ -143,7 +143,7 @@ image::images/jee-agent-process-flow.png[]
 
 You install Java EE policy agents in the web application containers serving web applications that you want to protect. Java EE policy agents are themselves web applications running in the container whose applications you configure OpenAM to protect. By default, the Java EE policy agent has only enough configuration at installation time to connect to OpenAM in order to get the rest of its configuration from the OpenAM configuration store. With nearly all configuration stored centrally, you can manage policy agents centrally from the OpenAM console.footnote:d0e557[You can opt to store the agent configuration locally if necessary.]
 
-For each web application that you protect, you also configure at least the deployment descriptor to filter requests through the policy agent. ForgeRock delivers the Java EE policy agents with a sample application `.war` file under `j2ee_agents/container_agent/sampleapp/`, which shows the configuration to use to protect your web application. In the `WEB-INF/web.xml` deployment descriptor file for the sample application, you find an example of the filter configuration that you must add to the deployment descriptors of your applications.
+For each web application that you protect, you also configure at least the deployment descriptor to filter requests through the policy agent. Open Identity Platform Community delivers the Java EE policy agents with a sample application `.war` file under `j2ee_agents/container_agent/sampleapp/`, which shows the configuration to use to protect your web application. In the `WEB-INF/web.xml` deployment descriptor file for the sample application, you find an example of the filter configuration that you must add to the deployment descriptors of your applications.
 
 You configure Java EE policy agents per OpenAM realm. Thus, to access centralized configuration, you select Realms > __Realm Name__ > Agents > Java EE > __Agent Name__. Java EE policy agent configuration is distinct from policy configuration. The only policy-like configuration that you apply to Java EE policy agents is indicating which URLs in the web server can be ignored (__not enforced URLs__) and which client IP address are exempt from policy enforcement (__not enforced IPs__).
 

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -127,7 +127,7 @@ Check your assumptions in testing. For example, make sure that logs are cleaned 
 [#ram-requirements]
 ==== Random Access Memory Requirements
 
-OpenAM core services require a minimum JVM heap size of 1 GB and, when running on JDK 7, a minimum permanent generation size of 256 MB. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ.
+OpenAM core services require a minimum JVM heap size of 1 GB and. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ.
 
 [NOTE]
 ====
@@ -144,7 +144,7 @@ The following sections list software requirements for deploying OpenAM server an
 [#os-requirements]
 ==== OpenAM Operating System Requirements
 
-ForgeRock supports customers using OpenAM server software on the following operating system versions:
+Open Identity Platform Approved Vendors supports customers using OpenAM server software on the following operating system versions:
 
 [#am-os-requirements]
 .Supported Operating Systems

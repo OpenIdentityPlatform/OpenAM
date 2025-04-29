@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -144,7 +144,7 @@ public class SamplePAP implements AMPostAuthProcessInterface {
     }
 }
 ----
-The link:https://github.com/ForgeRock/openam-post-auth-sample[sample post authentication plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
+The link:https://github.com/OpenIdentityPlatform/openam-post-auth-sample[sample post authentication plugin source, window=\_blank] is available online. Get a local clone so that you can try the sample on your system. In the sources you find the following files.
 --
 
 `pom.xml`::

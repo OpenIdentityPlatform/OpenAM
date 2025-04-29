@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-admin-tools]
@@ -82,19 +83,19 @@ Unpack this tool as part of policy agent installation.
 This tool lets you change OpenAM Administrator passwords, and display encrypted password values.
 
 +
-Install this from the `SSOAdminTools-13.5.2.zip`.
+Install this from the `SSOAdminTools-{openam-version}.zip`.
 
 `amverifyarchive`::
 This tool checks log archives for tampering.
 
 +
-Install this from `SSOAdminTools-13.5.2.zip`.
+Install this from `SSOAdminTools-{openam-version}.zip`.
 
-`openam-distribution-configurator-13.5.2.jar`::
+`openam-distribution-configurator-{openam-version}.jar`::
 This executable `.jar` file lets you perform a silent installation of an OpenAM server with a configuration file. For example, the `java -jar configurator.jar -f config.file` command couples the `configurator.jar` archive with the __config.file__. The `sampleconfiguration` file provided with the tool is set up with the format for the `config.file`, and it must be adapted for your environment.
 
 +
-Install this from `SSOConfiguratorTools-13.5.2.zip`.
+Install this from `SSOConfiguratorTools-{openam-version}.zip`.
 
 `ssoadm`::
 This tool provides a rich command-line interface for the configuration of OpenAM core services.
@@ -103,7 +104,7 @@ This tool provides a rich command-line interface for the configuration of OpenAM
 In a test environment, you can activate `ssoadm.jsp` to access the same functionality in your browser. Once active, you can use many features of the `ssoadm` command by navigating to the `ssoadm.jsp` URI, in a URL, such as `\http://openam.example.com:8080/openam/ssoadm.jsp`.
 
 +
-Install this from `SSOAdminTools-13.5.2.zip`.
+Install this from `SSOAdminTools-{openam-version}.zip`.
 
 +
 To translate settings applied in OpenAM console to service attributes for use with `ssoadm`, log in to the OpenAM console as `amadmin` and access the services page, in a URL, such as `\http://openam.example.com:8080/openam/services.jsp`.

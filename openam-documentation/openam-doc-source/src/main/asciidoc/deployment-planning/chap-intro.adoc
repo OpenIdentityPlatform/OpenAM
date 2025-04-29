@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-intro]
@@ -32,8 +33,6 @@ The proliferation of cloud-based technologies, mobile devices, social networks, 
 
 The challenges of securing such identity data and the environments that depend on the identity data are daunting. Organizations that expand their services in-house or globally through internal development or through acquisitions must manage identities across wide spectrum of identity infrastructures. This expansion requires a careful integration of acquisitions must manage identities across a wide spectrum of identity infrastructures. This expansion requires a careful integration of disparate access management systems, platform-dependent architectures with limited scalability, and ad-hoc security components.
 
-ForgeRock, a leader in the IAM market, provides proven solutions to securing your identity data with its Identity Relationship Management (IRM) platform.
-
 Identity Management is the automated provisioning, updating, and de-provisioning of identities over their lifecycles. Access Management is the authentication and authorization of identities who desire privileged access to an organization's resources. Access management encompasses the central auditing of operations performed on the system by customers, employees, and partners. Access management also provides the means to share identity data across different access management systems, legacy implementations, and networks.
 
 
@@ -42,9 +41,9 @@ Identity Management is the automated provisioning, updating, and de-provisioning
 
 OpenAM is an all-in-one open source, centralized access management solution, securing protected resources across the network and providing authentication, authorization, Web security, and Federation Services in a single, integrated solution. OpenAM is deployed as a simple `.war` file and provides production-proven platform independence, flexible and extensible components, as well as a high availability and a highly scalable infrastructure. Using open standards, OpenAM is fully extensible, and can expand its capabilities through its SDKs and numerous REST endpoints.
 
-OpenAM is part of ForgeRock's Identity Relationship Management (IRM) __platform__, built upon ForgeRock's Open Identity Stack, an open source identity and access management provider of mobile-ready, cloud, enterprise, social, and partner services. The IRM platform provides global consumer services across any platform for any connected device or any Internet-connected entity.
+OpenAM is part of Identity Relationship Management (IRM) __platform__, built upon Open Identity Platform Stack, an open source identity and access management provider of mobile-ready, cloud, enterprise, social, and partner services. The IRM platform provides global consumer services across any platform for any connected device or any Internet-connected entity.
 
-ForgeRock IRM platform features the following products:
+IRM platform features the following products:
 
 * *OpenAM Context-Based Access Management System*. OpenAM is an all-in-one industry-leading access management solution, providing authentication, authorization, federation, Web services security, adaptive risk, and entitlements services among many other features. OpenAM is deployed as a simple `.war` file, featuring an architecture that is platform independent, flexible, and extensible, and highly available and scalable.
 
@@ -58,7 +57,7 @@ ForgeRock IRM platform features the following products:
 (R)® Waveset, Brinqa
 (R)® GRC Platform, and so forth.
 +
-xref:#figure-irm["ForgeRock IRM Platform"] illustrates the ForgeRock IRM platform.
+xref:#figure-irm["IRM Platform"] illustrates the IRM platform.
 
 
 [#figure-irm]
@@ -84,34 +83,35 @@ OpenAM core server can be deployed and integrated within existing network infras
 |===
 |Distribution |Description 
 
-a|ClientSDK-13.5.2-15.jar
+a|ClientSDK-{openam-version}.jar
 a|OpenAM's default distribution `.war` file includes the core server code with an embedded OpenDJ directory server, which stores configuration data and simplifies deployments. The distribution includes an administrative graphical user interface (GUI) Web console. During installation, the `.war` file accesses a bootstrap file to obtain the fully qualified domain name, port, context path, and the location of the configuration folder. OpenAM provides a client SDK for developers to code extensions for their web applications to access OpenAM's services. The client SDK contains the Java packages, classes, property files, and sample code to help you develop your code.
 
-a|ExampleClientSDK-CLI-13.5.2-15.zip
+a|ExampleClientSDK-CLI-{openam-version}.zip
 a|OpenAM provides client SDK examples to help you run them on OpenAM. The `zip` distribution file contains setup scripts and samples that you can run to learn how to use the client SDK.
 
-a|ExampleClientSDK-WAR-13.5.2-15.war
+a|ExampleClientSDK-WAR-{openam-version}.war
 a|The example client SDK also comes in a `.war` file, which installs on your container.
 
-a|Fedlet-13.5.2-15.zip
+a|Fedlet-{openam-version}.zip
 a|OpenAM provides a core server-only `.war` file without the OpenAM Console. This setup is often used in multi-server deployments wherein the deployments is managed using a full server instance using the `ssoadm` command-line tool. The OpenAM server installs with an embedded OpenDJ directory server. OpenAM provides an OpenAM Fedlet, a light-weight SAML v2.0 service provider. The Fedlet lets you set up a federated deployment without the need of a fully-featured service provider.
 
-a|IDPDiscovery-13.5.2-15.war
+a|IDPDiscovery-{openam-version}.war
 a|OpenAM provides an IdP Discovery Profile (SAMLv2 binding profile) for its IdP Discovery service. The profile keeps track of the identity providers for each user.
 
-a|OpenAM-13.5.2-15.war
+a|OpenAM-{openam-version}.war
 a|OpenAM provides a smaller subset of the OpenAM SDK, providing client-side API to OpenAM services. The Client SDK allows you to write remote standalone or Web applications to access OpenAM and run its core services. OpenAM's distribution `.war` file includes the core server code with an embedded OpenDJ directory server, which stores configuration data and simplifies deployments. The distribution includes an administrative graphical user interface (GUI) Web console. During installation, the `.war` file accesses properties to obtain the fully qualified domain name, port, context path, and the location of the configuration folder. These properties can be obtained from the `boot.properties` file in the OpenAM installation directory, from environment variables, or from a combination of the two.
 
-a|openam-soap-sts-server-13.5.2-15.war
+a|openam-soap-sts-server-{openam-version}.war
 a|OpenAM provides a SOAP-based security token service (STS) server that issues tokens based on the WS-Security protocol.
 
-a|SSOAdminTools-13.5.2-15.zip
+a|SSOAdminTools-{openam-version}.zip
 a|OpenAM provides an `ssoadm` command-line tool that allows administrators to configure and maintain OpenAM as well as create their own configuration scripts. The `zip` distribution file contains binaries, properties file, script templates, and setup scripts for UNIX and windows servers.
 
-a|SSOConfiguratorTools-13.5.2-15.zip
+a|SSOConfiguratorTools-{openam-version}.zip
 a|OpenAM provides configuration and upgrade tools for installing and maintaining your server. The `zip` distribution file contains libraries, legal notices, and supported binaries for these configuration tools. Also, you can view example configuration and upgrade properties files that can be used as a template for your deployments.
 |===
-ForgeRock's OpenAM product is built on open-source code. ForgeRock maintains the OpenAM product, providing the community an open-source code repository, issue tracking, mailing lists, and web sites. ForgeRock also provides commercial releases of fully tested builds. ForgeRock offers the services you need to deploy OpenAM commercial builds into production, including training, consulting, and support.
+
+Open Identity Platform's OpenAM product is built on open-source code. Open Identity Platform Community maintains the OpenAM product, providing the community an open-source code repository, issue tracking, mailing lists, and web sites. Open Identity Platform Approved Vendors offer the services you need to deploy OpenAM builds into production, including training, consulting, and support.
 
 
 [#key-benefits]
@@ -166,8 +166,13 @@ In February 2010, a small group of former Sun employees founded ForgeRock to con
 
 * 2014: OpenAM 11.1 and 12.0
 
-ForgeRock continues to develop, enhance, and support the industry-leading OpenAM product to meet the changing and growing demands of the market.
+* In November 2016 ForgeRock closed OpenAM source code, renamed OpenAM to ForgeRock Access Management, and began distributing source code under a paid, commercial license.
 
-ForgeRock also took over responsibility for support and development of the OpenDS directory server, which was renamed as OpenDJ. ForgeRock plans to continue to maintain, enhance, and support OpenDJ.
+* Since November 2016, the Open Identity Platform Community continued to support the OpenAM Product.
+
+* 2016: OpenAM 14
+
+* 2025: OpenAM 15
+
 
 

@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-client-dev]
@@ -41,9 +42,9 @@ link:http://en.wikipedia.org/wiki/Representational_state_transfer[Representation
 
 As an architectural style, REST has very broad applications. The designs of both HTTP 1.1 and URIs follow RESTful principles. The World Wide Web is no doubt the largest and best known REST application. Many other web services also follow the REST architectural style. Examples include OAuth 2.0, OpenID Connect 1.0, and User-Managed Access (UMA) 1.0.
 
-ForgeRock Common REST (CREST) applies RESTful principles to define common verbs for HTTP-based APIs that access web resources and collections of web resources.
+Open Identity Platform Common REST (CREST) applies RESTful principles to define common verbs for HTTP-based APIs that access web resources and collections of web resources.
 
-Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs. (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their respective standards.) APIs covered in link:../dev-guide/index.html#appendix-deprecated-apis[Deprecated REST APIs] predate CREST, do not use the CREST verbs, and are deprecated in OpenAM 13.5.2-15.
+Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs. (In contrast, OAuth 2.0, OpenID Connect 1.0 and UMA 1.0 APIs follow their respective standards.) APIs covered in link:../dev-guide/index.html#appendix-deprecated-apis[Deprecated REST APIs] predate CREST, do not use the CREST verbs, and are deprecated in OpenAM {openam-version}.
 
 When using a CREST API, you use the common verbs as query string parameters in resource and resource collection URIs.
 --
@@ -168,17 +169,17 @@ Any changes to the methods used to make REST API calls will incur a __protocol__
 [#rest-api-versioning-supported-versions]
 ===== Supported REST API Versions
 
-The REST API version numbers supported in OpenAM 13.5.2-15 are as follows:
+The REST API version numbers supported in OpenAM {openam-version} are as follows:
 --
 
 __Supported protocol versions__::
-The __protocol__ versions supported in OpenAM 13.5.2-15 are:
+The __protocol__ versions supported in OpenAM {openam-version} are:
 +
 [none]
 * `1.0`
 
 __Supported resource versions__::
-The __resource__ versions supported in OpenAM 13.5.2-15 are shown in the following table.
+The __resource__ versions supported in OpenAM {openam-version} are shown in the following table.
 +
 
 [#rest-api-supported-resource-versions]
@@ -400,110 +401,91 @@ AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE.*AAJTSQACMDE.*
 This section describes how to work with realms when making REST API calls to OpenAM.
 
 Realms can be specified in three ways when making a REST API call to OpenAM:
---
 
 DNS Alias::
 When making a REST API call, the DNS alias of a realm can be specified in the subdomain and domain name components of the REST endpoint.
-
 +
+--
 To list all users in the top-level realm use the DNS alias of the OpenAM instance, for example the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/users?_queryId=*
 ----
-+
-+
+
 To list all users in a realm with DNS alias `suppliers.example.com` the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://suppliers.example.com:8443/openam/json/users?_queryId=*
 ----
-+
+--
 
 Path::
 When making a REST API call, the realm, or realm alias, can be specified in the path component of the REST endpoint.
-
 +
+--
 To authenticate a user in the top-level realm the REST endpoint would be:
-+
-
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/authenticate
 ----
-+
-+
+
 To authenticate a user in a realm named `customers` the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/customers/authenticate
 ----
-+
-+
+
 Subrealms are supported and should be separated with a forward slash (*/*).
 
-+
 For example, to authenticate to a subrealm named `europe` of a realm named `partners`, the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/partners/europe/authenticate
 ----
+--
 
 Query Parameter::
 When making a REST API call the realm, or realm alias, can be specified as the value of a query parameter named `realm`.
-
 +
+--
 To list the groups in the top-level realm the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/groups?_queryId=*
 ----
-+
-+
+
 To list the groups in a realm named `partners` the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/groups?realm=/partners&_queryId=*
 ----
-+
-+
 
 [IMPORTANT]
 ======
 When working with a named subrealm of the top-level realm a forward slash preceeding the realm name is required. You should not use a forward slash when using a realm alias.
 ======
-+
+
 Subrealms are supported and should be separated with a forward slash (*/*).
 
-+
 To authenticate a user in a subrealm named `europe` of a realm named `partners` the REST endpoint would be:
-+
 
 [source, console]
 ----
 https://openam.example.com:8443/openam/json/authenticate?realm=/partners/europe
 ----
 
---
 If more than one of the above methods is used to specify realms in a REST endpoint, OpenAM applies the following rules to determine the realm to use.
 
 . If realms are specified using both the DNS alias and path methods, they are concatenated together.
 +
 For example, the following REST endpoint returns users in a subrealm named `europe` of a realm with DNS alias `suppliers`.
 +
-
 [source, console]
 ----
 https://suppliers.example.com:8443/openam/json/europe/users?_queryId=*
@@ -519,7 +501,7 @@ For example, the following REST endpoint returns users in a subrealm of the `cus
 https://suppliers.example.com:8443/openam/json/europe/users?realm=/customers/asia&_queryId=*
 ----
 
-
+--
 
 [#rest-api-auth]
 ==== Authentication and Logout
@@ -841,20 +823,19 @@ Users are required to have appropriate privileges in order to access OpenAM func
 ==== Filtering, Sorting, and Paging Results
 
 Some OpenAM endpoints support additional query string parameters when querying the REST APIs to manipulate the returned data.
---
+
 The query string parameters for manipulating returned results are:
 
 `_queryFilter`::
 The `_queryFilter` parameter can take `true` to return every result, `false` to return no results, or a filter of the following form to match field values: `field operator value` where __field__ represents the field name, __operator__ is the operator code, __value__ is the value to match, and the entire filter is URL-encoded.
 +
-
+--
 [NOTE]
 ======
 Supported fields and operator codes vary depending on the endpoint.
 ======
-+
+
 The operators codes are as follows:
-+
 
 * `co`: contains
 
@@ -878,18 +859,14 @@ Do not set a __value__ when using this operator.
 
 * `sw`: starts with
 
-+
 Filters can be composed of multiple expressions by a using boolean operator `AND`, `OR`, or `!` (NOT) and by using parentheses, `(expression)` to group expressions.
 
-+
 Regular expressions are implemented for some operators, so you can create a filter that includes or excludes certain records.
 
-+
 You must URL-encode the __filter__ expression in `_queryFilter=filter`.
 
-+
 The following example returns resource types with a __name__ that contains `Service` and also has a __pattern__ that starts with `http`:
-+
+
 
 [source, console]
 ----
@@ -900,6 +877,7 @@ $ curl \
 '_queryFilter=name co "Service" and patterns sw "http"' \
 https://openam.example.com:8443/openam/json/resourcetypes
 ----
+--
 
 `_fields`::
 You can use `_fields=field-name[,field-name...]` to limit the fields returned in the output.
@@ -943,8 +921,6 @@ $ curl \
 --data-urlencode '_sortKeys=-creationDate' \
 https://openam.example.com:8443/openam/json/applications
 ----
-
---
 
 
 [#rest-api-serverinfo]
@@ -1307,7 +1283,7 @@ http://openam.example.com:8080/openam/json/users?_action=validateGoto
 [#rest-api-logging]
 ==== Logging
 
-OpenAM 13.5.2-15 supports two Audit Logging Services: a new common REST-based Audit Logging Service, and the legacy Logging Service, which is based on a Java SDK and is available in OpenAM versions prior to OpenAM 13. The legacy Logging Service is deprecated in OpenAM 13.5.2-15.
+OpenAM {openam-version} supports two Audit Logging Services: a new common REST-based Audit Logging Service, and the legacy Logging Service, which is based on a Java SDK and is available in OpenAM versions prior to OpenAM 13. The legacy Logging Service is deprecated in OpenAM {openam-version}.
 
 Both audit facilities log OpenAM REST API calls.
 
@@ -3302,7 +3278,7 @@ Policy resources are represented in JSON and take the following form. Policy res
     "creationDate": "2015-05-11T17:37:24.556Z"
 }
 ----
---
+
 The values for the fields shown in the example are explained below:
 
 `"name"`::
@@ -3331,14 +3307,12 @@ Action values can also be expressed as numeric values. When using numeric values
 
 `"subject"`::
 Specifies the subject conditions to which the policy applies, where subjects can be combined by using the built-in types `"AND"`, `"OR"`, and `"NOT"`, and where subject implementations are pluggable.
-
 +
+--
 Subjects are shown as JSON objects with `"type"` set to the name of the implementation (using a short name for all registered subject implementations), and also other fields depending on the implementation. The subject types registered by default include the following:
-+
 
 * `"AuthenticatedUsers"`, meaning any user that has successfully authenticated to OpenAM.
 +
-
 [source, javascript]
 ----
 {
@@ -3346,7 +3320,6 @@ Subjects are shown as JSON objects with `"type"` set to the name of the implemen
 }
 ----
 +
-
 [WARNING]
 ======
 The `AuthenticatedUsers` subject condition does not take into account the realm to which a user authenticated. Any user that has authenticated successfully to any realm passes this subject condition.
@@ -3355,7 +3328,6 @@ To test whether a user has authenticated successfully to a specific realm, also 
 
 * `"Identity"` to specify one or more users from an OpenAM identity repository:
 +
-
 [source, javascript]
 ----
 {
@@ -3369,7 +3341,6 @@ To test whether a user has authenticated successfully to a specific realm, also 
 +
 You can also use the `"Identity"` subject type to specify one or more groups from an identity repository:
 +
-
 [source, javascript]
 ----
 {
@@ -3419,6 +3390,7 @@ The following example defines the subject either as the user Sam Carter from an 
 ----
 +
 To read a single subject type description, or to list all the available subject types, see xref:#rest-api-authz-subject-types["Managing Subject Condition Types"].
+--
 
 `"condition"`::
 Specifies environment conditions, where conditions can be combined by using the built-in types `"AND"`, `"OR"`, and `"NOT"`, and where condition implementations are pluggable.
@@ -3552,7 +3524,7 @@ You can also use the `"IPv4"` and `"IPv6"` conditions with the `"dnsName"` field
 
 * `"ResourceEnvIP"` to specify a complex condition such as whether the user is making a request from a given host and has authenticated with a given authentication level. For example:
 +
-
+--
 [source, javascript]
 ----
 {
@@ -3562,11 +3534,11 @@ You can also use the `"IPv4"` and `"IPv6"` conditions with the `"dnsName"` field
     ]
 }
 ----
-+
+
 Entries must take the form of one or more IF...ELSE statements. If the IF statement is true, the THEN statement must also be true for the condition to be fulfilled. The IF statement can specify either IP to match the user's IP address, or dnsName to match their DNS name. The IP address can be IPv4 or IPv6 format, or a hybrid of the two, and can include wildcard characters.
-+
+
 The available parameters for the THEN statement are as follows:
-+
+
 [open]
 ====
 
@@ -3590,12 +3562,12 @@ The URL from which the user was redirected.
 
 `realm`::
 The realm to which the user authenticated.
-
 ====
+--
 
 * `"Session"` to specify how long the user's stateful or stateless session has been active, and to terminate the session if deemed too old, such that the user must authenticate again. Note that OpenAM terminates stateless sessions only if session blacklisting is in effect. For more information about session blacklisting, see xref:../admin-guide/chap-session-state.adoc#session-state-session-termination["Session Termination"] in the __Administration Guide__.
 +
-
+--
 [source, javascript]
 ----
 {
@@ -3667,7 +3639,8 @@ The following example defines the condition as neither Saturday or Sunday, nor c
     }
 }
 ----
-+
+--
+
 To read a single condition type description, or to list all the available condition types, see xref:#rest-api-authz-condition-types["Managing Environment Condition Types"].
 
 `"resourceTypeUuid"`::
@@ -3700,7 +3673,6 @@ An integer containing the last modified date and time, in number of seconds sinc
 +
 If the policy has not been modified since it was created, this will be the same value as `creationDate`.
 
---
 
 [#rest-api-authz-policies-query]
 ====== Querying Policies
@@ -5093,31 +5065,26 @@ Clients not running in a browser can authenticate as described in xref:#rest-api
 ====== OAuth 2.0 Client and Resource Server Endpoints
 
 OpenAM exposes REST endpoints for making calls to OpenAM acting as an authorization server, as described in xref:../admin-guide/chap-oauth2.adoc#chap-oauth2["Managing OAuth 2.0 Authorization"] in the __Administration Guide__.
---
+
 In addition to the standard authorization and token endpoints described in RFC 6749, OpenAM also exposes a token information endpoint for resource servers to get information about access tokens so they can determine how to respond to requests for protected resources, and an introspection endpoint to retrieve metadata about a token, such as approved scopes and the context in which the token was issued. OpenAM as authorization server exposes the following endpoints for clients and resource servers.
 
 `/oauth2/authorize`::
 Authorization endpoint defined in RFC 6749, used to obtain an authorization grant from the resource owner.
-
 +
+--
 The `/oauth2/authorize` endpoint is protected by the policy you created after OAuth 2.0 authorization server configuration, which grants all authenticated users access.
 
-+
 The following is an example URL for obtaining consent:
 
-+
 `\https://openam.example.com:8443/openam/oauth2/realms/root/authorize\ ?client_id=myClient\ &response_type=code\ &scope=profile\ &redirect_uri=https://www.example.com`
 
-+
 After logging in, the URL above presents the OAuth 2.0 consent screen, similar to the following:
-+
 
 [#figure-oauth2-consent-screen-xui]
 image::images/oauth2-authz-page-xui.png[]
-+
-+
+
 If creating your own consent page, you can create a POST request to the endpoint with the following additional parameters:
-+
+
 [open]
 ====
 
@@ -5130,25 +5097,20 @@ Valid values are `allow` or `deny`.
 `save_consent`::
 Updates the resource owner's profile to avoid having to prompt the resource owner to grant authorization when the client issues subsequent authorization requests.
 
-+
 To save consent, set the `save_consent` property to `on`.
 
-+
 You must provide the __Saved Consent Attribute Name__ property with a profile attribute in which to store the resource owner's consent decision.
 
-+
 For more information on setting this property in the OAuth2 Provider service, see xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 
 `csrf`::
 Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the resource owner giving consent.
 
-+
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
 
 ====
-+
+
 Example:
-+
 
 [source, console]
 ----
@@ -5166,19 +5128,18 @@ $ curl \
  "https://openam.example.com:8443/openam/oauth2/authorize?response_type=code&client_id=myClient"\
  "&realm=/&scope=profile&redirect_uri=http://www.example.net"
 ----
-+
+
 You must specify the realm if the OpenAM OAuth 2.0 provider is configured for a subrealm rather than the top-level realm. For example, if the OAuth 2.0 provider is configured for the `/customers` realm, then use `/oauth2/customers/authorize`.
 
-+
+
 The `/oauth2/authorize` endpoint can take additional parameters, such as:
-+
 
 * `module` and `service`. Use either as described in xref:../admin-guide/chap-auth-services.adoc#authn-from-browser["Authenticating To OpenAM"] in the __Administration Guide__, where `module` specifies the authentication module instance to use or `service` specifies the authentication chain to use when authenticating the resource owner.
 
 * `response_mode=form_post`. Use this parameter to return a self-submitting form that contains the code instead of redirecting to the redirect URL with the code as a string parameter. For more information, see the link:https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html[OAuth 2.0 Form Post Response Mode, window=\_blank] spec.
 
 * `code_challenge`. Use this parameter when __Proof Key for Code Exchange__ (PKCE) support is enabled in the OAuth2 Provider service. To configure it, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
-
+--
 
 `/oauth2/access_token`::
 Token endpoint defined in RFC 6749, used to obtain an access token from the authorization server.
@@ -5229,7 +5190,6 @@ $ curl \
 --data "client_secret=password" \
 https://openam.example.com:8443/openam/oauth2/token/revoke
 ----
-+
 +
 If you are revoking an access token, then that token will be revoked. If you are revoking a refresh token, then both the refresh token and any other associated access tokens will also be revoked. __Associated access tokens__ means that any other tokens that have come out of the same authorization grant will also be revoked. For cases where a client has multiple access tokens for a single user that were obtained via different authorization grants, then the client will have to make multiple calls to the `/oauth2/token/revoke` endpoint to invalidate each token.
 
@@ -5384,8 +5344,6 @@ $ curl \
 "https://openam.example.com:8443/openam/oauth2/introspect"
 ----
 ======
-
---
 
 
 [#rest-api-oauth2-device-flow]
@@ -9065,12 +9023,12 @@ If there is an active recording event, output similar to the following appears:
 [#sec-sdk]
 === Using the OpenAM Java SDK
 
-This section introduces OpenAM Java SDK. OpenAM Java SDK is delivered with the full version of OpenAM, `OpenAM-13.5.2.zip`.
+This section introduces OpenAM Java SDK. OpenAM Java SDK is delivered with the full version of OpenAM, `OpenAM-{openam-version}.zip`.
 
 [#install-sdk-samples]
 ==== Installing OpenAM Client SDK Samples
 
-The full OpenAM download, `OpenAM-13.5.2.zip`, contains the Java Client SDK library, `ClientSDK-13.5.2.jar`, as well as samples for use on the command line in `ExampleClientSDK-CLI-13.5.2.zip`, and samples in a web application, `ExampleClientSDK-WAR-13.5.2.war`. The link:../apidocs[OpenAM Java SDK API Specification, window=\_blank] provides a reference to the public APIs.
+The full OpenAM download, `OpenAM-{openam-version}.zip`, contains the Java Client SDK library, `ClientSDK-{openam-version}.jar`, as well as samples for use on the command line in `ExampleClientSDK-CLI-{openam-version}.zip`, and samples in a web application, `ExampleClientSDK-WAR-{openam-version}.war`. The link:../apidocs[OpenAM Java SDK API Specification, window=\_blank] provides a reference to the public APIs.
 
 [#deploy-client-sdk-war]
 .To Deploy the Sample Web Application
@@ -9082,7 +9040,7 @@ The sample web application deploys in your container to show you the client SDK 
 
 [source, console]
 ----
-$ cp ExampleClientSDK-WAR-13.5.2.war /path/to/tomcat/webapps/client.war
+$ cp ExampleClientSDK-WAR-{openam-version}.war /path/to/tomcat/webapps/client.war
 ----
 
 . If you have run this procedure before, make sure to deploy a fresh copy of the .war file to a different location, such as `/path/to/tomcat/webapps/client1.war`
@@ -9156,10 +9114,10 @@ Follow these steps to set up the command-line examples.
 . Unpack the sample applications and related libraries.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
 $ mkdir sdk && cd sdk
-$ unzip ~/Downloads/ExampleClientSDK-CLI-13.5.2.zip
+$ unzip ~/Downloads/ExampleClientSDK-CLI-{openam-version}.zip
 ----
 
 . Configure the samples to access OpenAM.

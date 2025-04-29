@@ -34,7 +34,17 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ["PhantomJS"],
+        browsers: ["chromeNoSandbox"],
+        customLaunchers: {
+            chromeNoSandbox: {
+                base: "Chrome",
+                flags: ["--headless=new",
+                    "--allow-file-access-from-files",
+                    "--disable-dev-shm-usage",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox"]
+            }
+        },
         singleRun: false
     });
 };

@@ -12,12 +12,13 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
+:openam-version: 15.1.3
 
 
 [#chap-federation]
@@ -407,12 +408,12 @@ Deploying the identity provider discovery service involves the following stages:
 ====
 How you deploy the discovery service `.war` file depends on your web application container. The procedure in this section shows how to deploy on Apache Tomcat.
 
-. Copy the `IDPDiscovery-13.5.2.war` file to the `webapps/` directory.
+. Copy the `IDPDiscovery-{openam-version}.war` file to the `webapps/` directory.
 +
 
-[source, console]
+[source, console, subs="attributes"]
 ----
-$ cp ~/Downloads/openam/IDPDiscovery-13.5.2.war \
+$ cp ~/Downloads/openam/IDPDiscovery-{openam-version}.war \
  /path/to/tomcat/webapps/disco.war
 ----
 
@@ -1560,7 +1561,7 @@ The following table provides information to help you decide whether to implement
 |===
 |Deployment Task or Requirement |Implementation Mode 
 
-a|You are migrating an existing OpenAM SAML v2.0 deployment from OpenAM 12 (or earlier) to OpenAM 13.5.2-15. Note that all OpenAM SAML v2.0 deployments prior to OpenAM 13 are standalone mode deployments.
+a|You are migrating an existing OpenAM SAML v2.0 deployment from OpenAM 12 (or earlier) to OpenAM {openam-version}. Note that all OpenAM SAML v2.0 deployments prior to OpenAM 13 are standalone mode deployments.
 a|Do not modify your deployment to integrated mode unless you want to change your authentication scenario to have SAML v2.0 authentication integrated into an OpenAM authentication chain.
 
 a|You want to deploy SAML v2.0 SSO and SLO using the easiest technique.
@@ -1686,7 +1687,7 @@ This chain includes two authentication modules, ordered as follows:
 
 . A Data Store authentication module with the `Required` flag.
 
-. A ForgeRock Authenticator (OATH) authentication module with the `Required` flag.
+. A Authenticator (OATH) authentication module with the `Required` flag.
 
 
 
@@ -1702,7 +1703,7 @@ This section describes the sequence of events that occurs the first time a user 
 
 *Service provider attempts to access a federated identity.* OpenAM attempts to locate the name ID in its user store. Because this is the first time the user has attempted to authenticate to the OpenAM service provider, the name ID has not yet been associated with any OpenAM user. The search for the name ID fails.
 
-*Invocation of the linking chain.* Therefore, OpenAM invokes the linking authentication chain. The Data Store authentication module executes first, requiring the user to provide a user ID and password. The ForgeRock Authenticator (OATH) module executes next, requiring the user to provide a one-time password from an authenticator app on the user's mobile device.
+*Invocation of the linking chain.* Therefore, OpenAM invokes the linking authentication chain. The Data Store authentication module executes first, requiring the user to provide a user ID and password. The Authenticator (OATH) module executes next, requiring the user to provide a one-time password from an authenticator app on the user's mobile device.
 
 *Identity federation.* OpenAM then writes the name ID into the user's profile in the OpenAM user store. This completes the SAML2 authentication module's processing.
 
@@ -2110,7 +2111,7 @@ Edit the source of the OpenAM Java Server Page, `saml2/jsp/autosubmitaccessright
 +
 When you add an image or other presentation element, make sure that you retain the form and Java code as is.
 
-. Unpack OpenAM-13.5.2.war, and add your modified template files under `WEB-INF/classes/` where you unpacked the .war.
+. Unpack OpenAM-{openam-version}.war, and add your modified template files under `WEB-INF/classes/` where you unpacked the .war.
 +
 Also include any images you reference in the page.
 
@@ -2574,7 +2575,7 @@ This also happens when transient identifiers are used to map accounts. When acco
 [#saml2-and-session-state]
 === SAML v2.0 and Session State
 
-ForgeRock recommends that you configure OpenAM to use stateful sessions when deploying OpenAM as a SAML v2.0 IdP or SP.
+Open Identity Platform Community recommends that you configure OpenAM to use stateful sessions when deploying OpenAM as a SAML v2.0 IdP or SP.
 
 The following SAML v2.0 profiles are not supported when you configure OpenAM to use stateless sessions:
 
