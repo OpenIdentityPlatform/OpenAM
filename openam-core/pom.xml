@@ -261,6 +261,16 @@
             <groupId>org.openidentityplatform.openam.shaded</groupId>
             <artifactId>click</artifactId>
             <classifier>jakarta</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.click</groupId>
+                    <artifactId>click-extras</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.click</groupId>
+                    <artifactId>click-nodeps</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
