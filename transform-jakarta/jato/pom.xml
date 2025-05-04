@@ -24,35 +24,13 @@
         <version>15.1.7-SNAPSHOT</version>
     </parent>
 
-    <artifactId>restlet</artifactId>
-
-    <repositories>
-        <repository>
-            <id>maven-restlet</id>
-            <url>https://maven.restlet.talend.com</url>
-        </repository>
-    </repositories>
-
+    <artifactId>jato</artifactId>
+    <version>2005-05-04</version>
     <dependencies>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
+            <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
+            <artifactId>jato</artifactId>
+            <version>2005-05-04</version>
         </dependency>
     </dependencies>
     <build>
@@ -67,4 +45,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
