@@ -118,13 +118,13 @@
 	                        </properties>
 	                        <pingURL>http://localhost:8207/openam</pingURL>
 	                    </deployable>
-                        <deployable>
-                            <type>war</type>
-                            <properties>
-                                <context>am</context>
-                            </properties>
-                            <pingURL>http://localhost:8207/am</pingURL>
-                        </deployable>
+<!--                        <deployable>-->
+<!--                            <type>war</type>-->
+<!--                            <properties>-->
+<!--                                <context>am</context>-->
+<!--                            </properties>-->
+<!--                            <pingURL>http://localhost:8207/am</pingURL>-->
+<!--                        </deployable>-->
 	                </deployables>
 	                <configuration>
 				    	<properties>

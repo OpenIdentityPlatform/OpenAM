@@ -1057,21 +1057,22 @@
         <version>${project.version}</version>
       </dependency>
       <!-- External project dependencies -->
-      <dependency>
-        <groupId>org.apache.click</groupId>
-        <artifactId>click-extras</artifactId>
-        <version>${click.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.click</groupId>
-        <artifactId>click-nodeps</artifactId>
-        <version>${click.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.openidentityplatform.openam.shaded</groupId>
         <artifactId>click</artifactId>
         <classifier>jakarta</classifier>
         <version>${project.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.click</groupId>
+            <artifactId>click-extras</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.click</groupId>
+            <artifactId>click-nodeps</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
