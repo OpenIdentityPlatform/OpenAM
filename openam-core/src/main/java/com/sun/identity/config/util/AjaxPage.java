@@ -53,8 +53,8 @@ import java.util.concurrent.TimeUnit;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.click.Page;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.Page;
+import org.openidentityplatform.openam.click.control.ActionLink;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;

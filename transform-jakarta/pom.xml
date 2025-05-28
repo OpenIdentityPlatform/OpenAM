@@ -28,7 +28,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>jaxrpc</module>
-        <module>click</module>
         <module>restlet</module>
         <module>activemq-client</module>
 <!--        <module>apache-cxf</module>-->

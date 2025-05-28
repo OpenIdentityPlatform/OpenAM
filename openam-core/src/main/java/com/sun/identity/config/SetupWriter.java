@@ -30,6 +30,7 @@
  * Portions Copyrighted 2011 ForgeRock AS
  */
 package com.sun.identity.config;
+
 import java.io.CharArrayWriter;
 import java.io.Writer;
 import java.io.IOException;

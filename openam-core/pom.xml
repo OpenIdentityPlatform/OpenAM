@@ -257,20 +257,17 @@
         </dependency>
 
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
+
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>click</artifactId>
-            <classifier>jakarta</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.click</groupId>
-                    <artifactId>click-extras</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.click</groupId>
-                    <artifactId>click-nodeps</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.click</groupId>
+            <artifactId>click-nodeps</artifactId>
+            <version>${click.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.click</groupId>
+            <artifactId>click-extras</artifactId>
+            <version>${click.version}</version>
         </dependency>
 
         <dependency>

@@ -1059,22 +1059,6 @@
       <!-- External project dependencies -->
 
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>click</artifactId>
-        <classifier>jakarta</classifier>
-        <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.click</groupId>
-            <artifactId>click-extras</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.click</groupId>
-            <artifactId>click-nodeps</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>${commons-beanutils.version}</version>

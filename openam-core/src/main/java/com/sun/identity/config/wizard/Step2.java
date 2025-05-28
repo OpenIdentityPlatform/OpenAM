@@ -38,7 +38,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 import org.forgerock.openam.utils.StringUtils;
 
 public class Step2 extends ProtectedPage {

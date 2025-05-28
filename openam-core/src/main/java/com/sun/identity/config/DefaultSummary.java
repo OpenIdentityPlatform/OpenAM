@@ -39,7 +39,7 @@ import com.sun.identity.setup.SetupConstants;
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 
 public class DefaultSummary extends ProtectedPage {
     
