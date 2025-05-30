@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -34,7 +35,9 @@ import org.forgerock.openam.sts.TokenType;
 
 import javax.xml.ws.WebServiceContext;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -65,9 +68,11 @@ public class TokenRenewOperationProvider implements Provider<RenewOperation> {
         }
 
         @Override
-        public RequestSecurityTokenResponseType renew(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType renew(RequestSecurityTokenType request,
+                                                      Principal principal,
+                                                      Map<String, Object> messageContext) {
             try {
-                return renewDelegate.renew(request, context);
+                return renewDelegate.renew(request, principal, messageContext);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }

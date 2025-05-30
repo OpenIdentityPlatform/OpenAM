@@ -12,6 +12,7 @@
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
 * Copyright 2014-2016 ForgeRock AS.
+* Portions Copyrighted 2025 3A-Systems LLC.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.saml2;
@@ -20,7 +21,7 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.ReceivedKey;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;

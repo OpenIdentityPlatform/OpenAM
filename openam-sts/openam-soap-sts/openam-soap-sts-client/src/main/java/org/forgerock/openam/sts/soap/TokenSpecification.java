@@ -12,16 +12,17 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionAssertion;
 import org.w3c.dom.Document;
@@ -185,7 +186,7 @@ public class TokenSpecification {
         type is generated
          */
         Element nestedPolicyElement = null;
-        return new OpenAMSessionAssertion(SP12Constants.INSTANCE, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+        return new OpenAMSessionAssertion(SPConstants.SPVersion.SP12, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
                 nestedPolicyElement, sessionId).getTokenElement();
     }
 }
