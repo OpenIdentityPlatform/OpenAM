@@ -12,14 +12,15 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -34,7 +35,7 @@ import org.slf4j.Logger;
  * UsernameToken validation by calling the OpenAM REST interface via bound TokenAuthenticationRequestDispacher<UsernameToken>
  *
  */
-public class OpenAMWSSUsernameTokenValidator extends org.apache.ws.security.validate.UsernameTokenValidator {
+public class OpenAMWSSUsernameTokenValidator extends org.apache.wss4j.dom.validate.UsernameTokenValidator {
     private final AuthenticationHandler<UsernameToken> authenticationHandler;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final ValidationInvocationContext validationInvocationContext;
@@ -61,7 +62,7 @@ public class OpenAMWSSUsernameTokenValidator extends org.apache.ws.security.vali
         } catch (TokenValidationException e) {
             String message = "Exception caught authenticating UsernameToken with OpenAM: " + e;
             logger.error(message, e);
-            throw new WSSecurityException(message, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e, message);
         }
     }
 
@@ -89,9 +90,9 @@ public class OpenAMWSSUsernameTokenValidator extends org.apache.ws.security.vali
     protected void printConfig(RequestData data) {
         WSSConfig config =  data.getWssConfig();
         if (config != null) {
-            logger.debug("Passwords are encoded: {}", config.getPasswordsAreEncoded());
-            logger.debug("Handle custom password types: {}", config.getHandleCustomPasswordTypes());
-            logger.debug("Required Password Type: {}", config.getRequiredPasswordType());
+            //logger.debug("Passwords are encoded: {}", data.getPasswordsAreEncoded());
+            //logger.debug("Handle custom password types: {}", data.getHandleCustomPasswordTypes());
+            logger.debug("Required Password Type: {}", data.getRequiredPasswordType());
         }
     }
 }

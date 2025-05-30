@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.policy.am;
@@ -20,8 +21,8 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AbstractToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.w3c.dom.Element;
 
@@ -69,12 +70,12 @@ public class OpenAMSessionTokenClientInterceptor extends AbstractOpenAMSessionTo
      * soap-sts instances.
      */
     @Override
-    protected Token assertTokens(SoapMessage message) {
+    protected AbstractToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_QNAME);
-        Token token = null;
+        AbstractToken token = null;
         for (AssertionInfo ai : ais) {
-            token = (Token)ai.getAssertion();
+            token = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);
         }
         ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);

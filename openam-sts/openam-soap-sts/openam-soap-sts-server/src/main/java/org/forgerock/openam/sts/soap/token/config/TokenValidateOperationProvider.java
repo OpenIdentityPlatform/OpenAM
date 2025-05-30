@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -33,8 +34,10 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 import javax.inject.Named;
 import javax.xml.ws.WebServiceContext;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,9 +68,11 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
         }
 
         @Override
-        public RequestSecurityTokenResponseType validate(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType validate(RequestSecurityTokenType request,
+                                                         Principal principal,
+                                                         Map<String, Object> messageContext) {
             try {
-                return validateDelegate.validate(request, context);
+                return validateDelegate.validate(request, principal, messageContext);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }
@@ -81,7 +86,9 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
      */
     static class UnsupportedValidateOperation implements ValidateOperation {
         @Override
-        public RequestSecurityTokenResponseType validate(RequestSecurityTokenType request, WebServiceContext context) {
+        public RequestSecurityTokenResponseType validate(RequestSecurityTokenType request,
+                                                         Principal principal,
+                                                         Map<String, Object> messageContext) {
             throw new STSException("Soap STS instance not configured to persist issued tokens in the CoreTokenService, and " +
                     "thus the ValidateOperation cannot be implemented. If the validation of issued tokens is desired, " +
                     "republish the soap-sts instance, with configuration which indicates that issued tokens should be " +

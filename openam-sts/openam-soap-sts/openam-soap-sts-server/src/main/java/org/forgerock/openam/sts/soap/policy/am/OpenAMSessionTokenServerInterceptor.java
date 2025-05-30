@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.policy.am;
@@ -25,15 +26,16 @@ import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.policy.model.AbstractToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -96,14 +98,15 @@ public class OpenAMSessionTokenServerInterceptor extends AbstractOpenAMSessionTo
                             results = new ArrayList<WSHandlerResult>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
-                        WSHandlerResult rResult = new WSHandlerResult(null, validationResults);
+                        WSHandlerResult rResult = new WSHandlerResult(null, validationResults, Collections.emptyMap());
                         results.add(0, rResult);
 
                         assertTokens(message);
 
                         Principal principal =
                                 (Principal)validationResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                        message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);
+                        message.put("wss4j.principal.result", principal); //TODO Jakarta WSS4JInInterceptor.PRINCIPAL_RESULT
+
 
                         SecurityContext sc = message.get(SecurityContext.class);
                         if (sc == null || sc.getUserPrincipal() == null) {
@@ -126,7 +129,7 @@ public class OpenAMSessionTokenServerInterceptor extends AbstractOpenAMSessionTo
      */
     private List<WSSecurityEngineResult> validateToken(Element tokenElement) throws WSSecurityException {
         final boolean bspComliant = true;
-        final BinarySecurity bst = new BinarySecurity(tokenElement, bspComliant);
+        final BinarySecurity bst = new BinarySecurity(tokenElement, new BSPEnforcer());
         bst.setValueType(AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_BST_VALUE_TYPE);
         final X509Certificate[] certs = null;
         WSSecurityEngineResult result =  new WSSecurityEngineResult(WSConstants.BST, bst, certs);
@@ -140,7 +143,7 @@ public class OpenAMSessionTokenServerInterceptor extends AbstractOpenAMSessionTo
             result.put(WSSecurityEngineResult.TAG_PRINCIPAL, principal);
 
         } catch (TokenValidationException e) {
-            throw new WSSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e, e.getMessage());
         }
         return Collections.singletonList(result);
     }
@@ -170,12 +173,12 @@ public class OpenAMSessionTokenServerInterceptor extends AbstractOpenAMSessionTo
      * soap-sts instances.
      */
     @Override
-    protected Token assertTokens(SoapMessage message) {
+    protected AbstractToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_QNAME);
-        Token token = null;
+        AbstractToken token = null;
         for (AssertionInfo ai : ais) {
-            token = (Token)ai.getAssertion();
+            token = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);
         }
         ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);

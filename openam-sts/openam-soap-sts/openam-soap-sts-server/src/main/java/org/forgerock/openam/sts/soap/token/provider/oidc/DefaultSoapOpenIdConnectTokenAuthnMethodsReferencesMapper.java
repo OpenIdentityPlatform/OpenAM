@@ -12,12 +12,13 @@
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2025 3A-Systems LLC.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.oidc;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import java.util.List;
 import java.util.Set;

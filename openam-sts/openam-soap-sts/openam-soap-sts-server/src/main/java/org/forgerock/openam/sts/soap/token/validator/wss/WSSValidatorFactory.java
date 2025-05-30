@@ -12,11 +12,12 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 
