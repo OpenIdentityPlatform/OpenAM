@@ -12,17 +12,18 @@
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
 * Copyright 2014-2015 ForgeRock AS.
+* Portions Copyrighted 2025 3A-Systems LLC.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.saml2;
 
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;

@@ -12,15 +12,16 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.policy.am;
 import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 
 import org.w3c.dom.Element;
@@ -45,7 +46,7 @@ public class OpenAMSessionTokenServerAssertionBuilder implements AssertionBuilde
             throw new IllegalArgumentException(AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_QNAME
                     + " must have an inner wsp:Policy element");
         }
-        return new OpenAMSessionAssertion(SP12Constants.INSTANCE, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+        return new OpenAMSessionAssertion(SPConstants.SPVersion.SP12, SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
                 nestedPolicyElement, element.getTextContent());
     }
 

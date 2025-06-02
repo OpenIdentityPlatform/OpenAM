@@ -12,15 +12,21 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.policy.am;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.policy.PolicyBuilderImpl;
+import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyBuilder;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.AbstractToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,7 +41,7 @@ import javax.xml.stream.XMLStreamWriter;
  * OpenAMSessionTokenClientAssertionBuilder registered with the org.apache.cxf.ws.policy.AssertionBuilderRegistry (obtained
  * via the cxf Bus) in the STSClient instance used to consume the OpenAM soap sts.
  */
-public class OpenAMSessionAssertion extends Token {
+public class OpenAMSessionAssertion extends AbstractToken {
     private final String sessionId;
 
     /**
@@ -54,12 +60,10 @@ public class OpenAMSessionAssertion extends Token {
      *                  OpenAMSessionTokenClientAssertionBuilder, and pulled from the BinarySecurityToken element which
      *                  encapsulates this sessionId when it arrives at the targeted sts.
      */
-    public OpenAMSessionAssertion(SPConstants version, SPConstants.IncludeTokenType includeTokenType, Element nestedPolicy, String sessionId) {
-        super(version);
-        setInclusion(includeTokenType);
+    public OpenAMSessionAssertion(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType, Element nestedPolicy, String sessionId) {
+        super(version, includeTokenType, null, null, null, new PolicyBuilderImpl().getPolicy(nestedPolicy));
         setIgnorable(false);
         setOptional(false);
-        setPolicy(nestedPolicy);
         this.sessionId = sessionId;
     }
 
@@ -95,13 +99,15 @@ public class OpenAMSessionAssertion extends Token {
         writer.writeNamespace(prefix, namespaceURI);
         writer.writeAttribute(prefix, namespaceURI, SPConstants.ATTR_INCLUDE_TOKEN, SP12Constants.INCLUDE_ALWAYS);
 
-        String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
+        QName policy = Constants.Q_ELEM_POLICY_15;
+
+        String pPrefix = writer.getPrefix(policy.getNamespaceURI());
         if (pPrefix == null) {
-            pPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
+            pPrefix = policy.getPrefix();
+            writer.setPrefix(policy.getPrefix(), policy.getNamespaceURI());
         }
         // write start element of nested policy element
-        writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+        writer.writeStartElement(pPrefix, policy.getLocalPart(), policy
                 .getNamespaceURI());
         // write end element of nested policy element
         writer.writeEndElement();
@@ -124,6 +130,11 @@ public class OpenAMSessionAssertion extends Token {
         return token.getElement();
     }
 
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return super.clone(nestedPolicy);
+    }
+
     /**
      * A private subclass of the wss4j BinarySecurityToken class, as an aid to obtain the xml corresponding to a
      * BinarySecurityToken necessary for inclusion in the soap security header by the OpenAMSessionTokenClientInterceptor.
@@ -140,7 +151,7 @@ public class OpenAMSessionAssertion extends Token {
          * @param sessionId The OpenAM session id to-be-included in the BST.
          */
         void setSessionId(String sessionId) {
-            getFirstNode().setData(sessionId);
+            setRawToken(sessionId.getBytes());
         }
     }
 }
