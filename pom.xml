@@ -267,25 +267,14 @@
 			      </executions>
 			    </plugin>
 			    <plugin>
-			      <groupId>org.sonatype.plugins</groupId>
-			      <artifactId>nexus-staging-maven-plugin</artifactId>
-			      <version>1.7.0</version>
-			      <extensions>true</extensions>
-			      <configuration>
-			        <serverId>ossrh</serverId>
-			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
-			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
-			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
-			      </configuration>
-			      <dependencies>
-			      	<dependency>
-				        <groupId>com.google.guava</groupId>
-				        <artifactId>guava</artifactId>
-				        <version>15.0</version>
-				     </dependency>
-			      </dependencies>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.8.0</version>
+				<extensions>true</extensions>
+				<configuration>
+				    <publishingServerId>ossrh</publishingServerId>
+				    <autoPublish>true</autoPublish>
+				</configuration>
 			    </plugin>
             </plugins>
         </build>
@@ -392,38 +381,28 @@
   </mailingLists>
   <!-- Maven Repositories -->
   	<repositories>
-		<repository>
-			<id>ossrh-snapshots</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	        <repository>
+	            <name>Central Portal Snapshots</name>
+	            <id>central-portal-snapshots</id>
+	            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+	            <releases>
+	                <enabled>false</enabled>
+	            </releases>
+	            <snapshots>
+	                <enabled>true</enabled>
+	            </snapshots>
+	        </repository>
+	    </repositories>
 	<pluginRepositories>
 		<pluginRepository>
-			<id>ossrh-snapshots</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<name>Central Portal Snapshots</name>
+	            <id>central-portal-snapshots</id>
+	            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
-	<distributionManagement>
-		<repository>
-			<id>ossrh</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
   <!-- Source Control -->
   <scm>
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
