@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;

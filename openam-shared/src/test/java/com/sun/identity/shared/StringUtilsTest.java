@@ -17,7 +17,7 @@ package com.sun.identity.shared;
 
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class StringUtilsTest {
 

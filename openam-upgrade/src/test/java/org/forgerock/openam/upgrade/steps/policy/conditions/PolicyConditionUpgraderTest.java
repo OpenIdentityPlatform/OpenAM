@@ -30,7 +30,7 @@ import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
 import java.util.HashSet;
 import java.util.Set;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;

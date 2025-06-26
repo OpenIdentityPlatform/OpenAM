@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.entitlement.rest.model.json;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -38,7 +38,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.shared.Constants;
 
-import org.fest.assertions.Condition;
+import org.assertj.core.api.Condition;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.services.context.Context;

@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.utils;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.security.PrivilegedAction;

@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.entitlement.constraints;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sun.identity.entitlement.URLResourceName;
 import org.forgerock.openam.entitlement.ResourceType;

@@ -17,7 +17,7 @@ package org.forgerock.openam.cts.exceptions;
 
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CoreTokenExceptionTest {
     @Test

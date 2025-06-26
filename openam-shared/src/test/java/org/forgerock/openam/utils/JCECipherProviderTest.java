@@ -24,7 +24,7 @@ import javax.crypto.Cipher;
 import java.security.Provider;
 import java.security.Security;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**

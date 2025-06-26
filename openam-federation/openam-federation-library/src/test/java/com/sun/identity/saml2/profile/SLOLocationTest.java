@@ -20,7 +20,7 @@ import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.impl.SingleLogoutServiceElementImpl;
 import java.util.ArrayList;
 import java.util.List;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import org.testng.annotations.Test;
 
 @Test

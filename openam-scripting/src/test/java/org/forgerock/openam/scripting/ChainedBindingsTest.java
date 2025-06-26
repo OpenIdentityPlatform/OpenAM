@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ChainedBindingsTest {
 

@@ -15,7 +15,7 @@
  */
 package com.sun.identity.log.service;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.forgerock.audit.events.AccessAuditEventBuilder.ResponseStatus;
 import org.testng.annotations.BeforeMethod;

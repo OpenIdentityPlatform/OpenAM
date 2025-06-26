@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Basic tests of the rhino script engine. The engine is more fully tested by the

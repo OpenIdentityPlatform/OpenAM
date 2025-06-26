@@ -22,8 +22,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.Fail.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -114,9 +113,7 @@ public class TokenBlobStrategyTest {
         // Then
         Object dataRef = data;
         Object captorRef = captor.getValue();
-        if (dataRef == captorRef) { // Verify the references are different (the contents will be the same)
-            fail();
-        }
+        assertThat(dataRef).isNotSameAs(captorRef);
     }
 
     @Test

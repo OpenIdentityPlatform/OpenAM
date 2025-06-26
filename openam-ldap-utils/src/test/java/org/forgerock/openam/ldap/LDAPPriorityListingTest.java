@@ -18,7 +18,7 @@ package org.forgerock.openam.ldap;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.testng.Assert.assertEquals;
 

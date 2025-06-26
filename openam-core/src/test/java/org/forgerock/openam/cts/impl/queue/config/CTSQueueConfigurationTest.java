@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.queue.config;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
