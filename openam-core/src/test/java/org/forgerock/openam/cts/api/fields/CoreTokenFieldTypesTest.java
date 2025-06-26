@@ -18,8 +18,9 @@ package org.forgerock.openam.cts.api.fields;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import org.fest.assertions.Assertions;
-import org.fest.assertions.Condition;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Condition;
+
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -86,10 +87,9 @@ public class CoreTokenFieldTypesTest {
                 continue;
             }
 
-            Assertions.assertThat(field).satisfies(new Condition<Object>("has valid type") {
+            Assertions.assertThat(field).is(new Condition<CoreTokenField>("has valid type") {
                 @Override
-                public boolean matches(Object t) {
-                    CoreTokenField obj = (CoreTokenField) t;
+                public boolean matches(CoreTokenField obj) {
                     return CoreTokenFieldTypes.isByteArray(obj) || CoreTokenFieldTypes.isCalendar(obj)
                             || CoreTokenFieldTypes.isInteger(obj) || CoreTokenFieldTypes.isString(obj);
                 }

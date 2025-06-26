@@ -18,8 +18,8 @@ package com.sun.identity.idm.common;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import org.testng.annotations.Test;
 
 public class IdRepoUtilsTest {
@@ -33,7 +33,7 @@ public class IdRepoUtilsTest {
         values.put("aunicodepwd", asSet("test4"));
         values.put("unicodepwd2", asSet("test5"));
         values.put("unicodepwd", asSet("test6"));
-        Map<String, ?> result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, null);
+        Map result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, null);
         assertThat(result.values()).containsOnly(asSet("test1"), asSet("test2"), asSet("test4"), asSet("test5"),
                 "xxx...");
     }
@@ -47,7 +47,7 @@ public class IdRepoUtilsTest {
         values.put("UnIcOdEpWd", asSet("test4"));
         values.put("unicodePwd", asSet("test5"));
         values.put("unicodepwd", asSet("test6"));
-        Map<String, ?> result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, null);
+        Map result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, null);
         assertThat(result.values()).containsOnly("xxx...");
     }
 
@@ -60,7 +60,7 @@ public class IdRepoUtilsTest {
         values.put("unicodepwd", asSet("test4"));
         values.put("hellp", asSet("test5"));
         values.put("worlt", asSet("test6"));
-        Map<String, ?> result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, asSet("HELLO", "WORLD"));
+        Map result = IdRepoUtils.getAttrMapWithoutPasswordAttrs(values, asSet("HELLO", "WORLD"));
         assertThat(result.values()).containsOnly(asSet("test5"), asSet("test6"), "xxx...");
     }
 }

@@ -21,7 +21,7 @@ import javax.security.auth.x500.X500Principal;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class CertUtilsTest {
 

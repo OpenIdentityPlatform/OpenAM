@@ -18,7 +18,7 @@ package org.forgerock.openam.idrepo.ldap.helpers;
 import com.sun.identity.idm.IdType;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import org.forgerock.openam.utils.CollectionUtils;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 

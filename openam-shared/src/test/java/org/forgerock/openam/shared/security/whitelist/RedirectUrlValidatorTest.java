@@ -20,7 +20,7 @@ import java.util.Set;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
 public class RedirectUrlValidatorTest {

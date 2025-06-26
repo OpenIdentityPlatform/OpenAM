@@ -16,7 +16,7 @@
  */
 package org.forgerock.openam.entitlement.rest;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;

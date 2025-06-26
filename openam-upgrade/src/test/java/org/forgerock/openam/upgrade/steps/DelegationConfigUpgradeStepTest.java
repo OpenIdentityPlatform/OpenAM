@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.upgrade.steps;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;

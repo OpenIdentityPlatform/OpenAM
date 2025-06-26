@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.cts.impl;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.forgerock.openam.cts.api.CTSOptions.PRE_DELETE_READ_OPTION;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;

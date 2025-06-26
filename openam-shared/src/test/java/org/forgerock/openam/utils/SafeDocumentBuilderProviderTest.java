@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link SafeDocumentBuilderProvider}. Assumes that the underlying

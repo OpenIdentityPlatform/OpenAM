@@ -19,7 +19,7 @@ package org.forgerock.openam.idrepo.ldap;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.openam.utils.MapHelper;

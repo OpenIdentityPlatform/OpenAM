@@ -51,8 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 
 public class JsonPolicyParserTest {
@@ -208,7 +208,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        assertThat(result.getEntitlement().getResourceNames()).containsOnly(included.toArray());
+        assertThat(result.getEntitlement().getResourceNames()).containsOnlyElementsOf(included);
     }
 
     @Test
@@ -450,7 +450,7 @@ public class JsonPolicyParserTest {
         ResourceAttribute attr = result.getResourceAttributes().iterator().next();
         assertThat(attr).isInstanceOf(StaticAttributes.class);
         assertThat(attr.getPropertyName()).isEqualTo("test");
-        assertThat(attr.getPropertyValues()).containsOnly(values.toArray());
+        assertThat(attr.getPropertyValues()).containsOnlyElementsOf(values);
     }
 
     @Test
@@ -673,7 +673,7 @@ public class JsonPolicyParserTest {
         assertThat(result.get(new JsonPointer("condition/conditions/0/condition/className")).asString())
                 .isEqualTo(AuthenticateToRealmCondition.class.getName());
         assertThat(result.get(new JsonPointer("condition/conditions/0/condition/properties")).asMapOfList(String.class))
-                .includes(entry("AuthenticateToRealm", Arrays.asList("REALM")));
+                .contains(entry("AuthenticateToRealm", Arrays.asList("REALM")));
     }
 
     @Test
@@ -714,7 +714,7 @@ public class JsonPolicyParserTest {
         assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyName")).asString())
                 .isEqualTo(staticAttrName);
         assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyValues")).asList(String.class))
-                .containsOnly(staticAttrValue.toArray());
+                .containsOnlyElementsOf(staticAttrValue);
     }
 
     private JsonValue buildJson(Map.Entry<String, Object> fieldValue) {

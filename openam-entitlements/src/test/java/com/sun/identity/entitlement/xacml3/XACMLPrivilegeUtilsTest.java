@@ -35,7 +35,7 @@ import java.util.Set;
 
 import static com.sun.identity.entitlement.xacml3.Assertions.*;
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.*;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.Time.*;
 import static org.testng.Assert.*;
 

@@ -17,10 +17,11 @@ package org.forgerock.openam.authentication.callbacks.helpers;
 
 import java.util.concurrent.TimeUnit;
 
-import org.fest.assertions.Assertions;
 import org.forgerock.openam.utils.TimeTravelUtil;
 import org.forgerock.openam.utils.TimeTravelUtil.FastForwardTimeService;
 import org.forgerock.util.time.TimeService;
+
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;

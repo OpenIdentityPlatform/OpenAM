@@ -17,7 +17,7 @@ package org.forgerock.openam.cts.utils.blob.strategies.encryption;
 
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class EncryptDecryptActionTest {
     @Test

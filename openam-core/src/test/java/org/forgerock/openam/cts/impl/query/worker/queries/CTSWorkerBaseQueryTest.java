@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;

@@ -16,7 +16,7 @@
 package org.forgerock.openam.ldap;
 
 import org.testng.annotations.Test;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 @Test
 public class LDAPURLParsingTest {

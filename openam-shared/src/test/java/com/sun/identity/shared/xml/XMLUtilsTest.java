@@ -18,7 +18,7 @@ package com.sun.identity.shared.xml;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class XMLUtilsTest {
 

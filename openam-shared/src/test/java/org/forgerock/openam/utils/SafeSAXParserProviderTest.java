@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import javax.xml.parsers.SAXParser;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Basic unit tests for {@link SafeSAXParserProvider}. Assumes the underlying {@link org.forgerock.util.xml.XMLUtils}

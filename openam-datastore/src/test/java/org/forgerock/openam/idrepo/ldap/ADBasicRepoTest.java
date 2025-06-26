@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.idrepo.ldap;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
 import org.forgerock.openam.utils.MapHelper;

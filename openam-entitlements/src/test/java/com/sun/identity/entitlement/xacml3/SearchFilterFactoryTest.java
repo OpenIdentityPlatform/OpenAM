@@ -21,7 +21,7 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.AssertJUnit.fail;
 
 public class SearchFilterFactoryTest {

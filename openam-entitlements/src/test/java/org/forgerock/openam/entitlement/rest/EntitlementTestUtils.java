@@ -15,12 +15,13 @@
  */
 package org.forgerock.openam.entitlement.rest;
 
-import static org.fest.assertions.Fail.fail;
+import static org.assertj.core.api.Assertions.fail;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 
 import com.sun.identity.entitlement.EntitlementException;
+
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
-import org.fest.assertions.Assertions;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;

@@ -22,7 +22,7 @@ import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 

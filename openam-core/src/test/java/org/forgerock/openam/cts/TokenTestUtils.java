@@ -26,7 +26,7 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.Time.*;
 
 /**

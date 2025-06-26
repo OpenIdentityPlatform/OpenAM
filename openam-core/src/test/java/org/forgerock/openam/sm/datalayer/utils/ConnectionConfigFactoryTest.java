@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.sm.ConnectionConfig;

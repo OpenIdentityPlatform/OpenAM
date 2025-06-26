@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class LDAPFilterConditionTest {

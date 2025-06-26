@@ -19,7 +19,7 @@ package org.forgerock.openam.notifications;
 import static com.sun.identity.common.configuration.AgentConfiguration.*;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.security.PrivilegedAction;

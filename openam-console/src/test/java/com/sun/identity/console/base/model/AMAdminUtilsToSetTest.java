@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -83,7 +83,7 @@ public class AMAdminUtilsToSetTest {
         assertThat(result).isNotNull()
                           .hasSize(2)
                           .contains("aaa", "ccc")
-                          .excludes("");
+                          .doesNotContain("");
     }
 
     @Test
