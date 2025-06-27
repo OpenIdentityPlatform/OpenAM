@@ -14,7 +14,6 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 public class Encoder {
-    private static final int COMPRESS_BUFFER_SIZE = 1024;
 
     private Encoder() {
     }
@@ -28,38 +27,19 @@ public class Encoder {
     }
 
     public static String encodeBase64(byte[] bytes) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        String result = encoder.encodeToString(bytes);
-        result = StringTokenizer2.replace(result, "\r", "");
-        result = StringTokenizer2.replace(result, "\n", "");
-        return result;
+        return Base64.getUrlEncoder().encodeToString(bytes);
     }
 
     public static byte[] decodeBase64(String s) {
-        Base64.Decoder decoder = Base64.getDecoder();
-        return decoder.decode(s);
+        return Base64.getUrlDecoder().decode(s);
     }
 
     public static String encodeHttp64(byte[] bytes, int compressThreshold) {
-        byte[] result;
-        if (bytes.length > compressThreshold) {
-            result = compress(bytes);
-        } else {
-            result = new byte[bytes.length + 1];
-            result[0] = 0;
-            System.arraycopy(bytes, 0, result, 1, bytes.length);
-        }
-
-        String encodedString = Base64.getEncoder().encodeToString(result);
-        encodedString = StringTokenizer2.replace(encodedString, "\r", "");
-        encodedString = StringTokenizer2.replace(encodedString, "\n", "");
-        return encodedString;
+        return Base64.getUrlEncoder().encodeToString(bytes);
     }
 
     public static byte[] decodeHttp64(String s) {
-        Base64.Decoder decoder = Base64.getDecoder();
-        byte[] result = decoder.decode(s);
-        return decompress(result);
+        return Base64.getUrlDecoder().decode(s);
     }
 
     public static byte[] compress(byte[] in) {
