@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -23,6 +24,8 @@
     </parent>
 	<properties>
 		<node.install.directory>${project.basedir}</node.install.directory>
+		<jquery.version>3.7.1</jquery.version>
+		<bootstrap.version>3.4.1</bootstrap.version>
 	</properties>
 
     <artifactId>openam-ui</artifactId>
@@ -32,6 +35,24 @@
         <module>openam-ui-ria</module>
         <module>openam-ui-api</module>
     </modules>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.openidentityplatform.commons.ui.libs</groupId>
+				<artifactId>bootstrap</artifactId>
+				<version>${bootstrap.version}</version>
+				<classifier>custom</classifier>
+				<type>css</type>
+			</dependency>
+			<dependency>
+				<groupId>org.openidentityplatform.commons.ui.libs</groupId>
+				<artifactId>bootstrap</artifactId>
+				<version>${bootstrap.version}</version>
+				<classifier>custom</classifier>
+				<type>js</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
     <build>
     		<plugins>
     			<plugin>
@@ -368,14 +389,6 @@
 			            </artifactItem>
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
-			              <artifactId>jquery</artifactId>
-			              <version>2.1.1</version>
-			              <packaging>js</packaging>
-			              <classifier>min</classifier>
-			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/jquery/{version}/{artifactId}.{classifier}.{packaging}</downloadUrl>
-			            </artifactItem>
-			            <artifactItem>
-			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>lodash</artifactId>
 			              <version>2.4.1</version>
 			              <packaging>js</packaging>
@@ -422,7 +435,7 @@
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>bootstrap</artifactId>
-			              <version>3.3.5</version>
+			              <version>${bootstrap.version}</version>
 			              <classifier>custom</classifier>
 			              <packaging>js</packaging>
 			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/{version}/{packaging}/{artifactId}.{packaging}</downloadUrl>
@@ -430,7 +443,7 @@
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>bootstrap</artifactId>
-			              <version>3.3.5</version>
+			              <version>${bootstrap.version}</version>
 			              <classifier>custom</classifier>
 			              <packaging>css</packaging>
 			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/{version}/{packaging}/{artifactId}.{packaging}</downloadUrl>

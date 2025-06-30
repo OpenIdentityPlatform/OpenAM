@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 require.config({
@@ -44,7 +45,7 @@ require.config({
         "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
         "backgrid-selectall": "libs/backgrid-select-all-0.3.5-min",
 
-        "bootstrap"               : "libs/bootstrap-3.3.5-custom",
+        "bootstrap"               : "libs/bootstrap-3.4.1-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
@@ -55,7 +56,7 @@ require.config({
         "form2js"          : "libs/form2js-2.0-769718a",
         "handlebars"       : "libs/handlebars-4.7.7",
         "i18next"          : "libs/i18next-1.7.3-min",
-        "jquery"           : "libs/jquery-2.1.1-min",
+        "jquery"           : "libs/jquery-3.7.1-min",
         "js2form"          : "libs/js2form-2.0-769718a",
         "jsonEditor"       : "libs/jsoneditor-0.7.23-custom",
         "lodash"           : "libs/lodash-3.10.1-min",
