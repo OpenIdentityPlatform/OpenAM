@@ -854,8 +854,8 @@ Copyright: Copyright (c)2014 Jan Mühlemann (jamuhl).
 Version: jquery-1.11.1-min.js
 Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
 
-Version: jquery-2.1.1-min.js
-Copyright: Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
+Version: jquery-3.7.1-min.js
+Copyright: Copyright 2005, 2023 jQuery Foundation, Inc. and other contributors
 
 Version: bootstrap-clockpicker-0.0.7-min.js
 Copyright: Copyright 2014 Wang Shenwei.
