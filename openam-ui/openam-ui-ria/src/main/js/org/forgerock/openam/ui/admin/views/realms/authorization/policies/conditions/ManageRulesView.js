@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 
@@ -93,35 +94,45 @@ define([
                 if (_.isArray(data) === false) {
                     data = [data];
                 }
+                return data.reduce(function (promise, item) {
+                    return promise.then(function () {
+                        var pr = $.Deferred().resolve();
+                        if (item && _.contains(operators, item.type)) {
+                            newRule = new OperatorRulesView();
+                            pr = newRule.render(self.data,
+                                container, self.idPrefix + self.idCount, (self.idCount === 0))
+                                .then(function () {
+                                    newRule.setValue(item.type);
+                                }).then(function () {
+                                    self.idCount++;
+                                });
 
-                _.each(data, function (item) {
-                    if (item && _.contains(operators, item.type)) {
+                        } else if (!_.isEmpty(item)) {
+                            if (item.type === Constants.LEGACY) {
+                                newRule = new LegacyListItemView();
+                                pr = newRule.render(item, container, self.idCount);
+                            } else {
+                                newRule = self.getNewRule();
+                                properties = self.getProperties();
+                                pr = newRule.render(properties, container, self.idCount, item)
+                                    .then(function () {
+                                        newRule.createListItem(properties, newRule.$el);
+                                    });
 
-                        newRule = new OperatorRulesView();
-                        newRule.render(self.data, container, self.idPrefix + self.idCount, (self.idCount === 0));
-                        newRule.setValue(item.type);
-                        self.idCount++;
-
-                    } else if (!_.isEmpty(item)) {
-                        if (item.type === Constants.LEGACY) {
-                            newRule = new LegacyListItemView();
-                            newRule.render(item, container, self.idCount);
-                        } else {
-                            newRule = self.getNewRule();
-                            properties = self.getProperties();
-                            newRule.render(properties, container, self.idCount, item);
-                            newRule.createListItem(properties, newRule.$el);
+                            }
+                            pr = pr.then(function () {
+                                self.idCount++;
+                            });
                         }
-
-                        self.idCount++;
-                    }
-
-                    if (item && item[self.properties]) {
-                        buildListItem(item[self.properties], newRule.dropbox, item);
-                    } else if (item && item[self.property]) {
-                        buildListItem(item[self.property], newRule.dropbox, item);
-                    }
-                });
+                        return pr.then(function () {
+                            if (item && item[self.properties]) {
+                                return buildListItem(item[self.properties], newRule.dropbox, item);
+                            } else if (item && item[self.property]) {
+                                return buildListItem(item[self.property], newRule.dropbox, item);
+                            }
+                        });
+                    });
+                }, $.Deferred().resolve());
             }
 
             /*
@@ -137,8 +148,8 @@ define([
                 this.localEntity[this.properties] = [properties];
             }
 
-            buildListItem(this.localEntity, this.$el.find("ol#dropOffArea"), null);
-            this.delegateEvents();
+            return buildListItem(this.localEntity, this.$el.find("ol#dropOffArea"), null)
+                .then(this.delegateEvents);
         },
 
         initSorting () {
@@ -259,21 +270,22 @@ define([
                 editRuleView = self.getNewRule(),
                 properties = self.getProperties(),
                 disabledConditions;
-            editRuleView.render(properties, item.parent(), self.idCount, item.data().itemData);
+            return editRuleView.render(properties, item.parent(), self.idCount, item.data().itemData).then(function () {
+                item.before(editRuleView.$el);
+            }).then(function () {
+                self.idCount++;
 
-            self.idCount++;
+                editRuleView.$el.addClass("editing");
 
-            editRuleView.$el.addClass("editing");
-            item.before(editRuleView.$el);
+                self.setInactive(self.buttons.addCondition, true);
+                self.setInactive(self.buttons.addOperator, true);
 
-            this.setInactive(this.buttons.addCondition, true);
-            this.setInactive(this.buttons.addOperator, true);
+                disabledConditions = self.$el.find(".rule, .operator").not(".editing");
+                disabledConditions.addClass("editing-disabled");
+                disabledConditions.find("> select").prop("disabled", true);
 
-            disabledConditions = this.$el.find(".rule, .operator").not(".editing");
-            disabledConditions.addClass("editing-disabled");
-            disabledConditions.find("> select").prop("disabled", true);
-
-            editRuleView.$el.find("select.type-selection:first").focus();
+                editRuleView.$el.find("select.type-selection:first").focus();
+            });
         },
 
         editStop (item) {
