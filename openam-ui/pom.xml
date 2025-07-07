@@ -25,7 +25,7 @@
 	<properties>
 		<node.install.directory>${project.basedir}</node.install.directory>
 		<jquery.version>3.7.1</jquery.version>
-		<bootstrap.version>3.4.1</bootstrap.version>
+		<bootstrap.version>3.3.5</bootstrap.version>
 	</properties>
 
     <artifactId>openam-ui</artifactId>

@@ -45,7 +45,7 @@ require.config({
         "backgrid.paginator": "libs/backgrid-paginator-0.3.5-custom.min",
         "backgrid-selectall": "libs/backgrid-select-all-0.3.5-min",
 
-        "bootstrap"               : "libs/bootstrap-3.4.1-custom",
+        "bootstrap"               : "libs/bootstrap-3.3.5-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",

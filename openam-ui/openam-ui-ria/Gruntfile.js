@@ -73,7 +73,7 @@ module.exports = function (grunt) {
             "**/*.woff",
             "**/*.woff2",
             "**/*.otf",
-            "css/bootstrap-3.4.1-custom.css",
+            "css/bootstrap-3.3.5-custom.css",
             "themes/**/*.*"
         ],
         serverDeployDirectory = process.env.OPENAM_HOME + "/XUI";
