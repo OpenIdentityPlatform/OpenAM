@@ -1860,7 +1860,6 @@
     </dependency>
   </dependencies>
   <!-- Build -->
-  <!-- Build -->
   <build>
     <plugins>
 	<plugin>
