@@ -387,6 +387,14 @@
 			              <classifier>min</classifier>
 			              <downloadUrl>https://raw.githubusercontent.com/cloudflare/backgrid-select-all/{version}/{artifactId}.{classifier}.{packaging}</downloadUrl>
 			            </artifactItem>
+						<artifactItem>
+							<groupId>org.openidentityplatform.commons.ui.libs</groupId>
+							<artifactId>jquery</artifactId>
+							<version>${jquery.version}</version>
+							<packaging>js</packaging>
+							<classifier>min</classifier>
+							<downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/jquery/{version}/{artifactId}.{classifier}.{packaging}</downloadUrl>
+						</artifactItem>
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>lodash</artifactId>
