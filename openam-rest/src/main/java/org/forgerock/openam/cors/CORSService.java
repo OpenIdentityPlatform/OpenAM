@@ -12,16 +12,20 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014 ForgeRock AS.
+* Portions copyright 2024-2025 3A Systems LLC.
 */
 package org.forgerock.openam.cors;
 
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.collections4.CollectionUtils;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.cors.utils.CSVHelper;
 import org.forgerock.util.Reject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,8 +130,10 @@ public class CORSService {
      * @param req CORS HTTP request
      * @param res HTTP response
      * @return true if the caller is to continue processing the request
+     *
+     * @throws IOException if an I/O error occurs while handling the response
      */
-    public boolean handleRequest(final HttpServletRequest req, final HttpServletResponse res) {
+    public boolean handleRequest(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
         if(!this.enabled) {
             return true;
         }
@@ -136,6 +142,7 @@ public class CORSService {
         }
 
         if (!isValidCORSRequest(req)) {
+            handleFailedCORS(res);
             return false;
         }
 
@@ -146,6 +153,22 @@ public class CORSService {
             return handleActualRequestFlow(req, res);
         }
 
+    }
+
+    /**
+     * Handles a failed CORS (Cross-Origin Resource Sharing) request by generating a standardized
+     * JSON error response and setting the appropriate HTTP status code.
+     *
+     * @param res the {@link HttpServletResponse} to which the error response will be written
+     * @throws IOException if an I/O error occurs while writing the response
+     */
+    private void handleFailedCORS(HttpServletResponse res) throws IOException {
+        ResourceException resourceException = ResourceException.getException(HttpServletResponse.SC_BAD_REQUEST, "CORS error occurred");
+        JsonValue jsonValue = resourceException.toJsonValue();
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write(jsonValue.toString());
+        res.setStatus(resourceException.getCode());
     }
 
     /**
