@@ -165,10 +165,10 @@ public class CORSService {
     private void handleFailedCORS(HttpServletResponse res) throws IOException {
         ResourceException resourceException = ResourceException.getException(HttpServletResponse.SC_BAD_REQUEST, "CORS error occurred");
         JsonValue jsonValue = resourceException.toJsonValue();
+        res.setStatus(resourceException.getCode());
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write(jsonValue.toString());
-        res.setStatus(resourceException.getCode());
     }
 
     /**
