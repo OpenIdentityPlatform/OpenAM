@@ -12,10 +12,12 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014 ForgeRock AS.
-* Portions Copyrighted 2024 3A Systems LLC.
+* Portions Copyrighted 2024-2025 3A Systems LLC.
 */
 package org.forgerock.openam.cors;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,7 +41,7 @@ public class CORSServiceTest {
     private HttpServletResponse mockResponse;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws IOException {
         ArrayList<String> origins = new ArrayList<>();
         origins.add("www.google.com");
         ArrayList<String> methods = new ArrayList<>();
@@ -54,6 +58,8 @@ public class CORSServiceTest {
 
         mockRequest = mock(HttpServletRequest.class);
         mockResponse = mock(HttpServletResponse.class);
+
+        when(mockResponse.getWriter()).thenReturn(mock(PrintWriter.class));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -108,7 +114,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldNotTouchResponseAsOriginNull() {
+    public void shouldNotTouchResponseAsOriginNull() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn(null);
 
@@ -120,7 +126,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldNotTouchResponseAsOriginEmpty() {
+    public void shouldReturnBadRequestAsOriginEmpty() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("");
 
@@ -128,11 +134,11 @@ public class CORSServiceTest {
         testService.handleRequest(mockRequest, mockResponse);
 
         //then
-        verifyZeroInteractions(mockResponse);
+        verify(mockResponse, times(1)).setStatus(eq(HttpServletResponse.SC_BAD_REQUEST));
     }
 
     @Test
-    public void shouldNotTouchResponseAsOriginInvalid() {
+    public void shouldReturnBadRequestAsOriginInvalid() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.yahoo.com");
 
@@ -140,11 +146,11 @@ public class CORSServiceTest {
         testService.handleRequest(mockRequest, mockResponse);
 
         //then
-        verifyZeroInteractions(mockResponse);
+        verify(mockResponse, times(1)).setStatus(eq(HttpServletResponse.SC_BAD_REQUEST));
     }
 
     @Test
-    public void shouldNotTouchResponseAsOriginCaseInvalid() {
+    public void shouldReturnBadRequestAsOriginCaseInvalid() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.GOOGLE.com");
 
@@ -152,12 +158,12 @@ public class CORSServiceTest {
         testService.handleRequest(mockRequest, mockResponse);
 
         //then
-        verifyZeroInteractions(mockResponse);
+        verify(mockResponse, times(1)).setStatus(eq(HttpServletResponse.SC_BAD_REQUEST));
     }
 
 
     @Test
-    public void shouldNotTouchResponseAsMethodInvalid() {
+    public void shouldReturnBadRequestAsMethodInvalid() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");
         given(mockRequest.getMethod()).willReturn("PUT");
@@ -166,11 +172,11 @@ public class CORSServiceTest {
         testService.handleRequest(mockRequest, mockResponse);
 
         //then
-        verifyZeroInteractions(mockResponse);
+        verify(mockResponse, times(1)).setStatus(eq(HttpServletResponse.SC_BAD_REQUEST));
     }
 
     @Test
-    public void shouldFollowNormalFlowApplyOriginCredsAndExpose() {
+    public void shouldFollowNormalFlowApplyOriginCredsAndExpose() throws IOException {
         //given
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");
         given(mockRequest.getMethod()).willReturn("POST");
@@ -186,7 +192,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldFollowNormalFlowJustApplyOrigin() {
+    public void shouldFollowNormalFlowJustApplyOrigin() throws IOException {
         //given
         ArrayList<String> origins = new ArrayList<String>();
         origins.add("*");
@@ -206,7 +212,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldFollowPreflightFlow() {
+    public void shouldFollowPreflightFlow() throws IOException {
         given(mockRequest.getHeader(CORSConstants.ORIGIN)).willReturn("www.google.com");
         given(mockRequest.getHeader(CORSConstants.AC_REQUEST_METHOD)).willReturn("POST");
         given(mockRequest.getMethod()).willReturn("OPTIONS");
@@ -224,7 +230,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldDoNothingIfPreflightAndNotOptions() {
+    public void shouldDoNothingIfPreflightAndNotOptions() throws IOException {
         given(mockRequest.getHeader(CORSConstants.AC_REQUEST_METHOD)).willReturn("POST");
         given(mockRequest.getMethod()).willReturn("GET");
 
@@ -236,7 +242,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldDoNothingIfPreflightAndNullRequestMethod() {
+    public void shouldDoNothingIfPreflightAndNullRequestMethod() throws IOException {
         given(mockRequest.getHeader(CORSConstants.AC_REQUEST_METHOD)).willReturn(null);
         given(mockRequest.getMethod()).willReturn("GET");
 
@@ -248,7 +254,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void shouldDoNothingIfPreflightAndEmptyRequestMethod() {
+    public void shouldDoNothingIfPreflightAndEmptyRequestMethod() throws IOException {
         given(mockRequest.getHeader(CORSConstants.AC_REQUEST_METHOD)).willReturn("");
         given(mockRequest.getMethod()).willReturn("GET");
 
@@ -260,7 +266,7 @@ public class CORSServiceTest {
     }
 
     @Test
-    public void testInvalidHostnameFailsValidation() {
+    public void testInvalidHostnameFailsValidation() throws IOException {
 
         ArrayList<String> origins = new ArrayList<String>();
         origins.add("www.google.com");
@@ -282,12 +288,12 @@ public class CORSServiceTest {
         testService.handleRequest(mockRequest, mockResponse);
 
         //then
-        verifyZeroInteractions(mockResponse);
+        verify(mockResponse, times(1)).setStatus(eq(HttpServletResponse.SC_BAD_REQUEST));
     }
 
 
     @Test
-    public void testHandleNormalIncludesExposedHeadersInResponse() {
+    public void testHandleNormalIncludesExposedHeadersInResponse() throws IOException {
 
         ArrayList<String> origins = new ArrayList<String>();
         origins.add("www.google.com");
