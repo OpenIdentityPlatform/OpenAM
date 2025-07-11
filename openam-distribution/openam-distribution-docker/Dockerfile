@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y curl unzip \
  && mkdir /usr/openam/ssoadmintools && unzip /usr/openam/ssoadmintools.zip -d /usr/openam/ssoadmintools && rm /usr/openam/ssoadmintools.zip \
  && chgrp -R 0 /usr/openam/ \
  && chmod -R g=u /usr/openam/ \
+ && chgrp -R 0 $CATALINA_HOME \
+ && chmod -R g=u $CATALINA_HOME \
  && useradd -m -r -u 1001 -g root $OPENAM_USER \
  && install -d -o $OPENAM_USER $OPENAM_DATA_DIR \
  && chown -R $OPENAM_USER:root $CATALINA_HOME \
