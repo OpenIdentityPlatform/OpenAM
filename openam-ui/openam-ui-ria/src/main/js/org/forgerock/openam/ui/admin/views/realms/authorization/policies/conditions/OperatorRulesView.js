@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 
@@ -49,7 +50,7 @@ define([
 
             this.setElement(element);
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
                 self.setElement(`#operator${itemID}`);

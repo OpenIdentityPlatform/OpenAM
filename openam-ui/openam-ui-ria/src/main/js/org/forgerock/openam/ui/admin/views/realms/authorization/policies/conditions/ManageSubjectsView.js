@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 
@@ -96,13 +97,13 @@ define([
                     this.buttons.addOperator.hide();
                 }
 
-                this.buildList();
-                this.initSorting();
-                this.identifyDroppableLogical();
-
-                if (callback) {
-                    callback();
-                }
+                this.buildList().done(function () {
+                    self.initSorting();
+                    self.identifyDroppableLogical();
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         }
     });
