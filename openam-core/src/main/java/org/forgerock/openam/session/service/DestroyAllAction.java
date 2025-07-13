@@ -20,6 +20,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 package org.forgerock.openam.session.service;
 
@@ -27,7 +28,7 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This action will invalidate all currently existing sessions, but it will

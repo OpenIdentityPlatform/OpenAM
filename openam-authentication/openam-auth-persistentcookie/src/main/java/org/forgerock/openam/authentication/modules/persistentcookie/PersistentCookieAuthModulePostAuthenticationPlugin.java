@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2018-2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -31,7 +32,7 @@ import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthLoginModulePostAuthenticationPlugin;
 import org.forgerock.openam.utils.ClientUtils;

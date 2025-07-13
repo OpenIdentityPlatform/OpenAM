@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2025 3A Systems LLC
  */
 
 package org.forgerock.openam.core.rest;
@@ -72,7 +72,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;

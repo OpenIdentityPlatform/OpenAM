@@ -25,6 +25,7 @@
  * $Id: AMCRLStore.java,v 1.7 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2023-2025 3A Systems, LLC.
  */
 package com.sun.identity.security.cert;
 
@@ -60,7 +61,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.ldap.LDAPRequests;

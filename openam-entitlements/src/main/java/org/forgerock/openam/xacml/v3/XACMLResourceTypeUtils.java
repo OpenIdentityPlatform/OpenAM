@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.xacml.v3;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;

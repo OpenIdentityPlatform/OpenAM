@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2018-2024 3A Systems LLC.
+ * Copyright 2018-2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oauth2.profile;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 
 public class ProfileProviderFactory {

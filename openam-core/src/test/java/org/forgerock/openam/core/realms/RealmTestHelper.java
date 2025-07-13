@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.realms;
@@ -24,7 +25,7 @@ import java.util.Arrays;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.iplanet.sso.SSOToken;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.description.Description;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.util.Reject;

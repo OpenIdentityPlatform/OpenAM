@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2017-2025 3A Systems LLC
  */
 
 package com.sun.identity.authentication.service;
@@ -67,7 +67,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.forgerock.guice.core.InjectorHolder;

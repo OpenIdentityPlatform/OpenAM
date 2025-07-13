@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Copyright 2019 Open Identity Platform Community.
+ * Copyright 2019-2025 3A Systems, LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
 import org.forgerock.openam.cts.continuous.ContinuousQueryListener;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.utils;
 
@@ -19,7 +20,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.session.util.SessionUtils;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;

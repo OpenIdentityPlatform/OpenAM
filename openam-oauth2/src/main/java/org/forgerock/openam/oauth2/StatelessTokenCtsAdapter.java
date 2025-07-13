@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -25,7 +26,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.tokens.CoreTokenField;

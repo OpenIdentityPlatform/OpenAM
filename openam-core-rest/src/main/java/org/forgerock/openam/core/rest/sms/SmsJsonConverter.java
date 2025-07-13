@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -49,7 +50,7 @@ import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.forgerock.json.resource.BadRequestException;

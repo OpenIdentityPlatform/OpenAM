@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.RestUtils;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.worker.process;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.time.StopWatch;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.worker.CTSWorkerQuery;

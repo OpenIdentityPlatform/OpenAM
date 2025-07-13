@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 
 package com.sun.identity.workflow;
@@ -25,7 +26,7 @@ import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.openam.shared.security.crypto.KeyStoreBuilder;
 import org.forgerock.openam.shared.security.crypto.KeyStoreType;

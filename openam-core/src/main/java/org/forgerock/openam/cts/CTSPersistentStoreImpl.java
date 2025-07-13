@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 package org.forgerock.openam.cts;
 
@@ -24,7 +25,7 @@ import java.util.Map;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
