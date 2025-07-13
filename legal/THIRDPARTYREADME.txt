@@ -71,10 +71,7 @@ Copyright: Copyright 2002-2014 The Apache Software Foundation
 Version: commons-io-2.3.jar
 Copyright: Copyright 2002-2012 The Apache Software Foundation
 
-Version: commons-lang-2.6.jar
-Copyright: Copyright 2001-2008 The Apache Software Foundation
-
-Version: commons-lang3-3.4.jar
+Version: commons-lang3-3.18.jar
 Copyright: Copyright 2001-2015 The Apache Software Foundation
 
 Version: commons-logging-1.1.3.jar

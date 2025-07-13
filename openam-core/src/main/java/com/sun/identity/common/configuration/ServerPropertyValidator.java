@@ -24,6 +24,7 @@
  *
  * $Id: ServerPropertyValidator.java,v 1.5 2008/09/02 23:44:07 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 /**
@@ -44,7 +45,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonPointer;
 

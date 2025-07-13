@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.authentication.modules.oauth2.HttpRequestContent;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthConf;
 import org.forgerock.openam.authentication.modules.oauth2.OAuthUtil;

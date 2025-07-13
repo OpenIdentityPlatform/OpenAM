@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2022 Open Identity Platform Community
+ * Portions Copyrighted 2022-2025 3A Systems, LLC.
  */
 package com.iplanet.dpro.session.service;
 
@@ -30,7 +30,7 @@ import java.security.PrivilegedAction;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.audit.AMActivityAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;

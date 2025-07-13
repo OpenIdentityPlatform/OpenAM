@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019-2024 3A Systems, LLC
+* Portions Copyrighted 2019-2025 3A Systems, LLC
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -65,7 +65,7 @@
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
-                <include>commons-lang:commons-lang</include>
+                <include>org.apache.commons:commons-lang3</include>
                 <include>commons-collections:commons-collections</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>external:jaxrpc-impl</include>

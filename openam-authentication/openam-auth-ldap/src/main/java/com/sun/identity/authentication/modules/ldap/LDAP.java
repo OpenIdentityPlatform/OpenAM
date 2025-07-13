@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2024-2025 3A Systems LLC
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -57,7 +57,7 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.ldap.LDAPAuthUtils;
 import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.ModuleState;

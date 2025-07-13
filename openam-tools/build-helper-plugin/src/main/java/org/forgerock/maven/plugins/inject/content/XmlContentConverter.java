@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2023-2025 3A Systems, LLC.
  */
 
 package org.forgerock.maven.plugins.inject.content;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * An implementation of a {@code ContentConverter} which will escape xml special characters from the line.

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2022-2025 3A Systems, LLC.
  */
 package org.forgerock.openam.core.rest;
 
@@ -33,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.mail.MessagingException;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;

@@ -19,6 +19,7 @@
  * [name of copyright owner]"
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 package org.forgerock.openam.session.service;
 
@@ -27,7 +28,7 @@ import com.iplanet.dpro.session.service.QuotaExhaustionActionImpl;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class DestroyNextExpiringAction extends QuotaExhaustionActionImpl {
 
