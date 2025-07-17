@@ -265,15 +265,19 @@
 			      </executions>
 			    </plugin>
 			    <plugin>
-				<groupId>org.sonatype.central</groupId>
-				<artifactId>central-publishing-maven-plugin</artifactId>
-				<version>0.8.0</version>
-				<extensions>true</extensions>
-				<configuration>
-				    <publishingServerId>ossrh</publishingServerId>
-				    <autoPublish>true</autoPublish>
-				    <waitMaxTime>5400</waitMaxTime>
-				</configuration>
+                  <groupId>org.sonatype.central</groupId>
+                  <artifactId>central-publishing-maven-plugin</artifactId>
+                  <version>0.8.0</version>
+                  <extensions>true</extensions>
+                  <configuration>
+                      <publishingServerId>ossrh</publishingServerId>
+                      <autoPublish>true</autoPublish>
+                      <waitMaxTime>5400</waitMaxTime>
+                      <excludeArtifacts>
+                        <!--very large for central may cause broken pipe error-->
+                        <excludeArtifact>openam-distribution-kit</excludeArtifact>
+                      </excludeArtifacts>
+                  </configuration>
 			    </plugin>
             </plugins>
         </build>
@@ -402,6 +406,18 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <name>Central Portal Staging</name>
+      <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
   <!-- Source Control -->
   <scm>
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
@@ -1730,6 +1746,7 @@
 		<dependency>
    			<groupId>com.fasterxml.woodstox</groupId>
    			<artifactId>woodstox-core</artifactId>
+            <version>6.4.0</version>
    		</dependency>
 		<dependency>
 			<groupId>org.owasp.antisamy</groupId>
