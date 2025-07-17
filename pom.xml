@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>15.1.7-SNAPSHOT</version>
+  <version>15.2.0</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -423,7 +423,7 @@
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
     <developerConnection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</developerConnection>
     <url>https://github.com/OpenIdentityPlatform/OpenAM</url>
-    <tag>HEAD</tag>
+    <tag>15.2.0</tag>
   </scm>
   <!-- Dependency Management -->
   <dependencyManagement>

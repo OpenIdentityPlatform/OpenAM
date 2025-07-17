@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-authentication</artifactId>
-        <version>15.1.7-SNAPSHOT</version>
+        <version>15.2.0</version>
     </parent>
 
     <!-- Component Definition -->
