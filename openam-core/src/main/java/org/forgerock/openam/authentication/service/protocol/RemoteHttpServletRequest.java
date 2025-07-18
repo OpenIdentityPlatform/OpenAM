@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,6 +53,7 @@ import jakarta.servlet.http.Part;
  * content handled sensibly.
  */
 public class RemoteHttpServletRequest extends RemoteServletRequest implements HttpServletRequest, Serializable {
+
     public static final long serialVersionUID = 42L;
     
     /**
@@ -419,7 +419,7 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
      * @return true if the session id is from a URL, false otherwise.
      */
     public boolean isRequestedSessionIdFromUrl() {
-	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromURL();
+	    return this._getHttpServletRequest() != null && this._getHttpServletRequest().isRequestedSessionIdFromUrl();
     }
 
     @Override
@@ -462,18 +462,4 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
 		return this._getHttpServletRequest() != null ? this._getHttpServletRequest().upgrade(handlerClass) : null;
 	}
 
-    @Override
-    public String getRequestId() {
-        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getRequestId() : null;
-    }
-
-    @Override
-    public String getProtocolRequestId() {
-        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getProtocolRequestId() : null;
-    }
-
-    @Override
-    public ServletConnection getServletConnection() {
-        return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getServletConnection() : null;
-    }
 }

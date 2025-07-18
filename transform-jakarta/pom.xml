@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.7-SNAPSHOT</version>
+        <version>15.2.1-SNAPSHOT</version>
     </parent>
     <groupId>org.openidentityplatform.openam.shaded</groupId>
     <artifactId>transform-jakarta</artifactId>
@@ -30,7 +30,6 @@
         <module>jaxrpc</module>
         <module>restlet</module>
         <module>activemq-client</module>
-<!--        <module>apache-cxf</module>-->
         <module>jato</module>
         <module>cc</module>
     </modules>

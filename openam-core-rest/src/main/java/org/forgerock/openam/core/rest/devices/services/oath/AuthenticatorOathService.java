@@ -25,7 +25,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
-import jakarta.annotation.Nonnull;
+import javax.annotation.Nonnull;
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 import org.forgerock.openam.core.rest.devices.services.DeviceService;
 import org.forgerock.openam.core.rest.devices.services.EncryptedDeviceStorage;

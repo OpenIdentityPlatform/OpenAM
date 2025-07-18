@@ -25,7 +25,7 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.annotation.Nonnull;
+import javax.annotation.Nonnull;
 
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import com.google.common.base.Predicate;

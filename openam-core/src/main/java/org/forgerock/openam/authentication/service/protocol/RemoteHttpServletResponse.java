@@ -133,6 +133,25 @@ public class RemoteHttpServletResponse extends RemoteServletResponse implements 
 	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeRedirectURL(url) : null;
     }
 
+    /**
+     * The default behavior of this method is to call encodeUrl(String url)
+     * on the wrapped response object. Not Serialized.
+     *
+     * @return The encoded URL, null if unavailable.
+     */
+    public String encodeUrl(String url) {
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeUrl(url) : null;
+    }
+
+    /**
+     * The default behavior of this method is to return encodeRedirectUrl(String url)
+     * on the wrapped response object. Not Serialized.
+     *
+     * @return The encoded redirect URL, null if not available.
+     */
+    public String encodeRedirectUrl(String url) {
+	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeRedirectUrl(url) : null;
+    }
 
     /**
      * The default behavior of this method is to call sendError(int sc, String msg)
@@ -324,6 +343,18 @@ public class RemoteHttpServletResponse extends RemoteServletResponse implements 
         }
     }
     
+    /**
+     * The default behavior of this method is to call setStatus(int sc, String sm)
+     * on the wrapped response object. Not Serialized.
+     *
+     * @param sc The status code of the response
+     */
+     public void setStatus(int sc, String sm) {
+         if (this._getHttpServletResponse() != null) {
+             this._getHttpServletResponse().setStatus(sc, sm);
+         }
+     }
+
     @Override
     public int getStatus() {
         if (this._getHttpServletResponse() != null) {

@@ -53,7 +53,17 @@ final class UnsupportedResponse implements HttpServletResponse {
         throw new UnsupportedOperationException();
     }
 
-        @Override
+    @Override
+    public String encodeUrl(String url) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String encodeRedirectUrl(String url) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void sendError(int sc, String msg) throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -100,6 +110,11 @@ final class UnsupportedResponse implements HttpServletResponse {
 
     @Override
     public void setStatus(int sc) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setStatus(int sc, String sm) {
         throw new UnsupportedOperationException();
     }
 

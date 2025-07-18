@@ -23,7 +23,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import java.util.Collections;
-import jakarta.annotation.Nonnull;
+import javax.annotation.Nonnull;
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 import org.forgerock.openam.core.rest.devices.services.DeviceService;
 import org.forgerock.openam.core.rest.devices.services.EncryptedDeviceStorage;

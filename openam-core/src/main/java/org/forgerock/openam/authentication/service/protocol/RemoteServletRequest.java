@@ -40,7 +40,6 @@ import java.util.Vector;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
@@ -356,21 +355,6 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
         return request != null ? request.getDispatcherType() : dispatcherType;
     }
 
-    @Override
-    public String getRequestId() {
-        return request != null ? request.getRequestId() : null;
-    }
-
-    @Override
-    public String getProtocolRequestId() {
-        return request != null ? request.getProtocolRequestId() : null;
-    }
-
-    @Override
-    public ServletConnection getServletConnection() {
-        return request != null ? request.getServletConnection() : null;
-    }
-
     /**
      * The default behavior of this method is to return getParameter(String name)
      * on the wrapped request object. Serialized. Only those parameters that
@@ -553,7 +537,12 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     public RequestDispatcher getRequestDispatcher(String path) {
 	    return request != null ? this.request.getRequestDispatcher(path) : null;
     }
-    
+
+    @Override
+    public String getRealPath(String s) {
+        return request != null ? this.request.getRealPath(s) : null;
+    }
+
     /**
      * Tests if an object implements the java.io.Serializable interface.
      * 

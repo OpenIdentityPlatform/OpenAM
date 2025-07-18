@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
-import jakarta.annotation.Nonnull;
+import javax.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.xml.bind.DatatypeConverter;

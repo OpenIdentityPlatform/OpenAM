@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.annotation.Nullable;
+import javax.annotation.Nullable;
 import jakarta.inject.Named;
 
 import com.google.common.base.Predicate;

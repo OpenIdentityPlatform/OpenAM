@@ -39,7 +39,7 @@ import java.util.Vector;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.http.HttpSessionContext;
 
 /**
  * Facade for the standard servlet HttpSession object.
@@ -172,6 +172,17 @@ public class RemoteSession implements HttpSession, Serializable {
     }
 
     /**
+     * Returns the session context, either from local object
+     * pre serialization or the stored value post serialization.
+     *
+     * @deprecated
+     * @return The session context
+     */
+    public HttpSessionContext getSessionContext() {
+        return (session != null) ? session.getSessionContext() : null;
+    }
+
+    /**
      * Fetch the value of a given session attribute, either from local object
      * pre serialization or the stored value post serialization.
      *
@@ -214,6 +225,11 @@ public class RemoteSession implements HttpSession, Serializable {
      * @deprecated
      * @return The value names
      */
+    public String[] getValueNames() {
+        return (session != null) ? session.getValueNames() :
+             (String[]) internalAttributeNames.toArray(new String[1]);
+    }
+
     /**
      * Sets an attribute on the session, either from local object
      * pre serialization or the stored value post serialization.
