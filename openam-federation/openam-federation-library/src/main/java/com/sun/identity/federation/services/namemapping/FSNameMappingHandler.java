@@ -24,6 +24,7 @@
  *
  * $Id: FSNameMappingHandler.java,v 1.3 2008/06/25 05:47:02 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -50,7 +51,7 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.shared.xml.XMLUtils;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.publish.soap;
@@ -22,7 +23,7 @@ import org.forgerock.openam.sts.publish.common.STSInstanceConfigStoreBase;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @see org.forgerock.openam.sts.publish.common.STSInstanceConfigStoreBase

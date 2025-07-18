@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 
 package org.forgerock.openam.services.push;
@@ -29,7 +30,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;

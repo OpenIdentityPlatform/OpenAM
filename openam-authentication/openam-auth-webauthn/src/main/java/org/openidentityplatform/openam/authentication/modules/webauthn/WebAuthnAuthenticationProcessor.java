@@ -34,7 +34,7 @@ import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.validator.exception.ValidationException;
 import org.apache.commons.lang3.ArrayUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

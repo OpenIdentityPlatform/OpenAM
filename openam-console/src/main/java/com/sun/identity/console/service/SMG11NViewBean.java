@@ -24,6 +24,7 @@
  *
  * $Id: SMG11NViewBean.java,v 1.5 2008/07/07 20:39:20 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -56,7 +57,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SMG11NViewBean
     extends AMServiceProfileViewBeanBase

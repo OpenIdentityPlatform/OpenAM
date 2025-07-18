@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -24,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthUtils;

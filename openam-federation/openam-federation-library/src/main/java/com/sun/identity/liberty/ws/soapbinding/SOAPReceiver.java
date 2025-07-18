@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.soapbinding; 
@@ -39,19 +40,19 @@ import java.util.logging.Level;
 
 import java.security.cert.X509Certificate;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPException;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.MimeHeaders;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -157,7 +158,7 @@ public class SOAPReceiver extends HttpServlet {
 	String remoteAddr = ClientUtils.getClientIPAddress(request);
 
         X509Certificate[] allCerts = (X509Certificate[]) 
-            request.getAttribute("javax.servlet.request.X509Certificate");
+            request.getAttribute("jakarta.servlet.request.X509Certificate");
         X509Certificate certificate = null;
         if (allCerts != null && allCerts.length > 0) {
             certificate = allCerts[0];

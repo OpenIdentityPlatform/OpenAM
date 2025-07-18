@@ -12,19 +12,20 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest;
 
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -193,10 +194,10 @@ public class RestEndpointServlet extends HttpServlet {
 
     private static final class HttpServletWrapper extends HttpServlet {
 
-        private final javax.servlet.http.HttpServlet realServlet;
+        private final jakarta.servlet.http.HttpServlet realServlet;
         private final HttpFrameworkServlet frameworkServlet;
 
-        private HttpServletWrapper(javax.servlet.http.HttpServlet realServlet, HttpFrameworkServlet frameworkServlet) {
+        private HttpServletWrapper(jakarta.servlet.http.HttpServlet realServlet, HttpFrameworkServlet frameworkServlet) {
             this.realServlet = realServlet;
             this.frameworkServlet = frameworkServlet;
         }

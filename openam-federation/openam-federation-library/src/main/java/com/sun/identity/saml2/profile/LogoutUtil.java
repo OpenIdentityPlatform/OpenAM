@@ -25,6 +25,7 @@
  * $Id: LogoutUtil.java,v 1.16 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -44,10 +45,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import org.w3c.dom.Document;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.authn;
 
@@ -24,7 +25,7 @@ import static org.forgerock.openam.audit.AuditConstants.TrackingIdKey.*;
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Set;
 

@@ -25,6 +25,7 @@
  * $Id: NamingService.java,v 1.13 2009/04/07 22:30:07 beomsuk Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.services.naming.service;
@@ -59,9 +60,9 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.utils.CollectionUtils;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;

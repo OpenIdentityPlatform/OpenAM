@@ -24,6 +24,8 @@
  *
  * $Id: AgentExportPolicyModelImpl.java,v 1.1 2009/12/19 00:08:14 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 package com.sun.identity.console.agentconfig.model;
 
@@ -40,7 +42,7 @@ import com.sun.identity.wss.provider.ProviderConfig;
 import com.sun.identity.wss.provider.ProviderException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class AgentExportPolicyModelImpl extends AMModelBase implements AgentExportPolicyModel {
 

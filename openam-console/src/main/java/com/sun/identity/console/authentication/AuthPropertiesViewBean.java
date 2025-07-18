@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  *
  * $Id: AuthPropertiesViewBean.java,v 1.5 2008/07/07 20:39:19 veiming Exp $
  *
@@ -32,7 +33,7 @@ package com.sun.identity.console.authentication;
 
 import static com.sun.identity.console.XuiRedirectHelper.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;

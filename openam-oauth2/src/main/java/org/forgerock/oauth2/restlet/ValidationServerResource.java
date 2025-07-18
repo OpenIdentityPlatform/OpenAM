@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -31,7 +32,7 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Handles requests to the OAuth2 tokeninfo endpoint for retrieving information about the provided token.

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.docs.api;
 
@@ -23,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.api.transform.LocalizableOperation;
 import com.google.common.collect.Lists;

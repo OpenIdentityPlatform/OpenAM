@@ -28,10 +28,11 @@
 
 /**
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.am.util;
 
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.PasswordAuthentication;
 
 /*
  * This is an implementation for javax.mail.Authenticator to do
@@ -40,7 +41,7 @@ import javax.mail.PasswordAuthentication;
  */
 
 public class AMUserNamePasswordAuthenticator
-        extends javax.mail.Authenticator {
+        extends jakarta.mail.Authenticator {
     private String userName;
     private String userPassword;
 

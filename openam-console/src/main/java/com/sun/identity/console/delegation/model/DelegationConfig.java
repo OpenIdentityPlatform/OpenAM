@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.delegation.model;
 
@@ -54,7 +55,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - NEED NOT LOG - */
 

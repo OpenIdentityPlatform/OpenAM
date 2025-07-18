@@ -25,6 +25,7 @@
  * $Id: CreateApplication.java,v 1.1 2009/08/19 05:40:31 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;

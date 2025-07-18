@@ -24,6 +24,7 @@
  *
  * $Id: FSNameRegistrationHandler.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -65,10 +66,10 @@ import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.common.SAMLResponderException;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.shared.encode.URLEncDec;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPException;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;

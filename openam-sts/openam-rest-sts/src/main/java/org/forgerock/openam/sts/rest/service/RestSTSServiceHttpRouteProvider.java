@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.service;
@@ -23,8 +24,8 @@ import static org.forgerock.http.routing.RoutingMode.*;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 import com.google.inject.Key;
 import org.forgerock.http.Handler;

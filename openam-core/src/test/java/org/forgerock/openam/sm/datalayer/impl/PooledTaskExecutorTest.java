@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.datalayer.impl;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;

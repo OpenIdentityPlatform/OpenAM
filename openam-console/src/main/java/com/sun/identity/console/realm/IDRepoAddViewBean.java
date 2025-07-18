@@ -24,6 +24,8 @@
  *
  * $Id: IDRepoAddViewBean.java,v 1.3 2009/11/19 23:45:59 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm;
@@ -45,7 +47,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class IDRepoAddViewBean
     extends IDRepoOpViewBeanBase

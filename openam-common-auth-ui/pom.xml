@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -31,13 +32,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

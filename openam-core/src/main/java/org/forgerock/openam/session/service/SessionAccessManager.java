@@ -12,14 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2024-2025 3A Systems LLC
  */
 package org.forgerock.openam.session.service;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.audit.context.AMExecutorServiceFactory;
 import org.forgerock.openam.session.SessionCache;

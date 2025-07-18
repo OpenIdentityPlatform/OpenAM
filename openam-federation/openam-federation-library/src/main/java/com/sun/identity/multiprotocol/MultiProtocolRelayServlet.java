@@ -24,15 +24,16 @@
  *
  * $Id: MultiProtocolRelayServlet.java,v 1.4 2008/06/25 05:47:25 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
 
 import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.federation.common.IFSConstants;
 

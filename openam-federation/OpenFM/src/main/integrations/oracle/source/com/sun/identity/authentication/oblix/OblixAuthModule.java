@@ -25,6 +25,7 @@
  * $Id: OblixAuthModule.java,v 1.2 2008/10/18 00:37:54 mallas Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.oblix;
@@ -41,8 +42,8 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import com.oblix.access.*;
 
 /**

@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
 
 import java.io.File;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletContext;
 
 import org.forgerock.openam.upgrade.VersionUtils;
 

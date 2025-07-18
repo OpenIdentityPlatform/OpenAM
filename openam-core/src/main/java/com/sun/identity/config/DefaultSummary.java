@@ -25,6 +25,7 @@
  * $Id: DefaultSummary.java,v 1.13 2009/01/05 23:17:09 veiming Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.config;
@@ -35,10 +36,10 @@ import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 
 public class DefaultSummary extends ProtectedPage {
     

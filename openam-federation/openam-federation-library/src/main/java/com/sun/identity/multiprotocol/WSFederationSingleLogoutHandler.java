@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationSingleLogoutHandler.java,v 1.4 2009/10/28 23:58:57 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -42,8 +43,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The <code>WSFederationSingleLogoutHandler</code> class is an implementation 

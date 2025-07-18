@@ -17,16 +17,17 @@
  * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
 >>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
 import static org.forgerock.openam.core.rest.authn.RestAuthenticationConstants.*;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.security.SignatureException;
 
 import com.iplanet.sso.SSOToken;

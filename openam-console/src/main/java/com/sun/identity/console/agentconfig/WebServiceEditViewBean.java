@@ -24,6 +24,8 @@
  *
  * $Id: WebServiceEditViewBean.java,v 1.7 2009/12/10 17:14:02 ggennaro Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.agentconfig;
@@ -54,7 +56,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Base class for all WSS customized View Bean.

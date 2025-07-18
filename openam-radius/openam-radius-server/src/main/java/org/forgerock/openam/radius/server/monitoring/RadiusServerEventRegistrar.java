@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 /**
  *
@@ -21,8 +22,8 @@ package org.forgerock.openam.radius.server.monitoring;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 

@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.services.comm.client;
 
@@ -53,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditRequestContext;

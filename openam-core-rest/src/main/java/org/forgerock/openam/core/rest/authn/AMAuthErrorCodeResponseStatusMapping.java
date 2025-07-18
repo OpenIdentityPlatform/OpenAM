@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 

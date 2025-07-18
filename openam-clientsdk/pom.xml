@@ -698,6 +698,15 @@
                             <pattern>javax.activation</pattern>
                             <shadedPattern>${shade.package}.javax.activation</shadedPattern>
                         </relocation>
+
+                        <relocation>
+                            <pattern>jakarta.inject</pattern>
+                            <shadedPattern>${shade.package}.javax.inject</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>jakarta.mail</pattern>
+                            <shadedPattern>${shade.package}.javax.mail</shadedPattern>
+                        </relocation>
                     </relocations>
                     <shadedArtifactAttached>false</shadedArtifactAttached>
                     <createDependencyReducedPom>true</createDependencyReducedPom>

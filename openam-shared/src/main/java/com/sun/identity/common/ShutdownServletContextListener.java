@@ -28,12 +28,13 @@
 
 /**
  * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.common;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * The <code>ShutdownServletContextListener</code> class is used to trigger

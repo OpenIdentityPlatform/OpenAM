@@ -29,7 +29,7 @@ import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;

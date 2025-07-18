@@ -24,13 +24,14 @@
  *
  * $Id: WSFederationClient.java,v 1.1 2009/12/14 23:42:47 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.client;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.saml.common.SAMLConstants;

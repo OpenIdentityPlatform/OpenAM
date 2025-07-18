@@ -12,11 +12,12 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2025 3A Systems LLC.
 */
 package org.forgerock.openam.core.guice;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * Stores the ServletContext into the ServletContextCache for reference

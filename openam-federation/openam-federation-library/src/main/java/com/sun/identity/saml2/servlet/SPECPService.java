@@ -24,6 +24,7 @@
  *
  * $Id: SPECPService.java,v 1.4 2009/06/12 22:21:41 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.servlet;
@@ -33,10 +34,10 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.profile.SPSSOFederate;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
 
 
 /**

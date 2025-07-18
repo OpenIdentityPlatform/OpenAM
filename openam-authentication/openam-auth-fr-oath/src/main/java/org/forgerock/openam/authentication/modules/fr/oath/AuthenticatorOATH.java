@@ -13,7 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2024-2025 3A Systems LLC
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
@@ -33,7 +33,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
