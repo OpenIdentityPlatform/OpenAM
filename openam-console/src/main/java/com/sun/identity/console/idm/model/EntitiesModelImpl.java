@@ -25,8 +25,7 @@
  * $Id: EntitiesModelImpl.java,v 1.17 2009/09/05 01:30:46 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2022 Open Identity Platform Community
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2022-2025 3A Systems LLC.
  */
 package com.sun.identity.console.idm.model;
 

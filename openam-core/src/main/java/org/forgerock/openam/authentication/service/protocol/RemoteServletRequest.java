@@ -538,9 +538,14 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
 	    return request != null ? this.request.getRequestDispatcher(path) : null;
     }
 
-    @Override
-    public String getRealPath(String s) {
-        return request != null ? this.request.getRealPath(s) : null;
+    /**
+     * The default behavior of this method is to return getRealPath(String path)
+     * on the wrapped request object. <b>Not serialized, null post serialization.</b>
+     *
+     * @return The real path of the request.
+     */
+    public String getRealPath(String path) {
+	    return request != null ? this.request.getRealPath(path) : null;
     }
 
     /**

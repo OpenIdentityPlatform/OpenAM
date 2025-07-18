@@ -94,4 +94,11 @@ public class AuditableHttpServletResponse extends HttpServletResponseWrapper {
         this.statusCode = sc;
     }
 
+    @Override
+    public void setStatus(int sc, String sm) {
+        super.setStatus(sc, sm);
+        this.statusCode = sc;
+        this.message = sm;
+    }
+
 }

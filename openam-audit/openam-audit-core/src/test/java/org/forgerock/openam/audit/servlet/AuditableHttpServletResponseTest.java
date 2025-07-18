@@ -86,4 +86,15 @@ public class AuditableHttpServletResponseTest {
         assertThat(auditableHttpServletResponse.getMessage()).isEqualTo("");
     }
 
+    @Test
+    public void capturesStatusCodeAndMessageWhenSetStatusCalled() throws Exception {
+        // Given setUp()
+        // When
+        auditableHttpServletResponse.setStatus(SC_BAD_REQUEST, "message");
+        // Then
+        verify(delegate, times(1)).setStatus(SC_BAD_REQUEST, "message");
+        assertThat(auditableHttpServletResponse.getStatusCode()).isEqualTo(SC_BAD_REQUEST);
+        assertThat(auditableHttpServletResponse.getMessage()).isEqualTo("message");
+    }
+
 }
