@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.queue;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.concurrent.ArrayBlockingQueue;

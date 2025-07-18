@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 package org.forgerock.openam.cts;
 
@@ -19,14 +20,14 @@ import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.Time.*;
 
 /**

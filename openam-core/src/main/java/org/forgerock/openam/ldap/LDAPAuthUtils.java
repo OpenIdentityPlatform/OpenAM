@@ -27,7 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2024-2025 3A Systems LLC
  */
 
 package org.forgerock.openam.ldap;
@@ -64,7 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;

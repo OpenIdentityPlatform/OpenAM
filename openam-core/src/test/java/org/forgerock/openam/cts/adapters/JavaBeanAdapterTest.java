@@ -17,7 +17,7 @@
 
 package org.forgerock.openam.cts.adapters;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;

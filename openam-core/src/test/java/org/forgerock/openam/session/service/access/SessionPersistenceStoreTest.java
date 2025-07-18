@@ -19,7 +19,6 @@ package org.forgerock.openam.session.service.access;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
-import org.fest.util.Collections;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -28,6 +27,7 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.session.service.access.persistence.SessionPersistenceStore;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.dpro.session.PartialSessionFactory;
 import org.forgerock.openam.identity.idm.IdentityUtils;
 import org.mockito.Mock;
@@ -100,14 +100,14 @@ public class SessionPersistenceStoreTest extends GuiceTestCase {
 
     @Test
     public void recoversSessionByHandle() throws Exception {
-        given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(Collections.list(mockToken));
+        given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(CollectionUtils.asList(mockToken));
 
         assertThat(sessionPersistenceStore.recoverSessionByHandle(HANDLE)).isEqualTo(mockSession);
     }
 
     @Test
     public void failsRecoverSessionByHandleWithNonUniqueMatch() throws Exception {
-        given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(Collections.list(mock(Token.class), mockToken));
+        given(mockCoreTokenService.query(any(TokenFilter.class))).willReturn(CollectionUtils.asList(mock(Token.class), mockToken));
 
         assertThat(sessionPersistenceStore.recoverSessionByHandle(HANDLE)).isNull();
     }

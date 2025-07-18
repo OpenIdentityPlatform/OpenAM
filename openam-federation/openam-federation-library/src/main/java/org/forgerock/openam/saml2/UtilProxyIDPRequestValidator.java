@@ -29,7 +29,7 @@ import com.sun.identity.saml2.profile.ClientFaultException;
 import com.sun.identity.saml2.profile.IDPSSOUtil;
 import com.sun.identity.saml2.profile.ServerFaultException;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.logging.Level;

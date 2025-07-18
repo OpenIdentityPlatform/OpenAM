@@ -15,7 +15,7 @@
 */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashSet;

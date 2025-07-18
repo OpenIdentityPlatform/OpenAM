@@ -45,6 +45,7 @@ module.exports = function (config) {
                     "--disable-setuid-sandbox"]
             }
         },
-        singleRun: false
+        singleRun: false,
+        browserNoActivityTimeout: 60000
     });
 };

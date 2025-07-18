@@ -25,7 +25,7 @@
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2017-2025 3A Systems, LLC.
  */
 
 package com.sun.identity.setup;
@@ -87,7 +87,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.license.License;
 import org.forgerock.openam.license.LicenseLocator;

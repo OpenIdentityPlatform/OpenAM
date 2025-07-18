@@ -19,7 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceAttribute;
-import org.fest.util.Collections;
+
+import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
@@ -27,7 +28,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
@@ -94,7 +95,7 @@ public class ResourceAttributeUtilTest {
 
         @Override
         public Set<String> getPropertyValues() {
-            return Collections.set("Weasel", "Ferret");
+            return CollectionUtils.asSet("Weasel", "Ferret");
         }
 
         @Override

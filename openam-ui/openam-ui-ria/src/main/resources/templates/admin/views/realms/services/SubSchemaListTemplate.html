@@ -5,7 +5,7 @@
                 <tr>
                     <th>{{t 'common.form.name'}}</th>
                     <th>{{t 'common.form.type'}}</th>
-                    <th class="fr-col-btn-2"/>
+                    <th class="fr-col-btn-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,10 +20,10 @@
                             <div class="btn-group">
                                 <a class="btn btn-link" href="{{routeTo 'realmsServiceSubSchemaEdit' ../realmPath ../type _type._id _id}}"
                                     title="{{t 'common.form.edit'}}">
-                                    <i class="fa fa-pencil"/>
+                                    <i class="fa fa-pencil"></i>
                                 </a>
                                 <button type="button" data-subschema-delete class="btn btn-link" title="{{t 'common.form.delete'}}">
-                                    <i class="fa fa-close"/>
+                                    <i class="fa fa-close"></i>
                                 </button>
                             </div>
                         </td>
@@ -49,7 +49,7 @@
     {{else}}
         <a class="btn btn-default pull-right" href="{{routeTo 'realmsServiceSubSchemaNew' realmPath type creatables.[0]._id}}"
             title="{{t 'common.form.edit'}}">
-            <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
+            <i class="fa fa-plus"></i> {{t "console.services.subSchema.add"}}
         </a>
     {{/if}}
 {{else}}
@@ -72,7 +72,7 @@
         {{else}}
             <a class="btn btn-primary" href="{{routeTo 'realmsServiceSubSchemaNew' realmPath type creatables.[0]._id}}"
                 title="{{t 'common.form.edit'}}">
-                <i class="fa fa-plus"/> {{t "console.services.subSchema.add"}}
+                <i class="fa fa-plus"></i> {{t "console.services.subSchema.add"}}
             </a>
         {{/if}}
     </div>

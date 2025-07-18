@@ -20,7 +20,7 @@ import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 import java.util.Arrays;
 import java.util.Set;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import org.forgerock.openam.ldap.LDAPURL;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;

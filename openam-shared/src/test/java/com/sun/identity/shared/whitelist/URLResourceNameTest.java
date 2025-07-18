@@ -15,11 +15,10 @@
  */
 package com.sun.identity.shared.whitelist;
 
-import org.fest.assertions.ComparisonFailureFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit test for URLResourceName.
@@ -39,7 +38,7 @@ public class URLResourceNameTest {
      * Tests that the normalisation process adheres to the expected rules.
      */
     @Test
-    public void verifyPortHandling() {
+    public void verifyPortHandling() throws Exception {
         // Previous ports are maintained.
         assertNormalisation("http://www.example.com:80/hello", "http://www.example.com:80/hello");
         assertNormalisation("http://www.example.com:12345/hello", "http://www.example.com:12345/hello");
@@ -69,13 +68,7 @@ public class URLResourceNameTest {
      * @param treatedResource
      *         The expected resource after it's been normalised.
      */
-    private void assertNormalisation(String untreatedResource, String treatedResource) {
-        try {
-            assertThat(resourceName.canonicalize(untreatedResource)).isEqualTo(treatedResource);
-        } catch (Exception e) {
-            String message = "Normalisation failed: " + e.getMessage();
-            throw ComparisonFailureFactory.comparisonFailure(message, treatedResource, "");
-        }
+    private void assertNormalisation(String untreatedResource, String treatedResource) throws Exception {
+        assertThat(resourceName.canonicalize(untreatedResource)).isEqualTo(treatedResource);
     }
-
 }

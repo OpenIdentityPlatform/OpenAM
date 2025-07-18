@@ -25,6 +25,7 @@
  * $Id: BootstrapCreator.java,v 1.14 2009/08/03 23:32:54 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2018-2025 3A Systems, LLC.
  */
 package com.sun.identity.setup;
 
@@ -37,7 +38,7 @@ import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.keystore.KeyStoreConfig;
 import org.forgerock.openam.setup.BootstrapConfig;
 import org.forgerock.openam.setup.ConfigStoreProperties;

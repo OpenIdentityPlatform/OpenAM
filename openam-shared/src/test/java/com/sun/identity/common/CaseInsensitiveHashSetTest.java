@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.Test;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class CaseInsensitiveHashSetTest {
 

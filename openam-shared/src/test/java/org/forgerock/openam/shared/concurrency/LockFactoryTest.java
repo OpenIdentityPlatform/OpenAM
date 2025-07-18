@@ -18,7 +18,7 @@ package org.forgerock.openam.shared.concurrency;
 import java.util.concurrent.locks.Lock;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test exercises the functionality of {@link LockFactory}.

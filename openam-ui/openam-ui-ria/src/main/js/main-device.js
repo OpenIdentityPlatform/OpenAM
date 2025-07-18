@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 require.config({
@@ -26,7 +27,7 @@ require.config({
     paths: {
         "handlebars": "libs/handlebars-4.7.7",
         "i18next": "libs/i18next-1.7.3-min",
-        "jquery": "libs/jquery-2.1.1-min",
+        "jquery": "libs/jquery-3.7.1-min",
         "lodash": "libs/lodash-3.10.1-min",
         "redux": "libs/redux-3.5.2-min",
         "text": "libs/text-2.0.15"

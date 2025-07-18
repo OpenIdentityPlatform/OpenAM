@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>15.1.7-SNAPSHOT</version>
+  <version>15.2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -79,7 +79,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>4.9.5-SNAPSHOT</opendj.version>
+    <opendj.version>4.10.1-SNAPSHOT</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>7.0.0</guice.version>
@@ -88,11 +88,9 @@
     <powermock.version>2.0.9</powermock.version>
 <!--     <slf4j.version>1.7.25</slf4j.version> -->
     <click.version>2.3.0</click.version>
-    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <commons-beanutils.version>1.11.0</commons-beanutils.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-digester.version>2.1</commons-digester.version>
-    <commons-fileupload.version>1.5</commons-fileupload.version>
-    <commons-lang.version>2.6</commons-lang.version>
     <commons-text.version>1.10.0</commons-text.version>
     <commons-logging.version>1.1.3</commons-logging.version>
     <commons-logging-api.version>1.1</commons-logging-api.version>
@@ -112,7 +110,7 @@
     <rhino.version>1.7.12</rhino.version>
     <saaj-api.version>1.3.4</saaj-api.version>
     <saaj-impl.version>1.3.19</saaj-impl.version>
-    <jsp-api.version>3.1.1</jsp-api.version>
+    <jsp-api.version>3.0.0</jsp-api.version>
     <xsdlib.version>20060615</xsdlib.version>
     <authapi.version>2005-08-12</authapi.version>
     <FastInfoset.version>2006-26-09</FastInfoset.version>
@@ -126,7 +124,7 @@
     <jakarta.inject.version>2.0.1</jakarta.inject.version>
     <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
-    <jakarta.websocket-api.version>2.1.1</jakarta.websocket-api.version>
+    <jakarta.websocket-api.version>2.0.0</jakarta.websocket-api.version>
     <openam.version>OpenAM ${project.version}</openam.version>
     <!--  Project web site -->
     <siteDistributionURL>scp://community.internal.forgerock.com/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
@@ -264,25 +262,19 @@
 			      </executions>
 			    </plugin>
 			    <plugin>
-			      <groupId>org.sonatype.plugins</groupId>
-			      <artifactId>nexus-staging-maven-plugin</artifactId>
-			      <version>1.7.0</version>
-			      <extensions>true</extensions>
-			      <configuration>
-			        <serverId>ossrh</serverId>
-			        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-			        <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
-			        <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
-			        <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
-			      </configuration>
-			      <dependencies>
-			      	<dependency>
-				        <groupId>com.google.guava</groupId>
-				        <artifactId>guava</artifactId>
-				        <version>15.0</version>
-				     </dependency>
-			      </dependencies>
+                  <groupId>org.sonatype.central</groupId>
+                  <artifactId>central-publishing-maven-plugin</artifactId>
+                  <version>0.8.0</version>
+                  <extensions>true</extensions>
+                  <configuration>
+                      <publishingServerId>ossrh</publishingServerId>
+                      <autoPublish>true</autoPublish>
+                      <waitMaxTime>5400</waitMaxTime>
+                      <excludeArtifacts>
+                        <!--very large for central may cause broken pipe error-->
+                        <excludeArtifact>openam-distribution-kit</excludeArtifact>
+                      </excludeArtifacts>
+                  </configuration>
 			    </plugin>
             </plugins>
         </build>
@@ -390,38 +382,40 @@
   </mailingLists>
   <!-- Maven Repositories -->
   	<repositories>
-		<repository>
-			<id>ossrh-snapshots</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+	        <repository>
+	            <name>Central Portal Snapshots</name>
+	            <id>central-portal-snapshots</id>
+	            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+	            <releases>
+	                <enabled>false</enabled>
+	            </releases>
+	            <snapshots>
+	                <enabled>true</enabled>
+	            </snapshots>
+	        </repository>
+	    </repositories>
 	<pluginRepositories>
 		<pluginRepository>
-			<id>ossrh-snapshots</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<name>Central Portal Snapshots</name>
+	            <id>central-portal-snapshots</id>
+	            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
-	<distributionManagement>
-		<repository>
-			<id>ossrh</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<name>Sonatype OSS Repository</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <name>Central Portal Staging</name>
+      <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
   <!-- Source Control -->
   <scm>
     <connection>scm:git:https://github.com/OpenIdentityPlatform/OpenAM.git</connection>
@@ -1079,16 +1073,6 @@
         <version>${commons-digester.version}</version>
       </dependency>
       <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>${commons-fileupload.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>${commons-lang.version}</version>
-      </dependency>
-      <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>${commons-logging.version}</version>
@@ -1590,12 +1574,6 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.easytesting</groupId>
-        <artifactId>fest-assert</artifactId>
-        <version>1.4</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>3.2</version>
@@ -1762,6 +1740,7 @@
 		<dependency>
    			<groupId>com.fasterxml.woodstox</groupId>
    			<artifactId>woodstox-core</artifactId>
+            <version>6.4.0</version>
    		</dependency>
 		<dependency>
 			<groupId>org.owasp.antisamy</groupId>
@@ -2210,7 +2189,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.2.1</version>
 			</plugin>
 
 			<plugin>

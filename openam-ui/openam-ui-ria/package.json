@@ -8,7 +8,7 @@
     "prejsdoc": "npm run clean:jsdoc -s",
     "jsdoc": "jsdoc --configure config/jsdoc/configuration.json",
     "start": "grunt",
-    "build:production": "cross-env NODE_ENV=production grunt prod",
+    "build:production": "cross-env NODE_ENV=production grunt prod --verbose",
     "test": "grunt karma:dev",
     "predeps": "npm run clean:deps -s",
     "deps": "ncu -u && mvn clean install",

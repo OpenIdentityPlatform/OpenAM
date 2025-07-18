@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sm.datalayer.store;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;
 

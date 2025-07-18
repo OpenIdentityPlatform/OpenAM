@@ -15,7 +15,7 @@
 */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;

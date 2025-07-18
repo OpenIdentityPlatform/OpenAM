@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.auditors;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.Reporter;
 import org.testng.annotations.DataProvider;

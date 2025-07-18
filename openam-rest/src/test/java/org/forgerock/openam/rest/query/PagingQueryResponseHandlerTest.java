@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.query;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;

@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -61,9 +61,9 @@ public class TokenCancelOperationProvider implements Provider<CancelOperation> {
         }
 
         @Override
-        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request, Principal context, Map<String, Object> map) {
+        public RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request, Principal principal, Map<String, Object> map) {
             try {
-                return cancelDelegate.cancel(request, context, map);
+                return cancelDelegate.cancel(request, principal, map);
             } finally {
                 threadLocalAMTokenCache.clearCachedSessions();
             }

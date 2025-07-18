@@ -22,7 +22,7 @@ import jakarta.inject.Named;
 
 import com.iplanet.am.util.AMPasswordUtil;
 import com.iplanet.am.util.SystemProperties;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;

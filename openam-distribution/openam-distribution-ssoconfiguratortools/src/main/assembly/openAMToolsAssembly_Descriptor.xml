@@ -21,7 +21,7 @@
 * with the fields enclosed by brackets [] replaced by
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
-*
+ * Portions Copyrighted 2019-2025 3A Systems, LLC.
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -42,7 +42,7 @@
                 <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:slf4j-nop</include>
-                <include>commons-lang:commons-lang</include>
+                <include>org.apache.commons:commons-lang3</include>
                 <include>org.openidentityplatform.openam:openam-tools</include>
                 <include>org.openidentityplatform.openam:openam-license-core</include>
                 <include>org.openidentityplatform.openam:openam-installer-utils</include>

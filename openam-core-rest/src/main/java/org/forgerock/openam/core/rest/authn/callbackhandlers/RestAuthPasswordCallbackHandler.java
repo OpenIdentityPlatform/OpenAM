@@ -18,7 +18,7 @@
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.RestUtils;

@@ -13,13 +13,14 @@
  *
  * Copyright 2014 ForgeRock AS.
  * Portions copyright 2016 Agile Digital Engineering
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.debug.Debug;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.JsonValue;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -59,7 +59,7 @@ import java.util.StringTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class <code>SAML2IDPProxyFRImpl</code> is used to find a preferred Identity

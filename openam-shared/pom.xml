@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.1.7-SNAPSHOT</version>
+        <version>15.2.1-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -77,8 +77,8 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <dependency>
@@ -131,11 +131,6 @@
         <dependency>
             <groupId>com.googlecode.java-ipv6</groupId>
             <artifactId>java-ipv6</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
         </dependency>
 
         <dependency>

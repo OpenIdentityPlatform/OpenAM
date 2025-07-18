@@ -64,7 +64,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;

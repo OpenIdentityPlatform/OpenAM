@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>15.1.7-SNAPSHOT</version>
+        <version>15.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>openam-client-sts</artifactId>
 
@@ -55,12 +55,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
         </dependency>
          <dependency>
             <groupId>org.testng</groupId>

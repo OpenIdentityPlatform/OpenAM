@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Collection of assertion methods for unit tests.

@@ -13,13 +13,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2017-2025 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>openam-federation</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.1.7-SNAPSHOT</version>
+        <version>15.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -211,13 +211,4 @@
             <artifactId>openam-federation-library</artifactId>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-    	<dependencies>
-    		<dependency>
-    			<groupId>com.fasterxml.woodstox</groupId>
-    			<artifactId>woodstox-core</artifactId>
-    			<version>6.4.0</version>
-    		</dependency>
-    	</dependencies>
-    </dependencyManagement>
 </project>

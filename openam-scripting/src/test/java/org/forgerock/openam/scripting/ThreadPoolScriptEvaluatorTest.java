@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.scripting;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getGroovyScript;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getJavascript;
 import static org.mockito.BDDMockito.given;

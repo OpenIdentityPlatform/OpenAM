@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2020-2025 3A Systems, LLC.
  */
 
 package com.sun.identity.log.handlers;
@@ -50,7 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.log.NullLocationException;

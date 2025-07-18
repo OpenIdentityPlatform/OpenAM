@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.util.HashMap;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Exercises the behaviour of {@link PrefixResourceName}.

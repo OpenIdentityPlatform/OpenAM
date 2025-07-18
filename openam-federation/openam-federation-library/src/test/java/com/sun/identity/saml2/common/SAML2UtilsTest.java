@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package com.sun.identity.saml2.common;
@@ -19,7 +20,7 @@ package com.sun.identity.saml2.common;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sun.identity.shared.encode.URLEncDec;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;

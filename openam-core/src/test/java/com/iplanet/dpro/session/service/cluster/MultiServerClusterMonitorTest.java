@@ -16,7 +16,7 @@
 
 package com.iplanet.dpro.session.service.cluster;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;

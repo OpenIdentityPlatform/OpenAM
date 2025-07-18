@@ -25,7 +25,7 @@
  * $Id: ServerEditViewBeanBase.java,v 1.3 2008/09/11 16:33:16 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025 3A Systems, LLC.
  */
 
 package com.sun.identity.console.service;
@@ -60,7 +60,7 @@ import com.sun.web.ui.view.html.CCButton;
 import com.sun.web.ui.view.html.CCPassword;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.tabs.CCTabs;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import java.security.AccessController;

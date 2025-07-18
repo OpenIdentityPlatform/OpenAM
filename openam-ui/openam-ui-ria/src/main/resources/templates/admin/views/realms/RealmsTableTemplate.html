@@ -26,15 +26,15 @@
                         <a href="{{routeTo 'realmEdit' path}}" class="btn btn-link" data-realm-name="{{name}}" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
                         {{#if active}}
                             <button type="button" data-toggle-realm {{#if isTopLevelRealm}}disabled{{/if}} class="btn btn-link" title="{{t 'common.form.deactivate'}}">
-                                <i class="fa fa-ban"/>
+                                <i class="fa fa-ban"></i>
                             </button>
                         {{else}}
                             <button type="button" data-toggle-realm {{#if isTopLevelRealm}}disabled{{/if}} class="btn btn-link" title="{{t 'common.form.activate'}}">
-                                <i class="fa fa-check"/>
+                                <i class="fa fa-check"></i>
                             </button>
                         {{/if}}
                         <button type="button" data-delete-realm {{#if isTopLevelRealm}}disabled{{/if}} class="btn btn-link" title="{{t 'common.form.delete'}}">
-                            <i class="fa fa-close"/>
+                            <i class="fa fa-close"></i>
                         </button>
                     </div>
                 </td>

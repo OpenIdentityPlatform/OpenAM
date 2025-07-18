@@ -50,7 +50,7 @@ import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.forgerock.json.resource.BadRequestException;
