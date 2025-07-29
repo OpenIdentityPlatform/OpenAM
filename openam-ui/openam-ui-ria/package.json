@@ -27,7 +27,7 @@
     "grunt-babel": "7.0.0",
     "grunt-cli": "1.4.3",
     "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-less": "1.4.0",
+    "grunt-contrib-less": "3.0.0",
     "grunt-contrib-requirejs": "1.0.0",
     "grunt-contrib-watch": "1.1.0",
     "grunt-eslint": "19.0.0",
@@ -61,9 +61,6 @@
     "eslint": {
       "shelljs": "^0.8.5",
       "ajv": "$ajv"
-    },
-    "grunt-contrib-less": {
-      "form_data": "$form-data"
     }
   }
 }
