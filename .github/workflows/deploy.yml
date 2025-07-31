@@ -22,7 +22,7 @@ jobs:
       - name: Set up Java for publishing to Maven Central Repository OSS
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
