@@ -139,95 +139,52 @@
     <logback.version>1.2.3</logback.version>
     <netty.version>4.1.118.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
+    <javadoc.opts>-Xdoclint:none</javadoc.opts>
+    <java.surefire.options>
+      -Xmx1g
+      --add-opens java.base/java.lang=ALL-UNNAMED
+      --add-opens java.base/java.lang.module=ALL-UNNAMED
+      --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+      --add-opens java.base/java.util=ALL-UNNAMED
+      --add-opens java.base/java.net=ALL-UNNAMED
+      --add-opens java.base/java.io=ALL-UNNAMED
+      --add-opens java.base/java.util.regex=ALL-UNNAMED
+      --add-opens java.base/java.security=ALL-UNNAMED
+      --add-opens java.naming/javax.naming.spi=ALL-UNNAMED
+      --add-opens java.base/javax.security.auth.login=ALL-UNNAMED
+      --add-opens java.base/java.nio.charset=ALL-UNNAMED
+      --add-opens java.base/java.security.cert=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.math=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.module=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+      --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
+      --add-opens java.base/sun.nio.ch=ALL-UNNAMED
+      --add-opens java.base/java.util.concurrent=ALL-UNNAMED
+      --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
+      --add-opens java.base/java.nio=ALL-UNNAMED
+      --add-opens java.logging/java.util.logging=ALL-UNNAMED
+
+      --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+      --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+      --add-exports java.base/sun.nio.ch=ALL-UNNAMED
+      --add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED
+      --add-exports java.base/sun.security.util=ALL-UNNAMED
+      --add-exports java.base/sun.security.jca=ALL-UNNAMED
+      --add-exports java.base/sun.security.x509=ALL-UNNAMED
+      --add-exports java.base/jdk.internal.util.random=ALL-UNNAMED
+      --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED
+      --add-exports java.management.rmi/com.sun.jmx.remote.internal.rmi=ALL-UNNAMED
+      --add-exports java.rmi/sun.rmi.registry=ALL-UNNAMED
+      --add-exports java.rmi/sun.rmi.server=ALL-UNNAMED
+      --add-exports java.sql/java.sql=ALL-UNNAMED
+    </java.surefire.options>
+    <javadoc.options>-J-Xmx2g</javadoc.options>
   </properties>
   <!-- Profiles -->
   <profiles>
-    <profile>
-      <id>set-compiler-release</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.14.0</version>
-              <configuration>
-                <fork>true</fork>
-                <compilerArgs>
-                  <arg>-XDignore.symbol.file</arg>
-                  <arg>-Xlint:unchecked</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.base/sun.net.www.protocol.https=ALL-UNNAMED</arg>
-                  <arg>--add-exports</arg>
-                  <arg>java.security.jgss/sun.security.krb5=ALL-UNNAMED</arg>
-                </compilerArgs>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>jdk11.options</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <properties>
-        <!-- Disable Doclint on JDK8+ -->
-        <javadoc.opts>-Xdoclint:none</javadoc.opts>
-        <!-- Surefire Argument Line -->
-        <java.surefire.options>
-          -Xmx1g
-          --add-opens java.base/java.lang=ALL-UNNAMED
-          --add-opens java.base/java.lang.module=ALL-UNNAMED
-          --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-          --add-opens java.base/java.util=ALL-UNNAMED
-          --add-opens java.base/java.net=ALL-UNNAMED
-          --add-opens java.base/java.io=ALL-UNNAMED
-          --add-opens java.base/java.util.regex=ALL-UNNAMED
-          --add-opens java.base/java.security=ALL-UNNAMED
-          --add-opens java.naming/javax.naming.spi=ALL-UNNAMED
-          --add-opens java.base/javax.security.auth.login=ALL-UNNAMED
-          --add-opens java.base/java.nio.charset=ALL-UNNAMED
-          --add-opens java.base/java.security.cert=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.math=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.module=ALL-UNNAMED
-          --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
-          --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
-          --add-opens java.base/sun.nio.ch=ALL-UNNAMED
-          --add-opens java.base/java.util.concurrent=ALL-UNNAMED
-          --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
-          --add-opens java.base/java.nio=ALL-UNNAMED
-          --add-opens java.logging/java.util.logging=ALL-UNNAMED
-
-          --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-          --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
-          --add-exports java.base/sun.nio.ch=ALL-UNNAMED
-          --add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED
-          --add-exports java.base/sun.security.util=ALL-UNNAMED
-          --add-exports java.base/sun.security.jca=ALL-UNNAMED
-          --add-exports java.base/sun.security.x509=ALL-UNNAMED
-          --add-exports java.base/jdk.internal.util.random=ALL-UNNAMED
-          --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED
-          --add-exports java.management.rmi/com.sun.jmx.remote.internal.rmi=ALL-UNNAMED
-          --add-exports java.rmi/sun.rmi.registry=ALL-UNNAMED
-          --add-exports java.rmi/sun.rmi.server=ALL-UNNAMED
-          --add-exports java.sql/java.sql=ALL-UNNAMED
-        </java.surefire.options>
-        <!-- JavaDoc Setting Properties -->
-        <javadoc.options>-J-Xmx2g</javadoc.options>
-      </properties>
-    </profile>
    	<profile>
         <id>release-sign-artifacts</id>
         <activation>
@@ -2158,7 +2115,16 @@
                 <configuration>
                   <fork>true</fork>
                   <compilerArgs>
-                    <arg>-XDignore.symbol.file=true</arg>
+                    <arg>-XDignore.symbol.file</arg>
+                    <arg>-Xlint:unchecked</arg>
+                    <arg>--add-exports</arg>
+                    <arg>java.base/sun.security.util=ALL-UNNAMED</arg>
+                    <arg>--add-exports</arg>
+                    <arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
+                    <arg>--add-exports</arg>
+                    <arg>java.base/sun.net.www.protocol.https=ALL-UNNAMED</arg>
+                    <arg>--add-exports</arg>
+                    <arg>java.security.jgss/sun.security.krb5=ALL-UNNAMED</arg>
                   </compilerArgs>
                 </configuration>
 			</plugin>
