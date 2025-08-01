@@ -67,14 +67,14 @@ public class ClickResourceService implements ResourceService {
     }
 
     /**
-     * @see org.apache.click.service.ResourceService#onDestroy()
+     * @see org.openidentityplatform.openam.click.service.ResourceService#onDestroy()
      */
     public void onDestroy() {
         resourceCache.clear();
     }
 
     /**
-     * @see org.apache.click.service.ResourceService#isResourceRequest(HttpServletRequest)
+     * @see org.openidentityplatform.openam.click.service.ResourceService#isResourceRequest(HttpServletRequest)
      *
      * @param request the servlet request
      * @return true if the request is for a static click resource
