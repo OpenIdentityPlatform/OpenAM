@@ -12,25 +12,21 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.identity.idm;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
-import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdEventListener;
 import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.log.spi.Debug;
-import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.guice.core.InjectorHolder;
 
 /**

@@ -13,15 +13,15 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions copyright 2025 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.rest;
 
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Arrays;

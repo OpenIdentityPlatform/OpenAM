@@ -25,6 +25,7 @@
  * $Id4
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -42,7 +43,7 @@ import com.sun.identity.log.Level;
 import java.text.MessageFormat;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 

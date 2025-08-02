@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.realms;
@@ -19,7 +20,7 @@ package org.forgerock.openam.core.realms;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.util.HashSet;
 import java.util.Set;
 

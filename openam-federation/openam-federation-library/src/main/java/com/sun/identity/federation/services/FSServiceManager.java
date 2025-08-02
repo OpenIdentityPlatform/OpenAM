@@ -24,6 +24,7 @@
  *
  * $Id: FSServiceManager.java,v 1.5 2008/06/25 05:46:56 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services;
@@ -64,8 +65,8 @@ import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.protocol.Request;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**

@@ -25,6 +25,7 @@
  * $Id: FSSingleLogoutHandler.java,v 1.15 2009/11/04 00:06:11 exu Exp $
  *
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  *
  */
 package com.sun.identity.federation.services.logout;
@@ -71,10 +72,10 @@ import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.xml.soap.SOAPMessage;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 

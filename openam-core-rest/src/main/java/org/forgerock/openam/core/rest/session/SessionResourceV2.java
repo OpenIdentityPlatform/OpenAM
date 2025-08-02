@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.session;
 
@@ -22,7 +23,7 @@ import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_REALM;
 import static org.forgerock.openam.session.SessionConstants.JSON_SESSION_USERNAME;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

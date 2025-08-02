@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.realms;
@@ -21,7 +22,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.fail;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 import com.sun.identity.idm.IdRepoErrorCode;
 import com.sun.identity.sm.ServiceConfigManager;

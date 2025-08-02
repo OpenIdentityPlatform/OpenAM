@@ -25,6 +25,7 @@
  * $Id: SessionID.java,v 1.10 2009/10/02 23:45:42 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session;
@@ -39,7 +40,7 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.utils.PerThreadCache;
 import org.forgerock.openam.utils.StringUtils;

@@ -24,6 +24,7 @@
  *
  * $Id: HttpCallback.java,v 1.4 2009/07/28 19:40:45 beomsuk Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -31,7 +32,7 @@ package com.sun.identity.authentication.spi;
 
 import java.io.Serializable;
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * <code>HttpCallback</code> class implements <code>Callback</code>

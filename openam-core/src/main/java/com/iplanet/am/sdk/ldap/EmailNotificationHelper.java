@@ -25,6 +25,7 @@
  * $Id: EmailNotificationHelper.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -51,7 +52,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 /**
  * This class has the functionality to send email notifications to the users

@@ -25,13 +25,14 @@
  * $Id: EmbeddedOpenSSO.java,v 1.1 2009/05/02 21:56:42 kevinserwin Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
 
 import java.util.Map;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 import com.sun.identity.authentication.UI.LoginLogoutMapping;
 
 /**

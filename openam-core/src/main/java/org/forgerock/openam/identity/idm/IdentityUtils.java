@@ -13,10 +13,11 @@
  *
  * Copyright 2016 ForgeRock AS.
  * Portions Copyrighted 2005 Sun Microsystems Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.identity.idm;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;

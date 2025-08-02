@@ -24,6 +24,8 @@
  *
  * $Id: CreateCOTViewBean.java,v 1.6 2009/08/21 20:09:23 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -65,7 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class CreateCOTViewBean
         extends AMPrimaryMastHeadViewBean 

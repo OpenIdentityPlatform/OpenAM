@@ -24,6 +24,8 @@
  *
  * $Id: SCSOAPBindingModelImpl.java,v 1.2 2008/06/25 05:49:46 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.service.model;
@@ -33,7 +35,7 @@ import com.sun.identity.console.base.model.AMServiceProfileModel;
 import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
 import com.sun.identity.console.property.PropertyXMLBuilder;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - NEED NOT LOG - */
 

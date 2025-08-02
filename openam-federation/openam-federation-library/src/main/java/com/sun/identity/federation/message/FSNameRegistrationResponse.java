@@ -25,6 +25,7 @@
  * $Id: FSNameRegistrationResponse.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -49,7 +50,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

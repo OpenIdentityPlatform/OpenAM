@@ -24,6 +24,7 @@
  *
  * $Id: SubSchemaTypeSelectViewBean.java,v 1.2 2008/06/25 05:43:17 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -50,7 +51,7 @@ import com.sun.web.ui.view.html.CCRadioButton;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SubSchemaTypeSelectViewBean
     extends AMPrimaryMastHeadViewBean

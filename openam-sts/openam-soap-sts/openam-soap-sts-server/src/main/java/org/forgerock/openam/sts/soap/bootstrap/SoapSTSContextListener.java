@@ -19,8 +19,8 @@ package org.forgerock.openam.sts.soap.bootstrap;
 import com.google.inject.Key;
 import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * This class will shutdown the soap-sts state related to polling the sts-publish service in order to

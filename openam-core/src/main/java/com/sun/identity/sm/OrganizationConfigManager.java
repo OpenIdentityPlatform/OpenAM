@@ -25,13 +25,14 @@
  * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.sm;
 
 import static com.iplanet.ums.IUMSConstants.*;
 import static com.sun.identity.idm.IdConstants.*;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,12 +50,10 @@ import org.forgerock.opendj.ldap.DN;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationUtils;
-import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.plugins.internal.AgentsRepo;
 import com.sun.identity.shared.Constants;

@@ -25,6 +25,7 @@
  * $Id: CreateFedletViewBean.java,v 1.4 2008/07/24 18:16:55 veiming Exp $
  *
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task;
@@ -51,7 +52,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Create Fedlet UI.

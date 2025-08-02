@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm;
@@ -19,8 +20,8 @@ package org.forgerock.openam.sm;
 import com.iplanet.services.ldap.LDAPUser;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Arrays;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
 import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;

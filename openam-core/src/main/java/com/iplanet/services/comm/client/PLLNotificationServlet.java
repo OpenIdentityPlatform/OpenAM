@@ -25,6 +25,7 @@
  * $Id: PLLNotificationServlet.java,v 1.6 2008/08/19 19:08:43 veiming Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.services.comm.client;
 
@@ -36,11 +37,11 @@ import com.sun.identity.common.RequestUtils;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.io.InputStream;
 import java.util.Vector;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 

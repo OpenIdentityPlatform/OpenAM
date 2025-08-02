@@ -24,6 +24,7 @@
  *
  * $Id: ConfigureSalesForceAppsWarningViewBean.java,v 1.1 2009/07/01 23:27:21 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task;
@@ -35,7 +36,7 @@ import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.task.model.TaskModel;
 import com.sun.identity.console.task.model.TaskModelImpl;
 import com.sun.web.ui.view.alert.CCAlert;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Create Warning for salesforce UI.

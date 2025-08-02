@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -20,8 +21,8 @@ import static org.forgerock.openam.core.rest.sms.SmsRealmProvider.REALMS_PATH;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 import static org.forgerock.openam.rest.RealmRoutingFactory.REALM_ROUTE;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.HashSet;

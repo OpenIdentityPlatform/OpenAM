@@ -32,7 +32,7 @@ public class XACML3HomeResource extends XACML3Resource {
      * Creates Home Document Content providing hints.
      *
      * @return String -- Containing Response in requested ContentType.
-     * @throws javax.servlet.ServletException
+     * @throws jakarta.servlet.ServletException
      * @throws java.io.IOException
      */
     public static String getHome() throws JSONException, IOException {

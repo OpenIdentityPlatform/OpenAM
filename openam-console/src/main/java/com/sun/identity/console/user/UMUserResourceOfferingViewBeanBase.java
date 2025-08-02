@@ -24,6 +24,7 @@
  *
  * $Id: UMUserResourceOfferingViewBeanBase.java,v 1.3 2008/10/01 16:19:42 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.user;
@@ -41,7 +42,7 @@ import com.sun.identity.console.user.model.UMUserResourceOfferingModelImpl;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.io.InputStream;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class UMUserResourceOfferingViewBeanBase
     extends SMDiscoveryBootstrapRefOffViewBeanBase

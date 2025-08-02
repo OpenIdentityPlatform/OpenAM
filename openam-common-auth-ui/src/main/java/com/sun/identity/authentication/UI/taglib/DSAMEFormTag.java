@@ -25,10 +25,11 @@
  * $Id: DSAMEFormTag.java,v 1.2 2008/06/25 05:41:50 qcheng Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI.taglib;
 
-import javax.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspException;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.taglib.html.FormTag;

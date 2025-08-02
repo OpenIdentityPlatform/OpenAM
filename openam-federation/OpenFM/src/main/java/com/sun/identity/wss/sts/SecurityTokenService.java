@@ -24,6 +24,7 @@
  *
  * $Id: SecurityTokenService.java,v 1.4 2008/06/25 05:50:13 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.sts;
@@ -31,8 +32,8 @@ package com.sun.identity.wss.sts;
 import java.io.*;
 import java.net.URLClassLoader;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import com.sun.identity.classloader.FAMClassLoader;
 import java.lang.reflect.Method;
 
@@ -58,13 +59,13 @@ public class SecurityTokenService extends HttpServlet {
            
                 Class clsa[] = new Class[2];
                 clsa[0] = Class.forName(
-                        "javax.servlet.http.HttpServletRequest");
+                        "jakarta.servlet.http.HttpServletRequest");
                 clsa[1] = Class.forName(
-                        "javax.servlet.http.HttpServletResponse");
+                        "jakarta.servlet.http.HttpServletResponse");
                 doGetMethod = jaxwsServlet.getDeclaredMethod("doGet", clsa);
                 doPostMethod = jaxwsServlet.getDeclaredMethod("doPost", clsa);
                 clsa = new Class[1];
-                clsa[0] = Class.forName("javax.servlet.ServletConfig");                
+                clsa[0] = Class.forName("jakarta.servlet.ServletConfig");
                 initMethod = jaxwsServlet.getDeclaredMethod("init", clsa);
                 wsServlet = jaxwsServlet.newInstance();
              }

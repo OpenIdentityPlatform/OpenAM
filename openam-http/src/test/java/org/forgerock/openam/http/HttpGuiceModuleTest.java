@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.http;
@@ -60,9 +61,9 @@ public class HttpGuiceModuleTest extends GuiceTestCase {
         } catch (ConfigurationException e) {
             //Then
             assertThat(e.getErrorMessages().iterator().next().getMessage())
-                    .contains("It was already configured on one or more child injectors or private modules")
-                    .contains("bound at org.forgerock.openam.http.HttpGuiceModule")
-                    .contains("If it was in a PrivateModule, did you forget to expose the binding?");
+                    .contains("Unable to create binding")
+                    .contains("it was already configured on one or more child injectors or private modules");
+
         }
     }
 }
