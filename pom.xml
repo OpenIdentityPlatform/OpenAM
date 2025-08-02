@@ -108,8 +108,8 @@
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
     <rhino.version>1.7.12</rhino.version>
-    <saaj-api.version>1.3.4</saaj-api.version>
-    <saaj-impl.version>1.3.19</saaj-impl.version>
+    <saaj-api.version>2.0.1</saaj-api.version>
+    <saaj-impl.version>2.0.1</saaj-impl.version>
     <jsp-api.version>3.0.0</jsp-api.version>
     <xsdlib.version>20060615</xsdlib.version>
     <authapi.version>2005-08-12</authapi.version>
@@ -1273,8 +1273,8 @@
         <version>${relaxngDatatype.version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.xml.soap</groupId>
-        <artifactId>saaj-api</artifactId>
+        <groupId>jakarta.xml.soap</groupId>
+        <artifactId>jakarta.xml.soap-api</artifactId>
         <version>${saaj-api.version}</version>
       </dependency>
       <dependency>
