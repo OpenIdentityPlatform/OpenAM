@@ -3,12 +3,12 @@ name: Package/Deploy
 on:
   workflow_dispatch:
   workflow_run:
-    branches: [ master ]
+    branches: [ 'master','release/16.0.0-SNAPSHOT' ]
     workflows: ["Build","Release"]
     types: [completed]
 jobs:
   deploy-maven:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event=='push'}}
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
@@ -19,10 +19,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Set up Java for publishing to Maven Central Repository OSS
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: ${{ github.event.workflow_run.head_branch == 'release/16.0.0-SNAPSHOT' && '11' || '8'}}
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
