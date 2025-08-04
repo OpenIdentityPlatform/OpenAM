@@ -215,7 +215,7 @@ public class ClickServlet extends HttpServlet {
             e.printStackTrace();
 
             String msg = "error while initializing Click servlet; throwing "
-                    + "javax.servlet.UnavailableException";
+                    + "jakarta.servlet.UnavailableException";
 
             log(msg, e);
 
@@ -244,7 +244,7 @@ public class ClickServlet extends HttpServlet {
             e.printStackTrace();
 
             String msg = "error while destroying Click servlet, throwing "
-                    + "javax.servlet.UnavailableException";
+                    + "jakarta.servlet.UnavailableException";
 
             log(msg, e);
 

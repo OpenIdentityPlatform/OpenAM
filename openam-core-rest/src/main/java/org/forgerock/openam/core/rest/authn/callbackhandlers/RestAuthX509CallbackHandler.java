@@ -36,7 +36,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
     private static final String CALLBACK_NAME = "X509CertificateCallback";
 
     /**
-     * Checks the request for the presence of a parameter named 'javax.servlet.request.X509Certificate', if present
+     * Checks the request for the presence of a parameter named 'jakarta.servlet.request.X509Certificate', if present
      * and not null or empty takes the first certificate from the array and sets it on the X509CerificateCallback and
      * returns true.
      *
@@ -46,7 +46,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
             HttpServletResponse response, X509CertificateCallback callback) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
-                "javax.servlet.request.X509Certificate");
+                "jakarta.servlet.request.X509Certificate");
 
         if (certificates != null && certificates.length > 0) {
             callback.setCertificate(certificates[0]);

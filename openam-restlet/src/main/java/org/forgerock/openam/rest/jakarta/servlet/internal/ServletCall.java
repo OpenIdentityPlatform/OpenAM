@@ -123,7 +123,7 @@ public class ServletCall extends ServerCall {
     @Override
     public List<Certificate> getCertificates() {
         Certificate[] certificateArray = (Certificate[]) getRequest()
-                .getAttribute("javax.servlet.request.X509Certificate");
+                .getAttribute("jakarta.servlet.request.X509Certificate");
 
         if (certificateArray != null) {
             return Arrays.asList(certificateArray);
@@ -135,7 +135,7 @@ public class ServletCall extends ServerCall {
     @Override
     public String getCipherSuite() {
         return (String) getRequest().getAttribute(
-                "javax.servlet.request.cipher_suite");
+                "jakarta.servlet.request.cipher_suite");
     }
 
     @Override
@@ -295,7 +295,7 @@ public class ServletCall extends ServerCall {
     @Override
     public Integer getSslKeySize() {
         Integer keySize = (Integer) getRequest().getAttribute(
-                "javax.servlet.request.key_size");
+                "jakarta.servlet.request.key_size");
 
         if (keySize == null) {
             keySize = super.getSslKeySize();
@@ -307,7 +307,7 @@ public class ServletCall extends ServerCall {
     @Override
     public String getSslSessionId() {
         Object sessionId = getRequest().getAttribute(
-                "javax.servlet.request.ssl_session_id");
+                "jakarta.servlet.request.ssl_session_id");
 
         if ((sessionId != null) && (sessionId instanceof String)) {
             return (String) sessionId;
@@ -318,7 +318,7 @@ public class ServletCall extends ServerCall {
          * Tomcat/Coyote.
          */
         sessionId = getRequest().getAttribute(
-                "javax.servlet.request.ssl_session");
+                "jakarta.servlet.request.ssl_session");
 
         if (sessionId instanceof String) {
             return (String) sessionId;

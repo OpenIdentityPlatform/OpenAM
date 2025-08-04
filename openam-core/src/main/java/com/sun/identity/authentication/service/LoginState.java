@@ -4202,7 +4202,7 @@ public class LoginState {
     public X509Certificate getX509Certificate(HttpServletRequest servletrequest) {
         if ((servletrequest != null) && (servletrequest.isSecure())) {
             Object obj = servletrequest.getAttribute(
-                    "javax.servlet.request.X509Certificate");
+                    "jakarta.servlet.request.X509Certificate");
             X509Certificate[] allCerts = (X509Certificate[]) obj;
             if ((allCerts != null) && (allCerts.length != 0)) {
                 if (DEBUG.messageEnabled()) {

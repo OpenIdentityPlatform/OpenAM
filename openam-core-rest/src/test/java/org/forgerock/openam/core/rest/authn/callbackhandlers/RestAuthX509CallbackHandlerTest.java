@@ -70,7 +70,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
@@ -93,7 +93,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509Certificate x509Certificate2 = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate, x509Certificate2};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
@@ -114,7 +114,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,

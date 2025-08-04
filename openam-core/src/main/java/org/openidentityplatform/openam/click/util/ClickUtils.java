@@ -2462,12 +2462,12 @@ public class ClickUtils {
         // Servlet 2.3 specification.
 
         String path = (String)
-                request.getAttribute("javax.servlet.include.servlet_path");
+                request.getAttribute("jakarta.servlet.include.servlet_path");
 
         // Also take into account the PathInfo stated on
         // SRV.4.4 Request Path Elements.
         String info = (String)
-                request.getAttribute("javax.servlet.include.path_info");
+                request.getAttribute("jakarta.servlet.include.path_info");
 
         if (path == null) {
             path = request.getServletPath();
@@ -2497,7 +2497,7 @@ public class ClickUtils {
         // special attribute holds the correct path.  See section 8.3 of the
         // Servlet 2.3 specification.
 
-        String requestURI = (String) request.getAttribute("javax.servlet.include.request_uri");
+        String requestURI = (String) request.getAttribute("jakarta.servlet.include.request_uri");
 
         if (requestURI == null) {
             requestURI = request.getRequestURI();

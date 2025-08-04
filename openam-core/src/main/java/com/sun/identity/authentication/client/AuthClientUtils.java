@@ -1671,7 +1671,7 @@ public class AuthClientUtils {
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
         boolean encoded = Boolean.parseBoolean(request.getParameter("encoded"));
 
-        if (request.getAttribute("javax.servlet.forward.servlet_path") != null) {
+        if (request.getAttribute("jakarta.servlet.forward.servlet_path") != null) {
             //this is a forwarded request, we should only save the forwarded URL.
             queryString.append(request.getQueryString());
             if (queryString.length() > 0) {

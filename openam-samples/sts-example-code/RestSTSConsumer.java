@@ -299,7 +299,7 @@ public class RestSTSConsumer {
      * must also be configured to trust the host running this test, and must be configured to reference the client's certificate
      * in the header specified by stsClientCertHeaderName (unless the rest-sts is being consumed via two-way-tls, in which
      * case the stsClientCertHeaderName is irrelevant, as the rest-sts will reference the client's certificate via the
-     * javax.servlet.request.X509Certificate ServletRequest attribute.
+     * jakarta.servlet.request.X509Certificate ServletRequest attribute.
      * @param subjectConfirmation The SAML2 SubjectConfirmation. For HoK, the certificate in the file /cert.jks on the
      *                            classpath will be included.
      * @param stsClientCertHeaderName The header name specification of where the published sts expects to find the client
