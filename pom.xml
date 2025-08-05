@@ -240,6 +240,8 @@
   <!-- OpenAM Child Modules -->
   <!-- Build order will be determined by the Maven Reactor. -->
   <modules>
+    <!-- shaded libraries -->
+    <module>jato-shaded</module>
     <module>openam-http</module>
     <module>openam-ldap-utils</module>
     <module>openam-datastore</module>
@@ -309,8 +311,6 @@
     <module>openam-notifications-integration</module>
     <!-- openam cassandra submodules -->
     <module>openam-cassandra</module>
-    <!-- shaded libraries -->
-    <module>jato-shaded</module>
     <module>transform-jakarta</module>
   </modules>
   <!-- Mailing Lists -->
