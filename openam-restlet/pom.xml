@@ -47,25 +47,52 @@
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet.ext.xml</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet.ext.jackson</artifactId>
+        </dependency>
+
+        <!-- resltet dependencies-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-smile</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+            <version>2.17.0</version>
         </dependency>
 
 

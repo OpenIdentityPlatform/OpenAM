@@ -19,31 +19,31 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>transform-jakarta</artifactId>
         <version>16.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>jaxrpc</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
-            <artifactId>jaxrpc-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
-            <artifactId>jaxrpc-spi</artifactId>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.transformer</groupId>
-                <artifactId>transformer-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+
+    <properties>
+        <transformer.artifact.groupId>org.restlet.jee</transformer.artifact.groupId>
+    </properties>
+
+    <artifactId>restlet-parent-jakarta</artifactId>
+
+    <packaging>pom</packaging>
+    <modules>
+        <module>restlet</module>
+        <module>restlet-ext-json</module>
+        <module>restlet-ext-xml</module>
+        <module>restlet-ext-servlet</module>
+        <module>restlet-ext-jackson</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>maven-restlet</id>
+            <url>https://maven.restlet.talend.com</url>
+        </repository>
+    </repositories>
+
 </project>

@@ -120,7 +120,7 @@
     <java-ipv6.version>0.17</java-ipv6.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
-    <activemq.version>[5.15.9,5.17)</activemq.version>
+    <activemq.version>5.16.8</activemq.version>
     <jakarta.inject.version>2.0.1</jakarta.inject.version>
     <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
@@ -310,7 +310,7 @@
     <!-- openam cassandra submodules -->
     <module>openam-cassandra</module>
     <!-- shaded libraries -->
-<!--    <module>jato-shaded</module>-->
+    <module>jato-shaded</module>
     <module>transform-jakarta</module>
   </modules>
   <!-- Mailing Lists -->
@@ -1137,21 +1137,14 @@
         <version>${jaxrpc-api.version}</version>
       </dependency>
       <dependency>
-        <!--                 <groupId>external</groupId> -->
-        <groupId>com.sun.xml.rpc</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-impl</artifactId>
         <version>${jaxrpc-impl.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.xml.rpc</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-spi</artifactId>
         <version>${jaxrpc-spi.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>jaxrpc</artifactId>
-        <classifier>jakarta</classifier>
-        <version>${project.version}</version>
       </dependency>
       <!-- TODO jmx -->
 	<dependency>
@@ -1160,16 +1153,14 @@
 	    <version>3.1.9</version>
 	</dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
-        <artifactId>jato</artifactId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
+        <artifactId>jato-shaded</artifactId>
         <version>2005-05-04</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>cc</artifactId>
         <version>2008-08-08</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
@@ -1376,12 +1367,12 @@
       </dependency>
       <!-- Session HA Module Dependencies-->
       <dependency>
-        <groupId>org.restlet.jee</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet</artifactId>
         <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.restlet.jee</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
         <version>${restlet.version}</version>
         <exclusions>
@@ -1396,17 +1387,17 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.restlet.jee</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.json</artifactId>
         <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.restlet.jee</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.xml</artifactId>
         <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.restlet.jee</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.servlet</artifactId>
         <version>${restlet.version}</version>
       </dependency>
@@ -1634,11 +1625,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>${project.version}</version>
+        <version>${activemq.version}</version>
         <scope>test</scope>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>

@@ -106,14 +106,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>jato</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jato-shaded</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>cc</artifactId>
-            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>com.sun.web.ui</groupId>

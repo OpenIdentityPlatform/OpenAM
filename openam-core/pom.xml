@@ -245,15 +245,13 @@
 
         <!-- View Dependencies -->
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>jato</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jato-shaded</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>cc</artifactId>
-            <classifier>jakarta</classifier>
         </dependency>
 
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
@@ -333,9 +331,13 @@
 <!--            <artifactId>jaxrpc-spi</artifactId>-->
 <!--        </dependency>-->
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>jaxrpc</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jaxrpc-spi</artifactId>
         </dependency>
 
         <dependency>

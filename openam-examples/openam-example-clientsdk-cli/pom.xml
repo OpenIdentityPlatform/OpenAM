@@ -75,7 +75,7 @@
         </dependency>
         <dependency>
 <!--             <groupId>external</groupId> -->
-			<groupId>com.sun.xml.rpc</groupId>
+			<groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
        	<dependency>

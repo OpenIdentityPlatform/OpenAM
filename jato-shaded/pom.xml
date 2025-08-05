@@ -22,15 +22,16 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.1-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
     <name>OpenAM Jato Shaded</name>
     <description>OpenAM Jato Shaded Library</description>
-    <groupId>org.openidentityplatform.openam.shaded</groupId>
+    <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
     <artifactId>jato-shaded</artifactId>
     <packaging>jar</packaging>
+    <version>2005-05-04</version>
 
     <!-- Build -->
 
@@ -39,7 +40,7 @@
         <dependency>
             <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
             <artifactId>jato</artifactId>
-            <classifier>jakarta</classifier>
+            <version>2005-05-04</version>
         </dependency>
     </dependencies>
     <build>

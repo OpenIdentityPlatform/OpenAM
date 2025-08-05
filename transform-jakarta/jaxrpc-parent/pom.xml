@@ -19,32 +19,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>transform-jakarta</artifactId>
         <version>16.0.0-SNAPSHOT</version>
     </parent>
+    <packaging>pom</packaging>
+    <artifactId>jaxrpc-parent</artifactId>
+    <properties>
+        <transformer.artifact.groupId>com.sun.xml.rpc</transformer.artifact.groupId>
+    </properties>
 
-    <artifactId>jato</artifactId>
-    <version>2005-05-04</version>
-    <dependencies>
-        <dependency>
-            <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
-            <artifactId>jato</artifactId>
-            <version>2005-05-04</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.transformer</groupId>
-                <artifactId>transformer-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>jaxrpc-impl</module>
+        <module>jaxrpc-spi</module>
+    </modules>
 
 </project>

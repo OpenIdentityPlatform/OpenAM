@@ -59,12 +59,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet.ext.jackson</artifactId>
         </dependency>
     </dependencies>

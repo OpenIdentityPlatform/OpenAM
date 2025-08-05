@@ -19,52 +19,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>transform-jakarta</artifactId>
         <version>16.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>restlet</artifactId>
+    <properties>
+        <transformer.artifact.groupId>org.openidentityplatform.external.com.iplanet.jato</transformer.artifact.groupId>
+    </properties>
 
-    <repositories>
-        <repository>
-            <id>maven-restlet</id>
-            <url>https://maven.restlet.talend.com</url>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
-        </dependency>
-    </dependencies>
+    <artifactId>jato-shaded</artifactId>
+    <version>2005-05-04</version>
+    <packaging>jar</packaging>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.eclipse.transformer</groupId>
                 <artifactId>transformer-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
+
 </project>

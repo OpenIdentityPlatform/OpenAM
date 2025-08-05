@@ -19,26 +19,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.openidentityplatform.openam.shaded</groupId>
+        <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>transform-jakarta</artifactId>
         <version>16.0.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>cc</artifactId>
     <version>2008-08-08</version>
-    <dependencies>
-        <dependency>
-            <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
-            <artifactId>cc</artifactId>
-            <version>2008-08-08</version>
-        </dependency>
-    </dependencies>
+
+    <properties>
+        <transformer.artifact.groupId>org.openidentityplatform.external.com.sun.web.ui</transformer.artifact.groupId>
+    </properties>
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.eclipse.transformer</groupId>
                 <artifactId>transformer-maven-plugin</artifactId>

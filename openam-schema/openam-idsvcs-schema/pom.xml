@@ -57,6 +57,7 @@
                                 <mkdir dir="${project.build.directory}/unwanted" />
 
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpathref="wscompile.path" failonerror="true">
+                                    <arg value="-verbose" />
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-keep" />
@@ -116,15 +117,29 @@
 <!--             <artifactId>jaxb-libs</artifactId> -->
 <!--         </dependency> -->
 
-<!--        <dependency>-->
-<!--            <groupId>javax.xml</groupId>-->
-<!--            <artifactId>jaxrpc-api</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+        </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
-            <artifactId>jaxrpc</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>javax.xml.soap</groupId>
+            <artifactId>javax.xml.soap-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.soap</groupId>
+            <artifactId>jakarta.xml.soap-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jaxrpc-spi</artifactId>
         </dependency>
 
         <dependency>

@@ -23,16 +23,19 @@
         <artifactId>openam</artifactId>
         <version>16.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.openidentityplatform.openam.shaded</groupId>
+    <groupId>org.openidentityplatform.openam.jakarta</groupId>
     <artifactId>transform-jakarta</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>jaxrpc</module>
-        <module>restlet</module>
+        <module>jaxrpc-parent</module>
+        <module>restlet-parent-jakarta</module>
         <module>activemq-client</module>
-        <module>jato</module>
+        <module>jato-shaded</module>
         <module>cc</module>
     </modules>
+    <properties>
+        <transformer.artifact.groupId>${project.groupId}</transformer.artifact.groupId>
+    </properties>
     <build>
         <pluginManagement>
             <plugins>
@@ -61,26 +64,42 @@
                     <artifactId>transformer-maven-plugin</artifactId>
                     <version>0.5.0</version>
                     <extensions>true</extensions>
-                    <configuration>
-                        <rules>
-                            <jakartaDefaults>true</jakartaDefaults>
-                        </rules>
-                    </configuration>
                     <executions>
+                        <execution>
+                            <id>transform-jakarta</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <artifact>
+                                    <groupId>${transformer.artifact.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                            </configuration>
+                        </execution>
                         <execution>
                             <id>default-jar</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
+                                <rules>
+                                    <jakartaDefaults>true</jakartaDefaults>
+                                </rules>
                                 <artifact>
-                                    <groupId>${project.groupId}</groupId>
+                                    <groupId>${transformer.artifact.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
-                                    <classifier>jakarta</classifier>
+                                    <version>${project.version}</version>
                                 </artifact>
+                                <classifier/>
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
