@@ -26,11 +26,11 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.idm.plugins.internal;
 
-import static com.google.inject.name.Names.named;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
@@ -46,7 +46,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
@@ -88,7 +88,6 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.JsonValue;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.notifications.LocalOnly;
 import org.forgerock.openam.notifications.NotificationBroker;

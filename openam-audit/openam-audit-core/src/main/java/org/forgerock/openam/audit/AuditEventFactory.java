@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.audit;
 
 import static org.forgerock.openam.utils.StringUtils.isNotBlank;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * Factory for creation of AuditEvent builders.

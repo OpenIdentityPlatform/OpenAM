@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2024-2025 3A Systems LLC.
  */
 package org.forgerock.openam.session.stateless.cache;
 
 import java.util.Collections;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.session.stateless.StatelessConfig;
 import org.forgerock.openam.utils.collections.LeastRecentlyUsed;

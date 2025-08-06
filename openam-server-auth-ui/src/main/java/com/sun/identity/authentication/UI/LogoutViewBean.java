@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;
 
@@ -35,10 +36,10 @@ import com.iplanet.am.util.SystemProperties;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.SessionID;

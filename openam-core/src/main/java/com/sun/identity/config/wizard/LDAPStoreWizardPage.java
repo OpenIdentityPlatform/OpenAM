@@ -31,7 +31,7 @@ package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.pojos.LDAPStore;
 import com.sun.identity.config.util.ProtectedPage;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 
 /*
  * LDAPStoreWizardPage is the base for Step 3.

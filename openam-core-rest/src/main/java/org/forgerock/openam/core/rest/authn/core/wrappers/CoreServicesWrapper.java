@@ -12,17 +12,17 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.core.wrappers;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
-import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AuthException;

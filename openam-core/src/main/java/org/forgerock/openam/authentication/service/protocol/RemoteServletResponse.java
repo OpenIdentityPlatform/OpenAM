@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -30,8 +31,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletResponse;
 
 /**
  * Encapsulates the transferable state of a ServletResponse object.

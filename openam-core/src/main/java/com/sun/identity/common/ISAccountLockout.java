@@ -25,13 +25,14 @@
  * $Id: ISAccountLockout.java,v 1.15 2009/03/07 08:01:50 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.common;
 
 import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.AMSendMail;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.authentication.spi.AMAuthCallBackException;

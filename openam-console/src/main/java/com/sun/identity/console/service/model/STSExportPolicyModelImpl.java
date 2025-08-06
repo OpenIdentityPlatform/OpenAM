@@ -24,6 +24,7 @@
  *
  * $Id: STSExportPolicyModelImpl.java,v 1.1 2009/12/19 00:14:56 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.service.model;
 
@@ -40,7 +41,7 @@ import com.sun.identity.wss.provider.ProviderConfig;
 import com.sun.identity.wss.provider.ProviderException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class STSExportPolicyModelImpl extends AMModelBase implements STSExportPolicyModel {
     

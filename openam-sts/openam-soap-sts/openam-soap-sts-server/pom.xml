@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-soap-sts</artifactId>
-        <version>15.2.1-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM SOAP STS Server</name>
@@ -44,7 +44,7 @@
     </build>
 
     <properties>
-        <cxf.version>3.1.16</cxf.version>
+        <cxf.version>4.0.6</cxf.version>
     </properties>
 
     <dependencies>
@@ -68,6 +68,7 @@
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
 		</dependency>
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -109,6 +110,7 @@
             <artifactId>cxf-services-sts-core</artifactId>
             <version>${cxf.version}</version>
         </dependency>
+
         <!--
             the cxf-rt-transports depends on cxf-rt-transports-jetty, which depends on slf4j-api(1.6.2). In some cases,
             cxf does not find a slf4j spi, so defaults to a no-op logger, so I am introducing this dependency.
@@ -118,13 +120,12 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <classifier>no_aop</classifier>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>

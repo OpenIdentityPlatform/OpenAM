@@ -12,14 +12,15 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.scripting.rest.batch.helpers;
 
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

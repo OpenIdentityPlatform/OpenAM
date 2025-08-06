@@ -24,6 +24,7 @@
  *
  * $Id: FSIntersiteTransferService.java,v 1.6 2008/08/29 04:57:16 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -58,11 +59,11 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServlet;
 
 import java.util.logging.Level;
 
@@ -510,7 +511,7 @@ public class FSIntersiteTransferService extends HttpServlet {
     public void doPost(
         HttpServletRequest request, 
         HttpServletResponse response
-    ) throws javax.servlet.ServletException, java.io.IOException 
+    ) throws jakarta.servlet.ServletException, java.io.IOException
     {
         doGet(request, response);
     }

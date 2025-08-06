@@ -25,6 +25,7 @@
  * $Id: SetApplicationPrivilegeSubjects.java,v 1.1 2009/11/10 19:01:04 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli.entitlement;
@@ -47,7 +48,7 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 
 /**

@@ -25,13 +25,14 @@
  * $Id: HomeViewBean.java,v 1.2 2008/06/25 05:43:21 qcheng Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task;
 
 import static com.sun.identity.console.XuiRedirectHelper.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;

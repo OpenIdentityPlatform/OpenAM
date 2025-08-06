@@ -24,6 +24,7 @@
  *
  * $Id: FSWMLPostConsumerHandler.java,v 1.2 2008/06/25 05:47:00 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -35,8 +36,8 @@ import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.FSException;
 import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 

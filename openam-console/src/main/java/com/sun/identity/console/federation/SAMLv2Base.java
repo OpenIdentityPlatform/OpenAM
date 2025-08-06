@@ -25,6 +25,7 @@
  * $Id: SAMLv2Base.java,v 1.8 2008/06/25 05:49:37 qcheng Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class SAMLv2Base extends EntityPropertiesBase {
     protected static final String PROPERTIES = "propertyAttributes";

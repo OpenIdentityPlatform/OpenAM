@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -25,8 +26,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.security.cert.X509Certificate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
@@ -69,7 +70,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
@@ -92,7 +93,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509Certificate x509Certificate2 = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate, x509Certificate2};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
@@ -113,7 +114,7 @@ public class RestAuthX509CallbackHandlerTest {
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{};
 
-        given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
+        given(request.getAttribute("jakarta.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,

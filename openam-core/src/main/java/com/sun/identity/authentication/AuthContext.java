@@ -25,6 +25,7 @@
  * $Id: AuthContext.java,v 1.25 2009/11/21 01:12:59 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication;
 
@@ -64,8 +65,8 @@ import org.w3c.dom.NodeList;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;

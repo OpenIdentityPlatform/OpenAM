@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -19,9 +20,9 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 

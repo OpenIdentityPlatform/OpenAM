@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC.
+ * Portions Copyrighted 2023-2025 3A Systems LLC.
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
@@ -23,7 +23,7 @@ import static org.forgerock.util.query.QueryFilter.lessThanOrEqualTo;
 
 import java.util.Calendar;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;

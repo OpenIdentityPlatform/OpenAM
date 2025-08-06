@@ -25,6 +25,7 @@
  * $Id: UserIdRepo.java,v 1.21 2009/12/23 00:22:34 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -38,7 +39,6 @@ import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.StringUtils;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -65,8 +65,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLContext;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;

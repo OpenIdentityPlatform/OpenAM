@@ -25,6 +25,7 @@
  * $Id: PLLRequestServlet.java,v 1.9 2009/02/12 17:24:13 bina Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.services.comm.server;
 
@@ -43,11 +44,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Hashtable;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 

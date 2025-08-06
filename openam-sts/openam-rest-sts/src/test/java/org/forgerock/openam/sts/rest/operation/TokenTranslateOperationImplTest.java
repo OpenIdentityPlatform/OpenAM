@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.operation;
@@ -40,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

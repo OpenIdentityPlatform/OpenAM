@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.oauth2.restlet;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,7 @@ import org.restlet.Request;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
 import org.restlet.ext.freemarker.TemplateRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;

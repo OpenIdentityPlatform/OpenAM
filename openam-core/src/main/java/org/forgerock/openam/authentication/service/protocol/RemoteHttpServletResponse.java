@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -35,8 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.forgerock.openam.utils.CollectionUtils;
 
 /**
@@ -135,23 +136,23 @@ public class RemoteHttpServletResponse extends RemoteServletResponse implements 
     /**
      * The default behavior of this method is to call encodeUrl(String url)
      * on the wrapped response object. Not Serialized.
-     * 
+     *
      * @return The encoded URL, null if unavailable.
      */
     public String encodeUrl(String url) {
 	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeUrl(url) : null;
     }
-    
+
     /**
      * The default behavior of this method is to return encodeRedirectUrl(String url)
      * on the wrapped response object. Not Serialized.
-     * 
+     *
      * @return The encoded redirect URL, null if not available.
      */
     public String encodeRedirectUrl(String url) {
 	    return this._getHttpServletResponse() != null ? this._getHttpServletResponse().encodeRedirectUrl(url) : null;
     }
-    
+
     /**
      * The default behavior of this method is to call sendError(int sc, String msg)
      * on the wrapped response object. Not serialized.
@@ -345,7 +346,7 @@ public class RemoteHttpServletResponse extends RemoteServletResponse implements 
     /**
      * The default behavior of this method is to call setStatus(int sc, String sm)
      * on the wrapped response object. Not Serialized.
-     * 
+     *
      * @param sc The status code of the response
      */
      public void setStatus(int sc, String sm) {

@@ -21,12 +21,12 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;

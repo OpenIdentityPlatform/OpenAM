@@ -24,6 +24,7 @@
  *
  * $Id: SingleLogoutManager.java,v 1.8 2008/11/10 22:57:00 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -55,8 +56,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;

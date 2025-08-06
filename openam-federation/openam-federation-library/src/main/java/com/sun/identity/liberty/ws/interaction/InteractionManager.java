@@ -25,6 +25,7 @@
  * $Id: InteractionManager.java,v 1.5 2008/08/06 17:28:10 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.interaction;
@@ -69,8 +70,8 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;

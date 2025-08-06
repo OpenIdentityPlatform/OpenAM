@@ -27,7 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2023-2025 3A Systems LLC
  */
 package com.sun.identity.authentication.service;
 
@@ -55,7 +55,7 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.audit.AuditConstants.AuthenticationFailureReason;

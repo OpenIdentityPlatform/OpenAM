@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.agentconfig;
 
@@ -71,7 +72,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import com.sun.identity.console.agentconfig.model.AgentsModel;
 import com.sun.identity.console.agentconfig.model.AgentsModelImpl;
 import com.sun.identity.console.base.AMPostViewBean;

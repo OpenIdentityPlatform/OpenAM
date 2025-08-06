@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A data structure that stores the cumulative count and rate for CTS connections.

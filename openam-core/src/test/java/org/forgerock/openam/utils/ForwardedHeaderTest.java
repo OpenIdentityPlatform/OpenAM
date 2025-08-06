@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.utils;
@@ -21,12 +22,9 @@ import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
-import org.forgerock.openam.services.baseurl.ForwardedHeaderBaseURLProvider;
-import org.forgerock.util.Pair;
 import org.testng.annotations.Test;
 
 public class ForwardedHeaderTest {

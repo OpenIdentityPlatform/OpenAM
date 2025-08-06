@@ -20,6 +20,7 @@
  * "Portions copyright [year] [name of copyright owner]"
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.services.email;
@@ -32,7 +33,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.security.AccessController;
 import java.util.Map;
 import java.util.Set;

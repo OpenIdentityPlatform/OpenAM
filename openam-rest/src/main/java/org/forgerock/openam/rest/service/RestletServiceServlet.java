@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.service;
 
-import org.restlet.ext.servlet.ServerServlet;
+import org.forgerock.openam.rest.jakarta.servlet.ServerServlet;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServlet;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;

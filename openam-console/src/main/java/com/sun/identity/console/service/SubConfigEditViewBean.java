@@ -25,6 +25,7 @@
  * $Id: SubConfigEditViewBean.java,v 1.2 2008/06/25 05:43:17 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -54,7 +55,7 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;

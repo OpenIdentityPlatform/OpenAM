@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.auditors;
@@ -21,7 +22,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.shared.debug.Debug;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
@@ -31,7 +32,7 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
 
 import javax.annotation.Nullable;
-import javax.inject.Named;
+import jakarta.inject.Named;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;

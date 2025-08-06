@@ -25,11 +25,12 @@
  * $Id: RestService.java,v 1.1 2009/12/01 02:09:57 veiming Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 

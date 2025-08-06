@@ -24,6 +24,7 @@
  *
  * $Id: FSIDPFinderService.java,v 1.4 2008/06/25 05:46:58 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -50,10 +51,10 @@ import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
 import com.sun.identity.shared.encode.URLEncDec;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
 
 import java.io.IOException;
 import java.util.Set;

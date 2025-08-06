@@ -24,6 +24,8 @@
  *
  * $Id: IDFFViewBeanBase.java,v 1.5 2008/06/25 05:49:36 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -56,7 +58,7 @@ import com.sun.identity.console.federation.model.IDFFModelImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class IDFFViewBeanBase
     extends EntityPropertiesBase 

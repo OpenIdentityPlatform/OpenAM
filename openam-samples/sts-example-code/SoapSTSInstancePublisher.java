@@ -19,6 +19,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.forgerock.openam.functionaltest.sts.frmwk.soap;
@@ -38,8 +39,8 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;

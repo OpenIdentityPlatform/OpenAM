@@ -24,12 +24,13 @@
  *
  * $Id: AgentShutdownServletContextListener.java,v 1.1 2009/06/19 02:23:15 bigfatrat Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.monitoring;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * The <code>AgentShutdownServletContextListener</code> class is used to

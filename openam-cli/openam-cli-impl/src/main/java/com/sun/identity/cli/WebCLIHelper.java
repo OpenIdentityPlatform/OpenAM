@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.cli;
 
@@ -40,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.owasp.esapi.ESAPI;
 
 /**

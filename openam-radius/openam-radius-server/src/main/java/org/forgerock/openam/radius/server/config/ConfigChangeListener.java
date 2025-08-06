@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.radius.server.config;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfigManager;

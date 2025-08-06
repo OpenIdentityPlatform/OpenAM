@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.saml2;
 
@@ -59,10 +60,10 @@ import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;

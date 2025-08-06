@@ -25,6 +25,7 @@
  * $Id: EntityEditViewBean.java,v 1.11 2009/01/28 05:34:57 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */ 
         
 package com.sun.identity.console.idm;
@@ -60,7 +61,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class EntityEditViewBean
     extends EntityOpViewBeanBase

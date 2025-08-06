@@ -24,6 +24,7 @@
  *
  * $Id: WSSAuthModule.java,v 1.2 2008/11/18 00:02:25 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.modules.wss;
@@ -39,7 +40,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.security.Principal;
 

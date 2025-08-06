@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.tokengeneration.state;
@@ -24,8 +25,8 @@ import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationModule;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * @see STSInstanceStateProvider

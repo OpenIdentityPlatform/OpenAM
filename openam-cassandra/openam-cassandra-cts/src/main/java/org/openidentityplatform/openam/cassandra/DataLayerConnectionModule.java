@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
@@ -90,7 +91,7 @@ public abstract class DataLayerConnectionModule extends org.forgerock.openam.sm.
 	     *  return
 	     */
 	    @SuppressWarnings("rawtypes")
-		protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
+		protected Class<? extends jakarta.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
 	        return DataLayerConnectionFactoryCache.class;
 	    }
 

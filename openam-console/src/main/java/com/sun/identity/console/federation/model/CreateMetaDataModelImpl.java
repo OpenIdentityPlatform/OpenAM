@@ -25,6 +25,7 @@
  * $Id: CreateMetaDataModelImpl.java,v 1.7 2010/01/06 23:11:25 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation.model;
@@ -58,7 +59,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
 
 public class CreateMetaDataModelImpl extends AMModelBase

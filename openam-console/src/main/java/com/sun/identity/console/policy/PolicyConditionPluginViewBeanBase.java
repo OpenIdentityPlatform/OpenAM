@@ -24,6 +24,8 @@
  *
  * $Id: PolicyConditionPluginViewBeanBase.java,v 1.2 2008/06/25 05:43:03 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.policy;
@@ -35,7 +37,7 @@ import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.policy.model.PolicyModelImpl;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class PolicyConditionPluginViewBeanBase
     extends AMViewBeanBase

@@ -25,6 +25,7 @@
  * $Id: AssertionManagerClient.java,v 1.8 2008/08/19 19:11:11 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml;
@@ -107,7 +108,7 @@ public final class AssertionManagerClient {
                     
                 // The following call will throw one of the following
                 // exception if service does not exist or does not have
-                // permissions: javax.xml.soap.SOAPException
+                // permissions: jakarta.xml.soap.SOAPException
                 // java.rmi.RemoteException, java.rmi.ServerException
                 remoteStub.send("checkForLocal", null, null,null);
                 if (isLocal) {

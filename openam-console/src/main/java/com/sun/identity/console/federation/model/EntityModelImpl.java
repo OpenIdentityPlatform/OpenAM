@@ -24,6 +24,8 @@
  *
  * $Id: EntityModelImpl.java,v 1.20 2009/12/25 09:13:22 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation.model;
@@ -38,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaException;

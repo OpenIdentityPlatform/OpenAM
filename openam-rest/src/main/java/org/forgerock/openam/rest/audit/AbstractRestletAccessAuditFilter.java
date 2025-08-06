@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.rest.audit;
 
@@ -24,15 +25,14 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.rest.service.RestletRealmRouter.REALM;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.forgerock.openam.utils.Time.*;
-import static org.restlet.ext.servlet.ServletUtils.getRequest;
+import static org.forgerock.openam.rest.jakarta.servlet.ServletUtils.getRequest;
 
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -40,7 +40,6 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.Status;
 import org.restlet.representation.BufferingRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Filter;

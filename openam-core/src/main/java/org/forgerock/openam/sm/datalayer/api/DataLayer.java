@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.datalayer.api;
@@ -21,7 +22,7 @@ import static java.lang.annotation.RetentionPolicy.*;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 /**
  * An annotation for marking injectable objects as for a specific data layer.

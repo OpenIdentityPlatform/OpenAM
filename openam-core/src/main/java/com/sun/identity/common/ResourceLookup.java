@@ -25,12 +25,12 @@
  * $Id: ResourceLookup.java,v 1.7 2009/05/02 22:12:04 kevinserwin Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.common;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.search.FileLookup;
@@ -40,10 +40,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * ResourceLookup is a partial replacement for implementation of FileLookup. It

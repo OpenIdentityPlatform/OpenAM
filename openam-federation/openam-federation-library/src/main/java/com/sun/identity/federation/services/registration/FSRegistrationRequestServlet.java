@@ -24,6 +24,7 @@
  *
  * $Id: FSRegistrationRequestServlet.java,v 1.4 2008/06/25 05:47:03 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.registration;
@@ -31,11 +32,11 @@ package com.sun.identity.federation.services.registration;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.LogUtil;

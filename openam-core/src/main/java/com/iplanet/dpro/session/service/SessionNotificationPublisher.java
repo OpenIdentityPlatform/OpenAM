@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service;
 
 import static org.forgerock.json.JsonValue.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.notifications.NotificationBroker;

@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -21,7 +22,7 @@ import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;

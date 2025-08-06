@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2010-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.scripting.api.http;
 
 import static org.forgerock.openam.scripting.ScriptConstants.SCRIPTING_HTTP_CLIENT_NAME;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Client;

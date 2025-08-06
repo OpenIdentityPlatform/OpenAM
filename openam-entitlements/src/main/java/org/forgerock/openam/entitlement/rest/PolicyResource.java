@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -79,7 +80,7 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -32,7 +32,7 @@ package com.sun.identity.config.wizard;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;

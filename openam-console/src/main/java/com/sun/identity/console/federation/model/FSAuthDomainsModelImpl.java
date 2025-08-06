@@ -24,6 +24,8 @@
  *
  * $Id: FSAuthDomainsModelImpl.java,v 1.12 2009/11/10 01:19:49 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation.model;
@@ -50,7 +52,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class FSAuthDomainsModelImpl extends AMModelBase
     implements FSAuthDomainsModel 

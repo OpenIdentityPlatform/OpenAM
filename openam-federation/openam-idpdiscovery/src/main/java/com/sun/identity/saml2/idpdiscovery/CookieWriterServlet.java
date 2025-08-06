@@ -24,6 +24,7 @@
  *
  * $Id: CookieWriterServlet.java,v 1.7 2009/11/03 00:50:34 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.idpdiscovery;
@@ -32,12 +33,12 @@ import com.sun.identity.shared.encode.Base64;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.StringTokenizer;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 
 /**
  * The Writer Service is used by the identity provider. After successful 

@@ -24,6 +24,7 @@
  *
  * $Id: RequestHandler.java,v 1.2 2008/06/25 05:48:03 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -32,7 +33,7 @@ package com.sun.identity.saml2.soapbinding;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.RequestAbstract;
 import com.sun.identity.saml2.protocol.Response;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPMessage;
 
 /**
  * The <code>RequestHandler</code> interface needs to be implemented

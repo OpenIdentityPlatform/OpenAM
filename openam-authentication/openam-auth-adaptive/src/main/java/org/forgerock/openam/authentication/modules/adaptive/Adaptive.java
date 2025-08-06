@@ -22,6 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -51,8 +52,8 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;

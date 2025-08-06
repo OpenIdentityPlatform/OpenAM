@@ -25,6 +25,7 @@
  * $Id: ConfigureData.java,v 1.11 2009/05/02 23:05:13 kevinserwin Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -34,7 +35,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -51,7 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * Configures product bootstrap data.

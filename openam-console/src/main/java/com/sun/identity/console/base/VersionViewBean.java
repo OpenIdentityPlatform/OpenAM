@@ -24,6 +24,8 @@
  *
  * $Id: VersionViewBean.java,v 1.2 2008/06/25 05:42:48 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 
@@ -36,7 +38,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMSystemConfig;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class displays the version information page. The version information

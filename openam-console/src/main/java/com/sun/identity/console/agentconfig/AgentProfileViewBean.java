@@ -24,6 +24,8 @@
  *
  * $Id: AgentProfileViewBean.java,v 1.14 2009/11/10 23:20:15 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.agentconfig;
@@ -62,7 +64,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Base class for all agent profile view bean.

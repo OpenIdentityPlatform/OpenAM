@@ -24,6 +24,7 @@
  *
  * $Id: UMUserPasswordResetOptionsViewBean.java,v 1.4 2008/09/22 20:17:37 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.user;
@@ -51,7 +52,7 @@ import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class UMUserPasswordResetOptionsViewBean
     extends RMRealmViewBeanBase

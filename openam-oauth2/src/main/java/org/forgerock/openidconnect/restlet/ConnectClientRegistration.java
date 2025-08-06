@@ -14,6 +14,7 @@
  * Copyright 2012-2016 ForgeRock AS.
  *
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -38,7 +39,7 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Handles requests to the OpenId Connect client registration endpoint for registering and retrieving OpenId Connect

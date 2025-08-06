@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -21,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.verify;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.sso.SSOException;
@@ -34,7 +35,7 @@ import org.restlet.Restlet;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.engine.adapter.HttpRequest;
-import org.restlet.ext.servlet.internal.ServletCall;
+import org.forgerock.openam.rest.jakarta.servlet.internal.ServletCall;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;

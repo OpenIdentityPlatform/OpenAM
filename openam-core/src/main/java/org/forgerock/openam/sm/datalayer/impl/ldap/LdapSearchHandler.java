@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collection;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;

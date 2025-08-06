@@ -33,7 +33,7 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.TokenType;
 
-import javax.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceContext;
 
 import java.security.Principal;
 import java.util.List;

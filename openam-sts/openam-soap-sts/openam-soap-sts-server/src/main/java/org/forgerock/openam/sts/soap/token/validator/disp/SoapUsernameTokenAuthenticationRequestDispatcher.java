@@ -26,8 +26,8 @@ import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.validator.disp.TokenAuthenticationRequestDispatcher;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;

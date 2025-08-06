@@ -25,6 +25,7 @@
  * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.idm;
 
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.callback.Callback;
 
 import org.forgerock.guice.core.InjectorHolder;

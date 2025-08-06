@@ -37,7 +37,7 @@ import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

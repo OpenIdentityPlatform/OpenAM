@@ -24,6 +24,7 @@
  *
  * $Id: FSScoping.java,v 1.2 2008/06/25 05:46:45 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -38,7 +39,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

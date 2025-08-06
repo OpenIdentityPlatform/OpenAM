@@ -11,9 +11,8 @@ import org.forgerock.oauth2.restlet.OAuth2Representation;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openidconnect.CheckSession;
-import org.forgerock.openidconnect.restlet.OpenIDConnectCheckSessionEndpoint;
 import org.restlet.Context;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -25,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Handles requests to the OpenId Connect checkSession endpoint to retrieve the status of OpenId Connect user sessions.

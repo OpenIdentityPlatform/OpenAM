@@ -25,6 +25,7 @@
  * $Id: AuthExceptionViewBean.java,v 1.8 2008/12/24 01:41:51 ericow Exp $
  *
  * Portions Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.UI;
@@ -35,10 +36,10 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;

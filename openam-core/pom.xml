@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2017-2024 3A Systems, LLC
+ * Portions copyright 2017-2025 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.1-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -245,24 +245,27 @@
 
         <!-- View Dependencies -->
         <dependency>
-            <groupId>org.openidentityplatform.openam.shaded</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jato-shaded</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>cc</artifactId>
         </dependency>
 
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
-        <dependency>
-            <groupId>org.apache.click</groupId>
-            <artifactId>click-extras</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.click</groupId>
             <artifactId>click-nodeps</artifactId>
+            <version>${click.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.click</groupId>
+            <artifactId>click-extras</artifactId>
+            <version>${click.version}</version>
         </dependency>
 
         <dependency>
@@ -312,19 +315,28 @@
              <groupId>org.slf4j</groupId>
              <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>jaxrpc-api</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.xml</groupId>-->
+<!--            <artifactId>jaxrpc-api</artifactId>-->
+<!--        </dependency>-->
 
+<!--        <dependency>-->
+<!--&lt;!&ndash;             <groupId>external</groupId> &ndash;&gt;-->
+<!--			<groupId>com.sun.xml.rpc</groupId>-->
+<!--            <artifactId>jaxrpc-impl</artifactId>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.sun.xml.rpc</groupId>-->
+<!--            <artifactId>jaxrpc-spi</artifactId>-->
+<!--        </dependency>-->
         <dependency>
-<!--             <groupId>external</groupId> -->
-			<groupId>com.sun.xml.rpc</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-spi</artifactId>
         </dependency>
 
@@ -355,19 +367,19 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
         </dependency>
 
         <dependency>
@@ -383,7 +395,6 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <classifier>no_aop</classifier>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons.guice</groupId>
@@ -438,18 +449,18 @@
         </dependency>
         
         <!--         java.xml.bind (JAXB) - REMOVED JDK11+ -->
-	    <dependency>
-		  <groupId>javax.xml.bind</groupId>
-		  <artifactId>jaxb-api</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>com.sun.xml.bind</groupId>
-		  <artifactId>jaxb-core</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>com.sun.xml.bind</groupId>
-		  <artifactId>jaxb-impl</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
     </dependencies>
 </project>
 

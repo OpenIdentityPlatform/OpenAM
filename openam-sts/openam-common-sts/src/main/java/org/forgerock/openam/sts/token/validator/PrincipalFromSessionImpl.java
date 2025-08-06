@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS. All rights reserved.
- * Copyright 2019 3A Systems, LLC. All rights reserved.
+ * Portions Copyrighted 2019-2025 3A Systems, LLC. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
@@ -21,7 +21,7 @@ import org.forgerock.openam.sts.TokenValidationException;
 
 import com.iplanet.sso.SSOTokenManager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.Principal;
 
 public class PrincipalFromSessionImpl implements PrincipalFromSession {

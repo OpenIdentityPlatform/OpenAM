@@ -25,6 +25,7 @@
 
 
    Portions copyright 2014-2015 ForgeRock AS.
+   Portions Copyrighted 2025 3A Systems LLC.
 --%>
 
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
@@ -35,7 +36,7 @@
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
 <%@ page import="com.sun.identity.idm.IdRepoException" %>
 <%@ page import="com.sun.identity.idm.IdType" %>
-<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.text.MessageFormat" %>

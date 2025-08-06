@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011-16 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.spi;
@@ -55,7 +56,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;

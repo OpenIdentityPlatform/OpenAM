@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -53,7 +54,7 @@ import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;

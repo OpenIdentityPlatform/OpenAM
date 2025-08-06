@@ -12,17 +12,17 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest;
 
 import static org.forgerock.json.resource.http.HttpUtils.PROTOCOL_VERSION_1;
 
-import javax.mail.internet.MimeUtility;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.mail.internet.MimeUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -78,7 +76,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * A collection of ForgeRock-REST based utility functions.

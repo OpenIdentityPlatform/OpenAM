@@ -25,6 +25,7 @@
  * $Id: AMServiceProfileViewBeanBase.java,v 1.3 2009/11/10 04:16:17 bhavnab Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -53,7 +54,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 public abstract class AMServiceProfileViewBeanBase extends DynamicRequestViewBean {

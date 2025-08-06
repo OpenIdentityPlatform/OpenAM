@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -23,7 +24,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

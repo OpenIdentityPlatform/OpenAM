@@ -13,6 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.guice;
@@ -24,7 +25,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.CollectionResourceProvider;

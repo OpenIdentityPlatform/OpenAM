@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.token.validator;
@@ -28,7 +29,7 @@ import java.security.cert.X509Certificate;
 /**
  * This class is a RestTokenTransformValidator responsible for validating X509 Certificates. It will only pull certificates
  * presented to the rest-sts via two-way tls. These certificates will be obtained from either the
- * javax.servlet.request.X509Certificate in the HttpServletRequest (OpenAM container is supporting two-way tls directly),
+ * jakarta.servlet.request.X509Certificate in the HttpServletRequest (OpenAM container is supporting two-way tls directly),
  * or from a header configured in the RestDeploymentConfig (to support deployments in which OpenAM is deployed behind
  * a tls-offloader). The {@code AuthenticationHandler<X509Certificate>} will ultimately consume the Certificate authN module
  * via 'portal' mode, which is where the Certificate module expects to find the certificate in a header. Thus the
@@ -36,7 +37,7 @@ import java.security.cert.X509Certificate;
  * OIDC token transformations). Note that this is not the same header value configured in the RestDeploymentConfig
  * for rest-sts instances, which specifies the header key where the rest-sts expects to find the client certificate. (The
  * header for the AuthTargetMapping could be re-used for this purpose, but rest-sts instances should be able to unequivocally
- * determine where the user intends the certificate to be found(in a header, or in the javax.servlet.request.X509Certificate
+ * determine where the user intends the certificate to be found(in a header, or in the jakarta.servlet.request.X509Certificate
  * attribute. Because the AuthTargetMapping has to be defined for all X509 token transformations, the presence/absence
  * of this state cannot be used to determine where the rest-sts should find the client's certificate (and simply looking
  * in both places is sloppy/imprecise)).

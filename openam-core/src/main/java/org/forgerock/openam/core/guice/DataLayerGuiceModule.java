@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.core.guice;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;

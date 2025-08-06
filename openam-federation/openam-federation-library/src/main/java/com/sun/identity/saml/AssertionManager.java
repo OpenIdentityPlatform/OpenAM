@@ -25,6 +25,7 @@
  * $Id: AssertionManager.java,v 1.13 2010/01/09 19:41:06 qcheng Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml;
@@ -65,8 +66,8 @@ import com.sun.identity.plugin.monitoring.MonitorManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The class <code>AssertionManager</code> is a <code>final</code> class

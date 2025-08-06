@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.oauth2;
 
@@ -22,9 +23,9 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import java.security.Key;
 import java.security.KeyPair;
@@ -86,7 +87,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.

@@ -24,6 +24,8 @@
  *
  * $Id: HomeViewBean.java,v 1.3 2008/06/25 05:42:44 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 /*
@@ -42,7 +44,7 @@ import com.sun.identity.console.idm.model.EntitiesModelImpl;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.model.CCPageTitleModel;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**

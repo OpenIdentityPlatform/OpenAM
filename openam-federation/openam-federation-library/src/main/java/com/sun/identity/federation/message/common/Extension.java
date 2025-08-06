@@ -24,6 +24,7 @@
  *
  * $Id: Extension.java,v 1.2 2008/06/25 05:46:46 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message.common;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

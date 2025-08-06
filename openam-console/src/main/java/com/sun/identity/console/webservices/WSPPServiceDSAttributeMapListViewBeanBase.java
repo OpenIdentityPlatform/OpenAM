@@ -24,6 +24,7 @@
  *
  * $Id: WSPPServiceDSAttributeMapListViewBeanBase.java,v 1.2 2008/06/25 05:49:50 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.webservices;
@@ -43,7 +44,7 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class WSPPServiceDSAttributeMapListViewBeanBase
     extends AMPrimaryMastHeadViewBean

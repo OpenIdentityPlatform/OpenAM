@@ -25,6 +25,7 @@
  * $Id: PrivilegeRestTest.java,v 1.5 2009/12/15 00:44:20 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
@@ -41,18 +42,18 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
 import java.net.URLEncoder;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import javax.security.auth.Subject;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONArray;

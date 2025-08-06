@@ -14,6 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -52,8 +53,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.api.annotations.Action;
 import org.forgerock.api.annotations.CollectionProvider;
