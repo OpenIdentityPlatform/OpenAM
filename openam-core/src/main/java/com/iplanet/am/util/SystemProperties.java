@@ -48,7 +48,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
-import javax.xml.rpc.holders.StringHolder;
 
 import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
@@ -792,6 +791,13 @@ public class SystemProperties {
 
         PropertiesHolder putAll(Properties newProperties) {
             return new PropertiesHolder(Maps.fromProperties(newProperties));
+        }
+    }
+
+    private static class StringHolder {
+        public String value=null;
+        public StringHolder(String property) {
+            this.value=property;
         }
     }
 }
