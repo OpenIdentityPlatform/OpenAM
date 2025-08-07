@@ -26,6 +26,10 @@
     <groupId>org.openidentityplatform.openam.jakarta</groupId>
     <artifactId>transform-jakarta</artifactId>
     <packaging>pom</packaging>
+
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>${project.groupId}:${project.artifactId}</description>
+
     <modules>
         <module>jaxrpc-parent</module>
         <module>restlet-parent-jakarta</module>
@@ -35,6 +39,8 @@
     </modules>
     <properties>
         <transformer.artifact.groupId>${project.groupId}</transformer.artifact.groupId>
+        <transformer.source.artifact.groupId>${transformer.artifact.groupId}</transformer.source.artifact.groupId>
+        <transformer.javadoc.artifact.groupId>${transformer.artifact.groupId}</transformer.javadoc.artifact.groupId>
     </properties>
     <build>
         <pluginManagement>
@@ -66,7 +72,7 @@
                     <extensions>true</extensions>
                     <executions>
                         <execution>
-                            <id>transform-jakarta</id>
+                            <id>default-jar</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -79,7 +85,7 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>default-jar</id>
+                            <id>transform-jakarta</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -93,6 +99,36 @@
                                     <version>${project.version}</version>
                                 </artifact>
                                 <classifier/>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>javadoc-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${maven.javadoc.skip}</skip>
+                                <artifact>
+                                    <groupId>${transformer.javadoc.artifact.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>>
+                                    <classifier>javadoc</classifier>
+                                </artifact>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>source-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${maven.source.skip}</skip>
+                                <artifact>
+                                    <groupId>${transformer.source.artifact.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>sources</classifier>
+                                </artifact>
                             </configuration>
                         </execution>
                     </executions>

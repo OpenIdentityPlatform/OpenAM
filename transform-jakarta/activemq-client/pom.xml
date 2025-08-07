@@ -25,7 +25,9 @@
     </parent>
 
     <artifactId>activemq-client</artifactId>
-    <version>${activemq.version}</version>
+    <version>5.16.8</version>
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>${project.groupId}:${project.artifactId}</description>
 
     <properties>
         <transformer.artifact.groupId>org.apache.activemq</transformer.artifact.groupId>
