@@ -25,7 +25,9 @@
     </parent>
 
     <artifactId>org.restlet.ext.json</artifactId>
-    <version>${restlet.version}</version>
+    <version>2.4.4</version>
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>${project.groupId}:${project.artifactId}</description>
 
     <build>
         <plugins>

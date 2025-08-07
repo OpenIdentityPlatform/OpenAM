@@ -25,8 +25,12 @@
     </parent>
     <packaging>pom</packaging>
     <artifactId>jaxrpc-parent</artifactId>
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>${project.groupId}:${project.artifactId}</description>
     <properties>
         <transformer.artifact.groupId>com.sun.xml.rpc</transformer.artifact.groupId>
+        <transformer.source.artifact.groupId>${project.groupId}</transformer.source.artifact.groupId>
+        <transformer.javadoc.artifact.groupId>${project.groupId}</transformer.javadoc.artifact.groupId>
     </properties>
 
     <modules>

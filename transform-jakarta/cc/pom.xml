@@ -25,9 +25,13 @@
     </parent>
     <artifactId>cc</artifactId>
     <version>2008-08-08</version>
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>${project.groupId}:${project.artifactId}</description>
 
     <properties>
         <transformer.artifact.groupId>org.openidentityplatform.external.com.sun.web.ui</transformer.artifact.groupId>
+        <transformer.source.artifact.groupId>${project.groupId}</transformer.source.artifact.groupId>
+        <transformer.javadoc.artifact.groupId>${project.groupId}</transformer.javadoc.artifact.groupId>
     </properties>
 
     <build>
