@@ -25,9 +25,8 @@
     </parent>
 
     <artifactId>jaxrpc-spi</artifactId>
-    <version>1.1.3_01</version>
+    <version>${jaxrpc-spi.version}</version>
     <name>${project.groupId}.${project.artifactId}</name>
-    <description>${project.groupId}:${project.artifactId}</description>
 
     <build>
         <plugins>

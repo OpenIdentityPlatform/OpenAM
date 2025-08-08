@@ -25,9 +25,9 @@
     </parent>
 
     <artifactId>org.restlet</artifactId>
-    <version>2.4.4</version>
+    <version>${restlet.version}</version>
+
     <name>${project.groupId}.${project.artifactId}</name>
-    <description>${project.groupId}:${project.artifactId}</description>
 
     <build>
         <plugins>

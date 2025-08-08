@@ -27,7 +27,7 @@
     <artifactId>jato-shaded</artifactId>
     <version>2005-05-04</version>
     <name>${project.groupId}.${project.artifactId}</name>
-    <description>${project.groupId}:${project.artifactId}</description>
+
 
     <properties>
         <transformer.artifact.groupId>org.openidentityplatform.external.com.iplanet.jato</transformer.artifact.groupId>
