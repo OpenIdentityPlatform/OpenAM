@@ -1210,6 +1210,12 @@
         <groupId>org.openidentityplatform.openam.shaded</groupId>
         <artifactId>jato-shaded</artifactId>
         <version>${project.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
+            <artifactId>jato</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.external.com.sun.web.ui</groupId>
