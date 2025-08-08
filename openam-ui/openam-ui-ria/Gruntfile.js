@@ -374,8 +374,7 @@ module.exports = function (grunt) {
         "less",
         "replace",
         "copy:compiled",
-        "copy:transpiled",
-        "karma:build"
+        "copy:transpiled"
     ]);
 
     grunt.registerTask("dev", ["copy:compose", "babel", "deploy", "watch"]);
