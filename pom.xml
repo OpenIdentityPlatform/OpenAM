@@ -230,6 +230,17 @@
                       <excludeArtifacts>
                         <!--very large for central may cause broken pipe error-->
                         <excludeArtifact>openam-distribution-kit</excludeArtifact>
+                        <!--ignore jakarta converted artifacts-->
+                        <excludeArtifact>activemq-client</excludeArtifact>
+                        <excludeArtifact>cc</excludeArtifact>
+                        <excludeArtifact>jato-shaded</excludeArtifact>
+                        <excludeArtifact>jaxrpc-impl</excludeArtifact>
+                        <excludeArtifact>jaxrpc-spi</excludeArtifact>
+                        <excludeArtifact>org.restlet</excludeArtifact>
+                        <excludeArtifact>org.restlet.ext.jackson</excludeArtifact>
+                        <excludeArtifact>org.restlet.ext.json</excludeArtifact>
+                        <excludeArtifact>org.restlet.ext.servlet</excludeArtifact>
+                        <excludeArtifact>org.restlet.ext.xml</excludeArtifact>
                       </excludeArtifacts>
                   </configuration>
 			    </plugin>
