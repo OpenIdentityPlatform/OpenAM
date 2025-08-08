@@ -9,7 +9,7 @@
     "jsdoc": "jsdoc --configure config/jsdoc/configuration.json",
     "start": "grunt",
     "build:production": "cross-env NODE_ENV=production grunt prod --verbose",
-    "test": "grunt karma:dev",
+    "test": "grunt karma:build",
     "predeps": "npm run clean:deps -s",
     "deps": "ncu -u && mvn clean install",
     "postdeps": "npm shrinkwrap --dev"
