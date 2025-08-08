@@ -39,8 +39,6 @@
     </modules>
     <properties>
         <transformer.artifact.groupId>${project.groupId}</transformer.artifact.groupId>
-        <transformer.source.artifact.groupId>${transformer.artifact.groupId}</transformer.source.artifact.groupId>
-        <transformer.javadoc.artifact.groupId>${transformer.artifact.groupId}</transformer.javadoc.artifact.groupId>
     </properties>
     <build>
         <pluginManagement>
@@ -99,36 +97,6 @@
                                     <version>${project.version}</version>
                                 </artifact>
                                 <classifier/>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>javadoc-jar</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${maven.javadoc.skip}</skip>
-                                <artifact>
-                                    <groupId>${transformer.javadoc.artifact.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>>
-                                    <classifier>javadoc</classifier>
-                                </artifact>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>source-jar</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${maven.source.skip}</skip>
-                                <artifact>
-                                    <groupId>${transformer.source.artifact.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                    <classifier>sources</classifier>
-                                </artifact>
                             </configuration>
                         </execution>
                     </executions>
