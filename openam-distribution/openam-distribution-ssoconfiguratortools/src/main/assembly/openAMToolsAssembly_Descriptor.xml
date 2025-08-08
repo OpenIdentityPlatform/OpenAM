@@ -47,8 +47,6 @@
                 <include>org.openidentityplatform.openam:openam-installer-utils</include>
             </includes>
 		</dependencySet>
-	</dependencySets>
-    <dependencySets>
         <dependencySet>
             <outputDirectory></outputDirectory>
             <includes>
