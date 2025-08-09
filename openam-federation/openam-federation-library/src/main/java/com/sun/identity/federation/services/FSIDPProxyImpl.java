@@ -24,6 +24,7 @@
  *
  * $Id: FSIDPProxyImpl.java,v 1.3 2008/06/25 05:46:54 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -38,8 +39,8 @@ import com.sun.identity.federation.services.util.FSServiceUtils;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.FSRedirectException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 

@@ -24,6 +24,8 @@
  *
  * $Id: SecurityTokenServiceModelImpl.java,v 1.2 2008/08/15 23:11:17 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 package com.sun.identity.console.service.model;
 
@@ -33,7 +35,7 @@ import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SecurityTokenServiceModelImpl
         extends AMServiceProfileModelImpl

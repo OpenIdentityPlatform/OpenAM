@@ -25,6 +25,7 @@
  * $Id: XACMLAuthzDecisionQueryHandler.java,v 1.6 2008/06/25 05:50:16 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.xacml.plugins;
@@ -49,7 +50,7 @@ import com.sun.identity.xacml.context.Resource;
 import com.sun.identity.xacml.saml2.XACMLAuthzDecisionQuery;
 import com.sun.identity.xacml.saml2.XACMLAuthzDecisionStatement;
 
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPMessage;
 
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Assertion;

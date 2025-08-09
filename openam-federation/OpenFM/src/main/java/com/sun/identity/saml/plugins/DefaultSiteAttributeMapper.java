@@ -24,6 +24,7 @@
  *
  * $Id: DefaultSiteAttributeMapper.java,v 1.2 2009/01/08 04:29:00 hengming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -36,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.util.ISAuthConstants;

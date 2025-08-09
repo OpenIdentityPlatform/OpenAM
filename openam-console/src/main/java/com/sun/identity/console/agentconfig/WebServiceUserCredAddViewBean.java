@@ -24,6 +24,8 @@
  *
  * $Id: WebServiceUserCredAddViewBean.java,v 1.3 2008/11/24 21:36:49 farble1670 Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.agentconfig;
@@ -46,7 +48,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * View Bean to create new User Credential entry.

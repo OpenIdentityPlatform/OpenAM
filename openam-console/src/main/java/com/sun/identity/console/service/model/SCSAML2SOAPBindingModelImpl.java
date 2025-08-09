@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2014 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service.model;
@@ -38,7 +39,7 @@ import com.sun.identity.console.base.model.AMServiceProfileModel;
 import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
 import com.sun.identity.console.property.PropertyXMLBuilder;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - NEED NOT LOG - */
 

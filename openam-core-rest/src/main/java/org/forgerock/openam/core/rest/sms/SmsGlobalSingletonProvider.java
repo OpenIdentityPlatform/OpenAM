@@ -12,13 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
 
-import static org.forgerock.api.enums.CreateMode.ID_FROM_CLIENT;
-import static org.forgerock.api.models.Create.create;
-import static org.forgerock.api.models.Delete.delete;
 import static org.forgerock.api.models.Read.read;
 import static org.forgerock.api.models.Update.update;
 
@@ -28,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.api.annotations.Handler;
 import org.forgerock.api.annotations.Operation;

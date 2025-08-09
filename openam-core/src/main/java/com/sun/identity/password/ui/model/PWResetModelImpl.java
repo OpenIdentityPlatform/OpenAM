@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.password.ui.model;
 
@@ -53,7 +54,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 /**
  * <code>PWResetModelImpl</code> defines the basic and commonly used 

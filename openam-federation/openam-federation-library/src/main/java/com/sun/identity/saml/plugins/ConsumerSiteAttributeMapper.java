@@ -24,14 +24,15 @@
  *
  * $Id: ConsumerSiteAttributeMapper.java,v 1.3 2009/01/21 19:04:34 weisun2 Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
 package com.sun.identity.saml.plugins;
 
 import com.sun.identity.saml.common.SAMLException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

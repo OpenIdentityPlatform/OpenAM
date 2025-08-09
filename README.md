@@ -48,7 +48,7 @@ This project is licensed under the [Common Development and Distribution License 
   * [IIS  Windows x32/x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)
 
 ## How-to Build OpenAM from Source
-To build OpenAM from source you should use JDK 8 or higher
+To build OpenAM from source you should use JDK 11 or higher
 
 For Windows users before clone and build run the following command:
 ```bash

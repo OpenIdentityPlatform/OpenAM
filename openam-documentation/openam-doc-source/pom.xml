@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>15.2.1-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM Server Documentation Sources</name>
@@ -74,7 +74,6 @@
                     <family>unix</family>
                     <name>Linux</name>
                 </os>
-                <jdk>1.8</jdk>
             </activation>
             <build>
                 <plugins>

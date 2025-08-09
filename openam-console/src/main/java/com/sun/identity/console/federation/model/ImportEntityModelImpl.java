@@ -25,6 +25,7 @@
  * $Id: ImportEntityModelImpl.java,v 1.11 2009/11/10 01:19:49 exu Exp $
  *
  * Portions Copyrighted 2012-2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.federation.model;
 
@@ -46,7 +47,7 @@ import com.sun.identity.workflow.WorkflowException;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
 
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;

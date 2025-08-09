@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Copyright 2019 3A Systems, LLC
+ * Portions Copyrighted 2019-2025 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.token.provider;
@@ -32,8 +32,8 @@ import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocat
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

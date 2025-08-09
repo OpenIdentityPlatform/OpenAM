@@ -31,10 +31,9 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-	<repositories>
-		<repository>
+	<dependencySets>
+		<dependencySet>
 			<outputDirectory>lib</outputDirectory>
-			<includeMetadata>false</includeMetadata>
 			<includes>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>org.openidentityplatform.commons.guice:core</include>
@@ -47,9 +46,7 @@
                 <include>org.openidentityplatform.openam:openam-license-core</include>
                 <include>org.openidentityplatform.openam:openam-installer-utils</include>
             </includes>
-		</repository>
-	</repositories>
-    <dependencySets>
+		</dependencySet>
         <dependencySet>
             <outputDirectory></outputDirectory>
             <includes>

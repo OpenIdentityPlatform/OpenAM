@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: HttpServletRequestWrapperEx.java,v 1.2 2009/11/12 18:37:35 veiming Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
 
 import java.security.Principal;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 /**
  */

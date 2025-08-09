@@ -24,6 +24,8 @@
  *
  * $Id: FSSAMLSetTrustedPartnerTypeViewBean.java,v 1.2 2008/06/25 05:49:34 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -43,7 +45,7 @@ import com.sun.web.ui.view.html.CCCheckBox;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class FSSAMLSetTrustedPartnerTypeViewBean
     extends FSSAMLSelectTrustedPartnerTypeViewBean {

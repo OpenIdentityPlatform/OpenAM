@@ -24,6 +24,7 @@
  *
  * $Id: CookieUtils.java,v 1.3 2008/06/25 05:41:41 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.services.util;
@@ -36,8 +37,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Implements utility methods for handling Cookie.

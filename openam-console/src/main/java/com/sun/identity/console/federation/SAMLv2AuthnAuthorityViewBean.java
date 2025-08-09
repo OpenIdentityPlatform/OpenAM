@@ -24,6 +24,8 @@
  *
  * $Id: SAMLv2AuthnAuthorityViewBean.java,v 1.3 2008/06/25 05:49:37 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -36,7 +38,7 @@ import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.federation.model.SAMLv2Model;
 import com.sun.web.ui.view.alert.CCAlert;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import com.sun.identity.console.base.model.AMConsoleException;
 import java.util.Map;
 import java.util.HashMap;

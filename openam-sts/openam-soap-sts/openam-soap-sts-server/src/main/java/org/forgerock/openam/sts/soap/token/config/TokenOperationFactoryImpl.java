@@ -17,8 +17,8 @@
 
 package org.forgerock.openam.sts.soap.token.config;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import com.google.inject.Provider;
 import org.apache.cxf.sts.token.canceller.TokenCanceller;

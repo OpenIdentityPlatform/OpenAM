@@ -23,15 +23,17 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CCUnOrderedListTag.java,v 1.1 2008/07/02 17:21:46 veiming Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.ui.taglib;
 
 import com.iplanet.jato.view.View;
 import com.sun.web.ui.taglib.editablelist.CCEditableListTag;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.Tag;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.tagext.Tag;
 
 /**
  * This is the corresponding tag for <code>CCUnOrderedListView</code>.

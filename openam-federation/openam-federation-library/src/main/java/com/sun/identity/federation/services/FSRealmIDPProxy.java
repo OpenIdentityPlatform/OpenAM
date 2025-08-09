@@ -24,6 +24,7 @@
  *
  * $Id: FSRealmIDPProxy.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -31,8 +32,8 @@ package com.sun.identity.federation.services;
 
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.common.FSRedirectException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This interface <code>FSRealmIDPProxy</code> is used to find a preferred 

@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Portions Copyrighted 2025 3A Systems LLC
  */
 
 package org.slf4j.impl;
@@ -24,6 +25,11 @@ TODO: look into the REQUESTED_API_VERSION string to participate in the slf4j ver
 included as we don't want to update the code when we move to a newer version of slf4j. Not having the version string
 means that we might skew with slf4j-api updates. See http://slf4j.org/faq.html, version check mechanism section.
  */
+
+/**
+ * @deprecated use {@link org.forgerock.openam.slf4j.OpenAMServiceProvider}
+ */
+@Deprecated
 public class StaticLoggerBinder implements LoggerFactoryBinder {
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
     public static final StaticLoggerBinder getSingleton() {

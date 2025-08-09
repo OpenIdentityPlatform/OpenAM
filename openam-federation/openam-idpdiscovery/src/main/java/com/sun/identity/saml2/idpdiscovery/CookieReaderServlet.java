@@ -24,16 +24,17 @@
  *
  * $Id: CookieReaderServlet.java,v 1.4 2009/03/26 19:41:29 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletConfig;
 
 /**
  * The Reader Service is used by the service provider. The service provider

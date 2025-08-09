@@ -25,6 +25,7 @@
  * $Id: CreateFedlet.java,v 1.20 2010/01/08 22:41:43 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.workflow;
@@ -61,7 +62,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;

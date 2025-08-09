@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RestNoSubjectHeaderTest.java,v 1.2 2009/11/25 18:09:51 veiming Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
@@ -33,11 +35,11 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import java.net.URLEncoder;
 import java.security.AccessController;
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

@@ -13,6 +13,7 @@
  *
  * Copyright 2016 ForgeRock AS.
  * Portions Copyrighted 2022 Open Identity Platform Community
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.session.service.access.persistence;
@@ -32,8 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 import com.iplanet.services.naming.URLNotFoundException;

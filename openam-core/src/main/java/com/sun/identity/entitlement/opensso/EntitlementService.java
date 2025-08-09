@@ -25,6 +25,7 @@
  * $Id: EntitlementService.java,v 1.13 2010/01/08 23:59:32 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 
 import org.forgerock.json.JsonValue;

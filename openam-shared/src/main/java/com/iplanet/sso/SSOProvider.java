@@ -25,6 +25,7 @@
  * $Id: SSOProvider.java,v 1.2 2008/06/25 05:41:42 qcheng Exp $
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.sso;
@@ -32,7 +33,7 @@ package com.iplanet.sso;
 import java.security.Principal;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * <code>SSOProvider</code> is the interface that the SSO providers or the

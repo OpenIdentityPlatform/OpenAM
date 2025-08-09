@@ -25,6 +25,7 @@
  * $Id: ServiceXMLTemplates.java,v 1.2 2009/05/02 23:07:18 kevinserwin Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -37,7 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Set;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * This utility class manages service XML template files.

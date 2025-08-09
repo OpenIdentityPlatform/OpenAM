@@ -25,6 +25,7 @@
  * $Id: WSFedPropertiesModelImpl.java,v 1.14 2009/11/10 01:19:50 exu Exp $
  *
  * Portions copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -50,7 +51,7 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

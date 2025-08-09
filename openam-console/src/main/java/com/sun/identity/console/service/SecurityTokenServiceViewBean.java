@@ -24,6 +24,7 @@
  *
  * $Id: SecurityTokenServiceViewBean.java,v 1.6 2009/12/19 02:17:03 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.service;
 
@@ -50,7 +51,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SecurityTokenServiceViewBean
         extends AMServiceProfileViewBeanBase {

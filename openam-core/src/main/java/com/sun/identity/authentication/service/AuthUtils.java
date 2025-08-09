@@ -25,6 +25,7 @@
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.service;
 
@@ -40,9 +41,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionServiceURLService;

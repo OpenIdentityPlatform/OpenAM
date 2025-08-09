@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2023 Open Identity Platform Community.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.authentication.modules;
@@ -32,8 +33,8 @@ import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import jcifs.ntlmssp.Type1Message;
 import jcifs.ntlmssp.Type2Message;

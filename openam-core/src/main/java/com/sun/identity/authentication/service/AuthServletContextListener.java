@@ -25,12 +25,13 @@
  * $Id: AuthServletContextListener.java,v 1.1 2009/12/14 23:40:35 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.service;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * The <code>AuthServletContextListener</code> class is used to reset the

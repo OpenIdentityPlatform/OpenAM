@@ -24,6 +24,7 @@
  *
  * $Id: IDPSSOUtil.java,v 1.3 2009/10/28 23:58:59 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -44,7 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The utility class is used by the identity provider to process 

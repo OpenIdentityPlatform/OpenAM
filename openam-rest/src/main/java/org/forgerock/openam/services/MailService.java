@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.services;
 
@@ -21,8 +22,8 @@ import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.utils.StringUtils.isBlank;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import javax.inject.Inject;
-import javax.mail.MessagingException;
+import jakarta.inject.Inject;
+import jakarta.mail.MessagingException;
 import java.util.Map;
 import java.util.Set;
 

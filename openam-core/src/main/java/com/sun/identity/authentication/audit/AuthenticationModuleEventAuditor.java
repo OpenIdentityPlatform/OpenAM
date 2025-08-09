@@ -12,11 +12,10 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.audit;
 
-import static com.sun.identity.authentication.util.ISAuthConstants.SHARED_STATE_USERNAME;
-import static java.util.Collections.emptyMap;
 import static org.forgerock.audit.events.AuthenticationAuditEventBuilder.Status.*;
 import static org.forgerock.openam.audit.AuditConstants.AUTHENTICATION_TOPIC;
 import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
@@ -24,7 +23,6 @@ import static org.forgerock.openam.audit.AuditConstants.EntriesInfoFieldKey.AUTH
 import static org.forgerock.openam.audit.AuditConstants.EventName.AM_LOGIN_MODULE_COMPLETED;
 import static org.forgerock.openam.audit.AuditConstants.LOGIN_MODULE_CONTROL_FLAG;
 import static org.forgerock.openam.audit.context.AuditRequestContext.getTransactionIdValue;
-import static org.forgerock.openam.utils.StringUtils.isEmpty;
 import static org.forgerock.openam.utils.StringUtils.isNotEmpty;
 
 import com.sun.identity.authentication.service.LoginState;
@@ -35,9 +33,8 @@ import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.Principal;
-import java.util.Map;
 
 /**
  * This auditor is specifically aimed at constructing and logging authentication events for login modules.
