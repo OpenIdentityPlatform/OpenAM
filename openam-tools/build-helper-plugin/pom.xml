@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-tools</artifactId>
-        <version>15.2.1</version>
+        <version>15.2.2-SNAPSHOT</version>
     </parent>
     <groupId>org.openidentityplatform.maven.plugins</groupId>
     <artifactId>build-helper-plugin</artifactId>
