@@ -1167,6 +1167,12 @@
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jato-shaded</artifactId>
         <version>2005-05-04</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
+            <artifactId>jato</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>

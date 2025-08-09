@@ -61,6 +61,7 @@
                     <createDependencyReducedPom>true</createDependencyReducedPom>
                     <shadeSourcesContent>true</shadeSourcesContent>
                     <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                    <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
                 </configuration>
             </plugin>
         </plugins>
