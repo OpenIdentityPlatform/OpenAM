@@ -1,4 +1,4 @@
-FROM tomcat:10-jre21
+FROM tomcat:11-jre21
 
 LABEL org.opencontainers.image.authors="Open Identity Platform Community"
 
