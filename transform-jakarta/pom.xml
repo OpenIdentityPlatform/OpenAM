@@ -45,20 +45,23 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
+                    <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <phase>package</phase>
+                            <id>unpack</id>
+                            <phase>process-classes</phase>
                             <goals>
-                                <goal>shade</goal>
+                                <goal>unpack</goal>
                             </goals>
                             <configuration>
-                                <shadedClassifierName>jakarta</shadedClassifierName>
-                                <shadedArtifactAttached>true</shadedArtifactAttached>
-                                <transformers>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"/>
-                                </transformers>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>${transformer.artifact.groupId}</groupId>
+                                        <artifactId>${project.artifactId}</artifactId>
+                                        <version>${project.version}</version>
+                                        <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                    </artifactItem>
+                                </artifactItems>
                             </configuration>
                         </execution>
                     </executions>
@@ -67,37 +70,17 @@
                     <groupId>org.eclipse.transformer</groupId>
                     <artifactId>transformer-maven-plugin</artifactId>
                     <version>0.5.0</version>
-                    <extensions>true</extensions>
+                    <configuration>
+                        <rules>
+                            <jakartaDefaults>true</jakartaDefaults>
+                        </rules>
+                    </configuration>
                     <executions>
                         <execution>
-                            <id>default-jar</id>
+                            <id>default-transform</id>
                             <goals>
-                                <goal>jar</goal>
+                                <goal>transform</goal>
                             </goals>
-                            <configuration>
-                                <artifact>
-                                    <groupId>${transformer.artifact.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>transform-jakarta</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
-                                    <jakartaDefaults>true</jakartaDefaults>
-                                </rules>
-                                <artifact>
-                                    <groupId>${transformer.artifact.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </artifact>
-                                <classifier/>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -108,6 +91,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
-
 </project>
