@@ -36,6 +36,7 @@
 		<dependencySet>
 <!--            <unpack>true</unpack>-->
 			<outputDirectory>lib</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
 			<includes>
                 <include>com.google.inject:guice:jar</include>
                 <include>aopalliance:aopalliance</include>
