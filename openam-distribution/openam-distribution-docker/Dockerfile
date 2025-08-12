@@ -17,7 +17,7 @@ RUN mkdir /usr/openam \
 
 #COPY openam-server/target/OpenAM-*.war $CATALINA_HOME/webapps/$OPENAM_PATH.war
 #COPY openam-distribution/openam-distribution-ssoadmintools/target/*.zip /usr/openam/ssoadmintools.zip
-#COPY openam-distribution/openam-distribution-ssoadmintools/target/*.war /usr/openam/ssoconfiguratortools.war
+#COPY openam-distribution/openam-distribution-ssoconfiguratortools/target/*.zip /usr/openam/ssoconfiguratortools.zip
 
 RUN if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists; fi
 
