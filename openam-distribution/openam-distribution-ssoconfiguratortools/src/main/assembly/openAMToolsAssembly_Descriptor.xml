@@ -29,16 +29,21 @@
     <id>openam-ssoConfiguratorTools</id>
     <formats>
         <format>zip</format>
+        <format>dir</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
 		<dependencySet>
+<!--            <unpack>true</unpack>-->
 			<outputDirectory>lib</outputDirectory>
 			<includes>
-                <include>com.google.inject:guice:jar:no_aop</include>
+                <include>com.google.inject:guice:jar</include>
+                <include>aopalliance:aopalliance</include>
+                <include>com.google.guava:guava</include>
+                <include>com.google.guava:failureaccess</include>
                 <include>org.openidentityplatform.commons.guice:core</include>
                 <include>org.openidentityplatform.openam:openam-license-manager-cli</include>
-                <include>org.apache.servicemix.bundles:org.apache.servicemix.bundles.javax-inject</include>
+                <include>jakarta.inject:jakarta.inject-api</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:slf4j-nop</include>
                 <include>org.apache.commons:commons-lang3</include>

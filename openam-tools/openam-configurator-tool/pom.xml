@@ -43,7 +43,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<useRepositoryLayout>true</useRepositoryLayout>
+							<useRepositoryLayout>false</useRepositoryLayout>
 						</configuration>
                     </execution>
                 </executions>
@@ -58,7 +58,7 @@
                             
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-              				<classpathLayoutType>repository</classpathLayoutType>
+              				<classpathLayoutType>simple</classpathLayoutType>
               				<useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
