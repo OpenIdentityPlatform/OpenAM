@@ -24,6 +24,7 @@
  *
  * $Id: LibertyManager.java,v 1.7 2008/06/25 05:48:17 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -39,10 +40,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPMessage;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
@@ -2147,7 +2148,7 @@ public class LibertyManager {
         } catch (java.io.IOException ioe) {
             debug.error(classMethod, ioe);
             return null;
-        } catch (javax.xml.soap.SOAPException soape) {
+        } catch (jakarta.xml.soap.SOAPException soape) {
             debug.error(classMethod, soape);
             return null;
         }            

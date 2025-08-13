@@ -25,6 +25,7 @@
  * $Id: AMPrimaryMastHeadViewBean.java,v 1.11 2009/08/18 22:38:10 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.base;
 
@@ -58,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.text.MessageFormat;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.owasp.esapi.ESAPI;
 
 /**

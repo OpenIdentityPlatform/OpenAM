@@ -24,6 +24,8 @@
  *
  * $Id: EndUserViewBean.java,v 1.4 2008/09/04 23:59:36 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.idm;
@@ -42,7 +44,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.web.ui.model.CCPageTitleModel;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class EndUserViewBean
     extends EntityEditViewBean

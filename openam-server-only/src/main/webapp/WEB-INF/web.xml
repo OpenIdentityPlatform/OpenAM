@@ -351,7 +351,7 @@
 
     <servlet>
         <servlet-name>click-servlet</servlet-name>
-        <servlet-class>org.apache.click.ClickServlet</servlet-class>
+        <servlet-class>org.openidentityplatform.openam.click.ClickServlet</servlet-class>
     </servlet>
 
     <servlet>

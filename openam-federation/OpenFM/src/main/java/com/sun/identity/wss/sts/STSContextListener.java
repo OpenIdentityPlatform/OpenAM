@@ -24,15 +24,16 @@
  *
  * $Id: STSContextListener.java,v 1.5 2008/06/25 05:50:12 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.sts;
 
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletContextAttributeListener;
-import javax.servlet.ServletContextAttributeEvent;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextAttributeListener;
+import jakarta.servlet.ServletContextAttributeEvent;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContext;
 import java.net.URLClassLoader;
 import com.sun.identity.classloader.FAMClassLoader;
 import java.lang.reflect.Method;
@@ -71,7 +72,7 @@ public class STSContextListener
             stsContextListener = cls.loadClass(
               "com.sun.xml.ws.transport.http.servlet.WSServletContextListener");
             Class clsa[] = new Class[1];
-            clsa[0] = Class.forName("javax.servlet.ServletContextEvent");
+            clsa[0] = Class.forName("jakarta.servlet.ServletContextEvent");
             ctxDestroyed = 
                  stsContextListener.getDeclaredMethod("contextDestroyed", clsa);
             
@@ -97,7 +98,7 @@ public class STSContextListener
             stsContextListener = cls.loadClass(
               "com.sun.xml.ws.transport.http.servlet.WSServletContextListener");
             Class clsa[] = new Class[1];
-            clsa[0] = Class.forName("javax.servlet.ServletContextEvent");
+            clsa[0] = Class.forName("jakarta.servlet.ServletContextEvent");
             ctxInitialized = 
                stsContextListener.getDeclaredMethod("contextInitialized", clsa);
             

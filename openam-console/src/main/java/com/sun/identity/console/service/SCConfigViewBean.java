@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.service;
 
@@ -47,7 +48,7 @@ import com.sun.web.ui.model.CCPropertySheetModel;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.propertysheet.CCPropertySheet;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class SCConfigViewBean extends AMPrimaryMastHeadViewBean {
 

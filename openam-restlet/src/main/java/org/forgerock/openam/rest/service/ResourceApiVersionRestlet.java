@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.service;
 
 import static org.forgerock.http.routing.RouteMatchers.resourceApiVersionMatcher;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.http.ApiProducer;
 import org.forgerock.services.context.Context;
@@ -30,7 +31,7 @@ import org.forgerock.services.routing.RouteMatcher;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 public final class ResourceApiVersionRestlet extends Restlet {
 

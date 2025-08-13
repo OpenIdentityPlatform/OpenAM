@@ -32,7 +32,7 @@ package com.sun.identity.config;
 import com.sun.identity.config.util.TemplatedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 import org.forgerock.openam.upgrade.VersionUtils;
 
 public class Options extends TemplatedPage {

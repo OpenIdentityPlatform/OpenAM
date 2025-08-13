@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.install.tools.admin;
@@ -42,7 +43,7 @@ import org.forgerock.openam.license.MissingLicenseException;
 import org.forgerock.openam.license.PersistentLicenseLocator;
 import org.forgerock.openam.license.User;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Checks whether the user has accepted the license terms, and if not, presents them to the user (on the CLI) to

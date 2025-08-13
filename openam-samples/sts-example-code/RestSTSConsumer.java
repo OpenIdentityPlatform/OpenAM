@@ -19,6 +19,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.forgerock.openam.functionaltest.sts.frmwk.rest;
@@ -49,7 +50,7 @@ import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.util.encode.Base64;
  
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -298,7 +299,7 @@ public class RestSTSConsumer {
      * must also be configured to trust the host running this test, and must be configured to reference the client's certificate
      * in the header specified by stsClientCertHeaderName (unless the rest-sts is being consumed via two-way-tls, in which
      * case the stsClientCertHeaderName is irrelevant, as the rest-sts will reference the client's certificate via the
-     * javax.servlet.request.X509Certificate ServletRequest attribute.
+     * jakarta.servlet.request.X509Certificate ServletRequest attribute.
      * @param subjectConfirmation The SAML2 SubjectConfirmation. For HoK, the certificate in the file /cert.jks on the
      *                            classpath will be included.
      * @param stsClientCertHeaderName The header name specification of where the published sts expects to find the client

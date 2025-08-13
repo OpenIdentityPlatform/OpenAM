@@ -24,6 +24,8 @@
  *
  * $Id: IDFFIDPViewBean.java,v 1.12 2008/10/24 00:11:56 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 package com.sun.identity.console.federation;
 
@@ -48,7 +50,7 @@ import com.sun.web.ui.view.table.CCActionTable;
 
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class IDFFIDPViewBean
         extends IDFFViewBeanBase {

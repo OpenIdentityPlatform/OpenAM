@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  * Copyright 2016 Agile Digital Engineering
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -30,7 +31,7 @@ import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerIntercept
 import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisher;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;

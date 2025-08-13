@@ -24,14 +24,14 @@
  *
  * $Id: ConfigurationFileLocator.java,v 1.2 2008/06/25 05:53:00 qcheng Exp $
  *
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.shared.configuration;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * This class provides method to locate configuration file.

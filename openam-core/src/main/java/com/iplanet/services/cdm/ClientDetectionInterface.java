@@ -24,11 +24,12 @@
  *
  * $Id: ClientDetectionInterface.java,v 1.3 2008/06/25 05:41:32 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.services.cdm;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The <code>ClientDetectionInterface</code> interface needs to be implemented

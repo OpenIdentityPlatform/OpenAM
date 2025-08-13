@@ -18,7 +18,7 @@
 package org.forgerock.openam.sts.soap.token.provider.saml2;
 
 import org.apache.cxf.sts.STSConstants;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.wss4j.dom.WSConstants;
@@ -268,7 +268,7 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
      * state cannot be successfully constructed.
      */
     private ProofTokenState getProofTokenState(TokenProviderParameters tokenProviderParameters) throws AMSTSRuntimeException {
-        ReceivedKey receivedKey = tokenProviderParameters.getKeyRequirements().getReceivedKey();
+        ReceivedCredential receivedKey = tokenProviderParameters.getKeyRequirements().getReceivedCredential();
         X509Certificate certificate = receivedKey.getX509Cert();
         if (certificate == null) {
             String exceptionMessage = "The ReceivedKey instance in the KeyRequirements has a null X509Cert. Thus the " +

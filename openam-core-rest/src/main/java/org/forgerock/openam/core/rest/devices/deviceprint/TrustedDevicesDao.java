@@ -13,11 +13,12 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.devices.deviceprint;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.UserDevicesDao;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.deviceprint.TrustedDeviceService;

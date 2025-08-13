@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oidc;
@@ -23,7 +24,7 @@ import com.sun.identity.common.HttpURLConnectionManager;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolverFactory;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @GuiceModule
 public class OpenIdConnectGuiceModule extends AbstractModule {

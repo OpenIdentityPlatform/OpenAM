@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -21,8 +22,8 @@ import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ISS;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

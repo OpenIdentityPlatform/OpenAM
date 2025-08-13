@@ -14,11 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task.model;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
 import java.util.Collections;

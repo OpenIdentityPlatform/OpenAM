@@ -12,16 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.datalayer.impl;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateBinder;
-import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapterFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;

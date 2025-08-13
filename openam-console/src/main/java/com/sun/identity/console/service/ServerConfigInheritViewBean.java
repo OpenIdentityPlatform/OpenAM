@@ -24,6 +24,7 @@
  *
  * $Id: ServerConfigInheritViewBean.java,v 1.5 2008/08/25 22:15:38 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -52,7 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Servers and Sites Management main page.

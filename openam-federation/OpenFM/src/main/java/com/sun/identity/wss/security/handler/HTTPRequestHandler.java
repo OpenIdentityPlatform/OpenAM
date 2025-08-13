@@ -24,6 +24,7 @@
  *
  * $Id: HTTPRequestHandler.java,v 1.10 2009/07/23 20:42:52 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security.handler;
@@ -32,8 +33,8 @@ import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Principal;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Set;
 import java.util.Map;

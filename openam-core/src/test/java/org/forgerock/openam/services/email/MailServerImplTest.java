@@ -20,6 +20,7 @@
  * "Portions copyright [year] [name of copyright owner]"
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.services.email;
@@ -32,10 +33,9 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import java.util.HashMap;
 import java.util.HashSet;

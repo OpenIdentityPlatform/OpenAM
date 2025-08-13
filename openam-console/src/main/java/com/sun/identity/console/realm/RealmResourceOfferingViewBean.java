@@ -24,6 +24,8 @@
  *
  * $Id: RealmResourceOfferingViewBean.java,v 1.2 2008/06/25 05:49:43 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm;
@@ -48,7 +50,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import java.text.MessageFormat;
 import java.util.Iterator;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class RealmResourceOfferingViewBean
     extends RMRealmViewBeanBase

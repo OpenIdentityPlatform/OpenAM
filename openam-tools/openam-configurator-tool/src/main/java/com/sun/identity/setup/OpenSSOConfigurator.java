@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -42,7 +43,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.forgerock.openam.installer.utils.StatusChecker;
 import org.forgerock.openam.license.LicensePresenter;
 import org.forgerock.openam.license.LicenseRejectedException;

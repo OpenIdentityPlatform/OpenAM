@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.upgrade.steps.policy;
@@ -26,7 +27,7 @@ import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
 import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Document;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 

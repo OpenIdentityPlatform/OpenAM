@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.notifications;
 
 import static com.sun.identity.shared.Constants.NOTIFICATIONS_AGENTS_ENABLED;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.configuration.ConfigurationListener;

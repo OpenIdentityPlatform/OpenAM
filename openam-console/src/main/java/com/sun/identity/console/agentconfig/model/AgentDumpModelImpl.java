@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AgentDumpModelImpl.java,v 1.1 2008/12/10 18:25:14 farble1670 Exp $
+ * Portions Copyrighted 2025 3A Systems LLC.
  *
  */
 
@@ -39,7 +40,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.sm.SMSException;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class AgentDumpModelImpl extends AMModelBase implements AgentDumpModel
 {
