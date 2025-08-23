@@ -24,17 +24,18 @@
  *
  * $Id: WSFederationService.java,v 1.1 2009/12/14 23:42:49 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.servlet;
 
 
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Produces;
 
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;

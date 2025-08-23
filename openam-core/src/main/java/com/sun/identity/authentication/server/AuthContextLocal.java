@@ -25,6 +25,7 @@
  * $Id: AuthContextLocal.java,v 1.12 2009/05/21 21:57:34 qcheng Exp $
  *
  * Portions Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.server;
@@ -39,7 +40,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;

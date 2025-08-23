@@ -24,6 +24,8 @@
  *
  * $Id: ServicesCannotAssignServiceViewBean.java,v 1.2 2008/06/25 05:43:12 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm;
@@ -39,7 +41,7 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ServicesCannotAssignServiceViewBean
     extends AMPrimaryMastHeadViewBean

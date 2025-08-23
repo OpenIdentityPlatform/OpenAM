@@ -24,6 +24,7 @@
  *
  * $Id: FSSSOLECPProfileHandler.java,v 1.3 2008/06/25 05:46:59 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -46,16 +47,16 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.shared.encode.URLEncDec;
-import javax.xml.soap.*;
+import jakarta.xml.soap.*;
 
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 import java.util.*;
 
 import org.w3c.dom.Document;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * <code>IDP</code> single sign on service handler handles <code>LECP</code>

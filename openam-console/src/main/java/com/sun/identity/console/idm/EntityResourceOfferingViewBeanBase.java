@@ -24,6 +24,8 @@
  *
  * $Id: EntityResourceOfferingViewBeanBase.java,v 1.2 2008/06/25 05:49:41 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.idm;
@@ -41,7 +43,7 @@ import com.sun.identity.console.idm.model.EntityResourceOfferingModelImpl;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.io.InputStream;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class EntityResourceOfferingViewBeanBase
     extends SMDiscoveryBootstrapRefOffViewBeanBase

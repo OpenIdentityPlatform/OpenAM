@@ -73,9 +73,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
 
@@ -179,7 +179,7 @@ public class TokenOperationFactoryImplTest {
         }
 
         @Provides
-        @javax.inject.Singleton
+        @jakarta.inject.Singleton
         @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
         String tokenGenerationServiceUriElement() {
             return "/sts-tokengen/issue?_action=create";

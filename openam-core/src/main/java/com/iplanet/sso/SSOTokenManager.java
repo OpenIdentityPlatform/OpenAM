@@ -25,6 +25,7 @@
  * $Id: SSOTokenManager.java,v 1.7 2009/02/18 23:59:36 qcheng Exp $
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.sso;
@@ -289,7 +290,7 @@ public class SSOTokenManager {
      * 
      */
     public SSOToken createSSOToken(
-            javax.servlet.http.HttpServletRequest request)
+            jakarta.servlet.http.HttpServletRequest request)
             throws UnsupportedOperationException, SSOException {
 
         for (SSOProviderPlugin ssoProvider : getSsoProviderPlugins()) {

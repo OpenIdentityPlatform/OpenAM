@@ -25,6 +25,7 @@
  * $Id: SubConfigAddViewBean.java,v 1.3 2008/06/25 05:43:17 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -56,7 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SubConfigAddViewBean
     extends DynamicRequestViewBean

@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011-2013 ForgeRock Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task.model;
@@ -66,7 +67,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 public class TaskModelImpl

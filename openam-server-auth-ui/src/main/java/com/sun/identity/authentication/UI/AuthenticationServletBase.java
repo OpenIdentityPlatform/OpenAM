@@ -28,12 +28,13 @@
 
 /**
  * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import com.iplanet.jato.ApplicationServletBase;
 import com.iplanet.jato.CompleteRequestException;

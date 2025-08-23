@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.scripts;
 
@@ -27,7 +28,7 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.realm.HasEntitiesTabs;
 import com.sun.identity.console.realm.RealmPropertiesBase;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 
 /**

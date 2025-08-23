@@ -14,6 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  * Portions 2006 Sun Microsystems Inc.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.agent;
 
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.identity.idm.IdentityUtils;

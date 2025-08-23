@@ -28,17 +28,18 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-import javax.servlet.http.Cookie;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;

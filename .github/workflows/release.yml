@@ -26,7 +26,7 @@ jobs:
       - name: Set up Java for publishing to Maven Central Repository OSS
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
@@ -160,53 +160,6 @@ jobs:
           build-args: |
             VERSION=${{ github.event.inputs.releaseVersion }}
           platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-  release-docker-alpine:
-    runs-on: 'ubuntu-latest'
-    needs:
-      - release-maven
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.releaseVersion }}
-          fetch-depth: 1
-          submodules: recursive
-      - name: Docker meta (alpine)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
-          tags: |
-            type=raw,value=alpine
-            type=raw,value=${{ github.event.inputs.releaseVersion }}-alpine
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        continue-on-error: true
-        uses: docker/build-push-action@v5
-        with:
-          context: ./openam-distribution/openam-distribution-docker
-          file: ./openam-distribution/openam-distribution-docker/Dockerfile-alpine
-          build-args: |
-            VERSION=${{ github.event.inputs.releaseVersion }}
-          platforms: linux/amd64,linux/arm64/8, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6, linux/ppc64le
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

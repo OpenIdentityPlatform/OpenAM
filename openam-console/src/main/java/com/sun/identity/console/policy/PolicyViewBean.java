@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2012 ForgeRock Inc 
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.policy;
 
@@ -62,7 +63,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class PolicyViewBean
     extends RealmPropertiesBase

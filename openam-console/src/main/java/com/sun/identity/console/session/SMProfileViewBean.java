@@ -27,6 +27,7 @@
 
 /**
  * Portions copyright 2013-2016 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.session;
@@ -38,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.opendj.ldap.DN;
 

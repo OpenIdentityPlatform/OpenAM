@@ -25,6 +25,7 @@
  * $Id: Utils.java,v 1.9 2008/11/10 22:56:59 veiming Exp $
  *
  * Portions Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.soapbinding; 
@@ -55,9 +56,9 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.helpers.DefaultValidationEventHandler;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.MimeHeaders;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MimeHeaders;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

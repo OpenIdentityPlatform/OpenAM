@@ -25,6 +25,7 @@
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -71,11 +72,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPMessage;
 
 import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;

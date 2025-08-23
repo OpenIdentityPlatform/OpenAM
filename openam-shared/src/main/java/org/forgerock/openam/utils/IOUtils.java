@@ -302,7 +302,7 @@ public final class IOUtils {
                     "java.util.HashMap","java.util.LinkedHashMap","java.util.Collections$UnmodifiableMap","java.util.TreeSet","java.lang.String$CaseInsensitiveComparator","java.util.TreeMap",
                     "java.util.HashSet",
                     "org.forgerock.openam.dpro.session.NoOpTokenRestriction",
-                    "org.apache.catalina.util.ParameterMap","javax.servlet.DispatcherType","java.lang.Enum",
+                    "org.apache.catalina.util.ParameterMap","jakarta.servlet.DispatcherType","java.lang.Enum",
                     "org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest",
                     "org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse",
                     "org.forgerock.openam.authentication.service.protocol.RemoteServletRequest",

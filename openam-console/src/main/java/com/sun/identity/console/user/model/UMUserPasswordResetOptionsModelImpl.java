@@ -24,6 +24,7 @@
  *
  * $Id: UMUserPasswordResetOptionsModelImpl.java,v 1.5 2010/01/27 18:21:37 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.user.model;
@@ -60,7 +61,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - LOG COMPLETE - */
 

@@ -13,6 +13,7 @@
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.radius.server.spi.handlers;
 
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -114,9 +115,9 @@ import com.sun.identity.shared.debug.Debug;
  * </pre>
  * <p/>
  * Of special note to authentication module implementors is what modules are allowed in the chain used by a radius
- * client. If an authentication module uses {@link javax.servlet.http.HttpServletRequest} or
+ * client. If an authentication module uses {@link jakarta.servlet.http.HttpServletRequest} or
  * {@link javax.servlet.http.HttpServletResponse} they generally won't work for radius clients without modification. For
- * non-http clients the {@link javax.servlet.http.HttpServletRequest} and {@link javax.servlet.http.HttpServletResponse}
+ * non-http clients the {@link jakarta.servlet.http.HttpServletRequest} and {@link jakarta.servlet.http.HttpServletResponse}
  * objects will be null typically leading to a {@link java.lang.NullPointerException}. Looking for a value of null is
  * how such modules can tell if they are dealing with a non-http client and adjust their behavior accordingly.
  * <p/>

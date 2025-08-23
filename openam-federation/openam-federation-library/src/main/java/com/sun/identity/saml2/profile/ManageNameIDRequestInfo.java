@@ -25,6 +25,7 @@
  * $Id: ManageNameIDRequestInfo.java,v 1.4 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -34,8 +35,8 @@ import static org.forgerock.openam.utils.Time.*;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.plugin.session.SessionManager;

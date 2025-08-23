@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.entitlement.service;
 
@@ -25,7 +26,7 @@ import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.util.query.QueryFilter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Map;

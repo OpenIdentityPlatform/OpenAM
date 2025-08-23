@@ -24,6 +24,7 @@
  *
  * $Id: ValidateSAML2SetupViewBean.java,v 1.5 2008/08/21 04:37:46 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task;
@@ -47,7 +48,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Validate Entity Setup.

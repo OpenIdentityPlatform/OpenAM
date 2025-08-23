@@ -25,11 +25,12 @@
  * $Id: SessionMaxStats.java,v 1.4 2008/06/25 05:41:31 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.dpro.session.service;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.session.service.SessionAccessManager;
 

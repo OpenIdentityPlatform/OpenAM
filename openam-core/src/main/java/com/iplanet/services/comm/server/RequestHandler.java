@@ -25,15 +25,16 @@
  * $Id: RequestHandler.java,v 1.2 2008/06/25 05:41:35 qcheng Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.services.comm.server;
 
 import com.iplanet.services.comm.share.Request;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.iplanet.services.comm.share.ResponseSet;
 

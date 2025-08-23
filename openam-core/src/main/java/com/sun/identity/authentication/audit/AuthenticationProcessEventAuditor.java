@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2023-2025 3A Systems LLC
  */
 package com.sun.identity.authentication.audit;
 
@@ -42,7 +42,7 @@ import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.model.AuthenticationAuditEntry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.Principal;
 import java.util.Collections;
 

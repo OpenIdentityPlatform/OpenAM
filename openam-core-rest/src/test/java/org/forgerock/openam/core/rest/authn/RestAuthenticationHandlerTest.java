@@ -17,6 +17,7 @@
  * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
 >>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -28,8 +29,8 @@ import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
 import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.util.Collections;
@@ -41,7 +42,6 @@ import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import org.assertj.core.api.Assertions;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.saml2.audit;
 
@@ -22,7 +23,7 @@ import static org.forgerock.openam.utils.StringUtils.*;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.sso.SSOToken;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;

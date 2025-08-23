@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.radius.server.config;
 
 import java.text.MessageFormat;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.radius.server.RadiusLifecycleException;
 import org.forgerock.openam.radius.server.RadiusRequestListener;

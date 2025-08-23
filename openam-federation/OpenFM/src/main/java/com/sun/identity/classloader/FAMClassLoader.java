@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.classloader;
 
@@ -35,7 +36,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 import java.util.ArrayList;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.Arrays;
 import com.sun.identity.common.SystemConfigurationUtil;
 
@@ -156,13 +157,13 @@ public class FAMClassLoader {
     
     private static void setSystemProperties() {
         // Fix for Geronimo Application server and WebLogic 10       
-        System.setProperty("javax.xml.soap.MetaFactory", 
+        System.setProperty("jakarta.xml.soap.MetaFactory", 
             "com.sun.xml.messaging.saaj.soap.SAAJMetaFactoryImpl");
-        System.setProperty("javax.xml.soap.MessageFactory", 
+        System.setProperty("jakarta.xml.soap.MessageFactory", 
             "com.sun.xml.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl");
-        System.setProperty("javax.xml.soap.SOAPConnectionFactory", 
+        System.setProperty("jakarta.xml.soap.SOAPConnectionFactory", 
             "com.sun.xml.messaging.saaj.client.p2p.HttpSOAPConnectionFactory");
-        System.setProperty("javax.xml.soap.SOAPFactory", 
+        System.setProperty("jakarta.xml.soap.SOAPFactory", 
             "com.sun.xml.messaging.saaj.soap.ver1_1.SOAPFactory1_1Impl");
     }
 
@@ -225,7 +226,7 @@ public class FAMClassLoader {
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
-        "javax.xml.soap.",
+        "jakarta.xml.soap.",
         "com.sun.istack.",
         "com.sun.identity.wss.",
         "com.sun.identity.wssagents.",
@@ -265,7 +266,7 @@ public class FAMClassLoader {
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
-        "javax.xml.soap.",
+        "jakarta.xml.soap.",
         "com.sun.istack.",
         "com.sun.identity.wss.",
         "com.sun.identity.wssagents.",        
