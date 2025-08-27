@@ -90,21 +90,21 @@ The next step is then to go to [http://login.domain.com:8080/openam](http://logi
 ## Contributing
 Please, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)
 
-<a href="https://github.com/OpenIdentityPlatform/OpenAM/graphs/contributors">
+<a href="https://opencollective.com/OpenAM/tiers" target="_blank">
   <!--img src="https://contributors-img.web.app/image?repo=OpenIdentityPlatform/OpenAM" /-->
-  <img src="https://opencollective.com/OpenAM/contributors.svg?width=890&button=false" />
+  <img src="https://opencollective.com/OpenAM/contributors.svg?width=890&button=true" />
 </a>
 
 ## Backers
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/OpenAM#backer)
+Thank you to all our backers! [Become a backer 🙏](https://opencollective.com/OpenAM/tiers)
 
-<a href="https://opencollective.com/OpenAM#backers" target="_blank">
+<a href="https://opencollective.com/OpenAM/tiers" target="_blank">
  <img src="https://opencollective.com/OpenAM/backers.svg?width=890">
 </a>
 
 ## Sponsors
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/OpenAM#sponsor)
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor ❤️](https://opencollective.com/OpenAM/tiers)
 
-<a href="https://opencollective.com/OpenAM/sponsor/0/website" target="_blank">
- <img src="https://opencollective.com/OpenAM/sponsor/0/avatar.svg">
-</a> 
+<a href="https://opencollective.com/OpenAM/tiers" target="_blank">
+ <img src="https://opencollective.com/OpenAM/sponsors.svg?width=890">
+</a>
