@@ -25,6 +25,7 @@
  * $Id: EntitiesViewBean.java,v 1.14 2009/12/11 23:25:19 veiming Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.idm;
@@ -70,7 +71,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class EntitiesViewBean
     extends RealmPropertiesBase

@@ -12,11 +12,12 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openidconnect;
 
 import java.util.Set;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;

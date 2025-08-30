@@ -13,11 +13,12 @@
  *
  * Copyright 2015 ForgeRock AS.
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.tokens.CoreTokenField;
 import com.datastax.oss.driver.api.core.CqlSession;

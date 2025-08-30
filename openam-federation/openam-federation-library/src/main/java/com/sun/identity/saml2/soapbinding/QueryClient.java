@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.saml2.soapbinding;
 
@@ -55,7 +56,7 @@ import com.sun.identity.saml2.protocol.RequestAbstract;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.impl.ResponseImpl;
 import com.sun.identity.xacml.saml2.XACMLAuthzDecisionQuery;
-import javax.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPException;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -74,7 +75,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

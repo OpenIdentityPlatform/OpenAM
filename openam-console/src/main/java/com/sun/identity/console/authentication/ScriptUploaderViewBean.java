@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.authentication;
@@ -26,7 +27,7 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.masthead.CCSecondaryMasthead;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * JATO view-bean for uploading scripts. Based on {@link com.sun.identity.console.federation.FileUploaderViewBean} but

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.indextree;
@@ -22,7 +23,7 @@ import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import org.forgerock.guice.core.InjectorHolder;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Set;
 
 /**

@@ -24,6 +24,7 @@
  *
  * $Id: FSSOAPReceiver.java,v 1.7 2008/06/25 05:46:56 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -80,17 +81,17 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
-import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.MimeHeaders;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPEnvelope;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -137,7 +138,7 @@ public class FSSOAPReceiver extends HttpServlet {
      * @exception ServletException, IOException if error occurrs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws javax.servlet.ServletException, java.io.IOException 
+        throws jakarta.servlet.ServletException, java.io.IOException
     {
         FSUtils.debug.message("FSSOAPReceiver.doPost: Called");
 

@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.radius.server;
 
 import java.security.AccessController;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import com.google.common.eventbus.EventBus;
 import org.forgerock.guice.core.GuiceModule;

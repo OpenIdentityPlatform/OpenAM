@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
@@ -21,7 +22,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;

@@ -12,14 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.sm.datalayer.impl;
 
 import java.util.concurrent.BlockingQueue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.util.Reject;
 

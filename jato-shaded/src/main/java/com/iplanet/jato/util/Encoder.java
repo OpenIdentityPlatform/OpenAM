@@ -13,8 +13,8 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-
 public class Encoder {
+
     private Encoder() {
     }
 
@@ -35,20 +35,11 @@ public class Encoder {
     }
 
     public static String encodeHttp64(byte[] bytes, int compressThreshold) {
-        byte[] result;
-        if (bytes.length > compressThreshold) {
-            result = compress(bytes);
-        } else {
-            result = new byte[bytes.length + 1];
-            result[0] = 0;
-            System.arraycopy(bytes, 0, result, 1, bytes.length);
-        }
-        return Base64.getUrlEncoder().encodeToString(result);
+        return Base64.getUrlEncoder().encodeToString(bytes);
     }
 
     public static byte[] decodeHttp64(String s) {
-        byte[] result = Base64.getUrlDecoder().decode(s);
-        return decompress(result);
+        return Base64.getUrlDecoder().decode(s);
     }
 
     public static byte[] compress(byte[] in) {
@@ -104,7 +95,7 @@ public class Encoder {
     public static byte[] serialize(Serializable o, boolean compress) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
         DeflaterOutputStream dos = null;
-        ObjectOutputStream oos;
+        ObjectOutputStream oos = null;
         if (compress) {
             dos = new DeflaterOutputStream(baos, new Deflater(9));
             oos = new ObjectOutputStream(dos);
@@ -125,8 +116,8 @@ public class Encoder {
 
     public static Object deserialize(byte[] b, boolean compressed) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
-        InflaterInputStream iis;
-        ObjectInputStream ois;
+        InflaterInputStream iis = null;
+        ObjectInputStream ois = null;
         if (compressed) {
             iis = new InflaterInputStream(bais);
             ois = new ApplicationObjectInputStream(iis);
@@ -138,3 +129,4 @@ public class Encoder {
         return result;
     }
 }
+

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.audit.events.handlers;
 
@@ -32,7 +33,7 @@ import org.forgerock.openam.audit.AuditEventHandlerFactory;
 import org.forgerock.openam.audit.configuration.AuditEventHandlerConfiguration;
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

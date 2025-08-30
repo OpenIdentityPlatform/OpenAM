@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -28,7 +29,7 @@ import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.AdviceWarning;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 
 final class ResourceApiVersionRoutingFilter extends org.forgerock.http.routing.ResourceApiVersionRoutingFilter {
 

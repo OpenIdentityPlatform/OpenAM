@@ -12,14 +12,15 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.audit.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * {@link HttpServletResponse} decorator used for capturing response status and message.
@@ -99,4 +100,5 @@ public class AuditableHttpServletResponse extends HttpServletResponseWrapper {
         this.statusCode = sc;
         this.message = sm;
     }
+
 }

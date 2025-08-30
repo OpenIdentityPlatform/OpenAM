@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.setup;
 
@@ -34,7 +35,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpServletRequestWrapper
     implements IHttpServletRequest {

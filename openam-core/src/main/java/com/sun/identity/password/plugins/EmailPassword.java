@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.password.plugins;
 
@@ -44,8 +45,8 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Set;
 import java.util.ResourceBundle;
-import javax.mail.SendFailedException;
-import javax.mail.MessagingException;
+import jakarta.mail.SendFailedException;
+import jakarta.mail.MessagingException;
 
 /**
  * <code>EmailPassword</code> defines a set of methods

@@ -440,7 +440,7 @@ REST STS instances can obtain X.509 certificates used as input tokens in two way
 
 * From the header key defined in the REST STS instance's Client Certificate Header Key property. In this case, STS also confirms that the request came from a host specified in the Trusted Remote Hosts property.
 
-* From the `javax.servlet.request.X509Certificate` attribute in the ServletRequest. The REST STS instance obtains the X.509 certificate from the ServletRequest if no header key is configured in the Client Certificate Header Key property.
+* From the `jakarta.servlet.request.X509Certificate` attribute in the ServletRequest. The REST STS instance obtains the X.509 certificate from the ServletRequest if no header key is configured in the Client Certificate Header Key property.
 
 The OpenAM Certificate module authenticates the X.509 certificate input token. The module optionally performs certificate revocation list (CRL) or Online Certificate Status Protocol (OCSP) checking, and can optionally check to see that the specified certificate is in a LDAP datastore.
 
@@ -580,7 +580,7 @@ Client Certificate Header Key::
 Specifies the name of a header that a TLS offloader should use to use to transmit client certificates.
 
 +
-Token transformations that take an X.509 certificate as the input token require the certificate to be presented using two-way TLS, so that the TLS handshake can validate client certificate ownership. A common way of obtaining the client certificate with two-way TLS is to use the `javax.servlet.request.X509Certificate` attribute in the servlet request.
+Token transformations that take an X.509 certificate as the input token require the certificate to be presented using two-way TLS, so that the TLS handshake can validate client certificate ownership. A common way of obtaining the client certificate with two-way TLS is to use the `jakarta.servlet.request.X509Certificate` attribute in the servlet request.
 
 +
 However, in deployments with TLS offloading, the offloader must use an HTTP header to transmit the certificate to its destination. This configuration property is the name of the HTTP header whose value contains the certificate.

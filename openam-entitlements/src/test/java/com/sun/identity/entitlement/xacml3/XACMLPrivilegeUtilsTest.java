@@ -14,6 +14,7 @@
  * Copyright 2014 Nomura Research Institute, Ltd.
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -29,7 +30,6 @@ import org.testng.annotations.Test;
 
 import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 

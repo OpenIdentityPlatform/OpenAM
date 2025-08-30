@@ -25,13 +25,14 @@
  * $Id: Utils.java,v 1.4 2008/11/10 22:57:00 veiming Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.sae.api;
 
 import org.owasp.esapi.ESAPI;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.Map;

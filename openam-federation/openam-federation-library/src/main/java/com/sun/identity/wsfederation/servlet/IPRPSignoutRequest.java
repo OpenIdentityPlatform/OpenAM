@@ -24,6 +24,7 @@
  *
  * $Id: IPRPSignoutRequest.java,v 1.7 2009/10/28 23:59:00 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -43,9 +44,9 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class implements the sign-out request for both identity provider and

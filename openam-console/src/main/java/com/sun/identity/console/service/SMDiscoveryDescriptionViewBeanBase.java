@@ -24,6 +24,7 @@
  *
  * $Id: SMDiscoveryDescriptionViewBeanBase.java,v 1.3 2008/10/20 23:40:01 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
  
 package com.sun.identity.console.service;
@@ -52,7 +53,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class SMDiscoveryDescriptionViewBeanBase
     extends AMPrimaryMastHeadViewBean

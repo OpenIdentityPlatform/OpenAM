@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.notifications.websocket;
 
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 
-import javax.websocket.DecodeException;
+import jakarta.websocket.DecodeException;
 
 import org.forgerock.json.JsonValue;
 import org.testng.annotations.BeforeMethod;

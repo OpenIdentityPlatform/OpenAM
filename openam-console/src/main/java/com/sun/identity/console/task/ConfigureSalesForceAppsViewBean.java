@@ -24,6 +24,7 @@
  *
  * $Id: ConfigureSalesForceAppsViewBean.java,v 1.1 2009/07/01 23:27:21 babysunil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.task;
 
@@ -49,7 +50,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Create SalesForce UI.

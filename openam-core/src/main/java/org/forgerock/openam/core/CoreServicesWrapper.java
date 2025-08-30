@@ -12,14 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.security.AccessController;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,7 +39,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.core.realms.Realm;
 
 /**
  * A wrapper class around core static class and methods.
@@ -53,7 +52,7 @@ public class CoreServicesWrapper {
      * Gets the Session Id from the HttpServletRequest.
      *
      * {@link com.sun.identity.authentication.service.AuthUtils#getSessionIDFromRequest(
-     *      javax.servlet.http.HttpServletRequest)}
+     *      jakarta.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
      * @return The SessionID from the request.
@@ -65,7 +64,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the environment map from a HttpServletRequest.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils#getEnvMap(javax.servlet.http.HttpServletRequest)}
+     * {@link com.sun.identity.authentication.client.AuthClientUtils#getEnvMap(jakarta.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
      * @return The environment map.

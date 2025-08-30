@@ -25,6 +25,7 @@
  * $Id: RequestUtils.java,v 1.5 2008/08/19 19:09:00 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  *
  */
 
@@ -32,7 +33,7 @@ package com.sun.identity.common;
 
 import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;

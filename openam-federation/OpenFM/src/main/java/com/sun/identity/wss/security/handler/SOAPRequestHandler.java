@@ -24,19 +24,20 @@
  *
  * $Id: SOAPRequestHandler.java,v 1.47 2010/01/15 18:54:34 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security.handler;
 
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPHeaderElement;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPHeaderElement;
 import javax.security.auth.Subject;
 import java.security.Key;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.security.cert.X509Certificate;
 
 import java.util.Set;
@@ -51,9 +52,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ResourceBundle;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

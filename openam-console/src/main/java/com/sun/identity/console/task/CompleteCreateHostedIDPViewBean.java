@@ -24,6 +24,7 @@
  *
  * $Id: CompleteCreateHostedIDPViewBean.java,v 1.2 2008/06/25 05:49:47 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.task;
@@ -32,7 +33,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**

@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FederationRestService.java,v 1.1 2009/12/14 23:42:47 mallas Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import com.sun.identity.wsfederation.servlet.WSFederationService;
 

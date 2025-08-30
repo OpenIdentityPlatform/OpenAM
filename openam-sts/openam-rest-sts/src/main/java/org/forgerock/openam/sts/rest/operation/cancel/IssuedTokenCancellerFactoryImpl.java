@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.operation.cancel;
@@ -26,7 +27,7 @@ import org.forgerock.openam.sts.rest.token.canceller.RestSAML2IssuedTokenCancell
 import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
 import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @see IssuedTokenCancellerFactory

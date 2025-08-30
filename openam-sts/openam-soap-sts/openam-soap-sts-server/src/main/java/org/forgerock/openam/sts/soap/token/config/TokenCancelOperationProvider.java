@@ -31,8 +31,10 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.xml.ws.WebServiceContext;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;

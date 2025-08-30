@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -21,7 +22,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.util.Reject;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 

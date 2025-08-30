@@ -29,7 +29,7 @@
 
 package com.sun.identity.config.wizard;
 
-import org.apache.click.Context;
+import org.openidentityplatform.openam.click.Context;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;

@@ -24,6 +24,7 @@
  *
  * $Id: FSPreLogoutHandler.java,v 1.11 2008/12/19 06:50:47 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -50,8 +51,8 @@ import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.saml.common.SAMLResponderException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
