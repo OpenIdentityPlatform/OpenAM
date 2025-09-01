@@ -34,6 +34,6 @@
       done: true
   };
 </script>
-<script data-main="${baseUrl?html}/XUI/main-device" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
+<script data-main="${baseUrl?html}/XUI/main-device" src="${baseUrl?html}/XUI/libs/requirejs-2.3.7-min.js"></script>
 </body>
 </html>

@@ -287,7 +287,7 @@
 			            <artifactItem>
 			              <groupId>org.openidentityplatform.commons.ui.libs</groupId>
 			              <artifactId>requirejs</artifactId>
-			              <version>2.1.14</version>
+			              <version>2.3.7</version>
 			              <classifier>min</classifier>
 			              <packaging>js</packaging>
 			              <downloadUrl>https://cdnjs.cloudflare.com/ajax/libs/require.js/{version}/require.{classifier}.{packaging}</downloadUrl>
