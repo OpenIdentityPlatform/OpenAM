@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
@@ -55,13 +56,15 @@ public class Generator {
         Path rootDir = Paths.get(authModulesPath); // Start directory
         String pattern = "glob:**/resources/amAuth*.xml"; // Recursive match
         TextStringBuilder asciidoc = new TextStringBuilder();
-        asciidoc.append("[#chap-auth-modules]").appendNewLine();
-        asciidoc.append("== ").append("Authentication Modules Reference").appendNewLine().appendNewLine();
+        asciidoc.appendln(":table-caption!:").appendNewLine();
+        asciidoc.appendln("[#chap-auth-modules]");
+        asciidoc.append("== ").appendln("Authentication Modules Reference").appendNewLine();
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(pattern);
         try (Stream<Path> paths = Files.walk(rootDir)) {
             paths.filter(Files::isRegularFile)
                     .filter(matcher::matches)
+                    .sorted(Comparator.comparing(f -> f.getFileName().toString()))
                     .forEach(p -> {
                         try {
                             generateDescriptionBySchema(p, asciidoc);
