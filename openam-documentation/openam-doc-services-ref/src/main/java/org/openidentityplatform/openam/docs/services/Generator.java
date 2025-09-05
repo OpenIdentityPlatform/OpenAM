@@ -207,7 +207,7 @@ public class Generator {
         return authClassMap.get(authServiceClassName);
     }
 
-    private void generateModuleDoc(Element schemaElement, ResourceBundle bundle, TextStringBuilder asciidoc, Map<String, String> authClassMap) throws Exception {
+    private void generateModuleDoc(Element schemaElement, ResourceBundle bundle, TextStringBuilder asciidoc, Map<String, String> authClassMap) {
 
         String moduleNameKey = schemaElement.getAttribute("i18nKey");
         String moduleName = bundle.getString(moduleNameKey);
@@ -217,7 +217,10 @@ public class Generator {
 
         String serviceName = ((Element) schemaElement.getParentNode()).getAttribute("name");
 
-        asciidoc.appendln(String.format("Java class name: `%s`", getAuthClassName(serviceName, authClassMap)))
+        String className = getAuthClassName(serviceName, authClassMap);
+        String classLink = String.format("link:../apidocs/index.html?%s.html[%s, window=\\_blank]",
+                className.replaceAll("\\.", "/"), className);
+        asciidoc.appendln(String.format("Java class: `%s`", classLink))
                 .appendNewLine();
 
         asciidoc.appendln(String.format("`ssoadm` service name: `%s`", ((Element) schemaElement.getParentNode()).getAttribute("name")));
@@ -281,7 +284,7 @@ public class Generator {
 
 
 
-    private void printAttributeElement(ResourceBundle bundle, TextStringBuilder asciidoc, Element attrElement) throws Exception {
+    private void printAttributeElement(ResourceBundle bundle, TextStringBuilder asciidoc, Element attrElement) {
         String type = attrElement.getAttribute("type");
         if (type.equals("validator")) {
             return;
