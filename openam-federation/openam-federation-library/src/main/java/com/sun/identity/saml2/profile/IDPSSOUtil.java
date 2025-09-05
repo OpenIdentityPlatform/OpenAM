@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2025 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.profile;
@@ -2738,10 +2739,11 @@ public class IDPSSOUtil {
                 return null;
             }
 
-            // retain in the idpCOTList the intersection of two lists
-            idpCOTList.retainAll(spCOTList);
-            for (int i = 0; i < idpCOTList.size(); i++) {
-                String cotName = (String) idpCOTList.get(i);
+            // retain in the commonCOTList the intersection of two lists
+            List commonCOTList = new ArrayList<>(idpCOTList);
+            commonCOTList.retainAll(spCOTList);
+            for (int i = 0; i < commonCOTList.size(); i++) {
+                String cotName = (String) commonCOTList.get(i);
 
                 CircleOfTrustDescriptor cotDescriptor =
                         cotManager.getCircleOfTrust(realm, cotName);
