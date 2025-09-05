@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2024 3A Systems LLC.
+ * Portions copyright 2024-2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -58,6 +58,25 @@
                                     <version>${project.version}</version>
                                     <classifier>ssoadm-ref</classifier>
                                     <outputDirectory>${project.build.directory}/docbkx-sources</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-external-docs</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.openidentityplatform.openam</groupId>
+                                    <artifactId>openam-doc-services-ref</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <includes>*.adoc</includes> <!-- Optional filter -->
+                                    <outputDirectory>${project.build.directory}/asciidoc/source/reference</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
