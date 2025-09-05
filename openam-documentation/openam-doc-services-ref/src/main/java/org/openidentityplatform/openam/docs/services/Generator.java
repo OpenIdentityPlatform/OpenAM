@@ -19,6 +19,7 @@ package org.openidentityplatform.openam.docs.services;
 import org.apache.commons.text.TextStringBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -234,9 +235,14 @@ public class Generator {
         asciidoc.appendNewLine();
 
         Element orgElement = (Element) schemaElement.getElementsByTagName("Organization").item(0);
-        NodeList attributes = orgElement.getElementsByTagName("AttributeSchema");
-        for (int i = 0; i < attributes.getLength(); i++) {
-            Element attrElement = (Element) attributes.item(i);
+        NodeList orgChildren = orgElement.getChildNodes();
+        for (int i = 0; i < orgChildren.getLength(); i++) {
+            Node node = orgChildren.item(i);
+            if (node.getNodeType() != Node.ELEMENT_NODE
+                    || !"AttributeSchema".equals(node.getNodeName())) {
+                continue;
+            }
+            Element attrElement = (Element)node;
             printAttributeElement(bundle, asciidoc, attrElement);
         }
         System.out.printf("generated doc for %s module%n", moduleName);
