@@ -40,7 +40,7 @@
     <url>https://doc.openidentityplatform.org/</url>
 
     <modules>
-        <module>openam-doc-authmodules-ref</module>
+        <module>openam-doc-services-ref</module>
         <module>openam-doc-log-message-ref</module>
         <module>openam-doc-ssoadm-ref</module>
         <module>openam-doc-source</module>

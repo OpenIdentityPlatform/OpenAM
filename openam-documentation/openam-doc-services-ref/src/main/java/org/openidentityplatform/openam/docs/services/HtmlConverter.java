@@ -14,7 +14,7 @@
  * Copyright 2022-2025 3A Systems LLC.
  */
 
-package org.openidentityplatform.openam.docs.authmodules;
+package org.openidentityplatform.openam.docs.services;
 
 import org.apache.commons.text.TextStringBuilder;
 import org.jsoup.Jsoup;
@@ -26,7 +26,7 @@ import org.jsoup.nodes.TextNode;
 import java.util.List;
 
 public class HtmlConverter {
-    public void convertToAsciidoc(String html, TextStringBuilder builder) throws Exception {
+    public void convertToAsciidoc(String html, TextStringBuilder builder) {
         html = html.replaceAll("(?i)(<br\\s*/?>\\s*){2,}", "<br/>");
         Document doc = Jsoup.parse(html);
 

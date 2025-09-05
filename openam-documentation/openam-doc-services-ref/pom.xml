@@ -23,7 +23,7 @@
         <artifactId>openam-documentation</artifactId>
         <version>15.2.2-SNAPSHOT</version>
     </parent>
-    <artifactId>openam-doc-authmodules-ref</artifactId>
+    <artifactId>openam-doc-services-ref</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
@@ -52,9 +52,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.openidentityplatform.openam.docs.authmodules.Generator</mainClass>
+                    <mainClass>org.openidentityplatform.openam.docs.services.Generator</mainClass>
                     <arguments>
-                        <argument>${project.basedir}/../../openam-authentication</argument>
+                        <argument>${project.basedir}/../../openam-server-only/target/OpenAM-ServerOnly-${project.version}</argument>
                         <argument>${build.outputDirectory}</argument>
                     </arguments>
                 </configuration>

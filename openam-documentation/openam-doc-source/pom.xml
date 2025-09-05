@@ -72,7 +72,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.openidentityplatform.openam</groupId>
-                                    <artifactId>openam-doc-authmodules-ref</artifactId>
+                                    <artifactId>openam-doc-services-ref</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <includes>*.adoc</includes> <!-- Optional filter -->
