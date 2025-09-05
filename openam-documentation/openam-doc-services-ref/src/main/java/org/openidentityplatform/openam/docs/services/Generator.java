@@ -101,7 +101,9 @@ public class Generator {
         String serviceNamesStr = serviceNamesProps.getProperty("serviceNames");
         String[] serviceNames = serviceNamesStr.split("\\s+");
         List<Exception> errors = new ArrayList<>();
+        final String INVALID_FILENAME_CHARACTERS_PATTERN = "[<>:\"/\\|?*]";
         List<Document> xmlServices = Arrays.stream(serviceNames).map(String::trim)
+                .filter(s -> !s.matches(INVALID_FILENAME_CHARACTERS_PATTERN))
                 .map(s -> {
                     try(InputStream is = cl.getResourceAsStream(s)) {
                         if (is == null) {
