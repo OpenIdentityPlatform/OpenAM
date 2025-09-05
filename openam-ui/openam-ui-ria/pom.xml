@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-ui</artifactId>
-        <version>15.2.2-SNAPSHOT</version>
+        <version>15.2.2</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
