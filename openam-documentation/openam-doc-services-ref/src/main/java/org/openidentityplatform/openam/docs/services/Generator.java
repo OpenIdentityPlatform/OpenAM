@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Generator {
@@ -101,9 +103,12 @@ public class Generator {
         String serviceNamesStr = serviceNamesProps.getProperty("serviceNames");
         String[] serviceNames = serviceNamesStr.split("\\s+");
         List<Exception> errors = new ArrayList<>();
-        final String INVALID_FILENAME_CHARACTERS_PATTERN = "[<>:\"/\\|?*]";
+        final Pattern INVALID_FILENAME_CHARACTERS_PATTERN = Pattern.compile("[<>:\"/|?*]");
         List<Document> xmlServices = Arrays.stream(serviceNames).map(String::trim)
-                .filter(s -> !s.matches(INVALID_FILENAME_CHARACTERS_PATTERN))
+                .filter(s -> {
+                    Matcher m = INVALID_FILENAME_CHARACTERS_PATTERN.matcher(s);
+                    return !m.find();
+                })
                 .map(s -> {
                     try(InputStream is = cl.getResourceAsStream(s)) {
                         if (is == null) {
