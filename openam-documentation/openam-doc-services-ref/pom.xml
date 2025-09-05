@@ -24,6 +24,7 @@
         <version>15.2.2-SNAPSHOT</version>
     </parent>
     <artifactId>openam-doc-services-ref</artifactId>
+    <name>OpenAM documentation reference guide generator</name>
     <dependencies>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
