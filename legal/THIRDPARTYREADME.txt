@@ -888,7 +888,7 @@ Copyright: Copyright (c) 2009 Kazuhiko Arase
 Version: qunit-1.15.0.js
 Copyright: Copyright 2012-2014 The Dojo Foundation
 
-Version: requirejs-2.1.14-min.js
+Version: requirejs-2.3.7-min.js
 Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 
 Version: spin-2.0.1-min.js

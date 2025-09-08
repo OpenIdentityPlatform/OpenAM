@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -32,13 +33,14 @@
     <inceptionYear>2011</inceptionYear>
     <packaging>pom</packaging>
     <description>
-     Generated DocBook XML sources for OpenAM core user documentation.
+     Generated AsciiDoc sources for OpenAM core user documentation.
      Java API reference documentation is generated from OpenAM source code.
     </description>
 
-    <url>http://openam.forgerock.org/</url>
+    <url>https://doc.openidentityplatform.org/</url>
 
     <modules>
+        <module>openam-doc-services-ref</module>
         <module>openam-doc-log-message-ref</module>
         <module>openam-doc-ssoadm-ref</module>
         <module>openam-doc-source</module>

@@ -33,3 +33,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+
+[Vote to raise the priority 🖐️](https://opencollective.com/openidentityplatform/projects/openam/contribute/vote-to-raise-the-priority-of-an-issue-92505)
+
