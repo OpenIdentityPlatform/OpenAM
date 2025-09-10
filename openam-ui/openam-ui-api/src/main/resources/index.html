@@ -13,7 +13,7 @@
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
   Copyright 2016 ForgeRock AS
-  Portions copyright 2019 Open Identity Community
+  Portions copyright 2019-2025 3A Systems LLC.
 -->
 <html>
 <head>
@@ -76,7 +76,7 @@
             };
 
             const ui = SwaggerUIBundle({
-                url: "https://petstore.swagger.io/v2/swagger.json",
+                url: url,
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
@@ -86,7 +86,7 @@
                 plugins: [
                   SwaggerUIBundle.plugins.DownloadUrl
                 ],
-                layout: "StandaloneLayout"
+                layout: "BaseLayout"
               })
               // End Swagger UI call region
 
