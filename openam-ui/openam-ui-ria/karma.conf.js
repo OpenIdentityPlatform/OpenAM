@@ -23,7 +23,7 @@ module.exports = function (config) {
         babelPreprocessor: {
             options: {
                 ignore: ["libs/"],
-                presets: ["env"]
+                presets: [["@babel/preset-env", { "targets": "> 0.2%, not dead, last 2 versions" }],]
             }
         },
         reporters: ["notify", "nyan"],

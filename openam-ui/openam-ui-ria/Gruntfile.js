@@ -87,17 +87,16 @@ module.exports = function (grunt) {
                     }
                 },
                 ignore: ["libs/"],
-                presets: ["env", "react"],
-                plugins: [
-                    ["transform-es2015-classes", { "loose": true }],
-                    "transform-object-rest-spread"
-                ]
+                presets: [
+                    ["@babel/preset-env", { "targets": "> 0.2%, not dead, last 2 versions" }],
+                    "@babel/preset-react"],
+                plugins: [["@babel/plugin-transform-classes", { "loose": true }]]
             },
             transpileJS: {
                 files: [{
                     expand: true,
                     cwd: compositionDirectory,
-                    src: ["**/*.js"],
+                    src: ["**/*.js", "!libs/**/*.js"],
                     dest: transpiledDirectory
                 }]
             },
@@ -112,7 +111,7 @@ module.exports = function (grunt) {
                     }
                 }],
                 options: {
-                    plugins: ["transform-es2015-modules-amd"]
+                    plugins: ["@babel/plugin-transform-modules-amd"]
                 }
             }
         },
@@ -159,6 +158,14 @@ module.exports = function (grunt) {
                         "!main.js" // Output by r.js
                     ],
                     dest: compiledDirectory
+                }]
+            },
+            libraries: {
+                files: [{
+                    expand: true,
+                    cwd: compositionDirectory,
+                    src: ["libs/**/*.js"],
+                    dest: transpiledDirectory
                 }]
             }
         },
@@ -370,6 +377,7 @@ module.exports = function (grunt) {
         "copy:compose",
         "eslint",
         "babel",
+        "copy:libraries",
         "requirejs",
         "less",
         "replace",
