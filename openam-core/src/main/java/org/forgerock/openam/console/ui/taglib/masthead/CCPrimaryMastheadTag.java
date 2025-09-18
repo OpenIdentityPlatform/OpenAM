@@ -21,14 +21,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2024 3A Systems LLC
+ * Portions Copyrighted 2024-2025 3A Systems LLC
  */  
 package org.forgerock.openam.console.ui.taglib.masthead;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.util.NonSyncStringBuffer;
 import com.sun.identity.shared.Constants;
-import javax.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspException;
 
 /**
  *

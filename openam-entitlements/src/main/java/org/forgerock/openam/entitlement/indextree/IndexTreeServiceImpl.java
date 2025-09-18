@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2018 3A Systems,LLC
+ * Portions Copyrighted 2018-2025 3A Systems,LLC
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -37,7 +37,7 @@ import org.forgerock.openam.entitlement.utils.indextree.SimpleReferenceTree;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;

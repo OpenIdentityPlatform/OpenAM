@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2024 3A-Systems LLC. All rights reserved.
+ * Copyright 2024-2025 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -29,7 +29,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;

@@ -24,6 +24,8 @@
  *
  * $Id: ProfileViewBeanBase.java,v 1.2 2008/06/25 05:43:04 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.policy;
@@ -36,7 +38,7 @@ import com.sun.identity.console.policy.model.CachedPolicy;
 import com.sun.identity.console.policy.model.PolicyCache;
 import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.console.policy.model.PolicyModelImpl;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class ProfileViewBeanBase
     extends AMPrimaryMastHeadViewBean

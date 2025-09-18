@@ -12,7 +12,7 @@
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
 * Copyright 2014-2015 ForgeRock AS.
-* Portions Copyrighted 2025 3A-Systems LLC.
+* Portions Copyrighted 2025 3A Systems LLC.
 */
 
 package org.forgerock.openam.sts.soap.token.provider.saml2;
@@ -29,7 +29,7 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 /**

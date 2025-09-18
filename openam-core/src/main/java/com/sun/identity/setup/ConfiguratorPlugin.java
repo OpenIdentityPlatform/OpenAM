@@ -24,12 +24,13 @@
  *
  * $Id: ConfiguratorPlugin.java,v 1.4 2008/06/25 05:44:02 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
 
 import com.iplanet.sso.SSOToken;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public interface ConfiguratorPlugin {
     /**

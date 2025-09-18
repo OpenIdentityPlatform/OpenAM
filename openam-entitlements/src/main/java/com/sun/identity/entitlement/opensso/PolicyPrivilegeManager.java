@@ -25,6 +25,7 @@
  * $Id: PolicyPrivilegeManager.java,v 1.9 2010/01/26 20:10:15 dillidorai Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -40,7 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.security.auth.Subject;
 
 import org.forgerock.json.JsonValue;

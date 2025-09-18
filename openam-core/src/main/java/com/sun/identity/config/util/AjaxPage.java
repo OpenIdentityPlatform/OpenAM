@@ -25,6 +25,7 @@
  * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.config.util;
@@ -49,11 +50,11 @@ import java.security.GeneralSecurityException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.click.Page;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.Page;
+import org.openidentityplatform.openam.click.control.ActionLink;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;

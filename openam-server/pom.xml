@@ -22,10 +22,11 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
     <properties>
         <test.config.path>${basedir}/target/config</test.config.path>
+        <maven.cargo.containerId>tomcat10x</maven.cargo.containerId>
     </properties>
 
     <!-- Component Definition -->
@@ -48,7 +49,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven3-plugin</artifactId>
-                <version>1.10.10</version>
+                <version>1.10.20</version>
                 <dependencies>
 					<dependency>
 					    <groupId>org.codehaus.plexus</groupId>
@@ -93,7 +94,7 @@
                         </manifest>
                     </archive>
                     <container>
-	                    <containerId>tomcat9x</containerId>
+	                    <containerId>${maven.cargo.containerId}</containerId>
 <!--	                    <type>embedded</type>-->
 <!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
 	                    <systemProperties>
@@ -263,6 +264,14 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jdk17.options</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <properties>
+                <maven.cargo.containerId>tomcat11x</maven.cargo.containerId>
+            </properties>
+        </profile>
     </profiles>
-
 </project>

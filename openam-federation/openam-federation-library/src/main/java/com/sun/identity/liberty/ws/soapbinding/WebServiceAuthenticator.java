@@ -24,6 +24,7 @@
  *
  * $Id: WebServiceAuthenticator.java,v 1.2 2008/06/25 05:47:24 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -32,7 +33,7 @@ package com.sun.identity.liberty.ws.soapbinding;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import javax.security.auth.Subject;
 

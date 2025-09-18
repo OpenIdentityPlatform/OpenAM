@@ -159,19 +159,21 @@ public class TokenSpecification {
      * operation invocation.
      */
     public static Element usernameTokenOnBehalfOfElement(String username, String password) {
-        WSSecUsernameToken unt = new WSSecUsernameToken();
-        unt.setUserInfo(username, password);
-        unt.setPasswordType(WSConstants.PASSWORD_TEXT);
-        unt.addCreated();
-        Date expirationDate = newDate();
-        expirationDate.setTime(currentTimeMillis() + (1000 * 60));
         try {
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            unt.prepare(document);
+
+            WSSecUsernameToken unt = new WSSecUsernameToken(document);
+            unt.setUserInfo(username, password);
+            unt.setPasswordType(WSConstants.PASSWORD_TEXT);
+            unt.addCreated();
+            Date expirationDate = newDate();
+            expirationDate.setTime(currentTimeMillis() + (1000 * 60));
+
+            unt.prepare();
+            return unt.getUsernameTokenElement();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
-        return unt.getUsernameTokenElement();
     }
 
     /**

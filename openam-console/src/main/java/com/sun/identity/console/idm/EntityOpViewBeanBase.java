@@ -25,6 +25,7 @@
  * $Id: EntityOpViewBeanBase.java,v 1.4 2008/09/04 23:59:37 veiming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.idm;
@@ -52,7 +53,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.tabs.CCTabs;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;

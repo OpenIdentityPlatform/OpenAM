@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.password.ui;
 
@@ -41,9 +42,9 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * <code>PWResetServlet</code> is the controller Servlet for the

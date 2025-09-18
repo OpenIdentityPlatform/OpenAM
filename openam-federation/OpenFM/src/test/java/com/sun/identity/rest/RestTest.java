@@ -29,6 +29,7 @@
 
 /**
  * Portions copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
@@ -46,8 +47,8 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.unittest.UnittestLog;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Hash;
 import java.net.URLEncoder;
@@ -55,7 +56,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONArray;

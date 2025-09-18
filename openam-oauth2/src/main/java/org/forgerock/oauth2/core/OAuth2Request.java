@@ -13,11 +13,12 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +38,7 @@ import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

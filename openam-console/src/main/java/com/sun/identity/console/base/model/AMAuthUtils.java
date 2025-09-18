@@ -24,6 +24,8 @@
  *
  * $Id: AMAuthUtils.java,v 1.2 2008/06/25 05:42:49 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.base.model;
@@ -33,7 +35,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class provides authentication related helper methods.

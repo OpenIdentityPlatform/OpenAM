@@ -25,6 +25,7 @@
  * $Id: SystemConfigurationUtil.java,v 1.7 2008/08/06 17:26:14 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.common;
@@ -41,7 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.plugin.configuration.ConfigurationActionEvent;
 import com.sun.identity.plugin.configuration.ConfigurationException;

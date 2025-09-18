@@ -25,20 +25,21 @@
  * $Id: FAMSTSImpl.java,v 1.6 2010/01/15 18:54:35 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.sts;
 
 import com.sun.identity.shared.xml.XMLUtils;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import com.sun.xml.ws.api.security.trust.WSTrustException;
 import com.sun.xml.ws.api.security.trust.config.STSConfiguration;

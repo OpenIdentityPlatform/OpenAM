@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2018-2025 3A Systems, LLC.
+ * Portions copyright 2018-2025 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -27,8 +27,8 @@ import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.NameCallback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Defines methods to update a NameCallback from the headers and request of a Rest call and methods to convert a

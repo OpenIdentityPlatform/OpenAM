@@ -25,6 +25,7 @@
  * $Id: ServerEditAdvancedViewBean.java,v 1.5 2009/07/06 18:20:04 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -61,7 +62,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Server Configuration, Advanced Tab.

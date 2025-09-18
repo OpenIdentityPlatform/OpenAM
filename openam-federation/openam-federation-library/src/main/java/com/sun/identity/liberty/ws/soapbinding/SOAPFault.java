@@ -24,6 +24,7 @@
  *
  * $Id: SOAPFault.java,v 1.2 2008/06/25 05:47:23 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -39,8 +40,8 @@ import javax.xml.bind.JAXBException;
 
 import javax.xml.namespace.QName;
 
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.MimeHeaders;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MimeHeaders;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

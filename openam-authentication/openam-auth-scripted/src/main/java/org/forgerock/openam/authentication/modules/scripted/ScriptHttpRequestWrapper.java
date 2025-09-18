@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
 import org.forgerock.util.Reject;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;

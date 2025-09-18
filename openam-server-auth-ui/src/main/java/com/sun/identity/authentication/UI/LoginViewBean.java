@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;
 
@@ -44,10 +45,10 @@ import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;

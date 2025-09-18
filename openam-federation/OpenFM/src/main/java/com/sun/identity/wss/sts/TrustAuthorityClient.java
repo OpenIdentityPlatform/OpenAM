@@ -24,6 +24,7 @@
  *
  * $Id: TrustAuthorityClient.java,v 1.29 2009/10/13 23:19:48 mallas Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.sts;
@@ -42,9 +43,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
-import javax.servlet.ServletContext;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPException;
+import jakarta.servlet.ServletContext;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPException;
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 import javax.crypto.spec.SecretKeySpec;

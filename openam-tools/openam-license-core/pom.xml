@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -20,7 +21,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -38,6 +39,28 @@
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openidentityplatform.commons.http-framework</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openidentityplatform.opendj</groupId>
+                    <artifactId>opendj-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openidentityplatform.openam</groupId>
+                    <artifactId>openam-audit-context</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openidentityplatform.opendj</groupId>
+                    <artifactId>opendj-grizzly</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openidentityplatform.commons</groupId>
+                    <artifactId>json-resource-http</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons.guice</groupId>
@@ -47,7 +70,6 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <classifier>no_aop</classifier>
         </dependency>
         
         <dependency>

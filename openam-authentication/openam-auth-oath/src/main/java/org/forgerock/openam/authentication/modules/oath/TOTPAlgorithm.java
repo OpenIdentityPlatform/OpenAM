@@ -9,6 +9,7 @@
  (http://trustee.ietf.org/license-info).
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -17,7 +18,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.security.GeneralSecurityException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * This is an example implementation of the OATH

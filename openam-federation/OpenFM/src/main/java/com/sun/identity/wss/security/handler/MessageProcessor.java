@@ -24,6 +24,7 @@
  *
  * $Id: MessageProcessor.java,v 1.2 2008/06/25 05:50:11 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security.handler;
@@ -32,12 +33,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.security.AccessController;
 import java.security.cert.Certificate;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPException;
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Map;
 import java.util.List;

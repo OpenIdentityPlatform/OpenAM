@@ -13,7 +13,7 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
- * Portions Copyrighted 2022-2025 3A Systems, LLC.
+ * Portions copyright 2022-2025 3A Systems, LLC.
  */
 package org.forgerock.openam.core.rest.authn.core;
 
@@ -32,9 +32,9 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Set;
 

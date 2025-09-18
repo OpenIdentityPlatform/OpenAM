@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -20,8 +21,8 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;

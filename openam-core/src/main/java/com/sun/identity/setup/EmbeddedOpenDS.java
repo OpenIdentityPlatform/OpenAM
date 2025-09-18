@@ -65,7 +65,7 @@ import java.util.zip.ZipFile;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import com.google.common.io.ByteStreams;
 import org.forgerock.i18n.LocalizableMessage;

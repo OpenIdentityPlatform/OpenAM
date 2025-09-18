@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -33,8 +34,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.forgerock.openam.sm.ServiceSchemaManagerFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;

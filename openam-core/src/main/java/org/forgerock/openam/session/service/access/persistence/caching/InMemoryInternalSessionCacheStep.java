@@ -14,6 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  * 
  * Portions Copyrighted 2023 Open Identity Platform Community.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.session.service.access.persistence.caching;
@@ -31,9 +32,9 @@ import java.util.concurrent.atomic.AtomicStampedReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.service.access.persistence.InternalSessionStore;

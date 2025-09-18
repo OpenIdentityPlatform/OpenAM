@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.cts.monitoring.impl.persistence;
 
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collection;
 
 /**

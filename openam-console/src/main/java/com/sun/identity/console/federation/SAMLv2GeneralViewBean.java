@@ -24,6 +24,8 @@
  *
  * $Id: SAMLv2GeneralViewBean.java,v 1.3 2008/06/25 05:49:37 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -35,7 +37,7 @@ import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.federation.model.SAMLv2Model;
 import com.sun.web.ui.view.alert.CCAlert;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SAMLv2GeneralViewBean extends SAMLv2Base {
     

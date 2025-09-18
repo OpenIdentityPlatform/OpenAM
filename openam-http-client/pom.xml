@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
@@ -67,7 +67,7 @@
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jee</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>

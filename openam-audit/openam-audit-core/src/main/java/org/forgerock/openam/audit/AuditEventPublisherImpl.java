@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.audit;
 
@@ -31,8 +32,8 @@ import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.openam.audit.AuditConstants.EventName;
 import org.forgerock.services.context.RootContext;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Responsible for publishing locally created audit events to the AuditService.

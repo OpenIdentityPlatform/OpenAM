@@ -12,16 +12,17 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.license;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * Locates license files using the {@link javax.servlet.ServletContext#getResourceAsStream(String)} method to locate
+ * Locates license files using the {@link jakarta.servlet.ServletContext#getResourceAsStream(String)} method to locate
  * licenses within a web archive. This allows more flexibility than the {@link ClasspathLicenseLocator} in a web
  * application as the license may be located anywhere within the .war file and does not need to be on the classpath.
  *

@@ -25,6 +25,7 @@
  * $Id: ConsoleServletBase.java,v 1.7 2009/03/24 23:57:32 babysunil Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.base;
 
@@ -46,8 +47,8 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.owasp.esapi.ESAPI;
 
 

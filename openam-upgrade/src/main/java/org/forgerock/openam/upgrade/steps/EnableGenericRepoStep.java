@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -21,7 +23,7 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;

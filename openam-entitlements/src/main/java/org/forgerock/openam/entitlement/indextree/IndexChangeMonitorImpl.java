@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.indextree;
@@ -19,7 +20,7 @@ package org.forgerock.openam.entitlement.indextree;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManagementDAO;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;

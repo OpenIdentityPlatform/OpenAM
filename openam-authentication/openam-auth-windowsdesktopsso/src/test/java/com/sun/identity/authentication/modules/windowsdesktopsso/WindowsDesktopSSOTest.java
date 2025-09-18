@@ -39,7 +39,7 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 @PrepareForTest({ SystemProperties.class, AuthD.class, InjectorHolder.class})
-@PowerMockIgnore({"jdk.internal.reflect.*", "javax.servlet.*"})
+@PowerMockIgnore({"jdk.internal.reflect.*", "jakarta.servlet.*"})
 public class WindowsDesktopSSOTest extends PowerMockTestCase {
 
     WindowsDesktopSSO windowsDesktopSSO = null;

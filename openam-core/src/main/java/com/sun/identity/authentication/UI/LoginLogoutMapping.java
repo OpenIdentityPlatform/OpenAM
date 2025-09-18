@@ -25,6 +25,7 @@
  * $Id: LoginLogoutMapping.java,v 1.11 2009/06/03 20:46:50 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;           
 
@@ -35,8 +36,8 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 
 /** 
  *

@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.modules.msisdn;
 
@@ -49,8 +50,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
 
 /**
  * MSISDN Authentication module retrieves the device's <code>msisdn</code>

@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.base;
 
@@ -36,7 +37,7 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class AMAdminFrameViewBean
     extends AMViewBeanBase

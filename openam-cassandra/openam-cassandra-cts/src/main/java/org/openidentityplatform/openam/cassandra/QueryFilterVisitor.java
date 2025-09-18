@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;

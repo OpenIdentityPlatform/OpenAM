@@ -24,6 +24,7 @@
  *
  * $Id: ServerConfigXMLViewBean.java,v 1.7 2008/08/29 18:14:52 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -57,7 +58,7 @@ import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This view bean manages server configuration XML.

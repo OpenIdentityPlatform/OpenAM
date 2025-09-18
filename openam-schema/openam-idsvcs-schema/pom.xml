@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -56,6 +57,7 @@
                                 <mkdir dir="${project.build.directory}/unwanted" />
 
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpathref="wscompile.path" failonerror="true">
+                                    <arg value="-verbose" />
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-keep" />
@@ -121,19 +123,28 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
+            <groupId>javax.xml.soap</groupId>
+            <artifactId>javax.xml.soap-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.soap</groupId>
+            <artifactId>jakarta.xml.soap-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-spi</artifactId>
         </dependency>
 
         <dependency>
-<!--             <groupId>external</groupId> -->
-            <groupId>com.sun.xml.rpc</groupId>
-            <artifactId>jaxrpc-impl</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
         </dependency>
     </dependencies>
 </project>

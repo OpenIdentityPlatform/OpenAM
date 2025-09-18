@@ -25,11 +25,12 @@
  * $Id: VersionViewBean.java,v 1.1 2009/08/05 20:15:51 veiming Exp $
  *
  * Portions copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.version;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;

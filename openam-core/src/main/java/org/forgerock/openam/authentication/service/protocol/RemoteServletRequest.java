@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -36,13 +37,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 /**
  * This class encapsulates a ServletRequest allowing its state to be serialized.
@@ -536,17 +537,17 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     public RequestDispatcher getRequestDispatcher(String path) {
 	    return request != null ? this.request.getRequestDispatcher(path) : null;
     }
-    
+
     /**
      * The default behavior of this method is to return getRealPath(String path)
      * on the wrapped request object. <b>Not serialized, null post serialization.</b>
-     * 
+     *
      * @return The real path of the request.
      */
     public String getRealPath(String path) {
 	    return request != null ? this.request.getRealPath(path) : null;
-    }    
-    
+    }
+
     /**
      * Tests if an object implements the java.io.Serializable interface.
      * 

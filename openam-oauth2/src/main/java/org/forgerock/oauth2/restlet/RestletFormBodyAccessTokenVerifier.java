@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.oauth2.restlet;
 
@@ -24,8 +25,8 @@ import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Verifies that a OAuth2 request that is made to one of the protected endpoints on the OAuth2 provider,

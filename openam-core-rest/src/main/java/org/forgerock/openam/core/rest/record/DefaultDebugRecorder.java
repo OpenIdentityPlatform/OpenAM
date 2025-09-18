@@ -13,6 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -38,8 +39,8 @@ import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

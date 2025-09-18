@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.xacml3.validation;
@@ -20,7 +21,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Set;
 
 /**

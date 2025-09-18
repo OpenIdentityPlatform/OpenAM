@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;
 
@@ -47,8 +48,8 @@ import java.util.ResourceBundle;
 import java.util.Map;
 import java.util.Set;
 import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.forgerock.openam.console.base.ConsoleViewBeanBase;
 
 /**

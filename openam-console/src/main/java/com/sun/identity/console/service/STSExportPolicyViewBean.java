@@ -27,6 +27,7 @@
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.service;
 
@@ -47,7 +48,7 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCStaticTextField;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.owasp.esapi.ESAPI;
 
 /**

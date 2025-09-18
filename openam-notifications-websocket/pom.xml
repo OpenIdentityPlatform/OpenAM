@@ -20,7 +20,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,8 +40,12 @@
             <artifactId>openam-notifications</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-client-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>

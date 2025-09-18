@@ -24,6 +24,7 @@
  *
  * $Id: DefaultIDPECPSessionMapper.java,v 1.2 2008/06/25 05:47:50 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -32,8 +33,8 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class is the default implementation of <code>IDPECPSessionMapper</code>.

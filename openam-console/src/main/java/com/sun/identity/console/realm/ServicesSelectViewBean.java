@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.realm;
 
@@ -55,8 +56,8 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ServicesSelectViewBean
     extends AMPrimaryMastHeadViewBean

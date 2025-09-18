@@ -25,14 +25,15 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service;
 
 import java.security.AccessController;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;

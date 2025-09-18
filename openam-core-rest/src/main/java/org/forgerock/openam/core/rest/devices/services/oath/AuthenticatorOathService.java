@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.core.rest.devices.services.oath;
 

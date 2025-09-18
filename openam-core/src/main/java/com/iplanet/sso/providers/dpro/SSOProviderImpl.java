@@ -28,6 +28,7 @@
 
 /**
  * Portions copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.iplanet.sso.providers.dpro;
 
@@ -35,7 +36,7 @@ import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.ClientUtils;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.http.authz;
 
@@ -20,8 +21,8 @@ import static org.forgerock.caf.authentication.framework.AuthenticationFramework
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.http.Filter;
 import org.forgerock.http.Handler;

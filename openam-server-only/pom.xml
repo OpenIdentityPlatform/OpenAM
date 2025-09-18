@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -908,15 +908,22 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+
         <!-- cassandra dependencies -->
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

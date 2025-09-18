@@ -24,6 +24,7 @@
  *
  * $Id: SMPostAuthPlugin.java,v 1.2 2008/06/25 05:48:57 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -33,8 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;

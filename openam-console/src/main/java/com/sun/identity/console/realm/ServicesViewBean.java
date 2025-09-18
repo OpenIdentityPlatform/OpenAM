@@ -24,6 +24,8 @@
  *
  * $Id: ServicesViewBean.java,v 1.2 2008/06/25 05:43:12 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm;
@@ -60,8 +62,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static com.sun.identity.console.XuiRedirectHelper.*;
 

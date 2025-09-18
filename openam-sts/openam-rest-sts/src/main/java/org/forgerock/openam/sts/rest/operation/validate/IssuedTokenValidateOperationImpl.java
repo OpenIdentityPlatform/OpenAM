@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.operation.validate;
@@ -28,7 +29,7 @@ import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidator;
 import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidatorParameters;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.HashSet;
 import java.util.Set;
 

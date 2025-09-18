@@ -25,6 +25,7 @@
  * $Id: MAPModelBase.java,v 1.3 2009/01/28 05:34:57 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service.model;
@@ -47,7 +48,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class MAPModelBase extends AMModelBase implements MAPModel {
 

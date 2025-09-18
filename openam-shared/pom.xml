@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -70,7 +70,6 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <classifier>no_aop</classifier>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
@@ -83,8 +82,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 

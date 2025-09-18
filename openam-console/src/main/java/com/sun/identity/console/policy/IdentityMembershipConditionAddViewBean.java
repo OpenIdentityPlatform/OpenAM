@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.policy;
 
@@ -49,7 +50,7 @@ import com.sun.web.ui.view.html.CCTextField;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Default implementation of Identity Member Condition Add View Bean.

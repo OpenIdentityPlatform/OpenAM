@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -27,10 +28,10 @@ import com.sun.identity.sm.ServiceListener;
 import java.security.AccessController;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletContext;
 
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.guice.ServletContextCache;

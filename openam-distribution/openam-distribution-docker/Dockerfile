@@ -1,4 +1,4 @@
-FROM tomcat:9-jre21
+FROM tomcat:11-jre21
 
 LABEL org.opencontainers.image.authors="Open Identity Platform Community"
 
@@ -12,15 +12,21 @@ ENV MEMORY="-server"
 ENV CATALINA_OPTS="$MEMORY -Dcom.iplanet.services.configpath=$OPENAM_DATA_DIR -Dcom.sun.identity.configuration.directory=$OPENAM_DATA_DIR"
 
 ARG VERSION
+RUN mkdir /usr/openam \
+    && rm -rf $CATALINA_HOME/webapps/*
+
+#COPY openam-server/target/OpenAM-*.war $CATALINA_HOME/webapps/$OPENAM_PATH.war
+#COPY openam-distribution/openam-distribution-ssoadmintools/target/*.zip /usr/openam/ssoadmintools.zip
+#COPY openam-distribution/openam-distribution-ssoconfiguratortools/target/*.zip /usr/openam/ssoconfiguratortools.zip
+
+RUN if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists; fi
 
 RUN apt-get update && apt-get install -y curl unzip \
- && rm -rf  $CATALINA_HOME/webapps/* \
  && if [ -z "$VERSION" ] ; then VERSION="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)"; fi \
- && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/OpenAM-$VERSION.war --output $CATALINA_HOME/webapps/$OPENAM_PATH.war  \
- && mkdir /usr/openam \
- && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOConfiguratorTools-$VERSION.zip --output /usr/openam/ssoconfiguratortools.zip  \
+ && if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/OpenAM-$VERSION.war --output $CATALINA_HOME/webapps/$OPENAM_PATH.war; fi \
+ && if [ ! -f "/usr/openam/ssoconfiguratortools.zip" ]; then curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOConfiguratorTools-$VERSION.zip --output /usr/openam/ssoconfiguratortools.zip; fi \
  && mkdir /usr/openam/ssoconfiguratortools && unzip /usr/openam/ssoconfiguratortools.zip -d /usr/openam/ssoconfiguratortools  && rm /usr/openam/ssoconfiguratortools.zip \
- && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOAdminTools-$VERSION.zip --output /usr/openam/ssoadmintools.zip  \
+ && if [ ! -f "/usr/openam/ssoadmintools.zip" ]; then curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOAdminTools-$VERSION.zip --output /usr/openam/ssoadmintools.zip; fi \
  && mkdir /usr/openam/ssoadmintools && unzip /usr/openam/ssoadmintools.zip -d /usr/openam/ssoadmintools && rm /usr/openam/ssoadmintools.zip \
  && chgrp -R 0 /usr/openam/ \
  && chmod -R g=u /usr/openam/ \

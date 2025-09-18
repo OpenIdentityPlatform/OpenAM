@@ -25,6 +25,7 @@
  * $Id: SessionCommand.java,v 1.9 2010/01/04 18:59:21 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.cli;
@@ -42,7 +43,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.SessionCache;

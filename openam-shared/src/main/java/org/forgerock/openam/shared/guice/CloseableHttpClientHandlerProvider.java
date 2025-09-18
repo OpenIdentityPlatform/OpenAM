@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.shared.guice;
@@ -21,7 +22,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.util.Options;

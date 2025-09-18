@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -19,9 +20,9 @@ package org.forgerock.openidconnect;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;

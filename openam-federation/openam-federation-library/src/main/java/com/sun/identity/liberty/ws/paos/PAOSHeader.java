@@ -24,6 +24,7 @@
  *
  * $Id: PAOSHeader.java,v 1.4 2008/06/25 05:47:20 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 
@@ -35,7 +36,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The <code>PAOSHeader</code> class is used by a web application

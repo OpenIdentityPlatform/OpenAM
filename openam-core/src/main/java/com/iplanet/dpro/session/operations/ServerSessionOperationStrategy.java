@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.operations;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;

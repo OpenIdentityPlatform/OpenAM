@@ -12,20 +12,20 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.authentication.callbacks.PollingWaitCallback;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Defines methods to update a PollingWaitCallback from the headers and request of a Rest call and methods to convert a

@@ -24,6 +24,8 @@
  *
  * $Id: FileUploaderViewBean.java,v 1.2 2008/06/25 05:49:36 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.federation;
@@ -37,7 +39,7 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.masthead.CCSecondaryMasthead;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class FileUploaderViewBean
     extends AMViewBeanBase

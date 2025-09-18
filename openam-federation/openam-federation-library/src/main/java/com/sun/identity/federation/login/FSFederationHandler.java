@@ -24,6 +24,7 @@
  *
  * $Id: FSFederationHandler.java,v 1.3 2008/08/29 04:57:15 exu Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.federation.login;
@@ -34,10 +35,10 @@ import com.sun.identity.federation.services.util.FSServiceUtils;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet processes requests to initiate Federation

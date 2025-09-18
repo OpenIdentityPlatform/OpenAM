@@ -24,6 +24,8 @@
  *
  * $Id: EntityServicesViewBean.java,v 1.7 2009/12/01 20:42:42 veiming Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.idm;
@@ -54,7 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class EntityServicesViewBean
     extends EntityEditViewBean

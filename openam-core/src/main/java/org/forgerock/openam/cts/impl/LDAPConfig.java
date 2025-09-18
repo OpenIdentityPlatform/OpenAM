@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2020-2025 3A Systems, LLC.
+ * Portions copyright 2020-2025 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.impl;
 
@@ -24,8 +24,8 @@ import org.forgerock.openam.utils.ModifiedProperty;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Responsible for storing the configuration required by the LDAP implementation of the

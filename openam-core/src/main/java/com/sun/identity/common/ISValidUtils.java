@@ -24,13 +24,14 @@
  *
  * $Id: ISValidUtils.java,v 1.2 2008/06/25 05:42:26 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.common;
 
 import java.util.Iterator;
 
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 

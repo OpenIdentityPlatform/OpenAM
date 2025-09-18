@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -23,7 +24,7 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;

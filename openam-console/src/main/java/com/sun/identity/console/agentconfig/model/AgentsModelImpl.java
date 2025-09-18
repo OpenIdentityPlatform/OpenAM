@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.agentconfig.model;
 
@@ -65,7 +66,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - LOG COMPLETE - */
 

@@ -13,6 +13,7 @@
 *
 * Copyright 2015-2016 ForgeRock AS.
 * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+* Portions copyright 2025 3A Systems LLC.
 */
 package org.forgerock.openam.oauth2;
 
@@ -21,7 +22,7 @@ import static org.forgerock.openidconnect.Client.TokenEndpointAuthMethod.*;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.Set;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;

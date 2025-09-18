@@ -25,6 +25,7 @@
  * $Id: AuthPropertiesModelImpl.java,v 1.3 2008/07/09 02:04:49 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.authentication.model;
 
@@ -45,7 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /* - LOG COMPLETE - */ 
 

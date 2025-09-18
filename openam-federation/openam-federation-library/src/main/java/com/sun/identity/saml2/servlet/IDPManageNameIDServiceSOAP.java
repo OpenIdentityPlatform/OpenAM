@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPManageNameIDServiceSOAP.java,v 1.3 2009/06/12 22:21:41 mallas Exp $
+ *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.servlet;
@@ -35,11 +37,11 @@ import com.sun.identity.saml.common.SAMLUtils;
 import java.io.IOException;
 import java.util.Map; 
 import java.util.HashMap; 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
-import javax.xml.soap.SOAPException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import jakarta.xml.soap.SOAPException;
 
 
 /**

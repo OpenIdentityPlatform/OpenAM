@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -22,8 +23,8 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.security.cert.X509Certificate;
 
 /**
@@ -35,7 +36,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
     private static final String CALLBACK_NAME = "X509CertificateCallback";
 
     /**
-     * Checks the request for the presence of a parameter named 'javax.servlet.request.X509Certificate', if present
+     * Checks the request for the presence of a parameter named 'jakarta.servlet.request.X509Certificate', if present
      * and not null or empty takes the first certificate from the array and sets it on the X509CerificateCallback and
      * returns true.
      *
@@ -45,7 +46,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
             HttpServletResponse response, X509CertificateCallback callback) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
-                "javax.servlet.request.X509Certificate");
+                "jakarta.servlet.request.X509Certificate");
 
         if (certificates != null && certificates.length > 0) {
             callback.setCertificate(certificates[0]);

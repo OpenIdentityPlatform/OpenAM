@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.console.authentication;
 
@@ -69,7 +70,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 public class AuthConfigViewBean

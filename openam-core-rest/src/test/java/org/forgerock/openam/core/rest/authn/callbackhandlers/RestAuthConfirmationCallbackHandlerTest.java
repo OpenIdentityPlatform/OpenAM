@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -22,8 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 import javax.security.auth.callback.ConfirmationCallback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 package org.forgerock.openam.saml2;
 
@@ -20,7 +21,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import com.sun.identity.saml2.profile.ClientFaultException;
 import com.sun.identity.saml2.profile.ServerFaultException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Responsible for validating and providing a handful of parameters required for

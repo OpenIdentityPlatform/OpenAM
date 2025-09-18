@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2025 3A Systems LLC.
  * Portions Copyrighted 2025 OSSTech Corporation
  */
 
@@ -124,9 +125,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.SOAPMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.soap.SOAPMessage;
 
 /**
  * The utility class is used by the identity provider to process

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -30,8 +31,8 @@ import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.CollectionProvider;
 import org.forgerock.api.annotations.Create;

@@ -24,6 +24,7 @@
  *
  * $Id: ServerConfigXMLAddServerViewBean.java,v 1.2 2008/06/25 05:43:16 qcheng Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 
 package com.sun.identity.console.service;
@@ -47,7 +48,7 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Creates a new server to server configuration XML.

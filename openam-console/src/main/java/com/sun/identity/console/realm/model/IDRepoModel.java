@@ -24,6 +24,8 @@
  *
  * $Id: IDRepoModel.java,v 1.3 2009/11/19 23:46:00 asyhuang Exp $
  *
+ * Portions Copyrighted 2025 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.console.realm.model;
@@ -33,7 +35,7 @@ import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMConsoleException;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /* - NEED NOT LOG - */
 

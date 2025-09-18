@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>15.2.3-SNAPSHOT</version>
+        <version>16.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -114,30 +115,14 @@
 			<groupId>org.glassfish.metro</groupId>
 			<artifactId>wsit-impl</artifactId>
 		</dependency>
-<!--         <dependency> -->
-<!--             <groupId>javax.xml.bind</groupId> -->
-<!--             <artifactId>jaxb-api</artifactId> -->
-<!--         </dependency> -->
-
-<!--         <dependency> -->
-<!--             <groupId>com.sun.xml.bind</groupId> -->
-<!--             <artifactId>jaxb1-impl</artifactId> -->
-<!--         </dependency> -->
-
-<!--         <dependency> -->
-<!--             <groupId>com.sun.xml.bind</groupId> -->
-<!--             <artifactId>jaxb-libs</artifactId> -->
-<!--         </dependency> -->
-
         <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>jaxrpc-api</artifactId>
-        </dependency>
-
-        <dependency>
-<!--             <groupId>external</groupId> -->
-			<groupId>com.sun.xml.rpc</groupId>
+            <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
 
     </dependencies>

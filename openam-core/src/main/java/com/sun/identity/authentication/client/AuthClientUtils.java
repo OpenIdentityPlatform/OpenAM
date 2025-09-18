@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2025 3A Systems LLC.
  */
 package com.sun.identity.authentication.client;
 
@@ -55,7 +56,6 @@ import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
 import com.sun.identity.common.ResourceLookup;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
@@ -80,10 +80,10 @@ import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.StringUtils;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -1671,7 +1671,7 @@ public class AuthClientUtils {
         String encoding = (clientEncoding != null) ? clientEncoding : "UTF-8";
         boolean encoded = Boolean.parseBoolean(request.getParameter("encoded"));
 
-        if (request.getAttribute("javax.servlet.forward.servlet_path") != null) {
+        if (request.getAttribute("jakarta.servlet.forward.servlet_path") != null) {
             //this is a forwarded request, we should only save the forwarded URL.
             queryString.append(request.getQueryString());
             if (queryString.length() > 0) {
@@ -2289,7 +2289,7 @@ public class AuthClientUtils {
 
     /**
      * @deprecated use {@link #getDomainNameByRequest(
-     * javax.servlet.http.HttpServletRequest, java.util.Map<String, String>)} instead.
+     * jakarta.servlet.http.HttpServletRequest, java.util.Map<String, String>)} instead.
      */
     public static String getDomainNameByRequest(Map<String, String> requestHash) {
         String realm = getRealmFromPolicyAdvice(requestHash);

@@ -43,7 +43,7 @@ import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModel;
 import com.sun.identity.password.ui.model.PWResetUserValidationModelImpl;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Hashtable;
 
