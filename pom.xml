@@ -2045,9 +2045,7 @@
 			  	<doclint>none</doclint>
                 <notimestamp>true</notimestamp>
                 <excludePackageNames>
-                  org.apache.click
-                  org.openidentityplatform.openam.click
-                  org.openidentityplatform.openam.velocity
+                  org.apache.click;org.openidentityplatform.openam.click;org.openidentityplatform.openam.velocity;*.taglib*;*.taglib
                 </excludePackageNames>
 			  </configuration>
 			</plugin>
