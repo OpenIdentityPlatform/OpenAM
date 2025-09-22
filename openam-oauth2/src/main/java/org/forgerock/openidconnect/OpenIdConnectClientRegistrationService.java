@@ -271,13 +271,13 @@ public class OpenIdConnectClientRegistrationService {
                     throw new InvalidClientMetadata("Invalid scopes requested");
                 }
             } else { //if nothing requested, fall back to provider defaults
-                scopes = new ArrayList<String>();
+                scopes = new ArrayList<>();
                 scopes.addAll(providerSettings.getDefaultScopes());
             }
 
             //regardless, we add openid
-            if (!scopes.contains(OPENID)) {
-                scopes = new ArrayList<String>(scopes);
+            if (scopes.isEmpty()) {
+                scopes = new ArrayList<>();
                 scopes.add(OPENID);
             }
 
