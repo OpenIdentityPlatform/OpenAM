@@ -36,7 +36,7 @@
 
 <ServicesConfiguration>
     <Service name="AgentService" version="1.0">
-        <Schema i18nFileName="agentService" revisionNumber="10">
+        <Schema i18nFileName="agentService" revisionNumber="11">
             <Organization>
                 <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001" hideConfigUI="yes">
                     <AttributeSchema
@@ -181,6 +181,7 @@
                             <ChoiceValue i18nKey="a741">client_secret_basic</ChoiceValue>
                             <!--     <ChoiceValue i18nKey="a742">client_secret_jwt</ChoiceValue> -->
                             <ChoiceValue i18nKey="a743">private_key_jwt</ChoiceValue>
+                            <ChoiceValue>none</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>client_secret_basic</Value>

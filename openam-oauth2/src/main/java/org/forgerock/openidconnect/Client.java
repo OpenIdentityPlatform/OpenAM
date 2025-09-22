@@ -217,9 +217,9 @@ public class Client extends JsonValue {
         /** Client secret post type. */
      //   CLIENT_SECRET_JWT("client_secret_jwt"), todo uncomment as we add suppot
         /** Client secret basic type. */
-        PRIVATE_KEY_JWT("private_key_jwt");
+        PRIVATE_KEY_JWT("private_key_jwt"),
         /** None type. */
-     //   NONE("none");
+        NONE("none");
 
         private String type;
 
