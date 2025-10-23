@@ -67,7 +67,7 @@
                         </goals>
                         <configuration>
                             <container>
-                                <timeout>180000</timeout>
+                                <timeout>900000</timeout>
                             </container>
                         </configuration>
                     </execution>
@@ -95,6 +95,7 @@
                     </archive>
                     <container>
 	                    <containerId>${maven.cargo.containerId}</containerId>
+                        <timeout>900000</timeout>
 <!--	                    <type>embedded</type>-->
 <!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
 	                    <systemProperties>
