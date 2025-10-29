@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -71,6 +72,10 @@ public class OidcClaimsExtensionTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.logger = mock(Debug.class);
+        doAnswer(invocationOnMock -> {
+          System.out.println(invocationOnMock.getArguments()[0]);
+          return null;
+        }).when(logger).warning(anyString());
         this.ssoToken = mock(SSOToken.class);
         this.identity = mock(AMIdentity.class);
         this.accessToken = new StatefulAccessToken(json(object()), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, "id");
@@ -106,18 +111,20 @@ public class OidcClaimsExtensionTest {
     public void testRequestedClaims() throws Exception {
         // Given
         Map<String, Set<String>> requestedClaims = new HashMap<String, Set<String>>();
-        requestedClaims.put("given_name", asSet("fred"));
+        requestedClaims.put("given_name", asSet("joe", "fred"));
         requestedClaims.put("family_name", asSet("flintstone"));
+
         Bindings variables = testBindings(asSet("profile"), requestedClaims);
         when(identity.getAttribute("cn")).thenReturn(asSet("Joe Bloggs"));
+        when(identity.getAttribute("sn")).thenReturn(asSet("bloggs"));
+        when(identity.getAttribute("givenname")).thenReturn(asSet("joe"));
 
         // When
         UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);
 
         // Then
         assertThat(result.getValues()).containsOnly(
-                entry("given_name", "fred"),
-                entry("family_name", "flintstone"),
+                entry("given_name", "joe"),
                 entry("name", "Joe Bloggs"));
 
         assertThat(result.getCompositeScopes()).containsOnlyKeys("profile");
@@ -128,7 +135,7 @@ public class OidcClaimsExtensionTest {
         verify(identity).getAttribute("cn");
         verify(identity).getAttribute("preferredlocale");
         verify(identity).getAttribute("preferredtimezone");
-        verifyNoMoreInteractions(identity);
+        verify(identity).getAttribute("sn");
     }
 
     @Test
@@ -138,6 +145,9 @@ public class OidcClaimsExtensionTest {
         requestedClaims.put("given_name", asSet("fred"));
         requestedClaims.put("family_name", asSet("flintstone"));
         Bindings variables = testBindings(asSet("openid"), requestedClaims);
+
+        when(identity.getAttribute("sn")).thenReturn(asSet("flintstone"));
+        when(identity.getAttribute("givenname")).thenReturn(asSet("fred"));
 
         // When
         UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);

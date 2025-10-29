@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014-2016 ForgeRock AS.
+* Portions copyright 2025 3A Systems LLC.
 */
 import com.iplanet.sso.SSOException
 import com.sun.identity.idm.IdRepoException
@@ -52,12 +53,16 @@ def fromSet = { claim, attr ->
 }
 
 attributeRetriever = { attribute, claim, identity, requested ->
+    def attr = fromSet(claim, identity.getAttribute(attribute))
     if (requested == null || requested.isEmpty()) {
-        fromSet(claim, identity.getAttribute(attribute))
-    } else if (requested.size() == 1) {
-        requested.iterator().next()
+        attr
     } else {
-        throw new RuntimeException("No selection logic for $claim defined. Values: $requested")
+        if (requested.contains(attr)) {
+            attr
+        } else {
+            logger.warning("OpenAMScopeValidator.getUserInfo(): $claim attribute=$attr does not match the requested value=$requested");
+            null
+        }
     }
 }
 
@@ -106,7 +111,7 @@ def computedClaims = scopes.findAll { s -> !"openid".equals(s) && scopeClaimsMap
     map << scopeClaims.findAll { c -> !requestedClaims.containsKey(c) }.collectEntries([:]) { claim -> computeClaim(claim, null) }
 }.findAll { map -> map.value != null } << requestedClaims.collectEntries([:]) { claim, requestedValue ->
     computeClaim(claim, requestedValue)
-}
+}.findAll { map -> map.value != null }
 
 def compositeScopes = scopeClaimsMap.findAll { scope ->
     scopes.contains(scope.key)
