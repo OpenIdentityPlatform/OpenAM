@@ -1,0 +1,169 @@
+package org.openidentityplatform.openam.mcp.server.service;
+
+import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
+import org.openidentityplatform.openam.mcp.server.model.User;
+import org.openidentityplatform.openam.mcp.server.model.UserDTO;
+import org.openidentityplatform.openam.mcp.server.model.UserSearchResponse;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class UserService {
+    private final RestClient openAMRestClient;
+
+    private final OpenAMConfig openAMConfig;
+
+    private final static String DEFAULT_REALM = "root";
+
+    public UserService(RestClient openAMRestClient, OpenAMConfig openAMConfig) {
+        this.openAMRestClient = openAMRestClient;
+        this.openAMConfig = openAMConfig;
+    }
+
+    @Tool(name = "get_users", description = "Returns OpenAM user list from the default (root) realm")
+    public List<User> getUsers(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
+                               @ToolParam(required = false, description = "Username filter") String filter) {
+
+        realm = getRealmOrDefault(realm);
+
+        String queryFilter = "true";
+        if(filter != null) {
+            queryFilter= "cn sw \"".concat(filter).concat("\"");
+        }
+        String uri = String.format("/json/realms/%s/users?_queryFilter=%s", realm, queryFilter);
+        String tokenId = getTokenId();
+        UserSearchResponse userSearchResponse  = openAMRestClient.get().uri(uri)
+                .header(openAMConfig.tokenHeader(), tokenId)
+                .retrieve()
+                .body(UserSearchResponse.class);
+        return userSearchResponse.result().stream().map(User::new).collect(Collectors.toList());
+    }
+
+    private static final Map<String, String> ATTR_MAP = Map.of("familyName", "sn",
+            "givenName", "givenName",
+            "name", "cn",
+            "mail", "mail",
+            "phone", "telephoneNumber");
+
+    @Tool(name = "set_user_attribute", description = "Sets the attribute value for a user")
+    public User setUserAttribute(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
+                                 @ToolParam(description = "username") String username,
+                                 @ToolParam(description = "user attribute name") String attribute,
+                                 @ToolParam(description = "user attribute value") String value) {
+
+        realm = getRealmOrDefault(realm);
+
+        if(!ATTR_MAP.containsKey(attribute)) {
+            throw new RuntimeException(String.format("invalid attribute: %s; allowed values %s", attribute, ATTR_MAP.keySet()));
+        }
+        String tokenId = getTokenId();
+
+        Map<String, String> requestBody = Map.of(ATTR_MAP.get(attribute), value);
+        String uri = String.format("/json/realms/%s/users/%s", realm, username);
+        UserDTO user = openAMRestClient.put().uri(uri).body(requestBody)
+                .header(openAMConfig.tokenHeader(), tokenId)
+                .header("Accept-API-Version","resource=2.0, protocol=1.0")
+                .retrieve()
+                .body(UserDTO.class);
+        return new User(user);
+    }
+
+
+    @Tool(name = "set_user_password", description = "Sets the password for a user")
+    public User setUserPassword(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
+                                 @ToolParam(description = "username") String username,
+                                 @ToolParam(description = "user password") String password) {
+
+        realm = getRealmOrDefault(realm);
+
+        String tokenId = getTokenId();
+
+        Map<String, String> requestBody = Map.of("userpassword", password);
+        String uri = String.format("/json/realms/%s/users/%s?_action=changePassword", realm, username);
+        UserDTO user = openAMRestClient.put().uri(uri).body(requestBody)
+                .header(openAMConfig.tokenHeader(), tokenId)
+                .header("Accept-API-Version","resource=2.0, protocol=1.0")
+                .retrieve()
+                .body(UserDTO.class);
+        return new User(user);
+    }
+
+    @Tool(name = "create_user", description = "Creates a new user")
+    public User createUser(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
+                                 @ToolParam(description = "Username (login)") String userName,
+                                 @ToolParam(description = "Password (min length 8)") String password,
+                                 @ToolParam(required = false, description = "User family name") String familyName,
+                                 @ToolParam(required = false, description = "User given name") String givenName,
+                                 @ToolParam(required = false, description = "Name") String name,
+                                 @ToolParam(required = false, description = "Email") String mail,
+                                 @ToolParam(required = false, description = "Phone number") String phone
+    ) {
+
+        realm = getRealmOrDefault(realm);
+
+        Map<String, String> userProps = new HashMap<>();
+        userProps.put("username", userName);
+        userProps.put("userpassword", password);
+        if(familyName != null) {
+            userProps.put(ATTR_MAP.get("familyName"), familyName);
+        }
+        if(givenName != null) {
+            userProps.put(ATTR_MAP.get("givenName"), givenName);
+        }
+        if(name != null) {
+            userProps.put(ATTR_MAP.get("name"), name);
+        }
+        if(mail != null) {
+            userProps.put(ATTR_MAP.get("mail"), mail);
+        }
+        if(phone != null) {
+            userProps.put(ATTR_MAP.get("phone"), phone);
+        }
+
+        String tokenId = getTokenId();
+
+        String uri = String.format("/json/realms/%s/users/?_action=create", realm);
+        UserDTO user = openAMRestClient.post().uri(uri).body(userProps)
+                .header(openAMConfig.tokenHeader(), tokenId)
+                .header("Accept-API-Version","resource=2.0, protocol=1.0")
+                .retrieve()
+                .body(UserDTO.class);
+        return new User(user);
+    }
+
+    @Tool(name = "delete_user", description = "Deletes a user")
+    public Map<String, String> deleteUser(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
+                           @ToolParam(description = "Username (login)") String username) {
+
+        realm = getRealmOrDefault(realm);
+
+        String tokenId = getTokenId();
+
+        String uri = String.format("/json/realms/%s/users/%s", realm, username);
+        return openAMRestClient.delete().uri(uri)
+                .header(openAMConfig.tokenHeader(), tokenId)
+                .header("Accept-API-Version","resource=2.0, protocol=1.0")
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+    }
+
+    private String getRealmOrDefault(String realm) {
+        return realm != null ? realm : DEFAULT_REALM;
+    }
+
+    private String getTokenId() {
+        RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
+        return (String) attrs.getAttribute("tokenId", RequestAttributes.SCOPE_REQUEST);
+    }
+
+}

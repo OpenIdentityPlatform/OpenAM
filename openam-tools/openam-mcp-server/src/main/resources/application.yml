@@ -1,0 +1,26 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: OpenAM MCP Server
+  ai:
+    mcp:
+      server:
+        name: openam-mcp-server
+        version: 0.0.1
+        protocol: STATELESS
+
+openam:
+  url: ${OPENAM_URL:http://openam.example.org:8080/openam}
+  tokenHeader: ${OPENAM_TOKEN_HEADER:iPlanetDirectoryPro}
+  useOAuthForAuthentication: ${OPENAM_USE_OAUTH:false}
+  username: ${OPENAM_ADMIN_USERNAME:amadmin}
+  password: ${OPENAM_ADMIN_PASSWORD:ampassword}
+  oidcAuthChain: ${OPENAM_OIDC_AUTH_CHAIN:oidc}
+  oidcAuthHeader: ${OPENAM_OIDC_AUTH_HEADER:oidc_id_token}
+
+
+logging:
+  level:
+    org:
+      #springframework: DEBUG
