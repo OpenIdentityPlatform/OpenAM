@@ -1248,7 +1248,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     || crestQuery.isEscapeQueryId()) && MapUtils.getObject(avPairs, searchAttr) == null) {
 
         		String pattern = crestQuery.getQueryId();
-                if (crestQuery.isEscapeQueryId()) {
+                if (crestQuery.isEscapeQueryId() && !"*".equals(crestQuery.getQueryId())) {
                     pattern =  Filter.escapeAssertionValue(pattern);
                 }
                 first = Filter.valueOf(searchAttr + "=" + pattern);
