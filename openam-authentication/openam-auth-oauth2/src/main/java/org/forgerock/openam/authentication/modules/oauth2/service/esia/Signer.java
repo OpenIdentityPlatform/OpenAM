@@ -4,22 +4,22 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.iplanet.am.util.SystemProperties;
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.cms.CMSTypedData;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.util.Store;
+import org.openidentityplatform.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.openidentityplatform.bouncycastle.cert.X509CertificateHolder;
+import org.openidentityplatform.bouncycastle.cert.jcajce.JcaCertStore;
+import org.openidentityplatform.bouncycastle.cms.CMSProcessableByteArray;
+import org.openidentityplatform.bouncycastle.cms.CMSSignedData;
+import org.openidentityplatform.bouncycastle.cms.CMSSignedDataGenerator;
+import org.openidentityplatform.bouncycastle.cms.CMSTypedData;
+import org.openidentityplatform.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.openidentityplatform.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openidentityplatform.bouncycastle.openssl.PEMKeyPair;
+import org.openidentityplatform.bouncycastle.openssl.PEMParser;
+import org.openidentityplatform.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.openidentityplatform.bouncycastle.operator.ContentSigner;
+import org.openidentityplatform.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.openidentityplatform.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.openidentityplatform.bouncycastle.util.Store;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class Signer {
 	
 	final static Logger logger = LoggerFactory.getLogger(Signer.class);
 	static {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Security.addProvider(new org.openidentityplatform.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
 
 	private static final Cache<String, X509CertificateHolder> certificateHolderCache = CacheBuilder.newBuilder().maximumSize(10)
