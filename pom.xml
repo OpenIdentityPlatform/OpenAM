@@ -139,6 +139,7 @@
     <logback.version>1.3.15</logback.version>
     <netty.version>4.1.125.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
+    <bouncycastle.version>1.81</bouncycastle.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
     <java.surefire.options>
       -Xmx1g
@@ -241,6 +242,7 @@
                         <excludeArtifact>org.restlet.ext.json</excludeArtifact>
                         <excludeArtifact>org.restlet.ext.servlet</excludeArtifact>
                         <excludeArtifact>org.restlet.ext.xml</excludeArtifact>
+                        <excludeArtifact>bcpkix-shaded</excludeArtifact>
                       </excludeArtifacts>
                   </configuration>
 			    </plugin>
@@ -253,6 +255,7 @@
   <modules>
     <!-- shaded libraries -->
     <module>jato-shaded</module>
+    <module>bcpkix-shaded</module>
     <module>openam-http</module>
     <module>openam-ldap-utils</module>
     <module>openam-datastore</module>
@@ -405,16 +408,6 @@
         <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-core</artifactId>
         <version>${opendj.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bc-fips</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bctls-fips</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
