@@ -1,0 +1,97 @@
+{
+  "result": [
+    {
+      "loginFailureUrl": [
+        ""
+      ],
+      "authChainConfiguration": [
+        {
+          "module": "DataStore",
+          "criteria": "REQUIRED",
+          "options": {}
+        }
+      ],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        ""
+      ],
+      "_id": "ldapService",
+      "_type": {
+        "_id": "EMPTY",
+        "name": "Authentication Configuration",
+        "collection": true
+      }
+    },
+    {
+      "loginFailureUrl": [
+        ""
+      ],
+      "authChainConfiguration": [
+        {
+          "module": "Amster",
+          "criteria": "REQUIRED",
+          "options": {}
+        }
+      ],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        ""
+      ],
+      "_id": "amsterService",
+      "_type": {
+        "_id": "EMPTY",
+        "name": "Authentication Configuration",
+        "collection": true
+      }
+    },
+    {
+      "loginFailureUrl": [
+        ""
+      ],
+      "authChainConfiguration": [
+        {
+          "module": "oath2",
+          "criteria": "REQUISITE",
+          "options": {}
+        }
+      ],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        ""
+      ],
+      "_id": "oauth",
+      "_type": {
+        "_id": "EMPTY",
+        "name": "Authentication Configuration",
+        "collection": true
+      }
+    },
+    {
+      "loginFailureUrl": [
+        ""
+      ],
+      "authChainConfiguration": [
+        {
+          "module": "oidc",
+          "criteria": "REQUISITE",
+          "options": {}
+        }
+      ],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        ""
+      ],
+      "_id": "oidc",
+      "_type": {
+        "_id": "EMPTY",
+        "name": "Authentication Configuration",
+        "collection": true
+      }
+    }
+  ],
+  "resultCount": 4,
+  "pagedResultsCookie": null,
+  "totalPagedResultsPolicy": "NONE",
+  "totalPagedResults": -1,
+  "remainingPagedResults": -1
+}

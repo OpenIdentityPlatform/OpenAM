@@ -1,16 +1,14 @@
 package org.openidentityplatform.openam.mcp.server.service;
 
 import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
+import org.openidentityplatform.openam.mcp.server.model.SearchResponseDTO;
 import org.openidentityplatform.openam.mcp.server.model.User;
 import org.openidentityplatform.openam.mcp.server.model.UserDTO;
-import org.openidentityplatform.openam.mcp.server.model.UserSearchResponse;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +16,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
-    private final RestClient openAMRestClient;
-
-    private final OpenAMConfig openAMConfig;
-
-    private final static String DEFAULT_REALM = "root";
-
+public class UserService extends OpenAMAbstractService {
     public UserService(RestClient openAMRestClient, OpenAMConfig openAMConfig) {
-        this.openAMRestClient = openAMRestClient;
-        this.openAMConfig = openAMConfig;
+        super(openAMRestClient, openAMConfig);
     }
 
     @Tool(name = "get_users", description = "Returns OpenAM user list from the default (root) realm")
@@ -42,10 +33,10 @@ public class UserService {
         }
         String uri = String.format("/json/realms/%s/users?_queryFilter=%s", realm, queryFilter);
         String tokenId = getTokenId();
-        UserSearchResponse userSearchResponse  = openAMRestClient.get().uri(uri)
+        SearchResponseDTO<UserDTO> userSearchResponse  = openAMRestClient.get().uri(uri)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .retrieve()
-                .body(UserSearchResponse.class);
+                .body(new ParameterizedTypeReference<>() {});
         return userSearchResponse.result().stream().map(User::new).collect(Collectors.toList());
     }
 
@@ -156,14 +147,4 @@ public class UserService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
     }
-
-    private String getRealmOrDefault(String realm) {
-        return realm != null ? realm : DEFAULT_REALM;
-    }
-
-    private String getTokenId() {
-        RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
-        return (String) attrs.getAttribute("tokenId", RequestAttributes.SCOPE_REQUEST);
-    }
-
 }
