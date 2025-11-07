@@ -1360,11 +1360,11 @@
         <artifactId>authapi</artifactId>
         <version>${authapi.version}</version>
       </dependency>
-	  <dependency>
-	    <groupId>org.opendaylight.cardinal</groupId>
-	    <artifactId>jdmk</artifactId>
-	    <version>0.3.3</version>
-	  </dependency>
+      <dependency>
+        <groupId>external</groupId>
+        <artifactId>jdmkrt</artifactId>
+        <version>2007-01-10</version>
+      </dependency>
       <dependency>
         <groupId>external</groupId>
         <artifactId>jdmktk</artifactId>
@@ -2298,6 +2298,21 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<inherited>false</inherited>
 				<executions>
+                    <execution>
+                      <id>install-jar-lib-jdmkrt</id>
+                      <goals>
+                        <goal>install-file</goal>
+                      </goals>
+                      <phase>validate</phase>
+                      <configuration>
+                        <groupId>external</groupId>
+                        <artifactId>jdmkrt</artifactId>
+                        <version>2007-01-10</version>
+                        <packaging>jar</packaging>
+                        <file>${basedir}/extlib/jdmkrt-2007-01-10.jar</file>
+                        <generatePom>true</generatePom>
+                      </configuration>
+                    </execution>
 					<execution>
 						<id>install-jar-lib-jdmktk</id>
 						<goals>
