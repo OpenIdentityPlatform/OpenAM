@@ -389,8 +389,8 @@
 
         <!-- Legacy External Libraries for OpenAM -->
 		<dependency>
-		    <groupId>org.opendaylight.cardinal</groupId>
-		    <artifactId>jdmk</artifactId>
+            <groupId>external</groupId>
+            <artifactId>jdmkrt</artifactId>
 		</dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
