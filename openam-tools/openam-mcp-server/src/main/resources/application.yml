@@ -7,7 +7,7 @@ spring:
     mcp:
       server:
         name: openam-mcp-server
-        version: 0.0.1
+        version: ^project.version^
         protocol: STATELESS
 
 openam:

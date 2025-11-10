@@ -82,6 +82,30 @@ Set the MCP server environment variable `OPENAM_USE_OAUTH` to `true`
 
 ## Available MCP Server Tools
 
+### Authentication Service Tools
+
+```java
+@Tool(name = "get_auth_modules", description = "Returns OpenAM authentication modules list")
+public List<AuthModule> getAuthModules(@ToolParam(required = false, description = "If not set, uses root realm") String realm)
+
+@Tool(name = "get_auth_chains", description = "Returns OpenAM authentication chains with modules")
+public List<AuthChain> getOpenAMAuthChains(@ToolParam(required = false, description = "If not set, uses root realm") String realm)
+
+@Tool(name = "get_available_modules", description = "Returns all avialable authenticaion modules")
+public List<CoreAuthModule> getAvailableModuleList() 
+
+
+```
+
+### Realm Tools
+
+```java
+@Tool(name = "get_realms", description = "Returns OpenAM realm list")
+public List<Realm> getRealms()
+```
+
+### User Tools
+
 ```java
 @Tool(name = "get_users", description = "Returns OpenAM user list from the default (root) realm")
 public List<User> getUsers(@ToolParam(required = false, description = "If not set, uses root realm") String realm,
@@ -124,22 +148,22 @@ In JSON-RPC format:
       "inputSchema": {
         "type": "object",
         "properties": {
-          "realm": {
+          "arg0": {
             "type": "string",
             "description": "If not set, uses root realm"
           },
-          "username": {
+          "arg1": {
             "type": "string",
             "description": "username"
           },
-          "password": {
+          "arg2": {
             "type": "string",
             "description": "user password"
           }
         },
         "required": [
-          "username",
-          "password"
+          "arg1",
+          "arg2"
         ],
         "additionalProperties": false
       }
@@ -150,28 +174,38 @@ In JSON-RPC format:
       "inputSchema": {
         "type": "object",
         "properties": {
-          "realm": {
+          "arg0": {
             "type": "string",
             "description": "If not set, uses root realm"
           },
-          "username": {
+          "arg1": {
             "type": "string",
             "description": "username"
           },
-          "attribute": {
+          "arg2": {
             "type": "string",
             "description": "user attribute name"
           },
-          "value": {
+          "arg3": {
             "type": "string",
             "description": "user attribute value"
           }
         },
         "required": [
-          "username",
-          "attribute",
-          "value"
+          "arg1",
+          "arg2",
+          "arg3"
         ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_realms",
+      "description": "Returns OpenAM realm list",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
         "additionalProperties": false
       }
     },
@@ -181,13 +215,28 @@ In JSON-RPC format:
       "inputSchema": {
         "type": "object",
         "properties": {
-          "realm": {
+          "arg0": {
             "type": "string",
             "description": "If not set, uses root realm"
           },
-          "filter": {
+          "arg1": {
             "type": "string",
             "description": "Username filter"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_auth_modules",
+      "description": "Returns OpenAM authentication modules list",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arg0": {
+            "type": "string",
+            "description": "If not set, uses root realm"
           }
         },
         "required": [],
@@ -200,42 +249,42 @@ In JSON-RPC format:
       "inputSchema": {
         "type": "object",
         "properties": {
-          "realm": {
+          "arg0": {
             "type": "string",
             "description": "If not set, uses root realm"
           },
-          "userName": {
+          "arg1": {
             "type": "string",
             "description": "Username (login)"
           },
-          "password": {
+          "arg2": {
             "type": "string",
             "description": "Password (min length 8)"
           },
-          "familyName": {
+          "arg3": {
             "type": "string",
             "description": "User family name"
           },
-          "givenName": {
+          "arg4": {
             "type": "string",
             "description": "User given name"
           },
-          "name": {
+          "arg5": {
             "type": "string",
             "description": "Name"
           },
-          "mail": {
+          "arg6": {
             "type": "string",
             "description": "Email"
           },
-          "phone": {
+          "arg7": {
             "type": "string",
             "description": "Phone number"
           }
         },
         "required": [
-          "userName",
-          "password"
+          "arg1",
+          "arg2"
         ],
         "additionalProperties": false
       }
@@ -246,22 +295,46 @@ In JSON-RPC format:
       "inputSchema": {
         "type": "object",
         "properties": {
-          "realm": {
+          "arg0": {
             "type": "string",
             "description": "If not set, uses root realm"
           },
-          "username": {
+          "arg1": {
             "type": "string",
             "description": "Username (login)"
           }
         },
         "required": [
-          "username"
+          "arg1"
         ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_available_modules",
+      "description": "Returns all avialable authenticaion modules",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_auth_chains",
+      "description": "Returns OpenAM authentication chains with modules",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arg0": {
+            "type": "string",
+            "description": "If not set, uses root realm"
+          }
+        },
+        "required": [],
         "additionalProperties": false
       }
     }
   ]
 }
-
 ```
