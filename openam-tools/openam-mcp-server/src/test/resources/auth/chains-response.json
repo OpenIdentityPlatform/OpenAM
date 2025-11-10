@@ -87,9 +87,31 @@
         "name": "Authentication Configuration",
         "collection": true
       }
+    },
+    {
+      "loginFailureUrl": [
+        ""
+      ],
+      "authChainConfiguration": [
+        {
+          "module": "HOTP",
+          "criteria": "REQUISITE",
+          "options": {}
+        }
+      ],
+      "loginPostProcessClass": [],
+      "loginSuccessUrl": [
+        ""
+      ],
+      "_id": "hotp",
+      "_type": {
+        "_id": "EMPTY",
+        "name": "Authentication Configuration",
+        "collection": true
+      }
     }
   ],
-  "resultCount": 4,
+  "resultCount": 5,
   "pagedResultsCookie": null,
   "totalPagedResultsPolicy": "NONE",
   "totalPagedResults": -1,
