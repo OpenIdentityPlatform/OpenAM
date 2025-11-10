@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>bcpkix-shaded</artifactId>
-            <version>1.81</version>
+            <version>${project.version}</version>
         </dependency>
 		<dependency>
             <groupId>org.mockito</groupId>

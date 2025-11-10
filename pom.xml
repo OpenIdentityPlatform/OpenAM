@@ -1143,12 +1143,12 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-impl</artifactId>
-        <version>${jaxrpc-impl.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-spi</artifactId>
-        <version>${jaxrpc-spi.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <!-- TODO jmx -->
 	<dependency>
@@ -1159,7 +1159,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jato-shaded</artifactId>
-        <version>2005-05-04</version>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
@@ -1170,7 +1170,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>cc</artifactId>
-        <version>2008-08-08</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
@@ -1379,12 +1379,12 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.stream</groupId>
@@ -1399,17 +1399,17 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.json</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.xml</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.servlet</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>
@@ -1637,7 +1637,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>${activemq.version}</version>
+        <version>${project.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

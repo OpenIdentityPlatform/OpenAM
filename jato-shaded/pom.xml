@@ -31,8 +31,6 @@
     <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
     <artifactId>jato-shaded</artifactId>
     <packaging>jar</packaging>
-    <version>2005-05-04</version>
-
     <!-- Build -->
 
     <dependencies>

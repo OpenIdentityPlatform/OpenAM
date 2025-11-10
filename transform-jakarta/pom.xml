@@ -39,6 +39,7 @@
     </modules>
     <properties>
         <transformer.artifact.groupId>${project.groupId}</transformer.artifact.groupId>
+        <transformer.artifact.version>${project.version}</transformer.artifact.version>
     </properties>
     <build>
         <pluginManagement>
@@ -58,7 +59,7 @@
                                     <artifactItem>
                                         <groupId>${transformer.artifact.groupId}</groupId>
                                         <artifactId>${project.artifactId}</artifactId>
-                                        <version>${project.version}</version>
+                                        <version>${transformer.artifact.version}</version>
                                         <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                                     </artifactItem>
                                 </artifactItems>
