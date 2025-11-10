@@ -25,11 +25,11 @@
     </parent>
 
     <artifactId>restlet-parent-jakarta</artifactId>
-
     <name>${project.groupId}.${project.artifactId}</name>
 
     <properties>
         <transformer.artifact.groupId>org.restlet.jee</transformer.artifact.groupId>
+        <transformer.artifact.version>${restlet.version}</transformer.artifact.version>
     </properties>
 
     <packaging>pom</packaging>

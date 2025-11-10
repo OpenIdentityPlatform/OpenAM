@@ -25,11 +25,11 @@
     </parent>
 
     <artifactId>activemq-client</artifactId>
-    <version>${activemq.version}</version>
     <name>${project.groupId}.${project.artifactId}</name>
 
     <properties>
         <transformer.artifact.groupId>org.apache.activemq</transformer.artifact.groupId>
+        <transformer.artifact.version>${activemq.version}</transformer.artifact.version>
     </properties>
 
     <build>

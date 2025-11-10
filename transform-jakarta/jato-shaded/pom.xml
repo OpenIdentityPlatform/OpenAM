@@ -25,7 +25,6 @@
     </parent>
 
     <artifactId>jato-shaded</artifactId>
-    <version>2005-05-04</version>
     <name>${project.groupId}.${project.artifactId}</name>
 
 

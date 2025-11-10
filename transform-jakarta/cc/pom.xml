@@ -24,11 +24,11 @@
         <version>16.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>cc</artifactId>
-    <version>2008-08-08</version>
     <name>${project.groupId}.${project.artifactId}</name>
 
     <properties>
         <transformer.artifact.groupId>org.openidentityplatform.external.com.sun.web.ui</transformer.artifact.groupId>
+        <transformer.artifact.version>2008-08-08</transformer.artifact.version>
     </properties>
 
     <build>
