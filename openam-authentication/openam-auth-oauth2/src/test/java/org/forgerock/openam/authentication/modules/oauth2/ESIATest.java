@@ -1,6 +1,22 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2018-2025 3A Systems LLC.
+ */
+
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.openidentityplatform.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrlProvider;
 import org.forgerock.openam.authentication.modules.oauth2.service.esia.Signer;
 import org.mockito.Matchers;
@@ -50,7 +66,7 @@ public class ESIATest extends PowerMockTestCase {
 	
 	@Test
 	public void testSigner() throws Exception {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Security.addProvider(new org.openidentityplatform.bouncycastle.jce.provider.BouncyCastleProvider());
 
 		KeyPairGenerator keygen = KeyPairGenerator.getInstance(algorithm, "BC");
 		keygen.initialize(new ECGenParameterSpec(paramsSpec));
@@ -66,22 +82,22 @@ public class ESIATest extends PowerMockTestCase {
 	}
 
 	private String generateTempCertificateFile(KeyPair keyPair)throws Exception {
-		org.bouncycastle.asn1.x500.X500Name subject = new org.bouncycastle.asn1.x500.X500Name("CN=" + alias);
+		org.openidentityplatform.bouncycastle.asn1.x500.X500Name subject = new org.openidentityplatform.bouncycastle.asn1.x500.X500Name("CN=" + alias);
 		BigInteger serial = BigInteger.ONE;
 		Date notBefore = new Date();
 		Date notAfter = new Date(notBefore.getTime() + TimeUnit.DAYS.toMillis(365 * 10));
 
-		org.bouncycastle.cert.X509v3CertificateBuilder certificateBuilder = new org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder(
+		org.openidentityplatform.bouncycastle.cert.X509v3CertificateBuilder certificateBuilder = new org.openidentityplatform.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder(
 				subject, serial,
 				notBefore, notAfter,
 				subject, keyPair.getPublic()
 		);
-		org.bouncycastle.cert.X509CertificateHolder certificateHolder = certificateBuilder.build(
-				new org.bouncycastle.operator.jcajce.JcaContentSignerBuilder(signatureAlgorithm)
+		org.openidentityplatform.bouncycastle.cert.X509CertificateHolder certificateHolder = certificateBuilder.build(
+				new org.openidentityplatform.bouncycastle.operator.jcajce.JcaContentSignerBuilder(signatureAlgorithm)
 						.build(keyPair.getPrivate())
 		);
-		org.bouncycastle.cert.jcajce.JcaX509CertificateConverter certificateConverter
-				= new org.bouncycastle.cert.jcajce.JcaX509CertificateConverter();
+		org.openidentityplatform.bouncycastle.cert.jcajce.JcaX509CertificateConverter certificateConverter
+				= new org.openidentityplatform.bouncycastle.cert.jcajce.JcaX509CertificateConverter();
 
 		X509Certificate certificate = certificateConverter.getCertificate(certificateHolder);
 

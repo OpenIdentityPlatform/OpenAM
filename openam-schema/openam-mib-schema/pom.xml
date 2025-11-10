@@ -134,8 +134,8 @@
         </dependency>
 
 		<dependency>
-		    <groupId>org.opendaylight.cardinal</groupId>
-		    <artifactId>jdmk</artifactId>
+		    <groupId>external</groupId>
+		    <artifactId>jdmkrt</artifactId>
 		</dependency>
     </dependencies>
 </project>

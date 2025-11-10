@@ -25,8 +25,10 @@
     </parent>
 
     <artifactId>jaxrpc-spi</artifactId>
-    <version>${jaxrpc-spi.version}</version>
     <name>${project.groupId}.${project.artifactId}</name>
+    <properties>
+        <transformer.artifact.version>${jaxrpc-spi.version}</transformer.artifact.version>
+    </properties>
 
     <build>
         <plugins>

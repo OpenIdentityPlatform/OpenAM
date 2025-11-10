@@ -79,7 +79,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>5.0.0-SNAPSHOT</opendj.version>
+    <opendj.version>5.0.1</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>7.0.0</guice.version>
@@ -139,6 +139,7 @@
     <logback.version>1.3.15</logback.version>
     <netty.version>4.1.125.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
+    <bouncycastle.version>1.81</bouncycastle.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
     <java.surefire.options>
       -Xmx1g
@@ -241,6 +242,7 @@
                         <excludeArtifact>org.restlet.ext.json</excludeArtifact>
                         <excludeArtifact>org.restlet.ext.servlet</excludeArtifact>
                         <excludeArtifact>org.restlet.ext.xml</excludeArtifact>
+                        <excludeArtifact>bcpkix-shaded</excludeArtifact>
                       </excludeArtifacts>
                   </configuration>
 			    </plugin>
@@ -253,6 +255,7 @@
   <modules>
     <!-- shaded libraries -->
     <module>jato-shaded</module>
+    <module>bcpkix-shaded</module>
     <module>openam-http</module>
     <module>openam-ldap-utils</module>
     <module>openam-datastore</module>
@@ -405,16 +408,6 @@
         <groupId>org.openidentityplatform.opendj</groupId>
         <artifactId>opendj-core</artifactId>
         <version>${opendj.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bc-fips</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bctls-fips</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 	  <dependency>
 		  <groupId>org.mockito</groupId>
@@ -1150,12 +1143,12 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-impl</artifactId>
-        <version>${jaxrpc-impl.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jaxrpc-spi</artifactId>
-        <version>${jaxrpc-spi.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <!-- TODO jmx -->
 	<dependency>
@@ -1166,7 +1159,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>jato-shaded</artifactId>
-        <version>2005-05-04</version>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.openidentityplatform.external.com.iplanet.jato</groupId>
@@ -1177,7 +1170,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>cc</artifactId>
-        <version>2008-08-08</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.web.ui</groupId>
@@ -1367,11 +1360,11 @@
         <artifactId>authapi</artifactId>
         <version>${authapi.version}</version>
       </dependency>
-	  <dependency>
-	    <groupId>org.opendaylight.cardinal</groupId>
-	    <artifactId>jdmk</artifactId>
-	    <version>0.3.3</version>
-	  </dependency>
+      <dependency>
+        <groupId>external</groupId>
+        <artifactId>jdmkrt</artifactId>
+        <version>2007-01-10</version>
+      </dependency>
       <dependency>
         <groupId>external</groupId>
         <artifactId>jdmktk</artifactId>
@@ -1386,12 +1379,12 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.stream</groupId>
@@ -1406,17 +1399,17 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.json</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.xml</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>org.restlet.ext.servlet</artifactId>
-        <version>${restlet.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>
@@ -1644,7 +1637,7 @@
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>${activemq.version}</version>
+        <version>${project.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -2305,6 +2298,21 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<inherited>false</inherited>
 				<executions>
+                    <execution>
+                      <id>install-jar-lib-jdmkrt</id>
+                      <goals>
+                        <goal>install-file</goal>
+                      </goals>
+                      <phase>validate</phase>
+                      <configuration>
+                        <groupId>external</groupId>
+                        <artifactId>jdmkrt</artifactId>
+                        <version>2007-01-10</version>
+                        <packaging>jar</packaging>
+                        <file>${basedir}/extlib/jdmkrt-2007-01-10.jar</file>
+                        <generatePom>true</generatePom>
+                      </configuration>
+                    </execution>
 					<execution>
 						<id>install-jar-lib-jdmktk</id>
 						<goals>

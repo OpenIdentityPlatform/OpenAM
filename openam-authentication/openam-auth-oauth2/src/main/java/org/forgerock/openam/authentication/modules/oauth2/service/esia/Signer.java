@@ -1,25 +1,41 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2018-2025 3A Systems LLC.
+ */
+
 package org.forgerock.openam.authentication.modules.oauth2.service.esia;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.iplanet.am.util.SystemProperties;
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.cms.CMSTypedData;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.util.Store;
+import org.openidentityplatform.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.openidentityplatform.bouncycastle.cert.X509CertificateHolder;
+import org.openidentityplatform.bouncycastle.cert.jcajce.JcaCertStore;
+import org.openidentityplatform.bouncycastle.cms.CMSProcessableByteArray;
+import org.openidentityplatform.bouncycastle.cms.CMSSignedData;
+import org.openidentityplatform.bouncycastle.cms.CMSSignedDataGenerator;
+import org.openidentityplatform.bouncycastle.cms.CMSTypedData;
+import org.openidentityplatform.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.openidentityplatform.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openidentityplatform.bouncycastle.openssl.PEMKeyPair;
+import org.openidentityplatform.bouncycastle.openssl.PEMParser;
+import org.openidentityplatform.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.openidentityplatform.bouncycastle.operator.ContentSigner;
+import org.openidentityplatform.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.openidentityplatform.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.openidentityplatform.bouncycastle.util.Store;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +51,7 @@ public class Signer {
 	
 	final static Logger logger = LoggerFactory.getLogger(Signer.class);
 	static {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Security.addProvider(new org.openidentityplatform.bouncycastle.jce.provider.BouncyCastleProvider());
 	}
 
 	private static final Cache<String, X509CertificateHolder> certificateHolderCache = CacheBuilder.newBuilder().maximumSize(10)
