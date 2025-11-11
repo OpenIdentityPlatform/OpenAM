@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>16.0.3</version>
+        <version>16.0.4-SNAPSHOT</version>
     </parent>
     <artifactId>openam-doc-services-ref</artifactId>
     <name>OpenAM documentation reference guide generator</name>

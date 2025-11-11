@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
         <artifactId>restlet-parent-jakarta</artifactId>
-        <version>16.0.3</version>
+        <version>16.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.restlet.ext.jackson</artifactId>
