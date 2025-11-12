@@ -84,7 +84,7 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
         }).collect(Collectors.toList());
     }
 
-    @Tool(name = "get_available_modules", description = "Returns all avialable authenticaion modules")
+    @Tool(name = "get_available_modules", description = "Returns all available authentication modules")
     public List<CoreAuthModule> getAvailableModuleList() {
         String tokenId = getTokenId();
         String coreModulesUri = "/json/global-config/authentication/modules?_action=getAllTypes";

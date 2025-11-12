@@ -1,7 +1,6 @@
 # OpenAM MCP Server
 
-OpenAM MCP Server is a lightweight management service for OpenAM user accounts.
-It allows administrators to create, update, delete, and reset passwords for users.
+OpenAM MCP Server is a lightweight management service for OpenAM user accounts. It allows administrators to create, update, delete, and reset passwords for users, as well as retrieve authentication modules and chains configurations.
 
 ## Prerequisites
 * JDK 17+
@@ -17,14 +16,12 @@ export OPENAM_ADMIN_USERNAME=amadmin
 export OPENAM_ADMIN_PASSWORD=passw0rd
 ```
 
-Clone the source code:
-
-Run from the source code:
+Clone and run from source:
 
 ```bash
 mvn spring-boot:run
 ```
-Build and run:
+Or build and run the JAR:
 
 ```bash
 cd openam-mcp-server
@@ -34,17 +31,18 @@ mvn package -DskipTests=true && java -jar ./target/openam-mcp-server-*.jar
 ## Advanced Authentication
 
 > [!IMPORTANT]  
-> Using administrative credentials directly in the MCP server may be insecure, so this server supports OpenAM's OAuth 2.0 protocol.
+> UUsing administrative credentials directly in the MCP server can be insecure. This server therefore supports OpenAM's OAuth 2.0 protocol.
 protocol.
 
-This approach requires additional OpenAM configuration:
+This approach requires additional OpenAM configuration.
 
 ### OpenAM OAuth2.0 Service Configuration
 
-Go to the OpenAM admin console, select the root realm, then select **Configure OAuth Provider** → **Configure OAuth2.0**.
-Leave the settings unchanged and click the Create button. 
+1. In the OpenAM admin console, select the root realm. 
+1. Select **Configure OAuth Provider** → **Configure OAuth2.0**.
+1. Leave the settings unchanged and click **Create**. 
 
-Set the following settings for the OAuth2.0 Provider:
+Configure the OAuth 2.0 Provider with the following settings:
 
 | Setting                                                          | Value   |
 |------------------------------------------------------------------|---------|
@@ -54,13 +52,16 @@ Set the following settings for the OAuth2.0 Provider:
 | OAuth2 Token Signing Algorithm                                   | RS256   |
 | Allow Open Dynamic Client Registration                           | enabled |
 
-See more in the OpenAM OAuth2.0 documentation: https://doc.openidentityplatform.org/openam/admin-guide/chap-oauth2
+For more details, see the OpenAM OAuth 2.0 documentation:: https://doc.openidentityplatform.org/openam/admin-guide/chap-oauth2
 
 ### Authentication Chain Configuration
-Create the OpenAM OAuth 2.0 authentication chain, so that the MCP server can exchange an access token for an SSO token to manage identities.
-In the administrator console, select the root realm. Then in the left menu select **Authentication** → **Modules** and create a new module with name  `oidc` and type `OpenID Connect id_token bearer`.
 
-Set the following settings for the `oidc` authentication module:
+Create an OpenAM OAuth 2.0 authentication chain so the MCP server can exchange an access token for an SSO token to manage identities.
+
+1. In the admin console, select the root realm.
+1. In the left menu go to **Authentication** → **Modules** and create a new module with named `oidc` of type `OpenID Connect id_token bearer`.
+
+Configure the `oidc` module as follows:
 
 | Setting                                            | Value                                                                                                                                    |
 |----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
@@ -69,16 +70,21 @@ Set the following settings for the `oidc` authentication module:
 | Mapping of jwt attributes to local LDAP attributes | sub=uid                                                                                                                                  |
 | Audience name                                      | Your MCP client's client ID, for example openam-mcp-server                                                                               |
 
-Create an authentication chain with the `oidc` module:
+Create an authentication chain:
 
-In the administrator console select the root realm then in the left menu select **Authentication** → **Chains** and create a new chain with name `oidc` and the following settings:
+1. In the admin console, select the root realm.
+1. In the left menu select **Authentication** → **Chains** 
+1. Create a new chain named `oidc` with the following configuration:
 
 | Module | Criteria   |
 |--------|------------|
 | oidc   | REQUISITE  |
 
-Set the MCP server environment variable `OPENAM_USE_OAUTH` to `true`
+Finally, enable OAuth 2.0 in the MCP server:
 
+```bash
+export OPENAM_USE_OAUTH=true
+```
 
 ## Available MCP Server Tools
 
@@ -91,7 +97,7 @@ public List<AuthModule> getAuthModules(@ToolParam(required = false, description 
 @Tool(name = "get_auth_chains", description = "Returns OpenAM authentication chains with modules")
 public List<AuthChain> getOpenAMAuthChains(@ToolParam(required = false, description = "If not set, uses root realm") String realm)
 
-@Tool(name = "get_available_modules", description = "Returns all avialable authenticaion modules")
+@Tool(name = "get_available_modules", description = "Returns all available authentication modules")
 public List<CoreAuthModule> getAvailableModuleList() 
 
 
@@ -312,7 +318,7 @@ In JSON-RPC format:
     },
     {
       "name": "get_available_modules",
-      "description": "Returns all avialable authenticaion modules",
+      "description": "Returns all available authenticaion modules",
       "inputSchema": {
         "type": "object",
         "properties": {},
