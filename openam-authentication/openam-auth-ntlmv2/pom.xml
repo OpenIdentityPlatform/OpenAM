@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-authentication</artifactId>
-        <version>16.0.0-SNAPSHOT</version>
+        <version>16.0.4-SNAPSHOT</version>
     </parent>
     <!-- Component Definition -->
     <name>OpenAM NTLMv2 Authentication Module</name>
