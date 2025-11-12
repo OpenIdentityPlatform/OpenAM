@@ -249,6 +249,15 @@
             </plugins>
         </build>
     </profile>
+    <profile>
+      <id>jdk17.options</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <modules>
+        <module>openam-mcp-server</module>
+      </modules>
+    </profile>
   </profiles>
   <!-- OpenAM Child Modules -->
   <!-- Build order will be determined by the Maven Reactor. -->
