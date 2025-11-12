@@ -19,7 +19,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openidentityplatform.openam</groupId>
-		<artifactId>openam-tools</artifactId>
+		<artifactId>openam</artifactId>
 		<version>16.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>openam-mcp-server</artifactId>

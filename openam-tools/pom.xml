@@ -93,26 +93,5 @@
 			</plugin>
     		</plugins>
     </build>
-	<profiles>
-		<profile>
-			<id>jdk17a</id>
-			<activation>
-				<jdk>[17,)</jdk>
-			</activation>
-			<modules>
-				<module>build-helper-plugin</module>
-				<module>openam-build-tools</module>
-				<module>openam-configurator-tool</module>
-				<module>openam-installtools</module>
-				<module>openam-installtools-launcher</module>
-				<module>openam-upgrade-tool</module>
-				<module>openam-license-core</module>
-				<module>openam-license-manager-cli</module>
-				<module>openam-installer-utils</module>
-				<module>openam-license-servlet</module>
-				<module>openam-mcp-server</module>
-			</modules>
-		</profile>
-	</profiles>
 </project>
 
