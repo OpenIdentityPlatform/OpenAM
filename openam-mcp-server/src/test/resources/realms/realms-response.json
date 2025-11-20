@@ -1,0 +1,26 @@
+{
+  "result": [
+    {
+      "_id": "Lw",
+      "parentPath": null,
+      "active": true,
+      "name": "/",
+      "aliases": [
+        "openam",
+        "openam.example.org"
+      ]
+    },
+    {
+      "_id": "L3Rlc3Q",
+      "parentPath": "/",
+      "active": true,
+      "name": "test",
+      "aliases": []
+    }
+  ],
+  "resultCount": 2,
+  "pagedResultsCookie": null,
+  "totalPagedResultsPolicy": "NONE",
+  "totalPagedResults": -1,
+  "remainingPagedResults": -1
+}
