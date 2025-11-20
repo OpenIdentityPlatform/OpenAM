@@ -93,6 +93,7 @@
         <dependency>
              <groupId>org.owasp.esapi</groupId>
              <artifactId>esapi</artifactId>
+             <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
