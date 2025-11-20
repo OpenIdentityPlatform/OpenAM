@@ -299,7 +299,8 @@
 		</dependency>
         <dependency>
              <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
+             <artifactId>esapi</artifactId>
+             <classifier>jakarta</classifier>
                 <exclusions>
                 	<exclusion>
                 		<groupId>log4j</groupId>

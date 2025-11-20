@@ -107,7 +107,8 @@
         </dependency>
         <dependency>
              <groupId>org.owasp.esapi</groupId>
-                <artifactId>esapi</artifactId>
+             <artifactId>esapi</artifactId>
+             <classifier>jakarta</classifier>
         </dependency>
 
         <dependency>
