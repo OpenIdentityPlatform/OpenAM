@@ -17,16 +17,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.scss'
-import OpenAMUI from './lib/OpenAMUI.tsx'
-import { setConfig } from './lib'
+import { OpenAMUI, setConfig } from './lib'
 
 setConfig({})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <div className='auth-container'>
-      <OpenAMUI />
+        <OpenAMUI />
     </div>
-  </StrictMode>,
+  </StrictMode>
 )
 

@@ -29,8 +29,8 @@ describe('DefaultLoginForm', () => {
     const mockDoLogin = vi.fn()
 
     setConfig({
-        callbackElement: mockCallbackElement,
-        actionElements: mockActionElements,
+        CallbackElement: mockCallbackElement,
+        ActionElements: mockActionElements,
     })
    
 

@@ -15,9 +15,7 @@
  */
 
 import type React from "react";
-import type { AuthData, AuthError, Callback, UserAuthData } from '../types';
-import type { UserService } from '../userService';
-
+import type { AuthData, AuthError, Callback, UserData } from '../types';
 
 // renders a login form with callbacks
 export type LoginForm = React.FC<{
@@ -34,9 +32,9 @@ export type CallbackElement = React.FC<{
 
 // renders a user profile form
 export type UserForm = React.FC<{
-  userAuthData: UserAuthData;
-  userService: UserService;
-  errorAuthHandler: (authError: AuthError) => void;
+  userData: UserData,
+  setUserData: (userData: UserData) => void
+  saveHandler: () => void
 }>
 
 // renders an authentication error form

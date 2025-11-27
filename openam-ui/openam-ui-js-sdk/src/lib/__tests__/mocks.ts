@@ -153,6 +153,12 @@ const userDataJSON = `{
     "cn": [
         "John Doe"
     ],
+    "mail": [
+        "john.doe@example.org"
+    ],
+    "telephoneNumber": [
+        "+1234567890"
+    ],
     "createTimestamp": [
         "20250805142017Z"
     ],

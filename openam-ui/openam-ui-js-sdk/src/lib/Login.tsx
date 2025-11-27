@@ -18,16 +18,22 @@ import { useEffect, useState } from "react";
 import { LoginService } from "./loginService";
 import type { AuthData, AuthError, AuthResponse, SuccessfulAuth } from "./types";
 import { getConfig } from "./config";
+import { useNavigate, useSearchParams } from "react-router";
 
 const config = getConfig();
 
 export type LoginProps = {
     loginService: LoginService;
-    successfulAuthHandler: (userData: SuccessfulAuth) => void;
-    errorAuthHandler: (authError: AuthError) => void;
 }
 
-const Login: React.FC<LoginProps> = ({ loginService, successfulAuthHandler, errorAuthHandler }) => {
+const Login: React.FC<LoginProps> = ({ loginService }) => {
+
+    const navigate = useNavigate();
+
+    const [searchParams] = useSearchParams(); 
+
+    const realm = searchParams.get('realm')
+    const service = searchParams.get('service')
 
     function isAuthError(response: unknown): response is AuthError {
         return typeof response === 'object' && response !== null && 'code' in response && 'message' in response;
@@ -43,11 +49,28 @@ const Login: React.FC<LoginProps> = ({ loginService, successfulAuthHandler, erro
             && 'successUrl' in response && typeof response.tokenId === 'string' && typeof response.successUrl === 'string';
     }
 
+    const doRedirect = (url: string) => {
+        const absoluteUrlPattern = /^(?:[a-z+]+:)?\/\//i;
+        if(absoluteUrlPattern.test(url)) {
+            window.location.href = url;
+        } else {
+            window.location.href = config.openamServer.concat(url)    
+        }
+    }
+
+    const successfulAuthHandler = async (successfulAuth : SuccessfulAuth) => {
+        if(config.redirectOnSuccessfulLogin){
+            doRedirect(successfulAuth.successUrl);
+            return;
+        }
+        navigate('/')
+    }
+
     function handleAuthResponse(response: AuthResponse) {
         if (isAuthData(response)) {
             setAuthData(response)
         } else if (isAuthError(response)) {
-            errorAuthHandler(response);
+            setAuthError(response)
         } else if (isSuccessfulAuth(response)) {
             successfulAuthHandler(response);
         } else {
@@ -57,9 +80,11 @@ const Login: React.FC<LoginProps> = ({ loginService, successfulAuthHandler, erro
 
     const [authData, setAuthData] = useState<AuthData | null>(null);
 
+    const [authError, setAuthError] = useState<AuthError | null>(null);
+
     useEffect(() => {
         const initAuth = async () => {
-            const authResponse = await loginService.init()
+            const authResponse = await loginService.init(realm, service)
             handleAuthResponse(authResponse);
         }
         initAuth();
@@ -81,15 +106,16 @@ const Login: React.FC<LoginProps> = ({ loginService, successfulAuthHandler, erro
         
         const newAuthData = loginService.setConfirmationActionValue(action, authData);
 
-        const authResponse = await loginService.submitCallbacks(newAuthData)
+        const authResponse = await loginService.submitCallbacks(newAuthData, realm, service)
 
         handleAuthResponse(authResponse);
     }
-
-    if (authData) {
-        return <config.loginForm authData={authData} setCallbackValue={setCallbackValue} doLogin={doLogin} />
+    if(authError) {
+        return <config.ErrorForm error={authError} resetError={() => { navigate('/')}} />
+    } else if (authData) {
+        return <config.LoginForm authData={authData} setCallbackValue={setCallbackValue} doLogin={doLogin} />
     }
-    return <></>
+    return <>Loading...</>
 }
 
 export default Login

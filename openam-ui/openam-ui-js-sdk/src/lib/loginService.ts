@@ -23,10 +23,30 @@ class LoginService {
   constructor(openamUrl: string) {
     this.authURL = openamUrl.concat("/json/realms/root/authenticate");
   }
+
+  buildAuthUrl(realm: string | null, service: string | null): string {
+    const params = new URLSearchParams()
+    
+    let authURL = this.authURL;
+    if(realm) {
+      params.append("realm", realm);
+    }
+    if(service) {
+      params.append("authIndexType", "service");
+      params.append("authIndexValue", service)
+    }
+    if(params.size) {
+      authURL = authURL.concat("?").concat(params.toString())
+    }
+    return authURL;
+  }
   
-  async init(): Promise<AuthResponse> {
+  async init(realm: string | null, service: string | null): Promise<AuthResponse> {
+
+    const authURL = this.buildAuthUrl(realm, service)
+
     try {
-      const response = await fetch(this.authURL, {
+      const response = await fetch(authURL, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -39,16 +59,17 @@ class LoginService {
     } catch (e) {
       if(import.meta.env.MODE === 'development') {
         console.log("fallback to test data", e)
-        return JSON.parse(authenticatorOATHMockData) as AuthResponse;
+        return JSON.parse(authError) as AuthResponse;
       } else {
         throw e
       }
     }
   }
 
-  async submitCallbacks(authData: AuthData): Promise<AuthResponse> {
+  async submitCallbacks(authData: AuthData, realm: string | null, service: string | null): Promise<AuthResponse> {
+    const authURL = this.buildAuthUrl(realm, service)
     try {
-      const response = await fetch(this.authURL, {
+      const response = await fetch(authURL, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -182,7 +203,7 @@ const successfulAuth = `{
     "realm": "/"
 }`
 
-//const authError = `{"code":401,"reason":"Unauthorized","message":"Authentication Failed"}`
+const authError = `{"code":401,"reason":"Unauthorized","message":"Authentication Failed"}`
 
 
 export { LoginService }

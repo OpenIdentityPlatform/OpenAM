@@ -14,11 +14,24 @@
  * Copyright 2025 3A Systems LLC.
  */
 
-import { RouterProvider } from "react-router";
-import router from "./router";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+import type { UserService } from "./userService";
 
-const OpenAMUI: React.FC = () => {
-    return <RouterProvider router={router} />
-};
+export default function Home({userService}:{userService: UserService}) {
 
-export default OpenAMUI;
+    const navigate = useNavigate();
+    const init = async () => {
+            const userData = await userService.getUserIdFromSession()
+            if (!userData || !userData.id) {
+                navigate('/login')        
+            } else {
+                navigate('/user')
+            }
+        }
+    useEffect(() => {
+        init();
+    }, []);
+
+    return <h2>Loading</h2>;
+}

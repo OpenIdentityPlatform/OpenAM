@@ -14,33 +14,10 @@
  * Copyright 2025 3A Systems LLC.
  */
 
-import { useEffect, useState } from "react";
-import type { UserData } from "../types";
+import type {  UserData } from "../types";
 import type { UserForm } from "./types";
 
-const DefaultUserForm: UserForm = ({ userAuthData, userService }) => {
-
-    const [userData, setUserData] = useState<UserData | null>(null);
-
-    const onSave = async () => {
-        if (!userData) {
-            return;
-        }
-        const data = await userService.saveUserData(userAuthData.id, userAuthData.realm, userData);
-        setUserData(data);
-    };
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const data = await userService.getUserData(userAuthData.id, userAuthData.realm);
-            setUserData(data);
-        }
-        fetchUserData();
-    }, [])
-
-    if (!userData) {
-        return <div>Loading user data...</div>;
-    }
+const DefaultUserForm: UserForm = ({ userData, setUserData, saveHandler }) => {
 
     //return // Helper to handle string/array fields
     const handleChange = (key: keyof UserData, value: string) => {
@@ -53,7 +30,7 @@ const DefaultUserForm: UserForm = ({ userAuthData, userService }) => {
         <form
             onSubmit={e => {
                 e.preventDefault();
-                onSave();
+                saveHandler();
             }}>
             <div className="form-group">
                 <label htmlFor="username">Username:</label>

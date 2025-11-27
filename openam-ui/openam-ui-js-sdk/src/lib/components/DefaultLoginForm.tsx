@@ -40,11 +40,11 @@ const DefaultLoginForm: LoginForm = ({ authData, setCallbackValue, doLogin }) =>
             {authData.callbacks.filter((cb) => cb.type !== 'ConfirmationCallback').map((cb, i) => {
                 const id = `callback_${i}`;
                 return <div key={id} className="form-group">
-                    <config.callbackElement callback={cb} setCallbackValue={(val) => setCallbackValue(i, val)} />
+                    <config.CallbackElement callback={cb} setCallbackValue={(val) => setCallbackValue(i, val)} />
                 </div>
             })}
             <div className="button-group">
-                <config.actionElements callbacks={authData.callbacks} />
+                <config.ActionElements callbacks={authData.callbacks} />
             </div>
         </form>
     </div>
