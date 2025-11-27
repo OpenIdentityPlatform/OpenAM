@@ -128,74 +128,74 @@ class LoginService {
 }
 
 
-const authenticatorOATHMockData = `{
-    "authId": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoSW5kZXhWYWx1ZSI6Im9hdGgiLCJvdGsiOiJwZnY3Zm04bzYyMzhvZ2FlcGJyOG1jcmpwcCIsImF1dGhJbmRleFR5cGUiOiJzZXJ2aWNlIiwicmVhbG0iOiJkYz1vcGVuYW0sZGM9b3BlbmlkZW50aXR5cGxhdGZvcm0sZGM9b3JnIiwic2Vzc2lvbklkIjoiQVFJQzV3TTJMWTRTZmN4TDFHSkJvOVJsWWxJZ2RHWFNsc0NGUHhnNWlDMm1Tc3MuKkFBSlRTUUFDTURFQUFsTkxBQlF0T0RVM09ETTJPVGN5TWpNMk1ETTJPVGt6TndBQ1V6RUFBQS4uKiJ9.iGjdeF08zb0pOOpmt8JiRIg0iH32KNZDqPQu7bidjx4",
-    "template": "",
-    "stage": "AuthenticatorOATH5",
-    "header": "Register your device with OpenAM",
-    "infoText": [],
-    "callbacks": [
-        {
-            "type": "TextOutputCallback",
-            "output": [
-                {
-                    "name": "message",
-                    "value": "\\n            Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to\\n            enter your verification code and login.\\n        "
-                },
-                {
-                    "name": "messageType",
-                    "value": "0"
-                }
-            ]
-        },
-        {
-            "type": "TextOutputCallback",
-            "output": [
-                {
-                    "name": "message",
-                    "value": "console.log('hello from text output callback')"
-                },
-                {
-                    "name": "messageType",
-                    "value": "4"
-                }
-            ]
-        },
-        {
-            "type": "ConfirmationCallback",
-            "output": [
-                {
-                    "name": "prompt",
-                    "value": ""
-                },
-                {
-                    "name": "messageType",
-                    "value": 0
-                },
-                {
-                    "name": "options",
-                    "value": [
-                        "Login using verification code"
-                    ]
-                },
-                {
-                    "name": "optionType",
-                    "value": -1
-                },
-                {
-                    "name": "defaultOption",
-                    "value": 0
-                }
-            ],
-            "input": [
-                {
-                    "name": "IDToken3",
-                    "value": 0
-                }
-            ]
-        }
-    ]
-}`
+// const authenticatorOATHMockData = `{
+//     "authId": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoSW5kZXhWYWx1ZSI6Im9hdGgiLCJvdGsiOiJwZnY3Zm04bzYyMzhvZ2FlcGJyOG1jcmpwcCIsImF1dGhJbmRleFR5cGUiOiJzZXJ2aWNlIiwicmVhbG0iOiJkYz1vcGVuYW0sZGM9b3BlbmlkZW50aXR5cGxhdGZvcm0sZGM9b3JnIiwic2Vzc2lvbklkIjoiQVFJQzV3TTJMWTRTZmN4TDFHSkJvOVJsWWxJZ2RHWFNsc0NGUHhnNWlDMm1Tc3MuKkFBSlRTUUFDTURFQUFsTkxBQlF0T0RVM09ETTJPVGN5TWpNMk1ETTJPVGt6TndBQ1V6RUFBQS4uKiJ9.iGjdeF08zb0pOOpmt8JiRIg0iH32KNZDqPQu7bidjx4",
+//     "template": "",
+//     "stage": "AuthenticatorOATH5",
+//     "header": "Register your device with OpenAM",
+//     "infoText": [],
+//     "callbacks": [
+//         {
+//             "type": "TextOutputCallback",
+//             "output": [
+//                 {
+//                     "name": "message",
+//                     "value": "\\n            Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to\\n            enter your verification code and login.\\n        "
+//                 },
+//                 {
+//                     "name": "messageType",
+//                     "value": "0"
+//                 }
+//             ]
+//         },
+//         {
+//             "type": "TextOutputCallback",
+//             "output": [
+//                 {
+//                     "name": "message",
+//                     "value": "console.log('hello from text output callback')"
+//                 },
+//                 {
+//                     "name": "messageType",
+//                     "value": "4"
+//                 }
+//             ]
+//         },
+//         {
+//             "type": "ConfirmationCallback",
+//             "output": [
+//                 {
+//                     "name": "prompt",
+//                     "value": ""
+//                 },
+//                 {
+//                     "name": "messageType",
+//                     "value": 0
+//                 },
+//                 {
+//                     "name": "options",
+//                     "value": [
+//                         "Login using verification code"
+//                     ]
+//                 },
+//                 {
+//                     "name": "optionType",
+//                     "value": -1
+//                 },
+//                 {
+//                     "name": "defaultOption",
+//                     "value": 0
+//                 }
+//             ],
+//             "input": [
+//                 {
+//                     "name": "IDToken3",
+//                     "value": 0
+//                 }
+//             ]
+//         }
+//     ]
+// }`
 
 const successfulAuth = `{
     "tokenId": "AQIC5wM2LY4SfcwIaAQY6dwlk4xEQjX9v59vw3gRzpGwfTI.*AAJTSQACMDEAAlNLABM2NDI1MzUyMDYwODgwODYyNzkyAAJTMQAA*",
