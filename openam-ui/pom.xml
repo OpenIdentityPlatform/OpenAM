@@ -34,6 +34,7 @@
     <modules>
         <module>openam-ui-ria</module>
         <module>openam-ui-api</module>
+		<module>openam-ui-js-sdk</module>
     </modules>
     <build>
     		<plugins>
@@ -586,7 +587,7 @@
 				<plugin>
 					<groupId>com.github.eirslett</groupId>
 					<artifactId>frontend-maven-plugin</artifactId>
-					<version>1.15.0</version>
+					<version>1.15.4</version>
 					<configuration>
 						<installDirectory>${node.install.directory}</installDirectory>
 					</configuration>
@@ -598,8 +599,8 @@
 							</goals>
 							<phase>initialize</phase>
 							<configuration>
-								<nodeVersion>v20.12.2</nodeVersion>
-								<npmVersion>10.5.0</npmVersion>
+								<nodeVersion>v22.21.1</nodeVersion>
+								<npmVersion>11.6.2</npmVersion>
 							</configuration>
 						</execution>
 						<execution>
