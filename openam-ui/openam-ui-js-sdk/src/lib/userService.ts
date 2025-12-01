@@ -14,9 +14,10 @@
  * Copyright 2025 3A Systems LLC.
  */
 
-import type { UserAuthData, UserData } from "./types";
+import type { AuthError, UserAuthData, UserData } from "./types";
 
 class UserService {
+
 
   //http://openam.example.org:8080/openam/json/users?_action=idFromSession
 
@@ -46,7 +47,7 @@ class UserService {
       }
       return await response.json();
     } catch (e) {
-      if(import.meta.env.MODE === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.log("error getting user id from session", e)
         console.log("fallback to demo user")
         return JSON.parse(usersSuccessfulResponse)
@@ -71,7 +72,7 @@ class UserService {
       })
       return await response.json();
     } catch (e) {
-      if(import.meta.env.MODE === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.log("error getting user data", e)
         console.log("fallback to demo user data")
         return JSON.parse(testUserData);
@@ -107,7 +108,7 @@ class UserService {
     }
 
     catch (e) {
-      if(import.meta.env.MODE === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.log("error getting user data", e)
         console.log("fallback to demo user data")
         return JSON.parse(testUserData);
@@ -116,6 +117,38 @@ class UserService {
       }
     }
   }
+
+  savePassword = async (userId: string, realm: string, password: string): Promise<void> => {
+    const userUrl = this.getUserUrlFromTemplate(userId, realm);
+
+    const dataToUpdate = {
+      userPassword: password
+    }
+    try {
+      const response = await fetch(userUrl, {
+        method: "PUT",
+        mode: "cors",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataToUpdate),
+      }
+      )
+      if(!response.ok) {
+        const data = await response.json() as AuthError
+        throw new Error(data.message)
+      }
+    } catch (e) {
+      if (import.meta.env.MODE === 'development') {
+        console.log("error saving password, assume its ok", e)
+      } else {
+        throw e
+      }
+    }
+  }
+
+
   private getUserUrlFromTemplate(userId: string, realm: string): string {
     if (!realm || realm === "" || realm === "/") {
       realm = "root";

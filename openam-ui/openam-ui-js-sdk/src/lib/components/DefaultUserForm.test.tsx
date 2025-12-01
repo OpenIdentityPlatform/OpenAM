@@ -26,17 +26,23 @@ describe('DefaultUserForm', () => {
     let defaultProps: {
         userData: UserData,
         setUserData: (userData: UserData) => void,
-        saveHandler: () => void
+        saveHandler: () => void,
+        savePasswordHandler: (password: string) => void
     }
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        window.alert = vi.fn();
+
         const mockSetUserData = vi.fn();
         const mockSaveHandler = vi.fn();
+        const mockSavePasswordHandler = vi.fn();
         defaultProps = {
             userData: mockUserData,
             setUserData: mockSetUserData,
-            saveHandler: mockSaveHandler
+            saveHandler: mockSaveHandler,
+            savePasswordHandler: mockSavePasswordHandler
         };
 
     });
@@ -90,7 +96,59 @@ describe('DefaultUserForm', () => {
         );
         const submitButton = screen.getByRole('button', { name: /save/i });
         fireEvent.click(submitButton);
-         expect(defaultProps.saveHandler).toHaveBeenCalledTimes(1);
+        expect(defaultProps.saveHandler).toHaveBeenCalledTimes(1);
     });
+
+    it('opens set password modal on click', () => {
+        render(
+            <DefaultUserForm {...defaultProps} />
+        );
+        const changePasswordButton = screen.getByText('Change Password');
+        expect(changePasswordButton).toBeInTheDocument();
+
+        fireEvent.click(changePasswordButton);
+
+        expect(screen.getByLabelText("New:")).toBeInTheDocument();
+        expect(screen.getByLabelText("Confirm:")).toBeInTheDocument();
+        expect(screen.getByText("Update Password")).toBeInTheDocument();
+    });
+
+    it('validates new and confirm password', () => {
+        render(
+            <DefaultUserForm {...defaultProps} />
+        );
+        const changePasswordButton = screen.getByText('Change Password');
+        expect(changePasswordButton).toBeInTheDocument();
+
+        fireEvent.click(changePasswordButton);
+
+        fireEvent.change(screen.getByLabelText('New:'), { target: { value: 'newPass123' } });
+        fireEvent.change(screen.getByLabelText('Confirm:'), { target: { value: 'mismatch123' } });
+
+        fireEvent.click(screen.getByText('Update Password'));
+
+        expect(window.alert).toHaveBeenCalledWith('Passwords do not match.');
+
+        expect(screen.getByLabelText('New:')).toBeInTheDocument();
+    });
+
+    it('saves password', () => {
+        render(
+            <DefaultUserForm {...defaultProps} />
+        );
+        const changePasswordButton = screen.getByText('Change Password');
+        expect(changePasswordButton).toBeInTheDocument();
+
+        fireEvent.click(changePasswordButton);
+
+        fireEvent.change(screen.getByLabelText('New:'), { target: { value: 'newPass123' } });
+        fireEvent.change(screen.getByLabelText('Confirm:'), { target: { value: 'newPass123' } });
+        fireEvent.click(screen.getByText('Update Password'));
+
+
+         expect(defaultProps.savePasswordHandler).toHaveBeenCalledTimes(1);
+    });
+
+
 
 });

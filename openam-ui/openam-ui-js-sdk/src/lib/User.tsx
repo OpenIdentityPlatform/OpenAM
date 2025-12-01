@@ -68,8 +68,19 @@ const User: React.FC<UserProps> = ({ userService }) => {
         setUserData(data);
     };
 
+    const savePassword = async(password: string) => {
+        if(!userAuthData) {
+            return;
+        }
+        if(!password) {
+            throw new Error("password is empty")
+        }
+
+        await userService.savePassword(userAuthData.id, userAuthData.realm, password)
+    }
+
         
-    return <config.UserForm userData={userData} setUserData={setUserData} saveHandler={saveHandler} />
+    return <config.UserForm userData={userData} setUserData={setUserData} saveHandler={saveHandler} savePasswordHandler={savePassword} />
 }
 
 export default User;

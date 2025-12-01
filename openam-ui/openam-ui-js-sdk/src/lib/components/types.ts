@@ -35,6 +35,7 @@ export type UserForm = React.FC<{
   userData: UserData,
   setUserData: (userData: UserData) => void
   saveHandler: () => void
+  savePasswordHandler: (password: string) => void
 }>
 
 // renders an authentication error form
