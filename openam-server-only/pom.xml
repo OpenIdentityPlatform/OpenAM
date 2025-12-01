@@ -108,6 +108,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/api</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openidentityplatform.openam</groupId>
+                                    <artifactId>openam-ui-js-sdk</artifactId>
+                                    <classifier>app</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/extui</outputDirectory>
+                                    <includes>**/*</includes>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -263,6 +272,14 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>api</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/extui/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>extui</targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -565,6 +582,13 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-ui-api</artifactId>
             <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-ui-js-sdk</artifactId>
+            <type>zip</type>
+            <classifier>app</classifier>
         </dependency>
 
         <dependency>
