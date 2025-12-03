@@ -172,7 +172,4 @@ In February 2010, a small group of former Sun employees founded ForgeRock to con
 
 * 2016: OpenAM 14
 
-* 2025: OpenAM 15
-
-
-
+* 2025: OpenAM 15 and 16

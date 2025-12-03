@@ -329,9 +329,9 @@ The installation process requires that you implement your deployment plan.
 
 * *Prepare the Operating System*. Prepare your operating system, depending on the OS: Linux, Solaris, Windows, Cloud (Amazon EC2, OpenStack, and so forth), Virtual Machines (VMWare, Xen, Hyper-V, and so forth)
 
-* *Prepare the Java Environment*. Prepare your Java environment, depending on your vendor type: Oracle, IBM, OpenJDK.
+* *Prepare the Java Environment*. Prepare your Java environment, depending on your vendor type: Oracle, OpenJDK, Eclipse Temurin etc.
 
-* *Prepare the App Server*. Prepare your application server, depending on type: Apache Tomcat, JBoss 4/5, WildFly, Jetty, Oracle WebLogic, IBM WebSphere. Also, prepare each app server for HTTPS.
+* *Prepare the App Server*. Prepare your application server, depending on type: Apache Tomcat, Jetty, Oracle WebLogic, IBM WebSphere. Also, prepare each app server for HTTPS.
 
 * *Prepare the Directory Servers*. Prepare the configuration directory server, OpenDJ for the core token service (CTS), and the LDAP identity repository. For information on installing data repositories, see xref:../install-guide/chap-prepare-install.adoc#chap-prepare-install["Preparing For Installation"] in the __Installation Guide__.
 
