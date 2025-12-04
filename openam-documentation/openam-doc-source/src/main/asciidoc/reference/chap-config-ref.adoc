@@ -1979,7 +1979,7 @@ Type of encryption keystore. Options include JCEKS, JKS, PKCS#11, and PKCS#12. D
 
 [NOTE]
 ======
-Before using a PKCS#11 keystore, make sure your Java runtime environment supports it. For more information, see the link:https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html[JDK 8 PKCS#11 Reference Guide., window=\_blank]
+Before using a PKCS#11 keystore, make sure your Java runtime environment supports it. For more information, see the link:https://docs.oracle.com/en/java/javase/11/security/pkcs11-reference-guide1.html[JDK 11 PKCS#11 Reference Guide., window=\_blank]
 ======
 +
 `ssoadm` attribute: `openam-authenticator-oath-device-settings-encryption-keystore-type`
@@ -2052,7 +2052,7 @@ Type of encryption keystore. Options include JCEKS, JKS, PKCS#11, and PKCS#12.
 
 [NOTE]
 ======
-Before using a PKCS#11 keystore, make sure your Java runtime environment supports it. For more information, see the link:https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html[JDK 8 PKCS#11 Reference Guide., window=\_blank]
+Before using a PKCS#11 keystore, make sure your Java runtime environment supports it. For more information, see the link:https://docs.oracle.com/en/java/javase/11/security/pkcs11-reference-guide1.html[JDK 11 PKCS#11 Reference Guide., window=\_blank]
 ======
 +
 Default: `JKS`
