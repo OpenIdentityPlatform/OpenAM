@@ -50,7 +50,8 @@
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
     "sinon-chai": "2.8.0",
-    "ajv": "^8.16.0"
+    "ajv": "^8.16.0",
+    "js-yaml": "^3.14.2"
   },
   "overrides": {
     "mocha": {
@@ -58,7 +59,11 @@
     },
     "eslint": {
       "shelljs": "^0.8.5",
-      "ajv": "$ajv"
+      "ajv": "$ajv",
+      "js-yaml": "$js-yaml"
+    },
+    "grunt": {
+      "js-yaml": "$js-yaml"
     }
   }
 }
