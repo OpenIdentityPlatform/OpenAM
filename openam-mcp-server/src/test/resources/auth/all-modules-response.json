@@ -1,0 +1,174 @@
+{
+  "result": [
+    {
+      "_id": "httpbasic",
+      "name": "HTTP Basic",
+      "collection": false
+    },
+    {
+      "_id": "activedirectory",
+      "name": "Active Directory",
+      "collection": false
+    },
+    {
+      "_id": "adaptiverisk",
+      "name": "Adaptive Risk ",
+      "collection": false
+    },
+    {
+      "_id": "anonymous",
+      "name": "Anonymous",
+      "collection": false
+    },
+    {
+      "_id": "certificate",
+      "name": "Certificate",
+      "collection": false
+    },
+    {
+      "_id": "datastore",
+      "name": "Data Store",
+      "collection": false
+    },
+    {
+      "_id": "persistentcookie",
+      "name": "Persistent Cookie",
+      "collection": false
+    },
+    {
+      "_id": "jdbc",
+      "name": "JDBC",
+      "collection": false
+    },
+    {
+      "_id": "ldap",
+      "name": "LDAP",
+      "collection": false
+    },
+    {
+      "_id": "msisdn",
+      "name": "MSISDN",
+      "collection": false
+    },
+    {
+      "_id": "membership",
+      "name": "Membership",
+      "collection": false
+    },
+    {
+      "_id": "windowsnt",
+      "name": "Windows NT",
+      "collection": false
+    },
+    {
+      "_id": "oauth2",
+      "name": "OAuth 2.0 / OpenID Connect",
+      "collection": false
+    },
+    {
+      "_id": "windowsdesktopsso",
+      "name": "Windows Desktop SSO",
+      "collection": false
+    },
+    {
+      "_id": "openidconnect",
+      "name": "OpenID Connect id_token bearer",
+      "collection": false
+    },
+    {
+      "_id": "radius",
+      "name": "RADIUS",
+      "collection": false
+    },
+    {
+      "_id": "hotp",
+      "name": "HOTP",
+      "collection": false
+    },
+    {
+      "_id": "authenticatoroath",
+      "name": "Authenticator (OATH)",
+      "collection": false
+    },
+    {
+      "_id": "federation",
+      "name": "Federation",
+      "collection": false
+    },
+    {
+      "_id": "sae",
+      "name": "SAE",
+      "collection": false
+    },
+    {
+      "_id": "wssauth",
+      "name": "sunAMAuthWSSAuthModuleService",
+      "collection": false
+    },
+    {
+      "_id": "scripted",
+      "name": "Scripted Module",
+      "collection": false
+    },
+    {
+      "_id": "deviceidmatch",
+      "name": "Device Id (Match)",
+      "collection": false
+    },
+    {
+      "_id": "deviceidsave",
+      "name": "Device Id (Save)",
+      "collection": false
+    },
+    {
+      "_id": "oath",
+      "name": "OATH",
+      "collection": false
+    },
+    {
+      "_id": "authSaml",
+      "name": "SAML2",
+      "collection": false
+    },
+    {
+      "_id": "authPush",
+      "name": "Authenticator (Push)",
+      "collection": false
+    },
+    {
+      "_id": "authPushReg",
+      "name": "Authenticator (Push) Registration",
+      "collection": false
+    },
+    {
+      "_id": "amster",
+      "name": "ForgeRock Amster",
+      "collection": false
+    },
+    {
+      "_id": "recaptcha",
+      "name": "QR code confirm from other session",
+      "collection": false
+    },
+    {
+      "_id": "securid",
+      "name": "SecurID",
+      "collection": false
+    },
+    {
+      "_id": "webauthnreg",
+      "name": "WebAuthn Registration",
+      "collection": false
+    },
+    {
+      "_id": "webauthnauth",
+      "name": "WebAuthn Authentication",
+      "collection": false
+    },
+    {
+      "_id": "sunAMAuthNtlmService",
+      "name": "NTLM",
+      "collection": false
+    }
+  ]
+}

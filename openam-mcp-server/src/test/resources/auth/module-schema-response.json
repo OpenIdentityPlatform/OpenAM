@@ -1,0 +1,158 @@
+{
+  "type": "object",
+  "properties": {
+    "userProfileEmailAttribute": {
+      "title": "Email Attribute Name",
+      "description": "This is the attribute name used by the OTP to email the user",
+      "propertyOrder": 1400,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "smtpFromAddress": {
+      "title": "Email From Address",
+      "description": "Emails from the HOTP Authentication module will come from this address.",
+      "propertyOrder": 800,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "authenticationLevel": {
+      "title": "Authentication Level",
+      "description": "The authentication level associated with this module.<br><br>Each authentication module has an authentication level that can be used to indicate the level of security associated with the module; 0 is the lowest (and the default).",
+      "propertyOrder": 100,
+      "required": true,
+      "type": "integer",
+      "exampleValue": ""
+    },
+    "mobileCarrierAttribute": {
+      "title": "Mobile Carrier Attribute Name",
+      "description": "This is the attribute name used for a mobile carrier domain for sending SMS messages",
+      "propertyOrder": 1300,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "otpValidityDuration": {
+      "title": "One Time Password Validity Length",
+      "description": "This One Time Password will remain valid for this period (in minutes)",
+      "propertyOrder": 900,
+      "required": true,
+      "type": "integer",
+      "exampleValue": ""
+    },
+    "userProfileTelephoneAttribute": {
+      "title": "Mobile Phone Number Attribute Name",
+      "description": "This is the attribute name used for a requested text message",
+      "propertyOrder": 1200,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "autoSendOTP": {
+      "title": "Auto Send OTP Code",
+      "description": "Select this checkbox if the OTP should be sent automatically",
+      "propertyOrder": 1500,
+      "required": true,
+      "type": "boolean",
+      "exampleValue": ""
+    },
+    "smtpUsername": {
+      "title": "Mail Server Authentication Username",
+      "description": "The username to use if the mail server is using SMTP authentication",
+      "propertyOrder": 500,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "otpLength": {
+      "title": "One Time Password Length ",
+      "description": "The length of the generated One Time Password (in digits)",
+      "propertyOrder": 1000,
+      "required": true,
+      "enum": [
+        "6",
+        "8"
+      ],
+      "options": {
+        "enum_titles": [
+          "6",
+          "8"
+        ]
+      },
+      "type": "string",
+      "exampleValue": ""
+    },
+    "smsGatewayClass": {
+      "title": "SMS Gateway Implementation Class",
+      "description": "The HOTP authentication module uses this class to send SMS messages.<br><br>The SMS gateway class must implement the following interface<br/><br/><code>com.sun.identity.authentication.modules.hotp.SMSGateway</code>",
+      "propertyOrder": 200,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "otpDeliveryMethod": {
+      "title": "One Time Password Delivery",
+      "description": "The mechanism used to deliver the One Time Password",
+      "propertyOrder": 1100,
+      "required": true,
+      "enum": [
+        "SMS",
+        "E-mail",
+        "SMS and E-mail"
+      ],
+      "options": {
+        "enum_titles": [
+          "SMS",
+          "E-mail",
+          "SMS and E-mail"
+        ]
+      },
+      "type": "string",
+      "exampleValue": ""
+    },
+    "smtpSslEnabled": {
+      "title": "Mail Server Secure Connection ",
+      "description": "This setting controls whether the authentication module communicates with the mail server using SSL/TLS",
+      "propertyOrder": 700,
+      "required": true,
+      "enum": [
+        "SSL",
+        "Non SSL"
+      ],
+      "options": {
+        "enum_titles": [
+          "SSL",
+          "Non SSL"
+        ]
+      },
+      "type": "string",
+      "exampleValue": ""
+    },
+    "smtpHostname": {
+      "title": "Mail Server Host Name",
+      "description": "The name of the mail server; OpenAM will use SMTP to send the messages.",
+      "propertyOrder": 300,
+      "required": true,
+      "type": "string",
+      "exampleValue": ""
+    },
+    "smtpUserPassword": {
+      "title": "Mail Server Authentication Password",
+      "description": "The password to use if the mail server is using SMTP authentication",
+      "propertyOrder": 600,
+      "required": true,
+      "type": "string",
+      "format": "password",
+      "exampleValue": ""
+    },
+    "smtpHostPort": {
+      "title": "Mail Server Host Port",
+      "description": "The port of the mail server.<br><br>The default port for SMTP is 25, if using SSL the default port is 465.",
+      "propertyOrder": 400,
+      "required": true,
+      "type": "integer",
+      "exampleValue": ""
+    }
+  }
+}
