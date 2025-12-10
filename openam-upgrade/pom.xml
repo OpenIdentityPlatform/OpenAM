@@ -22,7 +22,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>16.0.4-SNAPSHOT</version>
+        <version>16.0.4</version>
     </parent>
 
     <name>OpenAM Upgrade</name>
