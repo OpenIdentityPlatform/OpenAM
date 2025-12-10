@@ -51,7 +51,7 @@ Check the effective top-level domain list at link:https://publicsuffix.org/list/
 [#prepare-java]
 === Preparing a Java Environment
 
-OpenAM software depends on a Java runtime environment. Check the output of `java -version` to make sure your the version is supported. The current OpenAM release supports Java Development Kit 8, 11, 17 or 21 LTS version.
+OpenAM software depends on a Java runtime environment. Check the output of `java -version` to make sure your the version is supported. The current OpenAM release supports Java Development Kit 11, 17, 21 or 25 LTS version.
 
 [#prepare-java-sun]
 ==== Settings For Sun/Oracle Java Environments
@@ -1355,7 +1355,7 @@ You should also ensure `sslProtocol` is set to `TLS`, which disables the potenti
               maxThreads="150" scheme="https" secure="true"
               clientAuth="false" sslProtocol="TLS" URIEncoding="UTF-8" />
 ----
-The following example script, `/etc/init.d/tomcat`, manages the service at system startup and shutdown. This script assumes you run OpenAM as the user `openam` and that you use Oracle JDK 8.
+The following example script, `/etc/init.d/tomcat`, manages the service at system startup and shutdown. This script assumes you run OpenAM as the user `openam` and that you use JDK 11 LTS or later.
 
 [source, shell]
 ----

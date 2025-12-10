@@ -15,12 +15,12 @@
   Portions Copyright 2024 3A Systems LLC.
 ////
 
-= User's Guide
+= OpenAM J2EE Agents User's Guide
 :doctype: book
 :toc:
 :authors: Mark Craig, Gene Hirayama, Chris Lee
 :copyright: Copyright 2011-2017 ForgeRock AS.
-:copyright: Portions Copyright 2024 3A Systems LLC.
+:copyright: Portions Copyright 2024-2025 3A Systems LLC.
 
 :imagesdir: ../
 :figure-caption!:
@@ -34,9 +34,5 @@ include::./chap-about-jee-agents.adoc[]
 include::./chap-jee-agents-features.adoc[]
 include::./chap-jee-agent-config.adoc[]
 include::./chap-apache-tomcat.adoc[]
-include::./chap-jboss-7.adoc[]
 include::./chap-jetty.adoc[]
-include::./chap-weblogic.adoc[]
-include::./chap-websphere.adoc[]
 include::./chap-troubleshooting.adoc[]
-include::./tools-reference.adoc[]

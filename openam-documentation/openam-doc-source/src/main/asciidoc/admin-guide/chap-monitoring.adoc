@@ -106,7 +106,7 @@ You can also browse the MBeans by connecting to your web application container, 
 
 [#figure-jconsole-to-openam]
 image::images/jconsole-to-openam.png[]
-Also see link:http://docs.oracle.com/javase/1.5.0/docs/guide/management/agent.html[Monitoring and Management Using JMX, window=\_blank] for instructions on how to connect remotely, how to use SSL, and so forth.
+Also see link:https://docs.oracle.com/en/java/javase/11/management/monitoring-and-management-using-jmx-technology.html[Monitoring and Management Using JMX Technology, window=\_blank] for instructions on how to connect remotely, how to use SSL, and so forth.
 
 [IMPORTANT]
 ====
