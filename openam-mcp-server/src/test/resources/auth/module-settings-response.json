@@ -1,0 +1,23 @@
+{
+  "smtpHostPort": 465,
+  "smtpSslEnabled": "SSL",
+  "autoSendOTP": false,
+  "userProfileEmailAttribute": "mail",
+  "smtpUsername": "opensso.sun",
+  "otpDeliveryMethod": "SMS and E-mail",
+  "smsGatewayClass": "com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl",
+  "otpLength": "8",
+  "smtpHostname": "smtp.gmail.com",
+  "authenticationLevel": 0,
+  "mobileCarrierAttribute": "",
+  "otpValidityDuration": 5,
+  "userProfileTelephoneAttribute": "telephoneNumber",
+  "smtpFromAddress": "no-reply@openam.org",
+  "smtpUserPassword": null,
+  "_id": "hotp",
+  "_type": {
+    "_id": "hotp",
+    "name": "HOTP",
+    "collection": true
+  }
+}
