@@ -59,7 +59,7 @@ jobs:
         continue-on-error: true
         run: |
           mvn javadoc:aggregate -pl '-:openam-server,-:openam-server-only' \
-            -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api' \
+            -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api,-:openam-ui-js-sdk' \
             -pl '-:openam-server-auth-ui,-:openam-doc-ssoadm-ref,-:openam-liberty-schema' \
             -pl '-:openam-example-api-descriptor,-:openam-example-clientsdk-cli,-:openam-example-clientsdk-war' \
             -pl '-:bcpkix-shaded'

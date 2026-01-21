@@ -1,0 +1,171 @@
+/**
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2025 3A Systems LLC.
+ */
+ 
+body {
+  background-color: #1f2937;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background-color: #374151;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  .change-password-link {
+    color: #3b82f6;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 1rem;
+    text-align: center;
+
+    &:hover {
+      color: #2563eb;
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  label {
+    color: #d1d5db;
+    font-size: 0.875rem;
+    font-weight: 500;
+    width: 120px;
+    text-align: left;
+  }
+
+  input {
+    flex: 1;
+    padding: 0.75rem;
+    background-color: #4b5563;
+    border: 1px solid #6b7280;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    }
+  }
+}
+
+.button-group {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+  .primary-button,
+  .secondary-button {
+    flex: 1;
+    padding: 0.75rem;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .primary-button {
+    background-color: #3b82f6;
+
+    &:hover {
+      background-color: #2563eb;
+    }
+  }
+
+  .secondary-button {
+    background-color: #6b7280;
+
+    &:hover {
+      background-color: #4b5563;
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #374151;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+}
+
+p {
+  color: #ffffff;
+}

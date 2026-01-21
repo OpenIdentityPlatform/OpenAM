@@ -900,6 +900,13 @@
         <type>jar</type>
       </dependency>
       <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-ui-js-sdk</artifactId>
+        <version>${project.version}</version>
+        <classifier>app</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
         <groupId>org.openidentityplatform.commons.ui.libs</groupId>
         <artifactId>jquery.qrcode</artifactId>
         <version>0.11.0</version>
