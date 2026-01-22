@@ -44,7 +44,7 @@
     "karma-nyan-reporter": "0.2.4",
     "karma-requirejs": "1.1.0",
     "less-plugin-clean-css": "1.5.1",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "mocha": "7.2.0",
     "requirejs": "2.3.7",
     "rimraf": "2.5.4",
