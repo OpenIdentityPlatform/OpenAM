@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2017-2026 3A Systemc, LLC
  */
 
 package com.sun.identity.common.configuration;
@@ -145,8 +146,10 @@ public class ConfigurationObserver implements ServiceListener {
                     SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
                     try {
                         Properties newProp = ServerConfiguration.getServerInstance(adminToken, serverName);
-                        SystemProperties.initializeProperties(newProp, true, true);
-                        notifies(Constants.SVC_NAME_PLATFORM);
+                        if (newProp!=null) {
+                            SystemProperties.initializeProperties(newProp, true, true);
+                            notifies(Constants.SVC_NAME_PLATFORM);
+                        }
                     } catch (SSOException | IOException | SMSException ex) {
                         // ignored
                     }
