@@ -156,6 +156,7 @@ jobs:
           
           echo "Add another two OpenAM servers to the cluster"
           
+          echo "Starting OpenAM-2 container..."
           docker run --rm -it -d --memory="2g" -h openam2.example.org --name=test-openam2 --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           
           echo "waiting for OpenAM-2 to be alive..."
@@ -198,7 +199,8 @@ jobs:
           
           docker inspect --format="{{json .State.Health.Status}}" test-openam2 | grep -q \"healthy\"
           
-          docker run --rm -it -d --memory="2g" -h openam2.example.org --name=test-openam2 --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          echo "Starting OpenAM-3 container..."
+          docker run --rm -it -d --memory="2g" -h openam2.example.org --name=test-openam3 --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
 
           echo "waiting for OpenAM-3 to be alive..."
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"; do sleep 10; done'
