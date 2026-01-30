@@ -196,7 +196,7 @@ jobs:
           LB_PRIMARY_URL=http://lb.example.org:80/openam
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           
-          docker exec test-openam bash -c \
+          docker exec test-openam1 bash -c \
           'curl \
            --request POST \
            --header "Content-Type: application/json" \
