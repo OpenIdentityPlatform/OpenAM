@@ -183,7 +183,7 @@ jobs:
           ROOT_SUFFIX=dc=openam,dc=example,dc=org
           DS_DIRMGRDN=cn=Directory Manager
           DS_DIRMGRPASSWD=password
-          existingserverid=http://openam1.example.org:8080
+          existingserverid=http://openam.example.org:8080
           LB_SITE_NAME=lb
           LB_PRIMARY_URL=http://lb.example.org:80/openam
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
