@@ -166,7 +166,7 @@ jobs:
           docker network create test-openam
           
           echo "Starting OpenAM-1 container"
-          docker run --rm -it -h openam1.example.org --name=test-openam1 --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          docker run --rm -it -d -h openam1.example.org --name=test-openam1 --network test-openam localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           
           echo "Waiting for OpenAM-1 to be alive..."
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" test-openam1 | grep -q \"healthy\"; do sleep 10; done'
