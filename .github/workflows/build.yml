@@ -285,7 +285,7 @@ jobs:
           DS_DIRMGRDN=cn=Directory Manager
           DS_DIRMGRPASSWD=password
           DS_EMB_REPL_FLAG=embReplFlag
-          DS_EMB_REPL_REPLPORT1=8989
+          DS_EMB_REPL_REPLPORT1=9989
           DS_EMB_REPL_HOST2=openam2.example.com
           DS_EMB_REPL_ADMINPORT2=4444
           DS_EMB_REPL_REPLPORT2=8989
