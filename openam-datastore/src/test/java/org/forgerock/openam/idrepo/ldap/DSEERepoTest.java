@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2018-2026 3A Systems,LLC
  */
 
 package org.forgerock.openam.idrepo.ldap;
@@ -25,9 +26,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.ldap.LDAPConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 import org.forgerock.openam.utils.MapHelper;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -63,7 +65,8 @@ public class DSEERepoTest extends IdRepoTestBase {
         assertThat(roleMemberships).hasSize(1).containsOnly(ACCOUNTANT_DN);
         //retrieving filtered roles should also return managed roles
         roleMemberships = idrepo.getMemberships(null, IdType.USER, DEMO, IdType.FILTEREDROLE);
-        assertThat(roleMemberships).hasSize(1).containsOnly(ACCOUNTANT_DN);
+        assertEquals(roleMemberships.size(), 1);
+        assertTrue(roleMemberships.contains(ACCOUNTANT_DN));
     }
 
     @Test(dependsOnMethods = "addingRoleToUserSuccessful")
@@ -85,7 +88,8 @@ public class DSEERepoTest extends IdRepoTestBase {
     @Test
     public void retrievingFilteredRoleIsSuccessful() throws Exception {
         Set<String> filteredRoles = idrepo.getMemberships(null, IdType.USER, USER0, IdType.FILTEREDROLE);
-        assertThat(filteredRoles).hasSize(1).containsOnly(MANAGER_DN);
+        assertEquals(filteredRoles.size(), 1);
+        assertTrue(filteredRoles.contains(MANAGER_DN));
     }
 
     @Test
@@ -99,7 +103,7 @@ public class DSEERepoTest extends IdRepoTestBase {
         try {
             idrepo.modifyMemberShip(null, IdType.FILTEREDROLE, MANAGER, asSet(USER0), IdType.USER,
                     IdRepo.REMOVEMEMBER);
-            fail();
+            Assert.fail();
         } catch (IdRepoException ire) {
             assertThat(ire).hasMessage(getIdRepoExceptionMessage(IdRepoErrorCode.MEMBERSHIP_CANNOT_BE_MODIFIED,
                     DJLDAPv3Repo.class.getName(), IdType.FILTEREDROLE.getName()));
