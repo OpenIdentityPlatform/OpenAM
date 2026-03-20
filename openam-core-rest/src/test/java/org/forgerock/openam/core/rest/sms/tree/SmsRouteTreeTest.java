@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems,LLC
  */
 
 package org.forgerock.openam.core.rest.sms.tree;
@@ -151,7 +152,7 @@ public class SmsRouteTreeTest {
         Promise<ResourceResponse, ResourceException> result = routeTree.handleRead(context, request);
 
         //Then
-        assertThat(result).failedWithException();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(result).failedWithException();
         verify(authModule).authorizeRead(any(Context.class), any(ReadRequest.class));
         verifyNoMoreInteractions(requestHandler, defaultAuthModule);
     }
@@ -174,7 +175,7 @@ public class SmsRouteTreeTest {
         Promise<ResourceResponse, ResourceException> result = routeTree.handleRead(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(result).succeeded();
         verify(defaultAuthModule).authorizeRead(any(Context.class), any(ReadRequest.class));
         verifyNoMoreInteractions(authModule);
     }
@@ -196,7 +197,7 @@ public class SmsRouteTreeTest {
         Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(result).succeeded();
         assertThat(result.getOrThrow().getJsonContent()).hasArray("result").hasSize(3).containsOnly(
                 object(field("_id", "service1"), field("name", "one"), field("collection", false)),
                 object(field("_id", "service2"), field("name", "two"), field("collection", false)),
@@ -230,7 +231,7 @@ public class SmsRouteTreeTest {
         Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(result).succeeded();
         verifyGetTypeAction(handler1);
         verifyGetTypeAction(handler2);
         verifyGetTypeAction(handler3);
@@ -258,7 +259,7 @@ public class SmsRouteTreeTest {
         Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
 
         //Then
-        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
         verifyNoMoreInteractions(handler1);
     }
 
