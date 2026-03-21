@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -40,6 +40,11 @@
             <artifactId>jato</artifactId>
             <version>2005-05-04</version>
         </dependency>
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -55,6 +60,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <excludeScope>provided</excludeScope>
                         </configuration>
                     </execution>
                 </executions>
