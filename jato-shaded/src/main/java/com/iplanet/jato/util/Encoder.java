@@ -1,20 +1,38 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2023-2026 3A Systems LLC.
+ */
+
 package com.iplanet.jato.util;
 
-import java.io.ByteArrayInputStream;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
 
 public class Encoder {
 
+    private final static Debug debug = Debug.getInstance("amConsole");
     private Encoder() {
     }
 
@@ -115,18 +133,17 @@ public class Encoder {
     }
 
     public static Object deserialize(byte[] b, boolean compressed) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(b);
-        InflaterInputStream iis = null;
-        ObjectInputStream ois = null;
-        if (compressed) {
-            iis = new InflaterInputStream(bais);
-            ois = new ApplicationObjectInputStream(iis);
-        } else {
-            ois = new ApplicationObjectInputStream(bais);
+        if(debug.messageEnabled()) {
+            String trace = StackWalker.getInstance()
+                .walk(frames -> frames
+                        .skip(1).limit(3)
+                        .map(f -> String.format("%s.%s(%s:%d)",
+                                f.getClassName(), f.getMethodName(),
+                                f.getFileName(), f.getLineNumber()))
+                        .collect(Collectors.joining("; ")));
+            debug.message("Encoder:deserialize callers trace: " + trace);
         }
-
-        Object result = ois.readObject();
-        return result;
+        return IOUtils.deserialise(b, compressed);
     }
 }
 
