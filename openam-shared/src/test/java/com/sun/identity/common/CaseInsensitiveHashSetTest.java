@@ -12,10 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 
 package com.sun.identity.common;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.forgerock.openam.utils.CollectionUtils;
@@ -32,12 +34,12 @@ public class CaseInsensitiveHashSetTest {
         Set<String> setToInitialise = CollectionUtils.asSet("inetUser", "sunfederationmanagerdatastore",
                 "forgerock-am-dashboard-service", "iplanetpreferences");
 
-        Set<Object> ciHashSet = new CaseInsensitiveHashSet();
+        Set<String> ciHashSet = new CaseInsensitiveHashSet<>();
 
         ciHashSet.addAll(setToInitialise);
         ciHashSet.removeAll(setToRemove);
 
-        assertThat(ciHashSet).hasSize(2).contains("sunfederationmanagerdatastore", "forgerock-am-dashboard-service");
+        assertThat(ciHashSet).hasSize(2).containsSequence("sunfederationmanagerdatastore", "forgerock-am-dashboard-service");
     }
 
     @Test
@@ -48,12 +50,12 @@ public class CaseInsensitiveHashSetTest {
                 "four", "five");
         Set<String> setToInitialise = CollectionUtils.asSet("inetUser", "sunfederationmanagerdatastore",
                 "forgerock-am-dashboard-service", "iplanetpreferences");
-        Set<Object> ciHashSet = new CaseInsensitiveHashSet();
+        Set<String> ciHashSet = new CaseInsensitiveHashSet<>();
 
         ciHashSet.addAll(setToInitialise);
         ciHashSet.removeAll(ciSetToRemove);
 
-        assertThat(ciHashSet).hasSize(2).contains("sunfederationmanagerdatastore", "forgerock-am-dashboard-service");
+        assertThat(ciHashSet).hasSize(2).containsSequence("sunfederationmanagerdatastore", "forgerock-am-dashboard-service");
 
     }
 
