@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 package org.forgerock.openam.test.apidescriptor;
 
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.assertj.core.api.AbstractListAssert;
+import org.assertj.core.api.ObjectAssert;
 import org.forgerock.api.annotations.ApiError;
 import org.forgerock.api.annotations.Schema;
 
@@ -29,7 +31,7 @@ import org.forgerock.api.annotations.Schema;
  *
  * @since 14.0.0
  */
-public final class ApiErrorAssert extends AbstractListAssert<ApiErrorAssert, List<ApiError>, ApiError> {
+public final class ApiErrorAssert extends AbstractListAssert<ApiErrorAssert, List<ApiError>, ApiError, ObjectAssert<ApiError>> {
 
     private final Class<?> annotatedClass;
 
@@ -61,5 +63,17 @@ public final class ApiErrorAssert extends AbstractListAssert<ApiErrorAssert, Lis
             schemas.add(error.detailSchema());
         }
         return new ApiSchemaAssert(annotatedClass, schemas);
+    }
+
+    @Override
+    protected ObjectAssert<ApiError> toAssert(ApiError value, String description) {
+        return new ObjectAssert<>(value).as(description);
+    }
+
+    @Override
+    protected ApiErrorAssert newAbstractIterableAssert(Iterable<? extends ApiError> iterable) {
+        List<ApiError> list = new ArrayList<>();
+        iterable.forEach(list::add);
+        return new ApiErrorAssert(annotatedClass, list);
     }
 }

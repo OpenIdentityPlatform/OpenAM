@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.uma.rest;
@@ -103,7 +104,7 @@ public class ResourceSetResourceTest {
         Promise<ResourceResponse, ResourceException> readPromise = resource.readInstance(context, "RESOURCE_SET_ID", request);
 
         //Then
-        assertThat(readPromise).succeeded().withObject().isNotNull();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(readPromise).succeeded().withObject().isNotNull();
     }
     
     @Test
@@ -117,7 +118,7 @@ public class ResourceSetResourceTest {
         Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class ResourceSetResourceTest {
         Promise<QueryResponse, ResourceException> promise = resource.queryCollection(context, request, handler);
 
         //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test
@@ -173,7 +174,7 @@ public class ResourceSetResourceTest {
                         QueryFilter.equalTo("name", "NAME"),
                         QueryFilter.equalTo("clientId", "myclient")));
 
-        assertThat(promise).succeeded().withObject().isNotNull();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).succeeded().withObject().isNotNull();
 
     }
 
@@ -194,7 +195,7 @@ public class ResourceSetResourceTest {
         Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        assertThat(promise).succeeded().withObject().isNotNull();
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).succeeded().withObject().isNotNull();
         JsonValue jsonContent = promise.getOrThrowUninterruptibly().getJsonContent();
         assertThat(jsonContent.asMap()).isEmpty();
 
@@ -217,7 +218,7 @@ public class ResourceSetResourceTest {
         Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        assertThat(promise).failedWithException().isInstanceOf(ResourceException.class);
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).failedWithException().isInstanceOf(ResourceException.class);
     }
 
     @Test
@@ -233,7 +234,7 @@ public class ResourceSetResourceTest {
         Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
+        org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test

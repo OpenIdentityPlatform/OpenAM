@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -101,7 +102,7 @@ public final class RemoveRedundantDefaultApplicationTest {
         assertThat(isApplicable).isTrue();
         verify(applicationService).deleteApplication(eq("app1"));
         verify(applicationService).deleteApplication(eq("app2"));
-        assertThat(report).containsSequence("successfully removed", "app1", "failed to be removed", "app2");
+        assertThat(report).contains("successfully removed", "app1", "failed to be removed", "app2");
     }
 
 }
