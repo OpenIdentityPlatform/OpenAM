@@ -153,9 +153,12 @@ public class PooledTaskExecutorTest {
         public void execute(TokenStorageAdapter adapter) throws DataLayerException {
             debug("Locking");
             try {
-                latch.await();
+                if (!latch.await(30, TimeUnit.SECONDS)) {
+                    fail("LongTask was not unblocked within 30 seconds; test is likely hung.");
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                throw new DataLayerException("Task was interrupted while waiting on latch", e);
             }
             debug("Thread unlocked - continuing");
         }
