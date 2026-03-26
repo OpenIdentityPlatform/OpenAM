@@ -156,7 +156,7 @@ public class PooledTaskExecutorTest {
             this.executingThread = Thread.currentThread();
             debug("Locking");
             locked.set(true);
-            while (!locked.compareAndSet(false, true)) {
+            while (locked.get()) {
                 debug("Task still locked - parking thread");
                 LockSupport.park(this);
                 debug("Thread unparked");
