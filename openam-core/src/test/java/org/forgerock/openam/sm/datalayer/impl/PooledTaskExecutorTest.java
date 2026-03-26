@@ -22,10 +22,9 @@ import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.Mockito.*;
 
 import java.text.MessageFormat;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.LockSupport;
 
 import jakarta.inject.Provider;
 
@@ -148,18 +147,15 @@ public class PooledTaskExecutorTest {
 
     private static class LongTask implements Task {
 
-        private AtomicBoolean locked = new AtomicBoolean(false);
-        private Thread executingThread;
+        private final CountDownLatch latch = new CountDownLatch(1);
 
         @Override
         public void execute(TokenStorageAdapter adapter) throws DataLayerException {
-            this.executingThread = Thread.currentThread();
             debug("Locking");
-            locked.set(true);
-            while (locked.get()) {
-                debug("Task still locked - parking thread");
-                LockSupport.park(this);
-                debug("Thread unparked");
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
             debug("Thread unlocked - continuing");
         }
@@ -169,10 +165,7 @@ public class PooledTaskExecutorTest {
 
         public void unblock() {
             debug("Setting task unlocked");
-            locked.set(false);
-            debug("Unparking thread {0}", executingThread);
-            LockSupport.unpark(executingThread);
-            debug("Unparked thread {0}", executingThread);
+            latch.countDown();
         }
 
     }
