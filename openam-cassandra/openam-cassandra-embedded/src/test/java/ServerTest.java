@@ -32,6 +32,7 @@ public class ServerTest {
 		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");
+		System.setProperty("datastax-java-driver.basic.request.timeout", "20 seconds");
 	}
 	
 	@AfterClass
