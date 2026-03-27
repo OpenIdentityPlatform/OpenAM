@@ -71,7 +71,7 @@ public class UserService extends OpenAMAbstractService {
         realm = getRealmOrDefault(realm);
 
         if(!ATTR_MAP.containsKey(attribute)) {
-            throw new RuntimeException(String.format("invalid attribute: %s; allowed values %s", attribute, ATTR_MAP.keySet()));
+            throw new IllegalArgumentException(String.format("invalid attribute: %s; allowed values %s", attribute, ATTR_MAP.keySet()));
         }
         String tokenId = getTokenId();
 

@@ -36,6 +36,11 @@ public abstract class OpenAMAbstractService {
 
     protected String getTokenId() {
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
+        if (attrs == null) {
+            throw new IllegalStateException(
+                    "No RequestAttributes available. getTokenId() must be called within the context of an HTTP request " +
+                    "and with the appropriate RequestContext infrastructure configured.");
+        }
         return (String) attrs.getAttribute("tokenId", RequestAttributes.SCOPE_REQUEST);
     }
 

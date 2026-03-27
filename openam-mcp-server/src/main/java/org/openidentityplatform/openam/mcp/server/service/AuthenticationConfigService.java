@@ -79,7 +79,11 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
             List<String> chainModules = chainDTO.modules().stream().map(AuthChainDTO.AuthChainModuleDTO::module).toList();
             List<String> moduleNames = chainModules.stream()
                     .map(cm -> authModuleDTOList.stream()
-                            .filter(rm -> cm.equals(rm.id())).findFirst().get().typeDescription()).toList();
+                            .filter(rm -> cm.equals(rm.id()))
+                            .findFirst()
+                            .map(AuthModuleDTO::typeDescription)
+                            .orElse(cm))
+                    .toList();
             return new AuthChain(chainDTO.id(), moduleNames);
         }).collect(Collectors.toList());
     }

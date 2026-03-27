@@ -24,8 +24,12 @@ public record Realm(String name,
                     String parentPath,
                     List<String> aliases) {
       public Realm(RealmDTO realmDTO) {
+            List<String> safeAliases = (realmDTO.aliases() == null)
+                    ? new ArrayList<>()
+                    : new ArrayList<>(realmDTO.aliases());
             this(realmDTO.name().equals("/") ? "root" : realmDTO.name(),
-                    realmDTO.active(), realmDTO.parentPath(),
-                    new ArrayList<>(realmDTO.aliases()));
+                    realmDTO.active(),
+                    realmDTO.parentPath(),
+                    safeAliases);
       }
 }

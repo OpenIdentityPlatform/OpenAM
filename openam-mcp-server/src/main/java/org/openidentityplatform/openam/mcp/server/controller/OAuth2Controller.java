@@ -41,9 +41,15 @@ public class OAuth2Controller {
 
     @GetMapping("/.well-known/**")
     public ResponseEntity<String> openAMWellKnown(HttpServletRequest request) {
+        StringBuilder uriBuilder = new StringBuilder("/oauth2").append(request.getRequestURI());
+        String queryString = request.getQueryString();
+        if (queryString != null && !queryString.isEmpty()) {
+            uriBuilder.append('?').append(queryString);
+        }
+
         RestClient.RequestBodySpec requestSpec = openAMRestClient
                 .method(HttpMethod.valueOf(request.getMethod()))
-                .uri("/oauth2".concat(request.getRequestURI()))
+                .uri(uriBuilder.toString())
                 .headers(headers -> request.getHeaderNames().asIterator().forEachRemaining(name -> {
                     if (IGNORE_HEADERS.contains(name.toLowerCase())) {
                         return;

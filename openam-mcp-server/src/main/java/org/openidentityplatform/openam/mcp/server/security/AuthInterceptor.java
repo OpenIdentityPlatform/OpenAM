@@ -128,6 +128,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setHeader("WWW-Authenticate", "Bearer realm=\"OpenAM\"");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write("{\"error\":\"Unauthorized\"}");
             return false;
         }
         String accessToken = authHeader.substring(7);

@@ -46,6 +46,7 @@ class RealmServiceTest extends OpenAMServiceTest {
     @Test
     void getRealms() throws IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("realms/realms-response.json");
+        assertNotNull(is, "Test resource 'realms/realms-response.json' not found on the classpath");
         SearchResponseDTO<RealmDTO> realmsResponse = objectMapper.readValue(is, new TypeReference<>() {});
 
         when(responseSpec.body(eq(new ParameterizedTypeReference<SearchResponseDTO<RealmDTO>>() {}))).thenReturn(realmsResponse);
