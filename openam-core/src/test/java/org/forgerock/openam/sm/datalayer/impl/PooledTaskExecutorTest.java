@@ -159,7 +159,6 @@ public class PooledTaskExecutorTest {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new DataLayerException("Task was interrupted while waiting on latch", e);
-                throw new DataLayerException("Task was interrupted while waiting on latch", e);
             }
             debug("Thread unlocked - continuing");
         }
