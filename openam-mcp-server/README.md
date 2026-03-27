@@ -31,7 +31,7 @@ mvn package -DskipTests=true && java -jar ./target/openam-mcp-server-*.jar
 ## Advanced Authentication
 
 > [!IMPORTANT]  
-> UUsing administrative credentials directly in the MCP server can be insecure. This server therefore supports OpenAM's OAuth 2.0 protocol.
+> Using administrative credentials directly in the MCP server can be insecure. This server therefore supports OpenAM's OAuth 2.0 protocol.
 protocol.
 
 This approach requires additional OpenAM configuration.
