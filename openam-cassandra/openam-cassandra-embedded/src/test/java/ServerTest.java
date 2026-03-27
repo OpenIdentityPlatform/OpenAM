@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions Copyright 2020-2026 3A Systems, LLC.
  */
 
 
