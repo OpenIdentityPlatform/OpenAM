@@ -15,7 +15,7 @@ openam:
   tokenHeader: ${OPENAM_TOKEN_HEADER:iPlanetDirectoryPro}
   useOAuthForAuthentication: ${OPENAM_USE_OAUTH:false}
   username: ${OPENAM_ADMIN_USERNAME:amadmin}
-  password: ${OPENAM_ADMIN_PASSWORD:ampassword}
+  password: ${OPENAM_ADMIN_PASSWORD:changeit}
   oidcAuthChain: ${OPENAM_OIDC_AUTH_CHAIN:oidc}
   oidcAuthHeader: ${OPENAM_OIDC_AUTH_HEADER:oidc_id_token}
 
