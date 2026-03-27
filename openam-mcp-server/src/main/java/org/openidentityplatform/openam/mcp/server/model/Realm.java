@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.mcp.server.model;
@@ -24,12 +24,11 @@ public record Realm(String name,
                     String parentPath,
                     List<String> aliases) {
       public Realm(RealmDTO realmDTO) {
-            List<String> safeAliases = (realmDTO.aliases() == null)
-                    ? new ArrayList<>()
-                    : new ArrayList<>(realmDTO.aliases());
             this(realmDTO.name().equals("/") ? "root" : realmDTO.name(),
                     realmDTO.active(),
                     realmDTO.parentPath(),
-                    safeAliases);
+                    (realmDTO.aliases() == null)
+                            ? new ArrayList<>()
+                            : new ArrayList<>(realmDTO.aliases()));
       }
 }
