@@ -52,6 +52,6 @@ class RealmServiceTest extends OpenAMServiceTest {
         when(responseSpec.body(eq(new ParameterizedTypeReference<SearchResponseDTO<RealmDTO>>() {}))).thenReturn(realmsResponse);
 
         List<Realm> realmList = realmService.getRealms();
-        assertEquals(realmList.size(), 2);
+        assertEquals(2, realmList.size());
     }
 }

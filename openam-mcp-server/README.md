@@ -32,7 +32,6 @@ mvn package -DskipTests=true && java -jar ./target/openam-mcp-server-*.jar
 
 > [!IMPORTANT]  
 > Using administrative credentials directly in the MCP server can be insecure. This server therefore supports OpenAM's OAuth 2.0 protocol.
-protocol.
 
 This approach requires additional OpenAM configuration.
 
@@ -52,7 +51,7 @@ Configure the OAuth 2.0 Provider with the following settings:
 | OAuth2 Token Signing Algorithm                                   | RS256   |
 | Allow Open Dynamic Client Registration                           | enabled |
 
-For more details, see the OpenAM OAuth 2.0 documentation:: https://doc.openidentityplatform.org/openam/admin-guide/chap-oauth2
+For more details, see the OpenAM OAuth 2.0 documentation: https://doc.openidentityplatform.org/openam/admin-guide/chap-oauth2
 
 ### Authentication Chain Configuration
 
@@ -318,7 +317,7 @@ In JSON-RPC format:
     },
     {
       "name": "get_available_modules",
-      "description": "Returns all available authenticaion modules",
+      "description": "Returns all available authentication modules",
       "inputSchema": {
         "type": "object",
         "properties": {},

@@ -54,7 +54,7 @@ class UserServiceTest extends OpenAMServiceTest {
         when(responseSpec.body(eq(new ParameterizedTypeReference<SearchResponseDTO<UserDTO>>() {}))).thenReturn(userSearchResponse);
 
         List<User> userList = userService.getUsers(null, null);
-        assertEquals(userList.size(), 2);
+        assertEquals(2, userList.size());
     }
 
     @Test
