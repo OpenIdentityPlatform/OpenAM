@@ -61,7 +61,8 @@ jobs:
           mvn javadoc:aggregate -pl '-:openam-server,-:openam-server-only' \
             -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api' \
             -pl '-:openam-server-auth-ui,-:openam-doc-ssoadm-ref,-:openam-liberty-schema' \
-            -pl '-:openam-example-api-descriptor,-:openam-example-clientsdk-cli,-:openam-example-clientsdk-war'
+            -pl '-:openam-example-api-descriptor,-:openam-example-clientsdk-cli,-:openam-example-clientsdk-war' \
+            -pl '-:bcpkix-shaded'
       - name: Upload artifacts OpenAM Distribution Kit, containing all distributable artifacts
         uses: actions/upload-artifact@v4
         with:

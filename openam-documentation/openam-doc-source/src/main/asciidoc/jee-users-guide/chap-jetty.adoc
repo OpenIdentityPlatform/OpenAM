@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2025 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -32,65 +32,31 @@ Make sure OpenAM is installed and running, and that you can contact OpenAM from 
 
 You must install Jetty before you install the policy agent, and you must stop the server during installation.
 
-You must install a supported version of the Java runtime environment. Set the `JAVA_HOME` environment variable accordingly. The policy agent installer requires Java.
+You must install a supported version of the Java runtime environment. Set the `JAVA_HOME` environment variable accordingly. The policy agent requires Java.
 
 [source, console]
 ----
 $ echo $JAVA_HOME
 /path/to/java
 ----
-See the OpenAM __Installation Guide__ section, link:../../../openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also verify the checksum of the file you download against the checksum posted on the download page.
+Download the agent distribution of the J2EE Agent from link:https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents/releases/[GitHub, window=\_blank].
+Also verify the checksum of the file you download against the checksum posted on the download page.
 
-[NOTE]
-====
-Command line examples in this chapter show Jetty accessed remotely. If you are following the examples and have issues accessing Jetty remotely, you might have to change filter settings in the deployment descriptor file, such as `/path/to/jetty/webapps/test/WEB-INF/web.xml`, as shown in the following example:
-
-[source, xml]
-----
-<filter>
- <filter-name>TestFilter</filter-name>
- <filter-class>com.acme.TestFilter</filter-class>
- <init-param>
-  <param-name>remote</param-name>
-  <param-value>true</param-value> <!-- default: false -->
- </init-param>
-</filter>
-----
-====
 Unzip the file in the directory where you plan to install the J2EE policy agent. The agent you install stores its configuration and logs under this directory.
 
-When you unzip the policy agent, you find the following directories under the `j2ee_agents/jetty_v61_agent` directory.
+When you unzip the policy agent, you find the following files and directories under the `jee-agent-uberjar` or `jee-agent-jar-with-lib` directory.
 
 Despite the directory name, the policy agent supports multiple container versions.
 --
 
-`bin`::
-The installation and configuration program `agentadmin`. For more details about the available command-line tools, see xref:tools-reference.adoc#tools-reference[Command-Line Tool Reference].
+`agent.jar`::
+The policy agent JAR file itself.
 
-`config`::
-Configuration templates used by the `agentadmin` command during installation
+`agent-lib`::
+For the `jar-with-lib` distribution. Contains external libraries that the agent needs to run.
 
-`data`::
-Not used
-
-`etc`::
-Configuration templates used during installation
-
-`installer-logs`::
-Location for log files written during installation
-
-`legal-notices`::
-Contains licensing information including third-party licenses
-
-`lib`::
-Shared libraries used by the Java EE policy agent
-
-`locale`::
-Property files used by the installation program
-
-`README`::
-README file containing platform and install information for the agent
-
+`agent-locale`::
+Locale files and templates
 --
 
 
@@ -133,43 +99,7 @@ In centralized configuration mode, the Agent URL is used to populate the Agent P
 
 ====
 
-[#d0e5817]
-.To Create a Password File
-====
 
-. Create a text file containing only the password specified when creating the agent profile.
-+
-UNIX example:
-+
-
-[source, console]
-----
-$ echo password > /tmp/pwd.txt
-----
-+
-Windows example:
-+
-
-[source, console]
-----
-C:\> echo password > pwd.txt
-----
-
-. Protect the password file you create as appropriate for your operating system:
-+
-UNIX example:
-+
-
-[source, console]
-----
-$ chmod 400 /tmp/pwd.txt
-----
-+
-Windows example:
-+
-In Windows Explorer, right-click the created password file, for example `pwd.txt`, select Read-Only, and then click OK.
-
-====
 
 [#install-agent-into-jetty]
 .To Install the Policy Agent into Jetty
@@ -177,79 +107,57 @@ In Windows Explorer, right-click the created password file, for example `pwd.txt
 
 . Shut down the Jetty server where you plan to install the agent.
 
-. Make sure OpenAM is running.
-
-. Run `agentadmin --install` to install the agent.
+. Create the Agent configuration files
 +
-When you run the command, you will be prompted to read and accept the software license agreement for the agent installation. You can suppress the license agreement prompt by including the `--acceptLicence` parameter. The inclusion of the option indicates that you have read and accepted the terms stated in the license. To view the license agreement, open `<server-root>/legal-notices/license.txt`.
-+
+--
+`debugconfig.properties`:
 
-[source, console]
+[source, properties]
 ----
-$ /path/to/j2ee_agents/jetty_v61_agent/bin/agentadmin --install --acceptLicense
-...
------------------------------------------------
-SUMMARY OF YOUR RESPONSES
------------------------------------------------
-Jetty Server Config Directory : /path/to/jetty/etc
-OpenAM server URL : http://openam.example.com:8080/openam
-Jetty installation directory. : /path/to/jetty
-Agent URL : http://www.example.com:8080/agentapp
-Agent Profile name : Jetty Agent
-Agent Profile Password file name : /tmp/pwd.txt
-
-...
-SUMMARY OF AGENT INSTALLATION
------------------------------
-Agent instance name: Agent_001
-Agent Bootstrap file location:
-/path/to/j2ee_agents/jetty_v61_agent/Agent_001/config/
- OpenSSOAgentBootstrap.properties
-Agent Configuration file location
-/path/to/j2ee_agents/jetty_v61_agent/Agent_001/config/
- OpenSSOAgentConfiguration.properties
-Agent Audit directory location:
-/path/to/j2ee_agents/jetty_v61_agent/Agent_001/logs/audit
-Agent Debug directory location:
-/path/to/j2ee_agents/jetty_v61_agent/Agent_001/logs/debug
-
-
-Install log file location:
-/path/to/j2ee_agents/jetty_v61_agent/installer-logs/audit/install.log
-...
+org.forgerock.openam.debug.prefix=
+org.forgerock.openam.debug.suffix=
+org.forgerock.openam.debug.rotation=
 ----
-+
-Upon successful completion, the installer updates Jetty's `start.jar` to reference the agent, sets up the agent web application, and also sets up configuration and log directories for the agent.
-+
+and
+
+`OpenSSOAgentBootstrap.properties`:
+[source, properties]
+----
+com.iplanet.am.naming.url=http://openam.example.org:8080/openam/namingservice
+com.sun.identity.agents.config.service.resolver=org.openidentityplatform.identity.agents.GenericAgentServiceResolver
+com.sun.identity.agents.app.username=amadmin
+com.iplanet.am.service.secret = AQIC5wM2LY4SfcwrWIPia7mlGbsTreZGLWhi
+am.encryption.pwd = KmhUnWR1MYWDYW4xuqdF5nbm+CXIyOVt
+com.sun.identity.agents.config.profilename=myAgent
+
+com.iplanet.services.debug.level=message
+com.iplanet.services.debug.directory=/path/to/j2ee_agents/Agent_001/logs/debug
+com.sun.services.debug.mergeall=on
+com.sun.identity.agents.config.local.logfile=/path/to/j2ee_agents/Agent_001/logs/debug/debug.out
+com.sun.identity.agents.config.organization.name=/
+com.sun.identity.agents.config.lock.enable=false
+
+com.iplanet.am.server.protocol=http
+com.iplanet.am.server.host=openam.example.org
+com.iplanet.am.server.port=8080
+com.iplanet.am.services.deploymentDescriptor=/openam
+----
+
+Adjust configuration parameters to your needs according to xref:./chap-jee-agent-config.adoc#configure-j2ee-policy-agent[Configuring Java EE Policy Agent Properties]
 
 [NOTE]
 ======
-If the agent is in a different domain than the server, refer to __Administration Guide__ procedure, link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
+If the agent is in a different domain than the server, refer to the __Administration Guide__ procedure, link:../../../openam/admin-guide/chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
 ======
-
-. Take note of the configuration files and log locations.
-+
-Each agent instance that you install on the system has its own numbered configuration and logs directory. The first agent's configuration and logs are thus located under the directory `j2ee_agents/jetty_v61_agent/Agent_001/`:
-+
 --
+. If your policy agent configuration is not in the top-level realm (/), then you must edit config/OpenSSOAgentBootstrap.properties to identify the sub-realm that has your policy agent configuration. Find com.sun.identity.agents.config.organization.name and change the "/" to the path to your policy agent profile. This allows the policy agent to properly identify itself to the OpenAM server.
 
-`config/OpenSSOAgentBootstrap.properties`::
-Used to bootstrap the Java EE policy agent, allowing the agent to connect to OpenAM and download its configuration.
+. If you want to protect all applications in the container, you must add a filter manually for each protected application's `WEB-INF/web.xml` deployment descriptor file, following the opening <web-app> tag. Make sure that the agent filter is first in the filter chain:
++
 
-`config/OpenSSOAgentConfiguration.properties`::
-Only used if you configured the Java EE policy agent to use local configuration.
+Add the `agent.jar` file to the Jetty's `resources` directory and contents of the `agent-lib` directory, for `jee-agent-jar-with-lib` distribution, and contents of the `agent-locale` to the Jetty's `resources` directory.
 
-`logs/audit/`::
-Operational audit log directory, only used if remote logging to OpenAM is disabled.
-
-`logs/debug/`::
-Debug directory where the `debug.out` debug file resides. Useful in troubleshooting policy agent issues.
-
---
-
-. If your policy agent configuration is not in the top-level realm (/), then you must edit config/OpenSSOAgentBootstrap.properties to identify the sub-realm that has your policy agent configuration. Find com.sun.identity.agents.config.organization.name and change the / to the path to your policy agent profile. This allows the policy agent to properly identify itself to the OpenAM server.
-
-. To protect a web application, you must add the following filter to the application's `WEB-INF/web.xml` deployment descriptor, following the opening <web-app> tag.
+Add filter to the Jetty's `etc/webdefault.xml` configuration file:
 +
 
 [source, xml]
@@ -286,20 +194,10 @@ $ cd /path/to/jetty ; java -jar start.jar
 
 ====
 
-
-[#silent-jetty-agent-installation]
-=== Silent Jetty Policy Agent Installation
-
-When performing a scripted, silent installation, use `agentadmin --acceptLicense --saveResponse response-file` to create a response file for scripted installation. Then install silently using `agentadmin --install --acceptLicense --useResponse response-file`.
-
-
 [#uninstall-jetty-agent]
 === Removing Jetty Policy Agent Software
 
-Shut down the Jetty server before you uninstall the policy agent.
-
-To remove the Java EE policy agent, use `agentadmin --uninstall`. You must provide the Jetty configuration directory location.
-
-Uninstall does not remove the agent instance directory, but you can do so manually after removing the agent configuration from Jetty.
+. Remove agent files from the Jetty's `lib` and `resources` directories.
+. Remove the Agent filter from the Jetty's `etc/webdefault.xml` configuration file
 
 

@@ -14,7 +14,7 @@
  *
  * Copyright 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Agile Digital Engineering
- * Portions copyright 2017-2025 3A Systems, LLC
+ * Portions copyright 2017-2026 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>16.0.4-SNAPSHOT</version>
+  <version>16.0.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -79,7 +79,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>5.0.1</opendj.version>
+    <opendj.version>5.0.4</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>7.0.0</guice.version>
@@ -103,11 +103,11 @@
     <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
     <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
     <jsr311-api.version>1.1.1</jsr311-api.version>
-    <jstl.version>1.2.5</jstl.version>
+    <jstl.version>2.0.0</jstl.version>
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7.12</rhino.version>
+    <rhino.version>1.7.14.1</rhino.version>
     <saaj-api.version>2.0.1</saaj-api.version>
     <saaj-impl.version>2.0.1</saaj-impl.version>
     <jsp-api.version>3.0.0</jsp-api.version>
@@ -137,7 +137,7 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.3.15</logback.version>
-    <netty.version>4.1.125.Final</netty.version>
+    <netty.version>4.1.132.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
     <bouncycastle.version>1.81</bouncycastle.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
@@ -1092,7 +1092,8 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.6.0.0</version>
+        <version>2.7.0.0</version>
+        <classifier>jakarta</classifier>
         <exclusions>
         	<exclusion>
         		<groupId>org.apache.httpcomponents</groupId>
@@ -1253,8 +1254,8 @@
         <version>${jsr311-api.version}</version>
       </dependency>
       <dependency>
-		<groupId>org.apache.taglibs</groupId>
-		<artifactId>taglibs-standard-impl</artifactId>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl</artifactId>
         <version>${jstl.version}</version>
       </dependency>
       <dependency>
