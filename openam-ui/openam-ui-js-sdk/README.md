@@ -8,7 +8,7 @@ This project is intended to provide an alternative frontend SDK for interacting 
 - **Ease of Use**: Pre-configured React components ready for integration.
 - **Modular & Flexible**: Easily swap components and customize the SDK to suit your needs.
 - **TypeScript Support**: Enhance development experience with type safety and better code completion.
-- **Seamless Integration**: Easily integrate OpenAM with minimal configura
+- **Seamless Integration**: Easily integrate OpenAM with minimal configuration.
 
 # Prerequisites
 - Node.js 22 LTS and newer
@@ -32,9 +32,9 @@ npm run build
 
 ### As an Application
 
-Copy the contents of the `dist/app` folder into your OpenAM WAR file (or the extracted WAR contents in your web container), e.g., into a directory like `extui`, so it could be accessible in your OpenAM context path, for example, http://openam.example.org:8080/openam/extui
+Copy the contents of the `target/app` folder into your OpenAM WAR file (or the extracted WAR contents in your web container), e.g., into a directory like `extui`, so it could be accessible in your OpenAM context path, for example, http://openam.example.org:8080/openam/extui
 
-You can also run the application in a standalone server. The only condition, the servers shold be on the same subdomain, so OpenAM's cookies could be sent from the frontend application.
+You can also run the application in a standalone server. The only condition, the servers should be on the same subdomain, so OpenAM's cookies could be sent from the frontend application.
 
 
 ## As an SDK library
@@ -83,25 +83,34 @@ export interface Config {
 for example
 
 ```tsx
-//update the default configuration
-import { setConfig } from 'openam-js-sdk'
+// update the default configuration
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { OpenAMUI, setConfig } from 'openam-js-sdk';
 
 setConfig({
   openamServer: 'https://openam.example.org:443',
   openamContextPath: '/am',
-  errorForm: ({ error, resetError }) => {
-    return <div>
-      <h1>An error occurred</h1>
-      <p>{error?.message}</p>
-      <input type="button" value="Retry" onClick={() => resetError()} />
-    </div>
-})
+  ErrorForm: ({ error, resetError }) => {
+    return (
+      <div>
+        <h1>An error occurred</h1>
+        <p>{error?.message}</p>
+        <input
+          type="button"
+          value="Retry"
+          onClick={() => resetError()}
+        />
+      </div>
+    );
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <OpenAMUI />
   </StrictMode>,
-)
+);
 ```
 
 There are components you can override:
