@@ -70,6 +70,10 @@ class UserService {
           "Content-Type": "application/json"
         },
       })
+      if(!response.ok) {
+        const data = await response.json() as AuthError
+        throw new Error(data.message)
+      }
       return await response.json();
     } catch (e) {
       if (import.meta.env.MODE === 'development') {
@@ -104,6 +108,10 @@ class UserService {
         body: JSON.stringify(dataToUpdate),
       }
       )
+      if(!response.ok) {
+        const data = await response.json() as AuthError
+        throw new Error(data.message)
+      }
       return await response.json();
     }
 
