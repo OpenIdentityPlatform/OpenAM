@@ -29,7 +29,7 @@ const DefaultActionElements: ActionElements = ({ callbacks }) => {
     }
 
     return <>{opts.map((o, i) =>
-        <input className={i == 0 ? "primary-button" : "secondary-button"} key={"IDButton" + i}
+        <input className={i === 0 ? "primary-button" : "secondary-button"} key={"IDButton" + i}
             name={"IDButton" + i} type="submit" value={o} />)}
     </>;
 }
