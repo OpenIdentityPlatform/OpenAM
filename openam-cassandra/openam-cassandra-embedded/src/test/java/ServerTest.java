@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions Copyright 2020-2026 3A Systems, LLC.
  */
 
 
@@ -32,6 +33,7 @@ public class ServerTest {
 		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");
+		System.setProperty("datastax-java-driver.basic.request.timeout", "20 seconds");
 	}
 	
 	@AfterClass
