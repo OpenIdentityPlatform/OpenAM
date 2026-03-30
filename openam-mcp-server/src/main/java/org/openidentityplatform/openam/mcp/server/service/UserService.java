@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.mcp.server.service;
@@ -25,7 +25,9 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,10 @@ public class UserService extends OpenAMAbstractService {
         if(filter != null) {
             queryFilter= "cn sw \"".concat(filter).concat("\"");
         }
-        String uri = String.format("/json/realms/%s/users?_queryFilter=%s", realm, queryFilter);
+        String uri = String.format("/json/realms/%s/users?_queryFilter=%s",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodeQuery(queryFilter, StandardCharsets.UTF_8)
+        );
         String tokenId = getTokenId();
         SearchResponseDTO<UserDTO> userSearchResponse  = openAMRestClient.get().uri(uri)
                 .header(openAMConfig.tokenHeader(), tokenId)
@@ -76,7 +81,10 @@ public class UserService extends OpenAMAbstractService {
         String tokenId = getTokenId();
 
         Map<String, String> requestBody = Map.of(ATTR_MAP.get(attribute), value);
-        String uri = String.format("/json/realms/%s/users/%s", realm, username);
+        String uri = String.format("/json/realms/%s/users/%s",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodePath(username, StandardCharsets.UTF_8)
+        );
         UserDTO user = openAMRestClient.put().uri(uri).body(requestBody)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .header("Accept-API-Version","resource=2.0, protocol=1.0")
@@ -96,7 +104,9 @@ public class UserService extends OpenAMAbstractService {
         String tokenId = getTokenId();
 
         Map<String, String> requestBody = Map.of("userpassword", password);
-        String uri = String.format("/json/realms/%s/users/%s?_action=changePassword", realm, username);
+        String uri = String.format("/json/realms/%s/users/%s?_action=changePassword",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodePath(username, StandardCharsets.UTF_8));
         UserDTO user = openAMRestClient.put().uri(uri).body(requestBody)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .header("Accept-API-Version","resource=2.0, protocol=1.0")
@@ -139,7 +149,9 @@ public class UserService extends OpenAMAbstractService {
 
         String tokenId = getTokenId();
 
-        String uri = String.format("/json/realms/%s/users/?_action=create", realm);
+        String uri = String.format("/json/realms/%s/users/?_action=create",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8)
+        );
         UserDTO user = openAMRestClient.post().uri(uri).body(userProps)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .header("Accept-API-Version","resource=2.0, protocol=1.0")
@@ -156,7 +168,10 @@ public class UserService extends OpenAMAbstractService {
 
         String tokenId = getTokenId();
 
-        String uri = String.format("/json/realms/%s/users/%s", realm, username);
+        String uri = String.format("/json/realms/%s/users/%s",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodePath(username, StandardCharsets.UTF_8)
+        );
         return openAMRestClient.delete().uri(uri)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .header("Accept-API-Version","resource=2.0, protocol=1.0")
