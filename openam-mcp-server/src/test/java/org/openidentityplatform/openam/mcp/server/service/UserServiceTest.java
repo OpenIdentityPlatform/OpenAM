@@ -86,4 +86,26 @@ class UserServiceTest extends OpenAMServiceTest {
         Map<String, String> result = userService.deleteUser(null, "demo");
         assertEquals("true", result.get("success"));
     }
+
+    @Test
+    void createUserTest() throws IOException {
+        InputStream is = getClass().getClassLoader().getResourceAsStream("users/user-response.json");
+        UserDTO userDTO = objectMapper.readValue(is, UserDTO.class);
+
+        when(responseSpec.body(UserDTO.class)).thenReturn(userDTO);
+
+        User user = userService.createUser(null, "jdoe", "Passw0rd!", "Doe", "John", "John Doe", "jdoe@example.com", "+1234567890");
+        assertNotNull(user);
+    }
+
+    @Test
+    void createUserMinimalTest() throws IOException {
+        InputStream is = getClass().getClassLoader().getResourceAsStream("users/user-response.json");
+        UserDTO userDTO = objectMapper.readValue(is, UserDTO.class);
+
+        when(responseSpec.body(UserDTO.class)).thenReturn(userDTO);
+
+        User user = userService.createUser(null, "jdoe", "Passw0rd!", null, null, null, null, null);
+        assertNotNull(user);
+    }
 }

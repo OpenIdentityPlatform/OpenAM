@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
+import org.openidentityplatform.openam.mcp.server.model.UserDTO;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -81,5 +82,11 @@ public abstract class OpenAMServiceTest {
         when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
         when(restClient.delete()).thenReturn(requestHeadersUriSpec);
+
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.body(anyMap())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.header(anyString(), anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
     }
 }
