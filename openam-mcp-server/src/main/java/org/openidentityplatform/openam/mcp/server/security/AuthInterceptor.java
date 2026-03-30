@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,12 +52,13 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private final Cache<String, String> tokenCache;
 
+    @Autowired
     public AuthInterceptor(RestClient openAMRestClient, OpenAMConfig openAMConfig) {
         this(openAMRestClient, openAMConfig, Caffeine.newBuilder()
                 .expireAfterWrite(30, TimeUnit.MINUTES).build());
     }
 
-    public AuthInterceptor(RestClient openAMRestClient, OpenAMConfig openAMConfig, Cache<String, String> tokenCache) {
+    AuthInterceptor(RestClient openAMRestClient, OpenAMConfig openAMConfig, Cache<String, String> tokenCache) {
         this.openAMRestClient = openAMRestClient;
         this.openAMConfig = openAMConfig;
         this.tokenCache = tokenCache;
