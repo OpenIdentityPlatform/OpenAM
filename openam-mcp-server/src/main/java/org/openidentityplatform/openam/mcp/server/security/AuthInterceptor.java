@@ -43,6 +43,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private static final String LOGIN_PASSWORD_TOKEN_KEY = "login-password-token";
 
+    final int MAX_TOKEN_RESOLUTION_ATTEMPTS = 2;
+
     private static final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
 
     private final RestClient openAMRestClient;
@@ -114,8 +116,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     boolean preHandleUsernamePassword(HttpServletRequest request) {
-        final int maxAttempts = 2;
-        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+        for (int attempt = 0; attempt < MAX_TOKEN_RESOLUTION_ATTEMPTS; attempt++) {
             String token = tokenCache.get(LOGIN_PASSWORD_TOKEN_KEY, (k) -> getUserNamePasswordToken());
 
             long seconds = tokenValidSeconds(token);
@@ -124,16 +125,16 @@ public class AuthInterceptor implements HandlerInterceptor {
                 return true;
             }
             log.info("preHandleUsernamePassword: token {} is about to expire in {} s (attempt {}/{})",
-                    token, seconds, attempt + 1, maxAttempts);
+                    token, seconds, attempt + 1, MAX_TOKEN_RESOLUTION_ATTEMPTS);
             tokenCache.invalidate(LOGIN_PASSWORD_TOKEN_KEY);
             token = getUserNamePasswordToken();
             tokenCache.put(LOGIN_PASSWORD_TOKEN_KEY, token);
 
         }
         log.error("preHandleUsernamePassword: unable to obtain a valid token after {} attempts; " +
-                "the session endpoint may be unavailable or the token TTL cannot be determined.", maxAttempts);
+                "the session endpoint may be unavailable or the token TTL cannot be determined.", MAX_TOKEN_RESOLUTION_ATTEMPTS);
         throw new IllegalStateException(
-                "Failed to obtain a valid OpenAM session token after " + maxAttempts + " attempts. " +
+                "Failed to obtain a valid OpenAM session token after " + MAX_TOKEN_RESOLUTION_ATTEMPTS + " attempts. " +
                         "Check connectivity to the OpenAM session endpoint.");
     }
 
@@ -144,7 +145,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setHeader("WWW-Authenticate", "Bearer realm=\"OpenAM\"");
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+            response.getWriter().write("{\"error\":\"Missing token\"}");
             return false;
         }
         String accessToken = authHeader.substring(7);
@@ -156,21 +157,24 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.getWriter().write("{\"error\":\"Unauthorized\"}");
             return false;
         }
-        final String token;
-        try {
-            token = tokenCache.get(accessToken, this::getTokenIdFromAccessToken);
-        } catch (Exception e) {
-            log.warn("error getting token:", e);
-            throw e;
+
+        for (int attempt = 0; attempt < MAX_TOKEN_RESOLUTION_ATTEMPTS; attempt++) {
+            String token = tokenCache.get(accessToken, this::getTokenIdFromAccessToken);
+            long seconds = tokenValidSeconds(token);
+            if (seconds > 1) {
+                request.setAttribute("tokenId", token);
+                return true;
+            }
+            log.info("preHandleOAuth: token {} is about to expire in {} s", token, seconds);
+            tokenCache.invalidate(accessToken);
+            token = getTokenIdFromAccessToken(accessToken);
+            tokenCache.put(accessToken, token);
         }
-        long seconds = tokenValidSeconds(token);
-        if(seconds > 1) {
-            request.setAttribute("tokenId", token);
-            return true;
-        }
-        log.info("preHandleOAuth: token {} is about to expire in {} s", token, seconds);
-        tokenCache.invalidate(accessToken);
-        return preHandleOAuth(request, response);
+        log.error("preHandleOAuth: unable to obtain a valid access_token after {} attempts; " +
+                "the session endpoint may be unavailable or the token TTL cannot be determined.", MAX_TOKEN_RESOLUTION_ATTEMPTS);
+        throw new IllegalStateException(
+                "Failed to obtain a valid OpenAM access_token after " + MAX_TOKEN_RESOLUTION_ATTEMPTS + " attempts. " +
+                        "Check connectivity to the OpenAM session endpoint.");
     }
 
     boolean accessTokenValid(String accessToken) {
