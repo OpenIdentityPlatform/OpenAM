@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.mcp.server.security;
@@ -49,12 +49,17 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final OpenAMConfig openAMConfig;
 
 
-    private final Cache<String, String> tokenCache = Caffeine.newBuilder()
-            .expireAfterWrite(30, TimeUnit.MINUTES).build();
+    private final Cache<String, String> tokenCache;
 
     public AuthInterceptor(RestClient openAMRestClient, OpenAMConfig openAMConfig) {
+        this(openAMRestClient, openAMConfig, Caffeine.newBuilder()
+                .expireAfterWrite(30, TimeUnit.MINUTES).build());
+    }
+
+    public AuthInterceptor(RestClient openAMRestClient, OpenAMConfig openAMConfig, Cache<String, String> tokenCache) {
         this.openAMRestClient = openAMRestClient;
         this.openAMConfig = openAMConfig;
+        this.tokenCache = tokenCache;
     }
 
     @Override
@@ -66,7 +71,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
     }
 
-    private long tokenValidSeconds(String tokenId) {
+    long tokenValidSeconds(String tokenId) {
         String sessionUri = "/json/sessions/?_action=getSessionInfo";
         try {
             Map<String, String> tokenProps = openAMRestClient.post()
@@ -85,7 +90,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
     }
 
-    private String getUserNamePasswordToken() {
+    String getUserNamePasswordToken() {
         Map<String, String> tokenResponse = openAMRestClient.post().uri("/json/authenticate")
                 .header("X-OpenAM-Username", openAMConfig.username())
                 .header("X-OpenAM-Password", openAMConfig.password())
@@ -106,31 +111,37 @@ public class AuthInterceptor implements HandlerInterceptor {
         return tokenResponse.get("tokenId");
     }
 
-    private boolean preHandleUsernamePassword(HttpServletRequest request) {
-        final String token;
-        try {
-            token = tokenCache.get(LOGIN_PASSWORD_TOKEN_KEY, (k) -> getUserNamePasswordToken());
-        } catch (Exception e) {
-            log.warn("preHandleUsernamePassword: error getting token:", e);
-            throw e;
+    boolean preHandleUsernamePassword(HttpServletRequest request) {
+        final int maxAttempts = 2;
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            String token = tokenCache.get(LOGIN_PASSWORD_TOKEN_KEY, (k) -> getUserNamePasswordToken());
+
+            long seconds = tokenValidSeconds(token);
+            if (seconds > 1) {
+                request.setAttribute("tokenId", token);
+                return true;
+            }
+            log.info("preHandleUsernamePassword: token {} is about to expire in {} s (attempt {}/{})",
+                    token, seconds, attempt + 1, maxAttempts);
+            tokenCache.invalidate(LOGIN_PASSWORD_TOKEN_KEY);
+            token = getUserNamePasswordToken();
+            tokenCache.put(LOGIN_PASSWORD_TOKEN_KEY, token);
+
         }
-        long seconds = tokenValidSeconds(token);
-        if(seconds > 1) {
-            request.setAttribute("tokenId", token);
-            return true;
-        }
-        log.info("preHandleUsernamePassword: token {} is about to expire in {} s", token, seconds);
-        tokenCache.invalidate(LOGIN_PASSWORD_TOKEN_KEY);
-        return preHandleUsernamePassword(request);
+        log.error("preHandleUsernamePassword: unable to obtain a valid token after {} attempts; " +
+                "the session endpoint may be unavailable or the token TTL cannot be determined.", maxAttempts);
+        throw new IllegalStateException(
+                "Failed to obtain a valid OpenAM session token after " + maxAttempts + " attempts. " +
+                        "Check connectivity to the OpenAM session endpoint.");
     }
 
-    private boolean preHandleOAuth(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    boolean preHandleOAuth(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setHeader("WWW-Authenticate", "Bearer realm=\"OpenAM\"");
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Unauthorized\"}");
             return false;
         }
@@ -160,7 +171,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         return preHandleOAuth(request, response);
     }
 
-    private boolean accessTokenValid(String accessToken) {
+    boolean accessTokenValid(String accessToken) {
 
         //validate access token
         try {
