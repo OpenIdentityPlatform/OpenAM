@@ -34,9 +34,29 @@ public class OAuth2Controller {
         this.openAMRestClient = openAMRestClient;
     }
 
+    /**
+     * Headers that must never be forwarded to the upstream OpenAM server.
+     *
+     * <ul>
+     *   <li><b>host</b> – must not be forwarded; the RestClient sets its own Host
+     *       derived from the configured {@code openam.url}, so forwarding the
+     *       incoming client Host would cause a mismatch or enable host-header
+     *       spoofing.</li>
+     *   <li>All standard <b>hop-by-hop</b> headers (RFC 7230 §6.1) are
+     *       transport-level and must not be forwarded end-to-end.</li>
+     * </ul>
+     */
     private static final Set<String> IGNORE_HEADERS = Set.of(
-            "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
-            "te", "trailers", "transfer-encoding", "upgrade"
+            "host",
+            "connection",
+            "keep-alive",
+            "transfer-encoding",
+            "content-length",
+            "te",
+            "trailer",
+            "upgrade",
+            "proxy-authorization",
+            "proxy-authenticate"
     );
 
     @GetMapping("/.well-known/**")
