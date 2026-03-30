@@ -34,7 +34,7 @@
         <resources>
             <resource>
                 <directory>${project.basedir}/target/app</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
                 <includes>
                     <include>**</include>
                     <include>*</include>
