@@ -52,7 +52,7 @@ class UserService {
         console.log("fallback to demo user")
         return JSON.parse(usersSuccessfulResponse)
       } else {
-        console.log("request error ocurred:", e)
+        console.log("request error occurred:", e)
       }
       return null;
     }
