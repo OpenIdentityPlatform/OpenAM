@@ -42,7 +42,7 @@ const User: React.FC<UserProps> = ({ userService }) => {
             setUserAuthData(newUserAuthData);
         }
         initAuth();
-    }, [])
+    }, [userService, navigate])
     
     useEffect(() => {
         if(!userAuthData) {
