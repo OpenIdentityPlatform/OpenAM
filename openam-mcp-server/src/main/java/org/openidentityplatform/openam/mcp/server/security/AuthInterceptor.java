@@ -170,10 +170,10 @@ public class AuthInterceptor implements HandlerInterceptor {
             token = getTokenIdFromAccessToken(accessToken);
             tokenCache.put(accessToken, token);
         }
-        log.error("preHandleOAuth: unable to obtain a valid access_token after {} attempts; " +
+        log.error("preHandleOAuth: unable to obtain a valid OpenAM session token derived from the access token after {} attempts; " +
                 "the session endpoint may be unavailable or the token TTL cannot be determined.", MAX_TOKEN_RESOLUTION_ATTEMPTS);
         throw new IllegalStateException(
-                "Failed to obtain a valid OpenAM access_token after " + MAX_TOKEN_RESOLUTION_ATTEMPTS + " attempts. " +
+                "Failed to obtain a valid OpenAM session token derived from the provided OAuth access token after " + MAX_TOKEN_RESOLUTION_ATTEMPTS + " attempts. " +
                         "Check connectivity to the OpenAM session endpoint.");
     }
 
