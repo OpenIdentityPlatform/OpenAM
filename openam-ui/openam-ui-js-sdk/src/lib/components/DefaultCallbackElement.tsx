@@ -42,7 +42,7 @@ const DefaultCallbackElement: CallbackElement = ({ callback, setCallbackValue })
 
     const renderTextOutputCallback = (callback: Callback) => {
         const propMap = Object.fromEntries(callback.output.map((o) => [o.name, o.value]))
-        const messageType = propMap['messageType']
+        const messageType = String(propMap["messageType"] ?? "");
         const message = propMap['message'] as string
         switch (messageType) {
             case "0":

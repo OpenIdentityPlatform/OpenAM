@@ -51,7 +51,7 @@ Here's a basic example of how to use the SDK in a React application:
 
 ```tsx
 import React from 'react';
-import OpenAMUI from 'openam-js-sdk';
+import { OpenAMUI } from 'openam-js-sdk';
 
 const App = () => {
   return (
