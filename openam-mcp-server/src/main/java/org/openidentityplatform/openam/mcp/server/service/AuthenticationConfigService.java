@@ -31,7 +31,9 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +102,8 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
     }
 
     List<AuthChainDTO> getRealmAuthChains(String realm, String tokenId) {
-        final String chainsUri = String.format("/json/realms/%s/realm-config/authentication/chains?_queryFilter=true", realm);
+        final String chainsUri = String.format("/json/realms/%s/realm-config/authentication/chains?_queryFilter=true",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8));
         SearchResponseDTO<AuthChainDTO> authChainsResponse = openAMRestClient.get().uri(chainsUri)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .retrieve()
@@ -110,7 +113,8 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
     }
 
     List<AuthModuleDTO> getRealmAuthModules(String realm, String tokenId) {
-        final String modulesUri = String.format("/json/realms/%s/realm-config/authentication/modules?_queryFilter=true", realm);
+        final String modulesUri = String.format("/json/realms/%s/realm-config/authentication/modules?_queryFilter=true",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8));
         SearchResponseDTO<AuthModuleDTO> modulesResponse = openAMRestClient.get().uri(modulesUri)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .retrieve()
@@ -121,7 +125,9 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
 
     Map<String, PropertySchemaDTO> getModuleSchema(String tokenId, String realm, String moduleType) {
 
-        String schemaUrl = String.format( "/json/realms/%s/realm-config/authentication/modules/%s?_action=schema", realm, moduleType);
+        String schemaUrl = String.format( "/json/realms/%s/realm-config/authentication/modules/%s?_action=schema",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodePath(moduleType, StandardCharsets.UTF_8));
         AuthModuleSchemaDTO authModuleSchemaDTO = openAMRestClient.post().uri(schemaUrl)
                 .header(openAMConfig.tokenHeader(), tokenId)
                 .retrieve()
@@ -131,7 +137,10 @@ public class AuthenticationConfigService extends OpenAMAbstractService {
     }
 
     Map<String, Object> getModuleSettings(String tokenId, String realm, String moduleId, String moduleType) {
-        String settingsUrl = String.format("/json/realms/%s/realm-config/authentication/modules/%s/%s", realm, moduleType, moduleId);
+        String settingsUrl = String.format("/json/realms/%s/realm-config/authentication/modules/%s/%s",
+                UriUtils.encodePath(realm, StandardCharsets.UTF_8),
+                UriUtils.encodePath(moduleType, StandardCharsets.UTF_8),
+                UriUtils.encodePath(moduleId, StandardCharsets.UTF_8));
 
         return openAMRestClient.get().uri(settingsUrl)
                 .header(openAMConfig.tokenHeader(), tokenId)
