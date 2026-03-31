@@ -82,7 +82,10 @@ const DefaultUserForm: UserForm = ({ userData, setUserData, saveHandler, savePas
                 </div>
                 <div
                     className="change-password-link"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setIsPasswordModalOpen(true)}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setIsPasswordModalOpen(true)}
                     style={{ marginBottom: "1.5rem" }} // Inline style to ensure spacing from button
                 >
                     Change Password

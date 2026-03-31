@@ -59,7 +59,7 @@ class LoginService {
     } catch (e) {
       if(import.meta.env.MODE === 'development') {
         console.log("fallback to test data", e)
-        return JSON.parse(authError) as AuthResponse;
+        return JSON.parse(authDataJSON) as AuthResponse;
       } else {
         throw e
       }
@@ -205,5 +205,81 @@ const successfulAuth = `{
 
 const authError = `{"code":401,"reason":"Unauthorized","message":"Authentication Failed"}`
 
+const authDataJSON = `{
+  "authId": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvdGsiOiJsa21mODI5dHEzbmhraDNyNmVsbGZtYWpybCIsInJlYWxtIjoiZGM9b3BlbmFtLGRjPW9wZW5pZGVudGl0eXBsYXRmb3JtLGRjPW9yZyIsInNlc3Npb25JZCI6IkFRSUM1d00yTFk0U2ZjekloNTRQLTZ1czRod0tSa09ibWFKa251U0p3SUxNYi1VLipBQUpUU1FBQ01ERUFBbE5MQUJNMk56VTVOVEF5T1RrNU5UUXpOemM0T1RZNEFBSlRNUUFBKiJ9.0lYgF063co7bcg_-xbabvrZponm7NMq3s-IeYPaf9Js",
+  "template": "",
+  "stage": "DataStore1",
+  "header": "Sign in to OpenAM",
+  "infoText": [
+    "",
+    ""
+  ],
+  "callbacks": [
+    {
+      "type": "NameCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "User Name:"
+        }
+      ],
+      "input": [
+        {
+          "name": "IDToken1",
+          "value": "demo"
+        }
+      ]
+    },
+    {
+      "type": "PasswordCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "Password:"
+        }
+      ],
+      "input": [
+        {
+          "name": "IDToken2",
+          "value": "changeit"
+        }
+      ]
+    },
+    {
+      "type": "ConfirmationCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": ""
+        },
+        {
+          "name": "messageType",
+          "value": 0
+        },
+        {
+          "name": "options",
+          "value": [
+            "Register device",
+            "Skip this step"
+          ]
+        },
+        {
+          "name": "optionType",
+          "value": -1
+        },
+        {
+          "name": "defaultOption",
+          "value": 0
+        }
+      ],
+      "input": [
+        {
+          "name": "IDToken3",
+          "value": "1"
+        }
+      ]
+    }
+  ]
+}`
 
 export { LoginService }

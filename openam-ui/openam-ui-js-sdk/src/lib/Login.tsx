@@ -89,7 +89,7 @@ const Login: React.FC<LoginProps> = ({ loginService }) => {
         }
         initAuth();
 
-    }, [])
+    }, [loginService, realm, service, navigate])
 
     const setCallbackValue = (i: number, val: string | number) => {
         if (!authData) {

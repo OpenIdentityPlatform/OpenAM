@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import type { Callback } from "../types";
 import type { CallbackElement } from "./types";
 
-const ScriptElement = (scriptText: string) => {
+const ScriptElement: React.FC<{ scriptText: string }> = ({ scriptText })  => {
     useEffect(() => {
         const script = document.createElement('script');
         script.innerHTML = scriptText;
@@ -28,7 +28,7 @@ const ScriptElement = (scriptText: string) => {
                 document.body.removeChild(script);
             }
         };
-    }, []);
+    }, [scriptText]);
 
     return null; // This component renders nothing in the DOM
 }
@@ -50,7 +50,7 @@ const DefaultCallbackElement: CallbackElement = ({ callback, setCallbackValue })
             case "2":
                 return <p>{message}</p>
             case "4":
-                return ScriptElement(message);
+                return <ScriptElement scriptText={message} />;
             default:
                 console.log(`unknown message type: ${messageType}`)
                 return <></>;

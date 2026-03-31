@@ -21,7 +21,8 @@ import type { UserService } from "./userService";
 export default function Home({userService}:{userService: UserService}) {
 
     const navigate = useNavigate();
-    const init = async () => {
+    useEffect(() => {
+        const init = async () => {
             const userData = await userService.getUserIdFromSession()
             if (!userData || !userData.id) {
                 navigate('/login')        
@@ -29,9 +30,8 @@ export default function Home({userService}:{userService: UserService}) {
                 navigate('/user')
             }
         }
-    useEffect(() => {
         init();
-    }, []);
+    }, [userService, navigate]);
 
     return <h2>Loading</h2>;
 }

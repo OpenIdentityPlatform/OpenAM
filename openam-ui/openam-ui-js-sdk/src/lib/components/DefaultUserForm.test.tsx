@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import DefaultUserForm from './DefaultUserForm';
 import { mockUserData } from '../__tests__/mocks';
 import type { UserData } from '../types';
@@ -149,6 +149,54 @@ describe('DefaultUserForm', () => {
          expect(defaultProps.savePasswordHandler).toHaveBeenCalledTimes(1);
     });
 
-
+    describe('Change Password button accessibility', () => {
+        it('has role="button" for assistive technology', () => {
+            render(<DefaultUserForm {...defaultProps} />);
+ 
+            const changePasswordButton = screen.getByRole('button', { name: 'Change Password' });
+            expect(changePasswordButton).toBeInTheDocument();
+        });
+ 
+        it('is focusable via keyboard (tabIndex=0)', () => {
+            render(<DefaultUserForm {...defaultProps} />);
+ 
+            const changePasswordButton = screen.getByRole('button', { name: 'Change Password' });
+            expect(changePasswordButton).toHaveAttribute('tabindex', '0');
+        });
+ 
+        it('opens password modal on Enter key press', () => {
+            render(<DefaultUserForm {...defaultProps} />);
+ 
+            act(() => {
+                fireEvent.keyDown(screen.getByRole('button', { name: 'Change Password' }), { key: 'Enter' });
+            });
+ 
+            expect(screen.getByLabelText('New:')).toBeInTheDocument();
+            expect(screen.getByLabelText('Confirm:')).toBeInTheDocument();
+            expect(screen.getByText('Update Password')).toBeInTheDocument();
+        });
+ 
+        it('opens password modal on Space key press', () => {
+            render(<DefaultUserForm {...defaultProps} />);
+ 
+            act(() => {
+                fireEvent.keyDown(screen.getByRole('button', { name: 'Change Password' }), { key: ' ' });
+            });
+ 
+            expect(screen.getByLabelText('New:')).toBeInTheDocument();
+            expect(screen.getByLabelText('Confirm:')).toBeInTheDocument();
+            expect(screen.getByText('Update Password')).toBeInTheDocument();
+        });
+ 
+        it('does not open password modal on other key presses', () => {
+            render(<DefaultUserForm {...defaultProps} />);
+ 
+            act(() => {
+                fireEvent.keyDown(screen.getByRole('button', { name: 'Change Password' }), { key: 'Tab' });
+            });
+ 
+            expect(screen.queryByLabelText('New:')).not.toBeInTheDocument();
+        });
+    });
 
 });

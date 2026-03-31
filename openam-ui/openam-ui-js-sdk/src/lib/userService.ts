@@ -50,7 +50,7 @@ class UserService {
       if (import.meta.env.MODE === 'development') {
         console.log("error getting user id from session", e)
         console.log("fallback to demo user")
-        return JSON.parse(usersSuccessfulResponse)
+        return JSON.parse(userUnauthorizedResponse)
       } else {
         console.log("request error occurred:", e)
       }
@@ -178,7 +178,7 @@ const usersSuccessfulResponse = `{
     "fullLoginURL": "/openam/UI/Login?realm=%2F"
 }`
 
-// const userUnauthorizedResponse = `{"code":401,"reason":"Unauthorized","message":"Access Denied"}`
+const userUnauthorizedResponse = `{"code":401,"reason":"Unauthorized","message":"Access Denied"}`
 
 const testUserData = `{
     "username": "demo",
