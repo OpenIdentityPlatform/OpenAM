@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.mcp.server.service;
@@ -24,6 +24,8 @@ import org.openidentityplatform.openam.mcp.server.model.AuthChainDTO;
 import org.openidentityplatform.openam.mcp.server.model.AuthModule;
 import org.openidentityplatform.openam.mcp.server.model.AuthModuleDTO;
 import org.openidentityplatform.openam.mcp.server.model.AuthModuleSchemaDTO;
+import org.openidentityplatform.openam.mcp.server.model.CoreAuthModule;
+import org.openidentityplatform.openam.mcp.server.model.CoreAuthModuleDTO;
 import org.openidentityplatform.openam.mcp.server.model.SearchResponseDTO;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -32,6 +34,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -86,4 +89,17 @@ class AuthenticationConfigServiceTest extends OpenAMServiceTest {
         assertTrue(authModules.size() > 0);
 
     }
+
+    @Test
+    void getAvailableModuleListTest() throws IOException {
+
+        InputStream allModulesResponseStream
+                = getClass().getClassLoader().getResourceAsStream("auth/all-modules-response.json");
+        SearchResponseDTO<CoreAuthModuleDTO> modulesResponse = objectMapper.readValue(allModulesResponseStream, new TypeReference<>() {});
+        when(responseSpec.body(eq(new ParameterizedTypeReference<SearchResponseDTO<CoreAuthModuleDTO>>() {}))).thenReturn(modulesResponse);
+        List<CoreAuthModule> modules = authenticationConfigService.getAvailableModuleList();
+
+        assertEquals(34, modules.size());
+    }
+
 }
