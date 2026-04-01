@@ -15,10 +15,10 @@
  */
 
 import { render, fireEvent } from '@testing-library/react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import DefaultLoginForm from './DefaultLoginForm';
 import { mockAuthData } from '../__tests__/mocks';
-import { setConfig } from '../config';
+import { getConfig, setConfig, type Config } from '../config';
 import type { ActionElements, CallbackElement } from './types';
 
 describe('DefaultLoginForm', () => {
@@ -27,6 +27,20 @@ describe('DefaultLoginForm', () => {
 
     const mockSetCallbackValue = vi.fn();
     const mockDoLogin = vi.fn()
+
+    let previousConfig: Config;
+ 
+    beforeEach(() => {
+        previousConfig = getConfig();
+        setConfig({
+            CallbackElement: mockCallbackElement,
+            ActionElements: mockActionElements,
+        });
+    });
+ 
+    afterEach(() => {
+        setConfig(previousConfig);
+    });
 
     setConfig({
         CallbackElement: mockCallbackElement,
