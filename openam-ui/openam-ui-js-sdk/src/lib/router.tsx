@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 import { createHashRouter } from "react-router";
@@ -23,32 +23,41 @@ import Home from "./Home";
 import Login from "./Login";
 import User from "./User";
 
-const config = getConfig();
-const userService = new UserService(config.getOpenAmUrl());
-const loginService = new LoginService(config.getOpenAmUrl());
+let router: ReturnType<typeof createHashRouter> | null = null;
 
-const router = createHashRouter([
-    {
-        path: '/',
-        children: [
+export function getRouter(): ReturnType<typeof createHashRouter> {
+    if (!router) {
+        const config = getConfig();
+        const openAmUrl = config.getOpenAmUrl();
+        const userService = new UserService(openAmUrl);
+        const loginService = new LoginService(openAmUrl);
+ 
+        router = createHashRouter([
             {
                 path: '/',
-                element: <Home userService={userService} />
+                children: [
+                    {
+                        path: '/',
+                        element: <Home userService={userService} />
+                    },
+                    {
+                        path: 'login',
+                        element: <Login loginService={loginService} />,
+                    },
+                    {
+                        path: 'user',
+                        element: <User userService={userService} />,
+                    },
+                    {
+                        path: '*',
+                        element: <NotFoundPage />,
+                    },
+                ],
             },
-            {
-                path: 'login',
-                element: <Login loginService={loginService} />,
-            },
-            {
-                path: 'user',
-                element: <User userService={userService} />,
-            },
-            {
-                path: '*',
-                element: <NotFoundPage />,
-            },
-        ],
-    },
-]);
-
-export default router
+        ]);
+    }
+    return router;
+}
+export function resetRouter(): void {
+    router = null;
+}

@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 import { RouterProvider } from "react-router";
-import router from "./router";
+import { getRouter } from "./router";
 
 const OpenAMUI: React.FC = () => {
-    return <RouterProvider router={router} />
+    return <RouterProvider router={getRouter()} />
 };
 
 export default OpenAMUI;
