@@ -4,8 +4,6 @@ on:
   push:
     branches: [ 'sustaining/15.2.x','master' ]
   pull_request:
-    branches: [ 'sustaining/15.2.x','master' ]
-
 jobs:
   build-maven:
     runs-on: ${{ matrix.os }}
