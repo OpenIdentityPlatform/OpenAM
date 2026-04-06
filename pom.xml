@@ -79,7 +79,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>5.0.4</opendj.version>
+    <opendj.version>5.0.5-SNAPSHOT</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>7.0.0</guice.version>
@@ -1416,6 +1416,12 @@
         <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.freemarker</artifactId>
         <version>${restlet.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>
@@ -1700,11 +1706,6 @@
    			<artifactId>woodstox-core</artifactId>
             <version>6.4.0</version>
    		</dependency>
-		<dependency>
-			<groupId>org.owasp.antisamy</groupId>
-			<artifactId>antisamy</artifactId>
-			<version>1.7.5</version>
-		 </dependency>	
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-posix</artifactId>
