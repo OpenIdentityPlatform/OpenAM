@@ -1031,9 +1031,10 @@ public class IDPSSOUtil {
                 id = spEntityID;
             }
             boolean found = false;
-            for (NameIDandSPpair nameIDandSPpair : list) {
-                if (nameIDandSPpair.getSPEntityID().equals(id)) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getSPEntityID().equals(id)) {
                     found = true;
+                    list.set(i, pair);
                     break;
                 }
             }
