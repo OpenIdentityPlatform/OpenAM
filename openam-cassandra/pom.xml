@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019-2025 3A Systems LLC.
+ * Copyright 2019-2026 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -36,27 +36,6 @@
     </modules>
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-			    <groupId>com.datastax.oss</groupId>
-			    <artifactId>java-driver-core</artifactId>
-			    <version>4.17.0</version>
-			</dependency>
-			<dependency>
-			  <groupId>com.datastax.oss</groupId>
-			  <artifactId>java-driver-query-builder</artifactId>
-			  <version>4.17.0</version>
-			</dependency>
-			<dependency>
-			    <groupId>org.apache.cassandra</groupId>
-			    <artifactId>cassandra-all</artifactId>
-			    <version>4.0.20</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.lz4</groupId>
-						<artifactId>lz4-java</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
 			<dependency>
 				<groupId>at.yawk.lz4</groupId>
 				<artifactId>lz4-java</artifactId>
@@ -117,6 +96,25 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>skip-cassandra-tests-on-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skipTests>true</skipTests>
 						</configuration>
 					</plugin>
 				</plugins>
