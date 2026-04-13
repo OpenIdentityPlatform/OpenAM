@@ -1517,6 +1517,10 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1635,12 +1639,6 @@
         <groupId>org.powermock</groupId>
         <artifactId>powermock-module-testng-common</artifactId>
         <version>${powermock.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.12.1.GA</version>
         <scope>test</scope>
       </dependency>
       <dependency>
