@@ -65,8 +65,8 @@
                                 <artifactItem>
                                     <groupId>org.openidentityplatform.opendj</groupId>
                                     <artifactId>opendj-server-legacy</artifactId>
-                                    <version>${opendj.server.legacy}</version>
                                     <type>zip</type>
+                                    <classifier>slim</classifier>
                                 </artifactItem>
                             </artifactItems>
 
