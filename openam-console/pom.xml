@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2017-2025 3A Systems, LLC
+ * Portions copyright 2017-2026 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -169,6 +169,16 @@
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.jersey.bundles</groupId>
+                    <artifactId>jaxrs-ri</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
@@ -177,6 +187,12 @@
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>OpenFM</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.gmbal</groupId>
+                    <artifactId>gmbal</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

@@ -127,12 +127,6 @@
             <artifactId>javax.xml.soap-api</artifactId>
             <version>1.4.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>jakarta.xml.soap</groupId>
-            <artifactId>jakarta.xml.soap-api</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-impl</artifactId>
