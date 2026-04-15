@@ -51,10 +51,10 @@
     "sinon": "1.17.6",
     "sinon-chai": "2.8.0",
     "ajv": "^8.16.0",
-    "js-yaml": "^3.14.2",
-    "minimatch": "^3.1.5"
+    "js-yaml": "^3.14.2"
   },
   "overrides": {
+    "minimatch": "^3.1.5",
     "mocha": {
       "flat": "5.0.2",
       "js-yaml": "$js-yaml",
