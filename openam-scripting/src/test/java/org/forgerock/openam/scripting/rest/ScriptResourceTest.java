@@ -22,7 +22,7 @@ import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -118,7 +118,7 @@ public class ScriptResourceTest {
         Logger logger = mock(Logger.class);
         ScriptingService scriptingService = new MockScriptingService();
         ScriptingServiceFactory serviceFactory = mock(ScriptingServiceFactory.class);
-        when(serviceFactory.create(anyString())).thenReturn(scriptingService);
+        when(serviceFactory.create(nullable(String.class))).thenReturn(scriptingService);
         ExceptionMappingHandler<ScriptException, ResourceException> errorHandler = new ScriptExceptionMappingHandler();
         scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,
                 new StandardScriptValidator(new StandardScriptEngineManager()));
