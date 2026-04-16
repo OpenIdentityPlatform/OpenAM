@@ -115,14 +115,16 @@ public class IT_SetupWithOpenDJ extends BaseTest {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("nextTabButton"))).click();
 
-        waitForElement(By.id("loadBalancerDisable"));
+        waitForElementVisible(By.id("loadBalancerDisable"));
+        waitForElementVisible(By.id("loadBalancerHostName"));
 
-        WebElement nextTabButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nextTabButton")));
         Thread.sleep(1000);
-        nextTabButton.click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("nextTabButton"))).click();
 
         waitForElement(By.id("agentPassword")).sendKeys(PA_PASSWORD);
         waitForElement(By.id("agentConfirm")).sendKeys(PA_PASSWORD);
+
         wait.until(ExpectedConditions.elementToBeClickable(By.id("nextTabButton"))).click();
 
 
