@@ -106,7 +106,7 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         verify(jaspiAuthWrapper, never()).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailed");
@@ -128,7 +128,7 @@ public class JaspiAuthLoginModulePAPTest {
         jaspiPostAuthPlugin.onLoginSuccess(requestParamsMap, request, response, ssoToken);
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
         verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
     }
@@ -157,7 +157,7 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
         verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
@@ -188,7 +188,7 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
         verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
@@ -218,7 +218,7 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
         verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);

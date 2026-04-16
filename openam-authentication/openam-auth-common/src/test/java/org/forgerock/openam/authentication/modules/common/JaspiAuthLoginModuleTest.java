@@ -99,7 +99,7 @@ public class JaspiAuthLoginModuleTest {
         jaspiAuthLoginModule.init(subject, sharedState, options);
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
     }
 
     @Test
