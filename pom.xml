@@ -419,12 +419,6 @@
         <artifactId>opendj-core</artifactId>
         <version>${opendj.version}</version>
       </dependency>
-	  <dependency>
-		  <groupId>org.mockito</groupId>
-		  <artifactId>mockito-all</artifactId>
-		  <version>1.10.19</version>
-		  <scope>test</scope>
-		</dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
