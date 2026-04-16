@@ -104,7 +104,7 @@
 							<com.sun.identity.configuration.directory>${test.config.path}</com.sun.identity.configuration.directory>
 							<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
 							<ssoadm.disabled>false</ssoadm.disabled>
-							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
+							<com.iplanet.services.debug.level>warning</com.iplanet.services.debug.level>
 							<com.iplanet.services.debug.directory />
 							<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
  							<XUI.enable>false</XUI.enable>
