@@ -424,6 +424,12 @@
 		  <version>1.10.19</version>
 		  <scope>test</scope>
 		</dependency>
+      <!-- Fix CVE-2016-3093: upgrade OGNL from 2.6.9 to 3.0.21 -->
+      <dependency>
+        <groupId>ognl</groupId>
+        <artifactId>ognl</artifactId>
+        <version>3.0.21</version>
+      </dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
