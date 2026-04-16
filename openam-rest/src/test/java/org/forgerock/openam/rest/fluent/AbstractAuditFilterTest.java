@@ -104,7 +104,7 @@ public abstract class AbstractAuditFilterTest {
 
         // Then
         verify(auditor).auditAccessAttempt();
-        verify(auditor).auditAccessSuccess(any(JsonValue.class));
+        verify(auditor).auditAccessSuccess(nullable(JsonValue.class));
     }
 
     @Test(dataProvider = "auditedCrudpaqOperations")

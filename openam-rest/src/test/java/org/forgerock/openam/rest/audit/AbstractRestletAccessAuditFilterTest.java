@@ -76,7 +76,7 @@ public class AbstractRestletAccessAuditFilterTest {
         when(request.getEntity()).thenReturn(representation);
         when(request.getAttributes()).thenReturn(new ConcurrentHashMap<String, Object>());
         when(representation.isTransient()).thenReturn(false);
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(false);
+        when(eventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).thenReturn(false);
 
         // When
         auditFilter.handle(request, response);
@@ -94,7 +94,7 @@ public class AbstractRestletAccessAuditFilterTest {
         request.setDate(newDate());
         Response response = new Response(request);
         request.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
+        when(eventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).thenReturn(true);
 
         // When
         auditFilter.beforeHandle(request, response);
@@ -117,7 +117,7 @@ public class AbstractRestletAccessAuditFilterTest {
         request.setDate(newDate());
         Response response = new Response(request);
         response.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
+        when(eventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).thenReturn(true);
 
         // When
         auditFilter.afterHandle(request, response);

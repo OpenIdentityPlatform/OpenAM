@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -43,6 +44,7 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
@@ -53,7 +55,6 @@ import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
-import org.forgerock.openam.rest.query.QueryResponseHandler;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
@@ -99,7 +100,7 @@ public class RealmContextFilterTest {
         initMocks(this);
         filter = new RealmContextFilter(coreWrapper, realmValidator);
 
-        given(coreWrapper.getOrganization(any(SSOToken.class), eq(ENDPOINT_PATH_ELEMENT)))
+        given(coreWrapper.getOrganization(nullable(SSOToken.class), eq(ENDPOINT_PATH_ELEMENT)))
                 .willThrow(IdRepoException.class);
 
         realmTestHelper = new RealmTestHelper(coreWrapper);
@@ -540,13 +541,13 @@ public class RealmContextFilterTest {
     }
 
     private void mockRealmAlias(String alias, String realm) throws Exception {
-        given(coreWrapper.getOrganization(any(SSOToken.class), eq(alias))).willReturn(realm);
+        given(coreWrapper.getOrganization(nullable(SSOToken.class), eq(alias))).willReturn(realm);
         given(coreWrapper.convertOrgNameToRealmName(realm)).willReturn(realm);
         given(realmValidator.isRealm(realm)).willReturn(true);
     }
 
     private void mockInvalidRealmAlias(String alias) throws Exception {
-        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq(alias));
+        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(nullable(SSOToken.class), eq(alias));
     }
 
     private void verifyRealmContext(Context context, Realm expectedRealm) {
@@ -587,7 +588,7 @@ public class RealmContextFilterTest {
         verify(requestHandler, atLeast(0)).handleDelete(contextCaptor.capture(), (DeleteRequest) requestCaptor.capture());
         verify(requestHandler, atLeast(0)).handlePatch(contextCaptor.capture(), (PatchRequest) requestCaptor.capture());
         verify(requestHandler, atLeast(0)).handleAction(contextCaptor.capture(), (ActionRequest) requestCaptor.capture());
-        verify(requestHandler, atLeast(0)).handleQuery(contextCaptor.capture(), (QueryRequest) requestCaptor.capture(), any(QueryResponseHandler.class));
+        verify(requestHandler, atLeast(0)).handleQuery(contextCaptor.capture(), (QueryRequest) requestCaptor.capture(), any(QueryResourceHandler.class));
     }
 
     private Handler getHttpHandler(RequestHandler requestHandler) {
@@ -601,7 +602,7 @@ public class RealmContextFilterTest {
         given(requestHandler.handlePatch(any(Context.class), any(PatchRequest.class))).willReturn(result);
         given(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
                 .willReturn(Promises.<ActionResponse, ResourceException>newResultPromise(mock(ActionResponse.class)));
-        given(requestHandler.handleQuery(any(Context.class), any(QueryRequest.class), any(QueryResponseHandler.class)))
+        given(requestHandler.handleQuery(any(Context.class), any(QueryRequest.class), any(QueryResourceHandler.class)))
                 .willReturn(Promises.<QueryResponse, ResourceException>newResultPromise(mock(QueryResponse.class)));
         FilterChain filterChain = new FilterChain(requestHandler, filter);
         return CrestHttp.newHttpHandler(filterChain);
