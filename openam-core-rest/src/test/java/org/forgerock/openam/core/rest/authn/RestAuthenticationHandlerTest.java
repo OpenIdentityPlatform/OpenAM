@@ -59,7 +59,7 @@ import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -114,7 +114,7 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         //When
         JsonValue response = restAuthenticationHandler.initiateAuthentication(request, httpResponse,
@@ -154,7 +154,7 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.isSuccessful()).willReturn(false);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         //When
         try {
@@ -210,10 +210,10 @@ public class RestAuthenticationHandlerTest {
         JsonValue jsonCallbacks = new JsonValue(new HashMap<String, Object>());
         jsonCallbacks.add("KEY", "VALUE");
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
         given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
                 .willReturn(jsonCallbacks);
-        given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
+        given(authIdHelper.createAuthId(ArgumentMatchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
@@ -267,10 +267,10 @@ public class RestAuthenticationHandlerTest {
 
         JsonValue jsonCallbacks = new JsonValue(new HashMap<String, Object>());
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
         given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
                 .willReturn(jsonCallbacks);
-        given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
+        given(authIdHelper.createAuthId(ArgumentMatchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
@@ -318,10 +318,10 @@ public class RestAuthenticationHandlerTest {
         RestAuthResponseException restAuthResponseException =
                 new RestAuthResponseException(999, responseHeaders, jsonResponse);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
         given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
                 .willThrow(restAuthResponseException);
-        given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
+        given(authIdHelper.createAuthId(ArgumentMatchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
@@ -393,7 +393,7 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         SignedJwt signedJwt = mock(SignedJwt.class);
         JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
@@ -443,7 +443,7 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         // When
         restAuthenticationHandler.initiateAuthentication(request, response, "module", module, existingSessionId);
@@ -476,7 +476,7 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
-        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         given(coreWrapper.convertOrgNameToRealmName(anyString())).willReturn("REALM");
 

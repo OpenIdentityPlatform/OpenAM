@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -121,7 +121,7 @@ public class RestAuthX509CallbackHandlerTest {
                 x509CertificateCallback);
 
         //Then
-        verify(x509CertificateCallback, never()).setCertificate(Matchers.<X509Certificate>anyObject());
+        verify(x509CertificateCallback, never()).setCertificate(ArgumentMatchers.<X509Certificate>anyObject());
         assertTrue(updated);
     }
 

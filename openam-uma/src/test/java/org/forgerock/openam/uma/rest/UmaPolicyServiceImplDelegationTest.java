@@ -22,10 +22,10 @@ import static org.forgerock.openam.uma.rest.UmaPolicyServiceImplTest.*;
 import static org.forgerock.util.promise.Promises.*;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySetOf;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -80,7 +80,7 @@ import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -150,7 +150,7 @@ public class UmaPolicyServiceImplDelegationTest {
                 contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory,
                 extensionFilterManager);
 
-        given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
+        given(contextHelper.getRealm(ArgumentMatchers.<Context>anyObject())).willReturn("REALM");
 
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
@@ -338,8 +338,8 @@ public class UmaPolicyServiceImplDelegationTest {
 
     private void accessingUriForUser(String username) {
         userInUri = username;
-        given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(userInUri);
-        given(contextHelper.getUserUid(Matchers.<Context>anyObject())).willReturn("uid=" + userInUri + ",ou="
+        given(contextHelper.getUserId(ArgumentMatchers.<Context>anyObject())).willReturn(userInUri);
+        given(contextHelper.getUserUid(ArgumentMatchers.<Context>anyObject())).willReturn("uid=" + userInUri + ",ou="
                 + loggedInRealm + ",dc=openidentityplatform,dc=org");
     }
 
@@ -436,7 +436,7 @@ public class UmaPolicyServiceImplDelegationTest {
         updatedPolicies.add(updatedPolicy1);
         updatedPolicies.add(updatedPolicy3);
         Promise<List<ResourceResponse>, ResourceException> updatePolicyPromise = newResultPromise(updatedPolicies);
-        given(policyResourceDelegate.updatePolicies(any(Context.class), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.updatePolicies(any(Context.class), ArgumentMatchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePolicyPromise);
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
                 any(QueryResourceHandler.class))).willAnswer(new Answer<Promise<QueryResponse, ResourceException>>() {

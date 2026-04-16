@@ -20,7 +20,7 @@ import static com.sun.identity.entitlement.ApplicationTypeManager.URL_APPLICATIO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.xacml.v3.XACMLApplicationUtils.ApplicationTypeService;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;

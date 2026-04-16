@@ -48,7 +48,7 @@ import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -103,7 +103,7 @@ public class TrustedDevicesResourceTest {
         connection.query(ctx(), request, handler);
 
         //Then
-        verify(handler, times(2)).handleResource(Matchers.<ResourceResponse>anyObject());
+        verify(handler, times(2)).handleResource(ArgumentMatchers.<ResourceResponse>anyObject());
     }
 
     @Test

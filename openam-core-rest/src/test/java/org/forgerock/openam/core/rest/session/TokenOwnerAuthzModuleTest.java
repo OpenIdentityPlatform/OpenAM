@@ -17,7 +17,7 @@ package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.*;
 

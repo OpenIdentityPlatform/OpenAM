@@ -23,7 +23,7 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sun.identity.entitlement.Application;

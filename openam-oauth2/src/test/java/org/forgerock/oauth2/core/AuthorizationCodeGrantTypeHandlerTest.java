@@ -31,7 +31,7 @@ import java.util.Set;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -66,7 +66,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
                 tokenInvalidator, providerSettingsFactory, urisFactory, accessTokenGenerator);
 
         providerSettings = mock(RealmOAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);
         given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
@@ -217,7 +217,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
                 eq(request), isNull(String.class), anyLong())).willReturn(refreshToken);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+                anySetOf(String.class), ArgumentMatchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
@@ -258,7 +258,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+                anySetOf(String.class), ArgumentMatchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
@@ -299,7 +299,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+                anySetOf(String.class), ArgumentMatchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(authorizationCode.getScope()).willReturn(validatedScope);
 

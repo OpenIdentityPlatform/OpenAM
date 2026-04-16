@@ -17,7 +17,7 @@
 package org.forgerock.openam.authentication.modules.fr.oath;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sun.identity.shared.debug.Debug;

@@ -20,7 +20,7 @@ import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAs
 import static org.forgerock.openam.entitlement.rest.EntitlementTestUtils.assertQueryPromiseFailedWithCodes;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

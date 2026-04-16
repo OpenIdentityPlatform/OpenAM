@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ import org.forgerock.openam.uma.rest.PolicyResourceDelegate;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -78,7 +78,7 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
         Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newResultPromise(createdPolicyTwo);
 
-        given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
+        given(policyResource.handleCreate(eq(context), ArgumentMatchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
                 .willReturn(createPolicyTwoPromise);
 
@@ -86,7 +86,7 @@ public class PolicyResourceDelegateTest {
         List<ResourceResponse> returnedPolicies = delegate.createPolicies(context, policies).getOrThrowUninterruptibly();
 
         //Then
-        verify(policyResource, never()).handleDelete(eq(context), Matchers.<DeleteRequest>anyObject());
+        verify(policyResource, never()).handleDelete(eq(context), ArgumentMatchers.<DeleteRequest>anyObject());
         assertThat(returnedPolicies).isEqualTo(createdPolicies);
     }
 
@@ -107,10 +107,10 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(exception);
         Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
 
-        given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
+        given(policyResource.handleCreate(eq(context), ArgumentMatchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
                 .willReturn(createPolicyTwoPromise);
-        given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
+        given(policyResource.handleDelete(eq(context), ArgumentMatchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise);
 
         //When
@@ -143,10 +143,10 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(createException);
         Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newExceptionPromise(deleteException);
 
-        given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
+        given(policyResource.handleCreate(eq(context), ArgumentMatchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
                 .willReturn(createPolicyTwoPromise);
-        given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
+        given(policyResource.handleDelete(eq(context), ArgumentMatchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise);
 
         //When
@@ -180,7 +180,7 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
         Promise<ResourceResponse, ResourceException> updatePolicyTwoPromise = Promises.newResultPromise(updatedPolicyTwo);
 
-        given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
+        given(policyResource.handleUpdate(eq(context), ArgumentMatchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
                 .willReturn(updatePolicyTwoPromise);
 
@@ -206,7 +206,7 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
         Promise<ResourceResponse, ResourceException> updatePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
-        given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
+        given(policyResource.handleUpdate(eq(context), ArgumentMatchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
                 .willReturn(updatePolicyTwoPromise);
 
@@ -263,7 +263,7 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
         Promise<ResourceResponse, ResourceException> deletePolicyTwoPromise = Promises.newResultPromise(policyTwo);
 
-        given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
+        given(policyResource.handleDelete(eq(context), ArgumentMatchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)
                 .willReturn(deletePolicyTwoPromise);
 
@@ -287,7 +287,7 @@ public class PolicyResourceDelegateTest {
         Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
         Promise<ResourceResponse, ResourceException> deletePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
-        given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
+        given(policyResource.handleDelete(eq(context), ArgumentMatchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)
                 .willReturn(deletePolicyTwoPromise);
 

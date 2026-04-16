@@ -17,7 +17,7 @@ package com.iplanet.dpro.session.operations;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;

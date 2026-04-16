@@ -21,7 +21,7 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.anySetOf;
@@ -82,7 +82,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.AfterMethod;
@@ -137,9 +137,9 @@ public class UmaPolicyServiceImplTest {
                 contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory,
                 extensionFilterManager);
 
-        given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
-        given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(RESOURCE_OWNER_ID);
-        given(contextHelper.getUserUid(Matchers.<Context>anyObject())).willReturn("RESOURCE_OWNER_UID");
+        given(contextHelper.getRealm(ArgumentMatchers.<Context>anyObject())).willReturn("REALM");
+        given(contextHelper.getUserId(ArgumentMatchers.<Context>anyObject())).willReturn(RESOURCE_OWNER_ID);
+        given(contextHelper.getUserUid(ArgumentMatchers.<Context>anyObject())).willReturn("RESOURCE_OWNER_UID");
 
         resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",
@@ -277,7 +277,7 @@ public class UmaPolicyServiceImplTest {
         setupQueries(queryPromise, createdPolicy1, createdPolicy2);
 
         Promise<List<ResourceResponse>, ResourceException> createPolicyPromise = newResultPromise(createdPolicies);
-        given(policyResourceDelegate.createPolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.createPolicies(eq(context), ArgumentMatchers.<Set<JsonValue>>anyObject()))
                 .willReturn(createPolicyPromise);
 
         //When
@@ -313,7 +313,7 @@ public class UmaPolicyServiceImplTest {
                 newResultPromise(
                         Pair.of(newQueryResponse(), Collections.singletonList(policyResource)));
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
 
         //When
@@ -337,9 +337,9 @@ public class UmaPolicyServiceImplTest {
                 Promises.newExceptionPromise((ResourceException) new NotFoundException());
         Promise<List<ResourceResponse>, ResourceException> createPoliciesPromise = Promises.newExceptionPromise(exception);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
-        given(policyResourceDelegate.createPolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.createPolicies(eq(context), ArgumentMatchers.<Set<JsonValue>>anyObject()))
                 .willReturn(createPoliciesPromise);
 
         //When
@@ -412,7 +412,7 @@ public class UmaPolicyServiceImplTest {
         Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPromise =
                 newResultPromise(Pair.of(queryResult, policies));
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
 
         //When
@@ -433,7 +433,7 @@ public class UmaPolicyServiceImplTest {
         Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPromise =
                 Promises.newExceptionPromise(exception);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
 
         //When
@@ -468,7 +468,7 @@ public class UmaPolicyServiceImplTest {
 
         setupQueries(currentPolicyPromise, updatedPolicy1, updatedPolicy2);
 
-        given(policyResourceDelegate.updatePolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.updatePolicies(eq(context), ArgumentMatchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePolicyPromise);
 
         //When
@@ -499,9 +499,9 @@ public class UmaPolicyServiceImplTest {
                 = newResultPromise(Pair.of((QueryResponse) null, Collections.<ResourceResponse>emptyList()));
         Promise<List<ResourceResponse>, ResourceException> updatePoliciesPromise = newExceptionPromise(exception);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
-        given(policyResourceDelegate.updatePolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.updatePolicies(eq(context), ArgumentMatchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePoliciesPromise);
 
         //When
@@ -596,7 +596,7 @@ public class UmaPolicyServiceImplTest {
         Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> readPoliciesPromise =
                 Promises.newExceptionPromise(exception);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(readPoliciesPromise);
 
         //When
@@ -625,7 +625,7 @@ public class UmaPolicyServiceImplTest {
                 = newResultPromise(Pair.of((QueryResponse) null, readPolicies));
         Promise<List<ResourceResponse>, ResourceException> deletePoliciesPromise = newExceptionPromise(exception);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
         given(policyResourceDelegate.deletePolicies(eq(context), anyListOf(String.class)))
                 .willReturn(deletePoliciesPromise);
@@ -668,7 +668,7 @@ public class UmaPolicyServiceImplTest {
         Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> backendQueryPromise
                 = newResultPromise(Pair.of(queryResult, policyResources));
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+        given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(backendQueryPromise);
     }
 

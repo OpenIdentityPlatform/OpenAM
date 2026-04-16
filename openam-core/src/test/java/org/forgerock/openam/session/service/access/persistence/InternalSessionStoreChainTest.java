@@ -18,7 +18,7 @@ package org.forgerock.openam.session.service.access.persistence;
 
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.inOrder;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;

@@ -37,7 +37,7 @@ import org.forgerock.openam.oauth2.ResourceSetDescription;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -58,7 +58,7 @@ public class OpenAMResourceSetStoreTest {
 
         store = new OpenAMResourceSetStore("REALM", oAuth2UrisFactory, idGenerator, dataStore);
 
-        given(oAuth2UrisFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(oAuth2Uris);
+        given(oAuth2UrisFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(oAuth2Uris);
         given(oAuth2Uris.getResourceSetRegistrationPolicyEndpoint(anyString())).willReturn("POLICY_URI");
     }
 
@@ -72,7 +72,7 @@ public class OpenAMResourceSetStoreTest {
                         Collections.<String, Object>singletonMap("name", "RESOURCE_SET_NAME"));
 
         resourceSetDescription.setRealm("REALM");
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
+        given(dataStore.query(ArgumentMatchers.<QueryFilter<String>>anyObject()))
                 .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
@@ -95,7 +95,7 @@ public class OpenAMResourceSetStoreTest {
                 new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>singletonMap("name", "RESOURCE_SET_NAME"));
 
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
+        given(dataStore.query(ArgumentMatchers.<QueryFilter<String>>anyObject()))
                 .willReturn(Collections.<ResourceSetDescription>emptySet());
 
         //When
@@ -211,7 +211,7 @@ public class OpenAMResourceSetStoreTest {
                 new ResourceSetDescription("456", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>emptyMap());
 
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
+        given(dataStore.query(ArgumentMatchers.<QueryFilter<String>>anyObject()))
                 .willReturn(asSet(resourceSet1, resourceSet2));
         resourceSet1.setRealm("REALM");
         resourceSet2.setRealm("REALM");

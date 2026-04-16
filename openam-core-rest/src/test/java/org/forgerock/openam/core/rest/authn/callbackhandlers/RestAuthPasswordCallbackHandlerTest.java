@@ -32,7 +32,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -93,7 +93,7 @@ public class RestAuthPasswordCallbackHandlerTest {
                 passwordCallback);
 
         //Then
-        verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
+        verify(passwordCallback, never()).setPassword(ArgumentMatchers.<char[]>anyObject());
         assertThat(updated).isFalse();
     }
 
@@ -113,7 +113,7 @@ public class RestAuthPasswordCallbackHandlerTest {
                 passwordCallback);
 
         //Then
-        verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
+        verify(passwordCallback, never()).setPassword(ArgumentMatchers.<char[]>anyObject());
         assertThat(updated).isFalse();
     }
 

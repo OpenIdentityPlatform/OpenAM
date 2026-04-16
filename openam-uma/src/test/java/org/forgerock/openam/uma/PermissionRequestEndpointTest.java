@@ -43,7 +43,7 @@ import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.uma.extensions.PermissionRequestFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
@@ -73,7 +73,7 @@ public class PermissionRequestEndpointTest {
         OAuth2ProviderSettingsFactory providerSettingFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(RealmOAuth2ProviderSettings.class);
 
-        given(providerSettingFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(resourceSetStore);
 
         UmaProviderSettingsFactory umaProviderSettingsFactory = mock(UmaProviderSettingsFactory.class);

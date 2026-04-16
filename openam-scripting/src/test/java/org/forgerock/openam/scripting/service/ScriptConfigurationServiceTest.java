@@ -19,8 +19,8 @@ import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLIC
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;

@@ -39,7 +39,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
 import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -71,7 +71,7 @@ public class AccessTokenServiceTest {
                 providerSettingsFactory, urisFactory, mock(ConfirmationKeyValidator.class));
 
         providerSettings = mock(RealmOAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);
         given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);

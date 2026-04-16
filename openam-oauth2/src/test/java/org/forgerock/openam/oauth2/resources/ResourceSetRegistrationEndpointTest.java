@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.ArgumentMatchers.anyMapOf;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
@@ -60,7 +60,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.restlet.Request;
@@ -113,7 +113,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(RealmOAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
@@ -138,7 +138,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(endpoint.getResponse()).willReturn(response);
 
         OAuth2Request oAuth2Request = mock(OAuth2Request.class);
-        given(requestFactory.create(Matchers.<Request>anyObject())).willReturn(oAuth2Request);
+        given(requestFactory.create(ArgumentMatchers.<Request>anyObject())).willReturn(oAuth2Request);
         given(oAuth2Request.getToken(AccessToken.class)).willReturn(accessToken);
     }
 
@@ -219,7 +219,7 @@ public class ResourceSetRegistrationEndpointTest {
                 ArgumentCaptor.forClass(ResourceSetDescription.class);
         InOrder inOrder = inOrder(resourceRegistrationFilter, store, resourceRegistrationFilter);
         inOrder.verify(resourceRegistrationFilter).beforeResourceRegistration(any(ResourceSetDescription.class));
-        inOrder.verify(store).create(Matchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
+        inOrder.verify(store).create(ArgumentMatchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
         inOrder.verify(resourceRegistrationFilter).afterResourceRegistration(any(ResourceSetDescription.class));
         assertThat(resourceSetCaptor.getValue().getId()).isNotNull().isNotEmpty();
         assertThat(resourceSetCaptor.getValue().getClientId()).isEqualTo("CLIENT_ID");
@@ -232,7 +232,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
-        verify(hook).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
+        verify(hook).resourceSetCreated(anyString(), ArgumentMatchers.<ResourceSetDescription>anyObject());
         verify(labelRegistration).updateLabelsForNewResourceSet(any(ResourceSetDescription.class));
     }
 

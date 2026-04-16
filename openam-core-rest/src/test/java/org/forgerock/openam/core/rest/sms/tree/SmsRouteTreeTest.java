@@ -26,7 +26,7 @@ import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;

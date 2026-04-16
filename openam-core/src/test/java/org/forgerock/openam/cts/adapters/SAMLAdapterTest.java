@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.tokens.TokenType;
