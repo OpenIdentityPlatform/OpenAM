@@ -161,6 +161,7 @@
       --add-opens java.base/jdk.internal.math=ALL-UNNAMED
       --add-opens java.base/jdk.internal.module=ALL-UNNAMED
       --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.util=ALL-UNNAMED
       --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
       --add-opens java.base/sun.nio.ch=ALL-UNNAMED
       --add-opens java.base/java.util.concurrent=ALL-UNNAMED

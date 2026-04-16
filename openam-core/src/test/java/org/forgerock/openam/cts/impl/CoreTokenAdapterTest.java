@@ -17,6 +17,7 @@ package org.forgerock.openam.cts.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.ArgumentMatchers.nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +73,7 @@ public class CoreTokenAdapterTest {
         adapter.create(token, options);
 
         // Then
-        verify(mockTaskDispatcher).create(eq(token), any(Options.class), any(ResultHandler.class));
+        verify(mockTaskDispatcher).create(eq(token), any(Options.class), nullable(ResultHandler.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -144,7 +145,7 @@ public class CoreTokenAdapterTest {
         adapter.updateOrCreate(token, options);
 
         // Then
-        verify(mockTaskDispatcher).update(eq(token), any(Options.class), any(ResultHandler.class));
+        verify(mockTaskDispatcher).update(eq(token), any(Options.class), nullable(ResultHandler.class));
     }
 
     @Test
@@ -156,7 +157,7 @@ public class CoreTokenAdapterTest {
         adapter.delete(tokenId, options);
 
         // Then
-        verify(mockTaskDispatcher).delete(eq(tokenId), any(Options.class), any(ResultHandler.class));
+        verify(mockTaskDispatcher).delete(eq(tokenId), any(Options.class), nullable(ResultHandler.class));
     }
 
     @Test
@@ -169,7 +170,7 @@ public class CoreTokenAdapterTest {
 
         // Then
         ArgumentCaptor<TokenFilter> captor = ArgumentCaptor.forClass(TokenFilter.class);
-        verify(mockTaskDispatcher).partialQuery(captor.capture(), any(ResultHandler.class));
+        verify(mockTaskDispatcher).partialQuery(captor.capture(), nullable(ResultHandler.class));
         TokenFilter capturedFilter = captor.getValue();
         assertThat(capturedFilter).isSameAs(filter);
         assertThat(capturedFilter.getReturnFields()).containsOnly(CoreTokenField.TOKEN_ID);

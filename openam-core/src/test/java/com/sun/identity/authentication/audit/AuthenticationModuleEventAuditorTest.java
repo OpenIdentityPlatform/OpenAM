@@ -16,6 +16,7 @@
 package com.sun.identity.authentication.audit;
 
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import org.forgerock.openam.audit.AuditConstants.*;
 
 import com.sun.identity.authentication.service.LoginState;
@@ -53,7 +54,7 @@ public class AuthenticationModuleEventAuditorTest {
     public void setupMocks() {
         MockitoAnnotations.initMocks(this);
 
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
+        when(eventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).thenReturn(true);
         when(eventFactory.authenticationEvent(anyString())).thenCallRealMethod();
         auditor = new AuthenticationModuleEventAuditor(eventPublisher, eventFactory);
     }

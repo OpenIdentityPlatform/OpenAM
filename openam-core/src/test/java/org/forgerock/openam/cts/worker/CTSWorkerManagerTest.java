@@ -18,7 +18,9 @@ package org.forgerock.openam.cts.worker;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -50,7 +52,7 @@ public class CTSWorkerManagerTest {
         mockExecutorServiceFactory = mock(AMExecutorServiceFactory.class);
         CTSWorkerTaskProvider mockTaskProvider = mock(CTSWorkerTaskProvider.class);
         given(mockTaskProvider.getTasks()).willReturn(Collections.singletonList(mock(CTSWorkerTask.class)));
-        given(mockExecutorServiceFactory.createScheduledService(anyInt(), anyString()))
+        given(mockExecutorServiceFactory.createScheduledService(anyInt(), nullable(String.class)))
                 .willReturn(mock(ScheduledExecutorService.class));
         given(mockCoreTokenConfig.getRunPeriod()).willReturn(RUN_PERIOD);
 

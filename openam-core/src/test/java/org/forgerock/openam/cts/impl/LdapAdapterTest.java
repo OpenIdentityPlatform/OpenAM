@@ -553,9 +553,7 @@ public class LdapAdapterTest {
         given(mockBuilder.execute(any(Connection.class)))
                 .willReturn(Arrays.asList((Collection<Token>) Arrays.asList(new Token("weasel", TokenType.OAUTH))).iterator());
         given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
-        QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
-        given(mockQueryFactory.createFilterConverter()).willReturn(visitor);
-        given(visitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
+        given(mockQueryVisitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
 
         // When
         TokenFilter filter = new TokenFilterBuilder().withQuery(QueryFilter.<CoreTokenField>alwaysTrue()).build();
@@ -581,9 +579,7 @@ public class LdapAdapterTest {
         given(mockBuilder.executeAttributeQuery(any(Connection.class)))
                 .willReturn(Arrays.asList((Collection<PartialToken>) Arrays.asList(partialToken)).iterator());
         given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
-        QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
-        given(mockQueryFactory.createFilterConverter()).willReturn(visitor);
-        given(visitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
+        given(mockQueryVisitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
 
         // When
         TokenFilter filter = new TokenFilterBuilder()

@@ -26,6 +26,7 @@ import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.worker.process.CTSWorkerDeleteProcess.TokenDeletion;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -53,7 +54,11 @@ public class TokenDeletionTest {
         assertThat(deletion.deleteBatch(tokens).getCount()).isEqualTo(tokens.size());
     }
 
+    private int partialTokenCounter = 0;
+
     private PartialToken partialToken() {
-        return mock(PartialToken.class);
+        PartialToken token = mock(PartialToken.class);
+        given(token.getValue(CoreTokenField.TOKEN_ID)).willReturn("token-id-" + partialTokenCounter++);
+        return token;
     }
 }

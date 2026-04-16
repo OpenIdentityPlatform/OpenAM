@@ -35,6 +35,8 @@ public class DynamicSessionIDExtensionsTest {
         given(mockQuery.getSessionIDCorrector()).willReturn(mockCorrector);
 
         mockDelegate = mock(SessionIDExtensions.class);
+        given(mockDelegate.getPrimaryID()).willReturn("primaryId");
+        given(mockDelegate.getSiteID()).willReturn("siteId");
 
         dynamic = new DynamicSessionIDExtensions(mockQuery, mockDelegate);
     }

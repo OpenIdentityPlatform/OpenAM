@@ -41,6 +41,7 @@ public class DeleteOnQueryResultHandlerTest {
         mockTaskDispatcher = mock(TaskDispatcher.class);
         mockResultHandlerFactory = mock(ResultHandlerFactory.class);
         mockDebug = mock(Debug.class);
+        given(mockResultHandlerFactory.getDeleteHandler()).willReturn(mock(ResultHandler.class));
         handler = new DeleteOnQueryResultHandler(mockTaskDispatcher, mockResultHandlerFactory, mockDebug);
     }
 

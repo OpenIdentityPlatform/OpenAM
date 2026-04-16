@@ -66,10 +66,11 @@ public class ClientSdkOperationsTest {
     private SessionServerConfig mockServerConfig;
 
     @BeforeMethod
-    public void setup() throws SessionException {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         given(mockRequester.getID()).willReturn(mockRequesterId);
         given(mockSession.getID()).willReturn(mockSessionId);
+        given(mockSession.getSessionServiceURL()).willReturn(new java.net.URL("http://openam.example.com"));
         given(mockClientSdkSessionRequests.sendRequest(
                 any(URL.class),
                 any(SessionRequest.class),

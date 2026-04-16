@@ -49,7 +49,7 @@ public class MonitoredCTSConnectionFactoryTest {
     @Test
     public void shouldAddToFailedConnectionOnError() throws Exception {
         //given
-        doThrow(Exception.class).when(connectionFactory).create();
+        doThrow(DataLayerException.class).when(connectionFactory).create();
 
         //when
         try {

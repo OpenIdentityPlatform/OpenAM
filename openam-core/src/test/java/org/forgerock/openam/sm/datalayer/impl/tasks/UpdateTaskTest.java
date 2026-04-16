@@ -53,6 +53,7 @@ public class UpdateTaskTest {
         mockHandler = mock(ResultHandler.class);
         task = new UpdateTask(mockUpdated, options, mockHandler);
 
+        given(mockUpdated.getTokenId()).willReturn("test-token-id");
         given(mockAdapter.read(anyString(), eq(options))).willReturn(mockPrevious);
         given(mockAdapter.update(mockPrevious, mockUpdated, options)).willReturn(mockReturned);
     }

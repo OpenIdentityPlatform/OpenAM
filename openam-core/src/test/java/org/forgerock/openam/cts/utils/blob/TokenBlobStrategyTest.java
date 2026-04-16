@@ -46,6 +46,10 @@ public class TokenBlobStrategyTest {
         given(factory.getStrategies(any(CoreTokenConfig.class)))
                 .willReturn(Arrays.asList(first, second, third));
 
+        given(first.perform(any(byte[].class))).willReturn(new byte[0]);
+        given(second.perform(any(byte[].class))).willReturn(new byte[0]);
+        given(third.perform(any(byte[].class))).willReturn(new byte[0]);
+
         byte[] data = new byte[0];
 
         TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
@@ -68,6 +72,10 @@ public class TokenBlobStrategyTest {
 
         given(factory.getStrategies(any(CoreTokenConfig.class)))
                 .willReturn(Arrays.asList(first, second, third));
+
+        given(first.reverse(any(byte[].class))).willReturn(new byte[0]);
+        given(second.reverse(any(byte[].class))).willReturn(new byte[0]);
+        given(third.reverse(any(byte[].class))).willReturn(new byte[0]);
 
         byte[] data = new byte[0];
 

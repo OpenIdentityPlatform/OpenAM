@@ -75,7 +75,7 @@ public class ReadTaskTest {
         try {
             task.execute(mockAdapter);
         } catch (DataLayerException e) {}
-        verify(mockResultHandler).processError(any(CoreTokenException.class));
+        verify(mockResultHandler).processError(any(DataLayerException.class));
     }
 
     private void adapterWillFailOnRead() throws Exception {
