@@ -295,7 +295,7 @@ public class AccessTokenServiceTest {
         given(providerSettings.issueRefreshTokensOnRefreshingToken()).willReturn(true);
         given(tokenStore.createRefreshToken(nullable(String.class), anyString(), nullable(String.class),
                 nullable(String.class), anySetOf(String.class),
-                eq(request), isNull(String.class), anyString(), anyLong())).willReturn(newRefreshToken);
+                eq(request), isNull(String.class), nullable(String.class), anyLong())).willReturn(newRefreshToken);
         given(newRefreshToken.toString()).willReturn(newRefreshTokenId);
 
         given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class),

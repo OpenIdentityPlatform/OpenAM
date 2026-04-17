@@ -231,7 +231,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken, never()).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
@@ -273,7 +273,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken, never()).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
@@ -314,7 +314,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
         verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
