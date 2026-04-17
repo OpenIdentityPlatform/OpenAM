@@ -12,21 +12,25 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.lang.reflect.Field;
+
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LdapAdapter;
+import org.forgerock.openam.sm.datalayer.api.AbstractTask;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.util.Options;
@@ -45,6 +49,11 @@ public class UpdateTaskTest {
 
     @BeforeMethod
     public void setup() throws Exception {
+        // Clear the static token cache to prevent cross-test pollution
+        Field cacheField = AbstractTask.class.getDeclaredField("sid2token");
+        cacheField.setAccessible(true);
+        ((com.google.common.cache.Cache<?, ?>) cacheField.get(null)).invalidateAll();
+
         mockUpdated = mock(Token.class);
         mockPrevious = mock(Token.class);
         mockReturned = mock(Token.class);
@@ -53,6 +62,7 @@ public class UpdateTaskTest {
         mockHandler = mock(ResultHandler.class);
         task = new UpdateTask(mockUpdated, options, mockHandler);
 
+        given(mockUpdated.getTokenId()).willReturn("test-token-id");
         given(mockAdapter.read(anyString(), eq(options))).willReturn(mockPrevious);
         given(mockAdapter.update(mockPrevious, mockUpdated, options)).willReturn(mockReturned);
     }

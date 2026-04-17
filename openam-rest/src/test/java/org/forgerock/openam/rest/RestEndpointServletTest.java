@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest;
@@ -30,7 +30,7 @@ import java.util.Collections;
 
 import org.forgerock.http.Filter;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -105,7 +105,7 @@ public class RestEndpointServletTest {
         restEndpointServlet.service(request, response);
 
         //Then
-        verify(servlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
+        verify(servlet).service(ArgumentMatchers.<HttpServletRequest>anyObject(), eq(response));
         for (HttpServlet s : Arrays.asList(restletXACMLHttpServlet, restletOAuth2ServiceServlet,
                 restletUMAServiceServlet)) {
             if (s != servlet) {

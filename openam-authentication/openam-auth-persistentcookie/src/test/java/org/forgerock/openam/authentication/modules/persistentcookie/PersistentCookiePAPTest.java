@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -20,6 +20,7 @@ package org.forgerock.openam.authentication.modules.persistentcookie;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.testng.AssertJUnit.*;
 
 import java.security.Principal;
@@ -59,7 +60,7 @@ public class PersistentCookiePAPTest {
                 ServiceConfig serviceConfig = mock(ServiceConfig.class);
                 given(serviceConfig.getAttributes()).willReturn(Collections.singletonMap("iplanet-am-auth-key-alias",
                         (Set<String>) Sets.newHashSet("str")));
-                given(serviceConfigManager.getOrganizationConfig(anyString(), anyString())).willReturn(serviceConfig);
+                given(serviceConfigManager.getOrganizationConfig(nullable(String.class), isNull())).willReturn(serviceConfig);
                 return serviceConfigManager;
             }
         };
