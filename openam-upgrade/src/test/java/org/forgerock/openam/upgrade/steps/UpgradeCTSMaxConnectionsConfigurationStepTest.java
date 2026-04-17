@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -62,8 +63,8 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
         upgradeStep = new UpgradeCTSMaxConnectionsConfigurationStep(adminTokenAction, connectionFactory,
                 connectionCount, helper);
 
-        given(helper.getDefaultServerConfig(any(SSOToken.class))).willReturn(defaultServerInstanceConfig);
-        given(helper.getServerConfigs(any(SSOToken.class))).willReturn(serverInstanceConfigs);
+        given(helper.getDefaultServerConfig(nullable(SSOToken.class))).willReturn(defaultServerInstanceConfig);
+        given(helper.getServerConfigs(nullable(SSOToken.class))).willReturn(serverInstanceConfigs);
         given(connectionCount.getConnectionCount(anyInt(), any(ConnectionType.class)))
                 .willAnswer(new Answer<Integer>() {
                     @Override

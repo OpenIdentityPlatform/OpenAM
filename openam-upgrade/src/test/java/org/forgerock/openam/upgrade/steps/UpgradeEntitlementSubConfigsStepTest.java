@@ -17,6 +17,7 @@
 package org.forgerock.openam.upgrade.steps;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.security.PrivilegedAction;
@@ -111,7 +112,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         resourceTypeConfiguration = mock(ResourceTypeConfiguration.class);
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
         applicationService = mock(ApplicationService.class);
-        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        when(applicationServiceFactory.create(nullable(Subject.class), anyString())).thenReturn(applicationService);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(entitlementService, resourceTypeConfiguration,
                 adminTokenAction, connectionFactory, applicationServiceFactory);
 

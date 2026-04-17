@@ -16,6 +16,7 @@
 package org.forgerock.openam.upgrade.steps.policy;
 
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 
@@ -100,7 +101,7 @@ public class UpgradeResourceTypeStepTest {
 
         // Mock organisation and application service configuration
         ServiceConfig orgConfig = mock(ServiceConfig.class);
-        when(configManager.getOrganizationConfig(anyString(), anyString())).thenReturn(orgConfig);
+        when(configManager.getOrganizationConfig(anyString(), nullable(String.class))).thenReturn(orgConfig);
         ServiceConfig appsConfig = mock(ServiceConfig.class);
         when(orgConfig.getSubConfig(anyString())).thenReturn(appsConfig);
 
