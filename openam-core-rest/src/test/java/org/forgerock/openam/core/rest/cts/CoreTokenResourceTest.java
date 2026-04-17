@@ -85,6 +85,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
+        given(mockSerialisation.deserialise(anyString(), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
         doThrow(IllegalArgumentException.class).when(mockStore).create(any(Token.class));
 
         // When

@@ -255,7 +255,7 @@ public class OathDevicesResourceTest {
 
             AMIdentity mockId = mock(AMIdentity.class);
             try {
-                given(mockId.getAttribute(anyString())).willReturn(attribute); // makes them
+                given(mockId.getAttribute(any())).willReturn(attribute); // makes them
             } catch (IdRepoException | SSOException e) {
                 e.printStackTrace();
             }

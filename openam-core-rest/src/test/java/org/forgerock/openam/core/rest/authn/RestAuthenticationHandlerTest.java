@@ -479,6 +479,7 @@ public class RestAuthenticationHandlerTest {
         given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         given(coreWrapper.convertOrgNameToRealmName(anyString())).willReturn("REALM");
+        given(loginProcess.getOrgDN()).willReturn("/realm");
 
         return restAuthenticationHandler.initiateAuthentication(request, httpResponse, null, null, null);
     }
