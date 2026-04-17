@@ -424,6 +424,13 @@
         <groupId>ognl</groupId>
         <artifactId>ognl</artifactId>
         <version>3.0.21</version>
+        <exclusions>
+          <!-- Exclude old-group javassist to prevent shadowing org.javassist:javassist:3.27.0-GA required by PowerMock 2.x -->
+          <exclusion>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Pin javassist for PowerMock 2.x compatibility (CtClass.getDeclaredClasses()) -->
       <dependency>

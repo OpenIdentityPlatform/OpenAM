@@ -260,17 +260,36 @@
             <groupId>org.apache.click</groupId>
             <artifactId>click-nodeps</artifactId>
             <version>${click.version}</version>
+            <exclusions>
+                <!-- Exclude old-group javassist to prevent shadowing org.javassist:javassist required by PowerMock 2.x -->
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.click</groupId>
             <artifactId>click-extras</artifactId>
             <version>${click.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
