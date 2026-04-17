@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.anyMapOf;
 import static org.mockito.Mockito.*;
@@ -232,7 +233,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
-        verify(hook).resourceSetCreated(anyString(), ArgumentMatchers.<ResourceSetDescription>anyObject());
+        verify(hook).resourceSetCreated(nullable(String.class), ArgumentMatchers.<ResourceSetDescription>anyObject());
         verify(labelRegistration).updateLabelsForNewResourceSet(any(ResourceSetDescription.class));
     }
 
@@ -331,6 +332,9 @@ public class ResourceSetRegistrationEndpointTest {
         //Given
         setUriResourceSetId();
         addCondition();
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID",
+                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+        given(store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSetDescription);
 
         //When
         Representation responseRep = endpoint.deleteResourceSet();

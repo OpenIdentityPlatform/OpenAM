@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class OpenAMScopeValidatorTest {
         ScriptEvaluator scriptEvaluator = mock(ScriptEvaluator.class);
         IdentityManager identityManager = mock(IdentityManager.class);
         identity = mock(AMIdentity.class);
-        when(identityManager.getResourceOwnerIdentity(anyString(), anyString())).thenReturn(identity);
+        when(identityManager.getResourceOwnerIdentity(nullable(String.class), nullable(String.class))).thenReturn(identity);
         validator = new OpenAMScopeValidator(identityManager, null, factory, null, scriptEvaluator, null, null, null);
     }
 
@@ -148,7 +149,7 @@ public class OpenAMScopeValidatorTest {
         String scopeValue2 = "1234567890";
         AccessToken accessToken = mock(AccessToken.class);
         when(accessToken.getScope()).thenReturn(new HashSet<>(Arrays.asList(scopeKey1, scopeKey2)));
-        when(accessToken.getResourceOwnerId()).thenReturn(anyString());
+        when(accessToken.getResourceOwnerId()).thenReturn("RESOURCE_OWNER_ID");
         when(identity.getAttribute(scopeKey1)).thenReturn(Collections.singleton(scopeValue1));
         when(identity.getAttribute(scopeKey2)).thenReturn(Collections.singleton(scopeValue2));
 
@@ -169,7 +170,7 @@ public class OpenAMScopeValidatorTest {
         String scopeKey2 = "phone";
         AccessToken accessToken = mock(AccessToken.class);
         when(accessToken.getScope()).thenReturn(new HashSet<>(Arrays.asList(scopeKey1, scopeKey2)));
-        when(accessToken.getResourceOwnerId()).thenReturn(anyString());
+        when(accessToken.getResourceOwnerId()).thenReturn("RESOURCE_OWNER_ID");
         when(identity.getAttribute(scopeKey1)).thenReturn(Collections.emptySet());
         when(identity.getAttribute(scopeKey2)).thenReturn(null);
 

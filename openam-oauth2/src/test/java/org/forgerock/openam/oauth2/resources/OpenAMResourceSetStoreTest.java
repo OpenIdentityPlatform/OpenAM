@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -59,7 +60,7 @@ public class OpenAMResourceSetStoreTest {
         store = new OpenAMResourceSetStore("REALM", oAuth2UrisFactory, idGenerator, dataStore);
 
         given(oAuth2UrisFactory.get(ArgumentMatchers.<OAuth2Request>anyObject())).willReturn(oAuth2Uris);
-        given(oAuth2Uris.getResourceSetRegistrationPolicyEndpoint(anyString())).willReturn("POLICY_URI");
+        given(oAuth2Uris.getResourceSetRegistrationPolicyEndpoint(nullable(String.class))).willReturn("POLICY_URI");
     }
 
     @Test(enabled = false, expectedExceptions = BadRequestException.class)
