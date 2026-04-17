@@ -17,7 +17,7 @@
  * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
 >>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;

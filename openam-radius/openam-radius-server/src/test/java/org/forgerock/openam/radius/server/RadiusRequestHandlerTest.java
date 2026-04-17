@@ -12,9 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+
+ * Portions copyright 2026 3A Systems, LLC.
  */
 /*
  * Portions copyright 2015 ForgeRock AS
+
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.radius.server;

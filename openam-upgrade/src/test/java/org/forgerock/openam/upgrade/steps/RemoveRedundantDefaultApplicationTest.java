@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2026 3A Systems, LLC
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 

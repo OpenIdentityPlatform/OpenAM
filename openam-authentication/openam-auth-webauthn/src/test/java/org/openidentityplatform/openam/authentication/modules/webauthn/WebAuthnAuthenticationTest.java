@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2024-2025 3A-Systems LLC. All rights reserved.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;

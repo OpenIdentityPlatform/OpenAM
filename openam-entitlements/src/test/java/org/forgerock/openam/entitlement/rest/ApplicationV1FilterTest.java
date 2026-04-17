@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions copyright 2026 3A Systems, LLC.
 * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 */
 package org.forgerock.openam.entitlement.rest;

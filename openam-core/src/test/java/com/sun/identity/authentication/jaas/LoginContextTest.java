@@ -12,8 +12,9 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
- * 
+ * Portions copyright 2026 3A Systems, LLC. * 
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.jaas;
 
