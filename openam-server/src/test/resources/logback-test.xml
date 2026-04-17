@@ -6,7 +6,7 @@
     </layout>
   </appender>
 
-  <root level="TRACE">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
    
