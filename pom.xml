@@ -425,6 +425,12 @@
         <artifactId>ognl</artifactId>
         <version>3.0.21</version>
       </dependency>
+      <!-- Pin javassist for PowerMock 2.x compatibility (CtClass.getDeclaredClasses()) -->
+      <dependency>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.27.0-GA</version>
+      </dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
