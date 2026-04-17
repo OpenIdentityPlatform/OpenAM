@@ -23,7 +23,6 @@ import static org.forgerock.util.promise.Promises.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.anySetOf;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -574,7 +573,7 @@ public class UmaPolicyServiceImplTest {
 
         Promise<List<ResourceResponse>, ResourceException> deletePoliciesPromise = newResultPromise(readPolicies);
 
-        given(policyResourceDelegate.deletePolicies(eq(context), anyListOf(String.class)))
+        given(policyResourceDelegate.deletePolicies(eq(context), any(Collection.class)))
                 .willReturn(deletePoliciesPromise);
 
         //When
@@ -583,7 +582,7 @@ public class UmaPolicyServiceImplTest {
         //Then
         InOrder inOrder = inOrder(resourceDelegationFilter, policyResourceDelegate);
         inOrder.verify(resourceDelegationFilter).onResourceSharedDeletion(any(UmaPolicy.class));
-        inOrder.verify(policyResourceDelegate).deletePolicies(eq(context), anyListOf(String.class));
+        inOrder.verify(policyResourceDelegate).deletePolicies(eq(context), any(Collection.class));
     }
 
     @Test(expectedExceptions = ResourceException.class)
@@ -604,7 +603,7 @@ public class UmaPolicyServiceImplTest {
             policyService.deletePolicy(context, "RESOURCE_SET_ID").getOrThrowUninterruptibly();
         } catch (ResourceException e) {
             //Then
-            verify(policyResourceDelegate, never()).deletePolicies(eq(context), anyListOf(String.class));
+            verify(policyResourceDelegate, never()).deletePolicies(eq(context), any(Collection.class));
             throw e;
         }
     }
@@ -627,7 +626,7 @@ public class UmaPolicyServiceImplTest {
 
         given(policyResourceDelegate.queryPolicies(eq(context), ArgumentMatchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
-        given(policyResourceDelegate.deletePolicies(eq(context), anyListOf(String.class)))
+        given(policyResourceDelegate.deletePolicies(eq(context), any(Collection.class)))
                 .willReturn(deletePoliciesPromise);
 
         //When
@@ -635,7 +634,7 @@ public class UmaPolicyServiceImplTest {
             policyService.deletePolicy(context, "RESOURCE_SET_ID").getOrThrowUninterruptibly();
         } catch (ResourceException e) {
             //Then
-            verify(policyResourceDelegate).deletePolicies(eq(context), anyListOf(String.class));
+            verify(policyResourceDelegate).deletePolicies(eq(context), any(Collection.class));
             throw e;
         }
     }

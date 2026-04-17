@@ -25,6 +25,7 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
@@ -240,7 +241,7 @@ public class AuthorizationRequestEndpointTest {
             InOrder inOrder = inOrder(requestAuthorizationFilter, policyEvaluator, requestAuthorizationFilter);
             inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                     any(Subject.class));
-            inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
+            inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), nullable(Map.class), eq(false));
             inOrder.verify(requestAuthorizationFilter).afterFailedAuthorization(eq(permissionTicket),
                     any(Subject.class), any(Subject.class));
             assertThat(e.getStatusCode()).isEqualTo(403);
@@ -269,7 +270,7 @@ public class AuthorizationRequestEndpointTest {
             InOrder inOrder = inOrder(requestAuthorizationFilter, policyEvaluator, requestAuthorizationFilter);
             inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                     any(Subject.class));
-            inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
+            inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), nullable(Map.class), eq(false));
             inOrder.verify(requestAuthorizationFilter).afterFailedAuthorization(eq(permissionTicket),
                     any(Subject.class), any(Subject.class));
             assertThat(e.getStatusCode()).isEqualTo(403);
@@ -296,7 +297,7 @@ public class AuthorizationRequestEndpointTest {
         InOrder inOrder = inOrder(requestAuthorizationFilter, policyEvaluator, requestAuthorizationFilter);
         inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                 any(Subject.class));
-        inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
+        inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), nullable(Map.class), eq(false));
         inOrder.verify(requestAuthorizationFilter).afterSuccessfulAuthorization(eq(permissionTicket),
                 any(Subject.class), any(Subject.class));
     }
@@ -320,7 +321,7 @@ public class AuthorizationRequestEndpointTest {
         InOrder inOrder = inOrder(requestAuthorizationFilter, policyEvaluator, requestAuthorizationFilter);
         inOrder.verify(requestAuthorizationFilter).beforeAuthorization(eq(permissionTicket), any(Subject.class),
                 any(Subject.class));
-        inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), anyMap(), eq(false));
+        inOrder.verify(policyEvaluator).evaluate(anyString(), any(Subject.class), anyString(), nullable(Map.class), eq(false));
         inOrder.verify(requestAuthorizationFilter).afterSuccessfulAuthorization(eq(permissionTicket),
                 any(Subject.class), any(Subject.class));
     }
@@ -452,8 +453,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
-                    anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
+            verify(pendingRequestsService).createPendingRequest(nullable(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
+                    nullable(String.class), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
             verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), any(AMIdentity.class), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
@@ -484,8 +485,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
-                    anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
+            verify(pendingRequestsService).createPendingRequest(nullable(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
+                    nullable(String.class), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
             verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), any(AMIdentity.class), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
