@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
@@ -34,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;
-import org.mockito.Matchers;
-import static org.mockito.Matchers.eq;
+import org.mockito.ArgumentMatchers;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -374,9 +375,9 @@ public class PolicyConditionUpgraderTest {
         given(condition.getClassName()).willReturn("CONDITION_CLASS_NAME");
 
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT_CLASS_NAME"), eq(subject),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject);
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION_CLASS_NAME"), eq(condition),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
 
         //When
         conditionUpgrader.dryRunPolicyUpgrade(policy);
@@ -410,9 +411,9 @@ public class PolicyConditionUpgraderTest {
         given(subject1.getClassName()).willReturn("SUBJECT1_CLASS_NAME");
         given(subject2.getClassName()).willReturn("SUBJECT2_CLASS_NAME");
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT1_CLASS_NAME"), eq(subject1),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject1);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject1);
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT2_CLASS_NAME"), eq(subject2),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject2);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject2);
 
 
         //When
@@ -422,8 +423,8 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
         verify(orSubject).setESubjects(subjectCaptor.capture());
         assertThat(subjectCaptor.getValue()).hasSize(2).contains(migratedSubject1, migratedSubject2);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 
     @SuppressWarnings("unchecked")
@@ -446,9 +447,9 @@ public class PolicyConditionUpgraderTest {
         given(subject1.getClassName()).willReturn("SUBJECT1_CLASS_NAME");
         given(subject2.getClassName()).willReturn("SUBJECT2_CLASS_NAME");
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT1_CLASS_NAME"), eq(subject1),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject1);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject1);
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT2_CLASS_NAME"), eq(subject2),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject2);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject2);
 
 
         //When
@@ -458,8 +459,8 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
         verify(andSubject).setESubjects(subjectCaptor.capture());
         assertThat(subjectCaptor.getValue()).hasSize(2).contains(migratedSubject1, migratedSubject2);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 
     @Test
@@ -477,7 +478,7 @@ public class PolicyConditionUpgraderTest {
         given(notSubject.getESubjects()).willReturn(notSubjects);
         given(subject.getClassName()).willReturn("SUBJECT_CLASS_NAME");
         given(conditionUpgradeMap.migrateSubjectCondition(eq("SUBJECT_CLASS_NAME"), eq(subject),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedSubject);
 
         //When
         conditionUpgrader.dryRunPolicyUpgrade(policy);
@@ -486,8 +487,8 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
         verify(notSubject).setESubjects(subjectCaptor.capture());
         assertThat(subjectCaptor.getValue()).hasSize(1).contains(migratedSubject);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 
     @SuppressWarnings("unchecked")
@@ -510,9 +511,9 @@ public class PolicyConditionUpgraderTest {
         given(condition1.getClassName()).willReturn("CONDITION1_CLASS_NAME");
         given(condition2.getClassName()).willReturn("CONDITION2_CLASS_NAME");
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION1_CLASS_NAME"), eq(condition1),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition1);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition1);
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION2_CLASS_NAME"), eq(condition2),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition2);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition2);
 
 
         //When
@@ -522,8 +523,8 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> conditionsCaptor = ArgumentCaptor.forClass(Set.class);
         verify(orCondition).setEConditions(conditionsCaptor.capture());
         assertThat(conditionsCaptor.getValue()).hasSize(2).contains(migratedCondition1, migratedCondition2);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 
     @SuppressWarnings("unchecked")
@@ -546,9 +547,9 @@ public class PolicyConditionUpgraderTest {
         given(condition1.getClassName()).willReturn("CONDITION1_CLASS_NAME");
         given(condition2.getClassName()).willReturn("CONDITION2_CLASS_NAME");
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION1_CLASS_NAME"), eq(condition1),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition1);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition1);
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION2_CLASS_NAME"), eq(condition2),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition2);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition2);
 
 
         //When
@@ -558,8 +559,8 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> conditionCaptor = ArgumentCaptor.forClass(Set.class);
         verify(andCondition).setEConditions(conditionCaptor.capture());
         assertThat(conditionCaptor.getValue()).hasSize(2).contains(migratedCondition1, migratedCondition2);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 
     @Test
@@ -577,7 +578,7 @@ public class PolicyConditionUpgraderTest {
         given(notCondition.getEConditions()).willReturn(notConditions);
         given(condition.getClassName()).willReturn("CONDITION_CLASS_NAME");
         given(conditionUpgradeMap.migrateEnvironmentCondition(eq("CONDITION_CLASS_NAME"), eq(condition),
-                Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
+                ArgumentMatchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
 
         //When
         conditionUpgrader.dryRunPolicyUpgrade(policy);
@@ -586,7 +587,7 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<Set> conditionCaptor = ArgumentCaptor.forClass(Set.class);
         verify(notCondition).setEConditions(conditionCaptor.capture());
         assertThat(conditionCaptor.getValue()).hasSize(1).contains(migratedCondition);
-        verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
-        verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
+        verify(policy, never()).setSubject(ArgumentMatchers.<EntitlementSubject>anyObject());
+        verify(policy, never()).setCondition(ArgumentMatchers.<EntitlementCondition>anyObject());
     }
 }

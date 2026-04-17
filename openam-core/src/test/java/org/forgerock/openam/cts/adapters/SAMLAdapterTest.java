@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.tokens.TokenType;

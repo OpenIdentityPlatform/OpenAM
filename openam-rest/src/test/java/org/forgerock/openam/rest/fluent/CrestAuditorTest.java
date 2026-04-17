@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -68,7 +69,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditAccessShouldPublishEvents(Request request) throws Exception {
-        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
+        given(auditEventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
@@ -81,7 +82,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditSuccessShouldPublishEvents(Request request) throws Exception {
-        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
+        given(auditEventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
@@ -96,7 +97,7 @@ public class CrestAuditorTest {
 
     @Test(dataProvider = "CRESTRequests")
     public void auditFailureShouldPublishEvents(Request request) throws Exception {
-        given(auditEventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).willReturn(true);
+        given(auditEventPublisher.isAuditing(nullable(String.class), anyString(), any(EventName.class))).willReturn(true);
         auditor = new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
         givenAccessAuditingEnabled(auditEventPublisher);
 
