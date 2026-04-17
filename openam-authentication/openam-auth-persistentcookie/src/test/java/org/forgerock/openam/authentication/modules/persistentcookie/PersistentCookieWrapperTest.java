@@ -61,7 +61,7 @@ public class PersistentCookieWrapperTest {
                 ServiceConfig serviceConfig = mock(ServiceConfig.class);
                 given(serviceConfig.getAttributes()).willReturn(Collections.singletonMap("iplanet-am-auth-key-alias",
                                 (Set<String>)Sets.newHashSet(KEY_ALIAS)));
-                given(serviceConfigManager.getOrganizationConfig(anyString(), anyString())).willReturn(serviceConfig);
+                given(serviceConfigManager.getOrganizationConfig(anyString(), isNull())).willReturn(serviceConfig);
                 return serviceConfigManager;
             }
         };
