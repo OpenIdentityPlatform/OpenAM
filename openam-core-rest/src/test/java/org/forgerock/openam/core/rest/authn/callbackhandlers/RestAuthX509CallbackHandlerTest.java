@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -121,7 +121,7 @@ public class RestAuthX509CallbackHandlerTest {
                 x509CertificateCallback);
 
         //Then
-        verify(x509CertificateCallback, never()).setCertificate(Matchers.<X509Certificate>anyObject());
+        verify(x509CertificateCallback, never()).setCertificate(ArgumentMatchers.<X509Certificate>anyObject());
         assertTrue(updated);
     }
 

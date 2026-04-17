@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -53,7 +54,7 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -90,9 +91,9 @@ public class AuthIdHelperTest {
         given(claimsSetBuilder.build()).willReturn(claimsSet);
 
 
-        given(jwtBuilderFactory.jws(Matchers.<SigningHandler>anyObject())).willReturn(signedJwtBuilder);
+        given(jwtBuilderFactory.jws(ArgumentMatchers.<SigningHandler>anyObject())).willReturn(signedJwtBuilder);
         given(signedJwtBuilder.headers()).willReturn(jwsHeaderBuilder);
-        given(jwsHeaderBuilder.alg(Matchers.<Algorithm>anyObject())).willReturn(jwsHeaderBuilder);
+        given(jwsHeaderBuilder.alg(ArgumentMatchers.<Algorithm>anyObject())).willReturn(jwsHeaderBuilder);
         given(jwsHeaderBuilder.done()).willReturn(signedJwtBuilder);
         given(signedJwtBuilder.claims(claimsSet)).willReturn(signedJwtBuilder);
 
@@ -305,7 +306,7 @@ public class AuthIdHelperTest {
         PublicKey publicKey = mock(PublicKey.class);
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
-        given(signedJwt.verify(Matchers.<SigningHandler>anyObject())).willReturn(true);
+        given(signedJwt.verify(ArgumentMatchers.<SigningHandler>anyObject())).willReturn(true);
 
         mockGetSigningKey("REALM_DN", false);
 
@@ -314,7 +315,7 @@ public class AuthIdHelperTest {
 
         //Then
         verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
-        verify(signedJwt).verify(Matchers.<SigningHandler>anyObject());
+        verify(signedJwt).verify(ArgumentMatchers.<SigningHandler>anyObject());
     }
 
     @Test
@@ -341,7 +342,7 @@ public class AuthIdHelperTest {
 
         //Then
         verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
-        verify(signedJwt).verify(Matchers.<SigningHandler>anyObject());
+        verify(signedJwt).verify(ArgumentMatchers.<SigningHandler>anyObject());
         assertTrue(exceptionCaught);
     }
 

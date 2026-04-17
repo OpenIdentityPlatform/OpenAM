@@ -12,9 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+
+ * Portions copyright 2026 3A Systems, LLC.
  */
 /*
  * Portions copyright 2015 ForgeRock AS
+
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.radius.server;
@@ -34,7 +38,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;

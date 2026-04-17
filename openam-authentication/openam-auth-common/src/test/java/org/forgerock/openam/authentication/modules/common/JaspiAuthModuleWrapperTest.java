@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -32,7 +32,7 @@ import javax.security.auth.message.module.ServerAuthModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -66,7 +66,7 @@ public class JaspiAuthModuleWrapperTest {
         jaspiAuthWrapper.initialize(callbackHandler, config);
 
         //Then
-        verify(serverAuthModule).initialize(Matchers.<MessagePolicy>anyObject(), (MessagePolicy) isNull(),
+        verify(serverAuthModule).initialize(ArgumentMatchers.<MessagePolicy>anyObject(), (MessagePolicy) isNull(),
                 eq(callbackHandler), eq(config));
     }
 }

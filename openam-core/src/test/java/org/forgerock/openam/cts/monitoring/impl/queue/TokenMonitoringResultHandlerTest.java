@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
@@ -23,7 +24,7 @@ import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
