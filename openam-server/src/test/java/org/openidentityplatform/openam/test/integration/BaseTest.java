@@ -16,6 +16,7 @@
 
 package org.openidentityplatform.openam.test.integration;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -27,9 +28,9 @@ import org.openqa.selenium.io.FileHandler;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
@@ -52,8 +53,9 @@ public abstract class BaseTest {
     @BeforeClass
     public void webdriverSetup() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
-        //options.addArguments("--remote-allow-origins=*", "--verbose");
+        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox",
+                "--verbose", "--window-size=1920,1080", "--guest");
+//        options.addArguments("--remote-allow-origins=*", "--verbose", "--guest");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
