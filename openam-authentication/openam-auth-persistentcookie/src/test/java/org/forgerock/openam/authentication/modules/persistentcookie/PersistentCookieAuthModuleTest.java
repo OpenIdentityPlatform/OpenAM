@@ -20,6 +20,7 @@ package org.forgerock.openam.authentication.modules.persistentcookie;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.testng.AssertJUnit.*;
 
 import java.util.Collections;
@@ -65,7 +66,7 @@ public class PersistentCookieAuthModuleTest {
 
         persistentCookieWrapper = mock(PersistentCookieModuleWrapper.class);
         given(persistentCookieWrapper.generateConfig(anyString(), anyString(), anyBoolean(), anyString(), anyBoolean(),
-                anyBoolean(), anyString(), anyCollection(), anyString()))
+                anyBoolean(), nullable(String.class), anyCollection(), nullable(String.class)))
                 .willReturn(GENERATED_CONFIG);
 
         persistentCookieAuthModule = new PersistentCookieAuthModule(coreWrapper, persistentCookieWrapper);
@@ -97,7 +98,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         assertSame(GENERATED_CONFIG, config);
         verify(persistentCookieWrapper).generateConfig(eq("0"), eq("300"), anyBoolean(), anyString(),
-                anyBoolean(), anyBoolean(), anyString(), anyCollection(), anyString());
+                anyBoolean(), anyBoolean(), nullable(String.class), anyCollection(), nullable(String.class));
     }
 
     @Test
@@ -119,7 +120,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         assertSame(GENERATED_CONFIG, config);
         verify(persistentCookieWrapper).generateConfig(eq("60"), eq("0"), anyBoolean(), anyString(),
-                anyBoolean(), anyBoolean(), anyString(), anyCollection(), anyString());
+                anyBoolean(), anyBoolean(), nullable(String.class), anyCollection(), nullable(String.class));
     }
 
     @Test
@@ -143,7 +144,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         assertSame(GENERATED_CONFIG, config);
         verify(persistentCookieWrapper).generateConfig(eq("60"), eq("300"), anyBoolean(), anyString(),
-                anyBoolean(), anyBoolean(), anyString(), anyCollection(), anyString());
+                anyBoolean(), anyBoolean(), nullable(String.class), anyCollection(), nullable(String.class));
     }
 
 
@@ -163,7 +164,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         assertSame(GENERATED_CONFIG, config);
         verify(persistentCookieWrapper).generateConfig(anyString(), anyString(), eq(true), anyString(),
-                anyBoolean(), anyBoolean(), anyString(), anyCollection(), anyString());
+                anyBoolean(), anyBoolean(), nullable(String.class), anyCollection(), nullable(String.class));
     }
 
     @Test
