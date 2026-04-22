@@ -1,6 +1,6 @@
 /**
  * Copyright 2013 ForgeRock, Inc.
- *
+ * Portions copyright 2026 3A Systems, LLC. *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -26,8 +26,8 @@ import org.testng.annotations.Test;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 /**

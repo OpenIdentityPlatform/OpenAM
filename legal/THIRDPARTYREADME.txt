@@ -498,7 +498,7 @@ Copyright: Copyright (c) 2007 - The OWASP Foundation
 Version: freemarker-2.3.19.jar
 Copyright: Copyright (c) 2003 The Visigoth Software Society. All rights reserved.
 
-Version: ognl-2.6.9.jar
+Version: ognl-3.0.21.jar
 Copyright: Copyright (c) 1998-2004, Drew Davidson and Luke Blanshard
 
 Version: relaxngDatatype-20020414.jar

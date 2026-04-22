@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -22,7 +23,7 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
