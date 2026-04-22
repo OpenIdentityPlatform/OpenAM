@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.rest.query;
 
@@ -53,17 +54,17 @@ public class QueryByStringFilterConverterTest {
                 and(equalTo(new JsonPointer("param1"), "value1"), contains(new JsonPointer("param2"), "value2"));
         QueryByStringFilterConverter mockConverter = mock(QueryByStringFilterConverter.class);
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-        when(mockConverter.visitAndFilter(any(Void.class), anyList())).thenCallRealMethod();
+        when(mockConverter.visitAndFilter(nullable(Void.class), anyList())).thenCallRealMethod();
 
         // when
         filter.accept(mockConverter, null);
 
         // then
-        verify(mockConverter, times(1)).visitAndFilter(any(Void.class), captor.capture());
+        verify(mockConverter, times(1)).visitAndFilter(nullable(Void.class), captor.capture());
         assertThat(captor.getValue().size()).isEqualTo(2);
 
-        verify(mockConverter, times(1)).visitEqualsFilter(any(Void.class), any(JsonPointer.class), anyObject());
-        verify(mockConverter, times(1)).visitContainsFilter(any(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(1)).visitEqualsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(1)).visitContainsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
     }
 
     @Test
@@ -73,17 +74,17 @@ public class QueryByStringFilterConverterTest {
                 or(equalTo(new JsonPointer("param1"), "value1"), contains(new JsonPointer("param2"), "value2"));
         QueryByStringFilterConverter mockConverter = mock(QueryByStringFilterConverter.class);
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-        when(mockConverter.visitOrFilter(any(Void.class), anyList())).thenCallRealMethod();
+        when(mockConverter.visitOrFilter(nullable(Void.class), anyList())).thenCallRealMethod();
 
         // when
         filter.accept(mockConverter, null);
 
         // then
-        verify(mockConverter, times(1)).visitOrFilter(any(Void.class), captor.capture());
+        verify(mockConverter, times(1)).visitOrFilter(nullable(Void.class), captor.capture());
         assertThat(captor.getValue().size()).isEqualTo(2);
 
-        verify(mockConverter, times(1)).visitEqualsFilter(any(Void.class), any(JsonPointer.class), anyObject());
-        verify(mockConverter, times(1)).visitContainsFilter(any(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(1)).visitEqualsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(1)).visitContainsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
     }
 
     @Test
@@ -95,21 +96,21 @@ public class QueryByStringFilterConverterTest {
         QueryByStringFilterConverter mockConverter = mock(QueryByStringFilterConverter.class);
         ArgumentCaptor<List> andCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List> orCaptor = ArgumentCaptor.forClass(List.class);
-        when(mockConverter.visitAndFilter(any(Void.class), anyList())).thenCallRealMethod();
-        when(mockConverter.visitOrFilter(any(Void.class), anyList())).thenCallRealMethod();
+        when(mockConverter.visitAndFilter(nullable(Void.class), anyList())).thenCallRealMethod();
+        when(mockConverter.visitOrFilter(nullable(Void.class), anyList())).thenCallRealMethod();
 
         // when
         filter.accept(mockConverter, null);
 
         // then
-        verify(mockConverter, times(1)).visitAndFilter(any(Void.class), andCaptor.capture());
+        verify(mockConverter, times(1)).visitAndFilter(nullable(Void.class), andCaptor.capture());
         assertThat(andCaptor.getValue().size()).isEqualTo(2);
 
-        verify(mockConverter, times(2)).visitOrFilter(any(Void.class), orCaptor.capture());
+        verify(mockConverter, times(2)).visitOrFilter(nullable(Void.class), orCaptor.capture());
         assertThat(orCaptor.getAllValues().get(0).size()).isEqualTo(2);
         assertThat(orCaptor.getAllValues().get(1).size()).isEqualTo(2);
 
-        verify(mockConverter, times(2)).visitEqualsFilter(any(Void.class), any(JsonPointer.class), anyObject());
-        verify(mockConverter, times(2)).visitContainsFilter(any(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(2)).visitEqualsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
+        verify(mockConverter, times(2)).visitContainsFilter(nullable(Void.class), any(JsonPointer.class), anyObject());
     }
 }
