@@ -13,6 +13,7 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
+ * Portions copyright 2019-2026 3A Systems LLC.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -1249,7 +1250,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         		String pattern = crestQuery.getQueryId();
                 if (crestQuery.isEscapeQueryId()) {
-                    pattern =  Filter.escapeAssertionValue(pattern);
+                    pattern =  crestQuery.getEscapedQueryId();
                 }
                 first = Filter.valueOf(searchAttr + "=" + pattern);
         	}

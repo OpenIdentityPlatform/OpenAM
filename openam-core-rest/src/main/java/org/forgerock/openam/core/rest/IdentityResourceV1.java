@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2022-2025 3A Systems, LLC.
+ * Portions copyright 2022-2026 3A Systems, LLC.
  */
 package org.forgerock.openam.core.rest;
 
@@ -1209,7 +1209,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             if (queryId == null || queryId.isEmpty()) {
                 queryId = "*";
             }
-            List<String> users = identityServices.search(new CrestQuery(queryId, null, null, false),
+            List<String> users = identityServices.search(new CrestQuery(queryId),
                                                          getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.queryCollection :: QUERY performed on realm={}  by principalName={}", realm,

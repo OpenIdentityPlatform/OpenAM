@@ -25,6 +25,7 @@
  * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2021-2026 3A Systems LLC.
  */
 
 package com.sun.identity.idm.plugins.internal;
@@ -565,7 +566,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                     if (uidVals != null && !uidVals.isEmpty()) {
                         pattern = (String) uidVals.iterator().next();
                         if (crestQuery.isEscapeQueryId()) {
-                            pattern =  Filter.escapeAssertionValue(pattern);
+                            pattern = crestQuery.getEscapedQueryId();
                         }
                     } else {
                         // pattern is "*" and avPairs is not empty, so return
@@ -579,7 +580,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                 // If wild card is used for pattern, do a search else a lookup
                 if (pattern.indexOf('*') != -1) {
                     if (crestQuery.isEscapeQueryId()) {
-                        pattern =  Filter.escapeAssertionValue(pattern);
+                        pattern = crestQuery.getEscapedQueryId();
                     }
                     userRes = userConfig.getSubConfigNames(pattern);
                 } else {
