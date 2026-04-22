@@ -12,8 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2026 3A Systems, LLC. * Portions Copyrighted 2016 Agile Digital Engineering
-
+* Portions Copyrighted 2016 Agile Digital Engineering
  * Portions copyright 2026 3A Systems, LLC.
  */
 
