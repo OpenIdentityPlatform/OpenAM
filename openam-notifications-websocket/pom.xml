@@ -50,6 +50,7 @@
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>test-utils</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

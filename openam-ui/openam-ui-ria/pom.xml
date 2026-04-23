@@ -40,10 +40,6 @@
             <classifier>www</classifier>
         </dependency>
         <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.openidentityplatform.commons.ui.libs</groupId>
             <artifactId>selectize-non-standalone</artifactId>
             <version>0.12.1</version>
