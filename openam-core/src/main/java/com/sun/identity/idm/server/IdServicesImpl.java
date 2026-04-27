@@ -25,7 +25,7 @@
  * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2021 Open Identity Platform Community.
+ * Portions Copyrighted 2021-2026 3A Systems LLC.
  */
 
 package com.sun.identity.idm.server;
@@ -1667,7 +1667,7 @@ public class IdServicesImpl implements IdServices {
                for (Iterator items = repos.iterator(); items.hasNext();) {
                    IdRepo repo = (IdRepo) items.next();
                    if (repo instanceof SpecialRepo) {
-                       CrestQuery crestQuery = new CrestQuery("*", null, null, false);
+                       CrestQuery crestQuery = new CrestQuery("*");
                        RepoSearchResults res = repo.search(token, type, crestQuery,
                            0, 0, Collections.EMPTY_SET, false,
                            0, Collections.EMPTY_MAP, false);

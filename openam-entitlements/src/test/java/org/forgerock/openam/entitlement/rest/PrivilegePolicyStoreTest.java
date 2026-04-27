@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -44,7 +45,7 @@ import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anySetOf;
+import static org.mockito.ArgumentMatchers.anySetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 

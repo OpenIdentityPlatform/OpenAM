@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.core;
@@ -40,7 +40,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.openam.core.rest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -187,7 +187,7 @@ public class LoginAuthenticatorTest {
         verify(coreServicesWrapper).isNewRequest(authContextLocalWrapper);
         verify(coreServicesWrapper).getDomainNameByRequest(request);
         verify(coreServicesWrapper).isOrganizationActive("/ORG_DN");
-        verify(coreServicesWrapper).getExistingValidSSOToken(Matchers.<SessionID>anyObject());
+        verify(coreServicesWrapper).getExistingValidSSOToken(ArgumentMatchers.<SessionID>anyObject());
         verifyNoMoreInteractions(coreServicesWrapper);
     }
 
@@ -622,7 +622,7 @@ public class LoginAuthenticatorTest {
                 .indexValue(authIndexValue)
                 .sessionUpgrade(ssoTokenId);
 
-        given(coreServicesWrapper.getDomainNameByRequest(Matchers.<HttpServletRequest>anyObject()))
+        given(coreServicesWrapper.getDomainNameByRequest(ArgumentMatchers.<HttpServletRequest>anyObject()))
                 .willReturn("ORG_DN");
         given(coreServicesWrapper.getAuthContext((HttpServletRequest) anyObject(), eq((HttpServletResponse) null),
                 (SessionID) anyObject(), eq(true), eq(false))).willReturn(authContextLocalWrapper);
@@ -658,7 +658,7 @@ public class LoginAuthenticatorTest {
                 .indexValue(authIndexValue)
                 .sessionUpgrade(ssoTokenId);
 
-        given(coreServicesWrapper.getDomainNameByRequest(Matchers.<HttpServletRequest>anyObject()))
+        given(coreServicesWrapper.getDomainNameByRequest(ArgumentMatchers.<HttpServletRequest>anyObject()))
                 .willReturn("ORG_DN");
         given(coreServicesWrapper.getAuthContext((HttpServletRequest) anyObject(), eq((HttpServletResponse) null),
                 (SessionID) anyObject(), eq(false), eq(false))).willReturn(authContextLocalWrapper);

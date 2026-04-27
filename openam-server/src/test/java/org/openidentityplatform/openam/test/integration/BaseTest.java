@@ -11,26 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.test.integration;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.io.FileHandler;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -48,10 +53,11 @@ public abstract class BaseTest {
     @BeforeClass
     public void webdriverSetup() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox", "--verbose");
-        //options.addArguments("--remote-allow-origins=*", "--verbose");
+        options.addArguments("--remote-allow-origins=*","--headless", "--disable-dev-shm-usage", "--no-sandbox",
+                "--verbose", "--window-size=1920,1080", "--guest");
+//        options.addArguments("--remote-allow-origins=*", "--verbose", "--guest");
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
     @AfterClass
@@ -68,6 +74,15 @@ public abstract class BaseTest {
         if(testConfig.toFile().exists()) {
             System.out.println("delete existing config directory");
             FileUtils.deleteDirectory(testConfig.toFile());
+        }
+    }
+
+    //@AfterMethod //uncomment to debug
+    public void tearDown(ITestResult result) throws IOException {
+        if (result.getStatus() == ITestResult.FAILURE) {
+            WebElement element = driver.findElement(By.tagName("html"));
+            File source = element.getScreenshotAs(OutputType.FILE);
+            FileHandler.copy(source, new File("/tmp/element_screenshot.png"));
         }
     }
 
