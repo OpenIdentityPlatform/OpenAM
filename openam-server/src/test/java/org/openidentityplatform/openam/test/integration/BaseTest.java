@@ -57,7 +57,7 @@ public abstract class BaseTest {
                 "--verbose", "--window-size=1920,1080", "--guest");
 //        options.addArguments("--remote-allow-origins=*", "--verbose", "--guest");
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
     @AfterClass

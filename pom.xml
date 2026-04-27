@@ -161,6 +161,7 @@
       --add-opens java.base/jdk.internal.math=ALL-UNNAMED
       --add-opens java.base/jdk.internal.module=ALL-UNNAMED
       --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.util=ALL-UNNAMED
       --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
       --add-opens java.base/sun.nio.ch=ALL-UNNAMED
       --add-opens java.base/java.util.concurrent=ALL-UNNAMED
@@ -418,12 +419,6 @@
         <artifactId>opendj-core</artifactId>
         <version>${opendj.version}</version>
       </dependency>
-	  <dependency>
-		  <groupId>org.mockito</groupId>
-		  <artifactId>mockito-all</artifactId>
-		  <version>1.10.19</version>
-		  <scope>test</scope>
-		</dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>

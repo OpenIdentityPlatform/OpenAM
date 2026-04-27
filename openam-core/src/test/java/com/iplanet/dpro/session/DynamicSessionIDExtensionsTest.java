@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package com.iplanet.dpro.session;
 
@@ -35,6 +36,8 @@ public class DynamicSessionIDExtensionsTest {
         given(mockQuery.getSessionIDCorrector()).willReturn(mockCorrector);
 
         mockDelegate = mock(SessionIDExtensions.class);
+        given(mockDelegate.getPrimaryID()).willReturn("primaryId");
+        given(mockDelegate.getSiteID()).willReturn("siteId");
 
         dynamic = new DynamicSessionIDExtensions(mockQuery, mockDelegate);
     }

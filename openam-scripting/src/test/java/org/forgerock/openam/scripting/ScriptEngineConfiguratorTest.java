@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -21,8 +22,8 @@ import static org.forgerock.openam.scripting.ScriptConstants.ENGINE_CONFIGURATIO
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.mockito.ArgumentCaptor;

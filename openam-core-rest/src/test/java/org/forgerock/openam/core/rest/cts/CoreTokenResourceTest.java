@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.core.rest.cts;
 
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.*;
@@ -38,7 +39,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.util.promise.Promise;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -71,7 +72,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
-        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
+        given(mockSerialisation.deserialise(anyString(), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
         resource.createInstance(null, request);
@@ -85,6 +86,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
+        given(mockSerialisation.deserialise(anyString(), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
         doThrow(IllegalArgumentException.class).when(mockStore).create(any(Token.class));
 
         // When
@@ -159,7 +161,7 @@ public class CoreTokenResourceTest {
         JsonValue value = mock(JsonValue.class);
         given(value.toString()).willReturn("{ \"value\": \"test\" }");
         given(updateRequest.getContent()).willReturn(value);
-        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
+        given(mockSerialisation.deserialise(anyString(), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
         resource.updateInstance(null, "badger", updateRequest);
