@@ -69,6 +69,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.servlet.ServletContext;
 
 import org.forgerock.openam.ldap.LDAPRequests;
+import org.forgerock.openam.ldap.LDAPSchemaModificationException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Attribute;
@@ -280,7 +281,18 @@ class UserIdRepo {
             for (String file :  writeSchemaFiles(basedir, dbName, servletCtx, strFiles, userRepo, type)) {
                 Object[] params = {file};
                 SetupProgress.reportStart("emb.loadingschema", params);
-                LdifUtils.createSchemaFromLDIF(file, conn);
+                try {
+                    LdifUtils.createSchemaFromLDIF(file, conn);
+                    SetupProgress.reportEnd("emb.success", null);
+                } catch (IOException e) {
+                    SetupProgress.reportEnd("emb.failed", null);
+                    InstallLog.getInstance().write(
+                            "UserIdRepo.loadSchema:failed", e);
+                    if(!(e instanceof LDAPSchemaModificationException)) {
+                        throw e;
+                    }
+                }
+
                 SetupProgress.reportEnd("emb.success", null);
 
                 File f = new File(file);
