@@ -25,7 +25,7 @@
  * $Id: SessionRequestHandler.java,v 1.9 2009/04/02 04:11:44 ericow Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.service;
 
@@ -352,7 +352,7 @@ public class SessionRequestHandler implements RequestHandler {
                 break;
 
             case SessionRequest.AddSessionListener:
-                sessionService.addSessionListener(requesterSession, req.getNotificationURL());
+                sessionService.addSessionListener(this.clientToken, requesterSession, req.getNotificationURL());
                 break;
 
             case SessionRequest.SetProperty:
