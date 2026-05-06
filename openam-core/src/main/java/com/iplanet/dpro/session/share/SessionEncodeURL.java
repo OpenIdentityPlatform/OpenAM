@@ -25,7 +25,7 @@
  * $Id: SessionEncodeURL.java,v 1.7 2008/08/19 19:08:41 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.share;
 
@@ -274,7 +274,7 @@ public class SessionEncodeURL {
 
     /**
      * Encodes the specified URL by including the session ID in it. Similar to
-     * <code>javax.servlet.http.HttpServletResponse.encodeURL()</code>. session
+     * <code>jakarta.servlet.http.HttpServletResponse.encodeURL()</code>. session
      * ID will be only be included if the client needs encoding.
      * 
      * @param url URL to be rewritten with the session ID.

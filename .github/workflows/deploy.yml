@@ -62,7 +62,7 @@ jobs:
             -pl '-:openam-ui,-:openam-ui-ria,-:openam-ui-api,-:openam-ui-js-sdk' \
             -pl '-:openam-server-auth-ui,-:openam-doc-ssoadm-ref,-:openam-liberty-schema' \
             -pl '-:openam-example-api-descriptor,-:openam-example-clientsdk-cli,-:openam-example-clientsdk-war' \
-            -pl '-:bcpkix-shaded'
+            -pl '-:bcpkix-shaded' -pl '-:jato-shaded'
       - name: Upload artifacts OpenAM Distribution Kit, containing all distributable artifacts
         uses: actions/upload-artifact@v6
         with:
