@@ -131,7 +131,7 @@ public class StatelessOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(Session session, String url) throws SessionException {
+    public void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException {
         throw new UnsupportedOperationException();
     }
 

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -195,7 +196,7 @@ public class ClientSdkOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(Session session, String url) throws SessionException {
+    public void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException {
         SessionRequest sreq = new SessionRequest(
                 SessionRequest.AddSessionListener,
                 session.getSessionID().toString(), false);

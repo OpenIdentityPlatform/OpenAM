@@ -25,6 +25,7 @@
  * $Id: Session.java,v 1.25 2009/08/14 17:53:35 weisun2 Exp $
  *
  * Portions copyright 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2017-2026 3A Systems LLC
  */
 
 package com.iplanet.dpro.session;
@@ -33,12 +34,14 @@ import static org.forgerock.openam.session.SessionConstants.*;
 import static org.forgerock.openam.utils.Time.*;
 
 import java.net.URL;
+import java.security.AccessController;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.blacklist.BlacklistException;
 import org.forgerock.openam.blacklist.Blacklistable;
@@ -825,7 +828,7 @@ public class Session implements Blacklistable, AMSession{
         this.restriction = restriction;
     }
 
-    /**
+    /**restriction
       * populate context object with admin token
       * @exception SessionException
       * @param appSSOToken application SSO Token to bet set
@@ -862,9 +865,10 @@ public class Session implements Blacklistable, AMSession{
      */
     public void addInternalSessionListener() {
         try {
+            final SSOToken appSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             String url = WebtopNaming.getNotificationURL().toString();
             SessionOperations operations = sessionOperationStrategy.getOperation(sessionID);
-            operations.addSessionListener(this, url);
+            operations.addSessionListener(appSSOToken, this, url);
         } catch (Exception e) {
             sessionDebug.warning("error adding internal session listener", e);
         }

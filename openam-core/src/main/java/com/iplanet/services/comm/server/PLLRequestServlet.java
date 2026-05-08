@@ -25,7 +25,7 @@
  * $Id: PLLRequestServlet.java,v 1.9 2009/02/12 17:24:13 bina Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.services.comm.server;
 
@@ -96,7 +96,7 @@ public class PLLRequestServlet extends HttpServlet {
      * HttpServletRequest Reference to HttpServletRequest object @param
      * HttpServletResponse Reference to HttpServletResponse object
      * 
-     * @see javax.servlet.http.HttpServlet
+     * @see jakarta.servlet.http.HttpServlet
      */
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, java.io.IOException {

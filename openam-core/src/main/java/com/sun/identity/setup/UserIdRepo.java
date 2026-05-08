@@ -282,7 +282,6 @@ class UserIdRepo {
                 SetupProgress.reportStart("emb.loadingschema", params);
                 LdifUtils.createSchemaFromLDIF(file, conn);
                 SetupProgress.reportEnd("emb.success", null);
-
                 File f = new File(file);
                 f.delete();
             }
