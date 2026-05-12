@@ -359,3 +359,42 @@ jobs:
           http://openam3.example.org:8080/openam/json/authenticate | grep tokenId'
 
           docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"
+  ui-smoke-tests:
+    runs-on: ubuntu-latest
+    needs: build-docker
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Set Integration Test Environment
+        run: |
+          echo "127.0.0.1 idp.acme.org sp.mycompany.org" | sudo tee -a /etc/hosts
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers
+          restore-keys: ${{ runner.os }}-playwright-
+      - name: UI Smoke Tests (Playwright)
+        run: |
+          cd e2e
+          npm init -y
+          npm install @playwright/test
+          npx playwright install chromium --with-deps
+          npx playwright test --reporter=list
+        env:
+          OPENAM_IMAGE: localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+      - name: Upload failure artifacts
+        uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: failure-ui-java${{ matrix.java }}-${{ matrix.context_label }}-${{ matrix.samples_label }}
+          retention-days: 1
+          path: |
+            openidm/logs/**
+            e2e/playwright-report/**
+            e2e/test-results/**
