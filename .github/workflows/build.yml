@@ -380,6 +380,9 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers
           restore-keys: ${{ runner.os }}-playwright-
+      - name: Set env
+        run: |
+          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
       - name: UI Smoke Tests (Playwright)
         run: |
           cd e2e
@@ -388,7 +391,7 @@ jobs:
           npx playwright install chromium --with-deps
           npx playwright test --reporter=list
         env:
-          OPENAM_IMAGE: localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+          OPENAM_IMAGE: localhost:5000/${{ env.REPO_LC }}:${{ env.release_version }}
       - name: Upload failure artifacts
         uses: actions/upload-artifact@v7
         if: ${{ failure() }}
@@ -396,6 +399,5 @@ jobs:
           name: failure-ui-java${{ matrix.java }}-${{ matrix.context_label }}-${{ matrix.samples_label }}
           retention-days: 1
           path: |
-            openidm/logs/**
             e2e/playwright-report/**
             e2e/test-results/**
