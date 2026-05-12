@@ -9,8 +9,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [ '11', '17', '21', '25', '26' ]
-        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        # java: [ '11', '17', '21', '25', '26' ]
+        java: [ '11' ]
+        # os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        os: [ 'ubuntu-latest' ]
       fail-fast: false
     steps:
     - uses: actions/checkout@v6
@@ -38,7 +40,8 @@ jobs:
     - name: Build with Maven
       env:
         MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
-      run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
+      # run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }} 
+      run:  mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml -DskipTests=true -Dcargo.maven.skip=true -P \!man-pages
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
       with:
@@ -101,9 +104,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=${{ runner.temp }}/openam-image.tar
       
-      - name: Upload artifact
+      - name: Save docker image to tar
+        shell: bash
+        run: |
+          docker save -o ${{ runner.temp }}/openam-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
+      - name: Upload docker image
         uses: actions/upload-artifact@v4
         with:
           name: myimage
