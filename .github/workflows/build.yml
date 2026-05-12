@@ -108,6 +108,7 @@ jobs:
       - name: Save docker image to tar
         shell: bash
         run: |
+          docker pull localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
           docker save -o ${{ runner.temp }}/openam-image.tar localhost:5000/${GITHUB_REPOSITORY,,}:${{ env.release_version }}
       - name: Upload docker image
         uses: actions/upload-artifact@v4
