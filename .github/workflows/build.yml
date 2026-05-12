@@ -101,6 +101,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=docker,dest=${{ runner.temp }}/openam-image.tar
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: myimage
+          path: ${{ runner.temp }}/openam-image.tar
+
 
       - name: Docker test with an external OpenDJ identity store and an embedded OpenDJ configuration store
         shell: bash
@@ -371,20 +379,35 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
+
+      - name: Set env
+        run: |
+          export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
+          echo "release_version=$git_version_last" >> $GITHUB_ENV
+          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: myimage
+          path: ${{ runner.temp }}
+          
+      - name: Load Docker image
+        run: |
+          docker load --input ${{ runner.temp }}/openam-image.tar
+          docker image ls -a
+
       - name: Set Integration Test Environment
         run: |
           echo "127.0.0.1 idp.acme.org sp.mycompany.org" | sudo tee -a /etc/hosts
+
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers
           restore-keys: ${{ runner.os }}-playwright-
-      - name: Set env
-        run: |
-          export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
-          echo "release_version=$git_version_last" >> $GITHUB_ENV
-          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: UI Smoke Tests (Playwright)
         run: |
           cd e2e
