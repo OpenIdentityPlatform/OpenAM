@@ -382,6 +382,8 @@ jobs:
           restore-keys: ${{ runner.os }}-playwright-
       - name: Set env
         run: |
+          export git_version_last="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)" ; echo "last release: $git_version_last"
+          echo "release_version=$git_version_last" >> $GITHUB_ENV
           echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
       - name: UI Smoke Tests (Playwright)
         run: |
