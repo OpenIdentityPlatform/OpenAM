@@ -370,6 +370,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
+      - uses: actions/checkout@v6
       - name: Set Integration Test Environment
         run: |
           echo "127.0.0.1 idp.acme.org sp.mycompany.org" | sudo tee -a /etc/hosts
