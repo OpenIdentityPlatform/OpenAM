@@ -28,7 +28,6 @@ import { fileURLToPath } from "url";
  *   OPENAM_USERNAME   – login username                 (default: demo)
  *   OPENAM_PASSWORD   – login password                 (default: changeit)
  *   BOOTSTRAP_SCRIPT  – path to the startup script     (default: ./bootstrap.sh)
- *   SHUTDOWN_SCRIPT   – path to the shutdown script    (default: ./shutdown.sh)
  */
 
 // ─── __dirname equivalent in ESM ──────────────────────────────────────────────
@@ -39,11 +38,10 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const USERNAME = process.env.OPENAM_USERNAME ?? "demo";
 const PASSWORD = process.env.OPENAM_PASSWORD ?? "changeit";
 const BOOTSTRAP_SCRIPT = process.env.BOOTSTRAP_SCRIPT ?? "./bootstrap.sh";
-const SHUTDOWN_SCRIPT = process.env.SHUTDOWN_SCRIPT ?? "./shutdown.sh";
 
 // Derived URLs
-const LOGIN_URL = "http://sp.mycompany.org:8081/openam/spssoinit?metaAlias=/sp&idpEntityID=http%3A//idp.acme.org%3A8080/openam&RelayState=http%3A//sp.mycompany.org%3A8081/openam";
-const EXPECTED_IDP_URL_PATTERN = /idp\.acme\.org/;
+const LOGIN_URL = "http://sp.mycompany.org:8081/openam/spssoinit?metaAlias=/sp&idpEntityID=http%3A//openam.example.org%3A8080/openam&RelayState=http%3A//sp.mycompany.org%3A8081/openam";
+const EXPECTED_IDP_URL_PATTERN = /openam\.example\.org/;
 const EXPECTED_SP_URL_PATTERN = /sp\.mycompany\.org/;
 
 // ─── Selectors (XUI / LESS-based OpenAM UI) ───────────────────────────────────
@@ -74,13 +72,6 @@ test.beforeAll(() => {
   console.log(`\n▶ Running bootstrap script: ${scriptPath}`);
   execScript(scriptPath);
 
-});
-
-// ─── Shutdown – run once after all tests ────────────────────────────────────
-test.afterAll(() => {
-  const scriptPath = resolve(__dirname, SHUTDOWN_SCRIPT);
-  console.log(`\n▶ Running shutdown script: ${scriptPath}`);
-  execScript(scriptPath);
 });
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
