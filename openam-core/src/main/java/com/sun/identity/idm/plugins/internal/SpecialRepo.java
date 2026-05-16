@@ -566,7 +566,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                     if (uidVals != null && !uidVals.isEmpty()) {
                         pattern = (String) uidVals.iterator().next();
                         if (crestQuery.isEscapeQueryId()) {
-                            pattern = crestQuery.getEscapedQueryId();
+                            pattern = Filter.escapeAssertionValue(pattern);
                         }
                     } else {
                         // pattern is "*" and avPairs is not empty, so return
