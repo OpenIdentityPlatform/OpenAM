@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.classloader;
 
@@ -222,7 +222,7 @@ public class FAMClassLoader {
         "com.sun.xml.wss.",
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
-        "javax.xml.bind.",
+        "jakarta.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -262,7 +262,7 @@ public class FAMClassLoader {
         "com.sun.xml.wss.",
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
-        "javax.xml.bind.",
+        "jakarta.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -288,7 +288,7 @@ public class FAMClassLoader {
      * classLoader from loading.
      */
     public static String[] maskedResouces = new String[]{
-        "META-INF/services/javax.xml.bind.JAXBContext",
+        "META-INF/services/jakarta.xml.bind.JAXBContext",
         "META-INF/services",
         "/META-INF/services",
         "javax/xml/bind/",

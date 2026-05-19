@@ -12,16 +12,23 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.meta;
 
 import static org.testng.Assert.*;
+
+import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SAML2MetaUtilsTest {
     
@@ -66,6 +73,21 @@ public class SAML2MetaUtilsTest {
                 + PATH_SEPARATOR +  TEST_ENTITY;
         final String result = SAML2MetaUtils.getMetaAliasByUri(uri);
         assertEquals(result, PATH_SEPARATOR + TEST_SUB_REALM + PATH_SEPARATOR + TEST_ENTITY);        
-    }    
+    }
+
+    @Test
+    public void convertInputStreamToJaxbTest() throws Exception {
+        try(InputStream is = getClass().getClassLoader().getResourceAsStream("idp-extended.xml")) {
+            Object jaxb = SAML2MetaUtils.convertInputStreamToJAXB(is);
+            assertNotNull(jaxb);
+            assertTrue(jaxb instanceof EntityConfigElement);
+        }
+
+        try(InputStream is = getClass().getClassLoader().getResourceAsStream("idp-metadata.xml")) {
+            Object jaxb = SAML2MetaUtils.convertInputStreamToJAXB(is);
+            assertNotNull(jaxb);
+            assertTrue(jaxb instanceof EntityDescriptorElement);
+        }
+    }
     
 }

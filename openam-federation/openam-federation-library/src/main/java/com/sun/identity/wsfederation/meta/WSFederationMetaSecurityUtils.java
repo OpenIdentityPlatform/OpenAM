@@ -25,6 +25,7 @@
  * $Id: WSFederationMetaSecurityUtils.java,v 1.6 2009/10/28 23:58:59 exu Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.meta;
 
@@ -37,9 +38,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.sun.identity.saml.xmlsig.AMSignatureProvider;
+import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -466,7 +468,7 @@ public final class WSFederationMetaSecurityUtils {
         WSFederationMetaManager metaManager = new WSFederationMetaManager();
         FederationConfigElement config =
             metaManager.getEntityConfig(realm, entityID);
-        if (!config.isHosted()) {
+        if (!config.getValue().isHosted()) {
             String[] args = {entityID, realm};
             throw new WSFederationMetaException("entityNotHosted", args);
         }
@@ -483,7 +485,7 @@ public final class WSFederationMetaSecurityUtils {
             if ((certAlias == null) || (certAlias.length() == 0)) {
                 // remove key info
                 removeKeyDescriptor(desp);
-                setExtendedAttributeValue(idpConfig,
+                setExtendedAttributeValue(idpConfig.getValue(),
                         SAML2Constants.SIGNING_CERT_ALIAS, null);
             } else {
                 TokenSigningKeyInfoElement kde = getKeyDescriptor(certAlias);
@@ -491,7 +493,7 @@ public final class WSFederationMetaSecurityUtils {
                 // update extended metadata
                 Set value = new HashSet();
                 value.add(certAlias);
-                setExtendedAttributeValue(idpConfig,
+                setExtendedAttributeValue(idpConfig.getValue(),
                         SAML2Constants.SIGNING_CERT_ALIAS, value);
             }
         } else {
@@ -505,7 +507,7 @@ public final class WSFederationMetaSecurityUtils {
             if ((certAlias == null) || (certAlias.length() == 0)) {
                 // remove key info
                 removeKeyDescriptor(desp);
-                setExtendedAttributeValue(spConfig,
+                setExtendedAttributeValue(spConfig.getValue(),
                     SAML2Constants.SIGNING_CERT_ALIAS, null);
             } else {
                 TokenSigningKeyInfoElement kde = getKeyDescriptor(certAlias);
@@ -513,7 +515,7 @@ public final class WSFederationMetaSecurityUtils {
                 // update extended metadata
                 Set value = new HashSet();
                 value.add(certAlias);
-                setExtendedAttributeValue(spConfig,
+                setExtendedAttributeValue(spConfig.getValue(),
                         SAML2Constants.SIGNING_CERT_ALIAS, value);
             }
         }
@@ -526,22 +528,22 @@ public final class WSFederationMetaSecurityUtils {
         // NOTE : we only support one signing and one encryption key right now 
         // the code need to be change if we need to support multiple signing
         // and/or encryption keys in one entity
-        List objList = desp.getAny();
+        List objList = desp.getValue().getAny();
         for (Iterator iter = objList.iterator(); iter.hasNext();) {
             Object o = iter.next();
             if (o instanceof TokenSigningKeyInfoElement) {
                 iter.remove();
             }
         }
-        desp.getAny().add(0,newKey);
+        desp.getValue().getAny().add(0,newKey);
     }
 
     private static void removeKeyDescriptor(FederationElement desp) {
         // NOTE : we only support one signing and one encryption key right now 
         // the code need to be change if we need to support multiple signing
         // and/or encryption keys in one entity
-        List objList = desp.getAny();
-        for (Iterator iter = objList.iterator(); iter.hasNext();) {
+        List<Object> objList = desp.getValue().getAny();
+        for (Iterator<Object> iter = objList.iterator(); iter.hasNext();) {
             Object o = iter.next();
             if (o instanceof TokenSigningKeyInfoElement) {
                 iter.remove();
@@ -551,23 +553,19 @@ public final class WSFederationMetaSecurityUtils {
 
     private static void setExtendedAttributeValue(BaseConfigType config,
         String attrName, Set attrVal) throws WSFederationMetaException {
-        try {
-            List attributes = config.getAttribute();
-            for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-                AttributeType avp = (AttributeType)iter.next();
-                if (avp.getName().trim().equalsIgnoreCase(attrName)) {
-                     iter.remove();
-                }
+        List<AttributeElement> attributes = config.getAttribute();
+        for(Iterator<AttributeElement> iter = attributes.iterator(); iter.hasNext();) {
+            AttributeType avp = iter.next().getValue();
+            if (avp.getName().trim().equalsIgnoreCase(attrName)) {
+                 iter.remove();
             }
-            if (attrVal != null) {
-                ObjectFactory factory = new ObjectFactory();
-                AttributeType atype = factory.createAttributeType();
-                atype.setName(attrName);
-                atype.getValue().addAll(attrVal);
-                config.getAttribute().add(atype);
-            }
-        } catch (JAXBException e) {
-            throw new WSFederationMetaException(e);
+        }
+        if (attrVal != null) {
+            ObjectFactory factory = new ObjectFactory();
+            AttributeType atype = factory.createAttributeType();
+            atype.setName(attrName);
+            atype.getValue().addAll(attrVal);
+            config.getAttribute().add(factory.createAttributeElement(atype));
         }
     }
 

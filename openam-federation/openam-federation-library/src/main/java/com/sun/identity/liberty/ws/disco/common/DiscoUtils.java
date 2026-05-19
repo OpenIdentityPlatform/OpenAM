@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DiscoUtils.java,v 1.5 2008/06/25 05:47:12 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -39,19 +41,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.BitSet;
 
+import com.sun.identity.liberty.ws.disco.jaxb11.GenerateBearerTokenElement;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Statement;
-import com.sun.identity.liberty.ws.disco.DiscoveryException;
 import com.sun.identity.liberty.ws.disco.EncryptedResourceID;
 import com.sun.identity.liberty.ws.disco.ResourceOffering;
 import com.sun.identity.liberty.ws.disco.ResourceID;
 import com.sun.identity.liberty.ws.disco.Description;
 import com.sun.identity.liberty.ws.disco.jaxb.*;
-import com.sun.identity.liberty.ws.disco.jaxb11.*;
 import com.sun.identity.liberty.ws.disco.plugins.NameIdentifierMapper;
-import com.sun.identity.liberty.ws.disco.plugins.jaxb.*;
 import com.sun.identity.liberty.ws.interfaces.Authorizer;
-import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
 import com.sun.identity.liberty.ws.security.*;
 import com.sun.identity.liberty.ws.soapbinding.Message;
 import com.sun.identity.liberty.ws.soapbinding.ProviderHeader;
@@ -178,7 +177,7 @@ public class DiscoUtils extends DiscoSDKUtils {
         Iterator iter0 = directives.iterator();
         while(iter0.hasNext()) {
             Object directive = iter0.next();
-            List descIDRefs =
+            List<Object> descIDRefs =
                 ((DirectiveType) directive).getDescriptionIDRefs();
             if (directive instanceof EncryptResourceIDElement) {
                 debug.message("DiscoService: has encrypt D");

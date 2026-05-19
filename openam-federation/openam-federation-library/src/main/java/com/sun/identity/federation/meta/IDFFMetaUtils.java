@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDFFMetaUtils.java,v 1.5 2008/11/10 22:56:57 veiming Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -56,10 +58,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -190,7 +192,7 @@ public class IDFFMetaUtils {
             EntityDescriptorElement entityDescriptor) {
         SPDescriptorType spDescriptor = null;
         if (entityDescriptor != null) {
-            List spList = entityDescriptor.getSPDescriptor();
+            List spList = entityDescriptor.getValue().getSPDescriptor();
             if (spList != null && !spList.isEmpty()) {
                 Iterator spIterator = spList.iterator();
                 while (spIterator.hasNext()) {
@@ -216,7 +218,7 @@ public class IDFFMetaUtils {
             EntityDescriptorElement entityDescriptor) {
         IDPDescriptorType idpDescriptor = null;
         if (entityDescriptor != null) {
-            List idpList = entityDescriptor.getIDPDescriptor();
+            List idpList = entityDescriptor.getValue().getIDPDescriptor();
             if (idpList != null && !idpList.isEmpty()) {
                 Iterator idpIterator = idpList.iterator();
                 while (idpIterator.hasNext()) {
@@ -243,7 +245,7 @@ public class IDFFMetaUtils {
             EntityConfigElement entityConfig) {
         SPDescriptorConfigElement spEntityConfig = null;
         if (entityConfig != null) {
-            List spCfgList = entityConfig.getSPDescriptorConfig();
+            List spCfgList = entityConfig.getValue().getSPDescriptorConfig();
             if (spCfgList != null && !spCfgList.isEmpty()) {
                 Iterator spCfgIterator = spCfgList.iterator();
                 while (spCfgIterator.hasNext()) {
@@ -270,7 +272,7 @@ public class IDFFMetaUtils {
             EntityConfigElement entityConfig) {
         IDPDescriptorConfigElement idpEntityConfig = null;
         if (entityConfig != null) {
-            List idpCfgList = entityConfig.getIDPDescriptorConfig();
+            List idpCfgList = entityConfig.getValue().getIDPDescriptorConfig();
             if (idpCfgList != null && !idpCfgList.isEmpty()) {
                 Iterator idpCfgIterator = idpCfgList.iterator();
                 while (idpCfgIterator.hasNext()) {
@@ -351,7 +353,7 @@ public class IDFFMetaUtils {
             IDPDescriptorConfigElement idpConfig =
                 metaManager.getIDPDescriptorConfig(realm, idpEntityID);
             if (idpConfig != null) {
-                Map attributes = getAttributes(idpConfig);
+                Map attributes = getAttributes(idpConfig.getValue());
                 returnVal = getFirstAttributeValue(attributes, attrName);
             }
         } catch (IDFFMetaException e) {
@@ -482,10 +484,10 @@ public class IDFFMetaUtils {
             try {
                 if (providerRole.equalsIgnoreCase(IFSConstants.IDP)) {
                     providerConfig = metaManager.getIDPDescriptorConfig(
-                        realm, providerId);
+                        realm, providerId).getValue();
                 } else if (providerRole.equalsIgnoreCase(IFSConstants.SP)) {
                     providerConfig = metaManager.getSPDescriptorConfig(
-                        realm, providerId);
+                        realm, providerId).getValue();
                 }
             } catch (IDFFMetaException ie) {
                 debug.error(

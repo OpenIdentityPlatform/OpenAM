@@ -25,7 +25,7 @@
  * $Id: QueryHandlerServlet.java,v 1.9 2009/09/22 22:49:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.soapbinding;
 
@@ -418,7 +418,7 @@ public class QueryHandlerServlet extends HttpServlet {
                     pepEntityID);
             
             EncInfo encInfo = null;
-            boolean wantAssertionSigned=pepDescriptor.isWantAssertionsSigned();
+            boolean wantAssertionSigned=pepDescriptor.getValue().isWantAssertionsSigned();
             
             if (debug.messageEnabled()) {
                 debug.message(classMethod +

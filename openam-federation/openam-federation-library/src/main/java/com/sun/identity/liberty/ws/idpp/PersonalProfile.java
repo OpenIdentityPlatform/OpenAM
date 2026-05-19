@@ -25,6 +25,7 @@
  * $Id: PersonalProfile.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 
@@ -39,7 +40,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Iterator;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;

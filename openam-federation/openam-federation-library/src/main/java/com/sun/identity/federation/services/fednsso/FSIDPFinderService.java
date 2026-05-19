@@ -24,7 +24,7 @@
  *
  * $Id: FSIDPFinderService.java,v 1.4 2008/06/25 05:46:58 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -128,7 +128,7 @@ public class FSIDPFinderService extends HttpServlet {
         try {
             if (metaManager != null ) {
                 hostConfig = metaManager.getIDPDescriptorConfig(
-                    realm, entityID);
+                    realm, entityID).getValue();
                 if (hostConfig != null) {
                     hostMetaAlias = hostConfig.getMetaAlias();
                 }
@@ -242,7 +242,7 @@ public class FSIDPFinderService extends HttpServlet {
                 List cotList = null;
                 if (metaManager != null) {
                     BaseConfigType spConfig = 
-                        metaManager.getSPDescriptorConfig(realm, entityID);
+                        metaManager.getSPDescriptorConfig(realm, entityID).getValue();
                     cotList = IDFFMetaUtils.getAttributeValueFromConfig(
                         spConfig, IFSConstants.COT_LIST);
                 }
@@ -346,7 +346,7 @@ public class FSIDPFinderService extends HttpServlet {
             IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
             idpDescriptor = metaManager.getIDPDescriptor(realm, hostProviderID);
             idpConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostProviderID);
+                realm, hostProviderID).getValue();
         } catch (Exception e) {
             FSUtils.debug.error("FSIDPFinderServer.getLoginURL : exception "+
                 "while retrieving meta config", e);

@@ -25,6 +25,7 @@
  * $Id: FSAssertionManager.java,v 1.12 2009/08/03 18:18:36 bigfatrat Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 
 package com.sun.identity.federation.services;
@@ -187,7 +188,7 @@ public final class FSAssertionManager {
         artifactTimeout = IFSConstants.ARTIFACT_TIMEOUT_DEFAULT * 1000;
         try {
             BaseConfigType idpConfig = FSUtils.getIDFFMetaManager().
-                getIDPDescriptorConfig(realm, hostEntityId);
+                getIDPDescriptorConfig(realm, hostEntityId).getValue();
             attributes = IDFFMetaUtils.getAttributes(idpConfig);
             try {
                 cleanupInterval = Integer.parseInt(
@@ -490,7 +491,7 @@ public final class FSAssertionManager {
             BaseConfigType idpConfig = null;
             try {
                 idpConfig = metaManager.getIDPDescriptorConfig(
-                    realm, hostEntityId);
+                    realm, hostEntityId).getValue();
             } catch (IDFFMetaException e) {
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(

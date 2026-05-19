@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDFFProviderManager.java,v 1.3 2008/06/25 05:47:24 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -124,9 +126,9 @@ public class IDFFProviderManager implements ProviderManager {
         }
 
         BaseConfigType baseConfig =
-            IDFFMetaUtils.getSPDescriptorConfig(entityConfig);
+            IDFFMetaUtils.getSPDescriptorConfig(entityConfig).getValue();
         if (baseConfig == null) {
-            baseConfig = IDFFMetaUtils.getIDPDescriptorConfig(entityConfig);
+            baseConfig = IDFFMetaUtils.getIDPDescriptorConfig(entityConfig).getValue();
             if (baseConfig == null) {
                 return false;
             }
@@ -184,10 +186,10 @@ public class IDFFProviderManager implements ProviderManager {
         BaseConfigType providerConfig = null;
         try {
             providerConfig = idffMetaManager.getSPDescriptorConfig(
-                ROOT_REALM, providerID);
+                ROOT_REALM, providerID).getValue();
             if (providerConfig == null) {
                 providerConfig = idffMetaManager.
-                    getIDPDescriptorConfig(ROOT_REALM, providerID);
+                    getIDPDescriptorConfig(ROOT_REALM, providerID).getValue();
             }
         } catch (IDFFMetaException imex) {
             ProviderUtil.debug.error("IDFFProviderManager.getDecryptionKey",
@@ -210,10 +212,10 @@ public class IDFFProviderManager implements ProviderManager {
         BaseConfigType config = null;
         try {
             config = idffMetaManager.getSPDescriptorConfig(
-                ROOT_REALM, providerID);
+                ROOT_REALM, providerID).getValue();
             if (config == null) {
                 config = idffMetaManager.getIDPDescriptorConfig(
-                    ROOT_REALM, providerID);
+                    ROOT_REALM, providerID).getValue();
             }
         } catch(IDFFMetaException imex) {
             ProviderUtil.debug.error(

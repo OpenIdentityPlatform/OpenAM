@@ -25,7 +25,7 @@
  * $Id: FSPreLogin.java,v 1.6 2008/08/19 19:11:04 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.login;
@@ -259,11 +259,11 @@ public class FSPreLogin {
                 if (hostedProviderRole.equals(IFSConstants.SP)) {
                     hostedConfig =
                         metaManager.getSPDescriptorConfig(
-                            realm, hostedEntityID);
+                            realm, hostedEntityID).getValue();
                 } else if (hostedProviderRole.equals(IFSConstants.IDP)) {
                     hostedConfig =
                         metaManager.getIDPDescriptorConfig(
-                            realm, hostedEntityID);
+                            realm, hostedEntityID).getValue();
                 }
             }
 

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAccountManager.java,v 1.5 2008/06/25 05:46:39 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -87,12 +89,12 @@ public class FSAccountManager {
             BaseConfigType hostedConfig = null;
             if (role != null && role.equalsIgnoreCase(IFSConstants.IDP)) {
                 hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, hostedEntityID);
+                    metaManager.getIDPDescriptorConfig(realm, hostedEntityID).getValue();
             } else if (role != null &&
                 role.equalsIgnoreCase(IFSConstants.SP))
             {
                 hostedConfig = 
-                    metaManager.getSPDescriptorConfig(realm, hostedEntityID);
+                    metaManager.getSPDescriptorConfig(realm, hostedEntityID).getValue();
                 SP_PROVIDER_ID = hostedEntityID;
                 SP_FILTER = "|" + SP_PROVIDER_ID + "|";
             }

@@ -25,7 +25,7 @@
  * $Id: IDPArtifactResolution.java,v 1.13 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -333,7 +333,7 @@ public class IDPArtifactResolution {
                 return SOAPCommunicator.getInstance().createSOAPFault(SAML2Constants.CLIENT_FAULT,
                         "ArtifactResolveNotSigned", null);
             }
-            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODescriptor, spEntityID,
+            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODescriptor.getValue(), spEntityID,
                     SAML2Constants.SP_ROLE);
             if (!artResolve.isSignatureValid(verificationCerts)) {
                 SAML2Utils.debug.error(classMethod +
@@ -469,7 +469,7 @@ public class IDPArtifactResolution {
         }
         
         // check if need to sign the assertion
-        boolean signAssertion = spSSODescriptor.isWantAssertionsSigned();
+        boolean signAssertion = spSSODescriptor.getValue().isWantAssertionsSigned();
         if (signAssertion) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod +

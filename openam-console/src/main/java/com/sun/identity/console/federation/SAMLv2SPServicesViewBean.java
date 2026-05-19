@@ -23,7 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SAMLv2SPServicesViewBean.java,v 1.5 2008/12/11 18:51:51 babysunil Exp $
- *
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation;
@@ -161,15 +162,15 @@ public class SAMLv2SPServicesViewBean extends SAMLv2Base {
             AssertionConsumerServiceElement acsElem =
                 (AssertionConsumerServiceElement) assertionConServices.get(i);
             tblAssertionConsumerModel.setValue(
-                    TBL_DATA_DEFAULT, String.valueOf(acsElem.isIsDefault()));
+                    TBL_DATA_DEFAULT, String.valueOf(acsElem.getValue().isIsDefault()));
             tblAssertionConsumerModel.setValue(TBL_DATA_TYPE, (
-                    (acsElem.getBinding()).substring(37)));
+                    (acsElem.getValue().getBinding()).substring(37)));
             tblAssertionConsumerModel.setValue(TBL_DATA_LABEL, (
-                    (acsElem.getBinding()).substring(37)));
+                    (acsElem.getValue().getBinding()).substring(37)));
             tblAssertionConsumerModel.setValue(TBL_DATA_LOCATION, 
-                    acsElem.getLocation());
+                    acsElem.getValue().getLocation());
             tblAssertionConsumerModel.setValue(TBL_DATA_INDEX, 
-                    Integer.toString(acsElem.getIndex()));
+                    Integer.toString(acsElem.getValue().getIndex()));
         }
         
     }
@@ -251,10 +252,10 @@ public class SAMLv2SPServicesViewBean extends SAMLv2Base {
                 setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                         e.getMessage());
             }
-            acsElem.setBinding(binding);
-            acsElem.setIsDefault(theValue);
-            acsElem.setIndex(Integer.parseInt(index));
-            acsElem.setLocation(location);
+            acsElem.getValue().setBinding(binding);
+            acsElem.getValue().setIsDefault(theValue);
+            acsElem.getValue().setIndex(Integer.parseInt(index));
+            acsElem.getValue().setLocation(location);
             asconsServiceList.add(acsElem);
             
         }

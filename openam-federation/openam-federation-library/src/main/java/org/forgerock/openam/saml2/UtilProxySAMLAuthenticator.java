@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.saml2;
 
@@ -158,8 +158,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             SAML2Utils.debug.error(classMethod, sme);
         }
 
-        if (idpSSODescriptor.isWantAuthnRequestsSigned()
-                || (spSSODescriptor != null && spSSODescriptor.isAuthnRequestsSigned())) {
+        if (idpSSODescriptor.getValue().isWantAuthnRequestsSigned()
+                || (spSSODescriptor != null && spSSODescriptor.getValue().isAuthnRequestsSigned())) {
             // need to verify the query string containing authnRequest
             if (StringUtils.isBlank(data.getSpEntityID())) {
                 throw new ClientFaultException(data.getIdpAdapter(), INVALID_SAML_REQUEST);
@@ -170,7 +170,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 throw new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
             }
 
-            Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(spSSODescriptor, data.getSpEntityID(),
+            Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(spSSODescriptor.getValue(), data.getSpEntityID(),
                     SAML2Constants.SP_ROLE);
 
             try {
@@ -192,20 +192,20 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 // In ECP profile, sp doesn't know idp.
                 if (!isFromECP) {
                     // verify Destination
-                    List<SingleSignOnServiceElement> ssoServiceList = idpSSODescriptor.getSingleSignOnService();
+                    List<SingleSignOnServiceElement> ssoServiceList = idpSSODescriptor.getValue().getSingleSignOnService();
                     SingleSignOnServiceElement  endPoint = SPSSOFederate.getSingleSignOnServiceEndpoint(ssoServiceList, binding);
-                    if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                    if (endPoint == null || StringUtils.isEmpty(endPoint.getValue().getLocation())) {
                         SAML2Utils.debug
                                 .error("{} authn request unable to get endpoint location for IdpEntity: {}  MetaAlias: {} ",
                                         classMethod, data.getIdpEntityID(), data.getIdpMetaAlias());
                         throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
                     }
                     if (!SAML2Utils
-                            .verifyDestination(data.getAuthnRequest().getDestination(), endPoint.getLocation())) {
+                            .verifyDestination(data.getAuthnRequest().getDestination(), endPoint.getValue().getLocation())) {
                         SAML2Utils.debug
                                 .error("{} authn request destination verification failed for IdpEntity: {}  MetaAlias: {} Destination: {}  Location: {}",
                                         classMethod, data.getIdpEntityID(), data.getIdpMetaAlias(),
-                                        data.getAuthnRequest().getDestination(), endPoint.getLocation());
+                                        data.getAuthnRequest().getDestination(), endPoint.getValue().getLocation());
                         throw new ClientFaultException(data.getIdpAdapter(), "invalidDestination");
                     }
                 }

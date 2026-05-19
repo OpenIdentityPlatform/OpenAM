@@ -25,7 +25,7 @@
  * $Id: SPSSOFederate.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -250,21 +250,21 @@ public class SPSSOFederate {
             }
 
             String binding = getParameter(paramsMap, SAML2Constants.REQ_BINDING);
-            List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
+            List<SingleSignOnServiceElement> ssoServiceList = idpsso.getValue().getSingleSignOnService();
             final SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, binding);
 
-            if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+            if (endPoint == null || StringUtils.isEmpty(endPoint.getValue().getLocation())) {
                 String[] data = { idpEntityID };
                 LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, null);
                 throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
             }
 
-            String ssoURL = endPoint.getLocation();
+            String ssoURL = endPoint.getValue().getLocation();
             SAML2Utils.debug.message("SPSSOFederate: SingleSignOnService URL : {}", ssoURL);
             if (binding == null) {
                 SAML2Utils.debug.message("SPSSOFederate: reqBinding is null using endpoint binding: {} ",
-                        endPoint.getBinding());
-                binding = endPoint.getBinding();
+                        endPoint.getValue().getBinding());
+                binding = endPoint.getValue().getBinding();
                 if (binding == null) {
                     String[] data = { idpEntityID };
                     LogUtil.error(Level.INFO, LogUtil.NO_RETURN_BINDING, data, null);
@@ -374,7 +374,7 @@ public class SPSSOFederate {
         StringBuilder redirectURL =
                 new StringBuilder().append(ssoURL).append(ssoURL.contains("?") ? "&" : "?");
         // sign the query string
-        if (idpsso.isWantAuthnRequestsSigned() || spsso.isAuthnRequestsSigned()) {
+        if (idpsso.getValue().isWantAuthnRequestsSigned() || spsso.getValue().isAuthnRequestsSigned()) {
             String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
             String signedQueryStr = signQueryString(queryString.toString(), certAlias);
             redirectURL.append(signedQueryStr);
@@ -412,7 +412,7 @@ public class SPSSOFederate {
         Map spConfigAttrsMap = null;
 
         if (spEntityCfg != null) {
-            spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+            spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
         }
 
         return spConfigAttrsMap;
@@ -445,7 +445,7 @@ public class SPSSOFederate {
                                             Map spConfigAttrsMap, AuthnRequest authnRequest)
             throws SAML2Exception {
 
-        if (idpsso.isWantAuthnRequestsSigned() || spsso.isAuthnRequestsSigned()) {
+        if (idpsso.getValue().isWantAuthnRequestsSigned() || spsso.getValue().isAuthnRequestsSigned()) {
             String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
             signAuthnRequest(certAlias, authnRequest);
         }
@@ -503,7 +503,7 @@ public class SPSSOFederate {
                 sm.getSPSSOConfig(realm,spEntityID);
             Map spConfigAttrsMap=null;
             if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
             }
              // get SPSSODescriptor
             SPSSODescriptorElement spsso = 
@@ -586,12 +586,12 @@ public class SPSSOFederate {
                                 realm, idpEntityID, SAML2Constants.IDP_ROLE,
                                 SAML2Constants.ENTITY_DESCRIPTION);
                             idpEntry.setName(description);
-                            List<SingleSignOnServiceElement> ssoServiceList = idpDesc.getSingleSignOnService();
+                            List<SingleSignOnServiceElement> ssoServiceList = idpDesc.getValue().getSingleSignOnService();
                             SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, SAML2Constants.SOAP);
-                            if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+                            if (endPoint == null || StringUtils.isEmpty(endPoint.getValue().getLocation())) {
                                 throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
                             }
-                            String ssoURL = endPoint.getLocation();
+                            String ssoURL = endPoint.getValue().getLocation();
                             SAML2Utils.debug.message("SPSSOFederate.initiateECPRequest URL : {}", ssoURL);
                             idpEntry.setLoc(ssoURL);
                             if (idpEntries == null) {
@@ -605,7 +605,7 @@ public class SPSSOFederate {
                             .createIDPList();
                         idpList.setIDPEntries(idpEntries);
                         ecpRequest.setIDPList(idpList);
-                        Map attrs = SAML2MetaUtils.getAttributes(spEntityCfg);
+                        Map attrs = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
                         List values = (List)attrs.get(
                             SAML2Constants.ECP_REQUEST_IDP_LIST_GET_COMPLETE);
                         if ((values != null) && (!values.isEmpty())) {
@@ -965,11 +965,11 @@ public class SPSSOFederate {
         SingleSignOnServiceElement preferredEndpoint = null;
         boolean noPreferredBinding = StringUtils.isEmpty(binding);
         for (SingleSignOnServiceElement endpoint : ssoServiceList) {
-            if (noPreferredBinding && (SAML2Constants.HTTP_REDIRECT.equals(endpoint.getBinding())
-                    || SAML2Constants.HTTP_POST.equals(endpoint.getBinding()))) {
+            if (noPreferredBinding && (SAML2Constants.HTTP_REDIRECT.equals(endpoint.getValue().getBinding())
+                    || SAML2Constants.HTTP_POST.equals(endpoint.getValue().getBinding()))) {
                 preferredEndpoint = endpoint;
                 break;
-            } else if (binding.equals(endpoint.getBinding())) {
+            } else if (binding.equals(endpoint.getValue().getBinding())) {
                 preferredEndpoint = endpoint;
                 break;
             }
@@ -990,21 +990,21 @@ public class SPSSOFederate {
                 new StringBuffer().append(SAML2Constants.BINDING_PREFIX)
                                   .append(binding).toString();
         }
-        List acsList = spsso.getAssertionConsumerService();
+        List acsList = spsso.getValue().getAssertionConsumerService();
         String acsURL=null;
         if (acsList != null && !acsList.isEmpty()) {
             Iterator ac = acsList.iterator();
             while (ac.hasNext()) {
                 AssertionConsumerServiceElement ace =
                     (AssertionConsumerServiceElement) ac.next();
-                if ((ace != null && ace.isIsDefault()) && 
+                if ((ace != null && ace.getValue().isIsDefault()) &&
                   (responseBinding == null || responseBinding.length() ==0 )) {
-                    acsURL = ace.getLocation();
-                    responseBinding = ace.getBinding();
+                    acsURL = ace.getValue().getLocation();
+                    responseBinding = ace.getValue().getBinding();
                     break;
                 } else if ((ace != null) &&
-                       (ace.getBinding().equals(responseBinding))) {
-                    acsURL = ace.getLocation();
+                       (ace.getValue().getBinding().equals(responseBinding))) {
+                    acsURL = ace.getValue().getLocation();
                     break;
                 }
             }
@@ -1165,7 +1165,7 @@ public class SPSSOFederate {
             EntityDescriptorElement ed = sm.getEntityDescriptor(realm,entityID);
             if (ed != null) {
                  com.sun.identity.saml2.jaxb.metadata.ExtensionsType ext =
-                                    ed.getExtensions();
+                                    ed.getValue().getExtensions();
                 if (ext != null) {
                     extensionsList = ext.getAny();
                 }

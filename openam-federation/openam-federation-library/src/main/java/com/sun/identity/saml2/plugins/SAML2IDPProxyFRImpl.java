@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -59,6 +59,7 @@ import java.util.StringTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -143,7 +144,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                     sm.getSPSSOConfig(realm, authnRequest.getIssuer().getValue());
             Map spConfigAttrsMap = null;
             if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
             }
 
             // Check if the local configuration of the remote SP wants to use
@@ -341,7 +342,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                     debugMessage(classMethod, "IDP is: " + idp);
                     idpDesc = SAML2Utils.getSAML2MetaManager().getEntityDescriptor(realm, idp);
                     if (idpDesc != null) {
-                        ExtensionsType et = idpDesc.getExtensions();
+                        ExtensionsType et = idpDesc.getValue().getExtensions();
                         if (et != null) {
                             debugMessage(classMethod, "Extensions found for idp: " + idp);
                             List idpExtensions = et.getAny();
@@ -352,21 +353,21 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                                     EntityAttributesElement eael = (EntityAttributesElement) idpExtensionsI.next();
                                     if (eael != null) {
                                         debugMessage(classMethod, "Entity Attributes found for idp: " + idp);
-                                        List attribL = eael.getAttributeOrAssertion();
+                                        List<JAXBElement<?>> attribL = eael.getValue().getAttributeOrAssertion();
                                         if (attribL != null || !attribL.isEmpty()) {
                                             Iterator attrI = attribL.iterator();
                                             while (attrI.hasNext()) {
                                                 AttributeElement ae = (AttributeElement) attrI.next();
                                                 // TODO: Verify what type of element this is (Attribute or assertion)
                                                 // For validation purposes
-                                                List av = ae.getAttributeValue();
+                                                List<AttributeValueElement> av = ae.getValue().getAttributeValue();
                                                 if (av != null || !av.isEmpty()) {
                                                     debugMessage(classMethod, "Attribute Values found for idp: " + idp);
-                                                    Iterator avI = av.iterator();
+                                                    Iterator<AttributeValueElement> avI = av.iterator();
                                                     while (avI.hasNext()) {
-                                                        AttributeValueElement ave = (AttributeValueElement) avI.next();
-                                                        if (ave != null) {
-                                                            List contentL = ave.getContent();
+                                                        AttributeValueElement ave = avI.next();
+                                                        if (ave != null && ave.getValue() instanceof List) {
+                                                            List contentL = (List)ave.getValue();
                                                             debugMessage(classMethod, "Attribute Value Elements found for idp: " + idp
                                                                     + "-->" + contentL);
                                                             if (contentL != null || !contentL.isEmpty()) {
@@ -625,7 +626,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
 
             IDPSSOConfigElement config = SAML2Utils.getSAML2MetaManager().getIDPSSOConfig(
                                           realm, hostEntityId);
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
             List value = (List) attrs.get(attrName);
             if (value != null && value.size() != 0) {
                 result = value;

@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 package com.sun.identity.liberty.ws.disco.plugins;
 
@@ -43,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.liberty.ws.disco.common.DiscoConstants;
@@ -57,8 +58,7 @@ import com.sun.identity.liberty.ws.disco.jaxb.InsertEntryType;
 import com.sun.identity.liberty.ws.disco.jaxb.RemoveEntryType;
 import com.sun.identity.liberty.ws.disco.jaxb.ResourceIDType;
 import com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingType;
-import
-    com.sun.identity.liberty.ws.disco.jaxb.QueryType.RequestedServiceTypeType;
+import com.sun.identity.liberty.ws.disco.jaxb.QueryType.RequestedServiceType;
 import com.sun.identity.liberty.ws.disco.jaxb11.GenerateBearerTokenElement;
 import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
@@ -104,10 +104,10 @@ public class DiscoEntryHandlerImplUtils {
                 entry = (DiscoEntryElement)
                     DiscoUtils.getDiscoUnmarshaller().unmarshal(
                         XMLUtils.createSAXSource(new InputSource(new StringReader(entryStr))));
-                entryID = entry.getResourceOffering().getEntryID();
+                entryID = entry.getValue().getResourceOffering().getEntryID();
                 if ((entryID == null) || (entryID.length() == 0)) {
                     entryID = SAMLUtils.generateID();
-                    entry.getResourceOffering().setEntryID(entryID);
+                    entry.getValue().getResourceOffering().setEntryID(entryID);
                     needStore = true;
                 }
                 discoEntries.put(entryID, entry);
@@ -191,7 +191,7 @@ public class DiscoEntryHandlerImplUtils {
                 String curKey = (String) i.next();
                 DiscoEntryElement cur =
                     (DiscoEntryElement) discoEntries.get(curKey);
-                ResourceOfferingType offering = cur.getResourceOffering();
+                ResourceOfferingType offering = cur.getValue().getResourceOffering();
                 String serviceType =
                     offering.getServiceInstance().getServiceType();
                 List options = null;
@@ -201,8 +201,8 @@ public class DiscoEntryHandlerImplUtils {
 
                 Iterator j = reqServiceTypes.iterator();
                 while (j.hasNext()) {
-                    RequestedServiceTypeType curReqType =
-                        (RequestedServiceTypeType)j.next();
+                    RequestedServiceType curReqType =
+                        (RequestedServiceType)j.next();
                     String requestedServiceType = curReqType.getServiceType();
                     if (!requestedServiceType.equals(serviceType)) {
                         continue;
@@ -325,15 +325,8 @@ public class DiscoEntryHandlerImplUtils {
         List newEntryIDs = new LinkedList();
         while (i.hasNext()) {
             insertEntry = (InsertEntryType) i.next();
-            try {
-                de = DiscoUtils.getDiscoEntryFactory().
-                    createDiscoEntryElement();
-            } catch (JAXBException je) {
-                debug.error(
-                    "DiscoEntryHandlerImplUtils.handleInserts: couldn't "
-                    + "create DiscoEntry: ", je);
-                return insertResults;
-            }
+            de = DiscoUtils.getDiscoEntryFactory().
+                createDiscoEntryElement(new InsertEntryType());
             resOff = insertEntry.getResourceOffering();
             String newEntryID = SAMLUtils.generateID();
             if (debug.messageEnabled()) {
@@ -342,7 +335,7 @@ public class DiscoEntryHandlerImplUtils {
             }
             resOff.setEntryID(newEntryID);
             newEntryIDs.add(newEntryID);
-            de.setResourceOffering(resOff);
+            de.getValue().setResourceOffering(resOff);
 
             List dirs = insertEntry.getAny();
             if ((dirs != null) && !dirs.isEmpty()) {
@@ -395,7 +388,7 @@ public class DiscoEntryHandlerImplUtils {
                         return insertResults;
                     }
                 }
-                de.getAny().addAll(dirs);
+                de.getValue().getAny().addAll(dirs);
             }
 
             if (!discoEntries.add(de)) {
@@ -447,7 +440,7 @@ public class DiscoEntryHandlerImplUtils {
                 entry = (DiscoEntryElement)
                          DiscoUtils.getDiscoUnmarshaller().unmarshal(
                         XMLUtils.createSAXSource(new InputSource(new StringReader(entryStr))));
-                resOff = entry.getResourceOffering();
+                resOff = entry.getValue().getResourceOffering();
                 entryID = resOff.getEntryID();
                 if(entryID == null) {
                    entryID = SAMLUtils.generateID();
@@ -463,7 +456,7 @@ public class DiscoEntryHandlerImplUtils {
                    resID.setValue(DiscoConstants.IMPLIED_RESOURCE);
                    resOff.setResourceID(resID);
                 }
-                entry.setResourceOffering(resOff);
+                entry.getValue().setResourceOffering(resOff);
                 discoEntries.put(entryID, entry);
             } catch (Exception e) {
                 debug.error("DiscoEntryHandlerImplUtils.getServiceDiscoEntries:"

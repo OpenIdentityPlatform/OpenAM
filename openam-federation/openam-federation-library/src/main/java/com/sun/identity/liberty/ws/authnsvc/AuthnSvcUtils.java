@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AuthnSvcUtils.java,v 1.5 2008/12/05 00:18:02 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -117,7 +119,7 @@ public class AuthnSvcUtils {
         try {
             DiscoEntryElement discoEntry = (DiscoEntryElement)
                       DiscoServiceManager.getBootstrappingDiscoEntry();
-            ResourceOfferingType offering = discoEntry.getResourceOffering();
+            ResourceOfferingType offering = discoEntry.getValue().getResourceOffering();
             if (!DiscoServiceManager.useImpliedResource()) {
                 ServiceInstanceType serviceInstance =
                                                 offering.getServiceInstance();

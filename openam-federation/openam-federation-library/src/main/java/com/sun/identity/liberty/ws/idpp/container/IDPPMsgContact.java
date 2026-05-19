@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPMsgContact.java,v 1.3 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -65,7 +67,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPMsgContact:getContainerObject:Init");
         try {
-            PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+            PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
             Set msgContacts = (Set)userMap.get(
                 getAttributeMapper().getDSAttribute(
                 IDPPConstants.MSG_CONTACT_ELEMENT).toLowerCase());
@@ -116,7 +118,8 @@ public class IDPPMsgContact extends IDPPBaseContainer {
          }
 
          MsgContactElement mse = 
-              IDPPUtils.getIDPPFactory().createMsgContactElement();
+              IDPPUtils.getIDPPFactory().createMsgContactElement(
+                      IDPPUtils.getIDPPFactory().createMsgContactType());
 
          StringTokenizer st = 
              new StringTokenizer(entry, IDPPConstants.ATTRIBUTE_SEPARATOR);
@@ -149,23 +152,23 @@ public class IDPPMsgContact extends IDPPBaseContainer {
             }
 
             if(attribute.equals("MsgType")) {
-               mse.getMsgType().add(getDSTURI(value));
+               mse.getValue().getMsgType().add(getDSTURI(value));
             } else if(attribute.equals("Nick")) {
-               mse.setNick(getDSTString(value));
+               mse.getValue().setNick(getDSTString(value));
             } else if(attribute.equals("LComment")) {
-               mse.setLComment(getDSTString(value));
+               mse.getValue().setLComment(getDSTString(value));
             } else if(attribute.equals("MsgMethod")) {
-               mse.getMsgMethod().add(getDSTURI(value));
+               mse.getValue().getMsgMethod().add(getDSTURI(value));
             } else if(attribute.equals("MsgTechnology")) {
-               mse.getMsgTechnology().add(getDSTURI(value));
+               mse.getValue().getMsgTechnology().add(getMsgTechnology(value));
             } else if(attribute.equals("MsgAccount")) {
-               mse.setMsgAccount(getDSTString(value));
+               mse.getValue().setMsgAccount(getDSTString(value));
             } else if(attribute.equals("MsgSubAccount")) {
-               mse.setMsgSubaccount(getDSTString(value));
+               mse.getValue().setMsgSubaccount(getDSTString(value));
             } else if(attribute.equals("MsgProvider")) {
-               mse.setMsgProvider(getDSTString(value));
+               mse.getValue().setMsgProvider(getDSTString(value));
             } else if(attribute.equals("id")) {
-               mse.setId(value);
+               mse.getValue().setId(value);
             }
          } 
          return mse;
@@ -300,55 +303,55 @@ public class IDPPMsgContact extends IDPPBaseContainer {
 
          StringBuffer sb = new StringBuffer(200);
 
-         DSTString dstString = mse.getNick();
+         DSTString dstString = mse.getValue().getNick();
          if(dstString != null) {
             sb.append("Nick").append("=")
               .append(dstString.getValue()).append("|"); 
          }
 
-         dstString = mse.getLComment();
+         dstString = mse.getValue().getLComment();
          if(dstString != null) {
             sb.append("LComment").append("=")
               .append(dstString.getValue()).append("|"); 
          }
 
-         dstString = mse.getMsgProvider();
+         dstString = mse.getValue().getMsgProvider();
          if(dstString != null) {
             sb.append("MsgProvider").append("=")
               .append(dstString.getValue()).append("|"); 
          }
        
-         dstString = mse.getMsgAccount(); 
+         dstString = mse.getValue().getMsgAccount();
          if(dstString != null) {
             sb.append("MsgAccount").append("=")
               .append(dstString.getValue()).append("|"); 
          }
 
-         dstString = mse.getMsgSubaccount();
+         dstString = mse.getValue().getMsgSubaccount();
          if(dstString != null) {
             sb.append("MsgSubAccount").append("=")
               .append(dstString.getValue()).append("|"); 
          }
 
-         DSTURI dstURI = (DSTURI)mse.getMsgType().get(0);
+         DSTURI dstURI = (DSTURI)mse.getValue().getMsgType().get(0);
          if(dstURI != null) {
             sb.append("MsgType").append("=")
               .append(dstURI.getValue()).append("|"); 
          }
 
-         dstURI = (DSTURI)mse.getMsgMethod().get(0);
+         dstURI = (DSTURI)mse.getValue().getMsgMethod().get(0);
          if(dstURI != null) {
             sb.append("MsgMethod").append("=")
               .append(dstURI.getValue()).append("|"); 
          }
 
-         dstURI = (DSTURI)mse.getMsgTechnology().get(0);
+         dstURI = mse.getValue().getMsgTechnology().get(0);
          if(dstURI != null) {
             sb.append("MsgTechnology").append("=")
               .append(dstURI.getValue()); 
          }
 
-         String id = mse.getId();
+         String id = mse.getValue().getId();
          if(id != null) {
             sb.append("id").append("=").append(id); 
          }

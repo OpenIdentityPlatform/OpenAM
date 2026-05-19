@@ -24,7 +24,7 @@
  *
  * $Id: FSTerminationRequestServlet.java,v 1.4 2008/06/25 05:47:04 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -172,14 +172,14 @@ public class FSTerminationRequestServlet extends HttpServlet {
                 hostedProviderDesc =
                     metaManager.getIDPDescriptor(realm, hostedEntityId);
                 hostedConfig =
-                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId).getValue();
             } else if (hostedProviderRole != null &&
                 hostedProviderRole.equalsIgnoreCase(IFSConstants.SP))
             {
                 hostedProviderDesc =
                     metaManager.getSPDescriptor(realm, hostedEntityId);
                 hostedConfig =
-                    metaManager.getSPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getSPDescriptorConfig(realm, hostedEntityId).getValue();
             }
             if (hostedProviderDesc == null) {
                 throw new IDFFMetaException((String) null);

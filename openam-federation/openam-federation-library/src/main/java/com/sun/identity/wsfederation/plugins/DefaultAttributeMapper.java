@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DefaultAttributeMapper.java,v 1.4 2009/10/28 23:58:59 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -95,10 +97,10 @@ public class DefaultAttributeMapper {
             BaseConfigType config = null;
             if(role.equals(SP)) {
                config = WSFederationUtils.getMetaManager().getSPSSOConfig(
-                   realm, hostEntityID);
+                   realm, hostEntityID).getValue();
             } else {
                config = WSFederationUtils.getMetaManager().getIDPSSOConfig(
-                   realm, hostEntityID);
+                   realm, hostEntityID).getValue();
             }
 
             if(config == null) {

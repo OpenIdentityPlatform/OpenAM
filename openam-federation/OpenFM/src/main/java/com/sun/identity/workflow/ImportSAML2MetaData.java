@@ -25,6 +25,7 @@
  * $Id: ImportSAML2MetaData.java,v 1.5 2008/07/08 01:12:01 exu Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 package com.sun.identity.workflow;
 
@@ -36,7 +37,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.util.List;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 
 /**
@@ -72,9 +73,9 @@ public class ImportSAML2MetaData {
                 Object obj = SAML2MetaUtils.convertStringToJAXB(extended);
                 configElt = (obj instanceof EntityConfigElement) ?
                     (EntityConfigElement)obj : null;
-                if (configElt != null && configElt.isHosted()) {
+                if (configElt != null && configElt.getValue().isHosted()) {
                     List config =
-                    configElt.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                    configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                     if (!config.isEmpty()) {
                         BaseConfigType bConfig = (BaseConfigType)
                             config.iterator().next();
