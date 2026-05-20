@@ -147,6 +147,12 @@
        <jxb:class name="RequestedServiceType"/>
     </jxb:bindings>
 -->
+    <jxb:bindings node=".//xs:element[@name='ResourceOffering']">
+        <jxb:class name="ResourceOfferingElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='EncryptedResourceID']">
+        <jxb:class name="EncryptedResourceIDElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 

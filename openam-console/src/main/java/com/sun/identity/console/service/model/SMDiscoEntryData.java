@@ -140,7 +140,7 @@ public class SMDiscoEntryData implements Serializable {
             }
 
             DiscoEntryElement de = entryFac.createDiscoEntryElement(new InsertEntryType());
-            de.getValue().setResourceOffering(res);
+            de.getValue().setResourceOffering(DiscoUtils.getDiscoFactory().createResourceOfferingElement(res));
             createDirectivesEntry(de, descriptionTypeList);
 
             String str = convertDiscoEntryToXmlStr(de);

@@ -92,7 +92,7 @@ public class IDFFMetaUtils {
     private static final String PROP_JAXB_FORMATTED_OUTPUT =
             "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
-            "com.sun.xml.bind.namespacePrefixMapper";
+            "org.glassfish.jaxb.namespacePrefixMapper";
     
     private static NamespacePrefixMapperImpl nsPrefixMapper =
             new NamespacePrefixMapperImpl();

@@ -326,7 +326,7 @@ public class Utils {
                           throws JAXBException {
         Marshaller m = jc.createMarshaller();
         try {
-            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            m.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                     new NamespacePrefixMapperImpl());
         } catch(PropertyException ex) {
             debug.error("Utils.convertJAXBToElement", ex);
@@ -353,7 +353,7 @@ public class Utils {
             boolean checkIdref) throws JAXBException {
         Marshaller m = jc.createMarshaller();
         try {
-            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            m.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                     new NamespacePrefixMapperImpl());
             
         } catch(PropertyException ex) {

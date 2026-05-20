@@ -330,7 +330,7 @@ public class SMDiscoveryServiceData implements Serializable
         DiscoEntryElement entry,
         SMDiscoEntryData smDisco)
     {
-        ResourceOfferingType resOff = entry.getValue().getResourceOffering();
+        ResourceOfferingType resOff = entry.getValue().getResourceOffering().getValue();
         ResourceIDType resourceIdType = resOff.getResourceID();
         ServiceInstanceType serviceInstance = resOff.getServiceInstance();
         String providerID = serviceInstance.getProviderID();

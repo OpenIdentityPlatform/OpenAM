@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.BitSet;
 
 import com.sun.identity.liberty.ws.disco.jaxb11.GenerateBearerTokenElement;
+import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Statement;
 import com.sun.identity.liberty.ws.disco.EncryptedResourceID;
@@ -59,6 +60,7 @@ import com.sun.identity.liberty.ws.util.ProviderManager;
 import com.sun.identity.liberty.ws.util.ProviderUtil;
 import com.sun.identity.federation.message.common.EncryptedNameIdentifier;
 import com.sun.identity.federation.message.common.IDPProvidedNameIdentifier;
+import jakarta.xml.bind.JAXBElement;
 
 /**
  * Provides utility methods to discovery service.
@@ -90,23 +92,23 @@ public class DiscoUtils extends DiscoSDKUtils {
      *  Value: List of credentials (<code>Assertion</code>s)
      *  </pre>
      */
-    public static Map checkPolicyAndHandleDirectives(
-                                String userDN, Message message,
-                                Collection results, Authorizer authorizer,
-                                SessionContext invoSession, String wscID,
-                                Object token)
+    public static Map<String, Object> checkPolicyAndHandleDirectives(
+            String userDN, Message message,
+            Collection<DiscoEntryElement> results, Authorizer authorizer,
+            SessionContext invoSession, String wscID,
+            Object token)
     {
         DiscoUtils.debug.message("DiscoService.checkPolicyAndHandleDirectives");
 
-        List offerings = new LinkedList();
+        List<ResourceOffering> offerings = new LinkedList<>();
         List credentials = new LinkedList();
-        Map env = null;
-        Iterator k = results.iterator();
+        Map<String, Object> env = null;
+        Iterator<DiscoEntryElement> k = results.iterator();
         while (k.hasNext()) {
-            InsertEntryType entry = (InsertEntryType) k.next();
+            InsertEntryType entry = k.next().getValue();
             if (authorizer != null) {
                 if (env == null) {
-                    env = new HashMap();
+                    env = new HashMap<>();
                     env.put(Authorizer.USER_ID, userDN);
                     env.put(Authorizer.AUTH_TYPE,
                         message.getAuthenticationMechanism());
@@ -132,7 +134,7 @@ public class DiscoUtils extends DiscoSDKUtils {
                     ex);
                 continue;
             }
-            List directives = entry.getAny();
+            List<Object> directives = entry.getAny();
             if ((directives == null) || directives.isEmpty()) {
                 DiscoUtils.debug.message("DiscoService: no directives.");
                 offerings.add(current);
@@ -143,7 +145,7 @@ public class DiscoUtils extends DiscoSDKUtils {
             }
         }
 
-        Map returnMap = new HashMap();
+        Map<String, Object> returnMap = new HashMap();
         returnMap.put(OFFERINGS, offerings);
         returnMap.put(CREDENTIALS, credentials);
         return returnMap;
@@ -176,9 +178,8 @@ public class DiscoUtils extends DiscoSDKUtils {
         }
         Iterator iter0 = directives.iterator();
         while(iter0.hasNext()) {
-            Object directive = iter0.next();
-            List<Object> descIDRefs =
-                ((DirectiveType) directive).getDescriptionIDRefs();
+            JAXBElement<DirectiveType> directive =(JAXBElement<DirectiveType>) iter0.next();
+            List<Object> descIDRefs = directive.getValue().getDescriptionIDRefs();
             if (directive instanceof EncryptResourceIDElement) {
                 debug.message("DiscoService: has encrypt D");
                 current = doEncryption(current);

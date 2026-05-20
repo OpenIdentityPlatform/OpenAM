@@ -137,7 +137,7 @@ public class PPRequestHandler extends DSTRequestHandler {
                QueryElement query = (QueryElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
                IDPPUtils.getMarshaller().setProperty(
-                         "com.sun.xml.bind.namespacePrefixMapper",
+                         "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
                IDPPUtils.getMarshaller().marshal(query, doc);
                return processQueryRequest(query, providerID, requestMsg, doc);
@@ -145,7 +145,7 @@ public class PPRequestHandler extends DSTRequestHandler {
                ModifyElement modify = (ModifyElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
                IDPPUtils.getMarshaller().setProperty(
-                         "com.sun.xml.bind.namespacePrefixMapper",
+                         "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
                IDPPUtils.getMarshaller().marshal(modify, doc);
                return processModifyRequest(modify, providerID, requestMsg, doc);

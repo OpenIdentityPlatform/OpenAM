@@ -119,7 +119,7 @@ public class AuthnSvcUtils {
         try {
             DiscoEntryElement discoEntry = (DiscoEntryElement)
                       DiscoServiceManager.getBootstrappingDiscoEntry();
-            ResourceOfferingType offering = discoEntry.getValue().getResourceOffering();
+            ResourceOfferingType offering = discoEntry.getValue().getResourceOffering().getValue();
             if (!DiscoServiceManager.useImpliedResource()) {
                 ServiceInstanceType serviceInstance =
                                                 offering.getServiceInstance();
