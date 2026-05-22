@@ -74,23 +74,6 @@ async function ensureOAuth2ServiceExists(adminToken, request) {
  * Creates it with default configuration if it doesn't exist.
  */
 
-// curl -sS -X PUT \
-//     -H "iPlanetDirectoryPro: ${ADMIN_TOKEN}" \
-//     -H "Content-Type: application/json" -H "Accept-API-Version: protocol=2.0,resource=1.0" \
-//     -d "{
-//         \"com.forgerock.openam.oauth2provider.clientType\": \"Public\",
-//         \"com.forgerock.openam.oauth2provider.redirectionURIs\": [\"[0]=${REDIRECT_URI}\"],
-//         \"com.forgerock.openam.oauth2provider.scopes\": [\"[0]=${SCOPE}\"],
-//         \"com.forgerock.openam.oauth2provider.defaultScopes\": [\"[0]=${SCOPE}\"],
-//         \"com.forgerock.openam.oauth2provider.grantTypes\": [\"[0]=authorization_code\"],
-//         \"com.forgerock.openam.oauth2provider.responseTypes\": [\"[0]=code\"],
-//         \"com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod\": \"none\",
-//         \"isConsentImplied\": true,
-//         \"sunIdentityServerDeviceStatus\": \"Active\"
-//     }" \
-//     "${BASE}/json/realms/${REALM}/realm-config/agents/OAuth2Client/${CLIENT_ID}" \
-//     -o "${TMP}/client.json" -w "  client provisioned HTTP %{http_code}\n"
-
 async function ensureOAuth2ClientExists(adminToken, request) {
   const response = await request.get(
     `${OPENAM_BASE}/json/realms/${REALM}/realm-config/agents/OAuth2Client/${CLIENT_ID}`,
