@@ -192,7 +192,7 @@ module.exports = function (grunt) {
             },
             build: {
                 singleRun: true,
-                reporters: ["progress", "notify", "mocha"]
+                reporters: ["progress"]
             },
             dev: {
             }
