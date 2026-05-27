@@ -26,10 +26,7 @@ module.exports = function (config) {
                 presets: [["@babel/preset-env", { "targets": "> 0.2%, not dead, last 2 versions" }],]
             }
         },
-        reporters: ["notify", "nyan"],
-        mochaReporter: {
-            output: "autowatch"
-        },
+        reporters: ["progress"],
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
