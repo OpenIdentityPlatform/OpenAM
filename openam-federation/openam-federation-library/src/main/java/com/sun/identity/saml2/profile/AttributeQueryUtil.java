@@ -25,14 +25,13 @@
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
  * Portions copyright 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
 import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -335,7 +334,7 @@ public class AttributeQueryUtil {
             desiredAttrs = attrQuery.getAttributes();
         }
         try {
-            desiredAttrs = verifyDesiredAttributes(aad.getAttribute(),
+            desiredAttrs = verifyDesiredAttributes(aad.getValue().getAttribute(),
                 desiredAttrs);
         } catch (SAML2Exception se) {
             return SAML2Utils.getErrorResponse(attrQuery,
@@ -507,7 +506,7 @@ public class AttributeQueryUtil {
             throw new SAML2Exception(SAML2Utils.bundle.getString(
                 "attrQueryIssuerNotFound"));
         }
-        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(attrqDesc, requestedEntityID,
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(attrqDesc.getValue(), requestedEntityID,
                 SAML2Constants.ATTR_QUERY_ROLE);
 
         if (!signingCerts.isEmpty()) {
@@ -607,7 +606,7 @@ public class AttributeQueryUtil {
 
             IDPSSOConfigElement config = SAML2Utils.getSAML2MetaManager().getIDPSSOConfig(
                     realm, attrAuthorityEntityID);
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
 
             List nimAttrs = (List)attrs.get(SAML2Constants.NAME_ID_FORMAT_MAP);
 
@@ -820,7 +819,7 @@ public class AttributeQueryUtil {
 
         AttributeQueryDescriptorElement aqd =
             metaManager.getAttributeQueryDescriptor(realm, requesterEntityID);
-        EncInfo encInfo = KeyUtil.getEncInfo(aqd, requesterEntityID,
+        EncInfo encInfo = KeyUtil.getEncInfo(aqd.getValue(), requesterEntityID,
             SAML2Constants.ATTR_QUERY_ROLE);
 
         Element el = EncManager.getEncInstance().encrypt(
@@ -866,26 +865,25 @@ public class AttributeQueryUtil {
         return desiredAttrs;
     }
 
-    private static List convertAttributes(List jaxbAttrs)
+    private static List<Attribute> convertAttributes(List<AttributeElement> jaxbAttrs)
         throws SAML2Exception {
 
-        List resultAttrs = new ArrayList();
-        for(Iterator iter = jaxbAttrs.iterator(); iter.hasNext(); ) {
-            AttributeElement jaxbAttr = (AttributeElement)iter.next();
+        List<Attribute> resultAttrs = new ArrayList<>();
+        for(Iterator<AttributeElement> iter = jaxbAttrs.iterator(); iter.hasNext(); ) {
+            AttributeElement jaxbAttr = iter.next();
             Attribute attr = AssertionFactory.getInstance().createAttribute();
-            attr.setName(jaxbAttr.getName());
-            attr.setNameFormat(jaxbAttr.getNameFormat());
-            attr.setFriendlyName(jaxbAttr.getFriendlyName());
+            attr.setName(jaxbAttr.getValue().getName());
+            attr.setNameFormat(jaxbAttr.getValue().getNameFormat());
+            attr.setFriendlyName(jaxbAttr.getValue().getFriendlyName());
 
-            List jaxbValues = jaxbAttr.getAttributeValue();
+            List<AttributeValueElement> jaxbValues = jaxbAttr.getValue().getAttributeValue();
             if ((jaxbValues != null) && (!jaxbValues.isEmpty())) {
-                List newValues = new ArrayList();
-                for(Iterator iterV = jaxbValues.iterator(); iterV.hasNext();) {
-                    AttributeValueElement jaxbValeu =
-                        (AttributeValueElement)iter.next();
-                    List content = jaxbValeu.getContent();
-                    if ((content != null) && (!content.isEmpty())) {
-                        newValues.add(content.get(0));
+                List<AttributeValueElement> newValues = new ArrayList<>();
+                for(Iterator<AttributeValueElement> iterV = jaxbValues.iterator(); iterV.hasNext();) {
+                    AttributeValueElement jaxbValeu = iterV.next();
+                    Object content = jaxbValeu.getValue();
+                    if (content != null) {
+                        newValues.add(jaxbValeu);
                     }
                 }
                 if (!newValues.isEmpty()) {
@@ -990,7 +988,7 @@ public class AttributeQueryUtil {
 
     private static boolean isSameAttribute(Attribute desired, AttributeElement supported) {
         return desired.getName().equals(supported.getName())
-                && isNameFormatMatching(desired.getNameFormat(), supported.getNameFormat());
+                && isNameFormatMatching(desired.getNameFormat(), supported.getValue().getNameFormat());
     }
 
     /**
@@ -1021,16 +1019,16 @@ public class AttributeQueryUtil {
         if ((valuesD == null) || (valuesD.isEmpty())) {
             return true;
         }
-        List attrValuesS = supportedAttr.getAttributeValue();
+        List<AttributeValueElement> attrValuesS = supportedAttr.getValue().getAttributeValue();
         if ((attrValuesS == null) || (attrValuesS.isEmpty())) {
             return true;
         }
 
-        List valuesS = new ArrayList();
-        for(Iterator iter = attrValuesS.iterator(); iter.hasNext(); ) {
+        List<Object> valuesS = new ArrayList<>();
+        for(Iterator<AttributeValueElement> iter = attrValuesS.iterator(); iter.hasNext(); ) {
             AttributeValueElement attrValueElem =
-                (AttributeValueElement)iter.next();
-            valuesS.addAll(attrValueElem.getContent());
+                    iter.next();
+            valuesS.add(attrValueElem.getValue());
         }
 
         try {
@@ -1126,7 +1124,7 @@ public class AttributeQueryUtil {
                 "responseNotSigned"));
         }
 
-        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad, attrAuthorityEntityID,
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad.getValue(), attrAuthorityEntityID,
                 SAML2Constants.ATTR_AUTH_ROLE);
 
         if (!signingCerts.isEmpty()) {
@@ -1151,7 +1149,7 @@ public class AttributeQueryUtil {
         AttributeAuthorityDescriptorElement aad, String binding,
         String attrQueryProfile, String attrProfile) {
         SAML2Utils.debug.message("AttributeQueryUtil.findLocation entering...");
-        List attrProfiles = aad.getAttributeProfile();
+        List<String> attrProfiles = aad.getValue().getAttributeProfile();
         if ((attrProfiles == null) || (attrProfiles.isEmpty())) {
             SAML2Utils.debug.message("AttributeQueryUtil.findLocation: attrProfiles is null or empty");
             if (attrProfile != null) {
@@ -1164,14 +1162,14 @@ public class AttributeQueryUtil {
         }
         SAML2Utils.debug.message("AttributeQueryUtil.findLocation: entering...");
 
-        List attrServices = aad.getAttributeService();
-        for(Iterator iter = attrServices.iterator(); iter.hasNext(); ) {
+        List<AttributeServiceElement> attrServices = aad.getValue().getAttributeService();
+        for(Iterator<AttributeServiceElement> iter = attrServices.iterator(); iter.hasNext(); ) {
             AttributeServiceElement attrService =
-                (AttributeServiceElement)iter.next();
+                    iter.next();
             if (isValidAttributeService(binding, attrService,
                 attrQueryProfile)) {
                 SAML2Utils.debug.message("AttributeQueryUtil.findLocation: found valid service");
-                return attrService.getLocation();
+                return attrService.getValue().getLocation();
             }
         }
         SAML2Utils.debug.message("AttributeQueryUtil.findLocation: nothing found, leaving last line with null");
@@ -1182,7 +1180,7 @@ public class AttributeQueryUtil {
     private static boolean isValidAttributeService(String binding,
         AttributeServiceElement attrService, String attrQueryProfile) {
     
-        if (!binding.equalsIgnoreCase(attrService.getBinding())) {
+        if (!binding.equalsIgnoreCase(attrService.getValue().getBinding())) {
             return false;
         }
 
@@ -1193,7 +1191,7 @@ public class AttributeQueryUtil {
         return ((attrQueryProfile.equals(
             SAML2Constants.DEFAULT_ATTR_QUERY_PROFILE)) ||
             (SAML2Constants.X509_SUBJECT_ATTR_QUERY_PROFILE.equals(
-            attrQueryProfile) && attrService.isSupportsX509Query()));
+            attrQueryProfile) && attrService.getValue().isSupportsX509Query()));
     }
 
     /** 
@@ -1257,11 +1255,11 @@ public class AttributeQueryUtil {
             AttributeAuthorityConfigElement config =
                 metaManager.getAttributeAuthorityConfig(realm,
                 attrAuthorityEntityID);
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map<String, List<String>> attrs = SAML2MetaUtils.getAttributes(config.getValue());
             String value = null;
-            List values = (List) attrs.get(attrName);
+            List<String> values = attrs.get(attrName);
             if ((values != null) && (!values.isEmpty())) {
-                value = ((String)values.iterator().next()).trim();
+                value = values.iterator().next().trim();
             }
             return value;
         } catch (SAML2MetaException sme) {
@@ -1348,7 +1346,7 @@ public class AttributeQueryUtil {
             return null;
         }
 
-        String attrqMetaAlias = attrQueryConfig.getMetaAlias();
+        String attrqMetaAlias = attrQueryConfig.getValue().getMetaAlias();
         if (attrqMetaAlias == null) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod + "Attribute Query MetaAlias is null");
@@ -1498,7 +1496,7 @@ public class AttributeQueryUtil {
             AttributeAuthorityDescriptorElement aad =
                   metaManager.getAttributeAuthorityDescriptor("/", idpEntityID);
 
-            EncInfo encInfo = KeyUtil.getEncInfo(aad, idpEntityID,
+            EncInfo encInfo = KeyUtil.getEncInfo(aad.getValue(), idpEntityID,
                                                  SAML2Constants.ATTR_AUTH_ROLE);            
 
             EncryptedID encryptedID = nameID.encrypt(encInfo.getWrappingKey(),

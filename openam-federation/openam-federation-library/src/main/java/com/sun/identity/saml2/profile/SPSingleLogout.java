@@ -25,7 +25,7 @@
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -447,7 +447,7 @@ public class SPSingleLogout {
                 SAML2Utils.bundle.getString("metaDataError"));
         }
 
-        List slosList = idpsso.getSingleLogoutService();
+        List slosList = idpsso.getValue().getSingleLogoutService();
         if (slosList == null) {
             String[] data = {nameIdInfoKey.getRemoteEntityID()};
             LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
@@ -476,7 +476,7 @@ public class SPSingleLogout {
             request,
             response,
             paramsMap,
-            idpConfig);
+            idpConfig.getValue());
 
         String requestIDStr = requestID.toString();
         if (debug.messageEnabled()) {
@@ -906,7 +906,7 @@ public class SPSingleLogout {
                 SAML2Utils.bundle.getString("metaDataError"));
         }
         
-        List slosList = idpsso.getSingleLogoutService();
+        List slosList = idpsso.getValue().getSingleLogoutService();
         if (slosList == null) {
             String[] data = {idpEntityID};
             LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
@@ -1191,7 +1191,7 @@ public class SPSingleLogout {
 
                 // get application logout URL 
                 BaseConfigType spConfig = SAML2Utils.getSAML2MetaManager()
-                    .getSPSSOConfig(realm, spEntityID);
+                    .getSPSSOConfig(realm, spEntityID).getValue();
                 List appLogoutURL = (List) SAML2MetaUtils.getAttributes(
                     spConfig).get(SAML2Constants.APP_LOGOUT_URL);
                 if (debug.messageEnabled()) {
@@ -1462,7 +1462,7 @@ public class SPSingleLogout {
         SPSSODescriptorElement spsso, String binding) {
         String location = null;
         if (spsso != null) {
-            List sloList = spsso.getSingleLogoutService();
+            List sloList = spsso.getValue().getSingleLogoutService();
             if (sloList != null && !sloList.isEmpty()) {
                 location = LogoutUtil.getSLOResponseServiceLocation(
                            sloList, binding);

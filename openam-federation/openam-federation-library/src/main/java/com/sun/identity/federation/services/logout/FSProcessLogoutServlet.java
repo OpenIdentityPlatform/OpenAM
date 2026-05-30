@@ -24,7 +24,7 @@
  *
  * $Id: FSProcessLogoutServlet.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -166,12 +166,12 @@ public class FSProcessLogoutServlet extends HttpServlet {
                     hostedProviderDesc = metaManager.getIDPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                 } else if (hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
                     hostedProviderDesc = metaManager.getSPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                 }
             }
             if (hostedProviderDesc == null){

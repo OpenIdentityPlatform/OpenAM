@@ -25,7 +25,7 @@
  * $Id: NameIDMapping.java,v 1.6 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -183,7 +183,7 @@ public class NameIDMapping {
                     getNameIDMappingService(realm, idpEntityID, binding);
 
                 if (nameIDMappingService != null) {
-                    nimURL = nameIDMappingService.getLocation();
+                    nimURL = nameIDMappingService.getValue().getLocation();
                 }
             }
             if (SAML2Utils.debug.messageEnabled()) {
@@ -204,7 +204,7 @@ public class NameIDMapping {
             signNIMRequest(nimRequest, realm, spEntityID, true);
 
             BaseConfigType config = metaManager.getIDPSSOConfig(realm,
-                idpEntityID);
+                idpEntityID).getValue();
 
             nimURL = SAML2SDKUtils.fillInBasicAuthInfo(config, nimURL);
 
@@ -448,7 +448,7 @@ public class NameIDMapping {
             return null;
         }
 
-        List list = idpSSODesc.getNameIDMappingService();
+        List list = idpSSODesc.getValue().getNameIDMappingService();
 
         NameIDMappingServiceElement nimService = null;
         if ((list != null) && !list.isEmpty()) {
@@ -458,7 +458,7 @@ public class NameIDMapping {
             Iterator it = list.iterator();
             while (it.hasNext()) {
                 nimService = (NameIDMappingServiceElement)it.next();  
-                if (binding.equalsIgnoreCase(nimService.getBinding())) {
+                if (binding.equalsIgnoreCase(nimService.getValue().getBinding())) {
                     return nimService;
                 }
             }
@@ -472,9 +472,9 @@ public class NameIDMapping {
         RoleDescriptorType roled = null;
 
         if (role.equals(SAML2Constants.SP_ROLE)) {
-            roled = metaManager.getSPSSODescriptor(realm, entityID);
+            roled = metaManager.getSPSSODescriptor(realm, entityID).getValue();
         } else {
-            roled = metaManager.getIDPSSODescriptor(realm, entityID);
+            roled = metaManager.getIDPSSODescriptor(realm, entityID).getValue();
         }
 
         EncInfo encInfo = KeyUtil.getEncInfo(roled, entityID, role);
@@ -570,7 +570,7 @@ public class NameIDMapping {
 
         IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(
             realm, idpEntityID);
-        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, idpEntityID,
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), idpEntityID,
                 SAML2Constants.IDP_ROLE);
         
         if (!signingCerts.isEmpty()) {
@@ -591,7 +591,7 @@ public class NameIDMapping {
             EncryptedID encryptedID = nimRequest.getEncryptedID();
             try {
                 final IDPSSOConfigElement idpSsoConfig = metaManager.getIDPSSOConfig(realm, idpEntityID);
-                nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(idpSsoConfig));
+                nameID = encryptedID.decrypt(KeyUtil.getDecryptionKeys(idpSsoConfig.getValue()));
             } catch (SAML2Exception ex) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("NameIDMapping.getNameID:", ex);

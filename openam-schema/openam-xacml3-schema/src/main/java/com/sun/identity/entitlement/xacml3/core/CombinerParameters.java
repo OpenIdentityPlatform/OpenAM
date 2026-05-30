@@ -21,6 +21,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -36,11 +38,11 @@ package com.sun.identity.entitlement.xacml3.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**

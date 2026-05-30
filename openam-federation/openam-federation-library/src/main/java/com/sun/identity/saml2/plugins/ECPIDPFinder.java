@@ -24,7 +24,7 @@
  *
  * $Id: ECPIDPFinder.java,v 1.2 2008/06/25 05:47:51 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -63,7 +63,7 @@ public class ECPIDPFinder implements SAML2IDPFinder {
 
         SPSSOConfigElement spssoconfig = SAML2Utils.getSAML2MetaManager()
             .getSPSSOConfig(realm, hostProviderID);
-        Map attributes = SAML2MetaUtils.getAttributes(spssoconfig);
+        Map attributes = SAML2MetaUtils.getAttributes(spssoconfig.getValue());
         List idps = (List)attributes.get(SAML2Constants.ECP_REQUEST_IDP_LIST);
         if ((idps == null) || (idps.isEmpty())) {
             return null;

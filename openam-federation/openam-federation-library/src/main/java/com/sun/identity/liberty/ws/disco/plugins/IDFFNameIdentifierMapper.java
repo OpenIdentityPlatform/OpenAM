@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDFFNameIdentifierMapper.java,v 1.3 2008/06/25 05:47:12 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -106,7 +108,7 @@ public class IDFFNameIdentifierMapper implements NameIdentifierMapper {
 
             IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
             String metaAlias = metaManager.getIDPDescriptorConfig(
-                "/", idpProviderID).getMetaAlias();
+                "/", idpProviderID).getValue().getMetaAlias();
             
             FSAccountManager fsaccountmgr = 
                 FSAccountManager.getInstance(metaAlias);

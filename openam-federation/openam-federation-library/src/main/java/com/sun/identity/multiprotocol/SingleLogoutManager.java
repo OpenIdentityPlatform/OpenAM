@@ -24,7 +24,7 @@
  *
  * $Id: SingleLogoutManager.java,v 1.8 2008/11/10 22:57:00 veiming Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -689,7 +689,7 @@ public class SingleLogoutManager {
                         SingleLogoutManager.debug).getDocumentElement();
                     FSLogoutResponse responseLogout = new FSLogoutResponse(elem);
                     BaseConfigType hostedConfig =
-                        metaManager.getIDPDescriptorConfig(realm, idpEntityID);
+                        metaManager.getIDPDescriptorConfig(realm, idpEntityID).getValue();
                     logoutDoneURL = FSServiceUtils.getLogoutDonePageURL(request,
                         hostedConfig, null);
                     Status status = responseLogout.getStatus();

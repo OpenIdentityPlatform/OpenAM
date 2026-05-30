@@ -27,7 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012-2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.liberty.ws.interaction;
 
@@ -46,7 +46,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
@@ -62,9 +61,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -515,12 +514,14 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
             //read and save query parameters;
             InteractionResponseElement interactionResponseElement 
                     = JAXBObjectFactory.getObjectFactory()
-                    .createInteractionResponseElement();
-            List list = interactionResponseElement.getParameter();
-            Enumeration parameterNames = httpRequest.getParameterNames();
+                    .createInteractionResponseElement(
+                            JAXBObjectFactory.getObjectFactory().createInteractionResponseType()
+                    );
+            List<ParameterType> list = interactionResponseElement.getValue().getParameter();
+            Enumeration<String> parameterNames = httpRequest.getParameterNames();
             while ( parameterNames.hasMoreElements()) {
                 String parameterName 
-                        = (String)parameterNames.nextElement();
+                        = parameterNames.nextElement();
                 /*
                 ParameterType parameterType  
                         = JAXBObjectFactory.getObjectFactory()
@@ -582,13 +583,6 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
                 LogUtil.access(Level.INFO,LogUtil.IS_REDIRECTED_USER_AGENT_BACK,
                                objs);
             }
-        } catch (JAXBException je) {
-            debug.error(
-                    "WSPRedirectHandlerServlet.sendInteractionResponsePage():"
-                    + "catching JAXBException =", je);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error createing JAXBObject:"
-                    + je.getMessage());
         } catch (Exception e) {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionResponsePage():"

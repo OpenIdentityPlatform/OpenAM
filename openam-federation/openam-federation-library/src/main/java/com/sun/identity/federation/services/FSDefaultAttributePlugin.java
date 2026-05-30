@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSDefaultAttributePlugin.java,v 1.4 2008/11/10 22:56:58 veiming Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -112,7 +114,7 @@ public class FSDefaultAttributePlugin implements FSAttributePlugin {
                 IDPDescriptorConfigElement idpConfig =
                     metaManager.getIDPDescriptorConfig(realm, hostEntityId);
                 if (idpConfig != null) {
-                    Map attributes = IDFFMetaUtils.getAttributes(idpConfig);
+                    Map attributes = IDFFMetaUtils.getAttributes(idpConfig.getValue());
                     attributeMap = FSServiceUtils.parseAttributeConfig((List)
                         attributes.get(IFSConstants.IDP_ATTRIBUTE_MAP));
                 }

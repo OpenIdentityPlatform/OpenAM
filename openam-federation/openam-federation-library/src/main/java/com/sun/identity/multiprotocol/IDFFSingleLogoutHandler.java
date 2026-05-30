@@ -24,7 +24,7 @@
  *
  * $Id: IDFFSingleLogoutHandler.java,v 1.6 2008/11/10 22:56:59 veiming Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -223,7 +223,7 @@ public class IDFFSingleLogoutHandler implements SingleLogoutHandler {
                 ProviderDescriptorType hostedProviderDesc =
                     metaManager.getIDPDescriptor(realm, idpEntityId);
                 BaseConfigType hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, idpEntityId);
+                    metaManager.getIDPDescriptorConfig(realm, idpEntityId).getValue();
                 FSSingleLogoutHandler handlerObj = new FSSingleLogoutHandler();
                 handlerObj.setHostedDescriptor(hostedProviderDesc);
                 handlerObj.setHostedDescriptorConfig(hostedConfig);
@@ -301,7 +301,7 @@ public class IDFFSingleLogoutHandler implements SingleLogoutHandler {
                     }
                     IDPDescriptorConfigElement config =
                             idffManager.getIDPDescriptorConfig(realm, idpId);
-                    return config.getMetaAlias();
+                    return config.getValue().getMetaAlias();
                 }
             }
         } catch (Exception e) {

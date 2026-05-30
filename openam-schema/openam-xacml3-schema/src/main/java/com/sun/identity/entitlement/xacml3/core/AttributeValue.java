@@ -21,6 +21,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -38,15 +40,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlMixed;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAnyAttribute;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlMixed;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 

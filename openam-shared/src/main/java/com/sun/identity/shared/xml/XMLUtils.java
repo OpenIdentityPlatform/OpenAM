@@ -25,7 +25,7 @@
  * $Id: XMLUtils.java,v 1.15 2009/10/19 18:19:20 asyhuang Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.shared.xml;
 
@@ -47,7 +47,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;

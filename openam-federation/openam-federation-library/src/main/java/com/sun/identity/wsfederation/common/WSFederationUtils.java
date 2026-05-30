@@ -25,7 +25,7 @@
  * $Id: WSFederationUtils.java,v 1.6 2009/10/28 23:58:58 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.common;
 
@@ -521,8 +521,8 @@ public class WSFederationUtils {
             throw new WSFederationException(se);
         }
 
-        IDPAttributeMapper attrMapper = getIDPAttributeMapper(WSFederationMetaUtils.getAttributes(idpConfig));
-        IDPAccountMapper accountMapper = getIDPAccountMapper(WSFederationMetaUtils.getAttributes(idpConfig));
+        IDPAttributeMapper attrMapper = getIDPAttributeMapper(WSFederationMetaUtils.getAttributes(idpConfig.getValue()));
+        IDPAccountMapper accountMapper = getIDPAccountMapper(WSFederationMetaUtils.getAttributes(idpConfig.getValue()));
 
         List attributes = attrMapper.getAttributes(session, idpEntityId, spEntityId, realm);
 
@@ -539,13 +539,13 @@ public class WSFederationUtils {
 
         NameIdentifier nameIdentifier = accountMapper.getNameID(session, realm, idpEntityId, spEntityId);
 
-        int notBeforeSkew = WSFederationMetaUtils.getIntAttribute(idpConfig,
+        int notBeforeSkew = WSFederationMetaUtils.getIntAttribute(idpConfig.getValue(),
                 SAML2Constants.ASSERTION_NOTBEFORE_SKEW_ATTRIBUTE, SAML2Constants.NOTBEFORE_ASSERTION_SKEW_DEFAULT);
 
-        int effectiveTime = WSFederationMetaUtils.getIntAttribute(idpConfig,
+        int effectiveTime = WSFederationMetaUtils.getIntAttribute(idpConfig.getValue(),
                 SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE, SAML2Constants.ASSERTION_EFFECTIVE_TIME);
 
-        String certAlias = WSFederationMetaUtils.getAttribute(idpConfig, SAML2Constants.SIGNING_CERT_ALIAS);
+        String certAlias = WSFederationMetaUtils.getAttribute(idpConfig.getValue(), SAML2Constants.SIGNING_CERT_ALIAS);
 
         if (wantAssertionSigned && certAlias == null) {
             // SP wants us to sign the assertion, but we don't have a signing cert

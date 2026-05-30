@@ -24,7 +24,7 @@
  *
  * $Id: LibertyManager.java,v 1.7 2008/06/25 05:48:17 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -1276,7 +1276,7 @@ public class LibertyManager {
             try {
                 if (metaManager != null) {
                     BaseConfigType providerConfig = 
-                        metaManager.getSPDescriptorConfig(realm, entityID);
+                        metaManager.getSPDescriptorConfig(realm, entityID).getValue();
                     homePage = IDFFMetaUtils.getFirstAttributeValue(
                         IDFFMetaUtils.getAttributes(providerConfig),
                         IFSConstants.PROVIDER_HOME_PAGE_URL);
@@ -2025,7 +2025,7 @@ public class LibertyManager {
             hostedDescriptor = metaManager.getSPDescriptor(
                 realm, hostedEntityID);
             hostedConfig = metaManager.getSPDescriptorConfig(
-                realm, hostedEntityID);
+                realm, hostedEntityID).getValue();
         } catch (IDFFMetaException ie) {
             debug.error(classMethod + "couldn't obtain hosted meta:", ie);
             return null;

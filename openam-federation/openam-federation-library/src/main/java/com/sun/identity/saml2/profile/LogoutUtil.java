@@ -25,7 +25,7 @@
  * $Id: LogoutUtil.java,v 1.16 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.xml.soap.SOAPException;
@@ -70,7 +71,6 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
 import com.sun.identity.saml2.key.EncInfo;
@@ -604,7 +604,7 @@ public class LogoutUtil {
         Map<String, SingleLogoutServiceElement> sloBindings =
                 new HashMap<String, SingleLogoutServiceElement>(sloList.size());
         for (SingleLogoutServiceElement sloEndpoint : sloList) {
-            sloBindings.put(sloEndpoint.getBinding(), sloEndpoint);
+            sloBindings.put(sloEndpoint.getValue().getBinding(), sloEndpoint);
         }
 
         SingleLogoutServiceElement endpoint = sloBindings.get(preferredBinding);
@@ -651,7 +651,7 @@ public class LogoutUtil {
         for (int i=0; i<n; i++) {
             slos = (SingleLogoutServiceElement)sloList.get(i);
             if (slos != null) {
-                binding = slos.getBinding();
+                binding = slos.getValue().getBinding();
             }
             if (debug.messageEnabled()) {
                 debug.message(
@@ -660,7 +660,7 @@ public class LogoutUtil {
                     binding);
             }
             if ((binding != null) && (binding.equals(desiredBinding))) {
-                location = slos.getLocation();
+                location = slos.getValue().getLocation();
                 if (debug.messageEnabled()) {
                     debug.message(
                         classMethod +
@@ -698,7 +698,7 @@ public class LogoutUtil {
         for (int i=0; i<n; i++) {
             slos = (SingleLogoutServiceElement)sloList.get(i);
             if (slos != null) {
-                binding = slos.getBinding();
+                binding = slos.getValue().getBinding();
             }
             if (debug.messageEnabled()) {
                 debug.message(
@@ -707,7 +707,7 @@ public class LogoutUtil {
                     binding);
             }
             if ((binding != null) && (binding.equals(desiredBinding))) {
-                resLocation = slos.getResponseLocation();
+                resLocation = slos.getValue().getResponseLocation();
                 if (debug.messageEnabled()) {
                     debug.message(
                         classMethod +
@@ -892,10 +892,10 @@ public class LogoutUtil {
         Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), remoteEntity, SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), remoteEntity, SAML2Constants.IDP_ROLE);
         }
 
         if (!signingCerts.isEmpty()) {
@@ -1018,10 +1018,10 @@ public class LogoutUtil {
         Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), remoteEntity, SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), remoteEntity, SAML2Constants.IDP_ROLE);
         }
         
         if (!signingCerts.isEmpty()) {
@@ -1063,18 +1063,18 @@ public class LogoutUtil {
         }
         
         EncInfo encryptInfo = null;
-        KeyDescriptorType keyDescriptor = null;
+        KeyDescriptorElement keyDescriptor = null;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc =
                 metaManager.getSPSSODescriptor(realm, remoteEntity);
-            keyDescriptor = KeyUtil.getKeyDescriptor(spSSODesc, "encryption");
-            encryptInfo = KeyUtil.getEncInfo(spSSODesc, remoteEntity,
+            keyDescriptor = KeyUtil.getKeyDescriptor(spSSODesc.getValue(), "encryption");
+            encryptInfo = KeyUtil.getEncInfo(spSSODesc.getValue(), remoteEntity,
                 SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = 
                 metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            keyDescriptor = KeyUtil.getKeyDescriptor(idpSSODesc, "encryption");
-            encryptInfo = KeyUtil.getEncInfo(idpSSODesc, remoteEntity,
+            keyDescriptor = KeyUtil.getKeyDescriptor(idpSSODesc.getValue(), "encryption");
+            encryptInfo = KeyUtil.getEncInfo(idpSSODesc.getValue(), remoteEntity,
                 SAML2Constants.IDP_ROLE);
         }
 
@@ -1252,7 +1252,7 @@ public class LogoutUtil {
                     getSLOServiceElement(realm, remoteEntityID,
                                        hostEntityRole, null);
                 if (sloService != null) {
-                    binding = sloService.getBinding();
+                    binding = sloService.getValue().getBinding();
                 }
             }
         } catch (SessionException e) {
@@ -1320,16 +1320,16 @@ public class LogoutUtil {
             return null;
         }
 
-        List list = idpSSODesc.getSingleLogoutService();
+        List<SingleLogoutServiceElement> list = idpSSODesc.getValue().getSingleLogoutService();
 
         if ((list != null) && !list.isEmpty()) {
             if (binding == null) {
-                return (SingleLogoutServiceElement)list.get(0);
+                return list.get(0);
             }
-            Iterator it = list.iterator();
+            Iterator<SingleLogoutServiceElement> it = list.iterator();
             while (it.hasNext()) {
-                slo = (SingleLogoutServiceElement)it.next();  
-                if (binding.equalsIgnoreCase(slo.getBinding())) {
+                slo = it.next();
+                if (binding.equalsIgnoreCase(slo.getValue().getBinding())) {
                     break;
                 }
             }
@@ -1361,7 +1361,7 @@ public class LogoutUtil {
             return null;
         }
 
-        List list = spSSODesc.getSingleLogoutService();
+        List list = spSSODesc.getValue().getSingleLogoutService();
 
         if ((list != null) && !list.isEmpty()) {
             if (binding == null) {
@@ -1370,7 +1370,7 @@ public class LogoutUtil {
             Iterator it = list.iterator();
             while (it.hasNext()) {
                 slo = (SingleLogoutServiceElement)it.next();  
-                if (binding.equalsIgnoreCase(slo.getBinding())) {
+                if (binding.equalsIgnoreCase(slo.getValue().getBinding())) {
                     break;
                 }
             }

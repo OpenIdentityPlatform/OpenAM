@@ -24,7 +24,7 @@
  *
  * $Id: FSSSOAndFedService.java,v 1.8 2009/06/19 02:45:50 bigfatrat Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -244,7 +244,7 @@ public class FSSSOAndFedService  extends HttpServlet {
             hostEntityId = metaManager.getEntityIDByMetaAlias(metaAlias);
             hostedDesc = metaManager.getIDPDescriptor(realm, hostEntityId);
             hostedConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostEntityId);
+                realm, hostEntityId).getValue();
         } catch (Exception e) {
             if (FSUtils.debug.messageEnabled()) {
                 FSUtils.debug.message(
@@ -369,7 +369,7 @@ public class FSSSOAndFedService  extends HttpServlet {
             hostEntityId = metaManager.getEntityIDByMetaAlias(metaAlias);
             hostedDesc = metaManager.getIDPDescriptor(realm, hostEntityId);
             hostedConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostEntityId);
+                realm, hostEntityId).getValue();
         } catch (Exception e) {
             if (FSUtils.debug.messageEnabled()) {
                 FSUtils.debug.message(
@@ -428,7 +428,7 @@ public class FSSSOAndFedService  extends HttpServlet {
         try {
             hostedDesc = metaManager.getIDPDescriptor(realm, hostEntityId);
             hostedConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostEntityId);
+                realm, hostEntityId).getValue();
             if (hostedConfig != null) {
                 metaAlias = hostedConfig.getMetaAlias();
             }
@@ -725,7 +725,7 @@ public class FSSSOAndFedService  extends HttpServlet {
                     IDPDescriptorType hostedDesc =
                         metaManager.getIDPDescriptor(realm, hostEntityId);
                     BaseConfigType hostedConfig =
-                        metaManager.getIDPDescriptorConfig(realm, hostEntityId);
+                        metaManager.getIDPDescriptorConfig(realm, hostEntityId).getValue();
                     FSSessionManager sessionService = 
                         FSSessionManager.getInstance(metaAlias);
                     sessionService.setAuthnRequest(

@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 package org.forgerock.openam.sts.token;
 
@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import jakarta.inject.Inject;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

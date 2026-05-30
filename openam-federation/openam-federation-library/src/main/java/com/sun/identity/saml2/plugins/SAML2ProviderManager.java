@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SAML2ProviderManager.java,v 1.3 2008/06/25 05:47:52 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -92,9 +94,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public boolean isNameIDEncryptionEnabled(String providerID) {
         BaseConfigType config = null;
         try {
-            config = metaManager.getSPSSOConfig("/", providerID);
+            config = metaManager.getSPSSOConfig("/", providerID).getValue();
             if (config == null) {
-                config = metaManager.getIDPSSOConfig("/", providerID);
+                config = metaManager.getIDPSSOConfig("/", providerID).getValue();
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(
@@ -163,9 +165,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public PrivateKey getDecryptionKey(String providerID) {
         BaseConfigType providerConfig = null;
         try {
-            providerConfig = metaManager.getSPSSOConfig("/", providerID);
+            providerConfig = metaManager.getSPSSOConfig("/", providerID).getValue();
             if (providerConfig == null) {
-                providerConfig = metaManager.getIDPSSOConfig("/", providerID);
+                providerConfig = metaManager.getIDPSSOConfig("/", providerID).getValue();
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error("SAML2ProviderManager.getDecryptionKey",
@@ -187,9 +189,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public String getSigningKeyAlias(String providerID) {
         BaseConfigType config = null;
         try {
-            config = metaManager.getSPSSOConfig("/", providerID);
+            config = metaManager.getSPSSOConfig("/", providerID).getValue();
             if (config == null) {
-                config = metaManager.getIDPSSOConfig("/", providerID);
+                config = metaManager.getIDPSSOConfig("/", providerID).getValue();
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(
@@ -212,9 +214,9 @@ public class SAML2ProviderManager implements ProviderManager {
     private EncInfo getEncInfo(String providerID) {
         SSODescriptorType ssod = null;
         try {
-            ssod = metaManager.getSPSSODescriptor("/", providerID);
+            ssod = metaManager.getSPSSODescriptor("/", providerID).getValue();
             if (ssod == null) {
-                ssod = metaManager.getIDPSSODescriptor("/", providerID);
+                ssod = metaManager.getIDPSSODescriptor("/", providerID).getValue();
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(

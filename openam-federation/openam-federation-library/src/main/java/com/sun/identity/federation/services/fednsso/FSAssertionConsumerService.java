@@ -24,7 +24,7 @@
  *
  * $Id: FSAssertionConsumerService.java,v 1.3 2008/06/25 05:46:57 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -125,7 +125,7 @@ public class FSAssertionConsumerService extends HttpServlet {
             hostEntityId = metaManager.getEntityIDByMetaAlias(metaAlias);
             hostDesc = metaManager.getSPDescriptor(realm, hostEntityId);
             hostConfig = metaManager.getSPDescriptorConfig(
-                realm, hostEntityId);
+                realm, hostEntityId).getValue();
         } catch (Exception e) {
             FSUtils.debug.error("FSAssertionConsumerService.doGet: ", e);
             FSUtils.forwardRequest(request, response, framedPageURL);
@@ -251,7 +251,7 @@ public class FSAssertionConsumerService extends HttpServlet {
         try {
             hostEntityId = metaManager.getEntityIDByMetaAlias(metaAlias);
             hostDesc = metaManager.getSPDescriptor(realm, hostEntityId);
-            hostConfig = metaManager.getSPDescriptorConfig(realm, hostEntityId);
+            hostConfig = metaManager.getSPDescriptorConfig(realm, hostEntityId).getValue();
         } catch (Exception e) {
             FSUtils.debug.error("FSAssertionConsumerService.doPost: " +
                 "Exception when obtain host meta data:", e);

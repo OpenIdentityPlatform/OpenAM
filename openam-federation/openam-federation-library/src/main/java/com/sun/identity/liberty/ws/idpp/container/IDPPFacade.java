@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPFacade.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,55 +68,54 @@ public class IDPPFacade extends IDPPBaseContainer {
      public Object getContainerObject(Map userMap) throws IDPPException {
 
          IDPPUtils.debug.message("IDPPFacade:getContainerObject:Init");
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
-             FacadeElement fe = 
-                  IDPPUtils.getIDPPFactory().createFacadeElement();
+         PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
+         FacadeElement fe =
+              IDPPUtils.getIDPPFactory().createFacadeElement(
+                      IDPPUtils.getIDPPFactory().createFacadeType()
+              );
 
-             String mugShot = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.MUGSHOT_ELEMENT).toLowerCase());
+         String mugShot = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.MUGSHOT_ELEMENT).toLowerCase());
 
-             if(mugShot != null) {
-                fe.setMugShot(getDSTURI(mugShot));
-             }
-
-             String webSite = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.WEBSITE_ELEMENT).toLowerCase());
-             if(webSite != null) {
-                fe.setWebSite(getDSTURI(webSite));
-             }
-
-             String namePronounced = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.NAME_PRONOUNCED_ELEMENT).toLowerCase());
-             if(namePronounced != null) {
-                fe.setNamePronounced(getDSTURI(namePronounced));
-             }
-
-             String greetSound = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.GREET_SOUND_ELEMENT).toLowerCase());
-             if(greetSound != null) {
-                fe.setGreetSound(getDSTURI(greetSound));
-             }
-
-             String greetMeSound = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.GREET_ME_SOUND_ELEMENT).toLowerCase());
-             if(greetMeSound != null) {
-                fe.setGreetMeSound(getDSTURI(greetMeSound));
-             }
-             ppType.setFacade(fe);
-
-             return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPFacade:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
+         if(mugShot != null) {
+            fe.getValue().setMugShot(
+                    IDPPUtils.getIDPPFactory().createMugShotElement(getDSTURI(mugShot)));
          }
+
+         String webSite = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.WEBSITE_ELEMENT).toLowerCase());
+         if(webSite != null) {
+            fe.getValue().setWebSite(
+                    IDPPUtils.getIDPPFactory().createWebSiteElement(getDSTURI(webSite)));
+         }
+
+         String namePronounced = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.NAME_PRONOUNCED_ELEMENT).toLowerCase());
+         if(namePronounced != null) {
+            fe.getValue().setNamePronounced(IDPPUtils.getIDPPFactory().createNamePronouncedElement(getDSTURI(namePronounced)));
+         }
+
+         String greetSound = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.GREET_SOUND_ELEMENT).toLowerCase());
+         if(greetSound != null) {
+            fe.getValue().setGreetSound(IDPPUtils.getIDPPFactory().createGreetSoundElement(getDSTURI(greetSound)));
+         }
+
+         String greetMeSound = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.GREET_ME_SOUND_ELEMENT).toLowerCase());
+         if(greetMeSound != null) {
+            fe.getValue().setGreetMeSound(
+                    IDPPUtils.getIDPPFactory().createGreetMeSoundElement(getDSTURI(greetMeSound))
+            );
+         }
+         ppType.setFacade(fe);
+
+         return ppType;
      }
 
      /**
@@ -255,11 +256,11 @@ public class IDPPFacade extends IDPPBaseContainer {
          DSTURI greetMeSound = null;
          if(obj != null) {
             FacadeElement fe = (FacadeElement)obj;
-            mugShot = fe.getMugShot();
-            webSite = fe.getWebSite();
-            namePronounced = fe.getNamePronounced();
-            greetSound = fe.getGreetSound();
-            greetMeSound = fe.getGreetMeSound();
+            mugShot = fe.getValue().getMugShot().getValue();
+            webSite = fe.getValue().getWebSite().getValue();
+            namePronounced = fe.getValue().getNamePronounced().getValue();
+            greetSound = fe.getValue().getGreetSound().getValue();
+            greetMeSound = fe.getValue().getGreetMeSound().getValue();
          }
          getAttributeMap(IDPPConstants.MUGSHOT_ELEMENT, mugShot, map);
          getAttributeMap(IDPPConstants.WEBSITE_ELEMENT, webSite, map);

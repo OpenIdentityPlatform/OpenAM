@@ -28,6 +28,7 @@
 /*
  * Portions Copyrighted 2014 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 
 package com.sun.identity.workflow;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.forgerock.openam.utils.StringUtils;
 
@@ -111,9 +112,9 @@ public class GetCircleOfTrusts
             EntityConfigElement configElt =
                 (obj instanceof EntityConfigElement) ?
                 (EntityConfigElement)obj : null;
-            if (configElt != null && configElt.isHosted()) {
+            if (configElt != null && configElt.getValue().isHosted()) {
                 List config =
-                configElt.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                 if (!config.isEmpty()) {
                     BaseConfigType bConfig = (BaseConfigType)
                         config.iterator().next();

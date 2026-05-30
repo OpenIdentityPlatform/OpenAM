@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ProviderConfig.java,v 1.31 2009/11/16 21:52:58 mallas Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 package com.sun.identity.wss.provider; 
@@ -79,7 +81,7 @@ public abstract class ProviderConfig {
     public static final String WSS_PROVIDER_CONFIG_PLUGIN =
          "com.sun.identity.wss.provider.config.plugin";
  
-     protected List secMech = null;
+     protected List<String> secMech = null;
      protected String serviceURI = null;
      protected String providerName = null; 
      protected String wspEndpoint = null;
@@ -134,7 +136,7 @@ public abstract class ProviderConfig {
      *
      * @return list of security mechanisms.
      */
-    public List getSecurityMechanisms() {
+    public List<String> getSecurityMechanisms() {
          return secMech;
     }
 
