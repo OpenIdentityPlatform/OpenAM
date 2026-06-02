@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2017-2025 3A Systems, LLC
+ * Portions copyright 2017-2026 3A Systems, LLC
  
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -294,6 +294,8 @@
                                 <exclude>META-INF</exclude>
                                 <exclude>WEB-INF</exclude>
                                 <exclude>com_sun_web_ui/images</exclude>
+								<!-- JavaHelp search index files are binary; do not filter -->
+        						<exclude>**/JavaHelpSearch/**</exclude>
                             </excludes>
                             <targetPath />
                             <filtering>true</filtering>
@@ -306,6 +308,15 @@
                             <targetPath>com_sun_web_ui/images</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+						<!-- New: copy JavaHelp search indexes WITHOUT filtering -->
+						<webResource>
+						    <directory>${basedir}/src/main/webapp</directory>
+						    <includes>
+						        <include>**/JavaHelpSearch/**</include>
+						    </includes>
+						    <targetPath />
+						    <filtering>false</filtering>
+						</webResource>
                         <webResource>
                             <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
                             <includes>
