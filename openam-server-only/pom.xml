@@ -257,6 +257,7 @@
                         <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
     					<nonFilteredFileExtension>eot</nonFilteredFileExtension>
     					<nonFilteredFileExtension>svg</nonFilteredFileExtension>
+						<nonFilteredFileExtension>otf</nonFilteredFileExtension>
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
                     <webResources>
