@@ -22,8 +22,8 @@ import { getConfig, setConfig, type Config } from '../config';
 import type { ActionElements, CallbackElement } from './types';
 
 describe('DefaultLoginForm', () => {
-    const mockCallbackElement: CallbackElement = vi.fn();
-    const mockActionElements: ActionElements = vi.fn();
+    const mockCallbackElement: CallbackElement = vi.fn(() => { return null });
+    const mockActionElements: ActionElements = vi.fn(() => { return null });
 
     const mockSetCallbackValue = vi.fn();
     const mockDoLogin = vi.fn()
