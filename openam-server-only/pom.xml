@@ -258,6 +258,7 @@
     					<nonFilteredFileExtension>eot</nonFilteredFileExtension>
     					<nonFilteredFileExtension>svg</nonFilteredFileExtension>
 						<nonFilteredFileExtension>otf</nonFilteredFileExtension>
+						<nonFilteredFileExtension>db</nonFilteredFileExtension>
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
                     <webResources>
