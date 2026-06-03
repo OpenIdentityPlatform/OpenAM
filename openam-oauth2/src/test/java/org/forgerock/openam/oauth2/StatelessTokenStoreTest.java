@@ -19,8 +19,13 @@ package org.forgerock.openam.oauth2;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -79,13 +84,15 @@ public final class StatelessTokenStoreTest {
     private OAuth2Request request;
     @Mock
     private OAuth2ProviderSettings settings;
+    @Mock
+    private OAuth2AccessTokenModifier accessTokenModifier;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         tokenStore = new StatelessTokenStore(statefulTokenStore, new JwtBuilderFactory(), providerSettingsFactory,
                 logger, clientRegistrationStore, realmNormaliser, oAuth2UrisFactory, tokenBlacklist,
-                cts, tokenAdapter, utils);
+                cts, tokenAdapter, utils, accessTokenModifier);
     }
 
     @Test
@@ -213,6 +220,61 @@ public final class StatelessTokenStoreTest {
         // Then
         assertThat(token.getTokenInfo()).doesNotContainKey("acr");
         assertThat(token.getTokenInfo()).doesNotContainKey("authModules");
+    }
+
+    @Test
+    public void whenModificationScriptReturnsClaimsTheyAreMergedIntoAccessToken() throws Exception {
+        // Given
+        givenBaseProviderSettings();
+        given(utils.getConfirmationKey(request)).willReturn(null);
+
+        Map<String, Object> modifiedClaims = new HashMap<>();
+        modifiedClaims.put("department", "engineering");
+        modifiedClaims.put("custom_number", 42);
+        given(accessTokenModifier.getModifiedClaims(any(OAuth2Request.class), anyString(), anyString(), anyString(),
+                any(), any())).willReturn(modifiedClaims);
+
+        // When
+        AccessToken token = tokenStore.createAccessToken("client_credentials", "exmple", "123-456-789", "owner-id",
+                "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", request);
+
+        // Then
+        assertThat(token.getTokenInfo().get("department")).isEqualTo("engineering");
+        assertThat(token.getTokenInfo().get("custom_number")).isEqualTo(42);
+    }
+
+    @Test
+    public void whenModificationScriptReturnsClaimsTheyAreMergedIntoRefreshToken() throws Exception {
+        // Given
+        givenBaseProviderSettings();
+
+        Map<String, Object> modifiedClaims = new HashMap<>();
+        modifiedClaims.put("department", "engineering");
+        given(accessTokenModifier.getModifiedClaims(any(OAuth2Request.class), anyString(), anyString(), anyString(),
+                any(), any())).willReturn(modifiedClaims);
+
+        // When
+        RefreshToken token = tokenStore.createRefreshToken("client_credentials", "client-id", "owner-id",
+                "http://a/b.com", singleton("open"), request, "some-claim");
+
+        // Then
+        assertThat(token.getTokenInfo().get("department")).isEqualTo("engineering");
+    }
+
+    @Test
+    public void whenModificationScriptReturnsNoClaimsTokenIsUnchanged() throws Exception {
+        // Given
+        givenBaseProviderSettings();
+        given(utils.getConfirmationKey(request)).willReturn(null);
+        given(accessTokenModifier.getModifiedClaims(any(OAuth2Request.class), anyString(), anyString(), anyString(),
+                any(), any())).willReturn(new HashMap<String, Object>());
+
+        // When
+        AccessToken token = tokenStore.createAccessToken("client_credentials", "exmple", "123-456-789", "owner-id",
+                "client-id", "http://a/b.com", singleton("open"), null, "qwerty", "some-claim", request);
+
+        // Then
+        assertThat(token.getTokenInfo()).doesNotContainKey("department");
     }
 
     private void givenBaseProviderSettings() throws Exception {

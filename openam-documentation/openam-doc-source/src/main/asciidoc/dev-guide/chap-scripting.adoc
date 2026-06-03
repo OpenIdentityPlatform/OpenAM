@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -71,6 +71,12 @@ To see an example policy condition script, see xref:#sec-scripted-policy-conditi
 
 OIDC Claims::
 Scripts that gather and populate the claims in a request when issuing an ID token or making a request to the `userinfo` endpoint.
+
+OAuth2 Access Token Modification::
+Scripts that add, modify, or remove claims in a stateless (JWT) OAuth 2.0 access token or refresh token when it is issued.
+
++
+To see an example access token modification script, see xref:#scripting-api-access-token-modification["OAuth2 Access Token Modification API Functionality"].
 
 --
 OpenAM implements a configurable scripting engine for each of the context types that are executed on the server.
@@ -729,6 +735,91 @@ a|Contains requested claims if the `claims` query parameter is used in the reque
 }
 ----
 |===
+
+
+
+
+[#scripting-api-access-token-modification]
+==== OAuth2 Access Token Modification API Functionality
+
+This section covers functionality available when scripting OAuth 2.0 access token modification using the `OAUTH2_ACCESS_TOKEN_MODIFICATION` script context type.
+
+The script is executed when OpenAM issues a stateless (JWT) OAuth 2.0 access token or refresh token. Any claims the script adds, modifies, or removes are merged into the token payload before it is signed. This lets you embed custom claims (such as `acr`, `amr`, roles, or profile attributes) directly into the access token, without an additional call to the `/oauth2/tokeninfo` endpoint.
+
+[NOTE]
+======
+The script is only invoked when __Use Stateless Access & Refresh Tokens__ is enabled in the OAuth2 Provider service. Stateful tokens are opaque and do not carry claims.
+
+To preserve custom claims across the refresh cycle, the script runs both when issuing the access token and when issuing the refresh token.
+======
+
+[#scripted-api-access-token-modification-objects]
+.Access Token Modification Objects
+[cols="33%,22%,45%"]
+|===
+|Object |Type |Description
+
+a|`accessToken`
+a|`Class`
+a|A mutable view of the token being issued. Use the following methods to modify the token payload:
+
+* `accessToken.setField(String name, Object value)` - adds or overrides a claim.
+* `accessToken.getField(String name)` - reads a claim previously set by the script, or a read-only context value (for example `sub`, `realm`, `clientId`, `scope`, `grantType`, `acr`, `amr`, `tokenName`).
+* `accessToken.removeField(String name)` - removes a custom claim added by the script.
+
+ For more details, see the `org.forgerock.openam.oauth2.ScriptableAccessToken` class.
+
+a|`scopes`
+a|`Set<String>`
+a|Contains the set of scopes granted to the token. For example:
+
+[source, javascript]
+----
+[
+    "profile",
+    "openid"
+]
+----
+
+a|`identity`
+a|`Class`
+a|Contains a representation of the identity of the resource owner, when it can be resolved. May be `null` (for example, for the `client_credentials` grant).
+
+ For more details, see the `com.sun.identity.idm.AMIdentity` class in the link:../apidocs/index.html?com/sun/identity/idm/AMIdentity.html[OpenAM Javadoc, window=\_top].
+
+a|`session`
+a|`Class`
+a|Contains a representation of the user's session object if the request contained a valid session. May be `null`.
+
+ For more details, see the `com.iplanet.sso.SSOToken` class in the link:../apidocs/index.html?com/iplanet/sso/SSOToken.html[OpenAM Javadoc, window=\_top].
+
+a|`requestProperties`
+a|`Map<String, Object>`
+a|Contains selected properties of the OAuth 2.0 request, such as `clientId`, `realm`, and `grantType`.
+
+a|`logger`
+a|`Class`
+a|Contains the `OAuth2Provider` debug logger instance.
+
+ For more details, see the `com.sun.identity.shared.debug.Debug` class in the link:../apidocs/index.html?com/sun/identity/shared/debug/Debug.html[OpenAM Javadoc, window=\_top].
+|===
+
+The script does not need to return a value; changes applied to the `accessToken` object are merged into the issued token. For example, the following Groovy fragment copies the authentication context class reference into the token and adds a custom claim:
+
+[source, groovy]
+----
+def acr = accessToken.getField("acr")
+if (acr != null) {
+    accessToken.setField("acr", acr)
+}
+
+if (identity != null) {
+    def mail = identity.getAttribute("mail")
+    if (mail != null && !mail.isEmpty()) {
+        accessToken.setField("email", mail.iterator().next())
+    }
+}
+----
 
 
 
