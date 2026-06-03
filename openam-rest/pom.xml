@@ -145,6 +145,7 @@
         <dependency>
             <groupId>org.openidentityplatform.commons.guice</groupId>
             <artifactId>test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
