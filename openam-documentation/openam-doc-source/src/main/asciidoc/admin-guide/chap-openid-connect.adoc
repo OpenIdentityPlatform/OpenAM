@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -798,10 +798,22 @@ $ curl http://openam.example.com:8080/openam/oauth2/tokeninfo?access_token=eyAid
      "openid":"",
      "jti":"f8010f16-fba4-485e-84c5-c68e6296f21c",
      "token_type":"Bearer",
+     "acr":"urn:mace:incommon:iap:silver",
+     "authModules":"DataStore",
      "access_token":"eyAid...1knJDss",
      "profile":""
  }
 ----
++
+[NOTE]
+====
+The `acr` (Authentication Context Class Reference) and `authModules` claims are
+included in the stateless access token only when the originating authorization
+code or refresh token carries this information, for example when the access
+token is issued through the `authorization_code` or `refresh_token` grant. When
+no such data is available (for example, with the `client_credentials` grant),
+these claims are omitted.
+====
 
 ====
 
