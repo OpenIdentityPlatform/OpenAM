@@ -31,7 +31,7 @@ import org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler;
 import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
 import org.testng.annotations.Test;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -68,8 +68,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);
@@ -104,8 +103,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);
@@ -141,8 +139,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);
