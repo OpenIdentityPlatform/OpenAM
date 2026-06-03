@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2020-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -234,8 +234,29 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
-        
-        
+
+        // Propagate authentication context (acr) and authentication modules (amr) into the
+        // stateless JWT access token, mirroring the behaviour of createRefreshToken. The values
+        // are sourced from the AuthorizationCode (authorization_code grant) or from the previous
+        // RefreshToken (refresh_token grant), so PEPs/API gateways can read acr/amr directly from
+        // the access token payload without an extra /oauth2/tokeninfo round-trip.
+        String authModules = null;
+        String acr = null;
+        if (authCode != null) {
+            authModules = authCode.getAuthModules();
+            acr = authCode.getAuthenticationContextClassReference();
+        }
+        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
+        if (currentRefreshToken != null) {
+            authModules = currentRefreshToken.getAuthModules();
+            acr = currentRefreshToken.getAuthenticationContextClassReference();
+        }
+        if (authModules != null) {
+            claimsSetBuilder.claim(AUTH_MODULES, authModules);
+        }
+        if (acr != null) {
+            claimsSetBuilder.claim(ACR, acr);
+        }
 
         JsonValue confirmationJwk = utils.getConfirmationKey(request);
         if (confirmationJwk != null) {
