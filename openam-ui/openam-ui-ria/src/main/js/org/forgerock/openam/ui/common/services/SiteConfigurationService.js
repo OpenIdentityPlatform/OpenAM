@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 define([
@@ -59,6 +60,11 @@ define([
                 if (isRealmChanged()) {
                     location.href = "#confirmLogin/";
                 }
+            }, () => {
+                // No (valid) session - e.g. anonymous user, or an HttpOnly session cookie that
+                // cannot be read and turned out not to reference a live session. Continue without
+                // a realm change check rather than stalling page rendering.
+                return $.Deferred().resolve();
             });
         } else {
             return $.Deferred().resolve();

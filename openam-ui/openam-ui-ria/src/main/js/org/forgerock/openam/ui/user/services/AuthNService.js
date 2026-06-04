@@ -13,6 +13,7 @@
  *
  * Portions copyright 2011-2016 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2026 3A Systems, LLC.
  */
 define([
     "jquery",
@@ -45,7 +46,7 @@ define([
 
         // In case user has logged in already update session
         const sessionToken = SessionToken.get();
-        if (sessionToken) {
+        if (sessionToken && SessionToken.isResolvable(sessionToken)) {
             params.sessionUpgradeSSOTokenId = sessionToken;
         }
 
