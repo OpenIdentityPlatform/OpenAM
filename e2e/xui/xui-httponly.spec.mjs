@@ -39,7 +39,9 @@ import { OPENAM_BASE, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
 const SEL = {
     usernameInput: "#idToken1",
     passwordInput: "#idToken2",
-    loginButton: "#loginButton",
+    // The submit button id varies between XUI builds (loginButton / loginButton_0 / none),
+    // so match by submit type as the working SAML spec does.
+    loginButton: "#loginButton, input[type=\"submit\"], button[type=\"submit\"]",
 };
 
 // Optional hard expectation for the CI matrix ("true" | "false" | undefined)
@@ -71,7 +73,7 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         await expect(page.locator(SEL.usernameInput)).toBeVisible({ timeout: 20_000 });
         await page.fill(SEL.usernameInput, USERNAME);
         await page.fill(SEL.passwordInput, PASSWORD);
-        await page.click(SEL.loginButton);
+        await page.locator(SEL.loginButton).first().click();
 
         // ── 3. XUI must consider the user logged in (leaves the #login route) ────
         await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
@@ -107,4 +109,6 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         expect(afterLogout, "session cookie must be cleared after logout").toBeFalsy();
     });
 });
+
+
 
