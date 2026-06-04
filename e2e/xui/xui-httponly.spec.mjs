@@ -104,11 +104,21 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         await page.goto(`${OPENAM_BASE}/XUI/#logout/`);
         await page.waitForURL((url) => /^#(loggedOut|login)/.test(url.hash), { timeout: 30_000 });
 
-        // ── 8. Session cookie must be gone after logout ─────────────────────────
-        const afterLogout = (await context.cookies()).find((c) => c.name === cookieName && c.value);
-        expect(afterLogout, "session cookie must be cleared after logout").toBeFalsy();
+        // ── 8. The session must be invalidated server-side after logout ─────────
+        // Checking the browser cookie is not reliable: in HttpOnly mode JavaScript
+        // cannot clear it and the REST logout may not emit a Set-Cookie, so a stale
+        // (but dead) cookie can linger. The meaningful guarantee is that the server
+        // no longer resolves the session, which holds in both modes.
+        const afterLogoutId = await page.request.post(
+            `${OPENAM_BASE}/json/users?_action=idFromSession`,
+            { headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" } }
+        );
+        const sessionStillValid = afterLogoutId.ok() &&
+            String((await afterLogoutId.json()).id).toLowerCase() === USERNAME.toLowerCase();
+        expect(sessionStillValid, "session must be invalid after logout").toBe(false);
     });
 });
+
 
 
 
