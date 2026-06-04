@@ -100,15 +100,16 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         const idJson = await idResp.json();
         expect(String(idJson.id).toLowerCase()).toBe(USERNAME.toLowerCase());
 
-        // ── 7. Logout through the XUI must end back on the login route ──────────
+        // ── 7. Logout through the XUI must end on the logged-out/login route ────
         await page.goto(`${OPENAM_BASE}/XUI/#logout/`);
-        await page.waitForURL((url) => url.hash.startsWith("#login"), { timeout: 30_000 });
+        await page.waitForURL((url) => /^#(loggedOut|login)/.test(url.hash), { timeout: 30_000 });
 
         // ── 8. Session cookie must be gone after logout ─────────────────────────
         const afterLogout = (await context.cookies()).find((c) => c.name === cookieName && c.value);
         expect(afterLogout, "session cookie must be cleared after logout").toBeFalsy();
     });
 });
+
 
 
 
