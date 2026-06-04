@@ -33,7 +33,7 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { OPENAM_BASE, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
+import { OPENAM_BASE, USERNAME, PASSWORD, ADMIN_USER, ADMIN_PASS } from "../common/openam-commons.mjs";
 
 // XUI / LESS-based OpenAM login form selectors
 const SEL = {
@@ -53,6 +53,27 @@ async function getServerInfo(request) {
     });
     expect(resp.ok(), "GET /json/serverinfo/* should succeed").toBeTruthy();
     return resp.json();
+}
+
+/** Log in through the XUI login form and wait until the user leaves the #login route. */
+async function loginViaXui(page, user, pass) {
+    await page.goto(`${OPENAM_BASE}/XUI/#login/`);
+    await expect(page.locator(SEL.usernameInput)).toBeVisible({ timeout: 20_000 });
+    await page.fill(SEL.usernameInput, user);
+    await page.fill(SEL.passwordInput, pass);
+    await page.locator(SEL.loginButton).first().click();
+    await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
+}
+
+/** Resolve the username of the active session from the (auto-sent) session cookie. */
+async function idFromSession(request) {
+    const resp = await request.post(`${OPENAM_BASE}/json/users?_action=idFromSession`, {
+        headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+    });
+    if (!resp.ok()) {
+        return null;
+    }
+    return (await resp.json()).id;
 }
 
 test.describe("OpenAM XUI - HttpOnly session cookie", () => {
@@ -117,7 +138,35 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
             String((await afterLogoutId.json()).id).toLowerCase() === USERNAME.toLowerCase();
         expect(sessionStillValid, "session must be invalid after logout").toBe(false);
     });
+
+    test("admin stays logged in to the console after a browser page reload", async ({ page }) => {
+        // Reloading re-bootstraps the XUI from scratch: any in-memory token is lost, so the
+        // session must be re-detected purely from the (auto-sent) session cookie. This is the
+        // critical path that the HttpOnly support has to keep working.
+
+        // ── 1. Log in to the admin console ──────────────────────────────────────
+        await loginViaXui(page, ADMIN_USER, ADMIN_PASS);
+        expect(String(await idFromSession(page.request)).toLowerCase()).toBe(ADMIN_USER.toLowerCase());
+
+        // Land on the admin console (realms view) so the reload happens on a real console route.
+        await page.goto(`${OPENAM_BASE}/XUI/#realms/%2F`);
+        await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
+
+        // ── 2. Reload the page in the browser ───────────────────────────────────
+        await page.reload({ waitUntil: "networkidle" });
+
+        // ── 3. The user must still be logged in (not bounced back to #login) ─────
+        await page.waitForLoadState("networkidle");
+        expect(page.url(), "reload must not redirect to the login page").not.toContain("#login");
+        await expect(page.locator(SEL.usernameInput), "login form must not be shown after reload")
+            .toHaveCount(0);
+
+        // ── 4. The session is still resolvable after the reload ─────────────────
+        expect(String(await idFromSession(page.request)).toLowerCase()).toBe(ADMIN_USER.toLowerCase());
+    });
 });
+
+
 
 
 
