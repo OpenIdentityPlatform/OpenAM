@@ -11,13 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
-<<<<<<< HEAD
  * Copyright 2013-2016 ForgeRock AS.
-=======
- * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
->>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2018-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -37,7 +33,9 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.exceptions.JwsSigningException;
@@ -151,6 +149,8 @@ public class RestAuthenticationHandler {
 
             AuthIndexType indexType = getAuthIndexType(authIndexType);
 
+            sessionUpgradeSSOTokenId = resolveSessionUpgradeTarget(request, sessionUpgradeSSOTokenId);
+
             String authId = null;
             String sessionId = null;
 
@@ -208,6 +208,40 @@ public class RestAuthenticationHandler {
 
     private String getRealmDomainName(SignedJwt jwt) {
         return jwt.getClaimsSet().getClaim("realm", String.class);
+    }
+
+    /**
+     * Resolves the SSO Token Id of the session to upgrade (step-up).
+     * <p>
+     * Normally the client supplies this through the {@code sessionUpgradeSSOTokenId} query
+     * parameter. However, when the session cookie is configured as {@code HttpOnly} the XUI cannot
+     * read the {@code tokenId} from JavaScript, so it cannot send the parameter on an agent-driven
+     * session upgrade, which is performed via a fresh page load with an empty in-memory token.
+     * <p>
+     * In that case we fall back to the session carried by the (auto-sent) {@code HttpOnly} cookie as
+     * the upgrade target, so that the existing session is upgraded instead of being orphaned by a
+     * brand new login (which would lose its properties/sessionHandle and could make composite-advice
+     * step-up loop). The fallback is limited to the {@code HttpOnly} deployment mode so that the
+     * behaviour of all other (token-readable) deployments is unchanged.
+     *
+     * @param request The HttpServletRequest.
+     * @param sessionUpgradeSSOTokenId The explicitly supplied upgrade token id, may be null/empty.
+     * @return The upgrade token id to use, possibly resolved from the session cookie.
+     */
+    private String resolveSessionUpgradeTarget(HttpServletRequest request, String sessionUpgradeSSOTokenId) {
+        if (!StringUtils.isEmpty(sessionUpgradeSSOTokenId) || !CookieUtils.isCookieHttpOnly()) {
+            return sessionUpgradeSSOTokenId;
+        }
+        SSOToken existingToken = coreServicesWrapper.getExistingValidSSOToken(
+                coreServicesWrapper.getSessionIDFromRequest(request));
+        if (existingToken != null) {
+            String tokenId = existingToken.getTokenID().toString();
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("RestAuthenticationHandler :: resolved session upgrade target from HttpOnly cookie");
+            }
+            return tokenId;
+        }
+        return sessionUpgradeSSOTokenId;
     }
 
     private String getAuthIndexValue(SignedJwt jwt) {

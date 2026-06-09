@@ -30,6 +30,23 @@
  *
  * Optionally set EXPECT_COOKIE_HTTPONLY=true|false to additionally assert that
  * the server is in the expected mode (useful for the CI matrix).
+ *
+ * This spec covers three scenarios:
+ *   1. login / session detection / logout, with the cookie HttpOnly flag matching the server mode;
+ *   2. the admin staying logged in to the console after a full browser page reload;
+ *   3. an agent-driven session upgrade (step-up) being recognised as an upgrade — not a brand-new
+ *      login — after a fresh page load in HttpOnly mode.
+ *
+ * Step-up background / the bug it guards against:
+ *   A step-up is triggered by a fresh page load (a redirect from the agent). After such a reload
+ *   the XUI in-memory token is empty and, because the session cookie is HttpOnly, JavaScript cannot
+ *   read the tokenId. As a result the XUI cannot send the "sessionUpgradeSSOTokenId" query param.
+ *   Server-side that param used to be the ONLY source for the session to upgrade
+ *   (LoginAuthenticator resolves it via getExistingValidSSOToken(new SessionID(getSSOTokenId())) and
+ *   never reads the cookie). Without a fallback the request falls through to a brand-new login: the
+ *   existing session is orphaned, its properties/sessionHandle are lost and composite-advice step-up
+ *   can loop. The fix: when "sessionUpgradeSSOTokenId" is absent the REST authenticate flow falls
+ *   back to the session carried by the (auto-sent) HttpOnly cookie as the upgrade target.
  */
 
 import { test, expect } from "@playwright/test";
@@ -164,7 +181,52 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         // ── 4. The session is still resolvable after the reload ─────────────────
         expect(String(await idFromSession(page.request)).toLowerCase()).toBe(ADMIN_USER.toLowerCase());
     });
+
+    test("step-up after a fresh page load is recognised as a session upgrade, not a new login",
+        async ({ page }) => {
+            // ── 1. Discover the mode the server is actually running in ──────────────
+            const info = await getServerInfo(page.request);
+            const httpOnly = info.cookieHttpOnly === true;
+            console.log(`Server reports cookieHttpOnly=${httpOnly}`);
+
+            // The cookie fallback is specific to HttpOnly mode; in token-readable mode the XUI sends
+            // the upgrade token itself and there is nothing to fall back to.
+            test.skip(!httpOnly, "Session-cookie upgrade fallback only applies in HttpOnly mode");
+
+            // ── 2. Log in -> establishes the HttpOnly session cookie in the browser ──
+            await loginViaXui(page, USERNAME, PASSWORD);
+            const idBefore = await idFromSession(page.request);
+            expect(String(idBefore).toLowerCase()).toBe(USERNAME.toLowerCase());
+
+            // ── 3. Simulate the step-up request issued right after the redirect ──────
+            // A fresh page load means the XUI in-memory token is empty and the HttpOnly cookie
+            // cannot be read, so NO sessionUpgradeSSOTokenId is sent. The HttpOnly session cookie
+            // is, however, auto-sent with this request.
+            const resp = await page.request.post(`${OPENAM_BASE}/json/authenticate`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept-API-Version": "protocol=1.0,resource=2.1",
+                },
+                data: "{}",
+            });
+            expect(resp.ok(), "authenticate against the existing session should succeed").toBeTruthy();
+            const body = await resp.json();
+
+            // ── 4. The existing session is recognised as the upgrade target ──────────
+            // With the cookie fallback the server resolves the session from the HttpOnly cookie and
+            // returns its tokenId. Without the fix it would start a brand-new login and answer with
+            // an authId + callbacks (a fresh login form) instead.
+            expect(body.authId, "must NOT start a brand-new login flow (no fresh authId)").toBeFalsy();
+            expect(body.callbacks, "must NOT present a fresh login form (no callbacks)").toBeFalsy();
+            expect(body.tokenId, "the existing session must be recognised (tokenId returned)").toBeTruthy();
+
+            // ── 5. The session is still the same user's session (not orphaned/replaced) ──
+            const idAfter = await idFromSession(page.request);
+            expect(String(idAfter).toLowerCase()).toBe(USERNAME.toLowerCase());
+        });
 });
+
+
 
 
 
