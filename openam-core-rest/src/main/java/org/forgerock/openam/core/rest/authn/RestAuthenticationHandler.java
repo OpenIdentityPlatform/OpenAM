@@ -325,7 +325,16 @@ public class RestAuthenticationHandler {
                     SSOToken ssoToken = loginProcess.getSSOToken();
                     if (ssoToken != null) {
                         String tokenId = ssoToken.getTokenID().toString();
-                        jsonResponseObject.put(TOKEN_ID, tokenId);
+                        // In HttpOnly mode the session token is delivered to the browser ONLY via the
+                        // Set-Cookie header (an HttpOnly cookie). Never echo it in the response body:
+                        // the XUI in HttpOnly mode does not consume body.tokenId (it relies on the
+                        // auto-sent cookie), and returning it would let XSS on the origin read a
+                        // replayable SSO token - including a freshly upgraded one - which is exactly
+                        // what HttpOnly is meant to prevent.
+                        if (!CookieUtils.isCookieHttpOnly()) {
+                            jsonResponseObject.put(TOKEN_ID, tokenId);
+                        }
+                        // Server-side audit only - not exposed to the client.
                         AuditRequestContext.putProperty(TOKEN_ID, tokenId);
                     } else {
                         jsonResponseObject.put("message", "Authentication Successful");

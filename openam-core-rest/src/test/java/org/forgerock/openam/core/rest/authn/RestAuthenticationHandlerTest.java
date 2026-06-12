@@ -457,6 +457,37 @@ public class RestAuthenticationHandlerTest {
     }
 
     @Test
+    public void shouldNotEchoTokenIdInResponseBodyWhenCookieIsHttpOnly() throws Exception {
+
+        // Given - HttpOnly mode: the token must be delivered only via Set-Cookie, never in the body
+        setCookieHttpOnly(true);
+        try {
+            // When - a successful authentication completes
+            JsonValue response = performSuccessfulAuthentication();
+
+            // Then - the response is successful but carries NO tokenId (no token exfiltration path)
+            assertFalse(response.isDefined("tokenId"), "tokenId must not be echoed in HttpOnly mode");
+            assertThat(response).stringAt("realm").isEqualTo("REALM");
+            assertTrue(response.isDefined("successUrl"));
+        } finally {
+            setCookieHttpOnly(false);
+        }
+    }
+
+    @Test
+    public void shouldEchoTokenIdInResponseBodyWhenCookieIsNotHttpOnly() throws Exception {
+
+        // Given - token-readable mode (default): the XUI consumes body.tokenId to set the cookie
+        setCookieHttpOnly(false);
+
+        // When
+        JsonValue response = performSuccessfulAuthentication();
+
+        // Then - the tokenId is returned in the body as before
+        assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+    }
+
+    @Test
     public void shouldFallBackToSessionCookieAsUpgradeTargetWhenHttpOnlyAndNoUpgradeTokenSupplied()
             throws Exception {
 

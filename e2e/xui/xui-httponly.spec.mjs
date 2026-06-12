@@ -47,6 +47,11 @@
  *   existing session is orphaned, its properties/sessionHandle are lost and composite-advice step-up
  *   can loop. The fix: when "sessionUpgradeSSOTokenId" is absent the REST authenticate flow falls
  *   back to the session carried by the (auto-sent) HttpOnly cookie as the upgrade target.
+ *
+ *   Token never leaves the body in HttpOnly mode: a successful /json/authenticate response does NOT
+ *   echo the tokenId when the cookie is HttpOnly (the token is delivered only via Set-Cookie). This
+ *   prevents an XSS on the origin from reading a replayable SSO token via a single fetch. The XUI in
+ *   HttpOnly mode does not consume body.tokenId — it relies on the auto-sent cookie / idFromSession.
  */
 
 import { test, expect } from "@playwright/test";
@@ -212,13 +217,20 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
             expect(resp.ok(), "authenticate against the existing session should succeed").toBeTruthy();
             const body = await resp.json();
 
-            // ── 4. The existing session is recognised as the upgrade target ──────────
-            // With the cookie fallback the server resolves the session from the HttpOnly cookie and
-            // returns its tokenId. Without the fix it would start a brand-new login and answer with
-            // an authId + callbacks (a fresh login form) instead.
+            // ── 4. The existing session is recognised (no brand-new login) ──────────
+            // With the cookie fallback the server resolves the session from the auto-sent HttpOnly
+            // cookie and completes against it (successUrl/realm) instead of starting a brand-new login
+            // (which would answer with an authId + callbacks, i.e. a fresh login form).
+            //
+            // Note: in HttpOnly mode the server deliberately does NOT echo the tokenId in the body
+            // (it is delivered only via Set-Cookie), so recognition is asserted via the absence of a
+            // fresh login and a successful completion, and confirmed by idFromSession below — NOT by
+            // reading a token from the response body.
             expect(body.authId, "must NOT start a brand-new login flow (no fresh authId)").toBeFalsy();
             expect(body.callbacks, "must NOT present a fresh login form (no callbacks)").toBeFalsy();
-            expect(body.tokenId, "the existing session must be recognised (tokenId returned)").toBeTruthy();
+            expect(body.tokenId, "tokenId must NOT be echoed in the body in HttpOnly mode").toBeFalsy();
+            expect(body.successUrl ?? body.realm, "completion must reference the existing session")
+                .toBeTruthy();
 
             // ── 5. The session is still the same user's session (not orphaned/replaced) ──
             const idAfter = await idFromSession(page.request);
