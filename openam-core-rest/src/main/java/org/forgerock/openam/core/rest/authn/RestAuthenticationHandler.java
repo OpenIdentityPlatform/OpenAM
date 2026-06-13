@@ -1,4 +1,5 @@
 /*
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -325,13 +326,17 @@ public class RestAuthenticationHandler {
                     SSOToken ssoToken = loginProcess.getSSOToken();
                     if (ssoToken != null) {
                         String tokenId = ssoToken.getTokenID().toString();
-                        // In HttpOnly mode the session token is delivered to the browser ONLY via the
-                        // Set-Cookie header (an HttpOnly cookie). Never echo it in the response body:
-                        // the XUI in HttpOnly mode does not consume body.tokenId (it relies on the
-                        // auto-sent cookie), and returning it would let XSS on the origin read a
-                        // replayable SSO token - including a freshly upgraded one - which is exactly
-                        // what HttpOnly is meant to prevent.
-                        if (!CookieUtils.isCookieHttpOnly()) {
+                        // In HttpOnly mode the session token is delivered to the browser via the
+                        // Set-Cookie header. By default it is NOT echoed in the response body, so XSS
+                        // on the origin cannot read a replayable SSO token (incl. a freshly upgraded
+                        // one) - which is what HttpOnly is meant to prevent; the XUI relies on the
+                        // auto-sent cookie and does not consume body.tokenId in this mode.
+                        //
+                        // Deployments that genuinely need both the HttpOnly cookie AND the token in
+                        // the body (e.g. non-browser/raw-REST integrations) can opt back in via
+                        // org.openidentityplatform.openam.httponly.allowTokenInBody=true. When the
+                        // cookie is not HttpOnly the token is always returned, as before.
+                        if (!CookieUtils.isCookieHttpOnly() || CookieUtils.isHttpOnlyAllowTokenInBody()) {
                             jsonResponseObject.put(TOKEN_ID, tokenId);
                         }
                         // Server-side audit only - not exposed to the client.

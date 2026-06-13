@@ -25,7 +25,7 @@
  * $Id: CookieUtils.java,v 1.6 2009/10/02 00:08:26 ericow Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2017-2025 3A Systems, LLC.
+ * Portions Copyrighted 2017-2026 3A Systems, LLC.
  */
 
 package com.sun.identity.shared.encode;
@@ -69,6 +69,9 @@ public class CookieUtils {
         (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY) != null) &&
         (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY).
             equalsIgnoreCase("true"));
+
+    static boolean httpOnlyAllowTokenInBody =
+        SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY_ALLOW_TOKEN_IN_BODY, false);
 
     static String cookieSameSite = SystemPropertiesManager.get(
             Constants.AM_COOKIE_SAMESITE);
@@ -172,6 +175,21 @@ public class CookieUtils {
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Returns whether the SSO token id may be returned in the authenticate response body while the
+     * session cookie is {@code HttpOnly}.
+     * <p>
+     * Controlled by {@code org.openidentityplatform.openam.httponly.allowTokenInBody} and only
+     * relevant when {@link #isCookieHttpOnly()} is {@code true}. Defaults to {@code false}: the token
+     * is delivered only via the {@code Set-Cookie} header and is not echoed in the body. Set to
+     * {@code true} for integrations that need both the {@code HttpOnly} cookie and the body token.
+     *
+     * @return {@code true} if the token may be returned in the body in HttpOnly mode.
+     */
+    public static boolean isHttpOnlyAllowTokenInBody() {
+        return httpOnlyAllowTokenInBody;
     }
 
     /**

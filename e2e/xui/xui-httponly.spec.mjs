@@ -48,10 +48,28 @@
  *   can loop. The fix: when "sessionUpgradeSSOTokenId" is absent the REST authenticate flow falls
  *   back to the session carried by the (auto-sent) HttpOnly cookie as the upgrade target.
  *
- *   Token never leaves the body in HttpOnly mode: a successful /json/authenticate response does NOT
- *   echo the tokenId when the cookie is HttpOnly (the token is delivered only via Set-Cookie). This
- *   prevents an XSS on the origin from reading a replayable SSO token via a single fetch. The XUI in
- *   HttpOnly mode does not consume body.tokenId — it relies on the auto-sent cookie / idFromSession.
+ *   Token never leaves the body in HttpOnly mode (by default): a successful /json/authenticate
+ *   response does NOT echo the tokenId when the cookie is HttpOnly (the token is delivered only via
+ *   Set-Cookie). This prevents an XSS on the origin from reading a replayable SSO token via a single
+ *   fetch. The XUI in HttpOnly mode does not consume body.tokenId — it relies on the auto-sent
+ *   cookie / idFromSession.
+ *
+ * Response-body contract / configuration:
+ *   The presence of body.tokenId in a successful /json/authenticate response depends on two server
+ *   properties:
+ *
+ *     com.sun.identity.cookie.httponly                          (cookie HttpOnly flag)
+ *     org.openidentityplatform.openam.httponly.allowTokenInBody (default: false)
+ *
+ *   Behaviour matrix (success response body):
+ *     | httponly | allowTokenInBody | body.tokenId |
+ *     |----------|------------------|--------------|
+ *     | false    | (ignored)        | yes (legacy) |
+ *     | true     | false (default)  | no           |
+ *     | true     | true             | yes (opt-in) |
+ *
+ *   In all cases the session cookie is still set via Set-Cookie. This spec is mode-agnostic and, in
+ *   the default HttpOnly deployment (allowTokenInBody=false), asserts that body.tokenId is absent.
  */
 
 import { test, expect } from "@playwright/test";

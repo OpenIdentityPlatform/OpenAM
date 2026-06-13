@@ -459,8 +459,10 @@ public class RestAuthenticationHandlerTest {
     @Test
     public void shouldNotEchoTokenIdInResponseBodyWhenCookieIsHttpOnly() throws Exception {
 
-        // Given - HttpOnly mode: the token must be delivered only via Set-Cookie, never in the body
+        // Given - HttpOnly mode with the default policy (allowTokenInBody=false): the token must be
+        // delivered only via Set-Cookie, never in the body
         setCookieHttpOnly(true);
+        setHttpOnlyAllowTokenInBody(false);
         try {
             // When - a successful authentication completes
             JsonValue response = performSuccessfulAuthentication();
@@ -470,6 +472,25 @@ public class RestAuthenticationHandlerTest {
             assertThat(response).stringAt("realm").isEqualTo("REALM");
             assertTrue(response.isDefined("successUrl"));
         } finally {
+            setCookieHttpOnly(false);
+        }
+    }
+
+    @Test
+    public void shouldEchoTokenIdInResponseBodyWhenHttpOnlyAndAllowTokenInBodyEnabled() throws Exception {
+
+        // Given - HttpOnly mode but the deployment explicitly opted in to also return the token in
+        // the body (org.openidentityplatform.openam.httponly.allowTokenInBody=true)
+        setCookieHttpOnly(true);
+        setHttpOnlyAllowTokenInBody(true);
+        try {
+            // When
+            JsonValue response = performSuccessfulAuthentication();
+
+            // Then - both the HttpOnly cookie (set elsewhere) and the body token are available
+            assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+        } finally {
+            setHttpOnlyAllowTokenInBody(false);
             setCookieHttpOnly(false);
         }
     }
@@ -592,6 +613,12 @@ public class RestAuthenticationHandlerTest {
 
     private static void setCookieHttpOnly(boolean value) throws Exception {
         java.lang.reflect.Field field = CookieUtils.class.getDeclaredField("cookieHttpOnly");
+        field.setAccessible(true);
+        field.setBoolean(null, value);
+    }
+
+    private static void setHttpOnlyAllowTokenInBody(boolean value) throws Exception {
+        java.lang.reflect.Field field = CookieUtils.class.getDeclaredField("httpOnlyAllowTokenInBody");
         field.setAccessible(true);
         field.setBoolean(null, value);
     }
