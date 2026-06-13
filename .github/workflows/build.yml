@@ -114,7 +114,7 @@ jobs:
         run: |
           echo "Setup IDP"
   
-          docker run --rm -it -d --hostname opendj-idp --name opendj-idp --network test-openam openidentityplatform/opendj:latest
+          docker run --rm -it -d -e ADD_BASE_ENTRY="--addBaseEntry" --hostname opendj-idp --name opendj-idp --network test-openam openidentityplatform/opendj:latest
           docker run --rm -it -d -p 8080:8080 -p 8000:8000 --memory="2g" -h openam.example.org --name=openam-idp --network test-openam \
             -e JPDA_ADDRESS=*:8000 \
             -e JPDA_TRANSPORT=dt_socket \
@@ -205,7 +205,7 @@ jobs:
         run: |
           echo "Setup SP"
 
-          docker run --rm -it -d --hostname opendj-sp --name opendj-sp --network test-openam openidentityplatform/opendj:latest
+          docker run --rm -it -d -e ADD_BASE_ENTRY="--addBaseEntry"--hostname opendj-sp --name opendj-sp --network test-openam openidentityplatform/opendj:latest
   
           docker run --rm -it -d -p 8081:8080 -p 8001:8000 --memory="2g" -h sp.mycompany.org --name=openam-sp --network test-openam \
             -e JPDA_ADDRESS=*:8000 \
