@@ -48,6 +48,7 @@ public class IT_SetupWithOpenDJ extends BaseTest {
         try(GenericContainer<?> opendj =
                     new GenericContainer<>(DockerImageName.parse("openidentityplatform/opendj:latest"))
                             .withExposedPorts(1389, 4444)
+                            .withEnv("ADD_BASE_ENTRY", "--addBaseEntry")
                             .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(5)))) {
 
             opendj.start();
