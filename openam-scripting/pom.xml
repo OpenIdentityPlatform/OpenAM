@@ -72,8 +72,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.rhino</artifactId>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
         </dependency>
 
         <dependency>

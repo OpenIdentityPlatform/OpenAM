@@ -107,7 +107,6 @@
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7.15_1</rhino.version>
     <saaj-api.version>2.0.1</saaj-api.version>
     <saaj-impl.version>2.0.1</saaj-impl.version>
     <jsp-api.version>3.0.0</jsp-api.version>
@@ -137,7 +136,6 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.3.15</logback.version>
-    <netty.version>4.2.13.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
     <java.surefire.options>
@@ -1059,12 +1057,6 @@
         <version>${commons-text.version}</version>
       </dependency>
 
-      <!-- Mozilla Rhino Javascript engine -->
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.rhino</artifactId>
-        <version>${rhino.version}</version>
-      </dependency>
       <!-- Groovy scripting support -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
@@ -1727,94 +1719,6 @@
             <artifactId>jnr-posix</artifactId>
             <version>3.1.11</version>
         </dependency>
-        <dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-parent</artifactId>
-			<version>${netty.version}</version>
-			<type>pom</type>
-		</dependency>
-        <dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-common</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-resolver</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-epoll</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-epoll</artifactId>
-  			<version>${netty.version}</version>
-  			<classifier>linux-x86_64</classifier>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-kqueue</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-kqueue</artifactId>
-  			<version>${netty.version}</version>
-  			<classifier>osx-x86_64</classifier>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-unix-common</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-buffer</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-http</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-socks</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler-proxy</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport-classes-epoll</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport-classes-kqueue</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
         <dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-tcnative-boringssl-static</artifactId>
