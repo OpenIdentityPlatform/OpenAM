@@ -25,7 +25,7 @@
  * $Id: AMSetupDSConfig.java,v 1.20 2009/11/20 23:52:55 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2022-2026 3A Systems LLC.
  */
 package com.sun.identity.setup;
 
@@ -53,8 +53,10 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
@@ -212,6 +214,85 @@ public class AMSetupDSConfig {
         } catch (LdapException e) {
             disconnectDServer();
             return false;
+        }
+    }
+
+    /**
+     * Ensures that the base entry (root suffix) exists in an external directory
+     * server, creating it when it is missing.
+     *
+     * <p>For an embedded OpenDJ the suffix is created from
+     * <code>openam_suffix.ldif</code>. When OpenAM is installed against an
+     * external directory server the suffix is assumed to already exist (e.g.
+     * created by the OpenDJ docker image with <code>--addBaseEntry</code>).
+     * This method makes OpenAM create the base entry itself so the installation
+     * succeeds even when the suffix has not been pre-created.</p>
+     *
+     * <p>The method is idempotent: if the suffix already exists nothing is
+     * done. The object class of the created entry is derived from the naming
+     * attribute of the suffix (<code>dc</code>, <code>o</code> or
+     * <code>ou</code>).</p>
+     *
+     * @param ssl <code>true</code> if the directory server is running on LDAPS.
+     * @throws ConfiguratorException if the base entry cannot be created.
+     */
+    public void createBaseEntry(boolean ssl) throws ConfiguratorException {
+        if ((suffix == null) || (suffix.trim().length() == 0)) {
+            return;
+        }
+        // Suffix already present - nothing to do.
+        if (connectDSwithDN(ssl)) {
+            return;
+        }
+
+        DN suffixDN = DN.valueOf(suffix);
+        String namingAttr = suffixDN.rdn().getFirstAVA().getAttributeType().getNameOrOID();
+        String rdnValue = LDAPUtils.rdnValueFromDn(suffixDN);
+
+        SetupProgress.reportStart("emb.creatingfamsuffix", null);
+        Connection conn = getLDAPConnection(ssl);
+        if (conn == null) {
+            SetupProgress.reportEnd("emb.creatingfamsuffix.failure", new Object[] { suffix });
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                    "AMSetupDSConfig.createBaseEntry: unable to connect to directory server");
+            throw new ConfiguratorException("configurator.dsconnnectfailure", null, locale);
+        }
+        try {
+            AddRequest addRequest = LDAPRequests.newAddRequest(suffixDN)
+                    .addAttribute("objectClass", "top");
+
+            if ("dc".equalsIgnoreCase(namingAttr)) {
+                addRequest.addAttribute("objectClass", "domain")
+                        .addAttribute("dc", rdnValue);
+            } else if ("o".equalsIgnoreCase(namingAttr)) {
+                addRequest.addAttribute("objectClass", "organization")
+                        .addAttribute("o", rdnValue);
+            } else if ("ou".equalsIgnoreCase(namingAttr)) {
+                addRequest.addAttribute("objectClass", "organizationalUnit")
+                        .addAttribute("ou", rdnValue);
+            } else {
+                // Fallback for any other naming attribute.
+                addRequest.addAttribute("objectClass", "extensibleObject")
+                        .addAttribute(namingAttr, rdnValue);
+            }
+
+            conn.add(addRequest);
+            SetupProgress.reportEnd("emb.creatingfamsuffix.success", null);
+        } catch (LdapException e) {
+            // Created concurrently or already present - acceptable.
+            if (e.getResult() != null && ResultCode.ENTRY_ALREADY_EXISTS.equals(e.getResult().getResultCode())) {
+                SetupProgress.reportEnd("emb.creatingfamsuffix.success", null);
+                return;
+            }
+            Object[] error = { suffix };
+            SetupProgress.reportEnd("emb.creatingfamsuffix.failure", error);
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                    "AMSetupDSConfig.createBaseEntry: failed to create base entry " + suffix, e);
+            InstallLog.getInstance().write(
+                    "AMSetupDSConfig.createBaseEntry: failed to create base entry " + suffix, e);
+            throw new ConfiguratorException("configurator.ldiferror", null, locale);
+        } finally {
+            conn.close();
         }
     }
 

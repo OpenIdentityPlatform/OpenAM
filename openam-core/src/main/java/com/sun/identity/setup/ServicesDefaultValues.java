@@ -25,6 +25,7 @@
  * $Id: ServicesDefaultValues.java,v 1.38 2009/01/28 05:35:02 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2022-2026 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -155,12 +156,24 @@ public class ServicesDefaultValues {
                 throw new ConfiguratorException(
                     "configurator.dsconnnectfailure", null, locale);
             }
-            if ((!LDAPUtils.isDN((String) map.get(
-                    SetupConstants.CONFIG_VAR_ROOT_SUFFIX))) ||
-                (!dsConfig.connectDSwithDN(ssl))) {
+            if (!LDAPUtils.isDN((String) map.get(
+                    SetupConstants.CONFIG_VAR_ROOT_SUFFIX))) {
                 dsConfig = null;
                 throw new ConfiguratorException("configurator.invalidsuffix",
                     null, locale);
+            }
+            if (!dsConfig.connectDSwithDN(ssl)) {
+                // The base DN (root suffix) does not exist yet on the external
+                // directory server. Create it (mirrors the embedded behaviour
+                // that loads openam_suffix.ldif) so OpenAM can be installed
+                // without pre-creating the base entry (e.g. without the OpenDJ
+                // "--addBaseEntry" option).
+                dsConfig.createBaseEntry(ssl);
+                if (!dsConfig.connectDSwithDN(ssl)) {
+                    dsConfig = null;
+                    throw new ConfiguratorException("configurator.invalidsuffix",
+                        null, locale);
+                }
             }
 
             map.put(SetupConstants.DIT_LOADED, dsConfig.isDITLoaded(ssl));

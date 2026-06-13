@@ -126,12 +126,19 @@
                             </properties>
                             <pingURL>http://localhost:8207/am</pingURL>
                         </deployable>
+                        <deployable>
+                            <type>war</type>
+                            <properties>
+                                <context>am2</context>
+                            </properties>
+                            <pingURL>http://localhost:8207/am2</pingURL>
+                        </deployable>
 	                </deployables>
 	                <configuration>
 				    	<properties>
 				        	<cargo.rmi.port>8206</cargo.rmi.port>
 				        	<cargo.servlet.port>8207</cargo.servlet.port>
-    			        	<cargo.jvmargs>${java.surefire.options} </cargo.jvmargs>
+    			        	<cargo.jvmargs>${java.surefire.options} -Xmx2g</cargo.jvmargs>
 				        </properties>
 				    </configuration>
                 </configuration>
