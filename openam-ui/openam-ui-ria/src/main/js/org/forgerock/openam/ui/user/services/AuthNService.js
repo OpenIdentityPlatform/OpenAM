@@ -115,7 +115,7 @@ define([
             });
         }
 
-        const isAuthenticated = requirements.hasOwnProperty("tokenId");
+        const isAuthenticated = SessionToken.isAuthenticated(requirements);
 
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);

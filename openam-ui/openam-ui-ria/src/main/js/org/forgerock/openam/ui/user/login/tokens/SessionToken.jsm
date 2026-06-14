@@ -77,6 +77,30 @@ export function isResolvable (token) {
     return Boolean(token) && token !== HTTP_ONLY_TOKEN;
 }
 
+/**
+ * Whether the supplied <code>/json/authenticate</code> response represents a completed (successful)
+ * authentication.
+ * <p>
+ * Normally a completion is detected by the presence of a <code>tokenId</code> in the response body.
+ * However, when the session cookie is <code>HttpOnly</code> the server delivers the token solely via
+ * the <code>Set-Cookie</code> header and does NOT echo <code>tokenId</code> in the body (so an XSS on
+ * the origin cannot read a replayable token). In that case a completion is instead indicated by the
+ * presence of a <code>successUrl</code> with no further callbacks (no <code>authId</code>) to satisfy.
+ * @param {Object} response The parsed authenticate response.
+ * @returns {Boolean} true if the response represents a successful authentication.
+ */
+export function isAuthenticated (response) {
+    if (!response) {
+        return false;
+    }
+    if (Object.prototype.hasOwnProperty.call(response, "tokenId")) {
+        return true;
+    }
+    return isHttpOnly() &&
+        Object.prototype.hasOwnProperty.call(response, "successUrl") &&
+        !Object.prototype.hasOwnProperty.call(response, "authId");
+}
+
 export function set (token) {
     if (isHttpOnly()) {
         // The server is responsible for setting the HttpOnly session cookie. JavaScript cannot

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 
 define([
@@ -47,7 +48,7 @@ define([
             });
 
             AuthNService.submitRequirements(populatedRequirements, params).then(function (result) {
-                if (result.hasOwnProperty("tokenId")) {
+                if (SessionToken.isAuthenticated(result)) {
                     obj.getLoggedUser(function (user) {
                         Configuration.setProperty("loggedUser", user);
                         self.setSuccessURL(result.tokenId, result.successUrl).then(function () {
