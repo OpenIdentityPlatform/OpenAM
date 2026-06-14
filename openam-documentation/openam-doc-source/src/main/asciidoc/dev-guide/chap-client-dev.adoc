@@ -8480,6 +8480,9 @@ a|`JAVASCRIPT`
 
 a|`OIDC_CLAIMS`
 a|`JAVASCRIPT`, `GROOVY`
+
+a|`OAUTH2_ACCESS_TOKEN_MODIFICATION`
+a|`JAVASCRIPT`, `GROOVY`
 |===
 +
 
@@ -8509,6 +8512,9 @@ Client-side scripts must be written in JavaScript.
 
 `OIDC_CLAIMS`::
 OIDC Claims
+
+`OAUTH2_ACCESS_TOKEN_MODIFICATION`::
+OAuth2 Access Token Modification
 
 ====
 

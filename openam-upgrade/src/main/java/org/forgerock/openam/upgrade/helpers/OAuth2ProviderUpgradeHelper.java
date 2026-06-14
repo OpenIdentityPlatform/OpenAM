@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.upgrade.helpers;
@@ -38,6 +39,7 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
         attributes.add(JKWS_URI);
         attributes.add(SUPPORTED_CLAIMS);
         attributes.add(OIDC_CLAIMS_EXTENSION_SCRIPT);
+        attributes.add(ACCESS_TOKEN_MODIFICATION_SCRIPT);
         attributes.add(SCOPE_PLUGIN_CLASS);
 
         attributes.add(AUTHZ_CODE_LIFETIME_NAME);
@@ -64,6 +66,7 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
             case ID_TOKEN_SIGNING_ALGORITHMS:
             case SUPPORTED_CLAIMS:
             case OIDC_CLAIMS_EXTENSION_SCRIPT:
+            case ACCESS_TOKEN_MODIFICATION_SCRIPT:
             case RESPONSE_TYPE_LIST:
             case SCOPE_PLUGIN_CLASS:
             case AUTHZ_CODE_LIFETIME_NAME:

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.oauth2.guice;
 
@@ -117,6 +117,7 @@ import org.forgerock.openam.oauth2.StatefulTokenStore;
 import org.forgerock.openam.oauth2.StatelessCheck;
 import org.forgerock.openam.oauth2.StatelessTokenCtsAdapter;
 import org.forgerock.openam.oauth2.StatelessTokenMetadata;
+import org.forgerock.openam.oauth2.OAuth2AccessTokenModifier;
 import org.forgerock.openam.oauth2.StatelessTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
@@ -345,13 +346,13 @@ public class OAuth2GuiceModule extends AbstractModule {
             ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder,
             Blacklist<Blacklistable> tokenBlacklist, CTSPersistentStore cts,
             TokenAdapter<StatelessTokenMetadata> tokenAdapter, RecoveryCodeGenerator recoveryCodeGenerator,
-            OAuth2Utils utils) {
+            OAuth2Utils utils, OAuth2AccessTokenModifier accessTokenModifier) {
         StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
                 providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
                 cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator, utils);
         StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
                 realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
-                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils);
+                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils, accessTokenModifier);
         return new OpenAMTokenStore(realmAgnosticStatefulTokenStore,
                 realmAgnosticStatelessTokenStore, new DefaultStatelessCheck(providerSettingsFactory));
     }
@@ -424,9 +425,10 @@ public class OAuth2GuiceModule extends AbstractModule {
                 OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
                 OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
                 OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils) {
+                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils,
+                OAuth2AccessTokenModifier accessTokenModifier) {
             super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
-                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils);
+                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter, utils, accessTokenModifier);
         }
 
         @Override
