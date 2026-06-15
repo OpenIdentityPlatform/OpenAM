@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2026 @gujjuboy10x00
  */
 
 package com.sun.identity.federation.common;
@@ -62,6 +63,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.locale.Locale;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
+import org.owasp.esapi.ESAPI;
 
 /**
  * This class contain constants used in the SDK.
@@ -719,11 +721,20 @@ public class FSUtils {
         String SAMLmessageName, String SAMLmessageValue, String relayStateName,
         String relayStateValue, String targetURL) throws SAML2Exception {
 
-        request.setAttribute("TARGET_URL", targetURL);
-        request.setAttribute("SAML_MESSAGE_NAME", SAMLmessageName);
-        request.setAttribute("SAML_MESSAGE_VALUE", SAMLmessageValue);
-        request.setAttribute("RELAY_STATE_NAME", relayStateName);
-        request.setAttribute("RELAY_STATE_VALUE", relayStateValue);
+        // GHSA-fhrq-3gmx-p879: HTML-encode every value before forwarding to
+        // /saml2/jsp/autosubmitaccessrights.jsp. The JSP renders these
+        // request attributes via raw EL ('${...}'), and the values flow
+        // unmodified from request parameters (SAMLRequest, SAMLResponse,
+        // SAMLart, RelayState) in callers such as
+        // FSUtils.needSetLBCookieAndRedirect and
+        // UtilProxyCookieRedirector.setCookieAndRedirect. Mirrors the
+        // encoding already performed by the sibling
+        // SAML2Utils.postToTarget(...) helper.
+        request.setAttribute("TARGET_URL", ESAPI.encoder().encodeForHTML(targetURL));
+        request.setAttribute("SAML_MESSAGE_NAME", ESAPI.encoder().encodeForHTML(SAMLmessageName));
+        request.setAttribute("SAML_MESSAGE_VALUE", ESAPI.encoder().encodeForHTML(SAMLmessageValue));
+        request.setAttribute("RELAY_STATE_NAME", ESAPI.encoder().encodeForHTML(relayStateName));
+        request.setAttribute("RELAY_STATE_VALUE", ESAPI.encoder().encodeForHTML(relayStateValue));
         request.setAttribute("SAML_POST_KEY", bundle.getString("samlPostKey"));
 
         response.setHeader("Pragma", "no-cache");
