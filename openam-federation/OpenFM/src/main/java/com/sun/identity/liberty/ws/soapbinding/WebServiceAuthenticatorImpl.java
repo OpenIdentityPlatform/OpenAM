@@ -25,7 +25,7 @@
  * $Id: WebServiceAuthenticatorImpl.java,v 1.4 2008/08/06 17:29:25 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.soapbinding;
@@ -66,6 +66,18 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
     private static final String AUTH_TYPE_PROP = "AuthType";
     private static final String AUTH_INSTANT_PROP = "authInstant";
     private static final String ANONYMOUS_PRINCIPAL = "anonymous";
+
+    /**
+     * System property: when "true", restores the legacy behaviour of
+     * minting a synthetic anonymous WSC session for null-family
+     * authentication mechanisms with no client credential. Default
+     * is "false" (fail-close). Only set this if you have a deployed
+     * Liberty WSF integration that explicitly relies on the legacy
+     * anonymous-WSC behaviour.
+     */
+    private static final String PROP_ALLOW_ANON_WSC =
+            "com.sun.identity.liberty.allowAnonymousWSC";
+
     private static final String SESSION_SERVICE_NAME =
             "iPlanetAMSessionService";
     private static final String MAX_SESSION_TIME =
@@ -134,6 +146,29 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
         StringBuffer principalsSB = null;
         
         if (certs == null) {
+            // Level 2: refuse to mint an anonymous internal session for
+            // null-family auth mechanisms when no client credential
+            // (TLS cert or message cert) is presented. The previous
+            // behaviour treated this as "anonymous" and downstream
+            // handlers used the resulting SSOToken as proof of
+            // authentication, which broke authorization for IDPP/Disco.
+            String authMechCheck = message.getAuthenticationMechanism();
+            boolean nullFamily = (authMechCheck != null)
+                    && authMechCheck.contains(":null:");
+            boolean allowAnon = Boolean.parseBoolean(
+                    SystemPropertiesManager.get(
+                            PROP_ALLOW_ANON_WSC, "false"));
+            if (nullFamily && !allowAnon) {
+                if (debug.warningEnabled()) {
+                    debug.warning("WebServiceAuthenticatorImpl.authenticate: "
+                            + "refusing to mint anonymous WSC session for "
+                            + "null-family authMech '" + authMechCheck
+                            + "' without client credential. Set "
+                            + PROP_ALLOW_ANON_WSC + "=true to restore the "
+                            + "legacy (insecure) behaviour.");
+                }
+                return null;
+            }
             principal = ANONYMOUS_PRINCIPAL;
         } else {
             Set principalsSet = new HashSet(6);

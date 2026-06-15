@@ -27,6 +27,7 @@
    $Id: fmDisco.xml,v 1.6 2008/06/25 05:51:14 qcheng Exp $
                                                                                 
     Portions Copyrighted 2015 ForgeRock AS.
+    Portions Copyrighted 2026 3A Systems, LLC
 -->
 
 
@@ -143,7 +144,7 @@
                     order="400"
                     resourceName="usePolicyForDiscoveryLookup">
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema
@@ -154,7 +155,7 @@
                     order="500"
                     resourceName="usePolicyForDiscoveryUpdate">
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema

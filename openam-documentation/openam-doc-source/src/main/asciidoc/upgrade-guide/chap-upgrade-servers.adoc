@@ -42,6 +42,18 @@ Make sure you try upgrading OpenAM in a test environment before applying the upg
 If you are upgrading from an unsupported version of OpenAM to a later version, you must first upgrade to a supported version. In some cases, you may need to upgrade again depending on the upgrade path.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the legacy Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are *disabled by default* as part of the GHSA-p462-xxwx-pqf4 hardening. Existing deployments that rely on Liberty ID-WSF, IDPP, Discovery, AuthnSvc, or Interaction services must explicitly opt in by setting the advanced server property `com.sun.identity.liberty.enabled=true`.
+
+Two related advanced server properties were also introduced and now default to a fail-close behaviour:
+
+* `com.sun.identity.liberty.soap.sensitiveHandlers` (default `idpp,disco,authnsvc,interaction`) — list of SOAP RequestHandler keys that reject the unauthenticated `null:null` mechanism and the ANONYMOUS security profile.
+* `com.sun.identity.liberty.allowAnonymousWSC` (default `false`) — restores the legacy minting of an anonymous Web Service Client session for null-family mechanisms without a client credential.
+
+If your deployment depends on the previous (insecure) behaviour, review and adjust these properties before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====

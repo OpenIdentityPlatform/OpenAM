@@ -2169,6 +2169,11 @@ Default: No user attributes are protected.
 [#liberty-id-ff-service-configuration]
 ==== Liberty ID-FF Service Configuration
 
+[NOTE]
+====
+The Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are disabled by default. To enable them, set the advanced server property `com.sun.identity.liberty.enabled` to `true`. Two additional advanced properties (`com.sun.identity.liberty.soap.sensitiveHandlers` and `com.sun.identity.liberty.allowAnonymousWSC`) control how anonymous and null-family authentication is handled by sensitive Liberty handlers (IDPP, Discovery, AuthnSvc, Interaction). See xref:#servers-advanced-configuration["Advanced"].
+====
+
 --
 `ssoadm` service name: `sunFAMIDFFConfiguration`
 
@@ -5614,6 +5619,36 @@ Whether JSS should take priority over other providers.
 
 +
 Default: `true`
+
+`com.sun.identity.liberty.allowAnonymousWSC`::
+Controls whether the Liberty ID-WSF SOAP receiver mints a synthetic anonymous Web Service Client (WSC) session for null-family authentication mechanisms (`urn:liberty:security:2003-08:null:*`) when no client credential (TLS or message certificate) is presented.
+
++
+When `false` (the default), such requests are rejected (fail-close). Set to `true` only to restore the legacy (insecure) behaviour required by deployments that explicitly rely on anonymous WSC sessions. This setting was introduced as part of the GHSA-p462-xxwx-pqf4 hardening.
+
++
+Default: `false`
+
+`com.sun.identity.liberty.enabled`::
+Master kill-switch for the legacy Liberty ID-WSF SOAP endpoints (`/Liberty/*` served by `SOAPReceiver` and `/WSPRedirectHandler/*` served by `WSPRedirectHandlerServlet`).
+
++
+When `false` (the default), every request to these endpoints is rejected with HTTP 404. Liberty ID-WSF is a legacy protocol and most deployments do not need it. Set to `true` only if your deployment actively uses Liberty ID-WSF, IDPP, Discovery, AuthnSvc, or Interaction services.
+
++
+The property is read on every request, so the endpoint can be enabled or disabled without restarting OpenAM.
+
++
+Default: `false`
+
+`com.sun.identity.liberty.soap.sensitiveHandlers`::
+Comma-separated list of Liberty SOAP `RequestHandler` keys that MUST NOT accept the unauthenticated `urn:liberty:security:2003-08:null:null` mechanism nor the ANONYMOUS security profile, regardless of binding-level `SupportedAuthenticationMechanisms` or `SecurityProfile` configuration.
+
++
+Empty value disables the additional restriction (not recommended). This setting was introduced as part of the GHSA-p462-xxwx-pqf4 hardening.
+
++
+Default: `idpp,disco,authnsvc,interaction`
 
 `com.sun.identity.monitoring`::
 Whether monitoring is active for OpenAM.
