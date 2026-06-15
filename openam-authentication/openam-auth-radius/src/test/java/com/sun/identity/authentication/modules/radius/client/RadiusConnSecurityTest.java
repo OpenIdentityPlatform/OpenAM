@@ -133,8 +133,14 @@ public class RadiusConnSecurityTest {
     private RadiusConn newClient(boolean strict) throws IOException {
         final Set<RADIUSServer> servers = new HashSet<>();
         servers.add(new RADIUSServer("127.0.0.1", serverSocket.getLocalPort()));
-        // 2-second timeout; tests respond synchronously well within that.
-        return new RadiusConn(servers, Collections.<RADIUSServer>emptySet(), SHARED_SECRET, 2, null, 60, strict);
+        // Generous 15-second read timeout. Every test that uses this client receives a response
+        // (forged, malformed, or legitimate) and returns as soon as it arrives, so a large timeout
+        // never slows the happy path. It only guards against a false "No RADIUS server is online."
+        // failure when the very first test method pays JVM warm-up / class-loading cost and the
+        // responder thread is briefly starved on a CPU-constrained CI runner: a too-tight timeout
+        // there makes the client give up, mark its only server OFFLINE and report "no server" in
+        // place of the authenticator rejection the test actually asserts.
+        return new RadiusConn(servers, Collections.<RADIUSServer>emptySet(), SHARED_SECRET, 15, null, 60, strict);
     }
 
     /** Start a background responder that crafts a reply per the supplied lambda. */
