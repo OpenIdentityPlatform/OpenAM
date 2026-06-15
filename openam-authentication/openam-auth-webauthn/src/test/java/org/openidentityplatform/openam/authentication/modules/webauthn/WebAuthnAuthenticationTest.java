@@ -11,8 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2024-2025 3A-Systems LLC. All rights reserved.
- * Portions copyright 2026 3A Systems, LLC.
+ * Copyright 2024-2026 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -78,5 +77,4 @@ public class WebAuthnAuthenticationTest {
 		webAuthnAuthentication.init(null, Collections.singletonMap(webAuthnAuthentication.getUserKey(), "user1"), Collections.EMPTY_MAP);
 		assertEquals(webAuthnAuthentication.process(null, 1), 2);
 	}
-	
 }
