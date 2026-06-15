@@ -65,6 +65,15 @@ public class RadiusConnSecurityTest {
 
     @BeforeMethod
     public void startServerSocket() throws IOException {
+        // RadiusConn keeps the server-availability map and the health-check timer in static
+        // fields that outlive any single connection. Left untouched they leak across test
+        // methods: e.g. failoverToSecondary() permanently records its dead primary as OFFLINE
+        // and schedules a background RADIUSMonitor that keeps probing. A later test can then
+        // see getOnlineServer() return null ("No RADIUS server is online.") when an ephemeral
+        // port number is reused, or have its manually-driven monitor.run() race the background
+        // one. Reset the shared statics so every method starts from a clean slate.
+        resetRadiusConnStatics();
+
         serverSocket = new DatagramSocket(0, InetAddress.getByName("127.0.0.1"));
         serverSocket.setSoTimeout(5000);
         serverRunning = true;
@@ -83,6 +92,37 @@ public class RadiusConnSecurityTest {
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             }
+        }
+        // Tear down any state/timer this test scheduled so it cannot bleed into the next one.
+        resetRadiusConnStatics();
+    }
+
+    /**
+     * Cancel any scheduled health-check monitor and clear the static server-status map on
+     * {@link RadiusConn}, isolating each test method from the shared singleton state.
+     */
+    private static void resetRadiusConnStatics() {
+        try {
+            final java.lang.reflect.Field monitorField = RadiusConn.class.getDeclaredField("serverMonitor");
+            monitorField.setAccessible(true);
+            final Object monitor = monitorField.get(null);
+            if (monitor != null) {
+                // RADIUSMonitor extends GeneralTaskRunnable, whose cancel() unschedules it from
+                // the shared SystemTimer so no background thread keeps probing.
+                monitor.getClass().getMethod("cancel").invoke(monitor);
+                monitorField.set(null, null);
+            }
+
+            final java.lang.reflect.Field statusField = RadiusConn.class.getDeclaredField("SERVER_STATUS");
+            statusField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            final java.util.Map<RADIUSServer, Boolean> serverStatus =
+                    (java.util.Map<RADIUSServer, Boolean>) statusField.get(null);
+            synchronized (serverStatus) {
+                serverStatus.clear();
+            }
+        } catch (ReflectiveOperationException roe) {
+            throw new IllegalStateException("Unable to reset RadiusConn static state for test isolation", roe);
         }
     }
 
