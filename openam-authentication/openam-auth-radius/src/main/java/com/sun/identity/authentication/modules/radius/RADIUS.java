@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.modules.radius;
 
@@ -79,6 +80,12 @@ public class RADIUS extends AMLoginModule {
     private int iServerPort = 1645;
     private int iTimeOut = 5;
     private int healthCheckInterval = 5;
+    /**
+     * When true, the RADIUS client enforces the strict RFC 3579 / BlastRADIUS-mitigation profile
+     * and rejects any response that lacks a verifiable Message-Authenticator. Off by default for
+     * compatibility with legacy RADIUS servers that do not echo MA on responses.
+     */
+    private boolean requireMessageAuthenticator = false;
     private RadiusConn radiusConn = null;
     private boolean getCredentialsFromSharedState;
     private ChallengeException cException = null;
@@ -154,6 +161,14 @@ public class RADIUS extends AMLoginModule {
                             DEFAULT_INTERVAL);
                     healthCheckInterval = Integer.parseInt(interval);
 
+                    // Optional strict RFC 3579 / Cisco BlastRADIUS-mitigation profile. When
+                    // enabled every Access-Accept/Reject/Challenge MUST carry a verifiable
+                    // Message-Authenticator. Off by default to preserve interop with servers that
+                    // do not echo MA on responses.
+                    requireMessageAuthenticator = Boolean.parseBoolean(
+                            CollectionHelper.getMapAttr(options,
+                                    "openam-auth-radius-require-message-authenticator", "false"));
+
                     if (authLevel != null) {
                         try {
                             setAuthLevel(Integer.parseInt(authLevel));
@@ -221,7 +236,7 @@ public class RADIUS extends AMLoginModule {
         case ISAuthConstants.LOGIN_START:
             try {
                 radiusConn = new RadiusConn(primaryServers, secondaryServers, sharedSecret, iTimeOut,
-                        healthCheckInterval);
+                        null, healthCheckInterval, requireMessageAuthenticator);
             } catch (SocketException se) {
                 debug.error("RADIUS login failure; Socket Exception se == ", se);
                 shutdown();

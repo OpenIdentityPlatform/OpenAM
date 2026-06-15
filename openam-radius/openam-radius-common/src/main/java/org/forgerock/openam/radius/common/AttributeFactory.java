@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS.
  * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package org.forgerock.openam.radius.common;
 
@@ -188,6 +189,8 @@ public final class AttributeFactory {
                 return new PortLimitAttribute(data);
             case LOGIN_LAT_PORT: // 63
                 return new LoginLATPortAttribute(data);
+            case MESSAGE_AUTHENTICATOR: // 80
+                return new MessageAuthenticatorAttribute(data);
             default:
                 return new UnknownAttribute(data);
             }
