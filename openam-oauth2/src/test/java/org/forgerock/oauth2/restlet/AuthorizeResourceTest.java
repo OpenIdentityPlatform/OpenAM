@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -22,6 +23,7 @@ import java.util.Collections;
 
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
+import org.forgerock.oauth2.core.CsrfProtection;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.RedirectUriResolver;
@@ -59,12 +61,13 @@ public class AuthorizeResourceTest {
         xuiState = mock(XUIState.class);
         redirectUriResolver = mock(RedirectUriResolver.class);
         ResourceOwnerSessionValidator resourceOwnerSessionValidator = mock(ResourceOwnerSessionValidator.class);
+        CsrfProtection csrfProtection = mock(CsrfProtection.class);
 
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
                 CollectionUtils.asSet(hook), xuiState, mock(Router.class), null, redirectUriResolver, 
-                resourceOwnerSessionValidator);
+                resourceOwnerSessionValidator, csrfProtection);
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

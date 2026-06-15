@@ -13,7 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corp.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.oauth2.restlet;
 
@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.oauth2.core.CsrfProtection;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
@@ -41,8 +42,6 @@ import org.restlet.data.Reference;
 import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.routing.Router;
 
-import com.iplanet.sso.SSOToken;
-
 import static org.forgerock.json.JsonValue.*;
 
 /**
@@ -54,13 +53,16 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
     protected final XUIState xuiState;
     protected final BaseURLProviderFactory baseURLProviderFactory;
     private final ResourceOwnerSessionValidator resourceOwnerSessionValidator;
+    private final CsrfProtection csrfProtection;
 
     public ConsentRequiredResource(Router router, BaseURLProviderFactory baseURLProviderFactory,
-            XUIState xuiState, ResourceOwnerSessionValidator resourceOwnerSessionValidator) {
+            XUIState xuiState, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
+            CsrfProtection csrfProtection) {
         super(router);
         this.baseURLProviderFactory = baseURLProviderFactory;
         this.xuiState = xuiState;
         this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
+        this.csrfProtection = csrfProtection;
     }
 
     /**
@@ -93,10 +95,9 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
                 .getRootURL(ServletUtils.getRequest(getRequest())));
         data.put("saveConsentEnabled", consentRequired.isSaveConsentEnabled());
 
-        SSOToken token = resourceOwnerSessionValidator.getResourceOwnerSession(request);
-        if (token != null) {
-            data.put("csrf", token.getTokenID().toString());
-        }
+        // Mint a dedicated, random CSRF token bound to this authorization request instead of reusing the
+        // script-readable SSO cookie value. This allows the SSO cookie to ship as HttpOnly.
+        data.put("csrf", csrfProtection.createCsrfToken(request));
         List<String> locale = new ArrayList<>();
         for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
             locale.add(language.getMetadata().getName());

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.oauth2.restlet;
 
@@ -109,7 +109,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             AuthorizationService authorizationService, OAuth2ProviderSettingsFactory providerSettingsFactory,
             ExceptionHandler exceptionHandler, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
             ClientRegistrationStore clientRegistrationStore, OAuth2Utils oAuth2Utils, CsrfProtection csrfProtection) {
-        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator);
+        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator, csrfProtection);
         this.representation = representation;
         this.tokenStore = tokenStore;
         this.requestFactory = requestFactory;

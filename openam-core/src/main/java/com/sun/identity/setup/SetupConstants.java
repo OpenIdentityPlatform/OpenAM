@@ -25,6 +25,7 @@
  * $Id: SetupConstants.java,v 1.46 2009/12/23 00:21:38 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions copyright 2018-2026 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -322,6 +323,12 @@ public interface SetupConstants {
      */
     static final String CONFIG_VAR_SERVER_PROTO = "SERVER_PROTO";
     
+    /**
+     * Configuration Variable for the SSO cookie Secure flag. Derived from the deployment protocol: {@code true}
+     * for HTTPS deployments, {@code false} (with a deploy-time warning) for plain-HTTP deployments.
+     */
+    static final String CONFIG_VAR_COOKIE_SECURE = "SECURE_COOKIE";
+
     /**
      * Configuration Variable for server host.
      */

@@ -4800,10 +4800,19 @@ Secure Cookie::
 If yes, then OpenAM sets the cookie in secure mode such that the browser only returns the cookie if a secure protocol such as HTTPS is used.
 
 +
-Default: No
+Default: Derived from the deployment URL scheme at install time. If the server is configured over HTTPS, the secure flag is enabled (`Yes`); over plain HTTP it is left disabled (`No`) with a deploy-time warning.
 
 +
 property: `com.iplanet.am.cookie.secure`
+
+SameSite Cookie::
+Sets the `SameSite` attribute on the cookies issued by OpenAM. Valid values are `Lax`, `Strict`, and `None`.
+
++
+Default: `Lax`
+
++
+property: `org.openidentityplatform.openam.cookie.samesite`
 
 Encode Cookie Value::
 If yes, then OpenAM URL encodes cookie values.
