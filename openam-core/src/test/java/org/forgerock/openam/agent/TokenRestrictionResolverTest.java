@@ -46,6 +46,7 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 
+@Test
 public class TokenRestrictionResolverTest {
 
     private final static String REALM = "realm";
@@ -188,6 +189,22 @@ public class TokenRestrictionResolverTest {
                 GOTO_URL,
                 adminToken,
                 UNIQUE_SSO_TOKEN_COOKIE);
+    }
+
+    @Test(expectedExceptions = SSOException.class)
+    public void getTokenRestrictionThrowsExceptionIfGotoUrlPortIsInvalid_GHSA_r9pv_5rpp_vm8g() throws Exception {
+        HashMap<String, Set<String>> attributes = new HashMap<>();
+        attributes.put(LDAP_STATUS_ATTR_NAME, new HashSet<>(Collections.singletonList("Active")));
+        attributes.put(LDAP_ATTR_NAME,
+                new HashSet<>(Collections.singletonList(PROVIDER_ID_ATTR_NAME + "=http://go.to.url:788")));
+        AMIdentity agentIdentity = createAgentIdentity(attributes);
+        setUpIdentityRepositoryWithAgent(agentIdentity);
+
+        tokenRestrictionResolver.resolve(
+                PROVIDER_ID + "?Realm=" + REALM,
+                GOTO_URL,
+                adminToken,
+                false);
     }
 
     @Test
