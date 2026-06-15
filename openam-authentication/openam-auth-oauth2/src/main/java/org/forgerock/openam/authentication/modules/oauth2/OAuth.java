@@ -87,6 +87,7 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.PasswordPolicyException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
@@ -413,8 +414,8 @@ public class OAuth extends AMLoginModule {
                             saveAttributes(attributes);
                         }
 
-                        updateAccount(accountProvider, realm, userNames, profileSvcResponse, user, jwtClaims);
-                        
+                        updateAccount(accountProvider, realm, userNames, profileSvcResponse, jwtClaims);
+
                         storeUsernamePasswd(authenticatedUser, null);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
@@ -691,14 +692,16 @@ public class OAuth extends AMLoginModule {
     
     protected void updateAccount(AccountProvider accountProvider, 
     		String realm, Map<String, Set<String>> userNames, 
-    		String profileSvcResponse,
-            String userPassword, JwtClaimsSet jwtClaims)
+	    	String profileSvcResponse, JwtClaimsSet jwtClaims)
             throws AuthLoginException {
 
 
             Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse, jwtClaims);
-            attributes.put("userPassword", CollectionUtils.asSet(userPassword));
-            attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
+            removeRestrictedAccountUpdateAttributes(attributes);
+            if (attributes.isEmpty()) {
+                OAuthUtil.debugMessage("OAuth.updateAccount: no safe attributes to update");
+                return;
+            }
             AMIdentity userIdentity =
                     accountProvider.searchUser(getAMIdentityRepository(realm),
                     userNames);
@@ -707,13 +710,26 @@ public class OAuth extends AMLoginModule {
             	try {
             		userIdentity.setAttributes(attributes);
             		userIdentity.store();
+            	} catch(PasswordPolicyException e) {
+            		throw new AuthLoginException(
+                            "Password policy violation while updating OAuth2 account attributes", e);
             	} catch(Exception e) {
-            		logger.warn("error update attributes for identity {0}", userIdentity, e);
+            		logger.warn("error update attributes for identity {}", userIdentity, e);
             	}
             	
             }
                  
     }
+
+    static void removeRestrictedAccountUpdateAttributes(Map<String, Set<String>> attributes) {
+        attributes.keySet().removeIf(OAuth::isRestrictedAccountUpdateAttribute);
+    }
+
+    private static boolean isRestrictedAccountUpdateAttribute(String attribute) {
+        return "userPassword".equalsIgnoreCase(attribute)
+                || "inetuserstatus".equalsIgnoreCase(attribute);
+    }
+
     // Extract the Token from the OAuth 2.0 response
     // Todo: Maybe this should be pluggable
     public String extractToken(String tokenName, String response) {
