@@ -133,14 +133,11 @@ public class RadiusConnSecurityTest {
     private RadiusConn newClient(boolean strict) throws IOException {
         final Set<RADIUSServer> servers = new HashSet<>();
         servers.add(new RADIUSServer("127.0.0.1", serverSocket.getLocalPort()));
-        // Generous 15-second read timeout. Every test that uses this client receives a response
-        // (forged, malformed, or legitimate) and returns as soon as it arrives, so a large timeout
-        // never slows the happy path. It only guards against a false "No RADIUS server is online."
-        // failure when the very first test method pays JVM warm-up / class-loading cost and the
-        // responder thread is briefly starved on a CPU-constrained CI runner: a too-tight timeout
-        // there makes the client give up, mark its only server OFFLINE and report "no server" in
-        // place of the authenticator rejection the test actually asserts.
-        return new RadiusConn(servers, Collections.<RADIUSServer>emptySet(), SHARED_SECRET, 15, null, 60, strict);
+        // 10-second read timeout (defence-in-depth; the real CI de-flake is the responder no
+        // longer dying on its own read timeout - see startResponder). Every test using this client
+        // receives a response and returns as soon as it arrives, so a generous timeout never slows
+        // the happy path; it only adds margin against scheduling jitter on a loaded CI runner.
+        return new RadiusConn(servers, Collections.<RADIUSServer>emptySet(), SHARED_SECRET, 10, null, 60, strict);
     }
 
     /** Start a background responder that crafts a reply per the supplied lambda. */
@@ -152,6 +149,15 @@ public class RadiusConnSecurityTest {
                     final DatagramPacket dp = new DatagramPacket(buf, buf.length);
                     try {
                         serverSocket.receive(dp);
+                    } catch (java.net.SocketTimeoutException ste) {
+                        // The server socket carries a 5s SO_TIMEOUT (see @BeforeMethod). A read
+                        // timeout only means no request has arrived *yet* - it must NOT kill the
+                        // responder. The client can legitimately be slow to send its first packet
+                        // (cold-JVM class loading, or InetAddress.getLocalHost() blocking on reverse
+                        // DNS on a CI host), and if the responder died here it would never answer the
+                        // request that eventually arrives, leaving the client to time out and report
+                        // "No RADIUS server is online." Keep waiting instead.
+                        continue;
                     } catch (IOException e) {
                         if (!serverRunning) {
                             return;
