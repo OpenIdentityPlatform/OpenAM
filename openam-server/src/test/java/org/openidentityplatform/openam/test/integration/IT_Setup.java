@@ -32,12 +32,9 @@ import static org.testng.Assert.assertTrue;
 public class IT_Setup extends CargoBaseTest {
 
     @Test
-    @OpenAMContext("openam")
     public void testSetup() {
 
-
-
-        final String openamUrl = "http://openam.local:8207/openam";
+        final String openamUrl = OPENAM_URL;
 
         driver.get(openamUrl);
 

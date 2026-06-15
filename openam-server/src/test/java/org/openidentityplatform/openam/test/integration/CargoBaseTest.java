@@ -30,7 +30,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -41,27 +40,25 @@ import java.net.URL;
  * in {@code @AfterMethod}, so the instances run sequentially (one at a time) rather than all three being
  * deployed into a single shared container as before.
  *
- * <p>The web app context to deploy is taken from the {@link OpenAMContext} annotation on the test method.
- * The Tomcat distribution, the OpenAM WAR location, the container id and the JVM arguments are provided by
- * the build through system properties (see {@code openam-server/pom.xml}).</p>
+ * <p>Because the instances never overlap they all share the same {@value #CONTEXT} web app context; tests
+ * navigate to {@link #OPENAM_URL}. The Tomcat distribution, the OpenAM WAR location, the container id and
+ * the JVM arguments are provided by the build through system properties (see {@code openam-server/pom.xml}).</p>
  */
 public abstract class CargoBaseTest extends BaseTest {
 
     static final int SERVLET_PORT = 8207;
     static final int RMI_PORT = 8206;
 
+    /** Single web app context shared by all (sequentially started) OpenAM instances. */
+    static final String CONTEXT = "test-am";
+
+    /** Base URL of the running OpenAM instance, used by the tests. */
+    protected static final String OPENAM_URL = "http://openam.local:" + SERVLET_PORT + "/" + CONTEXT;
+
     private InstalledLocalContainer container;
-    private String context;
 
     @BeforeMethod(alwaysRun = true)
-    public void startOpenAM(Method method) throws Exception {
-        final OpenAMContext annotation = method.getAnnotation(OpenAMContext.class);
-        if (annotation == null) {
-            throw new IllegalStateException(
-                    "test method " + method.getName() + " must be annotated with @OpenAMContext");
-        }
-        context = annotation.value();
-
+    public void startOpenAM() throws Exception {
         // ensure the next OpenAM boots unconfigured
         cleanConfig();
 
@@ -76,9 +73,9 @@ public abstract class CargoBaseTest extends BaseTest {
         installer.install();
 
         final WAR war = new WAR(System.getProperty("openam.war"));
-        war.setContext(context);
+        war.setContext(CONTEXT);
 
-        final File configHome = new File(System.getProperty("cargo.config.dir"), context);
+        final File configHome = new File(System.getProperty("cargo.config.dir"), CONTEXT);
 
         final LocalConfiguration configuration = (LocalConfiguration) new DefaultConfigurationFactory()
                 .createConfiguration(containerId, ContainerType.INSTALLED,
@@ -93,10 +90,10 @@ public abstract class CargoBaseTest extends BaseTest {
         container.setHome(installer.getHome());
         container.setTimeout(180_000L);
 
-        System.out.println("starting OpenAM instance, context=/" + context);
+        System.out.println("starting OpenAM instance, context=/" + CONTEXT);
         container.start();
         waitForContext();
-        System.out.println("OpenAM instance started, context=/" + context);
+        System.out.println("OpenAM instance started, context=/" + CONTEXT);
     }
 
     /**
@@ -105,7 +102,7 @@ public abstract class CargoBaseTest extends BaseTest {
      * (this mirrors the per-deployable {@code pingURL} the cargo-maven plugin used previously).
      */
     private void waitForContext() throws Exception {
-        final URL url = new URI("http://localhost:" + SERVLET_PORT + "/" + context).toURL();
+        final URL url = new URI("http://localhost:" + SERVLET_PORT + "/" + CONTEXT).toURL();
         final long deadline = System.nanoTime() + 180_000L * 1_000_000L;
         Exception last = null;
         while (System.nanoTime() < deadline) {
@@ -128,13 +125,13 @@ public abstract class CargoBaseTest extends BaseTest {
             }
             Thread.sleep(2_000);
         }
-        throw new IllegalStateException("OpenAM context /" + context + " did not become available", last);
+        throw new IllegalStateException("OpenAM context /" + CONTEXT + " did not become available", last);
     }
 
     @AfterMethod(alwaysRun = true)
     public void stopOpenAM() {
         if (container != null) {
-            System.out.println("stopping OpenAM instance, context=/" + context);
+            System.out.println("stopping OpenAM instance, context=/" + CONTEXT);
             try {
                 container.stop();
             } finally {
