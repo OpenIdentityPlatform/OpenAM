@@ -34,18 +34,21 @@ import java.time.Duration;
 
 import static org.testng.Assert.assertTrue;
 
-public class IT_SetupWithOpenDJ extends BaseTest {
+public class IT_SetupWithOpenDJ extends CargoBaseTest {
 
     @Test
+    @OpenAMContext("am")
     public void testSetupWithOpendj() throws Exception {
         // External OpenDJ WITHOUT a pre-created base DN - OpenAM must create the base entry itself.
         runSetup("http://openam.local:8207/am", false);
     }
 
     @Test
+    @OpenAMContext("am2")
     public void testSetupWithOpendjAddBaseEntry() throws Exception {
         // External OpenDJ WITH a pre-created base DN (OpenDJ "--addBaseEntry").
-        // Uses a separate webapp context (/am2) because an OpenAM instance can only be configured once.
+        // Each test runs against its own freshly started OpenAM instance (see CargoBaseTest); the
+        // distinct /am2 context keeps it isolated from the /am test above.
         runSetup("http://openam.local:8207/am2", true);
     }
 
