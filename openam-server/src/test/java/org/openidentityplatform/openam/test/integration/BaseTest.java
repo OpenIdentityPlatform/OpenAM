@@ -168,6 +168,40 @@ public abstract class BaseTest {
         }
     }
 
+    /**
+     * Dump the top-level wizard page state when setup does not reach #confComplete. The wizard shows
+     * "proceed to console" (#confComplete) only when the createConfig XHR returns "true"; on a
+     * server-side error it instead reveals #returnToConfig / #setupMessage. Logging which of those is
+     * present (plus the full page source) tells us whether the install actually failed - information
+     * the install.log and a server thread dump cannot give, because the failure surfaces only in the
+     * browser. Must be called while on the top-level document (before switching into progressIframe).
+     */
+    protected void dumpPageState() {
+        try {
+            System.err.println("=== wizard page state ===");
+            System.err.println("current url: " + driver.getCurrentUrl());
+            for (String id : new String[] {"confComplete", "returnToConfig", "setupMessage", "inProgress"}) {
+                try {
+                    java.util.List<WebElement> els = driver.findElements(By.id(id));
+                    if (els.isEmpty()) {
+                        System.err.println(id + ": (absent)");
+                    } else {
+                        WebElement el = els.get(0);
+                        System.err.println(id + ": displayed=" + el.isDisplayed()
+                                + " text=[" + el.getText().replace("\n", " ").trim() + "]");
+                    }
+                } catch (Exception ex) {
+                    System.err.println(id + ": <error " + ex + ">");
+                }
+            }
+            System.err.println("=== page source ===");
+            System.err.println(driver.getPageSource());
+            System.err.println("=== end page source ===");
+        } catch (Exception e) {
+            System.err.println("page state capture failed: " + e);
+        }
+    }
+
     WebElement waitForElement(By by) {
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }

@@ -71,6 +71,7 @@ public class IT_Setup extends CargoBaseTest {
             // progress reads below are best-effort and must not mask them if the page never appears.
             dumpOpenAmThreadDump();
             printInstallLogFile();
+            dumpPageState();
             try {
                 WebElement progressIframe = waitForElement(By.id("progressIframe"));
                 driver.switchTo().frame(progressIframe);

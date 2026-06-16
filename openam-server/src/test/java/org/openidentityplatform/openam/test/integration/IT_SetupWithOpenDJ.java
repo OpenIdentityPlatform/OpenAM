@@ -159,6 +159,7 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
             // masking these diagnostics (as happened on CI).
             dumpOpenAmThreadDump();
             printInstallLogFile();
+            dumpPageState(); // capture the top-level wizard page BEFORE switching into the iframe
             try {
                 WebElement progressIframe = waitForElement(By.id("progressIframe"));
                 driver.switchTo().frame(progressIframe);
