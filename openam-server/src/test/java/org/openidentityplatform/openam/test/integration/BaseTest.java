@@ -32,7 +32,6 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -67,8 +66,11 @@ public abstract class BaseTest {
         }
     }
 
-    @BeforeMethod
-    public void cleanup() throws IOException {
+    /**
+     * Remove any OpenAM configuration left over from a previous instance so the next OpenAM boots
+     * unconfigured. Invoked by {@link CargoBaseTest} right before the per-test container is started.
+     */
+    protected void cleanConfig() throws IOException {
         String testConfigPath = System.getProperty("test.config.path");
         Path testConfig = Paths.get(testConfigPath);
         if(testConfig.toFile().exists()) {
