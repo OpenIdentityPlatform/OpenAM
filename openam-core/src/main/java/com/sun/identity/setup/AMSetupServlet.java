@@ -457,6 +457,10 @@ public class AMSetupServlet extends HttpServlet {
             return true;
         }
 
+        // Fresh run: clear any completion flag left from a previous (e.g. failed) attempt so this
+        // run's progress iframe streams normally rather than being closed immediately.
+        SetupProgress.resetCompletion();
+
         setLocale(request);
         final InstallLog installLog = InstallLog.getInstance();
         installLog.open((String) request.getParameterMap().get(SetupConstants.CONFIG_VAR_BASE_DIR));

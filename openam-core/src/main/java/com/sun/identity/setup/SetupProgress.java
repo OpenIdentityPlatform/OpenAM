@@ -25,6 +25,7 @@
  * $Id: SetupProgress.java,v 1.10 2008/08/31 06:56:18 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.setup;
@@ -44,10 +45,22 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import com.sun.identity.config.SetupWriter;
 import com.sun.identity.shared.DateUtils;
 
 public class SetupProgress {
     static private Writer writer = null;
+    /**
+     * Set once {@link #closeOutputStream()} has run, i.e. configuration has finished and the
+     * progress stream has been closed. Guards against a lost-completion race: on a fast install the
+     * configuration request can finish (and close the stream) <em>before</em> the wizard's progress
+     * iframe attaches its {@link SetupWriter} via {@link #setWriter(Writer)} and blocks in
+     * {@link SetupWriter#realFlush()}. Without this flag that {@code realFlush()} would wait forever
+     * for a {@code close()} that already happened, the iframe would never finish loading and the
+     * wizard's "#confComplete" link would never appear (observed as a ~20 minute setup hang on CI).
+     * Reset at the start of each configuration run via {@link #resetCompletion()}.
+     */
+    static private volatile boolean configurationComplete = false;
     static private String bundleName = "amConfigurator";
 
     static private OutputStream out = null;
@@ -92,6 +105,16 @@ public class SetupProgress {
         if (writer == null) {
             out = null;
             return;
+        }
+        // If configuration already finished before this progress stream attached, close it at once
+        // so SetupWriter.realFlush() returns immediately instead of blocking forever on a close()
+        // that has already been issued (see configurationComplete).
+        if (configurationComplete && (writer instanceof SetupWriter)) {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                // best effort - closing only flips a flag and notifies the waiting realFlush()
+            }
         }
         if (isTextMode) {
             out = new OutputStream() {
@@ -155,7 +178,18 @@ public class SetupProgress {
     }
 
     public static void closeOutputStream() {
+        // Mark completion BEFORE closing so a progress stream that attaches concurrently (or just
+        // after) is closed immediately by setWriter() rather than blocking in realFlush() forever.
+        configurationComplete = true;
         IOUtils.closeIfNotNull(writer);
+    }
+
+    /**
+     * Reset the completion flag at the start of a configuration run so the progress stream for that
+     * run streams normally. See {@link #configurationComplete}.
+     */
+    public static void resetCompletion() {
+        configurationComplete = false;
     }
 
     /**
