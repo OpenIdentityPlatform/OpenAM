@@ -79,6 +79,16 @@ public abstract class BaseTest {
         }
     }
 
+    /**
+     * Dump the OpenAM install.log after every test method (not just on failure), so each run leaves
+     * a record of how the per-test OpenAM instance was configured. Runs before the next test's
+     * {@link CargoBaseTest#startOpenAM()} wipes the config directory via {@code cleanConfig()}.
+     */
+    @AfterMethod(alwaysRun = true)
+    public void dumpInstallLog() {
+        printInstallLogFile();
+    }
+
     //@AfterMethod //uncomment to debug
     public void tearDown(ITestResult result) throws IOException {
         if (result.getStatus() == ITestResult.FAILURE) {

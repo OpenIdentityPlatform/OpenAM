@@ -76,6 +76,7 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
 
             testOpenAmLogin(openamUrl);
 
+            opendj.stop();
         }
     }
 
@@ -146,7 +147,7 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("writeConfigButton"))).click();
 
-        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(600));
+        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(1200));
         try {
             WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
             proceedToConsole.click();

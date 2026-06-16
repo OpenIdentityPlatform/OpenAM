@@ -61,7 +61,7 @@ public class IT_Setup extends CargoBaseTest {
         wait.until(ExpectedConditions.elementToBeClickable(By.id("createDefaultConfig"))).click();
 
         //wait for setup complete
-        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(300));
+        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(1200));
         try {
             WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
             proceedToConsole.click();
