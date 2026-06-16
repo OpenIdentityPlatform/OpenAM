@@ -37,9 +37,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseTest {
@@ -113,6 +115,57 @@ public abstract class BaseTest {
             }
         }
 
+    }
+
+    /**
+     * Dump a full thread dump of the running OpenAM (Tomcat) JVM to stderr.
+     *
+     * <p>Used by the setup tests when the install does not complete in time. The browser-side
+     * {@link org.openqa.selenium.TimeoutException} and {@code install.log} only tell us <em>that</em>
+     * the install stalled, not <em>where</em>. A thread dump of the server JVM pins the exact frame
+     * the install thread is blocked in (e.g. an unbounded LDAP connect while creating the base
+     * entry) - the one piece of evidence that is otherwise impossible to obtain on a CI runner where
+     * the hang does not reproduce locally.
+     *
+     * <p>The OpenAM instance runs in a forked Tomcat JVM (see {@link CargoBaseTest}); we locate it
+     * with {@code jps} (main class {@code org.apache.catalina.startup.Bootstrap}) and dump it with
+     * {@code jstack}, both taken from the JDK running these tests. Best-effort: any failure is logged
+     * and swallowed so it never masks the original test failure.
+     */
+    protected void dumpOpenAmThreadDump() {
+        try {
+            final String binDir = System.getProperty("java.home") + File.separator + "bin" + File.separator;
+            final List<String> pids = new ArrayList<>();
+            final Process jps = new ProcessBuilder(binDir + "jps", "-l").redirectErrorStream(true).start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(jps.getInputStream()))) {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    if (line.contains("catalina.startup.Bootstrap")) {
+                        pids.add(line.trim().split("\\s+")[0]);
+                    }
+                }
+            }
+            jps.waitFor();
+            if (pids.isEmpty()) {
+                System.err.println("thread dump: no OpenAM (catalina) JVM found via jps");
+                return;
+            }
+            for (String pid : pids) {
+                System.err.println("=== OpenAM JVM thread dump (pid " + pid + ") ===");
+                final Process jstack = new ProcessBuilder(binDir + "jstack", "-l", pid)
+                        .redirectErrorStream(true).start();
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(jstack.getInputStream()))) {
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        System.err.println(line);
+                    }
+                }
+                jstack.waitFor();
+                System.err.println("=== end thread dump (pid " + pid + ") ===");
+            }
+        } catch (Exception e) {
+            System.err.println("thread dump capture failed: " + e);
+        }
     }
 
     WebElement waitForElement(By by) {

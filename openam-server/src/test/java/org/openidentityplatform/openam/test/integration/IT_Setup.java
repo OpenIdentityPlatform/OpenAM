@@ -67,10 +67,17 @@ public class IT_Setup extends CargoBaseTest {
             proceedToConsole.click();
         } catch (TimeoutException e) {
             System.err.println("error occurred during install: " + e);
-            WebElement progressIframe = waitForElement(By.id("progressIframe"));
-            driver.switchTo().frame(progressIframe);
-            System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            // Capture reliable diagnostics first (server thread dump + install.log); the browser-side
+            // progress reads below are best-effort and must not mask them if the page never appears.
+            dumpOpenAmThreadDump();
             printInstallLogFile();
+            try {
+                WebElement progressIframe = waitForElement(By.id("progressIframe"));
+                driver.switchTo().frame(progressIframe);
+                System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            } catch (Exception diag) {
+                System.err.println("could not read install progress messages: " + diag);
+            }
             throw e;
         } finally {
             driver.switchTo().defaultContent();

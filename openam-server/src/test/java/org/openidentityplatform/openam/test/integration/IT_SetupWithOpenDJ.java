@@ -153,10 +153,19 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
             proceedToConsole.click();
         } catch (TimeoutException e) {
             System.err.println("error occurred during install: " + e);
-            WebElement progressIframe = waitForElement(By.id("progressIframe"));
-            driver.switchTo().frame(progressIframe);
-            System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            // Capture the reliable diagnostics FIRST: a thread dump of the server JVM (where is the
+            // install stuck?) and install.log. The browser-side reads below are fragile - if the
+            // install hung, progressIframe may never appear and that wait would otherwise throw,
+            // masking these diagnostics (as happened on CI).
+            dumpOpenAmThreadDump();
             printInstallLogFile();
+            try {
+                WebElement progressIframe = waitForElement(By.id("progressIframe"));
+                driver.switchTo().frame(progressIframe);
+                System.err.println("output messages: " + waitForElement(By.id("progressP")).getText());
+            } catch (Exception diag) {
+                System.err.println("could not read install progress messages: " + diag);
+            }
             throw e;
         } finally {
             driver.switchTo().defaultContent();

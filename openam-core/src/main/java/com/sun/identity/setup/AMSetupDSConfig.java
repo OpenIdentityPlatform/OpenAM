@@ -376,7 +376,15 @@ public class AMSetupDSConfig {
 
                 // All connections will use authentication
                 SimpleBindRequest request = LDAPRequests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray());
+                // REQUEST_TIMEOUT bounds individual LDAP operations, but on its own it does NOT bound
+                // the initial TCP connect / bind (nor a connect triggered while chasing a referral).
+                // Without a CONNECT_TIMEOUT those can block indefinitely when the directory's listening
+                // socket accepts the connection but never completes the handshake - which is exactly how
+                // setup hangs for ~20 minutes on some hosts when createBaseEntry() probes an external
+                // directory that has no base entry yet. Cap connection establishment so setup either
+                // proceeds or fails fast with a visible error instead of stalling the whole install.
                 Options options = Options.defaultOptions()
+                        .set(CONNECT_TIMEOUT, new Duration((long)10, TimeUnit.SECONDS))
                         .set(REQUEST_TIMEOUT, new Duration((long)3, TimeUnit.SECONDS))
                         .set(AUTHN_BIND_REQUEST, request);
 
