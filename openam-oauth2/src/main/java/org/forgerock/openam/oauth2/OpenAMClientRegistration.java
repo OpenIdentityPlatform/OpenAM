@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -54,6 +55,7 @@ import org.forgerock.http.util.MultiValueMap;
 import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
 import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
 import org.forgerock.jaspi.modules.openid.helpers.JWKSetParser;
+import org.forgerock.jaspi.modules.openid.resolvers.JWKOpenIdResolverImpl;
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
 import org.forgerock.jaspi.modules.openid.resolvers.SharedSecretOpenIdResolverImpl;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
@@ -93,6 +95,11 @@ import com.sun.identity.shared.encode.Base64;
 public class OpenAMClientRegistration implements OpenIdConnectClientRegistration {
 
     private static final String DELIMITER = "\\|";
+
+    /** Read/connect timeouts (ms) used when fetching a client's {@code jwks_uri}.
+     *  Mirrors the values previously configured in {@code OAuth2GuiceModule}. */
+    private static final int JWKS_URI_READ_TIMEOUT_MS = 3000;
+    private static final int JWKS_URI_CONNECT_TIMEOUT_MS = 3000;
     private static final Comparator<? super String[]> I18N_SPECIFICITY_COMPARATOR = new Comparator<String[]>() {
         @Override
         public int compare(String[] o1, String[] o2) {
@@ -731,19 +738,46 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
         final String url = set.iterator().next();
 
+        // GHSA-f2cx-463q-7m2c: the resolver cache MUST be keyed by something tied to the
+        // client registration, not by the attacker-controlled JWT 'iss' claim. Otherwise a
+        // resolver seeded by one client (with its own keys) can be reused to validate a
+        // forged assertion submitted on behalf of a different client that shares the same
+        // 'iss'.
+        //
+        // We deliberately bypass the singleton OpenIdResolverService here and keep our own
+        // process-wide cache keyed by (clientId | jwks_uri). The shared service used
+        // its single string argument as BOTH the map key and the OpenIdResolver's bound
+        // issuer (which BaseOpenIdResolver.verifyIssuer then compares against jwt.iss).
+        // Storing 'clientId|url' as the bound issuer would break every legitimate
+        // assertion, so we instead construct JWKOpenIdResolverImpl directly with the
+        // registration's client_id as the bound issuer. This:
+        //   * lets legitimate assertions (iss == sub == client_id, enforced upstream by
+        //     ClientCredentialsReader.verifyJwtBearer) pass verifyIssuer;
+        //   * provides defence in depth: even if a future caller reached this method
+        //     without the upstream iss==sub guard, verifyIssuer would still reject any
+        //     assertion whose iss does not match the registered client_id.
+        final String cacheKey = getClientId() + "|" + url;
+        final String boundIssuer = getClientId();
+
         try {
-            if (resolverService.getResolverForIssuer(jwt.getSignedJwt().getClaimsSet().getIssuer()) == null) {
-                boolean success =
-                        resolverService.configureResolverWithJWK(jwt.getSignedJwt().getClaimsSet().getIssuer(),
-                                new URL(url));
-                if (!success) {
+            OpenIdResolver resolver = ClientJwksResolverCache.get(cacheKey);
+            if (resolver == null) {
+                try {
+                    resolver = ClientJwksResolverCache.putIfAbsent(cacheKey,
+                            new JWKOpenIdResolverImpl(boundIssuer, new URL(url),
+                                    JWKS_URI_READ_TIMEOUT_MS, JWKS_URI_CONNECT_TIMEOUT_MS));
+                } catch (FailedToLoadJWKException e) {
+                    // Log the URL and root-cause server-side; the OAuth2 error response only
+                    // carries a generic message so the configured jwks_uri and any
+                    // stack-derived detail from e.getMessage() are not echoed back to the
+                    // client.
+                    logger.error("Unable to load JWKs for client '" + getClientId()
+                            + "' from " + url, e);
                     throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                            "Unable to configure internal JWK resolver service.");
+                            "Unable to load JWKs from registered jwks_uri.");
                 }
             }
-
-            resolverService.getResolverForIssuer(
-                    jwt.getSignedJwt().getClaimsSet().getIssuer()).validateIdentity(jwt.getSignedJwt());
+            resolver.validateIdentity(jwt.getSignedJwt());
         } catch (OpenIdConnectVerificationException e) {
             return false;
         }
