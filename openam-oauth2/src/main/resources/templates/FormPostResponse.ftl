@@ -13,6 +13,7 @@
 ~ information: "Portions copyright [year] [name of copyright owner]".
 ~
 ~ Copyright 2015 ForgeRock AS.
+~ Portions copyright 2026 3A Systems LLC
 -->
 <html lang="en">
     <head>
@@ -23,8 +24,8 @@
         <title>Submit This Form</title>
     </head>
     <body onload="javascript:document.forms[0].submit()">
-        <form method="post" action="${redirectUri}">
-            <#list formValues?keys as key><input type="hidden" name="${key}" value="${formValues[key]}"/></#list>
+        <form method="post" action="${redirectUri?html}">
+            <#list formValues?keys as key><input type="hidden" name="${key?html}" value="${formValues[key]?html}"/></#list>
         </form>
     </body>
 </html>
