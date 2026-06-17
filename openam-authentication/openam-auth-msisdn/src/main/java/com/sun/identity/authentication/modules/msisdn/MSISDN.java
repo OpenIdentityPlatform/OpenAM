@@ -24,6 +24,7 @@
  *
  * $Id: MSISDN.java,v 1.3 2008/06/25 05:41:58 qcheng Exp $
  *
+ * Portions Copyrighted 2025-2026 3A Systems, LLC
  */
 
 /*
@@ -59,8 +60,9 @@ import jakarta.servlet.http.Cookie;
  * <code>ServletRequest</code>. If the values cannot be retrieved then
  * callbacks to get <code>msisdn</code> number and wap gateway are sent back to
  * the client. The WAP Gateway is validated against a list of valid gateways in
- * the gateway list attribute. If the gateway list attribute is empty then all
- * gateways will trusted , if it is "none" then no gateways will be trusted and
+ * the gateway list attribute. If the gateway list attribute is empty then no
+ * gateways will be trusted, if it is "none" then no gateways will be trusted,
+ * if it is "any" then all gateways will be trusted, and
  * if specific values are specified only those gateways will be trusted. Once
  * the gateway is validated the <code>msisdn</code> number is searched for in
  * the repository. This module is written to lookup the <code>msisdn</code>
@@ -103,6 +105,8 @@ public class MSISDN extends AMLoginModule {
     private static final String SEARCH_COOKIE = "searchCookie";
     private static final String SEARCH_HEADER = "searchRequest";
     private static final String SEARCH_PARAM = "searchParam";
+    private static final String TRUST_ANY_GATEWAY = "any";
+    private static final String TRUST_NO_GATEWAY = "none";
     private static final int SUBMITTED_CREDENTIALS = 0;
 
     static {
@@ -142,23 +146,15 @@ public class MSISDN extends AMLoginModule {
         if (options != null) {
             debug.message("MSISDN: getting attributes.");
             gatewayList = (Set)options.get(TRUSTED_GATEWAY_LIST);
-            if ((gatewayList != null) && (!gatewayList.isEmpty()) 
-                            && (gatewayList.contains("none"))) {
+            parameterNameList = (Set)options.get(MSISDN_PARAMETER_NAME);
+            searchHeaderList = (Set)options.get(MSISDN_HEADER_SEARCH);
+            if ((searchHeaderList == null) || (searchHeaderList.isEmpty())){
+                searchAllHeaders = true;
                 if (debug.messageEnabled()) {
-                    debug.message("No gateways trusted ");
+                    debug.message("searchAllHeaders :" + searchAllHeaders);
                 }
-                errorMsgKey = "MSISDNInvalidGateway";
-            } else {
-                parameterNameList = (Set)options.get(MSISDN_PARAMETER_NAME);
-                searchHeaderList = (Set)options.get(MSISDN_HEADER_SEARCH);
-                if ((searchHeaderList == null) || (searchHeaderList.isEmpty())){
-                    searchAllHeaders = true;
-                    if (debug.messageEnabled()) {
-                        debug.message("searchAllHeaders :" + searchAllHeaders);
-                    }
-                }
-                setMSISDNAuthLevel();
             }
+            setMSISDNAuthLevel();
         } else {
             debug.error("options is null");
             errorMsgKey = "MSISDNValidateEx";
@@ -289,12 +285,36 @@ public class MSISDN extends AMLoginModule {
 
     /**
      * check if gateway is trusted.
-     * true if list is empty OR does not contain "none" OR
-     * matches the one of the gateways in the list.
-     */ 
+     * true if list explicitly contains "any" OR matches one of the gateways in the list.
+     * Empty list and "none" are deny-all.
+     */
     private boolean isValidGateway(String gateway) {
-        return (gatewayList != null) && ((gatewayList.isEmpty()) 
-                                     || (gatewayList.contains(gateway))); 
+        return isTrustedGateway(gatewayList, gateway);
+    }
+
+    static boolean isTrustedGateway(Set gatewayList, String gateway) {
+        if ((gatewayList == null) || gatewayList.isEmpty() || (gateway == null)) {
+            return false;
+        }
+
+        boolean trustedGatewayMatched = false;
+
+        for (Object trustedGateway : gatewayList) {
+            if (trustedGateway == null) {
+                continue;
+            }
+
+            String trustedGatewayValue = trustedGateway.toString().trim();
+            if (TRUST_NO_GATEWAY.equalsIgnoreCase(trustedGatewayValue)) {
+                return false;
+            }
+            if (TRUST_ANY_GATEWAY.equalsIgnoreCase(trustedGatewayValue)
+                    || trustedGatewayValue.equals(gateway)) {
+                trustedGatewayMatched = true;
+            }
+        }
+
+        return trustedGatewayMatched;
     }
 
     /**

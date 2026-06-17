@@ -1,4 +1,17 @@
-name: Build 
+# The contents of this file are subject to the terms of the Common Development and
+# Distribution License (the License). You may not use this file except in compliance with the
+# License.
+#
+# You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+# specific language governing permission and limitations under the License.
+#
+# When distributing Covered Software, include this CDDL Header Notice in each file and include
+# the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+# Header, with the fields enclosed by brackets [] replaced by your own identifying
+# information: "Portions copyright [year] [name of copyright owner]".
+#
+# Copyright 2021-2026 3A Systems, LLC.
+name: Build
 
 on:
   push:
@@ -32,13 +45,12 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run:  | 
         echo "MAVEN_PROFILE_FLAG=-P integration-test" >> $GITHUB_OUTPUT 
-        echo "MAVEN_VERIFY_STAGE=verify" >> $GITHUB_OUTPUT
         echo "127.0.0.1 openam.local" | sudo tee -a /etc/hosts
       id: maven-profile-flag
     - name: Build with Maven
       env:
         MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
-      run: mvn --batch-mode --errors --update-snapshots package ${{ steps.maven-profile-flag.outputs.MAVEN_VERIFY_STAGE }} --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
+      run: mvn --batch-mode --errors --update-snapshots verify --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
       with:
@@ -276,13 +288,38 @@ jobs:
         with:
           sparse-checkout: e2e
 
-      - name: UI Smoke Tests (Playwright)
+      - name: UI Smoke Tests (Playwright) - HttpOnly disabled
+        env:
+          EXPECT_COOKIE_HTTPONLY: "false"
         run: |
           cd e2e
           npm init -y
           npm install @playwright/test
           npx playwright install chromium --with-deps
           npx playwright test --reporter=list
+
+      - name: Enable HttpOnly session cookie on OpenAM IDP and restart
+        shell: bash
+        run: |
+          # com.sun.identity.cookie.httponly is read once at startup (static field
+          # in CookieUtils) and SystemProperties gives JVM -D properties priority,
+          # so we inject it via Tomcat setenv.sh and restart the same container
+          # (its configured data dir is preserved across a restart).
+          docker exec openam-idp bash -c '
+            echo "export CATALINA_OPTS=\"\$CATALINA_OPTS -Dcom.sun.identity.cookie.httponly=true\"" > "$CATALINA_HOME/bin/setenv.sh"
+            chmod +x "$CATALINA_HOME/bin/setenv.sh"'
+          docker restart openam-idp
+          echo "waiting for OpenAM IDP to be alive again..."
+          timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" openam-idp | grep -q \"healthy\"; do sleep 10; done'
+          echo "verifying the server now reports cookieHttpOnly=true"
+          curl -sf "http://openam.example.org:8080/openam/json/serverinfo/*" | jq -e '.cookieHttpOnly == true'
+
+      - name: UI Smoke Tests (Playwright) - HttpOnly enabled
+        env:
+          EXPECT_COOKIE_HTTPONLY: "true"
+        run: |
+          cd e2e
+          npx playwright test xui --reporter=list
 
       - name: Upload failure artifacts
         uses: actions/upload-artifact@v7

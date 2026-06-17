@@ -12,17 +12,24 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 3A Systems,LLC
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.scripting.sandbox;
 
+import org.kohsuke.groovy.sandbox.GroovyInterceptor.Invoker;
 import org.mozilla.javascript.ClassShutter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class GroovySandboxValueFilterTest {
 
@@ -87,5 +94,52 @@ public class GroovySandboxValueFilterTest {
         testFilter.filter(target);
 
         // Then - exception
+    }
+
+    @Test(expectedExceptions = SecurityException.class)
+    public void shouldBlockProcessExecuteOnList() throws Throwable {
+        Invoker invoker = mock(Invoker.class);
+        try {
+            testFilter.onMethodCall(invoker, Arrays.asList("sh", "-c", "id"), "execute");
+        } finally {
+            verify(invoker, never()).call(org.mockito.ArgumentMatchers.any(),
+                    org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.<Object[]>any());
+        }
+    }
+
+    @Test(expectedExceptions = SecurityException.class)
+    public void shouldBlockProcessExecuteOnString() throws Throwable {
+        Invoker invoker = mock(Invoker.class);
+        try {
+            testFilter.onMethodCall(invoker, "id", "execute");
+        } finally {
+            verify(invoker, never()).call(org.mockito.ArgumentMatchers.any(),
+                    org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.<Object[]>any());
+        }
+    }
+
+    @Test(expectedExceptions = SecurityException.class)
+    public void shouldBlockProcessExecuteOnStringArray() throws Throwable {
+        Invoker invoker = mock(Invoker.class);
+        String[] cmd = {"sh", "-c", "id"};
+        try {
+            testFilter.onMethodCall(invoker, cmd, "execute");
+        } finally {
+            verify(invoker, never()).call(org.mockito.ArgumentMatchers.any(),
+                    org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.<Object[]>any());
+        }
+    }
+
+    @Test(expectedExceptions = SecurityException.class)
+    public void shouldBlockProcessExecuteViaInvokeMethod() throws Throwable {
+        Invoker invoker = mock(Invoker.class);
+        try {
+            testFilter.onMethodCall(invoker, Arrays.asList("sh", "-c", "id"),
+                    "invokeMethod", "execute", new Object[0]);
+        } finally {
+            verify(invoker, never()).call(org.mockito.ArgumentMatchers.any(),
+                    org.mockito.ArgumentMatchers.anyString(),
+                    org.mockito.ArgumentMatchers.<Object[]>any());
+        }
     }
 }

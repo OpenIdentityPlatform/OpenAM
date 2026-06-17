@@ -448,6 +448,7 @@
         <dependency>
             <groupId>org.openidentityplatform.commons.guice</groupId>
             <artifactId>test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
@@ -478,6 +479,11 @@
 <!--            <groupId>com.sun.xml.bind</groupId>-->
 <!--            <artifactId>jaxb-impl</artifactId>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
 

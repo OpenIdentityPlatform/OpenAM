@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
+ * Portions Copyright 2025-2026 3A Systems, LLC
  */
 
 package com.sun.identity.config.wizard;
@@ -48,6 +49,7 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * Step 3 is for selecting the embedded or external configuration store 
@@ -623,19 +625,31 @@ public class Step3 extends LDAPStoreWizardPage {
         }
 
         /*
-         * Check if the provided root suffix exists and 'services' entry does not exist under the suffix in the existing
-         * SM host. If not, OpenAM denies setting up.
+         * Make sure the chosen config store does not already contain an OpenAM configuration (a 'services' entry under
+         * the root suffix). The root suffix itself does not need to exist yet: if it is missing OpenAM will create the
+         * base entry during installation. Only a real connection/authentication failure prevents proceeding.
          */
         try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
-            conn.readEntry(DN.valueOf(rootSuffix));
+            boolean servicesExist;
             try {
                 conn.readEntry(DN.valueOf(rootSuffix).child("ou", "services"));
-                writeToResponse(getLocalizedString("config.data.already.exist"));
+                servicesExist = true;
             } catch (EntryNotFoundException enfe) {
+                // Either the suffix or the 'services' entry is missing - safe to set up.
+                servicesExist = false;
+            }
+            if (servicesExist) {
+                writeToResponse(getLocalizedString("config.data.already.exist"));
+            } else {
                 writeToResponse("ok");
             }
         } catch (LdapException lex) {
-            if (!writeErrorToResponse(lex.getResult().getResultCode())) {
+            ResultCode resultCode = lex.getResult().getResultCode();
+            if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
+                // The root suffix (or its parent) does not exist yet - OpenAM will create the base entry during
+                // installation, so this is allowed.
+                writeToResponse("ok");
+            } else if (!writeErrorToResponse(resultCode)) {
                 writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
             }
         } catch (Exception e) {

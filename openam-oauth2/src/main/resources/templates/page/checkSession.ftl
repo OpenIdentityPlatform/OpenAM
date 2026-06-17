@@ -21,13 +21,15 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Portions copyright 2026 3A Systems LLC
 -->
 <html>
 <head>
   <title></title>
 </head>
 <body>
-  <script src="${baseUrl}/js/sha256.js"></script>
+  <script src="${baseUrl?html}/js/sha256.js"></script>
   <script type="text/javascript">
 
     window.addEventListener("message", receiveMessage, false);

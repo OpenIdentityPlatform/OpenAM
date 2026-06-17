@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -96,6 +97,27 @@ public final class DiscoveryService implements RequestHandler {
                 + "Mechanism used is not supported by this service:"+authnMech);
             throw new Exception(DiscoUtils.bundle.getString(
                                                 "authnMechNotSupported"));
+        }
+
+        // Fail-close: refuse anonymous WSC sessions independently of the
+        // *NeedPolicyEval* defaults. Mirrors PersonalProfile.getAuthZAction.
+        try {
+            Object tok = request.getToken();
+            if (tok instanceof com.iplanet.sso.SSOToken) {
+                String principal = ((com.iplanet.sso.SSOToken) tok)
+                        .getProperty("Principal");
+                if ("anonymous".equals(principal)) {
+                    DiscoUtils.debug.warning(
+                            "DiscoveryService.processRequest: denying "
+                            + "request from anonymous WSC session");
+                    throw new DiscoveryException(
+                            "anonymous WSC session is not authorized");
+                }
+            }
+        } catch (com.iplanet.sso.SSOException ssoe) {
+            DiscoUtils.debug.error(
+                    "DiscoveryService.processRequest: SSOException", ssoe);
+            throw new DiscoveryException(ssoe.getMessage());
         }
 
         Message message = null;

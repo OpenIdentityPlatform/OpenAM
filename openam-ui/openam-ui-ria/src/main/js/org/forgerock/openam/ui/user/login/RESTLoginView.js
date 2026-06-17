@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2021-2026 3A Systems, LLC
  */
 
 define([
@@ -37,10 +38,11 @@ define([
     "org/forgerock/openam/ui/user/login/logout",
     "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/login/gotoUrl",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "store/index"
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
     Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, Router, SessionManager, UIUtils,
-    URIUtils, logout, query, gotoUrl, store) => {
+    URIUtils, logout, query, gotoUrl, SessionToken, store) => {
     isRealmChanged = isRealmChanged.default;
 
     function hasSsoRedirectOrPost (goto) {
@@ -269,13 +271,13 @@ define([
             AuthNService.getRequirements().then(_.bind(function (reqs) {
 
                 // Clear out existing session if instructed
-                if (reqs.hasOwnProperty("tokenId") && params.arg === "newsession") {
+                if (SessionToken.isAuthenticated(reqs) && params.arg === "newsession") {
                     logout.default();
                 }
 
                 // If simply by asking for the requirements, we end up with a token,
                 // then we must have already had a session
-                if (reqs.hasOwnProperty("tokenId")) {
+                if (SessionToken.isAuthenticated(reqs)) {
                     this.handleExistingSession(reqs);
                 } else { // We aren't logged in yet, so render a form...
                     this.renderForm(reqs, params);

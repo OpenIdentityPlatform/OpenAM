@@ -11,13 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
-<<<<<<< HEAD
  * Copyright 2013-2016 ForgeRock AS.
-=======
- * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
->>>>>>> cafd23ed69... Remove an input parameter included in exception message (#123)
- * Portions copyright 2025-2026 3A Systems, LLC.
+ * Portions copyright 2018-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -39,8 +35,10 @@ import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
+import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
@@ -456,6 +454,173 @@ public class RestAuthenticationHandlerTest {
     public void shouldReturnAbsoluteRealmInSuccessfulAuthenticationResponse() throws Exception {
         JsonValue response = performSuccessfulAuthentication();
         assertThat(response).stringAt("realm").isEqualTo("REALM");
+    }
+
+    @Test
+    public void shouldNotEchoTokenIdInResponseBodyWhenCookieIsHttpOnly() throws Exception {
+
+        // Given - HttpOnly mode with the default policy (allowTokenInBody=false): the token must be
+        // delivered only via Set-Cookie, never in the body
+        setCookieHttpOnly(true);
+        setHttpOnlyAllowTokenInBody(false);
+        try {
+            // When - a successful authentication completes
+            JsonValue response = performSuccessfulAuthentication();
+
+            // Then - the response is successful but carries NO tokenId (no token exfiltration path)
+            assertFalse(response.isDefined("tokenId"), "tokenId must not be echoed in HttpOnly mode");
+            assertThat(response).stringAt("realm").isEqualTo("REALM");
+            assertTrue(response.isDefined("successUrl"));
+        } finally {
+            setCookieHttpOnly(false);
+        }
+    }
+
+    @Test
+    public void shouldEchoTokenIdInResponseBodyWhenHttpOnlyAndAllowTokenInBodyEnabled() throws Exception {
+
+        // Given - HttpOnly mode but the deployment explicitly opted in to also return the token in
+        // the body (org.openidentityplatform.openam.httponly.allowTokenInBody=true)
+        setCookieHttpOnly(true);
+        setHttpOnlyAllowTokenInBody(true);
+        try {
+            // When
+            JsonValue response = performSuccessfulAuthentication();
+
+            // Then - both the HttpOnly cookie (set elsewhere) and the body token are available
+            assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+        } finally {
+            setHttpOnlyAllowTokenInBody(false);
+            setCookieHttpOnly(false);
+        }
+    }
+
+    @Test
+    public void shouldEchoTokenIdInResponseBodyWhenCookieIsNotHttpOnly() throws Exception {
+
+        // Given - token-readable mode (default): the XUI consumes body.tokenId to set the cookie
+        setCookieHttpOnly(false);
+
+        // When
+        JsonValue response = performSuccessfulAuthentication();
+
+        // Then - the tokenId is returned in the body as before
+        assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+    }
+
+    @Test
+    public void shouldFallBackToSessionCookieAsUpgradeTargetWhenHttpOnlyAndNoUpgradeTokenSupplied()
+            throws Exception {
+
+        // Given - HttpOnly mode and no sessionUpgradeSSOTokenId supplied (XUI cannot read the cookie)
+        setCookieHttpOnly(true);
+        try {
+            HttpServletRequest request = mock(HttpServletRequest.class);
+            HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+            SessionID cookieSessionId = new SessionID("COOKIE_SSO_TOKEN_ID");
+            given(coreServicesWrapper.getSessionIDFromRequest(request)).willReturn(cookieSessionId);
+
+            SSOTokenID ssoTokenID = mock(SSOTokenID.class);
+            given(ssoTokenID.toString()).willReturn("COOKIE_SSO_TOKEN_ID");
+            SSOToken existingToken = mock(SSOToken.class);
+            given(existingToken.getTokenID()).willReturn(ssoTokenID);
+            given(coreServicesWrapper.getExistingValidSSOToken(cookieSessionId)).willReturn(existingToken);
+
+            LoginProcess loginProcess = completedLoginProcess();
+            given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                    .willReturn(loginProcess);
+
+            // When
+            restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                    AuthIndexType.MODULE.toString(), "INDEX_VALUE", null);
+
+            // Then - the session carried by the HttpOnly cookie is used as the upgrade target
+            ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
+            verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
+            LoginConfiguration loginConfiguration = argumentCaptor.getValue();
+            assertEquals(loginConfiguration.getSSOTokenId(), "COOKIE_SSO_TOKEN_ID");
+            assertTrue(loginConfiguration.isSessionUpgradeRequest());
+        } finally {
+            setCookieHttpOnly(false);
+        }
+    }
+
+    @Test
+    public void shouldNotFallBackToSessionCookieWhenCookieIsNotHttpOnly() throws Exception {
+
+        // Given - the cookie is readable by JS, so the XUI is responsible for supplying the token
+        setCookieHttpOnly(false);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+        LoginProcess loginProcess = completedLoginProcess();
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                .willReturn(loginProcess);
+
+        // When
+        restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                AuthIndexType.MODULE.toString(), "INDEX_VALUE", null);
+
+        // Then - no cookie lookup is performed and no upgrade target is resolved
+        verify(coreServicesWrapper, never()).getExistingValidSSOToken(ArgumentMatchers.<SessionID>any());
+        ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
+        verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
+        assertEquals(argumentCaptor.getValue().getSSOTokenId(), "");
+    }
+
+    @Test
+    public void shouldPreferSuppliedUpgradeTokenOverSessionCookieInHttpOnlyMode() throws Exception {
+
+        // Given - HttpOnly mode but an explicit upgrade token is supplied (e.g. straight after login)
+        setCookieHttpOnly(true);
+        try {
+            HttpServletRequest request = mock(HttpServletRequest.class);
+            HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+            LoginProcess loginProcess = completedLoginProcess();
+            given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                    .willReturn(loginProcess);
+
+            // When
+            restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                    AuthIndexType.MODULE.toString(), "INDEX_VALUE", "SUPPLIED_SSO_TOKEN_ID");
+
+            // Then - the explicitly supplied token wins and the cookie is not consulted
+            verify(coreServicesWrapper, never()).getExistingValidSSOToken(ArgumentMatchers.<SessionID>any());
+            ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
+            verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
+            assertEquals(argumentCaptor.getValue().getSSOTokenId(), "SUPPLIED_SSO_TOKEN_ID");
+        } finally {
+            setCookieHttpOnly(false);
+        }
+    }
+
+    private LoginProcess completedLoginProcess() throws Exception {
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
+        given(ssoTokenID.toString()).willReturn("NEW_SSO_TOKEN_ID");
+        SSOToken ssoToken = mock(SSOToken.class);
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+
+        AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
+        LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(true);
+        given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
+        return loginProcess;
+    }
+
+    private static void setCookieHttpOnly(boolean value) throws Exception {
+        java.lang.reflect.Field field = CookieUtils.class.getDeclaredField("cookieHttpOnly");
+        field.setAccessible(true);
+        field.setBoolean(null, value);
+    }
+
+    private static void setHttpOnlyAllowTokenInBody(boolean value) throws Exception {
+        java.lang.reflect.Field field = CookieUtils.class.getDeclaredField("httpOnlyAllowTokenInBody");
+        field.setAccessible(true);
+        field.setBoolean(null, value);
     }
 
     private JsonValue performSuccessfulAuthentication() throws Exception {

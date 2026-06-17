@@ -2395,11 +2395,24 @@ Possible values: `TLSv1`, `TLSv1.1`, `TLSv1.2`
 
 The Mobile Station Integrated Services Digital Network (MSISDN) authentication module enables non-interactive authentication using a mobile subscriber ISDN associated with a terminal, such as a mobile phone. The module checks the subscriber ISDN against the value found on a user's entry in an LDAP directory service.
 
+The module validates the MSISDN number taken from the request before searching the directory. The number must consist of at least seven digits, optionally preceded by a single `+` sign (for example, `+15551234567`). Requests carrying a value that does not match this format are rejected without performing a directory search.
+
 `ssoadm` service name: `sunAMAuthMSISDNService`
 --
 
 Trusted Gateway IP Address::
-Specifies a list of IP addresses of trusted clients that can access MSISDN modules. Either restrict the clients allowed to access the MSISDN module by adding each IPv4 or IPv6 address here, or leave the list empty to allow all clients to access the module. If you specify the value `none`, no clients are allowed access.
+Specifies a list of IP addresses of trusted clients that can access MSISDN modules. Restrict the clients allowed to access the MSISDN module by adding each trusted IPv4 or IPv6 address here. The list is evaluated as follows:
++
+* If the list is _empty_, no clients are trusted and the module fails closed. This is the default, secure behavior.
+* If the list contains the explicit value `none`, no clients are trusted, regardless of any other entries in the list.
+* If the list contains the explicit value `any`, all clients are trusted. Use this value only when you intentionally want to disable gateway IP address checking.
+* Otherwise, only clients whose IP address matches one of the listed addresses are trusted.
+
++
+[WARNING]
+====
+In earlier releases an empty list trusted _all_ clients. The behavior is now reversed to fail closed: an empty list trusts _no_ clients. If you previously relied on an empty list to allow all gateways, set the value to `any` to preserve that behavior, or, preferably, list the specific trusted gateway IP addresses.
+====
 
 +
 `ssoadm` attribute: `sunAMAuthMSISDNTrustedGatewayList`
@@ -3292,6 +3305,24 @@ Default: 5 minutes
 
 +
 `ssoadm` attribute: `openam-auth-radius-healthcheck-interval`
+
+Require Message-Authenticator on responses::
+Enforces the strict RFC 3579 / Cisco BlastRADIUS-mitigation profile.
+
++
+When enabled, every `Access-Accept`, `Access-Reject`, and `Access-Challenge` received from the RADIUS server *must* carry a verifiable Message-Authenticator (attribute 80). Responses without a valid Message-Authenticator are rejected and authentication fails. Enable this option when you control both ends of the link and the RADIUS server echoes Message-Authenticator on its responses (the fully protected flow recommended by Cisco's BlastRADIUS guidance).
+
++
+When disabled (the default), OpenAM still signs every outgoing `Access-Request` with a Message-Authenticator and verifies it on responses that include it, but legacy RADIUS servers that never echo Message-Authenticator remain interoperable.
+
++
+NOTE: This option mitigates the BlastRADIUS vulnerability (CVE-2024-3596). Use the default (disabled) profile only with trusted servers on a trusted network; prefer enabling it whenever the RADIUS server supports returning Message-Authenticator.
+
++
+Default: Disabled
+
++
+`ssoadm` attribute: `openam-auth-radius-require-message-authenticator`
 
 Authentication Level::
 Sets the authentication level used to indicate the level of security associated with the module. The value can range from 0 to any positive integer.

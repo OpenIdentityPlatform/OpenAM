@@ -104,7 +104,7 @@ public class UserService extends OpenAMAbstractService {
         String tokenId = getTokenId();
 
         Map<String, String> requestBody = Map.of("userpassword", password);
-        String uri = String.format("/json/realms/%s/users/%s?_action=changePassword",
+        String uri = String.format("/json/realms/%s/users/%s",
                 UriUtils.encodePath(realm, StandardCharsets.UTF_8),
                 UriUtils.encodePath(username, StandardCharsets.UTF_8));
         UserDTO user = openAMRestClient.put().uri(uri).body(requestBody)

@@ -13,7 +13,7 @@
 *
 * Copyright 2015-2016 ForgeRock AS.
 * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.oauth2;
 
@@ -127,8 +127,21 @@ public class ClientCredentialsReader {
 
         final OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
 
-        final ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
-        
+        // RFC 7523 §3: for client authentication the JWT 'iss' and 'sub' claims MUST
+        // both identify the OAuth2 client. Refuse the assertion if these are missing or
+        // do not match, to prevent cross-client impersonation (GHSA-f2cx-463q-7m2c).
+        final String sub = jwt.getSubject();
+        final String iss = jwt.getSignedJwt() != null && jwt.getSignedJwt().getClaimsSet() != null
+                ? jwt.getSignedJwt().getClaimsSet().getIssuer()
+                : null;
+        if (sub == null || sub.isEmpty() || iss == null || !sub.equals(iss)) {
+            logger.error("JWT client assertion rejected: iss/sub mismatch (iss=" + iss + ", sub=" + sub + ")");
+            throw failureFactory.getException(request,
+                    "JWT 'iss' and 'sub' claims must be equal to the client_id");
+        }
+
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(sub, request);
+
         if (jwt.isExpired()) {
             throw failureFactory.getException(request, "JWT has expired");
         }

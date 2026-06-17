@@ -25,7 +25,7 @@
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2017-2025 3A Systems, LLC.
+ * Portions Copyrighted 2017-2026 3A Systems, LLC.
  */
 
 package com.sun.identity.setup;
@@ -1474,6 +1474,18 @@ public class AMSetupServlet extends HttpServlet {
         SetupProgress.reportEnd("emb.success", null);
         
         AMSetupDSConfig dsConfig = AMSetupDSConfig.getInstance();
+
+        // For an external configuration store the root suffix (base entry) is
+        // assumed to already exist. Create it if it is missing so OpenAM can be
+        // installed against an external OpenDJ without pre-creating the base DN
+        // (e.g. without the OpenDJ "--addBaseEntry" option). The embedded store
+        // creates the suffix separately via openam_suffix.ldif.
+        if (SetupConstants.SMS_DS_DATASTORE.equals(dataStore)) {
+            String sslEnabled = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_SSL);
+            boolean ssl = "SSL".equals(sslEnabled);
+            dsConfig.createBaseEntry(ssl);
+        }
+
         dsConfig.loadSchemaFiles(schemaFiles);
 
         if (dataStore.equals(SetupConstants.SMS_EMBED_DATASTORE)) {

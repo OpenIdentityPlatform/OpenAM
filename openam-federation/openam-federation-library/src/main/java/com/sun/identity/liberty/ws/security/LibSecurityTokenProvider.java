@@ -25,6 +25,7 @@
  * $Id: LibSecurityTokenProvider.java,v 1.3 2008/08/06 17:28:11 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.security;
@@ -474,8 +475,35 @@ public class LibSecurityTokenProvider implements SecurityTokenProvider {
             throw new SecurityTokenException(
                 bundle.getString("nullSenderIdentity"));
         }
-        
-        
+
+        // Level 6: refuse to mint Liberty security tokens whose subject
+        // would be derived from an anonymous WSC session. This blocks the
+        // bearer-assertion-with-victim-DN escalation path described in
+        // the CVE.
+        if (invocatorSession != null) {
+            try {
+                com.sun.identity.saml.assertion.NameIdentifier ni =
+                        invocatorSession.getSessionSubject() != null
+                            ? invocatorSession.getSessionSubject()
+                                    .getNameIdentifier()
+                            : null;
+                if (ni != null && "anonymous".equals(ni.getName())) {
+                    debug.error("LibSecurityTokenProvider.getSAMLToken: "
+                            + "anonymous WSC session is not permitted to "
+                            + "mint Liberty security tokens");
+                    throw new SecurityTokenException(
+                            "anonymous WSC session is not permitted to "
+                            + "mint Liberty security tokens");
+                }
+            } catch (SecurityTokenException ste) {
+                throw ste;
+            } catch (Exception ex) {
+                debug.error("LibSecurityTokenProvider.getSAMLToken: "
+                        + "error inspecting invocator session", ex);
+                throw new SecurityTokenException(ex.getMessage());
+            }
+        }
+
         boolean statementNotFound = true;
         SecurityAssertion assertion = null;
         

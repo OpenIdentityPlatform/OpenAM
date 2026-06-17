@@ -17,6 +17,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 -->
 
@@ -25,7 +26,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/ForgerockOAuth2ProviderService"
                 i18nFileName="OAuth2Provider"
-                revisionNumber="1"
+                revisionNumber="2"
                 i18nKey="forgerock-oauth2-provider-description"
                 resourceName="oauth-oidc">
             <Global>
@@ -185,6 +186,27 @@
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>@GlobalOidcClaimsScriptId@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-access-token-modification-script"
+                                 type="single_choice"
+                                 uitype="scriptSelect"
+                                 propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
+                                 syntax="string"
+                                 i18nKey="a104ac"
+                                 resourceName="accessTokenModificationScript"
+                                 order="85">
+                    <ChoiceValues>
+                        <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                            <AttributeValuePair>
+                                <Attribute name="ContextId"/>
+                                <Value>OAUTH2_ACCESS_TOKEN_MODIFICATION</Value>
+                            </AttributeValuePair>
+                        </ChoiceValuesClassName>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>@GlobalAccessTokenModificationScriptId@</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -459,7 +481,7 @@
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

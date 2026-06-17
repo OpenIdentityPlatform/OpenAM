@@ -34,27 +34,43 @@ import java.time.Duration;
 
 import static org.testng.Assert.assertTrue;
 
-public class IT_SetupWithOpenDJ extends BaseTest {
+public class IT_SetupWithOpenDJ extends CargoBaseTest {
 
     @Test
     public void testSetupWithOpendj() throws Exception {
+        // External OpenDJ WITHOUT a pre-created base DN - OpenAM must create the base entry itself.
+        runSetup(OPENAM_URL, false);
+    }
 
-        final String openamUrl = "http://openam.local:8207/am";
+    @Test
+    public void testSetupWithOpendjAddBaseEntry() throws Exception {
+        // External OpenDJ WITH a pre-created base DN (OpenDJ "--addBaseEntry").
+        // Each test runs against its own freshly started OpenAM instance (see CargoBaseTest), so they
+        // can safely share the same web app context even though an OpenAM can only be configured once.
+        runSetup(OPENAM_URL, true);
+    }
+
+    private void runSetup(String openamUrl, boolean addBaseEntry) throws Exception {
 
         if(!DockerClientFactory.instance().isDockerAvailable()) {
             throw new SkipException("docker is not available");
         }
 
-        try(GenericContainer<?> opendj =
+        GenericContainer<?> opendj =
                     new GenericContainer<>(DockerImageName.parse("openidentityplatform/opendj:latest"))
                             .withExposedPorts(1389, 4444)
-                            .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(5)))) {
+                            .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofMinutes(10)));
+        if (addBaseEntry) {
+            opendj.withEnv("ADD_BASE_ENTRY", "--addBaseEntry");
+        }
 
-            opendj.start();
+        try (GenericContainer<?> opendjContainer = opendj) {
+
+            opendjContainer.start();
 
             System.out.println("containers started");
 
-            Integer opendjPort = opendj.getMappedPort(1389);
+            Integer opendjPort = opendjContainer.getMappedPort(1389);
 
             testOpenAmInstallation(openamUrl, opendjPort);
 
@@ -130,7 +146,7 @@ public class IT_SetupWithOpenDJ extends BaseTest {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("writeConfigButton"))).click();
 
-        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(300));
+        WebDriverWait waitComplete = new WebDriverWait(driver, Duration.ofSeconds(600));
         try {
             WebElement proceedToConsole = waitComplete.until(visibilityOfAnyElement(By.cssSelector("#confComplete a")));
             proceedToConsole.click();

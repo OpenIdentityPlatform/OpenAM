@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2021-2026 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.server;
 
@@ -172,6 +172,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("protectedUserAttributes", new ArrayList<>(protectedUserAttributes));
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
+            result.put("cookieHttpOnly", CookieUtils.isCookieHttpOnly());
             result.put("cookieSameSite", SystemProperties.get(Constants.AM_COOKIE_SAMESITE, null));
             result.put("forgotPassword", String.valueOf(selfServiceInfo.isForgottenPasswordEnabled()));
             result.put("forgotUsername", String.valueOf(selfServiceInfo.isForgottenUsernameEnabled()));

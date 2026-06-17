@@ -158,6 +158,15 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
             HttpServletResponse httpResponse) 
             throws IOException { 
 
+        // Level 5: master kill-switch for the legacy Liberty ID-WSF
+        // endpoints. Mirrors SOAPReceiver.doPost behaviour.
+        if (!Boolean.parseBoolean(
+                com.sun.identity.shared.configuration.SystemPropertiesManager
+                        .get("com.sun.identity.liberty.enabled", "false"))) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
         String wspRedirectHandler =
             InteractionConfig.getInstance().getWSPRedirectHandler();
         String lbWspRedirectHandler =

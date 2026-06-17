@@ -25,7 +25,7 @@
  * $Id: PersonalProfile.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -688,6 +688,28 @@ public class PersonalProfile {
             IDPPUtils.debug.error("PersonalProfile.getAuthZAction:null vals");
             throw new IDPPException(
             IDPPUtils.bundle.getString("nullInputParams"));
+         }
+
+         // Fail-close: never authorize an anonymous WSC session, even when
+         // *PolicyEval* flags are disabled. Defence in depth against the
+         // SOAPReceiver/WebServiceAuthenticator anonymous-session minting
+         // path being re-enabled by configuration.
+         try {
+             if (credential instanceof com.iplanet.sso.SSOToken) {
+                 com.iplanet.sso.SSOToken t =
+                         (com.iplanet.sso.SSOToken) credential;
+                 String principal = t.getProperty("Principal");
+                 if ("anonymous".equals(principal)) {
+                     IDPPUtils.debug.warning(
+                             "PersonalProfile.getAuthZAction: denying "
+                             + action + " for anonymous WSC session");
+                     return IDPPConstants.AUTHZ_DENY;
+                 }
+             }
+         } catch (com.iplanet.sso.SSOException ssoe) {
+             IDPPUtils.debug.error(
+                     "PersonalProfile.getAuthZAction: SSOException", ssoe);
+             return IDPPConstants.AUTHZ_DENY;
          }
 
          if(action.equals(DSTConstants.QUERY_ACTION) &&

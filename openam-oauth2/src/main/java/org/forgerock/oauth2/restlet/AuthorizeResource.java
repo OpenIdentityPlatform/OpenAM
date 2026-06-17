@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
+import org.forgerock.oauth2.core.CsrfProtection;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.RedirectUriResolver;
@@ -73,8 +74,9 @@ public class AuthorizeResource extends ConsentRequiredResource {
     public AuthorizeResource(OAuth2RequestFactory requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
             XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory,
-            RedirectUriResolver redirectUriResolver, ResourceOwnerSessionValidator resourceOwnerSessionValidator) {
-        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator);
+            RedirectUriResolver redirectUriResolver, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
+            CsrfProtection csrfProtection) {
+        super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator, csrfProtection);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
