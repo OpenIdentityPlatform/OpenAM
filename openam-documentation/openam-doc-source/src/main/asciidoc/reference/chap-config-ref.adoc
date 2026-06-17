@@ -2699,10 +2699,19 @@ If not enabled, if an access token is requested the client must use it to access
 `ssoadm` attribute: `alwaysAddClaimsToToken`
 
 Code Verifier Parameter Required::
-If enabled, requests using the authorization code grant require a `code_challenge` attribute.
+If enabled, every request using the authorization code grant must include a `code_challenge` parameter at the authorization endpoint and a matching `code_verifier` parameter at the token endpoint (Proof Key for Code Exchange, PKCE).
 
 +
-For more information, see the Internet-Draft: link:https://tools.ietf.org/html/draft-ietf-oauth-spop-12[Proof Key for Code Exchange by OAuth Public Clients, window=\_top].
+This property is *enabled by default*.
+
++
+[NOTE]
+====
+Independently of this setting, if an authorization code was issued together with a `code_challenge`, OpenAM always requires and validates the corresponding `code_verifier` when the code is exchanged at the token endpoint, as mandated by link:https://tools.ietf.org/html/rfc7636#section-4.6[RFC 7636 §4.6, window=\_top]. Disabling this property only stops OpenAM from *forcing* all clients to use PKCE; it never relaxes verification for codes that were issued with a challenge. This prevents PKCE downgrade attacks.
+====
+
++
+For more information, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
 
 +
 `ssoadm` attribute: `forgerock-oauth2-provider-code-verifier-enforced`

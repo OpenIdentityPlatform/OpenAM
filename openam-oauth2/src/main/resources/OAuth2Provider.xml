@@ -17,7 +17,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions Copyright 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 -->
 
@@ -481,7 +481,7 @@
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

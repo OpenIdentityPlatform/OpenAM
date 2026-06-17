@@ -5139,7 +5139,7 @@ The `/oauth2/authorize` endpoint can take additional parameters, such as:
 
 * `response_mode=form_post`. Use this parameter to return a self-submitting form that contains the code instead of redirecting to the redirect URL with the code as a string parameter. For more information, see the link:https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html[OAuth 2.0 Form Post Response Mode, window=\_blank] spec.
 
-* `code_challenge`. Use this parameter when __Proof Key for Code Exchange__ (PKCE) support is enabled in the OAuth2 Provider service. To configure it, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
+* `code_challenge`. Use this parameter to protect the authorization code grant with __Proof Key for Code Exchange__ (PKCE). When you send a `code_challenge`, OpenAM binds it to the issued authorization code and always requires the matching `code_verifier` at the token endpoint, regardless of provider settings. To force *all* clients to use PKCE, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property, which is enabled by default. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
 --
 
 `/oauth2/access_token`::
