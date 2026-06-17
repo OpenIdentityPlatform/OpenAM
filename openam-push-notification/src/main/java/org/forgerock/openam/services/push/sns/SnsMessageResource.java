@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 
 package org.forgerock.openam.services.push.sns;
@@ -32,6 +32,8 @@ import static org.forgerock.openam.services.push.PushNotificationConstants.JWT;
 import static org.forgerock.openam.services.push.PushNotificationConstants.MESSAGE_ID_JSON_POINTER;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -48,6 +50,7 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -60,7 +63,10 @@ import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.Predicate;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
+import org.forgerock.openam.services.push.dispatch.PushMessageChallengeResponsePredicate;
+import org.forgerock.openam.services.push.dispatch.SignedJwtVerificationPredicate;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
@@ -89,6 +95,11 @@ import com.sun.identity.shared.debug.Debug;
 @RequestHandler(@Handler(mvccSupported = false,
         title = SNS_MESSAGE_RESOURCE + TITLE, description = SNS_MESSAGE_RESOURCE + DESCRIPTION))
 public class SnsMessageResource {
+
+    private static final Map<String, Class<? extends Predicate>> PUSH_PREDICATES
+            = Set.of(PushMessageChallengeResponsePredicate.class,
+            SignedJwtVerificationPredicate.class,
+            SnsRegistrationPredicate.class).stream().collect(Collectors.toMap(Class::getCanonicalName, c -> c));
 
     private final PushNotificationService pushNotificationService;
     private final Debug debug;
@@ -181,7 +192,7 @@ public class SnsMessageResource {
                 try {
                     attemptFromCTS(messageId, actionContent, requestType);
                 } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
-                        | CoreTokenException | NotFoundException ex) {
+                        | CoreTokenException | NotFoundException | BadRequestException ex) {
                     debug.warning("Nothing in the CTS with messageId {}.", messageId, ex);
                     return RestUtils.generateBadRequestException();
                 }
@@ -202,11 +213,11 @@ public class SnsMessageResource {
      */
     private boolean attemptFromCTS(String messageId, JsonValue actionContent, RequestType requestType)
             throws CoreTokenException, ClassNotFoundException, IllegalAccessException, InstantiationException,
-            NotFoundException {
+            NotFoundException, BadRequestException {
         Token coreToken = coreTokenService.read(messageId);
 
-        if (coreToken == null) {
-            throw new NotFoundException("Unable to find token with id " + messageId + " in CTS.");
+        if (coreToken == null || !TokenType.PUSH.equals(coreToken.getType())) {
+            throw new NotFoundException("Unable to find token with id " + messageId + " and type PUSH in CTS.");
         }
 
         byte[] serializedBlob = coreToken.getBlob();
@@ -217,8 +228,11 @@ public class SnsMessageResource {
 
         for (Map.Entry<String, Object> entry : predicates.entrySet()) {
             String className = entry.getKey();
-            Predicate pred =
-                    (Predicate) jsonSerialisation.deserialise((String) entry.getValue(), Class.forName(className));
+            Class<? extends Predicate> predicateClass = PUSH_PREDICATES.get(className);
+            if (predicateClass == null) {
+                throw new BadRequestException("Unexpected push predicate type: " + className);
+            }
+            Predicate pred = jsonSerialisation.deserialise((String) entry.getValue(), predicateClass);
             if (!pred.perform(actionContent)) {
                 return false;
             }
