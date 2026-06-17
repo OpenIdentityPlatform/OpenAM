@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  * Portions 2006 Sun Microsystems Inc.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.agent;
 
@@ -128,13 +128,12 @@ public class TokenRestrictionResolver {
         Reject.ifNull(gotoUrl);
         Reject.ifNull(adminToken);
 
-        if (!uniqueSSOTokenCookie) {
-            return tokenRestrictionFactory.createNoOpTokenRestriction();
-        }
-
         Map<AMIdentity, Map<String, Set<String>>> agents = searchAgentsByUri(providerId, adminToken);
         AgentInfo agentInfo = getAgentInfo(agents);
         if (isGotoUrlValid(gotoUrl, agentInfo.getRootUrls())) {
+            if (!uniqueSSOTokenCookie) {
+                return tokenRestrictionFactory.createNoOpTokenRestriction();
+            }
             return createTokenRestriction(agentInfo);
         } else {
             throw (new SSOException("Goto URL not valid for the agent Provider ID: " + gotoUrl));
