@@ -12,23 +12,21 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.util.query.QueryFilter;
 
 import jakarta.inject.Inject;
@@ -37,10 +35,8 @@ import jakarta.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of the OAuthTokenStore interface that uses the CoreTokenService for storing the tokens as JSON
@@ -93,7 +89,7 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem reading the token.
      */
     public JsonValue read(String id) throws CoreTokenException {
-        Token token = cts.read(tokenIdFactory.generateTokenId(id));
+        Token token = readOAuthToken(id);
         //The CTS will not throw exception, but return null when read does not return a value
         if (token == null) {
             return null;
@@ -119,7 +115,13 @@ public class OAuthTokenStore {
      */
     public void delete(String id) throws CoreTokenException {
         try {
-            cts.delete(id);
+            String tokenStoreId = tokenIdFactory.toOAuthTokenStoreId(id);
+            Token token = cts.read(tokenStoreId);
+            if (isOAuthToken(token)) {
+                cts.delete(tokenStoreId);
+            } else if (token == null && isOAuthToken(cts.read(id))) {
+                cts.delete(id);
+            }
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"DELETED_TOKEN", id};
                 auditLogger.logAccessMessage("DELETED_TOKEN", obs, null);
@@ -134,6 +136,20 @@ public class OAuthTokenStore {
         }
     }
 
+    private Token readOAuthToken(String id) throws CoreTokenException {
+        Token token = cts.read(tokenIdFactory.toOAuthTokenStoreId(id));
+        if (token != null) {
+            return isOAuthToken(token) ? token : null;
+        }
+
+        Token legacyToken = cts.read(id);
+        return isOAuthToken(legacyToken) ? legacyToken : null;
+    }
+
+    private boolean isOAuthToken(Token token) {
+        return token != null && TokenType.OAUTH.equals(token.getType());
+    }
+
     /**
      * Queries for OAuth2 tokens based on the specified query parameters.
      *
@@ -142,7 +158,9 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem performing the query.
      */
     public JsonValue query(QueryFilter<CoreTokenField> query) throws CoreTokenException {
-        Collection<Token> tokens = cts.query(new TokenFilterBuilder().withQuery(query).build());
+        Collection<Token> tokens = cts.query(new TokenFilterBuilder()
+                .withQuery(QueryFilter.and(QueryFilter.equalTo(CoreTokenField.TOKEN_TYPE, TokenType.OAUTH), query))
+                .build());
         return convertResults(tokens);
     }
 
@@ -156,7 +174,10 @@ public class OAuthTokenStore {
         List<Map<String, Object>> results = new ArrayList<>();
 
         for (Token token : tokens) {
-            results.add(convertToken(token));
+            Map<String, Object> result = convertToken(token);
+            if (result != null) {
+                results.add(result);
+            }
         }
 
         return new JsonValue(results);

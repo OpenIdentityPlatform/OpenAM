@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package org.forgerock.openam.cts.api.tokens;
 
 import com.iplanet.dpro.session.SessionID;
 import org.forgerock.openam.cts.utils.KeyConversion;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.mockito.BDDMockito.mock;
@@ -32,7 +33,7 @@ public class TokenIdFactoryTest {
 
     private KeyConversion conversion;
 
-    @BeforeClass
+    @BeforeMethod
     public void setUp() {
         conversion = mock(KeyConversion.class);
 
@@ -51,6 +52,19 @@ public class TokenIdFactoryTest {
 
         // Then
         verify(conversion, times(2)).encodeKey(key);
+    }
+
+    @Test
+    public void shouldUseKeyConversionForOAuthTokenStoreIds() {
+
+        // Given
+        String key = "badger";
+
+        // When
+        factory.toOAuthTokenStoreId(key);
+
+        // Then
+        verify(conversion).encodeKey(key);
     }
 
     @Test
