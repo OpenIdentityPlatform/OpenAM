@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 import _ from "lodash";
@@ -21,17 +22,31 @@ import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDeleg
 import Constants from "org/forgerock/commons/ui/common/util/Constants";
 import store from "store/index";
 import moment from "moment";
+import { isResolvable } from "org/forgerock/openam/ui/user/login/tokens/SessionToken";
 
 const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/sessions`);
 const getSessionInfo = (token, options) => {
+    // When the session cookie is HttpOnly the token cannot be read by JavaScript. In that case
+    // we omit the tokenId so that the server resolves the session from the (automatically sent)
+    // HttpOnly cookie / Cookie header instead.
+    const resolvable = isResolvable(token);
+    const tokenIdParam = resolvable ? `&tokenId=${token}` : "";
+    // Without a client-readable token we cannot know up front whether a session exists, so we let
+    // the call fail quietly (e.g. when anonymous) and let the caller's rejection handler decide.
+    const suppressMissingSession = resolvable ? {} : {
+        errorsHandlers: {
+            "Bad Request": { status: 400 },
+            "Unauthorized": { status: 401 }
+        }
+    };
     return obj.serviceCall(_.merge({
-        url: `?_action=getSessionInfo&tokenId=${token}`,
+        url: `?_action=getSessionInfo${tokenIdParam}`,
         type: "POST",
         data: {},
         headers: {
             "Accept-API-Version": "protocol=1.0,resource=2.0"
         }
-    }, options));
+    }, suppressMissingSession, options));
 };
 
 export const getTimeLeft = (token) => {
@@ -55,8 +70,11 @@ export const updateSessionInfo = (token, options) => {
 export const isSessionValid = (token) => getSessionInfo(token).then((response) => _.has(response, "username"));
 
 export const logout = (token) => {
+    // Omit tokenId when the token is not client-readable (HttpOnly cookie); the server resolves
+    // the session to invalidate from the request cookie instead.
+    const tokenIdParam = isResolvable(token) ? `&tokenId=${token}` : "";
     return obj.serviceCall({
-        url: `?_action=logout&tokenId=${token}`,
+        url: `?_action=logout${tokenIdParam}`,
         type: "POST",
         data: {},
         headers: {

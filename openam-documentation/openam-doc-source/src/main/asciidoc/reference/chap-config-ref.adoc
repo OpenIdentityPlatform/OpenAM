@@ -5595,10 +5595,10 @@ Number of threads in the shared system timer pool used to schedule operations su
 Default: `3`
 
 `com.sun.identity.cookie.httponly`::
-When set to `true`, mark cookies as HTTPOnly to prevent scripts and third-party programs from accessing the cookies.
+When set to `true`, mark cookies as HttpOnly to prevent scripts and third-party programs from accessing the cookies.
 
 +
-Note that this configuration option is used only in non-XUI deployments. The XUI cannot set the HttpOnly name in a cookie.
+Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour.
 
 +
 Default: `false`
@@ -5996,6 +5996,21 @@ Default: None (do not time out)
 
 +
 For suggested settings, see xref:../admin-guide/chap-tuning.adoc#tuning-ldap-settings-cts["Tuning LDAP CTS and Configuration Store Settings"] in the __Administration Guide__.
+
+`org.openidentityplatform.openam.httponly.allowTokenInBody`::
+Controls whether the SSO token id (`tokenId`) is returned in the `/json/authenticate` response body when the session cookie is HttpOnly.
+
++
+This property is only relevant when the session cookie is HttpOnly (`com.sun.identity.cookie.httponly=true`). By default (`false`), the token is delivered to the browser solely through the `Set-Cookie` header and is not echoed in the response body, so an XSS on the origin cannot read a replayable SSO token (including a freshly upgraded one). The XUI relies on the auto-sent cookie and does not need the token in the body.
+
++
+Set this property to `true` to keep the legacy behaviour of also returning `tokenId` in the response body, for example for non-browser or raw-REST integrations that require both the HttpOnly cookie and the token in the body.
+
++
+When the session cookie is not HttpOnly, `tokenId` is always returned in the response body, regardless of this property.
+
++
+Default: `false`
 
 `securidHelper.ports`::
 Port on which SecurID daemon listens.

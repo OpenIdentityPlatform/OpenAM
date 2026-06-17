@@ -938,6 +938,7 @@ $ curl https://openam.example.com:8443/openam/json/serverinfo/*
     "protectedUserAttributes": [],
     "cookieName": "iPlanetDirectoryPro",
     "secureCookie": false,
+    "cookieHttpOnly": false,
     "forgotPassword": "false",
     "forgotUsername": "false",
     "kbaEnabled": "false",
