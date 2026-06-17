@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems LLC.
  */
 package org.forgerock.openam.scripting;
 
@@ -70,6 +71,7 @@ public final class ScriptConstants {
     public static final String AUTHENTICATION_SERVER_SIDE_NAME = "AUTHENTICATION_SERVER_SIDE";
     public static final String POLICY_CONDITION_NAME = "POLICY_CONDITION";
     public static final String OIDC_CLAIMS_NAME = "OIDC_CLAIMS";
+    public static final String OAUTH2_ACCESS_TOKEN_MODIFICATION_NAME = "OAUTH2_ACCESS_TOKEN_MODIFICATION";
     public static final String SCRIPTING_HTTP_CLIENT_NAME = "ScriptingHttpClient";
 
     /**
@@ -79,7 +81,8 @@ public final class ScriptConstants {
         AUTHENTICATION_SERVER_SIDE,
         AUTHENTICATION_CLIENT_SIDE,
         POLICY_CONDITION,
-        OIDC_CLAIMS
+        OIDC_CLAIMS,
+        OAUTH2_ACCESS_TOKEN_MODIFICATION
     }
 
     /**
@@ -96,6 +99,8 @@ public final class ScriptConstants {
         DEVICE_ID_MATCH_CLIENT_SIDE("Device Id (Match) - Client Side", "157298c0-7d31-4059-a95b-eeb08473b7e5",
                 AUTHENTICATION_CLIENT_SIDE),
         OIDC_CLAIMS_SCRIPT("OIDC Claims Script", "36863ffb-40ec-48b9-94b1-9a99f71cc3b5", OIDC_CLAIMS),
+        OAUTH2_ACCESS_TOKEN_MODIFICATION_SCRIPT("OAuth2 Access Token Modification Script",
+                "d22f9a0c-426a-4466-b95e-d0f125b0d5fa", OAUTH2_ACCESS_TOKEN_MODIFICATION),
         POLICY_CONDITION_SCRIPT("Policy Condition", "9de3eb62-f131-4fac-a294-7bd170fd4acb", POLICY_CONDITION);
 
         private final String displayName;

@@ -12,17 +12,19 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.scripting.guice;
 
 import static org.forgerock.openam.scripting.ScriptConstants.AUTHENTICATION_SERVER_SIDE_NAME;
 import static org.forgerock.openam.scripting.ScriptConstants.OIDC_CLAIMS_NAME;
+import static org.forgerock.openam.scripting.ScriptConstants.OAUTH2_ACCESS_TOKEN_MODIFICATION_NAME;
 import static org.forgerock.openam.scripting.ScriptConstants.POLICY_CONDITION_NAME;
 import static org.forgerock.openam.scripting.ScriptConstants.SCRIPTING_HTTP_CLIENT_NAME;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OIDC_CLAIMS;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OAUTH2_ACCESS_TOKEN_MODIFICATION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 
 import java.util.concurrent.BlockingQueue;
@@ -83,6 +85,10 @@ public class ScriptingGuiceModule extends AbstractModule {
 
         bind(StandardScriptEngineManager.class)
                 .annotatedWith(Names.named(OIDC_CLAIMS.name()))
+                .toInstance(new StandardScriptEngineManager());
+
+        bind(StandardScriptEngineManager.class)
+                .annotatedWith(Names.named(OAUTH2_ACCESS_TOKEN_MODIFICATION.name()))
                 .toInstance(new StandardScriptEngineManager());
 
         bind(RestletHttpClient.class)
@@ -150,6 +156,26 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(OIDC_CLAIMS_NAME)
     ScriptEvaluator getOidcClaimsScriptEvaluator(
             @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
+            AMExecutorServiceFactory executorServiceFactory) {
+
+        return createEvaluator(scriptEngineManager, executorServiceFactory);
+    }
+
+    /**
+     * Creates the script evaluator to use for evaluating OAuth2 Access Token Modification scripts. The evaluator
+     * returned uses a thread pool to evaluate scripts (supporting script interruption), delegating to a sandboxed
+     * script evaluator.
+     *
+     * @param scriptEngineManager the script engine manager to use.
+     * @param executorServiceFactory the factory for creating managed thread pools for script execution.
+     * @return an appropriately configured script evaluator for use with OAuth2 Access Token Modification scripts.
+     */
+    @Provides
+    @Singleton
+    @Inject
+    @Named(OAUTH2_ACCESS_TOKEN_MODIFICATION_NAME)
+    ScriptEvaluator getOAuth2AccessTokenModificationScriptEvaluator(
+            @Named(OAUTH2_ACCESS_TOKEN_MODIFICATION_NAME) StandardScriptEngineManager scriptEngineManager,
             AMExecutorServiceFactory executorServiceFactory) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory);

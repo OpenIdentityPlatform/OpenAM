@@ -2395,6 +2395,21 @@ Default: `OIDC Claims Script`
 +
 `ssoadm` attribute: `forgerock-oauth2-provider-oidc-claims-extension-script`
 
+OAuth2 Access Token Modification Script::
+The script that is run when issuing a stateless (JWT) OAuth 2.0 access token or refresh token. The script can add, modify, or remove claims in the token payload, allowing custom claims (such as `acr`, `amr`, roles, or profile attributes) to be embedded directly in the access token.
+
++
+The script has access to a mutable view of the token (`accessToken`), the granted scopes, the resource owner's identity, the user's session (if available), and selected request properties.
+
++
+This script is only run when stateless tokens are enabled. For more information on scripting, see xref:../dev-guide/chap-scripting.adoc#scripting-api-access-token-modification["OAuth2 Access Token Modification API Functionality"] in the __Developer's Guide__.
+
++
+Default: `OAuth2 Access Token Modification Script`
+
++
+`ssoadm` attribute: `forgerock-oauth2-provider-access-token-modification-script`
+
 Response Type Plugins::
 List of plugins that handle the valid `response_type` values. OAuth 2.0 clients pass response types as parameters to the OAuth 2.0 Authorization endpoint (`/oauth2/authorize`) to indicate which grant type is requested from the provider. For example, the client passes `code` when requesting an authorization code, and `token` when requesting an access token.
 
@@ -3640,6 +3655,9 @@ Client-side Authentication
 
 `OIDC_CLAIMS`::
 OIDC Claims
+
+`OAUTH2_ACCESS_TOKEN_MODIFICATION`::
+OAuth2 Access Token Modification
 
 ====
 +

@@ -14,6 +14,7 @@
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyright 2019-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -847,6 +848,8 @@ public class OAuth2Constants {
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
         public static final String OIDC_CLAIMS_EXTENSION_SCRIPT =
                 "forgerock-oauth2-provider-oidc-claims-extension-script";
+        public static final String ACCESS_TOKEN_MODIFICATION_SCRIPT =
+                "forgerock-oauth2-provider-access-token-modification-script";
         public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
         public static final String CREATED_TIMESTAMP_ATTRIBUTE_NAME =
                 "forgerock-oauth2-provider-created-attribute-name";
@@ -1109,6 +1112,8 @@ public class OAuth2Constants {
         public static final String CLAIMS = "claims";
         public static final String SESSION = "session";
         public static final String REQUESTED_CLAIMS = "requestedClaims";
+        public static final String ACCESS_TOKEN = "accessToken";
+        public static final String REQUEST_PROPERTIES = "requestProperties";
     }
 
     /**
