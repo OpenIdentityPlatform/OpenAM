@@ -50,6 +50,7 @@ import com.iplanet.am.util.SecureRandomManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.common.DNUtils;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -140,6 +141,19 @@ public class ServicesDefaultValues {
             SetupConstants.CONFIG_VAR_SERVER_HOST);
         map.put(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, getCookieDomain(cookieDomain, hostname));
         setPlatformLocale();
+
+        // Harden the SSO cookie by enabling the Secure flag automatically for HTTPS deployments. For plain-HTTP
+        // deployments the Secure flag must be left off (otherwise the browser would never send the cookie back over
+        // HTTP and login would break), so we degrade to a non-Secure cookie and emit a deploy-time warning.
+        String serverProto = (String) map.get(SetupConstants.CONFIG_VAR_SERVER_PROTO);
+        boolean secureCookie = "https".equalsIgnoreCase(serverProto);
+        map.put(SetupConstants.CONFIG_VAR_COOKIE_SECURE, Boolean.toString(secureCookie));
+        if (!secureCookie) {
+            Debug.getInstance("amSetupServlet").warning("ServicesDefaultValues: deploying over '" + serverProto
+                    + "'; the SSO cookie will be issued without the Secure flag (com.iplanet.am.cookie.secure=false). "
+                    + "Deploy OpenAM behind HTTPS and set com.iplanet.am.cookie.secure=true to harden the session "
+                    + "cookie against interception.");
+        }
 
         String dbOption = (String)map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
         boolean embedded = dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);

@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2019-2026 3A Systems LLC.
  */
 
 require.config({
@@ -59,13 +59,12 @@ require([
     "jquery",
     "lodash",
     "handlebars",
-    "org/forgerock/openam/ui/user/oauth2/OAuth2ConsentPageHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "ThemeManager",
     "Router"
-], function ($, _, HandleBars, OAuth2ConsentPageHelper, Configuration, Constants, i18nManager, ThemeManager, Router) {
+], function ($, _, HandleBars, Configuration, Constants, i18nManager, ThemeManager, Router) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -113,10 +112,9 @@ require([
             data.noScopes = true;
         }
 
-        OAuth2ConsentPageHelper.getUserSessionId().then(function (userSessionId) {
-            data.oauth2Data.csrf = userSessionId;
-            dataReady.resolve();
-        });
+        // The CSRF token is a dedicated, random value rendered into pageData by the server (no longer the
+        // script-readable SSO cookie value), so the SSO cookie can safely be HttpOnly.
+        dataReady.resolve();
     } else {
         data.noScopes = true;
         dataReady.resolve();

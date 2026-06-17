@@ -110,7 +110,9 @@ To configure OpenAM server to use secure cookies, in the OpenAM console, navigat
 +
 HttpOnly cookies are meant to be transmitted only over HTTP and HTTPS, and not through non-HTTP methods, such as JavaScript functions.
 +
-You can configure the OpenAM server to use HttpOnly cookies by navigating to Configure > Server Defaults > Advanced, and setting the `com.sun.identity.cookie.httponly` property's value to `true`. Save your changes. Both the classic UI and the XUI support HttpOnly session cookies: when HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and the `/json/authenticate` response delivers the token only through the `Set-Cookie` header rather than echoing `tokenId` in the response body. To keep returning `tokenId` in the body as well (for example, for non-browser or raw-REST integrations), set `org.openidentityplatform.openam.httponly.allowTokenInBody` to `true`. See xref:../reference/chap-config-ref.adoc#chap-config-ref["Configuration Reference"] in the __Reference__.
+You can configure the OpenAM server to use HttpOnly cookies by navigating to Configure > Server Defaults > Advanced, and setting the `com.sun.identity.cookie.httponly` property's value to `true`. Save your changes. Note that the XUI reads the `iPlanetDirectoryPro` SSO cookie from the browser to track the session, so enabling `HttpOnly` breaks XUI console login; the property therefore defaults to `false`. Set it to `true` only in deployments that do not rely on the XUI.
++
+To reduce cross-site request forgery (CSRF) exposure, OpenAM also sets a `SameSite` attribute on its cookies. A standard installation ships with `org.openidentityplatform.openam.cookie.samesite=Lax`. You can change this to `Strict` or `None` (the latter requires secure cookies) under Configure > Server Defaults > Security > Cookie.
 
 * Where possible, use subdomain cookies, and control subdomains in a specific DNS master.
 
