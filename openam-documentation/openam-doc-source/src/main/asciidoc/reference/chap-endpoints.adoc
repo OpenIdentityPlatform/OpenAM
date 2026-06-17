@@ -1422,9 +1422,13 @@ Used by a servlet named `ReturnRegistration`. Associated with the `SRegistration
 
 `/Liberty/*`::
 Used by a servlet named `WSSOAPReceiver`. Associated with the `SOAPReceiver` class. Defines an endpoint that handles SOAP requests.
++
+This endpoint is disabled by default and returns HTTP 404 for every request unless the advanced server property `com.sun.identity.liberty.enabled` is set to `true`. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/WSPRedirectHandler/*`::
 Used by a servlet named `WSPRedirectHandler`. Associated with the `WSPRedirectHandlerServlet` class. Used by the SP for user redirects.
++
+This endpoint is also gated by the advanced server property `com.sun.identity.liberty.enabled` (default `false`).
 
 `/idffwriter, /saml2writer`::
 Used by a servlet with a matching name (`idffwriter`, `saml2writer`). Associated with the `CookieWriterServlet` class. Used by the IDP to help the web container find app-specific info, such as Java classes or Java Archives (JARs).

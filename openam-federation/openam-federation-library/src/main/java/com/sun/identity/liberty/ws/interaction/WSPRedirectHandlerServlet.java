@@ -27,7 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012-2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.liberty.ws.interaction;
 
@@ -158,6 +158,15 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
     private void handleRequest(HttpServletRequest httpRequest, 
             HttpServletResponse httpResponse) 
             throws IOException { 
+
+        // Level 5: master kill-switch for the legacy Liberty ID-WSF
+        // endpoints. Mirrors SOAPReceiver.doPost behaviour.
+        if (!Boolean.parseBoolean(
+                com.sun.identity.shared.configuration.SystemPropertiesManager
+                        .get("com.sun.identity.liberty.enabled", "false"))) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         String wspRedirectHandler =
             InteractionConfig.getInstance().getWSPRedirectHandler();
