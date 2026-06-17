@@ -285,9 +285,9 @@ public class SessionRequestHandler implements RequestHandler {
         switch (req.getMethodID()) {
             case SessionRequest.GetValidSessions:
             case SessionRequest.GetSessionCount:
-                verifyRequestingSessionIsNotRestrictedToken(requesterSession);
-                break;
-
+                //GHSA-vvhj-w2jq-263q: prevent getting session count,
+                //as the session quota used only by internal functionality
+                throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
             case SessionRequest.GetSession:
             case SessionRequest.Logout:
             case SessionRequest.AddSessionListener:
@@ -359,14 +359,9 @@ public class SessionRequestHandler implements RequestHandler {
                 sessionService.setExternalProperty(this.clientToken, requesterSession.getSessionID(), req.getPropertyName(), req.getPropertyValue());
                 break;
 
-            case SessionRequest.GetSessionCount:
-                String uuid = req.getUUID();
-                Map sessions =  sessionQueryManager.getAllSessionsByUUID(uuid);
-                if (sessions != null) {
-                    res.setSessionsForGivenUUID(sessions);
-                }
+            //case SessionRequest.GetSessionCount: commented out due to GHSA-vvhj-w2jq-263q: prevent getting session count,
 
-                break;
+
 
             default:
                 return handleException(req, requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
