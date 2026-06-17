@@ -3306,6 +3306,24 @@ Default: 5 minutes
 +
 `ssoadm` attribute: `openam-auth-radius-healthcheck-interval`
 
+Require Message-Authenticator on responses::
+Enforces the strict RFC 3579 / Cisco BlastRADIUS-mitigation profile.
+
++
+When enabled, every `Access-Accept`, `Access-Reject`, and `Access-Challenge` received from the RADIUS server *must* carry a verifiable Message-Authenticator (attribute 80). Responses without a valid Message-Authenticator are rejected and authentication fails. Enable this option when you control both ends of the link and the RADIUS server echoes Message-Authenticator on its responses (the fully protected flow recommended by Cisco's BlastRADIUS guidance).
+
++
+When disabled (the default), OpenAM still signs every outgoing `Access-Request` with a Message-Authenticator and verifies it on responses that include it, but legacy RADIUS servers that never echo Message-Authenticator remain interoperable.
+
++
+NOTE: This option mitigates the BlastRADIUS vulnerability (CVE-2024-3596). Use the default (disabled) profile only with trusted servers on a trusted network; prefer enabling it whenever the RADIUS server supports returning Message-Authenticator.
+
++
+Default: Disabled
+
++
+`ssoadm` attribute: `openam-auth-radius-require-message-authenticator`
+
 Authentication Level::
 Sets the authentication level used to indicate the level of security associated with the module. The value can range from 0 to any positive integer.
 
