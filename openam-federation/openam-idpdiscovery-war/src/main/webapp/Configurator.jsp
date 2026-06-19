@@ -28,6 +28,7 @@
 <%--
    Portions Copyrighted 2012-2013 ForgeRock Inc
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyrighted 2026 3A Systems, LLC
 --%>
 
 <html>
@@ -207,8 +208,8 @@ java.util.Properties"
     <tr>
     <td>HTTP-Only Cookie:</td>
     <td>
-        <input type="radio" name="httpOnlyCookie" value="true" >True
-        <input type="radio" name="httpOnlyCookie" value="false" CHECKED>False
+        <input type="radio" name="httpOnlyCookie" value="true" CHECKED>True
+        <input type="radio" name="httpOnlyCookie" value="false" >False
     </td>
     </tr>
     <tr>
