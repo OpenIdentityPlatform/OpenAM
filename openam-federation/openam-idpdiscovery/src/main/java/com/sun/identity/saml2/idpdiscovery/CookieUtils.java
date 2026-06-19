@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
- * Portions Copyrighted 2025-2026 3A Systems LLC.
+ * Portions Copyrighted 2021-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.idpdiscovery;
 
@@ -63,11 +63,8 @@ public class CookieUtils {
         SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_SECURE).
            equalsIgnoreCase("true"));
 
-    static boolean cookieHttpOnly =
-        (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY) 
-            != null) &&
-        (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY).
-            equalsIgnoreCase("true"));
+    static boolean cookieHttpOnly = !"false".equalsIgnoreCase(
+        SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY));
 
     static String cookieSameSite = SystemPropertiesManager.get(
         Constants.AM_COOKIE_SAMESITE);
