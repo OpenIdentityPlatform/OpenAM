@@ -197,13 +197,13 @@ public class WSFederationCOTUtils {
         FederationConfigElement eConfig = 
             metaManager.getEntityConfig(realm, entityId);
         if (eConfig != null) {
-            List elist = eConfig.getValue().
+            List<JAXBElement<BaseConfigType>> elist = eConfig.getValue().
                     getIDPSSOConfigOrSPSSOConfig();
-            for (Iterator iter = elist.iterator(); iter.hasNext();) {
-                BaseConfigType bConfig = (BaseConfigType)iter.next();
-                List list = bConfig.getAttribute();
-                for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                    AttributeType avp = (AttributeType)iter2.next();
+            for (Iterator<JAXBElement<BaseConfigType>> iter = elist.iterator(); iter.hasNext();) {
+                BaseConfigType bConfig = iter.next().getValue();
+                List<AttributeElement> list = bConfig.getAttribute();
+                for (Iterator<AttributeElement> iter2 = list.iterator(); iter2.hasNext();) {
+                    AttributeType avp = iter2.next().getValue();
                     if (avp.getName().trim().equalsIgnoreCase(
                             SAML2Constants.COT_LIST)) {
                         List avpl = avp.getValue();
