@@ -1152,7 +1152,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     
                     if (nameIDmappingList.isEmpty()) {
                         namidElem1 =
-                                objFact.createNameIDMappingServiceElement(objFact.createAttributeServiceType());
+                                objFact.createNameIDMappingServiceElement(objFact.createEndpointType());
                         namidElem1.getValue().setBinding(soapBinding);
                         idpssoDescriptor.getValue().getNameIDMappingService().
                                 add(namidElem1);
@@ -2894,9 +2894,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 String uriLocation = getResult(
                         attrAuthValues, ASSERTION_ID_URI_LOC);
                 AssertionIDRequestServiceElement elem1 = 
-                        objFact.createAssertionIDRequestServiceElement(objFact.createAttributeServiceType());
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 AssertionIDRequestServiceElement elem2 = 
-                        objFact.createAssertionIDRequestServiceElement(objFact.createAttributeServiceType());
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 
                 elem1.getValue().setBinding(soapBinding);
                 elem2.getValue().setBinding(uriBinding);
@@ -3041,7 +3041,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     authnauthDescriptor.getValue().getAuthnQueryService().clear();
                 }
                 AuthnQueryServiceElement key =
-                        objFact.createAuthnQueryServiceElement(objFact.createAttributeServiceType());
+                        objFact.createAuthnQueryServiceElement(objFact.createEndpointType());
                 key.getValue().setBinding(soapBinding);
                 key.getValue().setLocation(queryService);
                 authnauthDescriptor.getValue().getAuthnQueryService().add(key);
@@ -3057,10 +3057,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     assertionIDReqList.clear();
                 }
                 AssertionIDRequestServiceElement elem1 =
-                        objFact.createAssertionIDRequestServiceElement(objFact.createAttributeServiceType());
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 elem1.getValue().setBinding(soapBinding);
                 AssertionIDRequestServiceElement elem2 =
-                        objFact.createAssertionIDRequestServiceElement(objFact.createAttributeServiceType());
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 elem2.getValue().setBinding(uriBinding);
                 
                 if (soapLocation != null) {
@@ -3469,7 +3469,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (lohttpLocation != null && lohttpLocation.length() > 0) {
             SingleLogoutServiceElement slsElemRed = 
-                    objFact.createSingleLogoutServiceElement(objFact.createAttributeServiceType());
+                    objFact.createSingleLogoutServiceElement(objFact.createEndpointType());
             slsElemRed.getValue().setBinding(httpRedirectBinding);
             slsElemRed.getValue().setLocation(lohttpLocation);
             slsElemRed.getValue().setResponseLocation(lohttpRespLocation);
@@ -3494,7 +3494,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (postLocation != null && postLocation.length() > 0) {
             SingleLogoutServiceElement slsElemPost =
-                    objFact.createSingleLogoutServiceElement(objFact.createAttributeServiceType());
+                    objFact.createSingleLogoutServiceElement(objFact.createEndpointType());
             slsElemPost.getValue().setBinding(httpPostBinding);
             slsElemPost.getValue().setLocation(postLocation);
             slsElemPost.getValue().setResponseLocation(postRespLocation);
