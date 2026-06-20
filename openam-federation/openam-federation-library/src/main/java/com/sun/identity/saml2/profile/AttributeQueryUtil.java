@@ -878,12 +878,12 @@ public class AttributeQueryUtil {
 
             List<AttributeValueElement> jaxbValues = jaxbAttr.getValue().getAttributeValue();
             if ((jaxbValues != null) && (!jaxbValues.isEmpty())) {
-                List<AttributeValueElement> newValues = new ArrayList<>();
+                List<Object> newValues = new ArrayList<>();
                 for(Iterator<AttributeValueElement> iterV = jaxbValues.iterator(); iterV.hasNext();) {
                     AttributeValueElement jaxbValeu = iterV.next();
                     Object content = jaxbValeu.getValue();
                     if (content != null) {
-                        newValues.add(jaxbValeu);
+                        newValues.add(content);
                     }
                 }
                 if (!newValues.isEmpty()) {
