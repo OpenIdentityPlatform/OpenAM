@@ -366,11 +366,14 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                                                     Iterator<AttributeValueElement> avI = av.iterator();
                                                     while (avI.hasNext()) {
                                                         AttributeValueElement ave = avI.next();
-                                                        if (ave != null && ave.getValue() instanceof List) {
-                                                            List contentL = (List)ave.getValue();
+                                                        if (ave != null && ave.getValue() != null) {
+                                                            Object content = ave.getValue();
+                                                            List contentL = (content instanceof List)
+                                                                    ? (List) content
+                                                                    : java.util.Collections.singletonList(content);
                                                             debugMessage(classMethod, "Attribute Value Elements found for idp: " + idp
                                                                     + "-->" + contentL);
-                                                            if (contentL != null || !contentL.isEmpty()) {
+                                                            if (!contentL.isEmpty()) {
                                                                 Set idpContextSet = trimmedListToSet(contentL);
                                                                 debugMessage(classMethod, "idpContextSet = " + idpContextSet);
                                                                 idpContextSet.retainAll(authnRequestContextSet);
