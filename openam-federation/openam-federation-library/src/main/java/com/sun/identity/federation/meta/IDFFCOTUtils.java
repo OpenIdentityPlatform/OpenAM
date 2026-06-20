@@ -130,8 +130,9 @@ public class IDFFCOTUtils {
             updateCOTAttrInConfig(
                 realm, idpConfigList,cotName,entityConfig,objFactory,
                 idffMetaMgr);
-            BaseConfigType affiConfig = 
-                entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
+            BaseConfigType affiConfig =
+                (entityConfig.getValue().getAffiliationDescriptorConfig() == null) ? null
+                : entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
             if (affiConfig != null) {
                 List affiConfigList = new ArrayList();
                 affiConfigList.add(affiConfig);
@@ -175,8 +176,9 @@ public class IDFFCOTUtils {
                     entityConfig,idffMetaMgr);
             removeCOTNameFromConfig(realm, idpConfigList,cotName,
                     entityConfig,idffMetaMgr);
-            BaseConfigType affiConfig = 
-                entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
+            BaseConfigType affiConfig =
+                (entityConfig.getValue().getAffiliationDescriptorConfig() == null) ? null
+                : entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
             if (affiConfig != null) {
                 List affiConfigList = new ArrayList();
                 affiConfigList.add(affiConfig);
