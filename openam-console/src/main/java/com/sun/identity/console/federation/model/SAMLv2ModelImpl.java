@@ -1716,7 +1716,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 for (int i=0; i<keyList.size(); i++) {
                     KeyDescriptorElement keyOne =
                             (KeyDescriptorElement)keyList.get(i);
-                    String type = keyOne.getValue().getUse().value();
+                    String type = (keyOne.getValue().getUse() == null) ? null
+                            : keyOne.getValue().getUse().value();
                     if ((type == null) || (type.length() == 0) || 
                         type.equals("encryption")) { 
                         List encryptMethod = keyOne.getValue().getEncryptionMethod();
