@@ -28,11 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
-<<<<<<< HEAD
  * Defines methods to convert a NameValueOutputCallback to a JSON representation.
-=======
- * Defines methods to convert a TextOutputCallback to a JSON representation.
->>>>>>> upstream/master
  */
 public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCallbackHandler<NameValueOutputCallback>  {
 
