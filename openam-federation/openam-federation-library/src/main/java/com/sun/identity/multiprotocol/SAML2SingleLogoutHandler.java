@@ -38,6 +38,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -51,6 +52,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -342,8 +345,9 @@ public class SAML2SingleLogoutHandler implements SingleLogoutHandler {
             SPSSODescriptorElement sp = null;
             sp = SAML2Utils.getSAML2MetaManager().
                     getSPSSODescriptor(realm, spEntityID);
-            List slosList = sp.getValue().getSingleLogoutService();
-            
+            List<EndpointType> slosList = sp.getValue().getSingleLogoutService().stream()
+                    .map(JAXBElement::getValue).collect(Collectors.toList());
+
             // get IDP entity config for basic auth info
             SPSSOConfigElement spConfig = SAML2Utils.
                     getSAML2MetaManager().getSPSSOConfig(realm, spEntityID);
