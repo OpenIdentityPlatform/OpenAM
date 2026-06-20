@@ -175,13 +175,14 @@ jobs:
           echo "Test IDP authentication"
 
           ADMIN_TOKEN=$(docker exec openam-idp bash -c \
-          'curl -sf \
+          'curl -sf -D - -o /dev/null \
             --request POST \
             --header "Content-Type: application/json" \
             --header "X-OpenAM-Username: amadmin" \
             --header "X-OpenAM-Password: ampassword" \
             --data "{}" \
-            http://openam.example.org:8080/openam/json/authenticate' |  jq -r .tokenId)
+            http://openam.example.org:8080/openam/json/authenticate \
+            | tr -d "\r" | sed -n "s/^[Ss]et-[Cc]ookie: *iPlanetDirectoryPro=\([^;]*\).*/\1/p" | grep . | tail -n1')
 
           docker inspect --format="{{json .State.Health.Status}}" openam-idp | grep -q \"healthy\"
         
@@ -210,7 +211,7 @@ jobs:
               --header "X-OpenAM-Username: demo" \
               --header "X-OpenAM-Password: changeit" \
               --data "{}" \
-              http://openam.example.org:8080/openam/json/authenticate'
+              http://openam.example.org:8080/openam/json/authenticate | grep -q successUrl'
 
       - name: Docker start with a dedicated OpenDJ container (SP)
         shell: bash
@@ -267,13 +268,13 @@ jobs:
           echo "Test SP authentication"
   
           docker exec openam-sp bash -c \
-            'curl \
+            'curl -sf \
               --request POST \
               --header "Content-Type: application/json" \
               --header "X-OpenAM-Username: amadmin" \
               --header "X-OpenAM-Password: ampassword" \
               --data "{}" \
-              http://sp.mycompany.org:8080/openam/json/authenticate | grep tokenId'
+              http://sp.mycompany.org:8080/openam/json/authenticate | grep -q successUrl'
         
           docker inspect --format="{{json .State.Health.Status}}" openam-sp | grep -q \"healthy\"
 
@@ -383,13 +384,13 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           
           docker exec test-openam1 bash -c \
-          'curl \
+          'curl -sf \
            --request POST \
            --header "Content-Type: application/json" \
            --header "X-OpenAM-Username: amadmin" \
            --header "X-OpenAM-Password: ampassword" \
            --data "{}" \
-           http://openam1.example.org:8080/openam/json/authenticate | grep tokenId'
+           http://openam1.example.org:8080/openam/json/authenticate | grep -q successUrl'
           
           docker inspect --format="{{json .State.Health.Status}}" test-openam1 | grep -q \"healthy\"
           
@@ -433,13 +434,13 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
   
           docker exec test-openam2 bash -c \
-          'curl \
+          'curl -sf \
           --request POST \
           --header "Content-Type: application/json" \
           --header "X-OpenAM-Username: amadmin" \
           --header "X-OpenAM-Password: ampassword" \
           --data "{}" \
-          http://openam2.example.org:8080/openam/json/authenticate | grep tokenId'
+          http://openam2.example.org:8080/openam/json/authenticate | grep -q successUrl'
           
           docker inspect --format="{{json .State.Health.Status}}" test-openam2 | grep -q \"healthy\"
           
@@ -481,12 +482,12 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
 
           docker exec test-openam3 bash -c \
-          'curl \
+          'curl -sf \
           --request POST \
           --header "Content-Type: application/json" \
           --header "X-OpenAM-Username: amadmin" \
           --header "X-OpenAM-Password: ampassword" \
           --data "{}" \
-          http://openam3.example.org:8080/openam/json/authenticate | grep tokenId'
+          http://openam3.example.org:8080/openam/json/authenticate | grep -q successUrl'
 
           docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"
