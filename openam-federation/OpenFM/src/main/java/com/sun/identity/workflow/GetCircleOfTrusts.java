@@ -37,6 +37,7 @@ import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import jakarta.xml.bind.JAXBElement;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
@@ -113,11 +114,11 @@ public class GetCircleOfTrusts
                 (obj instanceof EntityConfigElement) ?
                 (EntityConfigElement)obj : null;
             if (configElt != null && configElt.getValue().isHosted()) {
-                List config =
+                List<JAXBElement<BaseConfigType>> config =
                 configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                 if (!config.isEmpty()) {
-                    BaseConfigType bConfig = (BaseConfigType)
-                        config.iterator().next();
+                    BaseConfigType bConfig =
+                        config.iterator().next().getValue();
                     realm = SAML2MetaUtils.getRealmByMetaAlias(
                         bConfig.getMetaAlias());
                 }
