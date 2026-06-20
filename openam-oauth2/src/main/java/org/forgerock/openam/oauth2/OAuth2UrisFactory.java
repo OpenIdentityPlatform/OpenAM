@@ -203,5 +203,10 @@ public class OAuth2UrisFactory {
         public String getDeviceAuthorizationEndpoint() {
             return baseUrl + "/device/code";
         }
+        
+        @Override
+        public String getRevocationEndpoint() {
+            return baseUrl + "/revoke";
+        }
     }
 }
