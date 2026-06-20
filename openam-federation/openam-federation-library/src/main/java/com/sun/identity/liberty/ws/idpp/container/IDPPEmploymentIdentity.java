@@ -208,8 +208,8 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
         if(obj != null) {
            if(obj instanceof EmploymentIdentityType) {
               EmploymentIdentityType eiType = (EmploymentIdentityType)obj;
-              jobTitle = eiType.getJobTitle().getValue();
-              org = eiType.getO().getValue();
+              jobTitle = jaxbValue(eiType.getJobTitle());
+              org = jaxbValue(eiType.getO());
               altO = eiType.getAltO();
            } else {
               throw new IDPPException(

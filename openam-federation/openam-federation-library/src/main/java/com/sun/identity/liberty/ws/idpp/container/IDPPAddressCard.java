@@ -422,7 +422,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
         StringBuffer sb = new StringBuffer();
         sb.append("AddrType").append("=").append(addressType).append("|");
 
-        AddressType ae = ace.getValue().getAddress().getValue();
+        AddressType ae = jaxbValue(ace.getValue().getAddress());
         if(ae == null) {
            IDPPUtils.debug.error("IDPPAddressContainer.createAddressCard:" +
             "Address Element is null");

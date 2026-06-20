@@ -264,7 +264,7 @@ public class IDPPCommonName extends IDPPBaseContainer {
            if(obj instanceof CommonNameType) {
               CommonNameType cnType = (CommonNameType)obj;
               analyzedName = cnType.getAnalyzedName();
-              cn = cnType.getCN().getValue();
+              cn = jaxbValue(cnType.getCN());
               altCNs = cnType.getAltCN();
            } else {
               throw new IDPPException(

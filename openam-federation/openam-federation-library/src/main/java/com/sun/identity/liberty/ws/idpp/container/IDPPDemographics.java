@@ -276,9 +276,9 @@ public class IDPPDemographics extends IDPPBaseContainer {
         if(obj != null) {
            if(obj instanceof DemographicsType) {
               DemographicsType demoGraphs = (DemographicsType)obj;
-              displayLang = demoGraphs.getDisplayLanguage().getValue();
-              age = demoGraphs.getAge().getValue();
-              birthDay = demoGraphs.getBirthday().getValue();
+              displayLang = jaxbValue(demoGraphs.getDisplayLanguage());
+              age = jaxbValue(demoGraphs.getAge());
+              birthDay = jaxbValue(demoGraphs.getBirthday());
               languages = demoGraphs.getLanguage();
               timeZone = demoGraphs.getTimeZone();
            } else {

@@ -33,6 +33,7 @@ package com.sun.identity.liberty.ws.idpp.container;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -421,10 +422,10 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         if(obj != null) { 
            if(obj instanceof AnalyzedNameType) {
               AnalyzedNameType analyzedName = (AnalyzedNameType)obj;
-              fn = analyzedName.getFN().getValue();
-              sn = analyzedName.getSN().getValue();
-              mn =  analyzedName.getMN().getValue();
-              pt = analyzedName.getPersonalTitle().getValue();
+              fn = jaxbValue(analyzedName.getFN());
+              sn = jaxbValue(analyzedName.getSN());
+              mn =  jaxbValue(analyzedName.getMN());
+              pt = jaxbValue(analyzedName.getPersonalTitle());
            } else {
               throw new IDPPException(
               IDPPUtils.bundle.getString("invalid Element"));
@@ -440,6 +441,18 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         }
         getAttributeMap(IDPPConstants.PT_ELEMENT, pt, map);
         return map;
+     }
+
+     /**
+      * Returns the value wrapped by a JAXB element, or <code>null</code> if the
+      * element itself is absent. Under JAXB 3 optional global elements are
+      * exposed as possibly-null {@link JAXBElement} wrappers, so callers must
+      * guard against a null wrapper before unwrapping.
+      * @param element the JAXB element wrapper, may be null
+      * @return the wrapped value, or null if the wrapper is null
+      */
+     protected static <T> T jaxbValue(JAXBElement<T> element) {
+         return (element == null) ? null : element.getValue();
      }
  
      /**

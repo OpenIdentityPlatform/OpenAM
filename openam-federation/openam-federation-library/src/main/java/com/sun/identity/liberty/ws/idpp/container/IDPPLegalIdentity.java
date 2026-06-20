@@ -452,10 +452,10 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
               analyzedName = lType.getAnalyzedName();
               vat = lType.getVAT();
               altIDs = lType.getAltID();
-              dob = lType.getDOB().getValue();
-              mStatus = lType.getMaritalStatus().getValue();
-              gender = lType.getGender().getValue();
-              lName = lType.getLegalName().getValue();
+              dob = jaxbValue(lType.getDOB());
+              mStatus = jaxbValue(lType.getMaritalStatus());
+              gender = jaxbValue(lType.getGender());
+              lName = jaxbValue(lType.getLegalName());
            } else {
               throw new IDPPException(
               IDPPUtils.bundle.getString("invalid Element"));

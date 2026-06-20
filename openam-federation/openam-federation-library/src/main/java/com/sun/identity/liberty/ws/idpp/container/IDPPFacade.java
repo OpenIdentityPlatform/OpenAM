@@ -256,11 +256,11 @@ public class IDPPFacade extends IDPPBaseContainer {
          DSTURI greetMeSound = null;
          if(obj != null) {
             FacadeElement fe = (FacadeElement)obj;
-            mugShot = fe.getValue().getMugShot().getValue();
-            webSite = fe.getValue().getWebSite().getValue();
-            namePronounced = fe.getValue().getNamePronounced().getValue();
-            greetSound = fe.getValue().getGreetSound().getValue();
-            greetMeSound = fe.getValue().getGreetMeSound().getValue();
+            mugShot = jaxbValue(fe.getValue().getMugShot());
+            webSite = jaxbValue(fe.getValue().getWebSite());
+            namePronounced = jaxbValue(fe.getValue().getNamePronounced());
+            greetSound = jaxbValue(fe.getValue().getGreetSound());
+            greetMeSound = jaxbValue(fe.getValue().getGreetMeSound());
          }
          getAttributeMap(IDPPConstants.MUGSHOT_ELEMENT, mugShot, map);
          getAttributeMap(IDPPConstants.WEBSITE_ELEMENT, webSite, map);
