@@ -226,7 +226,7 @@ When you first configure OpenAM, there are many options to evaluate, plus a numb
 
 * On a server that includes OpenAM Console, all the endpoints defined in the Web application descriptor, `WEB-INF/web.xml`, are available for use.
 
-* To prevent cross-site scripting attacks, you can configure session cookies as HTTP Only by setting the property `com.sun.identity.cookie.httponly=true`. This property prevents third-party scripts from accessing the session cookie. Because the XUI reads the `iPlanetDirectoryPro` SSO cookie from the browser, this property defaults to `false`; enable it only in deployments that do not use the XUI. By default, OpenAM also sets `org.openidentityplatform.openam.cookie.samesite=Lax` to reduce cross-site request forgery (CSRF) exposure.
+* To prevent cross-site scripting attacks, OpenAM marks session cookies as HTTP Only by default (`com.sun.identity.cookie.httponly=true`), which prevents third-party scripts from accessing the session cookie. The XUI supports this mode out of the box; set the property to `false` only if you need the SSO token to be readable from `document.cookie`. By default, OpenAM also sets `org.openidentityplatform.openam.cookie.samesite=Lax` to reduce cross-site request forgery (CSRF) exposure.
 
 * You can deploy a reverse proxy within delimitarized zone (DMZ) firewalls to limit exposure of service URLs to the end user as well as block access to back end configuration and user data stores to unauthorized users.
 

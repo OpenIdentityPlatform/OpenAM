@@ -175,13 +175,14 @@ jobs:
           echo "Test IDP authentication"
 
           ADMIN_TOKEN=$(docker exec openam-idp bash -c \
-          'curl -sf \
+          'curl -sf -D - -o /dev/null \
             --request POST \
             --header "Content-Type: application/json" \
             --header "X-OpenAM-Username: amadmin" \
             --header "X-OpenAM-Password: ampassword" \
             --data "{}" \
-            http://openam.example.org:8080/openam/json/authenticate' |  jq -r .tokenId)
+            http://openam.example.org:8080/openam/json/authenticate \
+            | tr -d "\r" | sed -n "s/^[Ss]et-[Cc]ookie: *iPlanetDirectoryPro=\([^;]*\).*/\1/p" | grep . | tail -n1')
 
           docker inspect --format="{{json .State.Health.Status}}" openam-idp | grep -q \"healthy\"
         
@@ -210,7 +211,7 @@ jobs:
               --header "X-OpenAM-Username: demo" \
               --header "X-OpenAM-Password: changeit" \
               --data "{}" \
-              http://openam.example.org:8080/openam/json/authenticate'
+              http://openam.example.org:8080/openam/json/authenticate | grep -q successUrl'
 
       - name: Docker start with a dedicated OpenDJ container (SP)
         shell: bash
@@ -267,13 +268,13 @@ jobs:
           echo "Test SP authentication"
   
           docker exec openam-sp bash -c \
-            'curl \
+            'curl -sf \
               --request POST \
               --header "Content-Type: application/json" \
               --header "X-OpenAM-Username: amadmin" \
               --header "X-OpenAM-Password: ampassword" \
               --data "{}" \
-              http://sp.mycompany.org:8080/openam/json/authenticate | grep tokenId'
+              http://sp.mycompany.org:8080/openam/json/authenticate | grep -q successUrl'
         
           docker inspect --format="{{json .State.Health.Status}}" openam-sp | grep -q \"healthy\"
 
@@ -288,38 +289,46 @@ jobs:
         with:
           sparse-checkout: e2e
 
-      - name: UI Smoke Tests (Playwright) - HttpOnly disabled
+      - name: UI Smoke Tests (Playwright) - HttpOnly enabled (default)
+        # OpenAM now ships HttpOnly session cookies by default, so a freshly
+        # configured server already reports cookieHttpOnly=true. This stage runs
+        # the (mode-agnostic) XUI specs against that default.
         env:
-          EXPECT_COOKIE_HTTPONLY: "false"
+          EXPECT_COOKIE_HTTPONLY: "true"
         run: |
           cd e2e
           npm init -y
           npm install @playwright/test
           npx playwright install chromium --with-deps
-          npx playwright test --reporter=list
+          echo "verifying the freshly configured server reports cookieHttpOnly=true (the new default)"
+          curl -sf "http://openam.example.org:8080/openam/json/serverinfo/*" | jq -e '.cookieHttpOnly == true'
+          npx playwright test xui --reporter=list
 
-      - name: Enable HttpOnly session cookie on OpenAM IDP and restart
+      - name: Disable HttpOnly session cookie on OpenAM IDP and restart
         shell: bash
         run: |
           # com.sun.identity.cookie.httponly is read once at startup (static field
           # in CookieUtils) and SystemProperties gives JVM -D properties priority,
-          # so we inject it via Tomcat setenv.sh and restart the same container
-          # (its configured data dir is preserved across a restart).
+          # so we inject the non-default value via Tomcat setenv.sh and restart the
+          # same container (its configured data dir is preserved across a restart).
           docker exec openam-idp bash -c '
-            echo "export CATALINA_OPTS=\"\$CATALINA_OPTS -Dcom.sun.identity.cookie.httponly=true\"" > "$CATALINA_HOME/bin/setenv.sh"
+            echo "export CATALINA_OPTS=\"\$CATALINA_OPTS -Dcom.sun.identity.cookie.httponly=false\"" > "$CATALINA_HOME/bin/setenv.sh"
             chmod +x "$CATALINA_HOME/bin/setenv.sh"'
           docker restart openam-idp
           echo "waiting for OpenAM IDP to be alive again..."
           timeout 3m bash -c 'until docker inspect --format="{{json .State.Health.Status}}" openam-idp | grep -q \"healthy\"; do sleep 10; done'
-          echo "verifying the server now reports cookieHttpOnly=true"
-          curl -sf "http://openam.example.org:8080/openam/json/serverinfo/*" | jq -e '.cookieHttpOnly == true'
+          echo "verifying the server now reports cookieHttpOnly=false"
+          curl -sf "http://openam.example.org:8080/openam/json/serverinfo/*" | jq -e '.cookieHttpOnly == false'
 
-      - name: UI Smoke Tests (Playwright) - HttpOnly enabled
+      - name: UI Smoke Tests (Playwright) - HttpOnly disabled
+        # The full suite (oauth2/saml) runs in the non-HttpOnly mode because those
+        # specs read the SSO tokenId from the /json/authenticate response body,
+        # which is suppressed in the default HttpOnly mode.
         env:
-          EXPECT_COOKIE_HTTPONLY: "true"
+          EXPECT_COOKIE_HTTPONLY: "false"
         run: |
           cd e2e
-          npx playwright test xui --reporter=list
+          npx playwright test --reporter=list
 
       - name: Upload failure artifacts
         uses: actions/upload-artifact@v7
@@ -375,13 +384,13 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
           
           docker exec test-openam1 bash -c \
-          'curl \
+          'curl -sf \
            --request POST \
            --header "Content-Type: application/json" \
            --header "X-OpenAM-Username: amadmin" \
            --header "X-OpenAM-Password: ampassword" \
            --data "{}" \
-           http://openam1.example.org:8080/openam/json/authenticate | grep tokenId'
+           http://openam1.example.org:8080/openam/json/authenticate | grep -q successUrl'
           
           docker inspect --format="{{json .State.Health.Status}}" test-openam1 | grep -q \"healthy\"
           
@@ -425,13 +434,13 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
   
           docker exec test-openam2 bash -c \
-          'curl \
+          'curl -sf \
           --request POST \
           --header "Content-Type: application/json" \
           --header "X-OpenAM-Username: amadmin" \
           --header "X-OpenAM-Password: ampassword" \
           --data "{}" \
-          http://openam2.example.org:8080/openam/json/authenticate | grep tokenId'
+          http://openam2.example.org:8080/openam/json/authenticate | grep -q successUrl'
           
           docker inspect --format="{{json .State.Health.Status}}" test-openam2 | grep -q \"healthy\"
           
@@ -473,12 +482,12 @@ jobs:
           " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
 
           docker exec test-openam3 bash -c \
-          'curl \
+          'curl -sf \
           --request POST \
           --header "Content-Type: application/json" \
           --header "X-OpenAM-Username: amadmin" \
           --header "X-OpenAM-Password: ampassword" \
           --data "{}" \
-          http://openam3.example.org:8080/openam/json/authenticate | grep tokenId'
+          http://openam3.example.org:8080/openam/json/authenticate | grep -q successUrl'
 
           docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"
