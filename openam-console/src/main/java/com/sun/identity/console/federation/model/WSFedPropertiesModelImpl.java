@@ -25,13 +25,14 @@
  * $Id: WSFedPropertiesModelImpl.java,v 1.14 2009/11/10 01:19:50 exu Exp $
  *
  * Portions copyright 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
+import com.sun.identity.wsfederation.jaxb.wsfederation.AttributeExtensibleURI;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
@@ -50,7 +51,9 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerEndpointElemen
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
@@ -164,7 +167,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             SPSSOConfigElement spconfig =
                 metaManager.getSPSSOConfig(realm,fedId);
             if (spconfig != null) {
-                SPAttributes =  WSFederationMetaUtils.getAttributes(spconfig);
+                SPAttributes =  WSFederationMetaUtils.getAttributes(spconfig.getValue());
             }
         } catch (WSFederationMetaException e) {
             debug.warning(
@@ -192,7 +195,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             IDPSSOConfigElement idpconfig =
                 metaManager.getIDPSSOConfig(realm,fedId);
             if (idpconfig != null) {
-                IDPAttributes = WSFederationMetaUtils.getAttributes(idpconfig);
+                IDPAttributes = WSFederationMetaUtils.getAttributes(idpconfig.getValue());
             }
         } catch (WSFederationMetaException e) {
             debug.warning(
@@ -286,7 +289,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         if(UriNamedclaimTypes != null) {
             int iClaim = 0;
             int arr = 0;
-            claimList = UriNamedclaimTypes.getClaimType();
+            claimList = UriNamedclaimTypes.getValue().getClaimType();
             for(iClaim = 0; iClaim < claimList.size(); iClaim += 1) {
                 ClaimType claimType = (ClaimType)claimList.get(iClaim);
                 displayName = claimType.getDisplayName().getValue();
@@ -375,15 +378,17 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 }
                 throw new AMConsoleException("invalid.federation.element");
             } else {
-                for (Iterator iter = fedElem.getAny().iterator();
+                for (Iterator iter = fedElem.getValue().getAny().iterator();
                     iter.hasNext(); )
                 {
                     Object o = iter.next();
                     if (o instanceof TokenIssuerEndpointElement) {
-                        ((TokenIssuerEndpointElement)o).getAddress().
+                        ((TokenIssuerEndpointElement)o).getValue().getAddress().
                             setValue(tknissEndPt);
                     } else if (o instanceof TokenIssuerNameElement) {
-                        ((TokenIssuerNameElement)o).setValue(tknissName);
+                        AttributeExtensibleURI attr = new AttributeExtensibleURI();
+                        attr.setValue(tknissName);
+                        ((TokenIssuerNameElement)o).setValue(attr);
                     }
                 }
                 metaManager.setFederation(realm, fedElem);
@@ -425,7 +430,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             }
             SPSSOConfigElement  spsso = getspsso(fed);
             if (spsso != null) {
-                BaseConfigType baseConfig = (BaseConfigType)spsso;
+                BaseConfigType baseConfig = spsso.getValue();
                 updateBaseConfig(baseConfig, spExtvalues, role);
             }
             //saves the attributes by passing the new fed object
@@ -468,8 +473,8 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             }
             IDPSSOConfigElement  idpsso = getidpsso(fed);
             if (idpsso != null){
-                BaseConfigType baseConfig = (BaseConfigType)idpsso;
-                updateBaseConfig(idpsso, idpExtValues, role);
+                BaseConfigType baseConfig = idpsso.getValue();
+                updateBaseConfig(idpsso.getValue(), idpExtValues, role);
             }
 
             //saves the new configuration by passing new fed element created
@@ -519,7 +524,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
 
         if(UriNamedclaimTypes != null) {
             int iClaim = 0;
-            claimList = UriNamedclaimTypes.getClaimType();
+            claimList = UriNamedclaimTypes.getValue().getClaimType();
             for(iClaim = 0; iClaim < claimList.size(); iClaim += 1) {
                 claimType = (ClaimType)claimList.get(iClaim);
                 displayName = claimType.getDisplayName();
@@ -578,13 +583,13 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
      * @return the corresponding IDPSSOConfigType Object.
      */
     private IDPSSOConfigElement getidpsso(FederationConfigElement fed) {
-        List listFed = fed.getIDPSSOConfigOrSPSSOConfig();
+        List<JAXBElement<BaseConfigType>> listFed = fed.getValue().getIDPSSOConfigOrSPSSOConfig();
         IDPSSOConfigElement idpsso = null;
-        Iterator i = listFed.iterator();
+        Iterator<JAXBElement<BaseConfigType>> i = listFed.iterator();
         //TBD -- one config will have only one instance of
         //IDPSSOConfigElement ?????
         while (i.hasNext()) {
-            BaseConfigType bc = (BaseConfigType) i.next();
+            JAXBElement<BaseConfigType> bc = i.next();
             if (bc instanceof IDPSSOConfigElement) {
                 idpsso = (IDPSSOConfigElement) bc;
                 break;
@@ -600,13 +605,13 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
      * @return the corresponding SPSSOConfigType Object.
      */
     private SPSSOConfigElement getspsso(FederationConfigElement fed) {
-        List listFed = fed.getIDPSSOConfigOrSPSSOConfig();
+        List<JAXBElement<BaseConfigType>> listFed = fed.getValue().getIDPSSOConfigOrSPSSOConfig();
         SPSSOConfigElement spsso = null;
-        Iterator i = listFed.iterator();
+        Iterator<JAXBElement<BaseConfigType>> i = listFed.iterator();
         //TBD -- one config will have only one instance of
         //SPSSOConfigElement ?????
         while (i.hasNext()) {
-            BaseConfigType bc = (BaseConfigType) i.next();
+            JAXBElement<BaseConfigType> bc = i.next();
             if (bc instanceof SPSSOConfigElement) {
                 spsso = (SPSSOConfigElement) bc;
                 break;
@@ -639,12 +644,12 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         }
         for (Iterator it = attrList.iterator(); it.hasNext(); ) {
             AttributeElement avpnew = (AttributeElement)it.next();
-            String name = avpnew.getName();
+            String name = avpnew.getValue().getName();
             if (values.keySet().contains(name)) {
                 Set set = (Set)values.get(name);
                 if (set != null) {
-                    avpnew.getValue().clear();
-                    avpnew.getValue().addAll(set);
+                    avpnew.getValue().getValue().clear();
+                    avpnew.getValue().getValue().addAll(set);
                 }
             }
         }
@@ -688,12 +693,12 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             if (eConfig == null) {
                 BaseConfigType bctype = null;
                 FederationConfigElement ele =
-                    objFactory.createFederationConfigElement();
-                ele.setFederationID(fedId);
+                    objFactory.createFederationConfigElement(objFactory.createFederationConfigType());
+                ele.getValue().setFederationID(fedId);
                 if (location.equals("remote")) {
-                    ele.setHosted(false);
+                    ele.getValue().setHosted(false);
                 }
-                List ll = ele.getIDPSSOConfigOrSPSSOConfig();
+                List<JAXBElement<BaseConfigType>> ll = ele.getValue().getIDPSSOConfigOrSPSSOConfig();
                 // Decide which role EntityDescriptorElement includes
                 // Right now, it is either an SP or an IdP or dual role
                 if (isDualRole(edes)) {
@@ -701,27 +706,24 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                     //for dual role create both idp and sp config objects
                     BaseConfigType bctype_idp = null;
                     BaseConfigType bctype_sp = null;
-                    bctype_idp = objFactory.createIDPSSOConfigElement();
+                    bctype_idp = new BaseConfigType() {};
                     bctype_idp = createAttributeElement(keys, bctype_idp);
-                    bctype_sp = objFactory.createSPSSOConfigElement();
+                    bctype_sp = new BaseConfigType() {};
                     bctype_sp = createAttributeElement(keys, bctype_sp);
-                    ll.add(bctype_idp);
-                    ll.add(bctype_sp);
+                    ll.add(objFactory.createIDPSSOConfigElement(bctype_idp));
+                    ll.add(objFactory.createSPSSOConfigElement(bctype_sp));
                 } else if (role.equals(IDENTITY_PROVIDER)) {
-                    bctype = objFactory.createIDPSSOConfigElement();
+                    bctype =  new BaseConfigType() {};
                     //bctype.getAttribute().add(atype);
                     bctype = createAttributeElement(keys, bctype);
-                    ll.add(bctype);
+                    ll.add(objFactory.createIDPSSOConfigElement(bctype));
                 } else if (role.equals(SERVICE_PROVIDER)) {
-                    bctype = objFactory.createSPSSOConfigElement();
+                    bctype =  new BaseConfigType() {};
                     bctype = createAttributeElement(keys, bctype);
-                    ll.add(bctype);
+                    ll.add(objFactory.createSPSSOConfigElement(bctype));
                 }
                 metaManager.setEntityConfig(realm,ele);
             }
-        } catch (JAXBException e) {
-            debug.warning("WSFedPropertiesModelImpl.createExtendedObject", e);
-            throw new AMConsoleException(getErrorString(e));
         } catch (WSFederationMetaException e) {
             debug.warning("WSFedPropertiesModelImpl.createExtendedObject", e);
             throw new AMConsoleException(getErrorString(e));
@@ -739,19 +741,13 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             Map values,
             BaseConfigType bconfig
             )throws AMConsoleException {
-        try {
-            ObjectFactory objFactory = new ObjectFactory();
-            for (Iterator iter=values.keySet().iterator();
-            iter.hasNext();) {
-                AttributeElement avp = objFactory.createAttributeElement();
-                String key = (String)iter.next();
-                avp.setName(key);
-                bconfig.getAttribute().add(avp);
-            }
-        } catch (JAXBException e) {
-            debug.warning
-                    ("WSFedPropertiesModelImpl.createAttributeElement", e);
-            throw new AMConsoleException(e.getMessage());
+        ObjectFactory objFactory = new ObjectFactory();
+        for (Iterator iter=values.keySet().iterator();
+        iter.hasNext();) {
+            AttributeElement avp = objFactory.createAttributeElement(objFactory.createAttributeType());
+            String key = (String)iter.next();
+            avp.getValue().setName(key);
+            bconfig.getAttribute().add(avp);
         }
         return bconfig;
     }
@@ -767,7 +763,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
         int cnt = 0;
         boolean dual = false;
         if (edes != null) {
-            for (Iterator iter = edes.getAny().iterator(); iter.hasNext(); ) {
+            for (Iterator iter = edes.getValue().getAny().iterator(); iter.hasNext(); ) {
                 Object o = iter.next();
                 if (o instanceof TokenIssuerEndpointElement) {
                     cnt++;

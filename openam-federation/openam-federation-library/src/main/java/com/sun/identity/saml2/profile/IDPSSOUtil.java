@@ -1229,7 +1229,8 @@ public class IDPSSOUtil {
                 if (CollectionUtils.isNotEmpty(encryptedAssertions)) {
                     boolean firstAssertion = true;
                     String hostEntityId = metaManager.getEntityByMetaAlias(metaAlias);
-                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(metaManager.getSPSSOConfig(realm, hostEntityId));
+                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(
+                            metaManager.getSPSSOConfig(realm, hostEntityId).getValue());
                     for (EncryptedAssertion encryptedAssertion : encryptedAssertions) {
                         Assertion assertion = encryptedAssertion.decrypt(decryptionKeys);
                         authenticatingAuthorities.addAll(extractAuthenticatingAuthorities(assertion));
@@ -1853,7 +1854,7 @@ public class IDPSSOUtil {
         String classMethod = "IDPSSOUtil.getDefaultACSurl: ";
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
-        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+        List acsList = spSSODescriptorElement.getValue().getAssertionConsumerService();
         AssertionConsumerServiceElement acs = null;
         String acsURL = null;
         String binding = null;
@@ -1861,13 +1862,13 @@ public class IDPSSOUtil {
         String firstBinding = null;
         for (int i = 0; i < acsList.size(); i++) {
             acs = (AssertionConsumerServiceElement) acsList.get(i);
-            if (acs.isIsDefault()) {
-                acsURL = acs.getLocation();
-                binding = acs.getBinding();
+            if (acs.getValue().isIsDefault()) {
+                acsURL = acs.getValue().getLocation();
+                binding = acs.getValue().getBinding();
             }
             if (i == 0) {
-                firstAcsURL = acs.getLocation();
-                firstBinding = acs.getBinding();
+                firstAcsURL = acs.getValue().getLocation();
+                firstBinding = acs.getValue().getBinding();
             }
         }
 
@@ -1898,14 +1899,14 @@ public class IDPSSOUtil {
         String classMethod = "IDPSSOUtil.getBindingForAcsUrl: ";
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
-        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+        List acsList = spSSODescriptorElement.getValue().getAssertionConsumerService();
         AssertionConsumerServiceElement acs = null;
         String binding = null;
         for (int i = 0; i < acsList.size(); i++) {
             acs = (AssertionConsumerServiceElement) acsList.get(i);
-            String location = acs.getLocation();
+            String location = acs.getValue().getLocation();
             if (location != null && location.equals(acsURL)) {
-                return acs.getBinding();
+                return acs.getValue().getBinding();
             }
         }
         return null;
@@ -1933,7 +1934,7 @@ public class IDPSSOUtil {
         String classMethod = "IDPSSOUtil.getACSurlFromMetaByBinding: ";
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
-        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+        List acsList = spSSODescriptorElement.getValue().getAssertionConsumerService();
         String acsURL = null;
         String binding = null;
         String defaultAcsURL = null;
@@ -1944,18 +1945,18 @@ public class IDPSSOUtil {
         for (int i = 0; i < acsList.size(); i++) {
             acs = (AssertionConsumerServiceElement) acsList.get(i);
 
-            binding = acs.getBinding();
+            binding = acs.getValue().getBinding();
             if (binding.equals(desiredBinding)) {
-                acsURL = acs.getLocation();
+                acsURL = acs.getValue().getLocation();
                 break;
             }
-            if (acs.isIsDefault()) {
-                defaultAcsURL = acs.getLocation();
-                defaultBinding = acs.getBinding();
+            if (acs.getValue().isIsDefault()) {
+                defaultAcsURL = acs.getValue().getLocation();
+                defaultBinding = acs.getValue().getBinding();
             }
             if (i == 0) {
-                firstAcsURL = acs.getLocation();
-                firstBinding = acs.getBinding();
+                firstAcsURL = acs.getValue().getLocation();
+                firstBinding = acs.getValue().getBinding();
             }
         }
         if (acsURL == null || acsURL.length() == 0) {
@@ -2003,7 +2004,7 @@ public class IDPSSOUtil {
 
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
-        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+        List acsList = spSSODescriptorElement.getValue().getAssertionConsumerService();
         int index;
         String acsURL = null;
         String binding = null;
@@ -2015,20 +2016,20 @@ public class IDPSSOUtil {
         for (int i = 0; i < acsList.size(); i++) {
             acs = (AssertionConsumerServiceElement) acsList.get(i);
 
-            index = acs.getIndex();
-            binding = acs.getBinding();
+            index = acs.getValue().getIndex();
+            binding = acs.getValue().getBinding();
             if (index == acsIndex) {
-                acsURL = acs.getLocation();
-                binding = acs.getBinding();
+                acsURL = acs.getValue().getLocation();
+                binding = acs.getValue().getBinding();
                 break;
             }
-            if (acs.isIsDefault()) {
-                defaultAcsURL = acs.getLocation();
-                defaultBinding = acs.getBinding();
+            if (acs.getValue().isIsDefault()) {
+                defaultAcsURL = acs.getValue().getLocation();
+                defaultBinding = acs.getValue().getBinding();
             }
             if (i == 0) {
-                firstAcsURL = acs.getLocation();
-                firstBinding = acs.getBinding();
+                firstAcsURL = acs.getValue().getLocation();
+                firstBinding = acs.getValue().getBinding();
             }
         }
         if (acsURL == null || acsURL.length() == 0) {
@@ -2100,7 +2101,7 @@ public class IDPSSOUtil {
 
         ArtifactResolutionServiceElement ars =
                 (ArtifactResolutionServiceElement)
-                        idpSSODescriptorElement.getArtifactResolutionService().get(0);
+                        idpSSODescriptorElement.getValue().getArtifactResolutionService().get(0);
         if (ars == null) {
             SAML2Utils.debug.error(classMethod +
                     "Unable to get ArtifactResolutionServiceElement from meta.");
@@ -2115,7 +2116,7 @@ public class IDPSSOUtil {
         try {
             art = ProtocolFactory.getInstance().createArtifact(
                     null,
-                    ars.getIndex(),
+                    ars.getValue().getIndex(),
                     SAML2Utils.generateSourceID(idpEntityID),
                     SAML2Utils.generateMessageHandleWithServerID()
             );
@@ -2343,7 +2344,7 @@ public class IDPSSOUtil {
         try {
             IDPSSOConfigElement config = metaManager.getIDPSSOConfig(
                     realm, hostEntityId);
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
             List value = (List) attrs.get(attrName);
             if (value != null && value.size() != 0) {
                 result = (String) value.get(0);
@@ -2586,7 +2587,7 @@ public class IDPSSOUtil {
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
         // get the encryption information
-        EncInfo encInfo = KeyUtil.getEncInfo(spSSODescriptorElement,
+        EncInfo encInfo = KeyUtil.getEncInfo(spSSODescriptorElement.getValue(),
                 spEntityID, SAML2Constants.SP_ROLE);
         if (encInfo == null) {
             SAML2Utils.debug.error(classMethod +
@@ -2715,7 +2716,7 @@ public class IDPSSOUtil {
                     metaManager.getIDPSSOConfig(realm, idpEntityID);
             Map idpConfigAttrsMap = null;
             if (idpEntityCfg != null) {
-                idpConfigAttrsMap = SAML2MetaUtils.getAttributes(idpEntityCfg);
+                idpConfigAttrsMap = SAML2MetaUtils.getAttributes(idpEntityCfg.getValue());
             }
             if ((idpConfigAttrsMap == null) || (idpConfigAttrsMap.size() == 0)) {
                 return null;
@@ -2731,7 +2732,7 @@ public class IDPSSOUtil {
                     metaManager.getSPSSOConfig(realm, spEntityID);
             Map spConfigAttrsMap = null;
             if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
             }
             if ((spConfigAttrsMap == null) || (spConfigAttrsMap.size() == 0)) {
                 return null;
@@ -2981,12 +2982,12 @@ public class IDPSSOUtil {
         SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
                 realm, spEntityID, classMethod);
 
-        List acsList = spSSODescriptorElement.getAssertionConsumerService();
+        List acsList = spSSODescriptorElement.getValue().getAssertionConsumerService();
         AssertionConsumerServiceElement acs = null;
 
         for (int i = 0; i < acsList.size(); i++) {
             acs = (AssertionConsumerServiceElement) acsList.get(i);
-            String acsInMeta = acs.getLocation();
+            String acsInMeta = acs.getValue().getLocation();
             if (acsInMeta.equalsIgnoreCase(acsURL)) {
                 isValidACSurl = true;
                 SAML2Utils.debug.message(classMethod + " acsURL=" + acsURL +
@@ -3013,7 +3014,7 @@ public class IDPSSOUtil {
             SAML2Utils.debug.message(method + ": realm - " + realm + "/: spEntityID - " + spEntityID);
         }
         SPSSODescriptorElement spSSODescriptor = getSPSSODescriptor(spEntityID, realm, method);
-        return spSSODescriptor.isWantAssertionsSigned();
+        return spSSODescriptor.getValue().isWantAssertionsSigned();
     }
 
     /**

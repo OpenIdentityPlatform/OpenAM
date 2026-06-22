@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.soapbinding;
 
@@ -190,7 +190,7 @@ public class QueryClient {
                         
                    endPoint =
                                 SAML2SDKUtils.fillInBasicAuthInfo(
-                                pepConfig,endPoint);
+                                pepConfig.getValue(),endPoint);
                         String[] urls = { endPoint };
                         SOAPClient soapClient = new SOAPClient(urls);
                         if (debug.messageEnabled()) {
@@ -423,7 +423,7 @@ public class QueryClient {
                         getPolicyDecisionPointDescriptor(null,
                         pdpEntityID);
                 if (pdpDescriptor != null) {
-                    List xacmlPDP = pdpDescriptor.getXACMLAuthzService();
+                    List xacmlPDP = pdpDescriptor.getValue().getXACMLAuthzService();
                     if (xacmlPDP != null) {
                         Iterator i = xacmlPDP.iterator();
                         while (i.hasNext()) {
@@ -431,7 +431,7 @@ public class QueryClient {
                             if (o instanceof XACMLAuthzServiceElement) {
                                 XACMLAuthzServiceElement xType =
                                         (XACMLAuthzServiceElement) o;
-                                endPoint = xType.getLocation();
+                                endPoint = xType.getValue().getLocation();
                                 if (debug.messageEnabled()) {
                                     debug.message(classMethod +
                                             "EndPoint :" + endPoint);
@@ -590,7 +590,7 @@ public class QueryClient {
                 Set<PrivateKey> decryptionKeys;
                 List<EncryptedAssertion> encAssertions = samlResponse.getEncryptedAssertion();
                 if (encAssertions != null) {
-                    decryptionKeys = KeyUtil.getDecryptionKeys(pepConfig);
+                    decryptionKeys = KeyUtil.getDecryptionKeys(pepConfig.getValue());
                     for (EncryptedAssertion encAssertion : encAssertions) {
                         Assertion assertion = encAssertion.decrypt(decryptionKeys);
                         if (assertions == null) {
@@ -740,7 +740,7 @@ public class QueryClient {
         }
         String result = null;
         
-        Map attrs = SAML2MetaUtils.getAttributes(pepConfig);
+        Map attrs = SAML2MetaUtils.getAttributes(pepConfig.getValue());
         
         if (attrs != null) {
             List value = (List) attrs.get(attrName);
@@ -774,7 +774,7 @@ public class QueryClient {
         }
         String result = null;
 
-        Map attrs = SAML2MetaUtils.getAttributes(pdpConfig);
+        Map attrs = SAML2MetaUtils.getAttributes(pdpConfig.getValue());
 
         if (attrs != null) {
             List value = (List) attrs.get(attrName);
@@ -808,7 +808,7 @@ public class QueryClient {
                 getPolicyEnforcementPointDescriptor(realm,
                 pepEntityID);
         
-        return pepDescriptor.isWantAssertionsSigned();
+        return pepDescriptor.getValue().isWantAssertionsSigned();
     }
 
 

@@ -24,7 +24,7 @@
  *
  * $Id: FSRegistrationInitiationServlet.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -180,14 +180,14 @@ public class FSRegistrationInitiationServlet extends HttpServlet {
                 hostedProviderDesc = 
                     metaManager.getSPDescriptor(realm, hostedEntityId);
                 hostedConfig = 
-                    metaManager.getSPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getSPDescriptorConfig(realm, hostedEntityId).getValue();
             } else if (hostedRole != null &&
                 hostedRole.equalsIgnoreCase(IFSConstants.IDP))
             {
                 hostedProviderDesc = 
                     metaManager.getIDPDescriptor(realm, hostedEntityId);
                 hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId).getValue();
             }
             if (hostedProviderDesc == null) {
                 throw new IDFFMetaException((String) null);

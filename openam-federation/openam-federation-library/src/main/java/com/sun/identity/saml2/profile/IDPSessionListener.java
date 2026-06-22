@@ -25,6 +25,7 @@
  * $Id: IDPSessionListener.java,v 1.10 2009/09/23 22:28:31 bigfatrat Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import com.sun.identity.plugin.monitoring.FedMonAgent;
 import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
@@ -55,6 +57,7 @@ import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.debug.Debug;
+import jakarta.xml.bind.JAXBElement;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 
 
@@ -154,7 +157,7 @@ public class IDPSessionListener
                         NameID nameID = pair.getNameID();
 
                         BaseConfigType idpConfig =
-                               sm.getIDPSSOConfig(realm, idpEntityID);
+                               sm.getIDPSSOConfig(realm, idpEntityID).getValue();
 
                         if (idpConfig != null) {
                             List idpSessionSyncList =
@@ -296,7 +299,8 @@ public class IDPSessionListener
             throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
         }
 
-        List<EndpointType> slosList = spsso.getSingleLogoutService();
+        List<EndpointType> slosList = spsso.getValue().getSingleLogoutService().stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
         String location = LogoutUtil.getSLOServiceLocation(slosList, SAML2Constants.SOAP);
 
         if (location == null) {
@@ -310,6 +314,6 @@ public class IDPSessionListener
         SPSSOConfigElement spConfig = sm.getSPSSOConfig(realm, spEntityID);
 
         LogoutUtil.doLogout(metaAlias, spEntityID, slosList, null, binding, null, sessionIndex, nameID, null, null,
-                paramsMap, spConfig);
+                paramsMap, spConfig.getValue());
     }
 }

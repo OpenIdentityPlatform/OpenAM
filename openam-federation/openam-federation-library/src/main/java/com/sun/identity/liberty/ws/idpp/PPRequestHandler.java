@@ -23,12 +23,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PPRequestHandler.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 
 package com.sun.identity.liberty.ws.idpp;
 
+import com.sun.identity.liberty.ws.idpp.jaxb.ResponseType;
+import com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.liberty.ws.idpp.jaxb.QueryResponseElement;
 import com.sun.identity.liberty.ws.idpp.jaxb.QueryElement;
@@ -68,7 +72,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
+
+import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.w3c.dom.Document;
 
 //Interaction imports
@@ -131,7 +137,7 @@ public class PPRequestHandler extends DSTRequestHandler {
                QueryElement query = (QueryElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
                IDPPUtils.getMarshaller().setProperty(
-                         "com.sun.xml.bind.namespacePrefixMapper",
+                         "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
                IDPPUtils.getMarshaller().marshal(query, doc);
                return processQueryRequest(query, providerID, requestMsg, doc);
@@ -139,7 +145,7 @@ public class PPRequestHandler extends DSTRequestHandler {
                ModifyElement modify = (ModifyElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
                IDPPUtils.getMarshaller().setProperty(
-                         "com.sun.xml.bind.namespacePrefixMapper",
+                         "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
                IDPPUtils.getMarshaller().marshal(modify, doc);
                return processModifyRequest(modify, providerID, requestMsg, doc);
@@ -191,9 +197,9 @@ public class PPRequestHandler extends DSTRequestHandler {
            IDPPUtils.debug.message("PPRequestHandler:processQueryRequest:" +
            "request received:" + XMLUtils.print(request.getDocumentElement()));
         }
-        Object resObj = query.getResourceID();
+        Object resObj = query.getValue().getResourceID();
         if(resObj == null) {
-            resObj = query.getEncryptedResourceID();
+            resObj = query.getValue().getEncryptedResourceID();
         }
         QueryResponseElement response = getQueryResponse(query);
         String resourceID = getResourceID(resObj, providerID, 
@@ -203,8 +209,9 @@ public class PPRequestHandler extends DSTRequestHandler {
               IDPPUtils.debug.message("PPRequestHandler:processQuery" +
               "Request: resource id is invalid.");
            }
-           response.setStatus(setStatusType(false, DSTConstants.NO_RESOURCE, 
-           IDPPUtils.bundle.getString("invalidResourceID"), null));
+           StatusType status = setStatusType(false, DSTConstants.NO_RESOURCE,
+                    IDPPUtils.bundle.getString("invalidResourceID"), null);
+           response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
            return response;
         }
         if(LogUtil.isLogEnabled()) {
@@ -216,15 +223,16 @@ public class PPRequestHandler extends DSTRequestHandler {
                     "securityMechID") + "=" + 
                     requestMsg.getAuthenticationMechanism() + " ";
         }
-        List queryItems = query.getQueryItem();
+        List queryItems = query.getValue().getQueryItem();
         if (queryItems.size() == 0) {
             if(IDPPUtils.debug.warningEnabled()) {
                IDPPUtils.debug.warning("PPRequestHandler:processQuery" +
                "Request: The request does not have any query items.");
             }
-            response.setStatus(setStatusType(false, 
-            DSTConstants.UNEXPECTED_ERROR,  
-            IDPPUtils.bundle.getString("nullQueryItems"), null));
+            StatusType status = setStatusType(false,
+                    DSTConstants.UNEXPECTED_ERROR,
+                    IDPPUtils.bundle.getString("nullQueryItems"), null);
+            response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
             return response;
         }
 
@@ -235,8 +243,8 @@ public class PPRequestHandler extends DSTRequestHandler {
         int queryItemsSize = queryItems.size();
         for(int i= 0; i < queryItemsSize; i++) {
             boolean isQueryItemValid = true;
-            QueryType.QueryItemType item =
-                   (QueryType.QueryItemType)queryItems.get(i);
+            QueryType.QueryItem item =
+                   (QueryType.QueryItem)queryItems.get(i);
             String select = item.getSelect();
             String ref = item.getItemID();
             if(ref == null || ref.length() == 0) {
@@ -248,9 +256,9 @@ public class PPRequestHandler extends DSTRequestHandler {
                    IDPPUtils.debug.warning("PPRequestHandler:process"+
                    "QueryRequest: There is no Select in the request.");
                 }
-                response.setStatus(
-                setStatusType(false, DSTConstants.MISSING_SELECT, 
-                IDPPUtils.bundle.getString("missingSelect"), ref));
+                StatusType status = setStatusType(false, DSTConstants.MISSING_SELECT,
+                        IDPPUtils.bundle.getString("missingSelect"), ref);
+                response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                 isQueryItemValid = false;
            }
 
@@ -259,9 +267,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                  IDPPUtils.debug.warning("PPRequestHandler:process"+
                  "QueryRequest: Data not supported");
               }
-              response.setStatus(setStatusType(false, 
-              DSTConstants.INVALID_SELECT, 
-              IDPPUtils.bundle.getString("invalidSelect"), ref));
+               StatusType status = setStatusType(false,
+                       DSTConstants.INVALID_SELECT,
+                       IDPPUtils.bundle.getString("invalidSelect"), ref);
+              response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
               isQueryItemValid = false;
            }
 
@@ -273,9 +282,10 @@ public class PPRequestHandler extends DSTRequestHandler {
 
            if(authZAction == null || authZAction.equalsIgnoreCase(
               IDPPConstants.AUTHZ_DENY)) {
-              response.setStatus(setStatusType(false, 
-              DSTConstants.NOT_AUTHORIZED, 
-              IDPPUtils.bundle.getString("notAuthorized"), ref));
+               StatusType status = setStatusType(false,
+                       DSTConstants.NOT_AUTHORIZED,
+                       IDPPUtils.bundle.getString("notAuthorized"), ref);
+              response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
               if(LogUtil.isLogEnabled()) {
                  String[] data = {resourceID};
                  LogUtil.error(Level.INFO,LogUtil.PP_QUERY_FAILURE,data);
@@ -295,9 +305,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                           LogUtil.error(Level.INFO, 
                                         LogUtil.PP_INTERACTION_FAILURE,data);
                        }
-                       response.setStatus(setStatusType(false, 
-                       DSTConstants.NOT_AUTHORIZED, 
-                       IDPPUtils.bundle.getString("interactionFailed"),ref));
+                        StatusType status = setStatusType(false,
+                                DSTConstants.NOT_AUTHORIZED,
+                                IDPPUtils.bundle.getString("interactionFailed"), ref);
+                       response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                        isQueryItemValid = false;
                     }
                  } else {
@@ -317,9 +328,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                           LogUtil.error(Level.INFO, 
                                         LogUtil.PP_INTERACTION_FAILURE,data);
                        }
-                       response.setStatus(setStatusType(false, 
-                       DSTConstants.NOT_AUTHORIZED, 
-                       IDPPUtils.bundle.getString("interactionFailed"),ref));
+                        StatusType status = setStatusType(false,
+                                DSTConstants.NOT_AUTHORIZED,
+                                IDPPUtils.bundle.getString("interactionFailed"), ref);
+                       response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                        isQueryItemValid = false;
                     } else {
                        interactedData.putAll(intrData);
@@ -353,7 +365,7 @@ public class PPRequestHandler extends DSTRequestHandler {
                            dstQueryItems, interactedData, request);
         List data = getData(queryResults);
         if(data != null && !data.isEmpty()) {
-           response.getData().addAll(data); 
+           response.getValue().getData().addAll(data);
         }
         if(LogUtil.isLogEnabled()) {
            String[] msgData = { resourceID };
@@ -375,15 +387,9 @@ public class PPRequestHandler extends DSTRequestHandler {
         Set queryItems = queryResults.keySet();
         Iterator iter = queryItems.iterator();
         while(iter.hasNext()) {
-           QueryResponseType.DataType data = null;
-           try {
-               data = IDPPUtils.getIDPPFactory().
-                       createQueryResponseTypeDataType();
-            } catch (JAXBException je) {
-                IDPPUtils.debug.error("PPRequestHandler:getData:jaxb fail", je);
-                throw new IDPPException(
-                IDPPUtils.bundle.getString("jaxbFailure"));
-            }
+           QueryResponseType.Data data = null;
+            data = IDPPUtils.getIDPPFactory().
+                    createQueryResponseTypeData();
             DSTQueryItem dstQueryItem = (DSTQueryItem)iter.next();
             List values = (List)queryResults.get(dstQueryItem);
             if(values.isEmpty()) {
@@ -414,34 +420,28 @@ public class PPRequestHandler extends DSTRequestHandler {
            throw new IDPPException(
            IDPPUtils.bundle.getString("nullInputParams"));
         }
-        try {
-            StatusType status = IDPPUtils.getIDPPFactory().createStatusType();
-            if(success) {
-              QName qName = new QName(IDPPConstants.XMLNS_IDPP, statusCode);
-              status.setCode(qName);
-            } else {
-              QName qName = 
-                 new QName(IDPPConstants.XMLNS_IDPP, DSTConstants.FAILED);
-              status.setCode(qName);
+        StatusType status = IDPPUtils.getIDPPFactory().createStatusType();
+        if(success) {
+          QName qName = new QName(IDPPConstants.XMLNS_IDPP, statusCode);
+          status.setCode(qName);
+        } else {
+          QName qName =
+             new QName(IDPPConstants.XMLNS_IDPP, DSTConstants.FAILED);
+          status.setCode(qName);
 
-              StatusType secondStatus = 
-                   IDPPUtils.getIDPPFactory().createStatusType();
-              QName secondQ = new QName(IDPPConstants.XMLNS_IDPP, statusCode);
-              secondStatus.setCode(secondQ);
-              if(comment != null) {
-                 secondStatus.setComment(comment);
-              }
-              if(ref != null) {
-                 secondStatus.setRef(ref);
-              }
-              status.getStatus().add(secondStatus);
-            }
-            return status;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("PPRequestHandler:setStatusType:" +
-            "jaxb failure:" , je);
-            throw new IDPPException(IDPPUtils.bundle.getString("jaxbFailure"));
+          StatusType secondStatus =
+               IDPPUtils.getIDPPFactory().createStatusType();
+          QName secondQ = new QName(IDPPConstants.XMLNS_IDPP, statusCode);
+          secondStatus.setCode(secondQ);
+          if(comment != null) {
+             secondStatus.setComment(comment);
+          }
+          if(ref != null) {
+             secondStatus.setRef(ref);
+          }
+          status.getStatus().add(IDPPUtils.getIDPPFactory().createStatusElement(secondStatus));
         }
+        return status;
     }
 
     /**
@@ -475,9 +475,9 @@ public class PPRequestHandler extends DSTRequestHandler {
 
         Map interactedData = new HashMap();
         ModifyResponseElement response = getModifyResponse(modify);
-        Object resObj = modify.getResourceID();
+        Object resObj = modify.getValue().getResourceID();
         if(resObj == null) {
-            resObj = modify.getEncryptedResourceID();
+            resObj = modify.getValue().getEncryptedResourceID();
         }
         String resourceID = getResourceID(resObj, providerID, 
                   IDPPConstants.XMLNS_IDPP);
@@ -486,8 +486,9 @@ public class PPRequestHandler extends DSTRequestHandler {
               IDPPUtils.debug.warning("PPRequestHandler:processModify" +
               "Request: resource id is invalid.");
            }
-           response.setStatus(setStatusType(false, DSTConstants.NO_RESOURCE,
-           IDPPUtils.bundle.getString("invalidResourceID"), null));
+            StatusType status = setStatusType(false, DSTConstants.NO_RESOURCE,
+                    IDPPUtils.bundle.getString("invalidResourceID"), null);
+           response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
            return response;
         }
         if(LogUtil.isLogEnabled()) {
@@ -499,13 +500,14 @@ public class PPRequestHandler extends DSTRequestHandler {
                     "securityMechID") + "=" + 
                     requestMsg.getAuthenticationMechanism() + " ";
         }
-        List modificationElements = modify.getModification();
+        List<ModifyType.Modification> modificationElements = modify.getValue().getModification();
         if(modificationElements.size() == 0) {
            IDPPUtils.debug.error("PPRequestHandler:process" +
            "ModifyRequest: Modification elements are null");
-           response.setStatus(setStatusType(false, 
-           DSTConstants.UNEXPECTED_ERROR, 
-           IDPPUtils.bundle.getString("nullModifications"),null)); 
+            StatusType status = setStatusType(false,
+                    DSTConstants.UNEXPECTED_ERROR,
+                    IDPPUtils.bundle.getString("nullModifications"), null);
+           response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
            return response;
         }
 
@@ -513,8 +515,8 @@ public class PPRequestHandler extends DSTRequestHandler {
         List dstModifications = new ArrayList();
         int size = modificationElements.size();
         for (int i=0; i < size; i++) {
-             ModifyType.ModificationType modificationType =
-             (ModifyType.ModificationType)modificationElements.get(i);
+             ModifyType.Modification modificationType =
+            modificationElements.get(i);
 
              String select = modificationType.getSelect();
              String ref = modificationType.getId();
@@ -524,9 +526,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                    IDPPUtils.debug.warning("PersonalProfileService:process"+
                    "ModifyRequest: select is null");
                 }
-                response.setStatus(setStatusType(false, 
-                DSTConstants.MISSING_SELECT, 
-                IDPPUtils.bundle.getString("missingSelect"), ref));
+                 StatusType status = setStatusType(false,
+                         DSTConstants.MISSING_SELECT,
+                         IDPPUtils.bundle.getString("missingSelect"), ref);
+                response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                 return response;
              }
              if(!pp.isSelectDataSupported(select)){
@@ -534,9 +537,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                    IDPPUtils.debug.warning("PersonalProfileService:process"+
                    "ModifyRequest: Data not supported");
                 }
-                response.setStatus(setStatusType(false,
-                DSTConstants.INVALID_SELECT, 
-                IDPPUtils.bundle.getString("invalidSelect"), ref));
+                 StatusType status = setStatusType(false,
+                         DSTConstants.INVALID_SELECT,
+                         IDPPUtils.bundle.getString("invalidSelect"), ref);
+                response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                 return response;
              }
              //Check for authorization & interaction.
@@ -547,9 +551,10 @@ public class PPRequestHandler extends DSTRequestHandler {
 
              if(authZAction == null || authZAction.equalsIgnoreCase(
                 IDPPConstants.AUTHZ_DENY)) {
-                response.setStatus(setStatusType(false, 
-                DSTConstants.NOT_AUTHORIZED,
-                IDPPUtils.bundle.getString("notAuthorized"), ref));
+                 StatusType status = setStatusType(false,
+                         DSTConstants.NOT_AUTHORIZED,
+                         IDPPUtils.bundle.getString("notAuthorized"), ref);
+                response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                 if(LogUtil.isLogEnabled()) {
                    String[] data = { resourceID };
                    LogUtil.error(Level.INFO,LogUtil.PP_MODIFY_FAILURE,data);
@@ -573,9 +578,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                           LogUtil.error(Level.INFO, 
                                         LogUtil.PP_INTERACTION_FAILURE,data);
                        }
-                       response.setStatus(setStatusType(false, 
-                       DSTConstants.NOT_AUTHORIZED,
-                       IDPPUtils.bundle.getString("interactionFailed"), ref));
+                        StatusType status = setStatusType(false,
+                                DSTConstants.NOT_AUTHORIZED,
+                                IDPPUtils.bundle.getString("interactionFailed"), ref);
+                       response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                        return response;
                     }
                  } else {
@@ -596,9 +602,10 @@ public class PPRequestHandler extends DSTRequestHandler {
                           LogUtil.error(Level.INFO, 
                                         LogUtil.PP_INTERACTION_FAILURE,data);
                        }
-                       response.setStatus(setStatusType(false, 
-                       DSTConstants.NOT_AUTHORIZED,
-                       IDPPUtils.bundle.getString("interactionFailed"), ref));
+                        StatusType status = setStatusType(false,
+                                DSTConstants.NOT_AUTHORIZED,
+                                IDPPUtils.bundle.getString("interactionFailed"), ref);
+                       response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
                        return response;
                     } else {
                        interactedData.putAll(intrData);
@@ -609,7 +616,7 @@ public class PPRequestHandler extends DSTRequestHandler {
              }
 
              boolean override = modificationType.isOverrideAllowed();
-             ModifyType.ModificationType.NewDataType newData =
+             ModifyType.Modification.NewData newData =
                         modificationType.getNewData();
              DSTModification dstModification = new DSTModification();
              dstModification.setSelect(select);
@@ -635,9 +642,10 @@ public class PPRequestHandler extends DSTRequestHandler {
            }
            return response;
         } else {
-           response.setStatus(setStatusType(false, 
-           DSTConstants.UNEXPECTED_ERROR, 
-           IDPPUtils.bundle.getString("modifyFailed"), null));
+            StatusType status = setStatusType(false,
+                    DSTConstants.UNEXPECTED_ERROR,
+                    IDPPUtils.bundle.getString("modifyFailed"), null);
+           response.getValue().setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
 
            if(LogUtil.isLogEnabled()) {
                 String[] data = { logMsg };
@@ -675,18 +683,13 @@ public class PPRequestHandler extends DSTRequestHandler {
            throw new IDPPException(
            IDPPUtils.bundle.getString("nullInputParams"));
         }
-        try {
-            QueryResponseElement response =
-                   IDPPUtils.getIDPPFactory().createQueryResponseElement();
-            response.setStatus(setStatusType(true, DSTConstants.OK, null,null));
-            response.setId(SAMLUtils.generateID());
-            response.setItemIDRef(query.getItemID());
-            return response;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("PPRequestHandler:getQueryResponse:" +
-            "JAXB failure.", je);
-            throw new IDPPException(IDPPUtils.bundle.getString("jaxbFailure"));
-        }
+        QueryResponseType response =
+               IDPPUtils.getIDPPFactory().createQueryResponseType();
+        StatusType status = setStatusType(true, DSTConstants.OK, null, null);
+        response.setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
+        response.setId(SAMLUtils.generateID());
+        response.setItemIDRef(query.getValue().getItemID());
+        return IDPPUtils.getIDPPFactory().createQueryResponseElement(response);
 
     }
 
@@ -704,18 +707,13 @@ public class PPRequestHandler extends DSTRequestHandler {
            throw new IDPPException(
            IDPPUtils.bundle.getString("nullInputParams"));
         }
-        try {
-            ModifyResponseElement response =
-                   IDPPUtils.getIDPPFactory().createModifyResponseElement();
-            response.setStatus(setStatusType(true, DSTConstants.OK, null,null));
-            response.setId(SAMLUtils.generateID());
-            response.setItemIDRef(modify.getItemID());
-            return response;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("PPRequestHandler:getModifyResponse:" +
-            "JAXB failure.", je);
-            throw new IDPPException(IDPPUtils.bundle.getString("jaxbFailure"));
-        }
+        ResponseType response =
+               IDPPUtils.getIDPPFactory().createResponseType();
+        StatusType status = setStatusType(true, DSTConstants.OK, null, null);
+        response.setStatus(IDPPUtils.getIDPPFactory().createStatusElement(status));
+        response.setId(SAMLUtils.generateID());
+        response.setItemIDRef(modify.getValue().getItemID());
+        return  IDPPUtils.getIDPPFactory().createModifyResponseElement(response);
 
     }
 
@@ -762,11 +760,11 @@ public class PPRequestHandler extends DSTRequestHandler {
         try {
             //Create Interaction inquiry element
             InquiryElement inquiry =
-              JAXBObjectFactory.getObjectFactory().createInquiryElement();
-            inquiry.setTitle(IDPPUtils.bundle.getString(
+              JAXBObjectFactory.getObjectFactory().createInquiryElement(JAXBObjectFactory.getObjectFactory().createInquiryType());
+            inquiry.getValue().setTitle(IDPPUtils.bundle.getString(
             IDPPConstants.INTERACTION_TITLE));
 
-            List selectElements = inquiry.getSelectOrConfirmOrText();
+            List selectElements = inquiry.getValue().getSelectOrConfirmOrText();
             Set inquirySelects = interactResourceMap.keySet();
             Iterator iter = inquirySelects.iterator();
             while(iter.hasNext()) {
@@ -829,13 +827,13 @@ public class PPRequestHandler extends DSTRequestHandler {
        
        try {
            Confirm confirmElement =
-                JAXBObjectFactory.getObjectFactory().createInquiryTypeConfirm();
-           PPInteractionHelper helper = 
+                JAXBObjectFactory.getObjectFactory().createInquiryTypeConfirm(new InquiryElementType() {});
+           PPInteractionHelper helper =
                 new PPInteractionHelper(getLanguage(msg));
-           confirmElement.setName(resource);
-           confirmElement.setLabel(
+           confirmElement.getValue().setName(resource);
+           confirmElement.getValue().setLabel(
            helper.getInteractForConsentQuestion(isQuery, resource));
-           confirmElement.setHint(
+           confirmElement.getValue().setHint(
            helper.getInteractForConsentQuestion(isQuery, resource));
            return confirmElement;
 
@@ -882,11 +880,12 @@ public class PPRequestHandler extends DSTRequestHandler {
            while(iter.hasNext()) {
               String resourceKey = (String)iter.next();
               TextElement textElement =
-                    JAXBObjectFactory.getObjectFactory().createTextElement();
-              textElement.setName(resourceKey);
-              textElement.setLabel((String)interactQueries.get(resourceKey));
-              textElement.setMinChars(helper.getTextMinChars(resourceKey));
-              textElement.setMaxChars(helper.getTextMaxChars(resourceKey));
+                    JAXBObjectFactory.getObjectFactory().createTextElement(
+                            JAXBObjectFactory.getObjectFactory().createTextType());
+              textElement.getValue().setName(resourceKey);
+              textElement.getValue().setLabel((String)interactQueries.get(resourceKey));
+              textElement.getValue().setMinChars(helper.getTextMinChars(resourceKey));
+              textElement.getValue().setMaxChars(helper.getTextMaxChars(resourceKey));
               textElements.add(textElement);
             }
             return textElements;

@@ -28,7 +28,7 @@
 
 /*
  * Portions Copyrighted 2011-2013 ForgeRock Inc.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.task.model;
@@ -221,7 +221,7 @@ public class TaskModelImpl
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
                 // elm could be null due to OPENAM-269
-                if (elm != null && elm.isHosted() == hosted) {
+                if (elm != null && elm.getValue().isHosted() == hosted) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                             realm, entityId);
 
@@ -286,14 +286,14 @@ public class TaskModelImpl
             String signinPageURL = null;
             if (idpssoDescriptor != null) {
 
-                List signonList = idpssoDescriptor.getSingleSignOnService();
+                List signonList = idpssoDescriptor.getValue().getSingleSignOnService();
 
                 for (int i = 0; i < signonList.size(); i++) {
                     SingleSignOnServiceElement signElem =
                             (SingleSignOnServiceElement) signonList.get(i);
-                    String tmp = signElem.getBinding();
+                    String tmp = signElem.getValue().getBinding();
                     if (tmp.contains("HTTP-Redirect")) {
-                        signinPageURL = signElem.getLocation();
+                        signinPageURL = signElem.getValue().getLocation();
                         map.put("SigninPageURL",
                                 returnEmptySetIfValueIsNull(
                                 signinPageURL));
@@ -325,7 +325,7 @@ public class TaskModelImpl
             Map extValueMap = new HashMap();
             IDPSSOConfigElement idpssoConfig = samlManager.getIDPSSOConfig(realm, entityId);
             if (idpssoConfig != null) {
-                BaseConfigType baseConfig = (BaseConfigType) idpssoConfig;
+                BaseConfigType baseConfig = idpssoConfig.getValue();
                 extValueMap = SAML2MetaUtils.getAttributes(baseConfig);
             }
             List aList = (List) extValueMap.get("signingCertAlias");
@@ -366,7 +366,7 @@ public class TaskModelImpl
             IDPSSOConfigElement idpssoConfig = 
                     samlManager.getIDPSSOConfig(realm, entityId);
             if (idpssoConfig != null) {
-                BaseConfigType baseConfig = (BaseConfigType) idpssoConfig;
+                BaseConfigType baseConfig = idpssoConfig.getValue();
                 extValueMap = SAML2MetaUtils.getAttributes(baseConfig);
             }
             List aList = (List) extValueMap.get("signingCertAlias");
@@ -436,13 +436,13 @@ public class TaskModelImpl
                     samlManager.getSPSSODescriptor(realm, entityId);
             if (spssoDescriptor != null) {
                 List asconsServiceList =
-                        spssoDescriptor.getAssertionConsumerService();
+                        spssoDescriptor.getValue().getAssertionConsumerService();
 
                 for (Iterator i = asconsServiceList.listIterator(); i.hasNext();) {
                     AssertionConsumerServiceElement acsElem =
                             (AssertionConsumerServiceElement) i.next();
-                    if (acsElem.getBinding().contains("HTTP-POST")) {
-                        acsElem.setLocation(acsUrl);
+                    if (acsElem.getValue().getBinding().contains("HTTP-POST")) {
+                        acsElem.getValue().setLocation(acsUrl);
 
                     }
                 }

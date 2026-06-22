@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPEmploymentIdentity.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,42 +65,37 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
          IDPPUtils.debug.message("IDPPEmploymentIdentity:getContainerObj:Init");
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
-             EmploymentIdentityElement ei = 
-                 IDPPUtils.getIDPPFactory().createEmploymentIdentityElement();
-             String jobTitle = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.JOB_TITLE_ELEMENT).toLowerCase());
-             if(jobTitle != null) {
-                DSTString dstString = getDSTString(jobTitle);
-                ei.setJobTitle(dstString);
-             }
- 
-             String org = CollectionHelper.getMapAttr(userMap, 
-                getAttributeMapper().getDSAttribute(
-                    IDPPConstants.O_ELEMENT).toLowerCase());
-             if(org != null) {
-                DSTString dstString = getDSTString(org);
-                ei.setO(dstString);
-             }
-
-             Set altOs = (Set)userMap.get(
-             getAttributeMapper().getDSAttribute(
-             IDPPConstants.ALT_O_ELEMENT).toLowerCase());
-             Iterator iter = altOs.iterator();
-             while(iter.hasNext()) {
-                DSTString dstString = getDSTString((String)iter.next());
-                ei.getAltO().add(dstString);
-             }
-             ppType.setEmploymentIdentity(ei);
-             return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
+         PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
+         EmploymentIdentityElement ei =
+             IDPPUtils.getIDPPFactory().createEmploymentIdentityElement(
+                     IDPPUtils.getIDPPFactory().createEmploymentIdentityType()
+             );
+         String jobTitle = CollectionHelper.getMapAttr(
+            userMap, getAttributeMapper().getDSAttribute(
+                IDPPConstants.JOB_TITLE_ELEMENT).toLowerCase());
+         if(jobTitle != null) {
+            DSTString dstString = getDSTString(jobTitle);
+            ei.getValue().setJobTitle(IDPPUtils.getIDPPFactory().createJobTitleElement(dstString));
          }
+
+         String org = CollectionHelper.getMapAttr(userMap,
+            getAttributeMapper().getDSAttribute(
+                IDPPConstants.O_ELEMENT).toLowerCase());
+         if(org != null) {
+            DSTString dstString = getDSTString(org);
+            ei.getValue().setO(IDPPUtils.getIDPPFactory().createOElement(dstString));
+         }
+
+         Set altOs = (Set)userMap.get(
+         getAttributeMapper().getDSAttribute(
+         IDPPConstants.ALT_O_ELEMENT).toLowerCase());
+         Iterator iter = altOs.iterator();
+         while(iter.hasNext()) {
+            DSTString dstString = getDSTString((String)iter.next());
+            ei.getValue().getAltO().add(dstString);
+         }
+         ppType.setEmploymentIdentity(ei);
+         return ppType;
      }
 
      /**
@@ -211,8 +208,8 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
         if(obj != null) {
            if(obj instanceof EmploymentIdentityType) {
               EmploymentIdentityType eiType = (EmploymentIdentityType)obj;
-              jobTitle = eiType.getJobTitle();
-              org = eiType.getO();
+              jobTitle = jaxbValue(eiType.getJobTitle());
+              org = jaxbValue(eiType.getO());
               altO = eiType.getAltO();
            } else {
               throw new IDPPException(

@@ -25,7 +25,7 @@
  * $Id: FSServiceUtils.java,v 1.11 2008/11/10 22:56:59 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.util;
@@ -60,7 +60,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
-import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.federation.accountmgmt.FSAccountFedInfo;
 import com.sun.identity.federation.accountmgmt.FSAccountManager;
@@ -177,10 +176,10 @@ public class FSServiceUtils {
             if (role != null) {
                 if (role.equalsIgnoreCase(IFSConstants.SP)) {
                     hostConfig = metaManager.getSPDescriptorConfig(
-                        realm, entityId);
+                        realm, entityId).getValue();
                 } else if (role.equalsIgnoreCase(IFSConstants.IDP)) {
                     hostConfig = metaManager.getIDPDescriptorConfig(
-                        realm, entityId);
+                        realm, entityId).getValue();
                 }
             }
         }catch(Exception e){
@@ -933,13 +932,12 @@ public class FSServiceUtils {
         String matching = null;
         String defaultValue = null;
         String first = null;
-        List urls = spDescriptor.getAssertionConsumerServiceURL();
+        List<SPDescriptorType.AssertionConsumerServiceURL> urls = spDescriptor.getAssertionConsumerServiceURL();
         if (urls != null && !urls.isEmpty()) {
-            Iterator iter = urls.iterator();
-            SPDescriptorType.AssertionConsumerServiceURLType curUrl = null;
+            Iterator<SPDescriptorType.AssertionConsumerServiceURL> iter = urls.iterator();
+            SPDescriptorType.AssertionConsumerServiceURL curUrl = null;
             while (iter.hasNext()) {
-                curUrl = (SPDescriptorType.AssertionConsumerServiceURLType)
-                    iter.next();
+                curUrl = iter.next();
                 String curId = curUrl.getId();
                 String curValue = curUrl.getValue();
                 if (id != null && curId != null && curId.equals(id)) {

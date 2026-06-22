@@ -25,7 +25,7 @@
  * $Id: AssertionIDRequestUtil.java,v 1.8 2009/06/12 22:21:40 mallas Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -403,13 +403,13 @@ public class AssertionIDRequestUtil {
         try {
             if (SAML2Constants.IDP_ROLE.equals(role)) {
                 roled = metaManager.getIDPSSODescriptor(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             } else if (SAML2Constants.AUTHN_AUTH_ROLE.equals(role)) {
                 roled = metaManager.getAuthnAuthorityDescriptor(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             } else if (SAML2Constants.ATTR_AUTH_ROLE.equals(role)) {
                 roled = metaManager.getAttributeAuthorityDescriptor(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             }
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("AssertionIDRequestUtil." +
@@ -503,8 +503,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "idpNotFound"));
                 }
-                aIDReqServices = idpd.getAssertionIDRequestService();
-                roled = idpd;
+                aIDReqServices = idpd.getValue().getAssertionIDRequestService();
+                roled = idpd.getValue();
             } else if (role.equals(SAML2Constants.AUTHN_AUTH_ROLE)) {
                 AuthnAuthorityDescriptorElement attrd =
                     metaManager.getAuthnAuthorityDescriptor(realm,
@@ -513,8 +513,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "authnAuthorityNotFound"));
                 }
-                aIDReqServices = attrd.getAssertionIDRequestService();
-                roled = attrd;
+                aIDReqServices = attrd.getValue().getAssertionIDRequestService();
+                roled = attrd.getValue();
             } else if (role.equals(SAML2Constants.ATTR_AUTH_ROLE)) {
                 AttributeAuthorityDescriptorElement aad =
                     metaManager.getAttributeAuthorityDescriptor(realm,
@@ -523,8 +523,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "attrAuthorityNotFound"));
                 }
-                aIDReqServices = aad.getAssertionIDRequestService();
-                roled = aad;
+                aIDReqServices = aad.getValue().getAssertionIDRequestService();
+                roled = aad.getValue();
             } else {
                 throw new SAML2Exception(SAML2Utils.bundle.getString(
                     "unsupportedRole"));
@@ -549,8 +549,8 @@ public class AssertionIDRequestUtil {
         for(Iterator iter = aIDReqServices.iterator(); iter.hasNext(); ) {
             AssertionIDRequestServiceElement aIDReqService =
                 (AssertionIDRequestServiceElement)iter.next();
-            if (binding.equalsIgnoreCase(aIDReqService.getBinding())) {
-                location.append(aIDReqService.getLocation());
+            if (binding.equalsIgnoreCase(aIDReqService.getValue().getBinding())) {
+                location.append(aIDReqService.getValue().getLocation());
                 break;
             }
         }
@@ -603,7 +603,7 @@ public class AssertionIDRequestUtil {
                 "assertionIDRequestIssuerNotFound"));
         }
 
-        Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODesc, requestedEntityID,
+        Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), requestedEntityID,
                 SAML2Constants.SP_ROLE);
 
         if (!verificationCerts.isEmpty()) {
@@ -653,13 +653,13 @@ public class AssertionIDRequestUtil {
         try {
             if (role.equals(SAML2Constants.IDP_ROLE)) {
                 config = metaManager.getIDPSSOConfig(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             } else if (role.equals(SAML2Constants.AUTHN_AUTH_ROLE)) {
                 config = metaManager.getAuthnAuthorityConfig(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             } else if (role.equals(SAML2Constants.ATTR_AUTH_ROLE)) {
                 config = metaManager.getAttributeAuthorityConfig(realm,
-                    samlAuthorityEntityID);
+                    samlAuthorityEntityID).getValue();
             }
         } catch (SAML2MetaException sme) {
             if (SAML2Utils.debug.messageEnabled()) {

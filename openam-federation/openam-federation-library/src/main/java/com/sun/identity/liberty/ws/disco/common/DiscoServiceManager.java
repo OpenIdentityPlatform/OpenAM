@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.liberty.ws.disco.common;
 
@@ -39,7 +40,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper;

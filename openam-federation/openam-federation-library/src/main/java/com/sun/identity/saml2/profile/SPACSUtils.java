@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -392,7 +392,7 @@ public class SPACSUtils {
             IDPSSOConfigElement config = null;
             config = sm.getIDPSSOConfig(orgName, idpEntityID);
             location = SAML2Utils.fillInBasicAuthInfo(
-                config, location);
+                config.getValue(), location);
             resMsg = con.call(msg, location);
         } catch (SAML2Exception s2e) {
             SAML2Utils.debug.error("SPACSUtils.getResponseFromArtifact: "
@@ -496,7 +496,7 @@ public class SPACSUtils {
                 throws SAML2Exception,IOException
     {
         // find the artifact resolution service url
-        List arsList=idp.getArtifactResolutionService();
+        List arsList=idp.getValue().getArtifactResolutionService();
         ArtifactResolutionServiceElement ars = null;
         String location = null;
         String defaultLocation = null;
@@ -505,10 +505,10 @@ public class SPACSUtils {
         boolean isDefault = false;
         for (int i=0; i<arsList.size(); i++) {
             ars = (ArtifactResolutionServiceElement)arsList.get(i);
-            location = ars.getLocation();
+            location = ars.getValue().getLocation();
             //String binding = ars.getBinding();
-            index = ars.getIndex();
-            isDefault = ars.isIsDefault();
+            index = ars.getValue().getIndex();
+            isDefault = ars.getValue().isIsDefault();
             if (index == endpointIndex) {
                 break;
             }
@@ -627,7 +627,7 @@ public class SPACSUtils {
                                 sm,
                                 SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
         if (wantArtiRespSigned != null && wantArtiRespSigned.equals("true")) {
-            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp, idpEntityID,
+            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp.getValue(), idpEntityID,
                     SAML2Constants.IDP_ROLE);
             if (!artiResp.isSigned() || !artiResp.isSignatureValid(verificationCerts)) {
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -834,7 +834,7 @@ public class SPACSUtils {
             throw se;
         }
 
-        Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc, idpEntityID, SAML2Constants.IDP_ROLE);
+        Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc.getValue(), idpEntityID, SAML2Constants.IDP_ROLE);
         List assertions = resp.getAssertion();
         if ((assertions != null) && (!assertions.isEmpty())) {
             for(Iterator iter = assertions.iterator(); iter.hasNext(); ) {
@@ -1055,7 +1055,7 @@ public class SPACSUtils {
         boolean needAttributeEncrypted = getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
         boolean needNameIDEncrypted = getNeedNameIDEncrypted(needAssertionEncrypted, spssoconfig);
 
-        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
         if (needNameIDEncrypted && encId == null) {
             SAML2Utils.debug.error(classMethod +
                                    "process: NameID was not encrypted.");
@@ -1096,7 +1096,7 @@ public class SPACSUtils {
         }
         String nameIDFormat = nameId.getFormat();
         if (nameIDFormat != null) {
-            List spNameIDFormatList = spDesc.getNameIDFormat();
+            List spNameIDFormatList = spDesc.getValue().getNameIDFormat();
 
             if ((spNameIDFormatList != null) && (!spNameIDFormatList.isEmpty())
                 && (!spNameIDFormatList.contains(nameIDFormat))) {
@@ -1815,7 +1815,7 @@ public class SPACSUtils {
             if (config == null) {
                 return null;
             }
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
             List value = (List) attrs.get(attrName);
             if (value != null && value.size() != 0) {
                 result = ((String) value.iterator().next()).trim();
@@ -2076,7 +2076,7 @@ public class SPACSUtils {
 
         final EncryptedID encId = assertionSubject.getEncryptedID();
         final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spEntityId);
-        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
         final SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, spEntityId);
 
         boolean needNameIDEncrypted = false;
@@ -2111,7 +2111,7 @@ public class SPACSUtils {
         final String nameIDFormat = nameId.getFormat();
 
         if (nameIDFormat != null) {
-            List spNameIDFormatList = spDesc.getNameIDFormat();
+            List spNameIDFormatList = spDesc.getValue().getNameIDFormat();
 
             if (CollectionUtils.isNotEmpty(spNameIDFormatList) && !spNameIDFormatList.contains(nameIDFormat)) {
                 Object[] args = {nameIDFormat};

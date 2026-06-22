@@ -23,22 +23,26 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: WSFederationCOTUtils.java,v 1.5 2009/10/28 23:58:59 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 
 package com.sun.identity.wsfederation.meta;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Iterator;
 import java.util.List;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
+import jakarta.xml.bind.JAXBElement;
 
 /**
  * <code>WSFederationCOTUtils</code> provides utility methods to update
@@ -93,44 +97,44 @@ public class WSFederationCOTUtils {
         FederationConfigElement eConfig = 
             metaManager.getEntityConfig(realm, entityId);
         if (eConfig == null) {
-            BaseConfigType bctype = null;
+            JAXBElement<BaseConfigType> bctype = null;
             AttributeType atype = objFactory.createAttributeType();
             atype.setName(SAML2Constants.COT_LIST);
             atype.getValue().add(name);
             // add to eConfig
             FederationConfigElement ele = 
-                objFactory.createFederationConfigElement();
-            ele.setFederationID(entityId);
-            ele.setHosted(false);
-            List ll =
-                    ele.getIDPSSOConfigOrSPSSOConfig();
+                objFactory.createFederationConfigElement(objFactory.createFederationConfigType());
+            ele.getValue().setFederationID(entityId);
+            ele.getValue().setHosted(false);
+            List<JAXBElement<BaseConfigType>> ll =
+                    ele.getValue().getIDPSSOConfigOrSPSSOConfig();
             // Decide which role EntityDescriptorElement includes
             // Right now, it is either an SP or an IdP
             // IdP will have UriNamedClaimTypesOffered
             if (metaManager.getUriNamedClaimTypesOffered(edes) != 
                 null) {
-                bctype = objFactory.createIDPSSOConfigElement();
-                bctype.getAttribute().add(atype);
+                bctype = objFactory.createIDPSSOConfigElement(new BaseConfigType() {});
+                bctype.getValue().getAttribute().add(objFactory.createAttributeElement(atype));
                 ll.add(bctype);
             } else {
-                bctype = objFactory.createSPSSOConfigElement();
-                bctype.getAttribute().add(atype);
+                bctype = objFactory.createSPSSOConfigElement(new BaseConfigType() {});
+                bctype.getValue().getAttribute().add(objFactory.createAttributeElement(atype));
                 ll.add(bctype);
             }
             metaManager.setEntityConfig(realm,ele);
         } else {
-            List elist = eConfig.
+            List<JAXBElement<BaseConfigType>> elist = eConfig.getValue().
                     getIDPSSOConfigOrSPSSOConfig();
-            for (Iterator iter = elist.iterator(); iter.hasNext();) {
-                BaseConfigType bConfig = (BaseConfigType)iter.next();
-                List list = bConfig.getAttribute();
+            for (Iterator<JAXBElement<BaseConfigType>> iter = elist.iterator(); iter.hasNext();) {
+                BaseConfigType bConfig = iter.next().getValue();
+                List<AttributeElement> list = bConfig.getAttribute();
                 boolean foundCOT = false;
-                for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                    AttributeType avp = (AttributeType)iter2.next();
+                for (Iterator<AttributeElement> iter2 = list.iterator(); iter2.hasNext();) {
+                    AttributeType avp = iter2.next().getValue();
                     if (avp.getName().trim().equalsIgnoreCase(
                             SAML2Constants.COT_LIST)) {
                         foundCOT = true;
-                        List avpl = avp.getValue();
+                        List<String> avpl = avp.getValue();
                         if (avpl.isEmpty() ||!containsValue(avpl,name)) {
                             avpl.add(name);
                             metaManager.setEntityConfig(realm,
@@ -141,9 +145,9 @@ public class WSFederationCOTUtils {
                 }
                 // no cot_list in the original entity config
                 if (!foundCOT) {
-                    AttributeType atype = objFactory.createAttributeType();
-                    atype.setName(SAML2Constants.COT_LIST);
-                    atype.getValue().add(name);
+                    AttributeElement atype = objFactory.createAttributeElement(objFactory.createAttributeType());
+                    atype.getValue().setName(SAML2Constants.COT_LIST);
+                    atype.getValue().getValue().add(name);
                     list.add(atype);
                     metaManager.setEntityConfig(realm, eConfig);
                 }
@@ -193,13 +197,13 @@ public class WSFederationCOTUtils {
         FederationConfigElement eConfig = 
             metaManager.getEntityConfig(realm, entityId);
         if (eConfig != null) {
-            List elist = eConfig.
+            List<JAXBElement<BaseConfigType>> elist = eConfig.getValue().
                     getIDPSSOConfigOrSPSSOConfig();
-            for (Iterator iter = elist.iterator(); iter.hasNext();) {
-                BaseConfigType bConfig = (BaseConfigType)iter.next();
-                List list = bConfig.getAttribute();
-                for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                    AttributeType avp = (AttributeType)iter2.next();
+            for (Iterator<JAXBElement<BaseConfigType>> iter = elist.iterator(); iter.hasNext();) {
+                BaseConfigType bConfig = iter.next().getValue();
+                List<AttributeElement> list = bConfig.getAttribute();
+                for (Iterator<AttributeElement> iter2 = list.iterator(); iter2.hasNext();) {
+                    AttributeType avp = iter2.next().getValue();
                     if (avp.getName().trim().equalsIgnoreCase(
                             SAML2Constants.COT_LIST)) {
                         List avpl = avp.getValue();

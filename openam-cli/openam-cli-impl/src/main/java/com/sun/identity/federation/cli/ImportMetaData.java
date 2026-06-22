@@ -25,6 +25,7 @@
  * $Id: ImportMetaData.java,v 1.15 2009/10/29 00:03:50 exu Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.federation.cli;
 
@@ -62,7 +63,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
+import java.util.stream.Collectors;
+
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -185,9 +189,10 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.isHosted()) {
-                    List<BaseConfigType> config = configElt.
-                       getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                if (configElt != null && configElt.getValue().isHosted()) {
+                    List<BaseConfigType> config = configElt.getValue().
+                       getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig()
+                            .stream().map(JAXBElement::getValue).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(config)) {
                         realm = SAML2MetaUtils.getRealmByMetaAlias(config.get(0).getMetaAlias());
                         newMetaAliases = getMetaAliases(config);
@@ -256,18 +261,18 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if ((configElt != null) && configElt.isHosted()) {
+                if ((configElt != null) && configElt.getValue().isHosted()) {
                     IDPDescriptorConfigElement idpConfig =
                         IDFFMetaUtils.getIDPDescriptorConfig(configElt);
                     if (idpConfig != null) {
                         realm = SAML2MetaUtils.getRealmByMetaAlias(
-                            idpConfig.getMetaAlias());
+                            idpConfig.getValue().getMetaAlias());
                     } else {
                         SPDescriptorConfigElement spConfig =
                             IDFFMetaUtils.getSPDescriptorConfig(configElt);
                         if (spConfig != null) {
                             realm = SAML2MetaUtils.getRealmByMetaAlias(
-                                spConfig.getMetaAlias());
+                                spConfig.getValue().getMetaAlias());
                         }
                     }
                 }
@@ -316,9 +321,10 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.isHosted()) {
+                if (configElt != null && configElt.getValue().isHosted()) {
                     List<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType> config =
-                            configElt.getIDPSSOConfigOrSPSSOConfig();
+                            configElt.getValue().getIDPSSOConfigOrSPSSOConfig()
+                                    .stream().map(JAXBElement::getValue).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(config)) {
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(config.get(0).getMetaAlias());
                         newMetaAliases = getMetaAliasesWsFed(config);
@@ -454,7 +460,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                     descriptor =
                  (com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement)
                     obj;
-                entityID = descriptor.getProviderID();
+                entityID = descriptor.getValue().getProviderID();
                 //TODO: signature
                 //SAML2MetaSecurityUtils.verifySignature(doc);
                 //
@@ -514,14 +520,14 @@ public class ImportMetaData extends AuthenticatedCommand {
             if (obj instanceof com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement) {
                 // Just get the first element for now...
                 // TODO - loop through Federation elements?
-                obj = ((com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement)obj).getAny().get(0);
+                obj = ((com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement)obj).getValue().getAny().get(0);
             }
 
             if (obj instanceof com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement) {
                 com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 federation =
                 (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)obj;
-                federationID = federation.getFederationID();
+                federationID = federation.getValue().getFederationID();
                 if ( federationID == null )
                 {
                     federationID = WSFederationConstants.DEFAULT_FEDERATION_ID;
