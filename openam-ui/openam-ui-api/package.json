@@ -16,6 +16,7 @@
     "swagger-ui-dist": ">=5.29.0"
   },
   "overrides": {
+    "js-yaml": "^4.2.0",
     "grunt": {
       "lodash": "$lodash"
     }
