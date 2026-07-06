@@ -63,7 +63,9 @@ Base/framework classes — `openam-core/src/main/java/com/sun/identity/config/ut
   `AMSetupServlet.isConfigured()` is true (the only access control — pre-config bootstrap UI).
 - `TemplatedPage.java` — abstract templated-page base.
 - `TemplatedForm.java` — **the only class importing REAL Apache Click**
-  (`org.apache.click.control.Field` / `Form`); `extends` Click `Form`.
+  (`org.apache.click.control.Field` / `Form`); `extends` Click `Form`. **Dead code** — referenced
+  nowhere but itself, so it can be deleted immediately (removes the last real-`org.apache.click`
+  import from consumer code; the upstream jars then linger only for the fork).
 
 Wizard pages — `openam-core/src/main/java/com/sun/identity/config/wizard/` (extend `ProtectedPage`):
 - `Wizard.java` — the "execute" controller. `createConfig()` aggregates all session data from every
@@ -95,9 +97,19 @@ Upgrade page — `openam-upgrade/src/main/java/com/sun/identity/config/upgrade/U
 - `config/wizard/wizard.htm` (the JS tab shell) + `config/wizard/step1..step7.htm`
 
 Template idioms to port: `$page.getLocalizedString("k")`, `$context` (context path),
-`$path` (page path), `$startingTab`. Templates embed **YUI** JS and drive AJAX field validation
-against `$context$path?actionLink=<name>`, expecting either plain text or the JSON contract
-`{"valid":.., "body":..}`.
+`$path` (page path), `$startingTab`, plus per-page vars injected via Click's **public-field
+exposure** (`$configStoreHost`, `$type`, `$store`, `$selectEmbedded`, …). Templates embed **YUI** JS
+and drive AJAX field validation against `$context$path?actionLink=<name>` (the step posts back to its
+own URL).
+
+**Response contract (verified):** most handlers return **plain text** (`"true"`/`"ok"`/localized
+error string), read by the templates as `response.responseText == "true"`. The
+`{"valid":.., "body":..}` JSON template (`AjaxPage.java:80`) is essentially **unused** by these
+pages. The one structured response is Step 3's `validateHostName`, which returns a **bespoke** JSON
+shape (`{code, existingPort, embedded, replication, replicationPort, existingStoreHost,
+existingStorePort, message}`) parsed via `eval(...)`. Each handler's exact output bytes must be
+preserved. Note: `step1.htm` calls the **base-class `checkPasswords`** handler (plain text), *not*
+`Step1`'s own `checkAdminPassword`/`checkAgentPassword` `ActionLink`s, which no template references.
 
 ## Configuration & servlet wiring
 

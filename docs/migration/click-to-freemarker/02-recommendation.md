@@ -44,6 +44,18 @@ AJAX-validation architecture and all backend coupling intact.
 
 ## Delivery strategy
 
-Incremental, de-risked: **pilot one wizard step end-to-end on a parallel route** (nothing existing
-breaks), verify, lock the repeatable pattern, then roll out the remaining pages and remove Click.
-See `03-migration-plan.md`.
+Incremental, de-risked, and **URL-preserving** — two firm constraints drive the sequencing:
+
+- **Every servlet path is kept byte-for-byte.** Rather than a new route, a single wrapper servlet
+  (`ConfiguratorServlet`) takes over the `*.htm` mapping and routes each request by a migrated-page
+  registry: migrated → FreeMarker, otherwise → **delegate to the untouched Click fork via a named
+  `RequestDispatcher`** (which preserves the request path). The wizard shell JS, self-posting
+  `actionLink` AJAX, and `AMSetupFilter` URL constants all keep working unchanged, and migrating a
+  page is a Java-only change (one registry entry — no per-page `web.xml` edits).
+- **One page off Click at a time — no one-shot cutover.** Pages migrate individually; after each the
+  reactor builds green and the wizard runs with Click and FreeMarker side by side. The fork, the
+  upstream jars, and `click.xml` are deleted only in the final increment.
+
+Pilot `Step1` end-to-end (builds the shared servlet/base/FreeMarker infra), verify, lock the
+repeatable per-page pattern, then work through the remaining pages and remove Click last. See
+`03-migration-plan.md`.
