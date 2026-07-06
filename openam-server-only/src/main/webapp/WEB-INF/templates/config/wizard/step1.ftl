@@ -8,10 +8,10 @@
             $('adminPasswordStatus').innerHTML = errorImage +
                 '<small>' + response.responseText + '</small>';
             $('nextTabButton').disabled = true;
-	}     
+	}
     }
-        
-    function validateAdminPasswords() {        
+
+    function validateAdminPasswords() {
         var link = "?actionLink=checkPasswords";
         var cValue = "confirm=" + encodeURIComponent($('adminConfirm').value);
         var aValue = "&password=" + encodeURIComponent($('adminPassword').value);
@@ -21,9 +21,9 @@
         var iefix = "&ie7fix=" + ie7fix;
         field = "adminPassword";
 
-        AjaxUtils.doPost(null, "$context$path" + link + iefix,
+        AjaxUtils.doPost(null, "${context}${path}" + link + iefix,
             cValue + aValue + oValue + type, adminPasswordResponse, null, null);
-    } 
+    }
 
     function initStep1() {
         $('nextTabButton').disabled = true;
@@ -32,23 +32,23 @@
 </script>
 
 <div style="margin-left:10px;">
-    <h1>$page.getLocalizedString("step1.title")<img class="pointer" src="$context/assets/images/message.gif"/></h1>
-    <p>$page.getLocalizedString("step1.description")</p>
-    
+    <h1>${page.getLocalizedString('step1.title')}<img class="pointer" src="${context}/assets/images/message.gif"/></h1>
+    <p>${page.getLocalizedString('step1.description')}</p>
+
     <div class="summaryPanel" style="width:610px">
-        <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+        <p id="allfields"><em>*</em>&nbsp;${page.getLocalizedString('required.field.label')}</p>
       <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
-      <div class="headerBox">$page.getLocalizedString("step1.subtitle")</div>
+      <div class="headerBox">${page.getLocalizedString('step1.subtitle')}</div>
         <div class="bodyBox"  style="height:180px">
             <span>
                 <table class="temp">
                     <tr>
-                    <td colspan="2"><b>$page.getLocalizedString("step1.admin.user.name")</b></td></tr>
+                    <td colspan="2"><b>${page.getLocalizedString('step1.admin.user.name')}</b></td></tr>
                     <tr>
-                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")</td>
+                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('password.label')}</td>
                         <td>
-                            <input id="adminPassword" name="adminPassword" 
-                                   type="password" value="" 
+                            <input id="adminPassword" name="adminPassword"
+                                   type="password" value=""
                                    width="40" class="text"
                                    onkeyup="APP.callDelayed(this,validateAdminPasswords)"
                                    onchange="APP.callDelayed(this,validateAdminPasswords)" >
@@ -56,16 +56,16 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")</td>
+                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('confirm.label')}</td>
                         <td>
-                            <input id="adminConfirm" name="adminConfirm" 
-                                   type="password" value="" 
-                                   width="40" class="text" 
+                            <input id="adminConfirm" name="adminConfirm"
+                                   type="password" value=""
+                                   width="40" class="text"
                                    onkeyup="APP.callDelayed(this,validateAdminPasswords)"
-                                   onchange="APP.callDelayed(this,validateAdminPasswords)">                            
+                                   onchange="APP.callDelayed(this,validateAdminPasswords)">
                         </td>
                     </tr>
-                </table>   
+                </table>
             </span>
         </div>
         <b class="xbottom"><b class="xbGray1"></b><b class="xbGray2"></b><b class="xbGray3"></b><b class="xbGray4"></b></b>

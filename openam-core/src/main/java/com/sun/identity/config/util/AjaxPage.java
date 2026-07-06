@@ -30,14 +30,10 @@
 
 package com.sun.identity.config.util;
 
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
-
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 
@@ -49,21 +45,15 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.openidentityplatform.openam.click.Page;
 import org.openidentityplatform.openam.click.control.ActionLink;
-import org.forgerock.openam.ldap.LDAPRequests;
+import org.openidentityplatform.openam.config.servlet.SetupUtils;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
-import org.forgerock.util.Options;
-import org.forgerock.util.time.Duration;
 
 public abstract class AjaxPage extends Page {
 
@@ -77,10 +67,8 @@ public abstract class AjaxPage extends Page {
         new ActionLink("resetSessionAttributes", this,
         "resetSessionAttributes");
     
-    public static final String RESPONSE_TEMPLATE = "{\"valid\":\"${valid}\", \"body\":\"${body}\"}";
     public static final String OLD_RESPONSE_TEMPLATE = "{\"isValid\":${isValid}, \"errorMessage\":\"${errorMessage}\"}";
-   
-    private static int MIN_PASSWORD_SIZE = 8;
+
     private boolean rendering = false;
     private String hostName;
     protected java.util.Locale configLocale = null;
@@ -114,29 +102,11 @@ public abstract class AjaxPage extends Page {
     }
 
     protected boolean toBoolean(String paramName) {
-        String value = toString(paramName);
-        if (value == null) {
-            return false;
-        }
-        if ((value.equalsIgnoreCase("on")) ||
-            (value.equalsIgnoreCase("true")) ||
-            (value.equalsIgnoreCase("yes")) ||
-            (value.equalsIgnoreCase("checked"))) {
-            return true;
-        } else {
-            return false;
-        }
+        return SetupUtils.parseBoolean(toString(paramName));
     }
 
     protected int toInt( String paramName ) {
-        int intValue = 0;
-        String value = toString( paramName );
-        if ( value != null ) {
-            try {
-                intValue = Integer.parseInt( value );
-            } catch ( NumberFormatException e ) {}
-        }
-        return intValue;
+        return SetupUtils.parseInt(toString(paramName));
     }
 
     protected void writeValid() {
@@ -152,63 +122,24 @@ public abstract class AjaxPage extends Page {
     }
 
     protected void writeJsonResponse(String valid, String responseBody) {
-        String response = RESPONSE_TEMPLATE;
-        response = response.replaceFirst("\\$\\{" + "valid" +  "\\}", valid);
-        response = response.replaceFirst("\\$\\{" + "body" +  "\\}", responseBody);
-        writeToResponse(response);
+        writeToResponse(SetupUtils.jsonResponse(valid, responseBody));
     }
     protected void writeJsonResponse(boolean valid, String responseBody) {
-        String response = RESPONSE_TEMPLATE;
-        response = response.replaceFirst("\\$\\{" + "valid" +  "\\}", String.valueOf(valid));
-        response = response.replaceFirst("\\$\\{" + "body" +  "\\}", responseBody);
-        writeToResponse(response);
+        writeToResponse(SetupUtils.jsonResponse(valid, responseBody));
     }
 
     protected Connection getConnection(String host, int port, String bindDN, char[] bindPwd, int timeout, boolean isSSl)
             throws GeneralSecurityException, LdapException {
-        Options ldapOptions = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long)timeout, TimeUnit.SECONDS))
-                .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDN, bindPwd));
-
-        if (isSSl) {
-            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
-            ldapOptions = ldapOptions.set(SSL_CONTEXT,
-                    new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
-        }
-
-        ConnectionFactory factory = new LDAPConnectionFactory(host, port, ldapOptions);
-        return factory.getConnection();
+        return SetupUtils.getConnection(host, port, bindDN, bindPwd, timeout, isSSl);
     }
 
     protected boolean writeErrorToResponse(ResultCode resultCode) {
-        String msg = getMessage(resultCode);
+        String msg = SetupUtils.getMessage(resultCode);
         if (msg != null) {
             writeToResponse(getLocalizedString(msg));
             return true;
         }
         return false;
-    }
-
-    private String getMessage(ResultCode resultCode) {
-        if (ResultCode.CLIENT_SIDE_CONNECT_ERROR.equals(resultCode)) {
-            return "ldap.connect.error";
-        } else if (ResultCode.CLIENT_SIDE_SERVER_DOWN.equals(resultCode)) {
-            return "ldap.server.down";
-        } else if (ResultCode.INVALID_DN_SYNTAX.equals(resultCode)) {
-            return "ldap.invalid.dn";
-        } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
-            return "ldap.nosuch.object";
-        } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
-            return "ldap.invalid.credentials";
-        } else if (ResultCode.UNWILLING_TO_PERFORM.equals(resultCode)) {
-            return "ldap.unwilling";
-        } else if (ResultCode.INAPPROPRIATE_AUTHENTICATION.equals(resultCode)) {
-            return "ldap.inappropriate";
-        } else if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
-            return "ldap.constraint";
-        } else {
-            return null;
-        }
     }
 
     protected void writeToResponse( String text ) {
@@ -384,11 +315,11 @@ public abstract class AjaxPage extends Page {
         
         if (password == null) {
             responseString = getLocalizedString("missing.password");
-        } else if (password.length() < MIN_PASSWORD_SIZE) {
+        } else if (password.length() < SetupUtils.MIN_PASSWORD_SIZE) {
             responseString = getLocalizedString("password.size.invalid");
         } else if (confirm == null) {
             responseString = getLocalizedString("missing.confirm.password");
-        } else if (confirm.length() < MIN_PASSWORD_SIZE) {
+        } else if (confirm.length() < SetupUtils.MIN_PASSWORD_SIZE) {
             responseString = getLocalizedString("password.size.invalid");
         } else if (!password.equals(confirm)) {
             responseString = getLocalizedString("password.dont.match");

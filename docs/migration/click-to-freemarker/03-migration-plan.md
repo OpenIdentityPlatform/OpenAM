@@ -74,7 +74,7 @@ served by FreeMarker is indistinguishable to the shell from one served by Click.
 
 ## Shared infrastructure (built once, in the pilot increment)
 
-New code in `openam-core`, package `com.sun.identity.config.servlet`:
+New code in `openam-core`, package `org.openidentityplatform.openam.config.servlet`:
 
 - **`ConfiguratorServlet`** (`jakarta.servlet.HttpServlet`) — the wrapper/dispatcher, **mapped to
   `*.htm`**. For each request:
