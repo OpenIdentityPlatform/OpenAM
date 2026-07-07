@@ -5,7 +5,7 @@
             //convenient alias:
             var $ = YAHOO.util.Dom.get;
 
-            var startingTab = $startingTab; //determined by Click Wizard.java control based on user cookie
+            var startingTab = ${startingTab}; //determined by Wizard.java based on user cookie
 
             var currentTab = startingTab;
             var previousTab = 1;
@@ -32,7 +32,7 @@
             var field = "";
 
             function validate() {
-                var callUrl = "$context$path?actionLink=validateInput";
+                var callUrl = "${context}${path}?actionLink=validateInput";
                 var key = "&key=" + field;
                 var value = "&value=" + encodeURIComponent($(field).value);
                 ie7fix++;
@@ -41,7 +41,7 @@
             }
 
             function validatePost() {
-                var callUrl = "$context$path?actionLink=validateInput";
+                var callUrl = "${context}${path}?actionLink=validateInput";
                 var key = "key=" + field;
                 var value = "&value=" + encodeURIComponent($(field).value);
                 ie7fix++;
@@ -51,14 +51,14 @@
             }
 
             function fieldValidated(response) {
-                if (response.responseText == "true") { 
+                if (response.responseText == "true") {
                     eval(field + "Valid = true;" );
                     $(field + 'Status').innerHTML = okString;
                 } else {
                     eval(field + "Valid = false;" );
                     $(field + 'Status').innerHTML = errorImage +
                         '<small>' + response.responseText + '</small>';
-                }                
+                }
                 field = "";
             }
 
@@ -89,7 +89,7 @@
             }
 
             // helper function - do not call directly.
-            // change the references from tab6 to tab5 if skipping agent 
+            // change the references from tab6 to tab5 if skipping agent
             function _tabLoaded( tabNum ) {
                 $('wizardStep' + currentTab).style.display = "none";
                 $('wizardStep' + tabNum).style.display = "";
@@ -117,7 +117,7 @@
                 tabNum = rangeCheck(tabNum);
                 var callback = new Function( _tabLoaded( tabNum ) );
                 var tab = 'wizardStep' + tabNum;
-                var url = "$context/config/wizard/step" + tabNum + ".htm?" + getLocale();
+                var url = "${context}/config/wizard/step" + tabNum + ".htm?" + getLocale();
                 AjaxUtils.load(tab, url, callback);
             }
 
@@ -154,29 +154,29 @@
                 YAHOO.sun.identity.config.options.wizard.pushConfigDialog.hide();
                 YAHOO.sun.identity.config.options.wizard.pushingConfig.show();
                 ie7fix++;
-                AjaxUtils.call( "$context$path?actionLink=pushConfig&ie7fix=" + ie7fix,
+                AjaxUtils.call( "${context}${path}?actionLink=pushConfig&ie7fix=" + ie7fix,
                     onPushNewInstanceConfigResponse );
             }
             function cancelPushNewInstanceConfig() {
-                document.location = "$context/commonTasks.htm";
+                document.location = "${context}/commonTasks.htm";
             }
 
             function writeConfigurationAsync() {
                 ie7fix++;
-                AjaxUtils.call("$context$path?actionLink=createConfig&ie7fix=" + ie7fix,
+                AjaxUtils.call("${context}${path}?actionLink=createConfig&ie7fix=" + ie7fix,
                     writeConfigResponse );
             }
-            
+
             function writeConfiguration() {
             document.getElementById("returnToConfig").style.display = "none";
                 document.getElementById("setupMessage").innerHTML = "";
                 YAHOO.sun.identity.config.options.inProgress.show();
-                
+
                 var fr1 = window.frames['progressIframe'];
                 if ( fr1 ) {
-                    fr1.location = "$context/setup/setSetupProgress";
+                    fr1.location = "${context}/setup/setSetupProgress";
                 }
-                setTimeout('writeConfigurationAsync()', 2000); 
+                setTimeout('writeConfigurationAsync()', 2000);
             }
 
             /* =============================
@@ -244,7 +244,7 @@
             function storeServerValidated( type, response ) {
                 if( response.responseText == "true" ) {
                     eval( type + "StoreHostValid = true;" );
-                    $(type + 'StoreHostStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' + '<small>$page.getLocalizedString("ok.string")</small>';
+                    $(type + 'StoreHostStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' + '<small>${page.getLocalizedString('ok.string')}</small>';
                 } else {
                     eval( type + "StoreHostValid = true;" );
                     $(type + 'StoreHostStatus').innerHTML = response.responseText;
@@ -255,8 +255,8 @@
             function storeBaseDNValidated( type, response ) {
                 if( response.responseText == "true" ) {
                     eval( type + "StoreBaseDNValid = true;" );
-                    $(type + 'StoreBaseDNStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' +
-                                                           '<small>$page.getLocalizedString("ok.string")</small>';
+                    $(type + 'StoreBaseDNStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' +
+                                                           '<small>${page.getLocalizedString('ok.string')}</small>';
                 } else {
                     eval( type + "StoreBaseDNValid = true;" );
                     $(type + 'StoreBaseDNStatus').innerHTML = response.responseText;
@@ -267,8 +267,8 @@
             function storeLoginIdValidated( type, response ) {
                 if( response.responseText == "true" ) {
                     eval( type + "StoreLoginIdValid = true;" );
-                    $(type + 'StoreLoginIdStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' +
-                                                           '<small>$page.getLocalizedString("ok.string")</small>';
+                    $(type + 'StoreLoginIdStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' +
+                                                           '<small>${page.getLocalizedString('ok.string')}</small>';
                 } else {
                     eval( type + "StoreLoginIdValid = true;" );
                     $(type + 'StoreLoginIdStatus').innerHTML = response.responseText;
@@ -279,7 +279,7 @@
             function toPath( type ) {
                 return "/config/wizard/step" + (type == 'config' ? 3 : 4 ) + ".htm";
             }
-       
+
 
             function clearStore( type ) {
                 $(type + 'StoreHost').value = null;
@@ -296,7 +296,7 @@
                 $(type + 'StoreLoginIdStatus').innerHTML = "";
                 eval( type + "StoreLoginIdValid = false;" );
 
-                var callUrl = "$context" + toPath(type) + "?actionLink=clearStore";
+                var callUrl = "${context}" + toPath(type) + "?actionLink=clearStore";
                 ie7fix++;
                 callUrl = callUrl + "&ie7fix=" + ie7fix;
                 AjaxUtils.call( callUrl );
@@ -307,23 +307,23 @@
             }
 
             function wizardAcceptLicense() {
-               YAHOO.util.Dom.addClass('wizard', 'license-accepted'); 
+               YAHOO.util.Dom.addClass('wizard', 'license-accepted');
             }
 
 
             function wizardInit() {
 
-                //YAHOO.util.Dom.removeClass('wizard', 'license-accepted'); 
-                //AjaxUtils.simpleCall("$context/legal-notices/license.html", renderLicenseWizard);
+                //YAHOO.util.Dom.removeClass('wizard', 'license-accepted');
+                //AjaxUtils.simpleCall("${context}/legal-notices/license.html", renderLicenseWizard);
 
                 YAHOO.sun.identity.config.options.wizard.writeConf = new YAHOO.widget.Panel("writeConf", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
                 YAHOO.sun.identity.config.options.wizard.writeConf.setHeader("Writing configuration.  Please wait...");
-                YAHOO.sun.identity.config.options.wizard.writeConf.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+                YAHOO.sun.identity.config.options.wizard.writeConf.setBody('<img src="${context}/assets/images/rel_interstitial_loading.gif" />');
                 YAHOO.sun.identity.config.options.wizard.writeConf.render(document.body);
 
                 YAHOO.sun.identity.config.options.wizard.pushingConfig = new YAHOO.widget.Panel("pushingConfig", { width:"260px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
                 YAHOO.sun.identity.config.options.wizard.pushingConfig.setHeader("Pushing configuration to new instance.  Please wait...");
-                YAHOO.sun.identity.config.options.wizard.pushingConfig.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+                YAHOO.sun.identity.config.options.wizard.pushingConfig.setBody('<img src="${context}/assets/images/rel_interstitial_loading.gif" />');
                 YAHOO.sun.identity.config.options.wizard.pushingConfig.render(document.body);
 
                 YAHOO.sun.identity.config.options.wizard.pushConfigDialog = new YAHOO.widget.SimpleDialog("pushConfigDialog", {
@@ -353,19 +353,19 @@
                 YAHOO.util.Event.addListener("wizardCancelButton", "click", cancelWizard);
 
                 var showCurrentTab = new Function( showTab(currentTab) );
-                AjaxUtils.load('wizardStep' + currentTab, "$context/config/wizard/step" + currentTab + ".htm", showCurrentTab);
+                AjaxUtils.load('wizardStep' + currentTab, "${context}/config/wizard/step" + currentTab + ".htm", showCurrentTab);
             }
             YAHOO.util.Event.onDOMReady(wizardInit);
         </script>
-        <link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
+        <link href="${context}/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
 
         <div id="wizard" style="width:810px;background-color: #FFFFFF" class="wizard">
             <div style="background-color: #FFFFFF;padding:0">
-                <div class="header">$page.getLocalizedString("configurator.main.title")</div>
-                <div id="title" class="summary">$page.getLocalizedString("configurator.custom.title")</div>
+                <div class="header">${page.getLocalizedString('configurator.main.title')}</div>
+                <div id="title" class="summary">${page.getLocalizedString('configurator.custom.title')}</div>
 
                 <div class="license inner-license">
-                    <pre id="wizard-license-message"> </pre> 
+                    <pre id="wizard-license-message"> </pre>
                     <div class="accept-check-container clearfix">
                         <input type="checkbox" onchange="wizardAcceptChecked();" name="wizard-accept-check"  id="wizard-accept-check" >
                         <label for="wizard-accept-check">I accept the license agreement</label>
@@ -375,13 +375,13 @@
                 <div class="summary">
                     <div class="col1">
                         <ol id="tabList" class="tabList" start="1" type="1">
-                            <li id="tab1">$page.getLocalizedString("general.tab")</li>
-                            <li id="tab2">$page.getLocalizedString("server.tab")</li>
-                            <li id="tab3">$page.getLocalizedString("configuration.tab")</li>
-                            <li id="tab4">$page.getLocalizedString("user.tab")</li>
-                            <li id="tab5">$page.getLocalizedString("site.tab")</li>
-                            <li id="tab6">$page.getLocalizedString("agent.tab")</li>
-                            <li id="tab7">$page.getLocalizedString("summary.tab")</li>
+                            <li id="tab1">${page.getLocalizedString('general.tab')}</li>
+                            <li id="tab2">${page.getLocalizedString('server.tab')}</li>
+                            <li id="tab3">${page.getLocalizedString('configuration.tab')}</li>
+                            <li id="tab4">${page.getLocalizedString('user.tab')}</li>
+                            <li id="tab5">${page.getLocalizedString('site.tab')}</li>
+                            <li id="tab6">${page.getLocalizedString('agent.tab')}</li>
+                            <li id="tab7">${page.getLocalizedString('summary.tab')}</li>
                         </ol>
                         &nbsp;
                     </div>
@@ -402,34 +402,34 @@
 
                 <div align="left" style="float:left" class="license">
                     <button id="wizard-accept-license-button" type="button" onclick="wizardAcceptLicense();" class="buttonblue license" disabled>Continue</button>
-                </div>  
-                <div class="col1">&nbsp;</div>  
+                </div>
+                <div class="col1">&nbsp;</div>
 
                 <div align="left" style="float:left" class="summary">
-                    <button id="previousTabButton" type="button" disabled="disabled" class="" onclick="previousWizardTab();">$page.getLocalizedString("previous.button")</button>
-                    <button id="nextTabButton" type="button" onclick="nextWizardTab();" class="buttonblue ">$page.getLocalizedString("next.button")</button>
-                    <button id="writeConfigButton" type="button" style="display:none" onclick="writeConfiguration();" class="buttonblue ">$page.getLocalizedString("create.button")</button>
-               
+                    <button id="previousTabButton" type="button" disabled="disabled" class="" onclick="previousWizardTab();">${page.getLocalizedString('previous.button')}</button>
+                    <button id="nextTabButton" type="button" onclick="nextWizardTab();" class="buttonblue ">${page.getLocalizedString('next.button')}</button>
+                    <button id="writeConfigButton" type="button" style="display:none" onclick="writeConfiguration();" class="buttonblue ">${page.getLocalizedString('create.button')}</button>
+
                 </div>
                 <div align="right">
-                    <button id="wizardCancelButton" type="button" onclick="cancelWizard();">$page.getLocalizedString("cancel.button")</button>
+                    <button id="wizardCancelButton" type="button" onclick="cancelWizard();">${page.getLocalizedString('cancel.button')}</button>
                 </div>
             </div>
             <div id="confComplete" style="visibility:hidden">
-                <div class="header">$page.getLocalizedString("config.complete.title")</div>
+                <div class="header">${page.getLocalizedString('config.complete.title')}</div>
                 <div class="bd">
                     <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
 
                         <br>
-                        <h1>$page.getLocalizedString("config.complete.message")</h1>
+                        <h1>${page.getLocalizedString('config.complete.message')}</h1>
                         <br/>
-                        
+
                         <p align="center" class="blueSmall">
-                            <a class="pointer" href="#" onclick="launchConsole(); return false">$page.getLocalizedString("launch.console")</a>
+                            <a class="pointer" href="#" onclick="launchConsole(); return false">${page.getLocalizedString('launch.console')}</a>
                         </p>
                     </div>
                 </div>
             </div>
-                
+
             </div>
         </div>

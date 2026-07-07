@@ -56,7 +56,10 @@ public abstract class SetupPage {
     private final Map<String, Object> model = new HashMap<>();
     private ConfiguratorContext context;
     private boolean skipRender = false;
-    private java.util.Locale configLocale;
+    // Protected, not private: matches the old AjaxPage's visibility. Wizard.createConfig() (and
+    // DefaultSummary, not yet migrated) read this field directly to stamp the "locale" request
+    // parameter sent to AMSetupServlet.processRequest().
+    protected java.util.Locale configLocale;
     private ResourceBundle rb;
     private String hostName;
 
@@ -227,6 +230,22 @@ public abstract class SetupPage {
 
     protected String getCookieDomain() {
         return getHostName();
+    }
+
+    protected String getHostName(String serverUrl, String defaultHostName) {
+        try {
+            return new java.net.URL(serverUrl).getHost();
+        } catch (java.net.MalformedURLException mue) {
+            return defaultHostName;
+        }
+    }
+
+    protected int getServerPort(String serverUrl, int defaultPort) {
+        try {
+            return new java.net.URL(serverUrl).getPort();
+        } catch (java.net.MalformedURLException mue) {
+            return defaultPort;
+        }
     }
 
     protected String getAvailablePort(int portNumber) {

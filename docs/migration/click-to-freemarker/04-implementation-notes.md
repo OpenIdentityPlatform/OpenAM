@@ -1,8 +1,8 @@
-# Implementation notes: increments 0-4
+# Implementation notes: increments 0-5
 
 Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), Step3 +
-LDAPStoreWizardPage (3), and Step7 (4), worth knowing before increments 5+. Background in
-`02-recommendation.md` / `03-migration-plan.md`.
+LDAPStoreWizardPage (3), Step7 (4), and the wizard shell (5), worth knowing before increments 6+.
+Background in `02-recommendation.md` / `03-migration-plan.md`.
 
 ## FreeMarker's `WebappTemplateLoader` cannot be used (javax vs jakarta)
 
@@ -405,3 +405,122 @@ re-run manually if `step7.ftl`'s var references change.
 `ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
 `step7.htm` (now migrated) to `wizard.htm` (still Click, next up in increment 5) — update this
 again whenever the wizard shell lands.
+
+## Increment 5: the wizard shell (`Wizard.java` + `wizard.ftl`)
+
+The first page constructed from a class whose old Click version relied on **eager instance-field
+initializers** (`private String hostName = getHostName();`, and three `getAvailablePort`-derived
+`public String defaultPort/defaultAdminPort/defaultJmxPort` fields built from it) that themselves
+call `getContext()`. This surfaced a real gap in the wrapper architecture, not just a per-page
+porting detail.
+
+### `getContext()` is not safe in a field initializer or constructor under `ConfiguratorServlet`
+
+Old Click's `Page.getContext()` reads `Context.getThreadLocalContext()`, a `ThreadLocal` that
+`ClickServlet` binds **before** it constructs the page instance (`newPageInstance(...)` runs after
+the thread-local is already set) — so a Click page's field initializers, and even its constructor
+body, can safely call `getContext()`. `ConfiguratorServlet.service()` does the opposite:
+it calls `pageClass.getDeclaredConstructor().newInstance()` **first**, then
+`page.setContext(new ConfiguratorContext(...))` afterwards. Any migrated page whose fields or
+constructor call `getContext()`/`getHostName()`/etc. eagerly will NPE, because `context` is still
+null at that point.
+
+None of Steps 1-7 hit this (none has a field initializer that touches the context). Fix applied
+here: moved the equivalent computation into `Wizard.onInit()`, which `ConfiguratorServlet` always
+calls (right after `onSecurityCheck()` passes) before either render or `?actionLink=` dispatch —
+the same "runs unconditionally on every request" guarantee already established in increment 1's
+`onInit()` note. This preserves the old behavior's actual observable effect: old Click reconstructed
+a fresh (non-stateful — `Wizard` never calls `setStateful(true)`) page per request, so
+`hostName`/`defaultPort`/`defaultAdminPort`/`defaultJmxPort` were recomputed, and fresh sockets
+bound/released via `AMSetupUtils.getFirstUnusedPort`, on **every single request to `wizard.htm`**
+regardless of whether it was a plain GET or an `?actionLink=` call — not just on first load. Moving
+the computation to `onInit()` reproduces exactly that, just later in the call stack than field-init
+time. **If a future page needs eager state that depends on the request/session, put it in
+`onInit()`, never in a field initializer or the constructor.**
+
+### `SetupPage.configLocale` had to become `protected`, not stay `private`
+
+`Wizard.createConfig()`'s last step (`request.addParameter("locale", configLocale.toString())`)
+reads the old `AjaxPage.configLocale` field directly — it was `protected` there, deliberately, for
+subclass access. `SetupPage`'s port of the same field was `private`. `DefaultSummary.java`
+(increment 6, not yet migrated) has the identical `configLocale.toString()` line, so this isn't
+a Wizard-only fix: `SetupPage.configLocale` is now `protected`, matching `AjaxPage`'s original
+visibility exactly. Worth checking for other `protected`-in-`AjaxPage`-but-`private`-in-`SetupPage`
+fields before increment 6 lands, since Options/DefaultSummary are the last consumers of the old
+base class's subclass-visible state.
+
+### `testNewInstanceUrl`/`pushConfig`: `ActionLink`s with no backing method at all — not the same as Step1/Step6's kept-but-unreferenced ones
+
+Old `Wizard.java` declared `testUrlLink`/`pushConfigLink` `ActionLink`s bound by name to
+`testNewInstanceUrl()`/`pushConfig()` — but **neither method exists anywhere in `Wizard.java`**,
+and `git log --follow -p` on the file shows they never did in this repo's history. This is different
+from Step1's `checkAdminPassword`/`checkAgentPassword` or Step6's `checkAgentPassword` (increments 1
+and 2): those methods are real and correct, just not called by any template, so they were kept and
+`@ConfiguratorAction`-annotated for URL parity. Here there is no method to annotate — Click's
+`ActionLink.bindRequestValue()`/`dispatchActionEvent()` would reflectively look up `pushConfig`/
+`testNewInstanceUrl` on `Wizard` via `ClickUtils.invokeListener`, fail with
+`NoSuchMethodException`, and rethrow as a `RuntimeException` ("Exception occurred invoking public
+method"). Confirmed this is also unreachable through the actual UI: `wizard.htm` builds a
+`pushConfigDialog` (`YAHOO.widget.SimpleDialog`) in `wizardInit()` but **never calls `.show()` on
+it anywhere** — grepped the whole `webapp/` tree — so a user can never trigger
+`pushNewInstanceConfig()`, the one JS function that posts `?actionLink=pushConfig`.
+`testNewInstanceUrl` has no caller in the JS at all, commented or otherwise. Net effect: both
+`ActionLink` fields were dropped with no replacement (nothing to port), leaving `createConfig` as
+the sole `@ConfiguratorAction`. Direct-URL invocation of `?actionLink=pushConfig` now 404s instead
+of 500ing — a different failure mode, but both are equally unreachable through the product, so this
+is not a behavior change a real user or the IT suite can observe.
+
+### Two more pre-existing dead fields, left in place
+
+`cookieDomain` (a `private String` field, assigned `null` and never read again — shadowed by an
+unrelated local variable of the same name inside `createConfig()`) and `dataStore` (a `private
+String` field initialized to `SetupConstants.SMS_EMBED_DATASTORE` and never referenced again
+anywhere in the class) are both fully dead, pre-existing this migration. Kept byte-for-byte, same
+"port the bugs/dead code, don't clean up" rule already applied to Step3's `LDAPStore` machinery and
+Step4/Step7's findings.
+
+### `startingTab`'s "user cookie" comment was already stale before this port
+
+`wizard.htm`'s JS comment (`// determined by Click Wizard.java control based on user cookie`)
+doesn't match the actual code: `Wizard.java` has no cookie-reading logic anywhere, `startingTab` is
+a plain `public int startingTab = 1;` field never reassigned except by client-side JS
+(`startNewConfig()` sets the JS-local `startingTab = 2`, which never round-trips back to the
+server). Only the now-actively-wrong framework reference ("Click Wizard.java") was edited out of
+the ported comment in `wizard.ftl`; the "user cookie" claim was left as-is since it predates this
+migration and isn't this increment's job to fix — noted here so it isn't mistaken for a port error.
+
+### `wizard.htm` has zero Velocity control-flow directives
+
+Grepped for `#if`/`#foreach`/`#set`/`#else`/`#end` — none. Only four distinct `$`-prefixed forms
+appear (`$context`, `$path` is absent as a bare token — it's always paired with `$context` as
+`$context$path` — `$startingTab`, `$page.getLocalizedString(...)`), all straight token-map
+substitutions. The simplest template port of the six done so far.
+
+### Test coverage: `createConfig()` itself is not unit-tested, but a real Selenium IT test already covers it end-to-end
+
+`createConfig()` is the wizard's "execute" operation, but its only substantive logic is copying
+session state into request parameters ahead of one direct call to the static
+`AMSetupServlet.processRequest(request, response)`, which performs real configuration writes
+(embedded/external OpenDJ, on-disk config) — out of proportion for an `openam-core` unit test, same
+category of call already made for `AMSetupServlet.isConfigured()` in increment 1. Unlike earlier
+"manual-smoke-only" gaps, this one already has automated e2e coverage:
+`openam-server/.../test/integration/IT_SetupWithOpenDJ.java` is a Cargo-container Selenium test that
+walks all seven wizard tabs via `nextTabButton` and clicks `writeConfigButton`, which is exactly
+`Wizard.createConfig()`'s only trigger path. Worth running that IT suite (not attempted this session
+— it needs a full container deploy, out of scope for the `openam-core`-only build used here) as the
+real verification for this method, rather than adding static-mocking (e.g. PowerMock, already a test
+dependency per increment 1's note) to fake it in a unit test — consistent with not introducing that
+technique anywhere else in this migration so far.
+
+### `wizard.ftl` real-render check
+
+Same module-boundary gap as `step1.ftl`/`step7.ftl` (`.ftl` lives in `openam-server-only`, no test
+tree; `ConfiguratorServlet` lives in `openam-core`). Rendered directly with a throwaway FreeMarker
+2.3.31 harness (real `Configuration` + real `wizard.ftl` from disk, stub `page.getLocalizedString`)
+with `context`/`path`/`startingTab` stubs; confirmed no `InvalidReferenceException` and spot-checked
+that `${context}${path}?actionLink=createConfig` etc. resolve correctly. Not kept as a checked-in
+test, same call as the prior two pages; re-run manually if `wizard.ftl`'s var references change.
+
+`ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
+`wizard.htm` (now migrated) to `options.htm` (still Click, next up in increment 6) — update this
+again whenever `Options.java`/`options.ftl` lands.
