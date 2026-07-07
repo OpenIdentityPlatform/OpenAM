@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.config.wizard.Step1;
 import com.sun.identity.config.wizard.Step2;
+import com.sun.identity.config.wizard.Step3;
 import com.sun.identity.config.wizard.Step4;
 import com.sun.identity.config.wizard.Step5;
 import com.sun.identity.config.wizard.Step6;
@@ -66,6 +67,7 @@ public class ConfiguratorServlet extends HttpServlet {
     static {
         PAGES.put("/config/wizard/step1.htm", Step1.class);
         PAGES.put("/config/wizard/step2.htm", Step2.class);
+        PAGES.put("/config/wizard/step3.htm", Step3.class);
         PAGES.put("/config/wizard/step4.htm", Step4.class);
         PAGES.put("/config/wizard/step5.htm", Step5.class);
         PAGES.put("/config/wizard/step6.htm", Step6.class);

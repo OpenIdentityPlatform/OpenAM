@@ -42,8 +42,8 @@ import com.sun.identity.shared.Constants;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
-import org.openidentityplatform.openam.click.Context;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorContext;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
@@ -52,48 +52,28 @@ import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.ResultCode;
 
 /**
- * Step 3 is for selecting the embedded or external configuration store 
+ * Step 3 is for selecting the embedded or external configuration store
  */
 public class Step3 extends LDAPStoreWizardPage {
 
     public static final String LDAP_STORE_SESSION_KEY =
         "wizardCustomConfigStore";
 
-    public ActionLink validateSMHostLink =
-        new ActionLink("validateSMHost", this, "validateSMHost");
-    public ActionLink validateRootSuffixLink = 
-        new ActionLink("validateRootSuffix", this, "validateRootSuffix");
-    public ActionLink setReplicationLink =
-        new ActionLink("setReplication", this, "setReplication");
-    public ActionLink validateHostNameLink = 
-        new ActionLink("validateHostName", this, "validateHostName");
-    public ActionLink validateConfigStoreHost =
-        new ActionLink("validateConfigStoreHost", this, "validateConfigStoreHost");    
-    public ActionLink setConfigType = 
-        new ActionLink("setConfigType", this, "setConfigType");
-    public ActionLink validateLocalPortLink = 
-        new ActionLink("validateLocalPort", this, "validateLocalPort");
-    public ActionLink validateLocalAdminPortLink =
-        new ActionLink("validateLocalAdminPort", this, "validateLocalAdminPort");
-    public ActionLink validateLocalJmxPortLink =
-        new ActionLink("validateLocalJmxPort", this, "validateLocalJmxPort");
-    public ActionLink validateEncKey =
-        new ActionLink("validateEncKey", this, "validateEncKey");
-    
     private static final String QUOTE = "\"";
     private static final String SEPARATOR = "\" : \"";
     private String localRepPort;
-    
+
     public Step3() {
     }
-    
+
+    @Override
     public void onInit() {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
 
         val = getAttribute("encryptionKey", AMSetupUtils.getRandomString());
         addModel("encryptionKey", val);
-        
+
         val = getAttribute("configStorePort", getAvailablePort(50389));
         addModel("configStorePort", val);
         addModel("localConfigPort", val);
@@ -109,7 +89,7 @@ public class Step3 extends LDAPStoreWizardPage {
         localRepPort = getAttribute("localRepPort", getAvailablePort(58989));
         addModel("localRepPort", localRepPort);
 
-        val = getAttribute("existingPort", getAvailablePort(50389));        
+        val = getAttribute("existingPort", getAvailablePort(50389));
         addModel("existingPort", val);
 
         val = getAttribute("existingRepPort", getAvailablePort(58990));
@@ -117,7 +97,7 @@ public class Step3 extends LDAPStoreWizardPage {
 
         val = getAttribute("configStoreSSL", "SIMPLE");
         addModel("configStoreSSL", val);
-        
+
         if (val.equals("SSL")) {
             addModel("selectConfigStoreSSL", "checked=\"checked\"");
         } else {
@@ -126,10 +106,10 @@ public class Step3 extends LDAPStoreWizardPage {
 
         // initialize the data store type being used
         val = getAttribute(
-            SetupConstants.CONFIG_VAR_DATA_STORE, 
+            SetupConstants.CONFIG_VAR_DATA_STORE,
             SetupConstants.SMS_EMBED_DATASTORE);
         addModel(SetupConstants.CONFIG_VAR_DATA_STORE, val);
-               
+
         if (val.equals(SetupConstants.SMS_EMBED_DATASTORE)) {
             addModel("selectEmbedded", "checked=\"checked\"");
             addModel("selectExternal", "");
@@ -159,8 +139,9 @@ public class Step3 extends LDAPStoreWizardPage {
          }
 
         super.onInit();
-    }       
+    }
 
+    @ConfiguratorAction
     public boolean setConfigType() {
         String type = toString("type");
         if (type.equals("remote")) {
@@ -170,21 +151,34 @@ public class Step3 extends LDAPStoreWizardPage {
             getContext().setSessionAttribute(
                     SessionAttributeNames.CONFIG_STORE_HOST, "localhost");
         }
-        getContext().setSessionAttribute( 
+        getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_VAR_DATA_STORE, type);
+        // NOTE: the old Click ActionLink returned `true` here with no setPath(null), which in the
+        // Click framework would go on to run onGet() + render the full step3 page into this AJAX
+        // response body. ConfiguratorServlet's actionLink dispatch never renders after invoking a
+        // handler (see ConfiguratorServlet.invokeAction), regardless of the method's return value.
+        // The callers (enableRemote/disableRemote in step3.ftl) are fire-and-forget - no callback
+        // reads the response - and Step3.onInit() has no session side effects beyond what is set
+        // above, so skipping that render is behaviorally invisible to the wizard. See
+        // docs/migration/click-to-freemarker/04-implementation-notes.md.
+        skipRender();
         return true;
     }
 
+    @ConfiguratorAction
     public boolean setReplication() {
         String type = toString("multi");
         if (type.equals("enable")) {
             type = SetupConstants.DS_EMP_REPL_FLAG_VAL;
-        } 
+        }
         getContext().setSessionAttribute(
             SessionAttributeNames.DS_EMB_REPL_FLAG, type);
+        // See the NOTE in setConfigType() above - same fire-and-forget, no-render situation.
+        skipRender();
         return true;
     }
 
+    @ConfiguratorAction
     public boolean validateRootSuffix() {
         String rootsuffix = toString("rootSuffix");
         if ((rootsuffix == null) || (rootsuffix.trim().length() == 0)) {
@@ -197,13 +191,13 @@ public class Step3 extends LDAPStoreWizardPage {
             getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX, rootsuffix);
         }
-        setPath(null);
-        return false;    
+        return false;
     }
-    
+
+    @ConfiguratorAction
     public boolean validateLocalPort() {
         String port = toString("port");
-        
+
         if (port == null) {
             writeToResponse(getLocalizedString("missing.required.field"));
         } else {
@@ -243,11 +237,11 @@ public class Step3 extends LDAPStoreWizardPage {
                 writeToResponse(getLocalizedString("invalid.port.number"));
             }
         }
-        setPath(null);        
-        return false;    
+        return false;
     }
 
-        public boolean validateLocalAdminPort() {
+    @ConfiguratorAction
+    public boolean validateLocalAdminPort() {
         String port = toString("port");
 
         if (port == null) {
@@ -289,10 +283,10 @@ public class Step3 extends LDAPStoreWizardPage {
                 writeToResponse(getLocalizedString("invalid.port.number"));
             }
         }
-        setPath(null);
         return false;
     }
 
+    @ConfiguratorAction
     public boolean validateLocalJmxPort() {
         String port = toString("port");
 
@@ -335,7 +329,6 @@ public class Step3 extends LDAPStoreWizardPage {
                 writeToResponse(getLocalizedString("invalid.port.number"));
             }
         }
-        setPath(null);
         return false;
     }
 
@@ -343,6 +336,7 @@ public class Step3 extends LDAPStoreWizardPage {
      * Returns <code>false</code> always. Length of encryption key
      * must be at least 10 chars.
      */
+    @ConfiguratorAction
     public boolean validateEncKey() {
         String key = toString("encKey");
 
@@ -357,16 +351,15 @@ public class Step3 extends LDAPStoreWizardPage {
                 writeToResponse("true");
             }
         }
-        setPath(null);
         return false;
-    } 
+    }
 
+    @ConfiguratorAction
     public boolean validateConfigStoreHost() {
         String host = toString("configStoreHost");
 
         if (host == null) {
             writeToResponse(getLocalizedString("missing.required.field"));
-            setPath(null);
             return false;
         } else {
             getContext().setSessionAttribute("configStoreHost", host);
@@ -378,7 +371,6 @@ public class Step3 extends LDAPStoreWizardPage {
         } catch (UnknownHostException uhe) {
             writeToResponse(getLocalizedString("contact.host.unknown"));
         }
-        setPath(null);
         return false;
     }
 
@@ -386,21 +378,22 @@ public class Step3 extends LDAPStoreWizardPage {
      * a call is made to the OpenAM url entered in the browser. If
      * the OpenAM server
      * exists a <code>Map</code> of data will be returned which contains the
-     * information about the existing servers data store, including any 
+     * information about the existing servers data store, including any
      * replication ports if its embedded.
      * Information to control the UI is returned in a JSON object of the form
-     * { 
-     *   "param1" : "value1", 
+     * {
+     *   "param1" : "value1",
      *   "param2" : "value2"
      * }
      * The JS on the browser will interpret the above and make the necessary
      * changes to prompt the user for any more details required.
      */
+    @ConfiguratorAction
     public boolean validateHostName() {
         StringBuffer sb = new StringBuffer();
         String hostName = toString("hostName");
-        
-        if (hostName == null) {            
+
+        if (hostName == null) {
             addObject(sb, "code", "100");
             addObject(sb, "message",
                 getLocalizedString("missing.required.field"));
@@ -409,18 +402,18 @@ public class Step3 extends LDAPStoreWizardPage {
             String admin = "amadmin";
             String password = (String)getContext().getSessionAttribute(
                 SessionAttributeNames.CONFIG_VAR_ADMIN_PWD);
-            
-            try { 
+
+            try {
                 String dsType;
                 Map data = AMSetupUtils.getRemoteServerInfo(hostName, admin, password);
-                
+
                 // data returned from existing OpenAM server
-                if (data != null && !data.isEmpty()) {                    
+                if (data != null && !data.isEmpty()) {
                     addObject(sb, "code", "100");
                     addObject(sb, "message", getLocalizedString("ok.string"));
-                    
+
                     setupDSParams(data);
-                    
+
                     String key = (String)data.get("enckey");
                     getContext().setSessionAttribute(
                         SessionAttributeNames.ENCRYPTION_KEY, key);
@@ -428,27 +421,27 @@ public class Step3 extends LDAPStoreWizardPage {
                     getContext().setSessionAttribute(
                         SessionAttributeNames.ENCLDAPUSERPASSWD,
                         (String)data.get("ENCLDAPUSERPASSWD"));
-                    
+
                     // true for embedded, false for ODSEE
-                    String embedded = 
+                    String embedded =
                         (String)data.get(BootstrapData.DS_ISEMBEDDED);
-                    addObject(sb, "embedded", embedded);           
+                    addObject(sb, "embedded", embedded);
                     String host = (String)data.get(BootstrapData.DS_HOST);
 
                     if (embedded.equals("true")) {
                         getContext().setSessionAttribute(
                             SessionAttributeNames.CONFIG_STORE_HOST, getHostName());
                         addObject(sb, "configStoreHost", getHostName());
-                        
-                        // set the multi embedded flag 
+
+                        // set the multi embedded flag
                         getContext().setSessionAttribute(
-                            SessionAttributeNames.CONFIG_VAR_DATA_STORE, 
-                            SetupConstants.SMS_EMBED_DATASTORE); 
-                        
+                            SessionAttributeNames.CONFIG_VAR_DATA_STORE,
+                            SetupConstants.SMS_EMBED_DATASTORE);
+
                         getContext().setSessionAttribute(
                             SessionAttributeNames.DS_EMB_REPL_FLAG,
-                            SetupConstants.DS_EMP_REPL_FLAG_VAL); 
-      
+                            SetupConstants.DS_EMP_REPL_FLAG_VAL);
+
                         // get the existing replication ports if any
                         String replAvailable = (String)data.get(
                             BootstrapData.DS_REPLICATIONPORT_AVAILABLE);
@@ -475,10 +468,10 @@ public class Step3 extends LDAPStoreWizardPage {
                             SessionAttributeNames.CONFIG_STORE_PWD, password);
                     } else {
                         getContext().setSessionAttribute(
-                            SessionAttributeNames.CONFIG_STORE_PORT, 
+                            SessionAttributeNames.CONFIG_STORE_PORT,
                             (String)data.get(BootstrapData.DS_PORT));
                         getContext().setSessionAttribute(
-                            SessionAttributeNames.CONFIG_STORE_HOST, host);   
+                            SessionAttributeNames.CONFIG_STORE_HOST, host);
                         addObject(sb, "configStoreHost", host);
 
                         String dsprot = (String)data.get(
@@ -488,7 +481,7 @@ public class Step3 extends LDAPStoreWizardPage {
                         getContext().setSessionAttribute(
                             SessionAttributeNames.CONFIG_STORE_SSL, dsSSL);
                         addObject(sb, "configStoreSSL", dsSSL);
-                        
+
                         String dspwd = (String)data.get(BootstrapData.DS_PWD);
                         getContext().setSessionAttribute(
                             SessionAttributeNames.CONFIG_STORE_PWD,
@@ -509,7 +502,7 @@ public class Step3 extends LDAPStoreWizardPage {
                     getContext().setSessionAttribute(
                             SessionAttributeNames.EXISTING_STORE_PORT, ds_existingStorePort);
                     addObject(sb, "existingStorePort", ds_existingStorePort);
-                    
+
                     getContext().setSessionAttribute(
                         SessionAttributeNames.EXISTING_HOST, host);
 
@@ -542,12 +535,11 @@ public class Step3 extends LDAPStoreWizardPage {
                 addObject(sb, "message", message);
             }
         }
-        sb.append(" }");           
+        sb.append(" }");
         writeToResponse(sb.toString());
-        setPath(null);
         return false;
     }
-        
+
     private void addObject(StringBuffer sb, String key, String value) {
         if (sb.length() < 1) {
             // add first object
@@ -559,16 +551,16 @@ public class Step3 extends LDAPStoreWizardPage {
           .append(key)
           .append(SEPARATOR)
           .append(value)
-          .append(QUOTE);                         
+          .append(QUOTE);
     }
-    
+
     /*
      * the following value have been pulled from an existing OpenAM
-     * server which was configured to use an external DS. We need to set the DS 
+     * server which was configured to use an external DS. We need to set the DS
      * values in the request so they can be used to configure the existing
      * OpenAM server.
      */
-    private void setupDSParams(Map data) {             
+    private void setupDSParams(Map data) {
         String tmp = (String)data.get(BootstrapData.DS_BASE_DN);
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX, tmp);
@@ -576,22 +568,23 @@ public class Step3 extends LDAPStoreWizardPage {
         tmp = (String)data.get(BootstrapData.DS_MGR);
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_LOGIN_ID, tmp);
-        
+
         tmp = (String)data.get(BootstrapData.DS_PWD);
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_PWD, tmp);
-       
+
         getContext().setSessionAttribute(
-            SessionAttributeNames.CONFIG_VAR_DATA_STORE, 
-            SetupConstants.SMS_DS_DATASTORE);    
+            SessionAttributeNames.CONFIG_VAR_DATA_STORE,
+            SetupConstants.SMS_DS_DATASTORE);
     }
 
     /**
      * Validate an Existing SM Host for Configuration Backend.
      * @return
      */
+    @ConfiguratorAction
     public boolean validateSMHost() {
-        Context ctx = getContext();
+        ConfiguratorContext ctx = getContext();
         String strSSL = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_SSL);
         boolean ssl = (strSSL != null) && (strSSL.equals("SSL"));
@@ -656,7 +649,6 @@ public class Step3 extends LDAPStoreWizardPage {
             writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
         }
 
-        setPath(null);
         return false;
     }
 }

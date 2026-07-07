@@ -1,7 +1,8 @@
-# Implementation notes: increments 0, 1 & 2
+# Implementation notes: increments 0-3
 
-Findings from actually building the pilot (0, 1) and the Steps 2/4/5/6 batch (2), worth knowing
-before increments 3+. Background in `02-recommendation.md` / `03-migration-plan.md`.
+Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), and Step3 +
+LDAPStoreWizardPage (3), worth knowing before increments 4+. Background in
+`02-recommendation.md` / `03-migration-plan.md`.
 
 ## FreeMarker's `WebappTemplateLoader` cannot be used (javax vs jakarta)
 
@@ -235,3 +236,88 @@ calling this method from an `openam-core` test throws `ExceptionInInitializerErr
 `validateCookieDomain()`; the manual smoke step (deploy the unconfigured WAR, exercise Step 2 in
 the browser) is the only current coverage for that handler, same category as the still-open
 "real FreeMarker render of `step1.ftl` isn't unit-tested" gap above.
+
+## Increment 3: Step3 + LDAPStoreWizardPage
+
+Step3 is the heaviest page so far (many public-field/session pre-fills, the `LDAPStore` object,
+`clearStore`, the bespoke `validateHostName` JSON shape). It's also the first page with a
+*migrated intermediate base class*: `LDAPStoreWizardPage` sat between `Step3` and the old
+`ProtectedPage`, so it had to be ported too, following the same recipe as `SetupPage` itself
+(`onSecurityCheck()` moved onto `LDAPStoreWizardPage`, not duplicated onto `Step3` — Step3 never
+overrode it in the old code either, it just inherited the check).
+
+### `setConfigType()`/`setReplication()`: old Click `ActionLink`s that returned `true` with no render-skip
+
+Unlike every handler ported in increments 1-2 (which all either call `writeToResponse(...)` — which
+now bakes in `skipRender()` — or explicitly call `setPath(null)`/`skipRender()`), Step3's
+`setConfigType()` and `setReplication()` write **nothing** to the response and return `true` with
+no `setPath(null)` at all. In the old Click framework an `ActionLink` handler returning `true` (and
+never calling `setPath(null)`) tells Click to *continue* normal request processing — i.e. run
+`onGet()` and render the full page template into the same AJAX response.
+`ConfiguratorServlet.invokeAction()` has no equivalent: it invokes the `@ConfiguratorAction` method
+and returns unconditionally, **ignoring the method's boolean return value entirely**. So in the new
+code these two handlers now produce an empty response instead of a full-page render.
+
+Checked whether this is an observable behavior change: both callers
+(`enableRemote`/`disableRemote`/`enableExisting`/`disableExisting` in `step3.ftl`) invoke them via
+`AjaxUtils.call(url)` with **no callback**, i.e. fire-and-forget — nothing on the client ever reads
+the response body either way. And `Step3.onInit()` has no session side effects (only session reads
++ `addModel` calls), so re-running it (as the old full-page render would have done) wouldn't have
+produced any additional session state. Net effect: the missing render is bytes nobody reads, not a
+behavior difference. Ported as plain `skipRender()` + `@ConfiguratorAction`, with a comment at each
+call site pointing back here — **if a future page has this same "return true, no write" shape but
+its `onInit()` *does* have session side effects, that page cannot be ported this simply** and
+`ConfiguratorServlet` would need to grow support for continuing to render on a truthy return.
+
+### `getAvailablePort(int)` added to `SetupPage`
+
+Called out in earlier increments as "add only when the page that needs it migrates" (mirrors the
+`getBaseDir`/`getCookieDomain`/`getHostName`/`getAttribute` additions in increment 2). Step3 is the
+first migrated page that needs it (`configStorePort`/`configStoreAdminPort`/`configStoreJmxPort`/
+`localRepPort`/`existingPort` defaults, plus the `validateSMHost` port fallback). Copied 1:1 from
+`AjaxPage.getAvailablePort(int)`: `Integer.toString(AMSetupUtils.getFirstUnusedPort(getHostName(),
+portNumber, 1000))`.
+
+### Two more pre-existing Velocity-silently-blank template variables, this time in step3.htm
+
+Same `$var`-vs-`addModel` diff recommended by the plan and already used in increment 2's Step4
+port. `step3.htm` references `$existingStoreHost` and `$existingStorePort` in the "existing LDAP"
+section's initial `value="..."` attributes, but **neither key is ever `addModel`-ed by
+`Step3.onInit()` or `LDAPStoreWizardPage.onInit()`**. They're populated only client-side, by JS
+reading the `validateHostName` JSON response (`resp.existingStoreHost`/`resp.existingStorePort`)
+and setting the `<input>` `.value` directly — the server-rendered initial value was always silently
+blank under Velocity. Ported as `${existingStoreHost!""}` / `${existingStorePort!""}`. (By contrast,
+`configStorePassword` *is* `addModel`-ed but never referenced by the template at all — the
+template only reads `$store.password` for that field. Harmless, unused-model-entry case, left
+as-is, not a gap that needs a `!""` default.)
+
+### The `LDAPStore`/`store`/`clearStore`/`LDAP_STORE_SESSION_KEY` machinery looks mostly vestigial
+
+`LDAPStoreWizardPage.save(LDAPStore)` is never called anywhere in the repo (confirmed by grep before
+porting) — the `store` field is populated once per request (`getConfig()`/`ensureConfig()`) and
+handed to the template for the one `$store.password` prefill, but nothing ever writes a populated
+`LDAPStore` back into the `customConfigStore` session key, so that prefill is always blank in
+practice. `Step3.LDAP_STORE_SESSION_KEY = "wizardCustomConfigStore"` is also dead — the session key
+actually used is `LDAPStoreWizardPage`'s own default, `"customConfigStore"` (a different string);
+the constant is never read anywhere. All of this is pre-existing (predates this migration) and
+ported byte-for-byte, including the naming mismatch — not a bug introduced here, and not this
+increment's job to clean up. Worth knowing if a future increment is tempted to "simplify" this
+class: the apparent dead weight is original behavior, not migration residue.
+
+### Increment 3 test coverage gaps (same category as prior increments)
+
+- `validateHostName()`/`validateSMHost()`: require a live remote-server HTTP round trip and a live
+  LDAP connection respectively — same disproportionate-effort call as Step4Test's
+  `validateUMHost`/`validateUMDomainName` skip.
+- `validateLocalPort()`/`validateLocalAdminPort()`/`validateLocalJmxPort()`: the "port not in use"
+  happy path calls `AMSetupUtils.isPortInUse()`, which binds a real `ServerSocket` — environment-
+  dependent. Only the parameter-validation branches and the external-data-store bypass (which
+  short-circuits before ever calling `isPortInUse()`) are unit-tested; the local/embedded
+  port-in-use branch is manual-smoke-only.
+- `validateConfigStoreHost()`'s `UnknownHostException` branch isn't unit-tested — DNS behavior for a
+  deliberately-invalid hostname isn't reliably reproducible across environments/sandboxes. The
+  resolvable-host branch is covered using `localhost` (resolves without real network).
+
+`ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
+`step3.htm` (now migrated) to `step7.htm` (still Click, next up in increment 4) — update this again
+whenever step7 lands.

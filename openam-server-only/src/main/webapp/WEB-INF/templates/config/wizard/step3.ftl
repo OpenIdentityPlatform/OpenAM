@@ -2,19 +2,19 @@
 
     var multiServer = "false";
     var validServerURL = "true";
-    
+
     function configStoreServerValidated( response ) {
-        storeServerValidated( '$type', response );
+        storeServerValidated( '${type}', response );
     }
     function configStoreBaseDNValidated( response ) {
-        storeBaseDNValidated('$type', response );
+        storeBaseDNValidated('${type}', response );
     }
     function configStoreLoginIdValidated( response ) {
-        storeLoginIdValidated( '$type', response );
+        storeLoginIdValidated( '${type}', response );
     }
 
     function validateUserFields(response) {
-        if (response.responseText == "ok") { 
+        if (response.responseText == "ok") {
 	    eval(field + "Valid = true;" );
             $(field + 'Status').innerHTML = okString;
             allValid();
@@ -22,13 +22,13 @@
             eval(field + "Valid = false;" );
             $(field + 'Status').innerHTML = errorImage +
                 '<small>' + response.responseText + '</small>';
-        }                
+        }
         field = "";
     }
 
     function validateAdminPort() {
         field = "configStoreAdminPort";
-        var callUrl = "$context$path?actionLink=validateLocalAdminPort";
+        var callUrl = "${context}${path}?actionLink=validateLocalAdminPort";
         var param = "&port=" + $('configStoreAdminPort').value;
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
@@ -38,7 +38,7 @@
 
     function validateJmxPort() {
         field = "configStoreJmxPort";
-        var callUrl = "$context$path?actionLink=validateLocalJmxPort";
+        var callUrl = "${context}${path}?actionLink=validateLocalJmxPort";
         var param = "&port=" + $('configStoreJmxPort').value;
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
@@ -50,7 +50,7 @@
         $('nextTabButton').disabled = true;
         var value = encodeURIComponent($('encryptionKey').value);
         var callUrl =
-            "$context$path?actionLink=validateEncKey&encKey=" + value;
+            "${context}${path}?actionLink=validateEncKey&encKey=" + value;
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, validateEncKeyResponse);
     }
@@ -67,37 +67,37 @@
     function validateConfigStoreSSL() {
         var value = ($('configStoreSSL').checked) ? "SSL" : "SIMPLE";
         var callUrl =
-            "$context$path?actionLink=validateInput&key=configStoreSSL&value=" +
+            "${context}${path}?actionLink=validateInput&key=configStoreSSL&value=" +
             value;
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, validateConfigSSL);
-    }       
+    }
 
     function validateConfigSSL(response) {
         // no ops
     }
 
     function validateConfigStoreHost() {
-        var call = "$context$path?actionLink=validateConfigStoreHost";
-        var hostname = "&configStoreHost=" + $('configStoreHost').value;        
+        var call = "${context}${path}?actionLink=validateConfigStoreHost";
+        var hostname = "&configStoreHost=" + $('configStoreHost').value;
         $('nextTabButton').disabled = true;
 	    field = "configStoreHost";
         ie7fix++;
         call = call + "&ie7fix=" + ie7fix;
-        AjaxUtils.call(call+hostname, validateSMHost);        
+        AjaxUtils.call(call+hostname, validateSMHost);
     }
 
     function validateConfigStorePort() {
         field = "configStorePort";
-        var callUrl = "$context$path?actionLink=validateLocalPort";
+        var callUrl = "${context}${path}?actionLink=validateLocalPort";
         var param = "&port=" + $('configStorePort').value;
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl+param, validateUserFields);
     }
-    
+
     function validateConfigStoreLoginId() {
         $('nextTabButton').disabled = true;
 	field = "configStoreLoginId";
@@ -116,33 +116,33 @@
         $('nextTabButton').disabled = true;
         ie7fix++;
 	    field = "rootSuffix";
-        var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
+        var callUrl = "${context}${path}?actionLink=validateRootSuffix&ie7fix=" +
             ie7fix + "&rootSuffix=" +  encodeURIComponent($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
     }
 
-    function validateServerURL(response) {        
+    function validateServerURL(response) {
         var resp = eval('('+response.responseText+')');
-        var image = okImage;   
+        var image = okImage;
 
         if (resp.code == "100") {
             // url was a valid OpenAM server
-            validServerURL = true;  
+            validServerURL = true;
 
             document.getElementById("existingPort").disabled = true;
             document.getElementById("existingPort").value = resp.existingPort;
 
             if (resp.embedded == "true") {
-                document.getElementById("replicationPorts").style.display = "";                    
+                document.getElementById("replicationPorts").style.display = "";
                 var message = "";
                 if (resp.replication == "true") {
                     document.getElementById("existingRepPort").disabled = true;
-		    message = '<small>$page.getQuoteEscapedLocalizedString("existing.port.values.replication")</small>';
+		    message = '<small>${page.getQuoteEscapedLocalizedString('existing.port.values.replication')}</small>';
                 } else {
-                    document.getElementById("existingRepPort").disabled = false; 
-		    message='<small>$page.getQuoteEscapedLocalizedString("existing.port.values.noreplication")</small>';
-                }   
+                    document.getElementById("existingRepPort").disabled = false;
+		    message='<small>${page.getQuoteEscapedLocalizedString('existing.port.values.noreplication')}</small>';
+                }
                 document.getElementById("replicationMessage").innerHTML= message;
                 document.getElementById("existingRepPort").value = resp.replicationPort;
             } else {
@@ -159,8 +159,8 @@
 
         } else{
             // error handling
-            validServerURL = false;  
-            image = errorImage;        
+            validServerURL = false;
+            image = errorImage;
             document.getElementById("replicationPorts").style.display = "none";
             document.getElementById("existingLDAP").style.display = "none";
 
@@ -169,10 +169,10 @@
         $('existingHostStatus').innerHTML = image +
             '<small>' + resp.message + '</small>';
     }
-    
+
     function validateHostName() {
-        $('existingHostStatus').innerHTML = '$page.getQuoteEscapedLocalizedString("validating.url.string")';
-        var call = "$context$path?actionLink=validateHostName";
+        $('existingHostStatus').innerHTML = '${page.getQuoteEscapedLocalizedString('validating.url.string')}';
+        var call = "${context}${path}?actionLink=validateHostName";
         var hostname = "&hostName=" + $('existingHost').value;
         $('nextTabButton').disabled = true;
         ie7fix++;
@@ -196,7 +196,7 @@
 
     function validateLocalConfigPort() {
         field = "localConfigPort";
-        var call = "$context$path?actionLink=validateLocalPort";
+        var call = "${context}${path}?actionLink=validateLocalPort";
         var portVal = "&port=" + $('localConfigPort').value;
         ie7fix++;
         call = call + "&ie7fix=" + ie7fix;
@@ -205,7 +205,7 @@
 
     function validateLocalConfigAdminPort() {
         field = "localConfigAdminPort";
-        var call = "$context$path?actionLink=validateLocalAdminPort";
+        var call = "${context}${path}?actionLink=validateLocalAdminPort";
         var portVal = "&port=" + $('localConfigAdminPort').value;
         ie7fix++;
         call = call + "&ie7fix=" + ie7fix;
@@ -214,13 +214,13 @@
 
     function validateLocalConfigJmxPort() {
         field = "localConfigJmxPort";
-        var call = "$context$path?actionLink=validateLocalJmxPort";
+        var call = "${context}${path}?actionLink=validateLocalJmxPort";
         var portVal = "&port=" + $('localConfigJmxPort').value;
         ie7fix++;
         call = call + "&ie7fix=" + ie7fix;
         AjaxUtils.call(call+portVal, localPortResponse);
     }
-    
+
     function validateLocalRepPort() {
         field = "localRepPort";
         validate();
@@ -244,14 +244,14 @@
         $('tab4').style.color = "#D3D3D3";
         $('tab6').style.color = "#D3D3D3";
         nextTab = 5;
-        
+
         document.getElementById("newInstanceOptions").style.display = "none";
         document.getElementById("existingInstanceURL").style.display = "";
         document.getElementById("replicationPorts").style.display = "none";
         document.getElementById("existingLDAP").style.display = "none";
 
         ie7fix++;
-	AjaxUtils.call("$context$path?actionLink=setReplication&multi=enable&ie7fix=" + ie7fix);
+	AjaxUtils.call("${context}${path}?actionLink=setReplication&multi=enable&ie7fix=" + ie7fix);
     }
 
     function disableExisting() {
@@ -262,20 +262,20 @@
         $('tab6').style.color = "";
         $('tab4').style.color = "";
         nextTab = 4;
-        
+
         document.getElementById("newInstanceOptions").style.display = "";
         document.getElementById("existingInstanceURL").style.display = "none";
         document.getElementById("replicationPorts").style.display = "none";
         document.getElementById("existingLDAP").style.display = "none";
 
         ie7fix++;
-	AjaxUtils.call("$context$path?actionLink=setReplication&multi=disable&ie7fix=" + ie7fix);
+	AjaxUtils.call("${context}${path}?actionLink=setReplication&multi=disable&ie7fix=" + ie7fix);
     }
 
     function setExternalFieldsDisplay(display) {
         document.getElementById("login").style.display = display;
         document.getElementById("password").style.display = display;
-        
+
         if (display == "none") {
             document.getElementById("configStoreSSL").disabled = true;
             document.getElementById("configStoreHost").disabled = true;
@@ -306,7 +306,7 @@
         userStore = "external";
         enableNextButton();
         ie7fix++;
-	AjaxUtils.call("$context$path?actionLink=setConfigType&type=remote&ie7fix=" + ie7fix);
+	AjaxUtils.call("${context}${path}?actionLink=setConfigType&type=remote&ie7fix=" + ie7fix);
 	setExternalFieldsDisplay("");
     }
 
@@ -315,24 +315,24 @@
         userStore = "embedded";
         enableNextButton();
         ie7fix++;
-	AjaxUtils.call("$context$path?actionLink=setConfigType&type=embedded&ie7fix=" + ie7fix);
+	AjaxUtils.call("${context}${path}?actionLink=setConfigType&type=embedded&ie7fix=" + ie7fix);
     }
 
     function initConfig() {
-        if ("$DATA_STORE" == 'embedded') {
+        if ("${DATA_STORE}" == 'embedded') {
             disableRemote();
         } else {
             enableRemote();
         }
 
-        if ("$FIRST_INSTANCE" == "1") {
+        if ("${FIRST_INSTANCE}" == "1") {
             enableExisting();
         }
     }
 
     function enableNextButton() {
         if (userStore == "embedded") {
-            $('nextTabButton').disabled = 
+            $('nextTabButton').disabled =
                 !isFieldOK('configStoreHost') ||
                 !isFieldOK('configStorePort') ||
                 !isFieldOK('configStoreAdminPort') ||
@@ -348,7 +348,7 @@
                 (document.getElementById('configStorePassword').value != '');
             if (allFieldsValid) {
                 ie7fix++;
-                AjaxUtils.call("$context$path?actionLink=validateSMHost&ie7fix=" + ie7fix,
+                AjaxUtils.call("${context}${path}?actionLink=validateSMHost&ie7fix=" + ie7fix,
                     validateSMHost);
             } else {
                 $('nextTabButton').disabled = true;
@@ -362,7 +362,7 @@
     }
 
     function validateSMHost(response) {
-        if (response.responseText == "ok") { 
+        if (response.responseText == "ok") {
             $('nextTabButton').disabled = false;
             $('configStoreHostStatusEx').innerHTML = "";
         } else {
@@ -374,7 +374,7 @@
     }
 
     function isFieldOK(field) {
-        var x = $(field + 'Status').innerHTML; 
+        var x = $(field + 'Status').innerHTML;
         return (x == '') || (x.indexOf('ok.jpg') != -1);
     }
 
@@ -382,18 +382,18 @@
 </script>
 
 <div style="margin-left:10px;">
-    <h1>$page.getLocalizedString("step3.title")<img class="pointer" 
-        src="$context/assets/images/message.gif"/></h1>
-    <p>$page.getLocalizedString("step3.description")</p> 
-    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" $selectFirstSetup />
-        $page.getLocalizedString("create.new.instance")
-    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" $selectExistingSetup />
-        $page.getLocalizedString("add.existing.instance")
-       
+    <h1>${page.getLocalizedString('step3.title')}<img class="pointer"
+        src="${context}/assets/images/message.gif"/></h1>
+    <p>${page.getLocalizedString('step3.description')}</p>
+    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" ${selectFirstSetup} />
+        ${page.getLocalizedString('create.new.instance')}
+    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" ${selectExistingSetup} />
+        ${page.getLocalizedString('add.existing.instance')}
+
     <!-- EMBEDDED STORE PROPERTIES -->
     <div id="configStoreProperties" style="width:620px;" >
         <p id="allfields"><em>*</em>&nbsp;
-            $page.getLocalizedString("required.field.label")</p>
+            ${page.getLocalizedString('required.field.label')}</p>
         <b class="xtop">
             <b class="xt1"></b>
             <b class="xt2"></b>
@@ -401,117 +401,117 @@
             <b class="xt4"></b>
         </b>
         <div class="headerBox">
-            $page.getLocalizedString("step3.sub.title")
+            ${page.getLocalizedString('step3.sub.title')}
         </div>
         <div class="bodyBox" style="height:290px;">
-             <span>  
+             <span>
              <!-- New Instances -->
-             <div id="newInstanceOptions">            
+             <div id="newInstanceOptions">
                 <table class="temp">
                     <tr>
                         <td><label for="configStoreCustom">
-                                $page.getLocalizedString("existing.instance.label")
+                                ${page.getLocalizedString('existing.instance.label')}
                              </label></td>
                         <td>
-                        <input type="radio" id="configStoreDefault" name="configStoreCustom" 
-                           style="margin-left:1em" value="false" $selectEmbedded 
-                           onclick="disableRemote();"/> 
-                            $page.getLocalizedString("step3.embedded.option")
-                        <input type="radio" id="configStoreCustom" name="configStoreCustom" 
-                           style="margin-left:1em" value="true" $selectExternal
+                        <input type="radio" id="configStoreDefault" name="configStoreCustom"
+                           style="margin-left:1em" value="false" ${selectEmbedded}
+                           onclick="disableRemote();"/>
+                            ${page.getLocalizedString('step3.embedded.option')}
+                        <input type="radio" id="configStoreCustom" name="configStoreCustom"
+                           style="margin-left:1em" value="true" ${selectExternal}
                            onclick="enableRemote();"/>
-                            $page.getLocalizedString("step3.external.option")
+                            ${page.getLocalizedString('step3.external.option')}
                         </td>
                     </tr>
                 </table>
-            
+
                 <!-- Embedded Store -->
                 <table class="temp">
                     <tr id="ssl">
                         <td><label for="configStoreSSL"><em>*&nbsp;</em>
-                            $page.getLocalizedString("ssl.label")</label></td>
+                            ${page.getLocalizedString('ssl.label')}</label></td>
                         <td>
-                            <input id="configStoreSSL" name="configStoreSSL" 
+                            <input id="configStoreSSL" name="configStoreSSL"
                                type="checkbox" value="SSL"
-                               onClick="APP.callDelayed(this, validateConfigStoreSSL)" $selectConfigStoreSSL /></td>
+                               onClick="APP.callDelayed(this, validateConfigStoreSSL)" ${selectConfigStoreSSL} /></td>
                     </tr>
                     <tr id="host">
                         <td><label for="configStoreHost"><em>*&nbsp;</em>
-                            $page.getLocalizedString("host.name.label")</label></td>
+                            ${page.getLocalizedString('host.name.label')}</label></td>
                         <td>
-                            <input id="configStoreHost" name="configStoreHost" 
+                            <input id="configStoreHost" name="configStoreHost"
                                type="text" class="text" style="width:200px"
-                               value="$configStoreHost"
+                               value="${configStoreHost}"
                                onkeyup="APP.callDelayed(this, validateConfigStoreHost)"
                                onchange="APP.callDelayed(this, validateConfigStoreHost)"/>
                             <span id="configStoreHostStatus"></span>
                             <span id="configStoreHostStatusEx"></span>
                         </td>
-                    </tr>  
+                    </tr>
                     <tr>
 			            <td><label for="configStorePort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("port.label")</label></td>
+                            ${page.getLocalizedString('port.label')}</label></td>
                         <td>
-                            <input id="configStorePort" name="configStorePort" 
-                                   type="text" size="5" maxLength="5" 
-                                   value="$configStorePort" 
+                            <input id="configStorePort" name="configStorePort"
+                                   type="text" size="5" maxLength="5"
+                                   value="${configStorePort}"
                                    onkeyup="APP.callDelayed(this, validateConfigStorePort)"
                                    onchange="APP.callDelayed(this, validateConfigStorePort)"/>
                             <span id="configStorePortStatus"></span></td>
                     </tr>
                     <tr id="adminport">
 			            <td><label for="configStoreAdminPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("admin.port.label")</label></td>
+                            ${page.getLocalizedString('admin.port.label')}</label></td>
                         <td>
                             <input id="configStoreAdminPort" name="configStoreAdminPort"
                                    type="text" size="5" maxLength="5"
-                                   value="$configStoreAdminPort"
+                                   value="${configStoreAdminPort}"
                                    onkeyup="APP.callDelayed(this, validateAdminPort)"
                                    onchange="APP.callDelayed(this, validateAdminPort)"/>
                             <span id="configStoreAdminPortStatus"></span></td>
                     </tr>
                     <tr id="jmxport">
 			            <td><label for="configStoreJmxPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("jmx.port.label")</label></td>
+                            ${page.getLocalizedString('jmx.port.label')}</label></td>
                         <td>
                             <input id="configStoreJmxPort" name="configStoreJmxPort"
                                    type="text" size="5" maxLength="5"
-                                   value="$configStoreJmxPort"
+                                   value="${configStoreJmxPort}"
                                    onkeyup="APP.callDelayed(this, validateJmxPort)"
                                    onchange="APP.callDelayed(this, validateJmxPort)"/>
                             <span id="configStoreJmxPortStatus"></span></td>
                     </tr>
-                    <tr>                    
+                    <tr>
                         <td><label for="encryptionKey"><em>*&nbsp;</em>
-                            $page.getLocalizedString("step2.encr.key")</label></td>
+                            ${page.getLocalizedString('step2.encr.key')}</label></td>
                         <td>
-                            <input id="encryptionKey" name="encryptionKey" 
-                                type="text" class="text" style="width:200px" 
-                                value="$encryptionKey" 
+                            <input id="encryptionKey" name="encryptionKey"
+                                type="text" class="text" style="width:200px"
+                                value="${encryptionKey}"
                                 onkeyup="APP.callDelayed(this, validateEncKey)"
                                 onchange="APP.callDelayed(this, validateEncKey)"/>
                             <span id="encryptionKeyStatus"></span></td>
-                    </tr>   
+                    </tr>
                     <tr>
                         <td><label for="rootSuffix"><em>*&nbsp;</em>
-                            $page.getLocalizedString("root.suffix.label")</label></td>
+                            ${page.getLocalizedString('root.suffix.label')}</label></td>
                         <td>
-                            <input id="rootSuffix" name="rootSuffix" 
-                                   type="text" class="text" style="width:200px" 
-                                   value="$rootSuffix" 
+                            <input id="rootSuffix" name="rootSuffix"
+                                   type="text" class="text" style="width:200px"
+                                   value="${rootSuffix}"
                                    onkeyup="APP.callDelayed(this, validateRootSuffix)"
                                    onchange="APP.callDelayed(this, validateRootSuffix)"/>
-                            <span id="rootSuffixStatus"></span>                       
+                            <span id="rootSuffixStatus"></span>
                         </td>
                     </tr>
 
                     <tr id="login">
                         <td><label for="configStoreLoginId"><em>*&nbsp;</em>
-                            $page.getLocalizedString("login.id.label")</label></td>
+                            ${page.getLocalizedString('login.id.label')}</label></td>
                         <td>
-                            <input id="configStoreLoginId" name="configStoreLoginId" 
-                               type="text" class="text" style="width:150px" 
-                               value="$configStoreLoginId"
+                            <input id="configStoreLoginId" name="configStoreLoginId"
+                               type="text" class="text" style="width:150px"
+                               value="${configStoreLoginId}"
                                onkeyup="APP.callDelayed(this, validateConfigStoreLoginId )"
                                onchange="APP.callDelayed(this, validateConfigStoreLoginId )"/>
                             <span id="configStoreLoginIdStatus"></span>
@@ -519,151 +519,151 @@
                     </tr>
                     <tr id="password">
                         <td><label for="configStorePassword"><em>*&nbsp;</em>
-                            $page.getLocalizedString("password.label")</label></td>
+                            ${page.getLocalizedString('password.label')}</label></td>
                         <td>
-                            <input id="configStorePassword" 
-                               name="configStorePassword" 
-                               type="password" class="text" style="width:100px" 
-                               value="#if($store.password)$store.password#{end}" 
+                            <input id="configStorePassword"
+                               name="configStorePassword"
+                               type="password" class="text" style="width:100px"
+                               value="<#if store.password??>${store.password}</#if>"
                                onkeyup="APP.callDelayed(this, validateConfigStorePassword )"
                                onchange="APP.callDelayed(this, validateConfigStorePassword )"/>
                             <span id="configStorePasswordStatus"></span></td>
-                    </tr>  
+                    </tr>
                 </table>
-            </div> 
-                
+            </div>
+
             <!-- Existing OpenAM Instance to Join -->
             <div id="existingInstanceURL" style="display:none">
                 <table class="temp">
                     <tr>
                         <td><label for="existingHost"><em>*&nbsp;</em>
-                            $page.getLocalizedString("host.url.label")</label></td>
+                            ${page.getLocalizedString('host.url.label')}</label></td>
                         <td>
-                            <input id="existingHost" name="existingHost" type="text" 
+                            <input id="existingHost" name="existingHost" type="text"
                                    class="text" size="60"
                                    onkeyup="APP.callDelayed(this, validateHostName)"
                                    onchange="APP.callDelayed(this, validateHostName)"/>
-                            <span id="existingHostStatus"></span>                        
+                            <span id="existingHostStatus"></span>
                         </td>
-                    </tr>  
+                    </tr>
                     <tr>
                         <td>&nbsp;</td>
                         <td>
-                            <small>$page.getLocalizedString("url.server.help")</small>                    
+                            <small>${page.getLocalizedString('url.server.help')}</small>
                         </td>
-                    </tr>              
+                    </tr>
                 </table>
             </div>
-            
+
             <!-- replication ports -->
             <div id="replicationPorts" style="display:none">
-                <small>$page.getLocalizedString("local.port.values")</small>
-                <table class="temp">       
+                <small>${page.getLocalizedString('local.port.values')}</small>
+                <table class="temp">
                     <tr>
                         <td><label for="localConfigPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("local.port.label")</label></td>
+                            ${page.getLocalizedString('local.port.label')}</label></td>
                         <td>
-                            <input id="localConfigPort" name="localConfigPort" 
-                                   type="text" class="text" size="5" maxLength="5" 
-                                   value="$localConfigPort" 
+                            <input id="localConfigPort" name="localConfigPort"
+                                   type="text" class="text" size="5" maxLength="5"
+                                   value="${localConfigPort}"
                                    onkeyup="APP.callDelayed(this, validateLocalConfigPort)"
                                    onchange="APP.callDelayed(this, validateLocalConfigPort)"/>
-                            <span id="localConfigPortStatus"></span>                       
+                            <span id="localConfigPortStatus"></span>
                         </td>
                         <td><label for="localConfigAdminPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("admin.port.label")</label></td>
+                            ${page.getLocalizedString('admin.port.label')}</label></td>
                         <td>
                             <input id="localConfigAdminPort" name="localConfigAdminPort"
                                    type="text" class="text" size="5" maxLength="5"
-                                   value="$localConfigAdminPort"
+                                   value="${localConfigAdminPort}"
                                    onkeyup="APP.callDelayed(this, validateLocalConfigAdminPort)"
                                    onchange="APP.callDelayed(this, validateLocalConfigAdminPort)"/>
                             <span id="localConfigAdminPortStatus"></span>
                         </td>
-                    </tr> 
+                    </tr>
                     <tr>
                         <td><label for="localRepPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("replication.port.label")</label></td>
+                            ${page.getLocalizedString('replication.port.label')}</label></td>
                         <td>
-                            <input id="localRepPort" name="localRepPort" 
-                                   type="text" class="text" size="5" maxLength="5" 
-                                   value="$localRepPort" 
+                            <input id="localRepPort" name="localRepPort"
+                                   type="text" class="text" size="5" maxLength="5"
+                                   value="${localRepPort}"
                                    onkeyup="APP.callDelayed(this, validateLocalRepPort)"
                                    onchange="APP.callDelayed(this, validateLocalRepPort)"/>
-                            <span id="localRepPortStatus"></span>                       
+                            <span id="localRepPortStatus"></span>
                         </td>
                         <td><label for="localConfigJmxPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("jmx.port.label")</label></td>
+                            ${page.getLocalizedString('jmx.port.label')}</label></td>
                         <td>
                             <input id="localConfigJmxPort" name="localConfigJmxPort"
                                    type="text" class="text" size="5" maxLength="5"
-                                   value="$localConfigJmxPort"
+                                   value="${localConfigJmxPort}"
                                    onkeyup="APP.callDelayed(this, validateLocalConfigJmxPort)"
                                    onchange="APP.callDelayed(this, validateLocalConfigJmxPort)"/>
                             <span id="localConfigJmxPortStatus"></span>
                         </td>
-                    </tr>  
+                    </tr>
                     <tr>
                         <td colspan="4">
                             <span id="replicationMessage"></span></td>
                     </tr>
                     <tr>
                         <td><label for="existingPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("existing.port.label")</label></td>
+                            ${page.getLocalizedString('existing.port.label')}</label></td>
                         <td>
-                            <input id="existingPort" name="existingPort" type="text" 
-                                   class="text" size="5" maxLength="5" 
-                                   value="$existingPort" 
+                            <input id="existingPort" name="existingPort" type="text"
+                                   class="text" size="5" maxLength="5"
+                                   value="${existingPort}"
                                    onkeyup="APP.callDelayed(this, validateExistingPort)"
                                    onchange="APP.callDelayed(this, validateExistingPort)"/>
-                            <span id="existingPortStatus"></span>                        
+                            <span id="existingPortStatus"></span>
                         </td>
                         <td></td><td></td>
-                    </tr>      
+                    </tr>
                     <tr>
                         <td><label for="existingRepPort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("existing.replication.port")</label></td>
+                            ${page.getLocalizedString('existing.replication.port')}</label></td>
                         <td>
-                            <input id="existingRepPort" name="existingRepPort" 
+                            <input id="existingRepPort" name="existingRepPort"
                                    type="text" class="text" size="5" maxLength="5"
-                                   value="$existingRepPort" 
+                                   value="${existingRepPort}"
                                    onkeyup="APP.callDelayed(this, validateExistingRepPort)"
                                    onchange="APP.callDelayed(this, validateExistingRepPort)"/>
                             <span id="existingRepPortStatus"></span>
                         </td>
                         <td></td><td></td>
-                    </tr>   
+                    </tr>
                 </table>
             </div>
             <!-- existing LDAP -->
             <div id="existingLDAP" style="display:none">
-                <small>$page.getLocalizedString("existing.port.values.external")</small>
+                <small>${page.getLocalizedString('existing.port.values.external')}</small>
                 <table class="temp">
                     <tr>
                         <td><label for="existingStoreHost"><em>*&nbsp;</em>
-                            $page.getLocalizedString("existing.ldap.label")</label></td>
+                            ${page.getLocalizedString('existing.ldap.label')}</label></td>
                         <td><input id="existingStoreHost" name="existingStoreHost" type="text"
                                    class="text" size="60" style="width:150px"
-                                   value="$existingStoreHost" 
+                                   value="${existingStoreHost!""}"
                                    onkeyup="APP.callDelayed(this, validateSMHost)"
                                    onchange="APP.callDelayed(this, validateSMHost)"/>
                             <span id="existingStoreHostStatus"></span>
                         </td>
-                    </tr>      
-                    <tr>   
+                    </tr>
+                    <tr>
                         <td><label for="existingStorePort"><em>*&nbsp;</em>
-                            $page.getLocalizedString("port.label")</label></td>  
+                            ${page.getLocalizedString('port.label')}</label></td>
                         <td>
                             <input id="existingStorePort" name="existingStorePort"
                                    type="text" size="5" maxLength="5"
-                                   value="$existingStorePort"
+                                   value="${existingStorePort!""}"
                                    onkeyup="APP.callDelayed(this, validateConfigStorePort)"
                                    onchange="APP.callDelayed(this, validateConfigStorePort)"/>
                             <span id="existingStorePortStatus"></span>
                         </td>
                     </tr>
-                </table>     
-            </div>                
+                </table>
+            </div>
             </span>
         </div>
         <div>
@@ -676,6 +676,3 @@
         </div>
     </div>
 </div>
-
-
-

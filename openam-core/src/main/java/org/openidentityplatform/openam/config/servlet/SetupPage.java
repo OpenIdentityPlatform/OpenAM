@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -226,6 +227,10 @@ public abstract class SetupPage {
 
     protected String getCookieDomain() {
         return getHostName();
+    }
+
+    protected String getAvailablePort(int portNumber) {
+        return Integer.toString(AMSetupUtils.getFirstUnusedPort(getHostName(), portNumber, 1000));
     }
 
     protected String getBaseDir(HttpServletRequest req) {
