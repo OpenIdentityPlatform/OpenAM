@@ -671,3 +671,132 @@ references change.
 `ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
 `options.htm` (now migrated) to `upgrade.htm` (still Click, next up in increment 7) — update this
 again whenever `Upgrade.java`/`upgrade.ftl` lands.
+
+## Increment 7: Upgrade (`openam-upgrade` module)
+
+The last real page. This is also the first (and, per the plan's increment order, only) migrated
+page that doesn't live in `openam-core` — and that broke an assumption every prior increment's
+registry entry relied on without ever stating it.
+
+### `Upgrade.java` lives downstream of `ConfiguratorServlet`, so it can't be a compile-time registry entry
+
+`openam-upgrade` depends on `openam-core` (for `openam-core`'s huge shared surface generally, not
+specifically for anything configurator-related) — not the other way round. `ConfiguratorServlet`
+(in `openam-core`) adding `PAGES.put("/config/upgrade/upgrade.htm", Upgrade.class)` the way every
+prior increment did for its own page would need a compile-time import of `Upgrade`, which would
+make `openam-core` depend on `openam-upgrade` too: a Maven cycle. Nothing in `03-migration-plan.md`
+anticipated this because every other page (`Step1`-`Step7`, `Wizard`, `Options`, `DefaultSummary`)
+already lived in `openam-core`.
+
+Fix: a small `ConfiguratorPageProvider` SPI (`getPath()` / `getPageClass()`) in
+`org.openidentityplatform.openam.config.servlet`, discovered via `ServiceLoader` —
+`ConfiguratorServlet`'s static initializer now also runs
+`ServiceLoader.load(ConfiguratorPageProvider.class)` and merges whatever it finds into `PAGES`.
+`Upgrade` itself doesn't implement the SPI (it's a `SetupPage`, not a registration descriptor); a
+tiny sibling class, `com.sun.identity.config.upgrade.UpgradePageProvider`, does, and
+`openam-upgrade/src/main/resources/META-INF/services/org.openidentityplatform.openam.config.servlet.ConfiguratorPageProvider`
+names it. `openam-upgrade` can freely implement an interface declared in `openam-core` (that's the
+dependency direction that already exists), so this needs no new Maven dependency in either
+direction — genuine decoupling, not just a workaround.
+
+This isn't a novel idiom for this codebase: `com.sun.identity.setup.SetupListener` (also in
+`openam-core`) is discovered the exact same way (`ServiceLoader.load(SetupListener.class)` in
+`AMSetupServlet.registerListeners()`), with implementations from several downstream modules
+(`openam-scripting`, `openam-radius`, `openam-audit-configuration`, ...) each dropping a
+`META-INF/services` file. `ConfiguratorPageProvider` follows that established pattern rather than
+inventing a new one (e.g. a startup `ServletContextListener` + a public
+`ConfiguratorServlet.registerPage(...)` API, which was considered and rejected: it would need a new
+per-increment `web.xml` listener entry, breaking the "pure Java, wired once in increment 1"
+invariant the whole registry design is built on).
+
+**Consequence for test coverage, worth knowing before trusting `ConfiguratorServletTest` at face
+value:** `openam-core`'s own test classpath never has `openam-upgrade` on it, so
+`ServiceLoader.load(ConfiguratorPageProvider.class)` always finds zero providers *there* — meaning
+`ConfiguratorServletTest`'s `unregisteredPathForwardsToClickByName` test, which still uses
+`/config/upgrade/upgrade.htm`, keeps passing after this increment, but for a different reason than
+before (module-boundary artifact of the test run, not because the page is actually unmigrated in
+the real, assembled WAR). There is no longer any real un-migrated page left to use as that example
+— increment 7 was the last one before final removal. The real end-to-end proof that the
+ServiceLoader wiring works lives in `openam-upgrade`'s own test tree instead
+(`ConfiguratorServletUpgradeRoutingTest`, package `org.openidentityplatform.openam.config.servlet`),
+which — unlike `openam-core` — can see both `ConfiguratorServlet` and `Upgrade`/
+`UpgradePageProvider` on the same classpath. It drives a real `ConfiguratorServlet.service()` call
+for `?actionLink=doUpgrade` and asserts the failure it gets back (a `ServletException` wrapping a
+`NullPointerException` — see below) is the one that proves routing reached the real
+`Upgrade.doUpgrade()`, while separately asserting the Click named-dispatcher was never invoked. This
+is the first increment with a dedicated routing test living outside `openam-core`, and it's the
+template to reuse if a future page ever migrates from a different downstream module.
+
+### `onRender()` has no equivalent in `ConfiguratorServlet` — ported to `onGet()` instead
+
+Unlike every previous page, the old `Upgrade.java` builds its template model in `onRender()`, not
+`onInit()` or a Click `onGet()`/`onPost()` override, with an explicit comment explaining why:
+`onRender()` only runs when Click is actually about to render the page, never on an `ActionLink`
+dispatch (`doUpgrade`/`saveReport` both `return false` with no further Click processing) — so
+`generateShortUpgradeReport(...)` (a real report-generation call, not free) is not redone on every
+upgrade-progress poll or report download.
+
+`SetupPage.onRender()` exists (copied into the increment-1 scaffolding for Click-lifecycle parity)
+but grepping `ConfiguratorServlet.service()` confirms it is **never called** — the servlet's actual
+flow is `onSecurityCheck()` -> `onInit()` -> (`actionLink` present: `invokeAction()` and stop) ->
+else `onGet()` -> render if not skipped. `onGet()` is the hook that actually reproduces the "only
+when about to render, not on actionLink dispatch" guarantee the old `onRender()` provided — so the
+model-building logic moved there instead. `Upgrade` is the first page in this migration to actually
+override `onGet()` for that reason; every earlier page either had no such optimization to preserve
+or built its model unconditionally in `onInit()`. If a future page is ever found overriding
+`onRender()` expecting it to run, that expectation is already wrong under `ConfiguratorServlet` —
+worth deleting `SetupPage.onRender()` itself in the final increment's cleanup if nothing ever ends
+up using it.
+
+### `isLicenseAccepted()`: ported off `Context.getRequestParameter`, not `SetupPage.toString()`
+
+The old code reads `getContext().getRequestParameter(SetupConstants.ACCEPT_LICENSE_PARAM)`, which —
+checked directly against the Click fork's `Context.getRequestParameter()` source — is a straight
+`request.getParameter(name)` (plus a null-name guard that's irrelevant for a constant). Ported as
+`getContext().getRequest().getParameter(...)`, **not** `SetupPage.toString(paramName)` (used
+elsewhere in this migration for the same kind of read): `toString()` trims whitespace and maps
+`""`/blank to `null` before `Boolean.parseBoolean` would see it, which is extra normalization the
+old code never applied here. Using it would have been a silent, if extremely unlikely to matter in
+practice, behavior change — flagged here as the reason this one call site looks inconsistent with
+the rest of the file's style.
+
+### `doUpgrade()`'s pre-existing "no `error` guard" NPE — kept, locked in with a test
+
+If `Upgrade`'s constructor fails (`error = true`, `upgrade` stays `null`) and `doUpgrade()` is
+invoked anyway, `upgrade.upgrade(...)` NPEs — uncaught, since the method only catches
+`UpgradeException`. This is original Click behavior, not introduced by this port. Checked
+reachability the same way as `Wizard`'s dead `ActionLink`s and `Step7`'s `EXT_DATA_STORE` NPE:
+`upgrade.ftl`'s `<#if error??>` branch (ported 1:1 from Velocity's `#if ($error)`) never renders the
+`upgradeButton`/`doUpgrade()` JS function when `error` is true, so normal navigation can't trigger
+it — but a direct `?actionLink=doUpgrade` request still would. Locked in with
+`UpgradeTest.doUpgradeThrowsIfSubsystemFailedToInitialize` (and exercised for real, end-to-end,
+through the servlet by `ConfiguratorServletUpgradeRoutingTest` above) so a future refactor doesn't
+silently "fix" this without it being a deliberate, reviewed decision — same category and same
+rationale as `Step7Test.onInitThrowsIfExtDataStoreNeverSet`.
+
+### `UpgradeTest` environment gap — same category as `OptionsTest`, but this time the gap *is* the tested behavior
+
+`Upgrade`'s constructor calls `AdminTokenAction.getInstance()` / `UpgradeServices.getInstance()`,
+both needing a real bootstrapped OpenAM environment (SSOToken infrastructure, SMS-backed config) to
+succeed. In a bare `openam-upgrade` unit-test JVM this always fails, and the constructor's broad
+`catch (Exception ue)` turns that into `error = true` — exactly like the old Click page did. Unlike
+every prior "can't test this branch" gap in this migration, here the untestable-without-a-real-
+environment branch **is** the one branch this test JVM can reliably exercise: `onGet()`'s `error`
+path and the resulting NPE in `doUpgrade()`. The happy path (`error == false`, a real
+`generateShortUpgradeReport`/`upgrade()` call) is manual-smoke/IT-only, same as
+`Wizard.createConfig()`/`DefaultSummary.createDefaultConfig()`.
+
+### `upgrade.ftl` real-render check
+
+Same module-boundary gap as every prior page (`.ftl` lives in `openam-server-only`, no test tree;
+`ConfiguratorServlet` lives in `openam-core`). Rendered directly with a throwaway FreeMarker 2.3.31
+harness (real `Configuration` + real `upgrade.ftl` from disk, stub `page.getLocalizedString`)
+against both the `error` and normal (`currentVersion`/`newVersion`/`changelist` populated) branches;
+confirmed no `InvalidReferenceException` in either. The `$var`-vs-`addModel` diff found no gaps this
+time — `currentVersion`/`newVersion`/`changelist` are always set together in the one branch that
+reads them, and `error` is read via `<#if error??>` (an existence check, not a boolean read),
+matching the idiom already established for `Step7.ftl`'s `<#if embedded??>` for a key that's only
+ever added when true. Not kept as a checked-in test, same call as every prior page's real-render
+check; re-run manually if `upgrade.ftl`'s var references change.
+
+This was the last page. What's left is increment 8, the final removal.

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -79,6 +80,14 @@ public class ConfiguratorServlet extends HttpServlet {
         PAGES.put("/config/wizard/wizard.htm", Wizard.class);
         PAGES.put("/config/options.htm", Options.class);
         PAGES.put("/config/defaultSummary.htm", DefaultSummary.class);
+
+        // Pages that live in a module downstream of openam-core (e.g. Upgrade, in openam-upgrade,
+        // which depends on openam-core and so cannot be depended on back without a Maven cycle)
+        // self-register via ConfiguratorPageProvider instead of a compile-time class reference
+        // here - same ServiceLoader/META-INF/services idiom as com.sun.identity.setup.SetupListener.
+        for (ConfiguratorPageProvider provider : ServiceLoader.load(ConfiguratorPageProvider.class)) {
+            PAGES.put(provider.getPath(), provider.getPageClass());
+        }
     }
 
     private volatile Configuration freemarkerConfig;

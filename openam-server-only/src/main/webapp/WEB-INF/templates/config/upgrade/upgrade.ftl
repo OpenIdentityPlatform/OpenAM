@@ -12,7 +12,7 @@
   ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
-  ~ 
+  ~
   ~ Portions Copyrighted 2015 Nomura Research Institute, Ltd.
   -->
 
@@ -21,20 +21,20 @@
 
     //convenient alias:
     var $ = YAHOO.util.Dom.get;
-    
+
     function cancelUpgrade() {
         YAHOO.sun.identity.config.options.upgrade.hide();
     }
 
     function saveReport() {
-        window.open("$context$path?actionLink=saveReport", "Download");
+        window.open("${context}${path}?actionLink=saveReport", "Download");
     }
 
     function writeUpgradeAsync() {
         ie7fix++;
         var licenseAccepted = document.getElementById("upgrade-accept-check").checked ? "true" : "false";
 
-        AjaxUtils.call("$context$path?actionLink=doUpgrade&ie7fix=" + ie7fix + "&acceptLicense=" + licenseAccepted, writeConfigResponse);
+        AjaxUtils.call("${context}${path}?actionLink=doUpgrade&ie7fix=" + ie7fix + "&acceptLicense=" + licenseAccepted, writeConfigResponse);
     }
 
     function doUpgrade() {
@@ -44,7 +44,7 @@
 
         var fr1 = window.frames['progressIframe'];
         if (fr1) {
-            fr1.location = "$context/upgrade/setUpgradeProgress";
+            fr1.location = "${context}/upgrade/setUpgradeProgress";
         }
         setTimeout('writeUpgradeAsync()', 2000);
     }
@@ -54,21 +54,21 @@
     }
 
     function upgradeAcceptLicense() {
-       YAHOO.util.Dom.addClass('upgrade', 'license-accepted'); 
+       YAHOO.util.Dom.addClass('upgrade', 'license-accepted');
     }
 </script>
 <div id="upgrade" style="width: 810px; background-color: #FFFFFF" class="clearfix">
-    <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
-    #if ($error)
+    <div class="header">${page.getLocalizedString('upgrade.main.title')}</div>
+    <#if error??>
     <div id="content" class="tabContent">
         <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
-            <p class="blueSmall">$page.getLocalizedString("upgrade.init.error")</p>
-            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+            <p class="blueSmall">${page.getLocalizedString('upgrade.init.error')}</p>
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">${page.getLocalizedString('cancel.button')}</button>
         </div>
     </div>
-    #else
+    <#else>
     <div class="license inner-license">
-        <pre id="upgrade-license-message"> </pre> 
+        <pre id="upgrade-license-message"> </pre>
         <div class="accept-check-container clearfix">
             <input type="checkbox" onchange="upgradeAcceptChecked();" name="upgrade-accept-check"  id="upgrade-accept-check" tabindex=1/>
             <label for="upgrade-accept-check" >I accept the license agreement</label>
@@ -76,32 +76,32 @@
     </div>
     <div id="content" class="tabContent summary">
         <div style="margin: 10px 23px">
-            $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
-            $page.getLocalizedString("upgrade.new.version") $newVersion
+            ${page.getLocalizedString('upgrade.current.version')} ${currentVersion} <br/>
+            ${page.getLocalizedString('upgrade.new.version')} ${newVersion}
         </div>
         <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
-            $changelist
+            ${changelist}
         </div>
     </div>
     <div id="upgradeFooter" style="padding-bottom: 10px" class="clearfix">
-        
+
         <div class="col1">&nbsp;</div>
 
         <div align="left" style="float:left; margin-left: 23px" class="license">
             <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled tabindex=2>Continue</button>
-        </div>   
+        </div>
         <div class="summary" style="text-align: center;">
             <div style="float: left; margin-left: 23px">
-                <button id="upgradeButton" type="button" onclick="doUpgrade()" tabindex=3>$page.getLocalizedString("upgrade.button")</button>
+                <button id="upgradeButton" type="button" onclick="doUpgrade()" tabindex=3>${page.getLocalizedString('upgrade.button')}</button>
             </div>
             <div style="float: right; margin-right: 23px">
-                <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>$page.getLocalizedString("cancel.button")</button>
+                <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>${page.getLocalizedString('cancel.button')}</button>
             </div>
             <div style="display: inline-block;margin:0 auto;">
-                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue" tabindex=4>$page.getLocalizedString("save.report.button")</button>
+                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue" tabindex=4>${page.getLocalizedString('save.report.button')}</button>
             </div>
         </div>
     </div>
 
-    #end
+    </#if>
 </div>

@@ -35,13 +35,25 @@ import org.testng.annotations.Test;
 
 /**
  * Routing behavior of {@link ConfiguratorServlet} against the real migrated-page registry
- * (steps 1-7, the wizard shell, {@code Options} and {@code DefaultSummary} as of this increment):
- * a registered path dispatches {@code ?actionLink=} requests to the matching
- * {@code @ConfiguratorAction} method, and an unregistered path forwards, by name, to the
- * still-installed {@code click-servlet} - proving the mixed-engine fallback this whole approach
- * depends on. {@code upgrade.htm} (not yet migrated - see
- * docs/migration/click-to-freemarker/03-migration-plan.md, increment 7) stands in for "still on
- * Click" below; update this to whichever page is next in line as increments land.
+ * (steps 1-7, the wizard shell, {@code Options}, {@code DefaultSummary} and, as of increment 7,
+ * {@code Upgrade} - every real configurator page as of this increment): a registered path
+ * dispatches {@code ?actionLink=} requests to the matching {@code @ConfiguratorAction} method, and
+ * an unregistered path forwards, by name, to the still-installed {@code click-servlet} - proving
+ * the mixed-engine fallback this whole approach depends on.
+ *
+ * <p>{@code upgrade.htm} still stands in for "unregistered" below, but for a different reason than
+ * every prior increment: {@code Upgrade} lives in {@code openam-upgrade}, which depends on
+ * {@code openam-core} (not the other way round), so it registers itself into
+ * {@code ConfiguratorServlet.PAGES} via {@link ConfiguratorPageProvider}/{@link
+ * java.util.ServiceLoader} rather than a compile-time entry in this module - see
+ * {@code docs/migration/click-to-freemarker/04-implementation-notes.md}. {@code openam-core}'s own
+ * test classpath never has {@code openam-upgrade} on it, so the ServiceLoader here always finds
+ * zero providers and {@code upgrade.htm} genuinely falls back to Click in this specific test run,
+ * even though it is fully migrated in the real, assembled WAR. The real end-to-end routing (through
+ * the actual ServiceLoader-discovered {@code Upgrade} page) is covered instead by a test in
+ * {@code openam-upgrade}, which - unlike this module - can see both classes. There is no longer any
+ * real, still-on-Click page left to use as the "unregistered" example here; increment 7 was the
+ * last one before final removal (see the migration plan's increment 8).
  */
 public class ConfiguratorServletTest {
 
@@ -96,6 +108,8 @@ public class ConfiguratorServletTest {
 
     @Test
     public void unregisteredPathForwardsToClickByName() throws Exception {
+        // See the class Javadoc: this path is only "unregistered" from openam-core's own test
+        // classpath, which never has the openam-upgrade ServiceLoader provider on it.
         when(request.getServletPath()).thenReturn("/config/upgrade/upgrade.htm");
         RequestDispatcher dispatcher = mock(RequestDispatcher.class);
         when(servletContext.getNamedDispatcher("click-servlet")).thenReturn(dispatcher);
