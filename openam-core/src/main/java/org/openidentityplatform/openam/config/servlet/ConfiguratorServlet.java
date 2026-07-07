@@ -31,6 +31,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.config.wizard.Step1;
+import com.sun.identity.config.wizard.Step2;
+import com.sun.identity.config.wizard.Step4;
+import com.sun.identity.config.wizard.Step5;
+import com.sun.identity.config.wizard.Step6;
 import com.sun.identity.shared.debug.Debug;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -61,6 +65,10 @@ public class ConfiguratorServlet extends HttpServlet {
     private static final Map<String, Class<? extends SetupPage>> PAGES = new HashMap<>();
     static {
         PAGES.put("/config/wizard/step1.htm", Step1.class);
+        PAGES.put("/config/wizard/step2.htm", Step2.class);
+        PAGES.put("/config/wizard/step4.htm", Step4.class);
+        PAGES.put("/config/wizard/step5.htm", Step5.class);
+        PAGES.put("/config/wizard/step6.htm", Step6.class);
     }
 
     private volatile Configuration freemarkerConfig;

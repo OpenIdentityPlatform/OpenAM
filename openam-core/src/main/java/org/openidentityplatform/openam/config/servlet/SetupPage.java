@@ -15,6 +15,7 @@
  */
 package org.openidentityplatform.openam.config.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
@@ -27,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.sun.identity.config.SessionAttributeNames;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -55,6 +57,7 @@ public abstract class SetupPage {
     private boolean skipRender = false;
     private java.util.Locale configLocale;
     private ResourceBundle rb;
+    private String hostName;
 
     public String responseString = "true";
 
@@ -207,6 +210,40 @@ public abstract class SetupPage {
             // do nothing
         }
         return (localizedValue == null) ? i18nKey : localizedValue;
+    }
+
+    protected String getAttribute(String attr, String defaultValue) {
+        String value = (String) getContext().getSessionAttribute(attr);
+        return (value != null) ? value : defaultValue;
+    }
+
+    protected String getHostName() {
+        if (hostName == null) {
+            hostName = getContext().getRequest().getServerName();
+        }
+        return hostName;
+    }
+
+    protected String getCookieDomain() {
+        return getHostName();
+    }
+
+    protected String getBaseDir(HttpServletRequest req) {
+        String basedir = AMSetupServlet.getPresetConfigDir();
+        if ((basedir == null) || (basedir.length() == 0)) {
+            String tmp = System.getProperty("user.home");
+            if (File.separatorChar == '\\') {
+                tmp = tmp.replace('\\', '/');
+            }
+            String uri = req.getRequestURI();
+            int idx = uri.indexOf("/", 1);
+            if (idx != -1) {
+                uri = uri.substring(0, idx);
+            }
+            basedir = (tmp.endsWith("/")) ? tmp.substring(0, tmp.length() - 1) : tmp;
+            basedir += uri;
+        }
+        return basedir;
     }
 
     @ConfiguratorAction

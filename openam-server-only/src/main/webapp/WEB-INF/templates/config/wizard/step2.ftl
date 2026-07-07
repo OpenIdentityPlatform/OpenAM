@@ -5,7 +5,7 @@
     var configDirectoryValid = true;
     var encryptionKeyValid = true;
     var cookieDomainValid = true;
-    
+
     function serverFieldsValid() {
         $('nextTabButton').disabled =
            !(serverURLValid &&
@@ -16,7 +16,7 @@
     }
 
     function validateInput(field, handler) {
-        var callUrl = "$context$path?actionLink=validateInput";
+        var callUrl = "${context}${path}?actionLink=validateInput";
         var key = "&key=" + field;
         var value = "&value=" + $(field).value;
         ie7fix++;
@@ -37,19 +37,19 @@
     }
 
     function validated(response, field) {
-        if (response.responseText == "true") { 
+        if (response.responseText == "true") {
             eval(field + "Valid = true;" );
             $(field + 'Status').innerHTML = okString;
         } else if (response.responseText.search("warning") == 0) {
             eval(field + "Valid = true;" );
-            $(field + 'Status').innerHTML = warningImage + 
+            $(field + 'Status').innerHTML = warningImage +
                 '<small>' + response.responseText.substring(7) + '</small>';
-            
+
         } else {
             eval(field + "Valid = false;" );
             $(field + 'Status').innerHTML = errorImage +
                 '<small>' + response.responseText + '</small>';
-        }                
+        }
         serverFieldsValid();
         field = "";
     }
@@ -62,81 +62,81 @@
     function validateLocale() {
 	field = "platformLocale";
         validateInput(field, null);
-    } 
+    }
 
     function validateConfigDir() {
         field = "configDirectory";
-        var callUrl = "$context$path?actionLink=validateConfigDir&dir=" +
+        var callUrl = "${context}${path}?actionLink=validateConfigDir&dir=" +
             encodeURIComponent($(field).value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);
-    } 
+    }
 
     function validateCookieDomain() {
 	field = "cookieDomain";
-        var callUrl = "$context$path?actionLink=validateCookieDomain&domain=" +
+        var callUrl = "${context}${path}?actionLink=validateCookieDomain&domain=" +
             encodeURIComponent($(field).value) + "&serverurl=" + encodeURIComponent($("serverURL").value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);
-    } 
+    }
 
 </script>
 
 <div style="margin-left:10px;">
-<h1>$page.getLocalizedString("step2.title")<img class="pointer" src="$context/assets/images/message.gif"/></h1>
-<p>$page.getLocalizedString("step2.description")</p>
+<h1>${page.getLocalizedString('step2.title')}<img class="pointer" src="${context}/assets/images/message.gif"/></h1>
+<p>${page.getLocalizedString('step2.description')}</p>
 
 <div id="serverSettingsDiv" style="width:610px;">
-    <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+    <p id="allfields"><em>*</em>&nbsp;${page.getLocalizedString('required.field.label')}</p>
     <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
-    <div class="headerBox" >$page.getLocalizedString("step2.server.settings")</div>
-    <div class="bodyBox" style="height:220px;">	
+    <div class="headerBox" >${page.getLocalizedString('step2.server.settings')}</div>
+    <div class="bodyBox" style="height:220px;">
         <span>
             <table class="temp">
                 <tr>
-                    <td><label for="serverURL"><em>*&nbsp;</em>$page.getLocalizedString("step2.server.url")</label></td>
+                    <td><label for="serverURL"><em>*&nbsp;</em>${page.getLocalizedString('step2.server.url')}</label></td>
                     <td>
-                        <input id="serverURL" name="serverURL" type="text" 
-                            class="text" size="40" 
-                            value="$serverURL" 
+                        <input id="serverURL" name="serverURL" type="text"
+                            class="text" size="40"
+                            value="${serverURL}"
                             onkeyup="APP.callDelayed(this, validateServerURL)"
                             onchange="APP.callDelayed(this, validateServerURL)"/>
                             <span id="serverURLStatus"></span>
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="cookieDomain">$page.getLocalizedString("step2.cookie.domain")</label></td>
+                    <td><label for="cookieDomain">${page.getLocalizedString('step2.cookie.domain')}</label></td>
                     <td>
-                        <input id="cookieDomain" name="cookieDomain" type="text" 
-                            class="text" style="width:150px" 
-                            value="$cookieDomain" 
+                        <input id="cookieDomain" name="cookieDomain" type="text"
+                            class="text" style="width:150px"
+                            value="${cookieDomain}"
                             onkeyup="APP.callDelayed(this, validateCookieDomain)"
                             onchange="APP.callDelayed(this, validateCookieDomain)"/>
-                        <span data-tooltip="$page.getLocalizedString("step2.cookie.domain.help")">
-                            <img class="pointer" alt="help" src="$context/com_sun_web_ui/images/alerts/info_small.gif" width="11" height="11" />
+                        <span data-tooltip="${page.getLocalizedString('step2.cookie.domain.help')}">
+                            <img class="pointer" alt="help" src="${context}/com_sun_web_ui/images/alerts/info_small.gif" width="11" height="11" />
                         </span>
                         <span id="cookieDomainStatus"></span>
                     </td>
-                </tr>   
-                <tr>                    
-                    <td><label for="platformLocale"><em>*&nbsp;</em>$page.getLocalizedString("step2.platform.locale")</label></td>
+                </tr>
+                <tr>
+                    <td><label for="platformLocale"><em>*&nbsp;</em>${page.getLocalizedString('step2.platform.locale')}</label></td>
                     <td>
-                        <input id="platformLocale" name="platformLocale" type="text" class="text" style="width:150px" value="$platformLocale" onchange="APP.callDelayed(this, validateLocale)"/>
+                        <input id="platformLocale" name="platformLocale" type="text" class="text" style="width:150px" value="${platformLocale}" onchange="APP.callDelayed(this, validateLocale)"/>
                         <span id="platformLocaleStatus"></span>
                     </td>
-                </tr> 
- 
-                <tr>                    
-                    <td><label for="configDirectory"><em>*&nbsp;</em>$page.getLocalizedString("step2.config.directory")</label></td>
+                </tr>
+
+                <tr>
+                    <td><label for="configDirectory"><em>*&nbsp;</em>${page.getLocalizedString('step2.config.directory')}</label></td>
                     <td>
-                        <input id="configDirectory" name="configDirectory" 
-                        type="text" class="text" size="40" 
-                        value="$configDirectory" onkeyup="APP.callDelayed(this, validateConfigDir)" />
-                        <span id="configDirectoryStatus">$initialCheck</span>
+                        <input id="configDirectory" name="configDirectory"
+                        type="text" class="text" size="40"
+                        value="${configDirectory}" onkeyup="APP.callDelayed(this, validateConfigDir)" />
+                        <span id="configDirectoryStatus">${initialCheck}</span>
                     </td>
-                </tr> 
+                </tr>
             </table>
         </span>
     </div>
@@ -150,5 +150,4 @@
     </div>
 </div>
 </div> <!-- indent div -->
-
 

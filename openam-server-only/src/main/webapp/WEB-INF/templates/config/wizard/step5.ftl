@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-    var loadBalancerValid = #if((!$host && !$port) || ($host && $port))true#{else}false#{end};
+    var loadBalancerValid = <#if (!host?? && !port??) || (host?? && port??)>true<#else>false</#if>;
 
     function disableLoadBalancer() {
         $('loadBalancerEnable').checked = false;
@@ -13,7 +13,7 @@
         $('loadBalancerHostName').disabled = true;
         $('loadBalancerPort').disabled = true;
         ie7fix++;
-        AjaxUtils.call("$context$path?actionLink=clear&ie7fix=" + ie7fix);
+        AjaxUtils.call("${context}${path}?actionLink=clear&ie7fix=" + ie7fix);
     }
 
     function enableLoadBalancer() {
@@ -41,7 +41,7 @@
 
     function validatePrimaryURL() {
         ie7fix++;
-        AjaxUtils.call("$context$path?actionLink=validateURL&port=" + 
+        AjaxUtils.call("${context}${path}?actionLink=validateURL&port=" +
             $('loadBalancerPort').value + "&ie7fix=" + ie7fix, urlValidated);
     }
 
@@ -61,7 +61,7 @@
 
     function validateSiteName() {
         var params = "host=" + $('loadBalancerHostName').value;
-        APP.call("$context$path", "validateSite", params, 
+        APP.call("${context}${path}", "validateSite", params,
             siteNameValidated, siteNameInvalidated);
     }
 
@@ -90,44 +90,44 @@
 </script>
 
 <div style="margin-left:10px;">
-    <h1>$page.getLocalizedString("step5.title")<img class="pointer" alt="info" src="$context/assets/images/message.gif"/></h1>
-    <p>$page.getLocalizedString("step5.description")</p>
-    <input type="radio" id="loadBalancerDisable" #if (!$host && !$port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("no.label")</span><br/>
-    <input type="radio" id="loadBalancerEnable" #if ($host || $port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("yes.label")</span>
+    <h1>${page.getLocalizedString('step5.title')}<img class="pointer" alt="info" src="${context}/assets/images/message.gif"/></h1>
+    <p>${page.getLocalizedString('step5.description')}</p>
+    <input type="radio" id="loadBalancerDisable" <#if !host?? && !port??>checked="checked"</#if>/><span>&nbsp;${page.getLocalizedString('no.label')}</span><br/>
+    <input type="radio" id="loadBalancerEnable" <#if host?? || port??>checked="checked"</#if>/><span>&nbsp;${page.getLocalizedString('yes.label')}</span>
 
     <div id="loadBalancerModule" style="width:500px;">
-        <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+        <p id="allfields"><em>*</em>&nbsp;${page.getLocalizedString('required.field.label')}</p>
         <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
-            <div class="headerBox">$page.getLocalizedString("step5.sub.title")</div>
+            <div class="headerBox">${page.getLocalizedString('step5.sub.title')}</div>
         <div class="bodyBox" style="height:180px">
-            $page.getLocalizedString("step5.help.message")
+            ${page.getLocalizedString('step5.help.message')}
             <span>
                 <table class="temp">
                     <tr>
-                        <td><label for="loadBalancerHostName"><em>*&nbsp;</em>$page.getLocalizedString("site.name.label")</label></td>
+                        <td><label for="loadBalancerHostName"><em>*&nbsp;</em>${page.getLocalizedString('site.name.label')}</label></td>
                         <td>
-                            <input id="loadBalancerHostName" name="loadBalancerHostName" 
-                            type="text" value="#if($host)$host#{end}" class="text" 
+                            <input id="loadBalancerHostName" name="loadBalancerHostName"
+                            type="text" value="<#if host??>${host}</#if>" class="text"
                             style="width:180px"
-                            onkeyup="APP.callDelayed(this, validateSiteName)"    
+                            onkeyup="APP.callDelayed(this, validateSiteName)"
                             onchange="APP.callDelayed(this, validateSiteName)"/>
-                            <span id="siteNameStatus"></span>                    
+                            <span id="siteNameStatus"></span>
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="loadBalancerPort"><em>*&nbsp;</em>$page.getLocalizedString("primary.url.label")</label></td>
+                        <td><label for="loadBalancerPort"><em>*&nbsp;</em>${page.getLocalizedString('primary.url.label')}</label></td>
                         <td>
-                            <input id="loadBalancerPort" name="loadBalancerPort" 
-                            type="text" value="#if($port)$port#{end}" class="text" 
+                            <input id="loadBalancerPort" name="loadBalancerPort"
+                            type="text" value="<#if port??>${port}</#if>" class="text"
                             style="width:180px"
-                            onkeyup="APP.callDelayed(this, validatePrimaryURL)"    
+                            onkeyup="APP.callDelayed(this, validatePrimaryURL)"
                             onchange="APP.callDelayed(this, validatePrimaryURL)"/>
-                            <span id="loadBalancerStatus"></span>                  
+                            <span id="loadBalancerStatus"></span>
                         </td>
                     </tr>
                     <tr>
                 </table>
-            </span>                 
+            </span>
         </div>
         <div>
             <b class="xbottom">

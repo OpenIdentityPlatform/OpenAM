@@ -25,63 +25,75 @@
  * $Id: Step6.java,v 1.13 2009/01/05 23:17:10 veiming Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import com.sun.identity.setup.AMSetupServlet;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 
 /**
  * This is the first step in the advanced configuration flow.
  * The user will be required to add the default admin password and
  * the agent passwords.
  */
-public class Step6 extends ProtectedPage {
-    
-    // this links required for client side validation calls
-    public ActionLink validateAgent = 
-        new ActionLink("checkAgentPassword", this, "checkAgentPassword" );
-    
-    public void onInit() {     
+public class Step6 extends SetupPage {
+
+    @Override
+    public boolean onSecurityCheck() {
+        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
+        // OpenAM has already been configured.
+        if (AMSetupServlet.isConfigured()) {
+            skipRender();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onInit() {
         String agentPwd = (String)getContext().getSessionAttribute(
             SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD);
         if (agentPwd != null) {
             addModel("agentPassword",agentPwd);
         }
-        
+
         String confirmPwd = (String)getContext().getSessionAttribute(
             SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM);
         if (confirmPwd != null) {
             addModel("agentConfirm", confirmPwd);
         }
-        
+
         super.onInit();
     }
-      
+
+    // Not referenced by step6.htm/step6.ftl (the template posts to the base checkPasswords
+    // handler instead, same as Step1), but kept web-invokable for byte-identical behavior with
+    // the old Click page - see docs/migration/click-to-freemarker/04-implementation-notes.md.
+    @ConfiguratorAction
     public boolean checkAgentPassword() {
         String agentPassword = toString("agent");
         String agentConfirm = toString("agentConfirm");
         String tmpadmin = (String)getContext().getSessionAttribute(
             SessionAttributeNames.CONFIG_VAR_ADMIN_PWD);
-         
-        if (agentPassword == null || agentConfirm == null) {        
+
+        if (agentPassword == null || agentConfirm == null) {
             writeInvalid(getLocalizedString("missing.required.field"));
         } else if (agentPassword.equals(tmpadmin)) {
             writeInvalid(getLocalizedString("agent.admin.passwords.match"));
         } else if (agentPassword.length() < 8) {
             writeInvalid(getLocalizedString("invalid.password.length"));
         } else if (!agentPassword.equals(agentConfirm)) {
-            writeInvalid(getLocalizedString("passwords.do.not.match"));             
+            writeInvalid(getLocalizedString("passwords.do.not.match"));
         } else {
             writeValid("OK");
             getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD,
                 agentPassword);
         }
-        setPath(null);
         return false;
-    }    
+    }
 }
-

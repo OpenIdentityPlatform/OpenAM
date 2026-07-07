@@ -18,6 +18,7 @@ package org.openidentityplatform.openam.config.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -46,6 +47,10 @@ public class ConfiguratorContext {
 
     public HttpSession getSession() {
         return request.getSession();
+    }
+
+    public ServletContext getServletContext() {
+        return request.getServletContext();
     }
 
     public Object getSessionAttribute(String name) {

@@ -25,12 +25,12 @@
  * $Id: Step2.java,v 1.15 2010/01/04 19:08:36 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.setup.SetupConstants;
@@ -38,14 +38,22 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 import org.forgerock.openam.utils.StringUtils;
 
-public class Step2 extends ProtectedPage {
-    public ActionLink validateConfigDirLink = 
-        new ActionLink("validateConfigDir", this, "validateConfigDir");
-    public ActionLink validateCookieDomainLink = 
-        new ActionLink("validateCookieDomain", this, "validateCookieDomain");
+public class Step2 extends SetupPage {
+
+    @Override
+    public boolean onSecurityCheck() {
+        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
+        // OpenAM has already been configured.
+        if (AMSetupServlet.isConfigured()) {
+            skipRender();
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public void onInit() {
@@ -88,9 +96,9 @@ public class Step2 extends ProtectedPage {
 
         if (!hasWritePermission(baseDir)) {
             String deployURI = getContext().getServletContext().getContextPath();
-            add("initialCheck", "<small><img class=\"pointer\" src=\"" + deployURI + 
+            add("initialCheck", "<small><img class=\"pointer\" src=\"" + deployURI +
                     "/assets/images/error.jpg\">" +
-                    getLocalizedString("configuration.wizard.step2.no.write.permission.to.basedir") + 
+                    getLocalizedString("configuration.wizard.step2.no.write.permission.to.basedir") +
                     "</small>");
         } else if (alreadyHasContent(baseDir)) {
             String deployURI = getContext().getServletContext().getContextPath();
@@ -101,17 +109,17 @@ public class Step2 extends ProtectedPage {
         } else {
             add("initialCheck", "");
         }
-        
+
         super.onInit();
     }
-    
+
     private static boolean alreadyHasContent(String dirName) {
-        File f = new File(dirName); 
-        
+        File f = new File(dirName);
+
         if (f.exists() && f.isDirectory()) {
             return (f.list().length > 0);
         }
-        
+
         return false;
     }
 
@@ -122,10 +130,11 @@ public class Step2 extends ProtectedPage {
         }
         return (f == null) ? false : f.isDirectory() && f.canWrite();
     }
-    
+
+    @ConfiguratorAction
     public boolean validateConfigDir() {
         String configDir = toString("dir");
-        
+
         if (configDir == null) {
             writeToResponse(getLocalizedString("missing.required.field"));
         } else if (!hasWritePermission(configDir)) {
@@ -139,10 +148,10 @@ public class Step2 extends ProtectedPage {
                 SessionAttributeNames.CONFIG_DIR, configDir);
             writeToResponse("true");
         }
-        setPath(null);        
-        return false;    
+        return false;
     }
 
+    @ConfiguratorAction
     public boolean validateCookieDomain() {
         String serverUrl = toString("serverurl");
         String domain = toString("domain");
@@ -155,10 +164,9 @@ public class Step2 extends ProtectedPage {
             getContext().setSessionAttribute(SessionAttributeNames.COOKIE_DOMAIN, domain);
             writeToResponse("true");
         }
-        setPath(null);
         return false;
     }
-    
+
     private boolean mismatchedCookieDomain(String serverUrl, String domain) {
         if (StringUtils.isNotEmpty(serverUrl) && StringUtils.isNotEmpty(domain)) {
             try {
@@ -173,14 +181,14 @@ public class Step2 extends ProtectedPage {
     }
 
     private String getServerURL() {
-        String hostname = (String)getContext().getRequest().getServerName();
-        int portnum  = (int)getContext().getRequest().getServerPort();
-        String protocol = (String)getContext().getRequest().getScheme();
+        String hostname = getContext().getRequest().getServerName();
+        int portnum  = getContext().getRequest().getServerPort();
+        String protocol = getContext().getRequest().getScheme();
         return protocol + "://" + hostname + ":" + portnum;
     }
 
     /**
-     * used to add the key to the page and to the session so it can 
+     * used to add the key to the page and to the session so it can
      * be retrieved when the final store is done
      */
     private void add(String key, String value) {
