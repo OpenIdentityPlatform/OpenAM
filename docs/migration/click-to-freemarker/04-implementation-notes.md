@@ -1,8 +1,8 @@
-# Implementation notes: increments 0-5
+# Implementation notes: increments 0-6
 
 Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), Step3 +
-LDAPStoreWizardPage (3), Step7 (4), and the wizard shell (5), worth knowing before increments 6+.
-Background in `02-recommendation.md` / `03-migration-plan.md`.
+LDAPStoreWizardPage (3), Step7 (4), the wizard shell (5), and Options + DefaultSummary (6), worth
+knowing before increment 7+. Background in `02-recommendation.md` / `03-migration-plan.md`.
 
 ## FreeMarker's `WebappTemplateLoader` cannot be used (javax vs jakarta)
 
@@ -524,3 +524,150 @@ test, same call as the prior two pages; re-run manually if `wizard.ftl`'s var re
 `ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
 `wizard.htm` (now migrated) to `options.htm` (still Click, next up in increment 6) — update this
 again whenever `Options.java`/`options.ftl` lands.
+
+## Increment 6: Options + DefaultSummary
+
+The first increment to migrate a **full top-level HTML page**, not a fragment. Every page in
+increments 1-5 (steps 1-7, the wizard shell) is loaded as an AJAX fragment into some container —
+`options.htm` is that container. It's requested directly by the browser and, uniquely among all
+12 old templates, is the *only* page whose Click page class overrides `getTemplate()` (via
+`TemplatedPage`) to point at a **second, wrapping** template (`assets/templates/main.html`), which
+Velocity's `#parse($path)` then used to splice `options.htm`'s own content into the middle of a
+shared HTML/`<head>`/copyright-footer shell. `defaultSummary.htm` (the other page in this
+increment) has no such wrapping — like every fragment page before it, its class extends
+`ProtectedPage`, not `TemplatedPage`, so it never went through `main.html` at all.
+
+### `ConfiguratorServlet` has no decorator/layout support, so `main.html` had to be inlined into `options.ftl`
+
+Click's two-level template resolution (page template, wrapped by a layout template that
+`#parse`s it back in) has no equivalent in `ConfiguratorServlet.render()`, which loads and
+processes exactly one named template per URL. Building generic decorator support for this one
+remaining full-page use case would be speculative infrastructure for a single caller. Instead,
+`options.ftl` is `main.html` and the old `options.htm` **merged into one file**: the full
+`<!DOCTYPE>`/`<head>`/table-layout shell from `main.html`, with `options.htm`'s content (its own
+`<link>`/`<script>`/`<div id="options-container">`, translated with the usual token map) inserted
+literally at the point where `#parse($path)` used to sit. Note that `options.htm`'s own
+`<link>`/`<script>` tags end up inside the HTML `<body>`, not `<head>`, exactly as they did before
+(Velocity's `#parse` is a literal text splice, and browsers tolerate this) — not "fixed" as part of
+this port. If a future page ever needs the same `main.html` wrapping, extract this into a real
+FreeMarker `<#include>`/macro at that point; doing it for a single page here would be premature.
+
+### `main.html`'s `$imports` is always empty for `Options` — dropped, not defaulted
+
+`$imports` is Click's own `PageImports` mechanism (auto-collects `JsImport`/`CssImport` from a
+page's `getHeadElements()` and its registered `Control`s). Confirmed via the fork's `Page`/
+`PageImports` source that `getHeadElements()` defaults to an empty list unless a page overrides
+it, and neither `Options` nor any of its old ancestors (`TemplatedPage`/`AjaxPage`) does, nor do
+raw `ActionLink` fields contribute head elements. So `$imports` always rendered empty for this
+page; the line is dropped entirely rather than reproduced as `${imports!""}` on an empty line,
+matching the plan's own instruction to drop unused shared-model keys.
+
+### `Options`'s three `ActionLink`s are dead — same shape as `Wizard`'s `testNewInstanceUrl`/`pushConfig`
+
+`createConfigLink`/`testUrlLink`/`pushConfigLink` were bound by name to `upgrade()`/`coexist()`/
+`olderUpgrade()` — none of which exist anywhere in `Options.java`, confirmed by grep and by `git
+log --follow -p`. Exactly the increment-5 `Wizard` situation: Click would have reflectively
+thrown `NoSuchMethodException` on any request that actually tried to invoke one, and the template
+never posts to any of them — the matching `id="upgradeLink"`/`id="DemoConfiguration"`/
+`id="CreateNewConf"` HTML elements are plain anchors driven by static JS `addEventListener` calls,
+unrelated to Click's `ActionLink` control mechanism despite the name coincidence. Dropped with no
+replacement, same as `Wizard`'s pair.
+
+### `TemplatedPage`'s title/`currentYear`/status-message machinery was entirely dead for `Options` — dropped along with the class
+
+`Options` was `TemplatedPage`'s only subclass (confirmed by grep), so this increment retires
+`TemplatedPage.java` per the plan. Before deleting it, checked whether its `onInit()` machinery
+(`addModel("title", ...)`, `currentYear`, `statusMessages`/`addStatusMessageCode`/
+`getStatusMessageCodes()`) does anything observable: grepped every `$`-token in `options.htm` and
+every caller of `addStatusMessageCode`/`getStatusMessageCodes` repo-wide. Neither `$title` nor
+`$currentYear` nor `$statusMessages` is ever referenced by `options.htm`, and nothing outside
+`TemplatedPage` itself calls the status-message methods — fully dead, not merely unused-but-safe
+like Step3's `configStorePassword`. Unlike that precedent (where the addModel call was left in
+place because it was part of a method being ported verbatim), this is the framework class itself
+being retired, so the dead mechanism was not carried into `Options` at all: no `title/currentYear/
+statusMessages` model keys, no `getTitle()` (which becomes dead the moment nothing adds "title" to
+the model, so it was removed rather than left as an orphan). `getTemplate()` was not ported either
+— it was Click's own template-resolution hook, made obsolete by `ConfiguratorServlet`'s
+URL-to-template mapping.
+
+### A second, unrelated dead field: `Options`'s own private `configLocale`
+
+Separately from the `AjaxPage`/`SetupPage.configLocale` field used by `Wizard`/`DefaultSummary`,
+the old `Options.java` declared its own `private java.util.Locale configLocale = null;`, which
+**shadows** the inherited one and is never assigned or read anywhere else in the class — inert by
+construction, not a bug that changes behavior, just leftover cruft. Not carried into the port.
+
+### Two more pre-existing silently-blank Velocity variables, both in `options.htm`
+
+Same `$var`-vs-`addModel` diff used for every page since Step4. `options.htm` reads `$currentVersion`
+inside `#if ($upgrade || $upgradeCompleted)`, but `doInit()` only calls `addModel("currentVersion",
+...)` when `upgrade` is `true` — a narrower condition. Since `upgrade` and `upgradeCompleted` are
+independent booleans (`upgradeCompleted` is a separate persisted flag from
+`AMSetupServlet.isUpgradeCompleted()`), the state `upgrade=false, upgradeCompleted=true` is
+reachable (an install that already finished upgrading, so the version check no longer reports
+"newer") and would have silently rendered `$currentVersion` blank under Velocity. Ported as
+`${currentVersion!""}`. `$odsdir` has no such gap — it's read only inside `#if ($isOpenDS1x)`, and
+`addModel("odsdir", ...)` is guarded by the identical condition — but it was still given a
+`${odsdir!""}` default defensively, since `AMSetupServlet.getBaseDir()` (its value) can itself
+return `null`, which FreeMarker's default object wrapper treats the same as "undefined" and would
+otherwise throw. Both defaults were exercised through a throwaway FreeMarker 2.3.31 harness (real
+`options.ftl` from disk, stub `page.getLocalizedString`) across three model shapes — new-install,
+mid-upgrade, and the `upgrade=false && upgradeCompleted=true` gap specifically — confirming no
+`InvalidReferenceException` in any of them; not kept as a checked-in test, same call as every
+prior page's real-render check (see below).
+
+### `Options` has no `onSecurityCheck()` override at all — the first migrated page like this
+
+Every other migrated page (`Step1`-`Step7`, `Wizard`) ports `ProtectedPage`'s "block re-entry once
+configured" check. `Options` never extended `ProtectedPage` in the first place — only
+`TemplatedPage` — so it inherited Click `Page`'s default `onSecurityCheck()` (always `true`,
+verified in the fork's source), meaning **the options page must stay reachable even after OpenAM
+is configured**: that's exactly how a completed install reaches its upgrade-detection branch
+(`isNewInstall()` returning `false`). `SetupPage`'s own default `onSecurityCheck()` is already
+`true`, so no override was needed — just a comment on the class recording *why* one isn't there,
+so it doesn't look like an oversight next to every other page's explicit override.
+`DefaultSummary`, by contrast, did extend `ProtectedPage`, so it got the standard ported override,
+identical in shape to `Step7`'s/`Wizard`'s.
+
+### `Options.onInit()` cannot be exercised in an `openam-core` unit test at all — a new, broader category of environment gap
+
+Every previous page's `onInit()` was at least partially unit-tested. `Options.onInit()` is not,
+for a reason worth flagging clearly since it's a step beyond the prior per-branch gaps
+(`Step2Test`'s `ServicesDefaultValues`, `Step3Test`'s live-network calls): its first real
+computation, `EmbeddedOpenDS.isOpenDSVer1Installed()` → `getOpenDSVersion()` →
+`AMSetupServlet.getBaseDir()`, unconditionally throws `ConfiguratorException("Servlet Context is
+null")` unless `AMSetupServlet`'s private static `servletCtx` has already been set — which only
+happens via that servlet's real `init(ServletConfig)`, called by the container because
+`openam-server-only/.../WEB-INF/web.xml` declares `AMSetupServlet` with
+`<load-on-startup>5</load-on-startup>`. That never runs in a bare `openam-core` test JVM, so *any*
+call to `Options.onInit()` throws immediately, before even reaching the debug-parameter check at
+the bottom of the method. Confirmed this is pre-existing, not introduced by the port: the old
+Click `Options.doInit()` called `EmbeddedOpenDS.isOpenDSVer1Installed()` just as unconditionally.
+Faking `AMSetupServlet.servletCtx` well enough to satisfy it (`getAppResource`, `getRealPath`, ...)
+would need either reflection into a private static field of a large shared legacy class or calling
+its real, heavyweight `init(...)` — disproportionate for this one page, so `OptionsTest` only
+covers `isNewInstall()` (which doesn't touch any of this) and documents the rest as untestable
+here, same call as every other environment-coupled gap in this migration.
+
+### `DefaultSummary.createDefaultConfig()` not unit-tested — same call as `Wizard.createConfig()`, but with real IT coverage this time
+
+Its only substantive logic is copying session state into request parameters ahead of one direct
+call to the static `AMSetupServlet.processRequest(...)`, which performs real configuration writes
+— the identical disproportionate-effort call already made for `Wizard.createConfig()` in
+increment 5. Unlike that method, there's no dedicated Cargo/Selenium IT test for the default-config
+path specifically, but `openam-server`'s existing `IT_Setup` (distinct from increment 5's
+`IT_SetupWithOpenDJ`) already clicks `DemoConfiguration` then `createDefaultConfig` through the
+real UI, so this isn't left completely unverified even without a unit test.
+
+### `options.ftl`/`defaultSummary.ftl` real-render check
+
+Same module-boundary gap as every prior page (`.ftl` lives in `openam-server-only`, no test tree;
+`ConfiguratorServlet` lives in `openam-core`). Rendered both directly with a throwaway FreeMarker
+2.3.31 harness (real `Configuration` + real templates from disk, stub `page.getLocalizedString`);
+`options.ftl` was checked across the three model shapes described above. Not kept as checked-in
+tests, same call as every prior page's real-render check; re-run manually if either template's var
+references change.
+
+`ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
+`options.htm` (now migrated) to `upgrade.htm` (still Click, next up in increment 7) — update this
+again whenever `Upgrade.java`/`upgrade.ftl` lands.

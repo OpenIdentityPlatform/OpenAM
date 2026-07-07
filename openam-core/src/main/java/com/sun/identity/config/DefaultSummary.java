@@ -30,7 +30,6 @@
 
 package com.sun.identity.config;
 
-import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.HttpServletRequestWrapper;
@@ -39,17 +38,23 @@ import com.sun.identity.setup.SetupConstants;
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 
-public class DefaultSummary extends ProtectedPage {
-    
-    public ActionLink createConfig = 
-        new ActionLink("createDefaultConfig", this, "createDefaultConfig");
-    
-    public void onInit() {
-        super.onInit();
+public class DefaultSummary extends SetupPage {
+
+    @Override
+    public boolean onSecurityCheck() {
+        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
+        // OpenAM has already been configured.
+        if (AMSetupServlet.isConfigured()) {
+            skipRender();
+            return false;
+        }
+        return true;
     }
-    
+
+    @ConfiguratorAction
     public boolean createDefaultConfig() {
         HttpServletRequest req = getContext().getRequest();
         HttpServletRequestWrapper request = 
@@ -134,7 +139,6 @@ public class DefaultSummary extends ProtectedPage {
             debug.error("DefaultSummary.createDefaultConfig()", e);
         }
         writeToResponse( ((responseString!=null)?responseString:"") );
-        setPath(null);
         return false;
     }
 }

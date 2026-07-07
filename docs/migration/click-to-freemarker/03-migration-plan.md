@@ -212,7 +212,8 @@ Within each increment, one page = one commit where practical, so review stays pa
   under `/config/auth/default` and `/config/federation`.)
 - [ ] Delete `openam-core/src/main/java/org/openidentityplatform/openam/click/` (57 files) and the
   `org.openidentityplatform.openam.velocity` fork.
-- [ ] Delete `com/sun/identity/config/util/AjaxPage.java`, `ProtectedPage.java`, `TemplatedPage.java`
+- [x] `TemplatedPage.java` deleted in increment 6 (its only subclass, `Options`, migrated off it).
+- [ ] Delete `com/sun/identity/config/util/AjaxPage.java`, `ProtectedPage.java`
   (all logic now in `SetupPage`/`SetupUtils`); fold `SetupUtils` back inline if the split is no longer
   worth it.
 - [ ] Delete `WEB-INF/click.xml` and `WEB-INF/classes/click-page.properties`.

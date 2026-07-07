@@ -4,12 +4,12 @@
     var defaultAdminFieldsValid = false;
     function defaultFieldsValid() {
         return defaultAgentFieldsValid &&
-               defaultAdminFieldsValid; 
+               defaultAdminFieldsValid;
     }
 
     function closeDefault() {
-        YAHOO.sun.identity.config.options.defaultSummary.hide(); 
-    } 
+        YAHOO.sun.identity.config.options.defaultSummary.hide();
+    }
 
     function createConfig() {
         document.getElementById("returnToConfig").style.display = "none";
@@ -18,14 +18,14 @@
 
         var fr1 = window.frames['progressIframe'];
         if ( fr1 ) {
-            fr1.location = "$context/setup/setSetupProgress";
+            fr1.location = "${context}/setup/setSetupProgress";
         }
-        
-        AjaxUtils.call("$context$path?actionLink=createDefaultConfig", writeConfigResponse);         
+
+        AjaxUtils.call("${context}${path}?actionLink=createDefaultConfig", writeConfigResponse);
     }
 
-    
-    
+
+
     function defaultAdminPasswordResponse(response) {
         if (response.responseText == "true") {
             $('defaultAdminPasswordStatus').innerHTML = okString;
@@ -33,7 +33,7 @@
         } else {
             $('defaultAdminPasswordStatus').innerHTML = errorImage +
             '<small>' + response.responseText + '</small>';
-                
+
             defaultAdminFieldsValid = false;
         }
         $('createDefaultConfig').disabled = !defaultFieldsValid();
@@ -46,7 +46,7 @@
         var oValue = "&otherPassword=" + encodeURIComponent($('defaultAgentPassword').value);
         var type = "&type=admin";
         ie7fix++;
-        AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
+        AjaxUtils.doPost(null, "${context}${path}" + link + "&ie7fix=" + ie7fix,
             cValue+aValue+oValue+type, defaultAdminPasswordResponse, null,
             null);
     }
@@ -69,9 +69,9 @@
     }
 
     function acceptLicense() {
-        YAHOO.util.Dom.addClass('defaultSummary', 'license-accepted'); 
+        YAHOO.util.Dom.addClass('defaultSummary', 'license-accepted');
     }
- 
+
     function validateDefaultAgentPasswords() {
         var link = "?actionLink=checkPasswords";
         var cValue = "confirm=" + encodeURIComponent($('defaultAgentConfirm').value);
@@ -79,11 +79,11 @@
         var oValue = "&otherPassword=" + encodeURIComponent($('defaultAdminPassword').value);
         var type = "&type=agent";
         ie7fix++;
-        AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
+        AjaxUtils.doPost(null, "${context}${path}" + link + "&ie7fix=" + ie7fix,
             cValue + aValue + oValue + type, defaultAgentPasswordResponse,
             null, null);
     }
-    
+
     function initialize() {
         $('createDefaultConfig').disabled = true;
     }
@@ -92,12 +92,12 @@
 
 </script>
 
-<link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
+<link href="${context}/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
 
 <div id="defaultSummary" class="wizard" style="width:810px;background-color: #FFFFFF">
     <div style="background-color: #FFFFFF;padding:0">
-       <div class="header">$page.getLocalizedString("fam.configurator.title")</div>
-        <div id="title" class="summary">$page.getLocalizedString("default.config.title")</div>
+       <div class="header">${page.getLocalizedString('fam.configurator.title')}</div>
+        <div id="title" class="summary">${page.getLocalizedString('default.config.title')}</div>
 
         <div class="inner-license license">
             <pre id="license-message"> </pre>
@@ -110,26 +110,26 @@
         <div class="summary">
             <div class="col1">
               <ol id="generalTabList" class="tabList" start="1" type="1">
-                <li id="generalTab1" class="currentTab">$page.getLocalizedString("passwords.tab")</li>
+                <li id="generalTab1" class="currentTab">${page.getLocalizedString('passwords.tab')}</li>
               </ol>
               &nbsp;
             </div>
             <div id="generalTabContents" class="tabContents">
                 <div id="defaultStep1" class="tabContent">&nbsp;
                     <div style="margin-left:10px;">
-                        <h1>$page.getLocalizedString("default.config.subtitle")</h1>
-                        <p>$page.getLocalizedString("default.config.description")</p>
+                        <h1>${page.getLocalizedString('default.config.subtitle')}</h1>
+                        <p>${page.getLocalizedString('default.config.description')}</p>
                         <div class="summaryPanel" style="width:610px">
-                            <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
+                            <p id="allfields"><em>*</em>&nbsp;${page.getLocalizedString('required.field.label')}</p>
                             <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
-                            <div class="headerBox">$page.getLocalizedString("step1.subtitle")</div>
+                            <div class="headerBox">${page.getLocalizedString('step1.subtitle')}</div>
                             <div class="bodyBox">
                                 <table class="temp">
                                     <tr>
-                                        <td colspan="2"><b>$page.getLocalizedString("default.user.name")</b></td>
+                                        <td colspan="2"><b>${page.getLocalizedString('default.user.name')}</b></td>
                                     </tr>
                                     <tr>
-                                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")</td>
+                                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('password.label')}</td>
                                         <td><input id="defaultAdminPassword" name="defaultAdminPassword"
                                                 type="password" value="" class="text"
                                                 onkeyup="APP.callDelayed(this,validateDefaultAdminPasswords)">
@@ -137,7 +137,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")</td>
+                                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('confirm.label')}</td>
                                         <td>
                                             <input id="defaultAdminConfirm" name="defaultAdminConfirm"
                                                 type="password" value="" class="text"
@@ -149,14 +149,14 @@
                             <b class="xbottom"><b class="xbGray1"></b><b class="xbGray2"></b><b class="xbGray3"></b><b class="xbGray4"></b></b>
 
                             <b class="xtop" style="margin-top: 10px"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
-                            <div class="headerBox">$page.getLocalizedString("agent.step.subtitle")</div>
+                            <div class="headerBox">${page.getLocalizedString('agent.step.subtitle')}</div>
                             <div class="bodyBox">
                                 <table class="temp">
                                     <tr>
-                                        <td colspan="2"><b>$page.getLocalizedString("agent.user.name")</b></td>
+                                        <td colspan="2"><b>${page.getLocalizedString('agent.user.name')}</b></td>
                                     </tr>
                                     <tr>
-                                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("password.label")</td>
+                                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('password.label')}</td>
                                         <td>
                                             <input id="defaultAgentPassword" name="defaultAgentPassword"
                                                 type="password" class="text"
@@ -165,7 +165,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><em>&nbsp;*&nbsp;</em>$page.getLocalizedString("confirm.label")</td>
+                                        <td><em>&nbsp;*&nbsp;</em>${page.getLocalizedString('confirm.label')}</td>
                                         <td>
                                             <input id="defaultAgentConfirm" name="defaultAgentConfirm"
                                                 type="password" class="text"
@@ -182,13 +182,13 @@
         </div>
     </div>
 
-    <div id="wizardFooter">        
+    <div id="wizardFooter">
         <div align="left" style="float:left">
-            <button id="createDefaultConfig" type="button" onclick="createConfig();" class="buttonblue summary">$page.getLocalizedString("create.button")</button>
+            <button id="createDefaultConfig" type="button" onclick="createConfig();" class="buttonblue summary">${page.getLocalizedString('create.button')}</button>
             <button id="acceptLicenseButton" type="button" onclick="acceptLicense();" class="buttonblue license" disabled>Continue</button>
         </div>
         <div align="right">
-            <button id="wizardCancelButton" type="button" onclick="closeDefault();">$page.getLocalizedString("cancel.button")</button>
+            <button id="wizardCancelButton" type="button" onclick="closeDefault();">${page.getLocalizedString('cancel.button')}</button>
         </div>
     </div>
 </div>

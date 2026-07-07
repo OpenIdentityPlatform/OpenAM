@@ -30,6 +30,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import com.sun.identity.config.DefaultSummary;
+import com.sun.identity.config.Options;
 import com.sun.identity.config.wizard.Step1;
 import com.sun.identity.config.wizard.Step2;
 import com.sun.identity.config.wizard.Step3;
@@ -75,6 +77,8 @@ public class ConfiguratorServlet extends HttpServlet {
         PAGES.put("/config/wizard/step6.htm", Step6.class);
         PAGES.put("/config/wizard/step7.htm", Step7.class);
         PAGES.put("/config/wizard/wizard.htm", Wizard.class);
+        PAGES.put("/config/options.htm", Options.class);
+        PAGES.put("/config/defaultSummary.htm", DefaultSummary.class);
     }
 
     private volatile Configuration freemarkerConfig;
