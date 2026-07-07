@@ -1,7 +1,7 @@
-# Implementation notes: increments 0-3
+# Implementation notes: increments 0-4
 
-Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), and Step3 +
-LDAPStoreWizardPage (3), worth knowing before increments 4+. Background in
+Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), Step3 +
+LDAPStoreWizardPage (3), and Step7 (4), worth knowing before increments 5+. Background in
 `02-recommendation.md` / `03-migration-plan.md`.
 
 ## FreeMarker's `WebappTemplateLoader` cannot be used (javax vs jakarta)
@@ -333,3 +333,75 @@ class: the apparent dead weight is original behavior, not migration residue.
 `ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
 `step3.htm` (now migrated) to `step7.htm` (still Click, next up in increment 4) — update this again
 whenever step7 lands.
+
+## Increment 4: Step7 (summary)
+
+The simplest page so far: `Step7.onInit()` only reads session attributes and `addModel`s a
+display-only summary, and — confirmed by grepping `step7.htm` for `actionLink` before porting —
+**the template never posts back to the page at all**. No `ActionLink`s, no
+`@ConfiguratorAction` methods, nothing to dispatch. `ConfiguratorServlet`'s registry entry alone
+(`Step7.class`) is the entire wiring; the page class itself only overrides `onSecurityCheck()`
+(copied 1:1 from the other steps' `ProtectedPage` port) and `onInit()`.
+
+All three `SetupPage` helpers Step7 needs (`getAttribute`, `getHostName` transitively via
+`getAvailablePort`, `getAvailablePort` itself) were already added in increments 2-3 — no new
+`SetupPage` surface required for this increment.
+
+### `$embedded` in step7.htm was already dead before this port — a model-key/template-var mismatch, not a `!""` gap
+
+Different from every other "silently blank" finding in increments 2-3 (which were template vars
+never `addModel`-ed at all): here **both sides exist, under different names**. `Step7.java` only
+ever calls `add("isEmbedded", "1")`; `step7.htm`/`step7.ftl` only ever reads `$embedded`/
+`${embedded}`. Confirmed by grepping the whole `com.sun.identity.config` tree (and Click's own
+`Page`/`AjaxPage`) for a public field or model key literally named `embedded` — there isn't one
+reachable by Step7. Net effect, **unchanged by this port**: the two embedded-only summary rows
+(local admin port, local JMX port) never render on the summary page, regardless of whether the
+config store is actually embedded. Ported as `<#if embedded??>` (an existence check on a key that
+is never populated, so always false) rather than inventing a real boolean — matches the "byte-
+identical, bugs included" rule already applied to Step4's ODSEE checkbox bug and Step3's dead
+`LDAPStore` machinery. `Step7Test.onInitSummarizesEmbeddedConfigStoreWithDefaultUserStore` asserts
+`model.doesNotContainKey("embedded")` specifically so a future cleanup doesn't "fix" this by
+accident without it being a deliberate, reviewed decision.
+
+### `getAvailablePort()` runs unconditionally on every `onInit()`, even when the session already has a value
+
+`getAttribute("configStorePort", getAvailablePort(50389))` (and the `configStoreAdminPort`/
+`configStoreJmxPort` siblings) evaluates the `getAvailablePort(...)` argument **eagerly**, in
+plain Java, before `getAttribute` ever checks whether the session attribute exists — this was true
+in the original Click `Step7.java` too, copied verbatim here. So every single render of the
+summary page binds and releases up to three real local sockets via
+`AMSetupUtils.getFirstUnusedPort`/`isPortInUse`, whether or not the result is actually used. Not a
+regression (identical to pre-migration behavior) and not this increment's job to optimize, but
+worth knowing: unlike Step3Test (which carefully picked external-data-store scenarios specifically
+to avoid ever calling `isPortInUse`), `Step7Test` cannot avoid this — every test stubs
+`request.getServerName()` to `"localhost"` purely to keep the resulting socket bind deterministic.
+
+### `EXT_DATA_STORE` NPE if Step7 is reached before Step4 ever ran for the session
+
+`Step7.onInit()`'s user-store branch does `tmp = ctx.getSessionAttribute(EXT_DATA_STORE); if
+(tmp.equals("true"))` with no null guard — identical to the original Click page. `EXT_DATA_STORE`
+is written only by `Step4.onInit()`. Checked whether this is reachable through the real UI: the
+still-Click wizard shell (`wizard.htm`, increment 5) lazy-loads each `stepN.htm` fragment on
+demand via `AjaxUtils.load` only when the user navigates to that tab (`showTab`/`nextTab`), so
+normal next-button navigation always runs Step4's `onInit()` at least once before Step7 can be
+reached. Not provably unreachable (a deep link or unusual navigation could in principle hit tab 7
+without tab 4), but not a behavior change either way — pre-existing in the Click version.
+Locked in with a dedicated test (`Step7Test.onInitThrowsIfExtDataStoreNeverSet`) asserting the
+`NullPointerException`, specifically so this doesn't get silently "fixed" as a side effect of an
+unrelated future change to this method.
+
+### Real FreeMarker render of `step7.ftl` — checked out-of-band, not as a permanent test
+
+Same module-boundary gap as `step1.ftl` (the `.ftl` lives in `openam-server-only`, a WAR module
+with no test tree; `ConfiguratorServlet` lives in `openam-core`). Rather than leave this fully
+unverified before merging, the template was rendered directly with a throwaway FreeMarker 2.3.31
+harness (real `Configuration` + real `step7.ftl` from disk, stub `page.getLocalizedString`)
+against three scenarios — minimal/embedded, fully-populated external config+user store+load
+balancer, and the default-user-store branch — and confirmed no `InvalidReferenceException` in any
+of them. This wasn't kept as a checked-in test (would need a cross-module test source set to load
+the real production template, which is out of scope here, same call already made for `step1.ftl`);
+re-run manually if `step7.ftl`'s var references change.
+
+`ConfiguratorServletTest`'s "unregistered path forwards to Click" example was moved from
+`step7.htm` (now migrated) to `wizard.htm` (still Click, next up in increment 5) — update this
+again whenever the wizard shell lands.

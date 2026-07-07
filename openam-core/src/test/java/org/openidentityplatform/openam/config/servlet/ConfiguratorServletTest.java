@@ -35,11 +35,11 @@ import org.testng.annotations.Test;
 
 /**
  * Routing behavior of {@link ConfiguratorServlet} against the real migrated-page registry
- * (steps 1, 2, 3, 4, 5, 6 as of this increment): a registered path dispatches {@code ?actionLink=}
- * requests to the matching {@code @ConfiguratorAction} method, and an unregistered path forwards,
- * by name, to the still-installed {@code click-servlet} - proving the mixed-engine fallback this
- * whole approach depends on. {@code step7.htm} (not yet migrated - see
- * docs/migration/click-to-freemarker/03-migration-plan.md, increment 4) stands in for "still on
+ * (steps 1, 2, 3, 4, 5, 6, 7 as of this increment): a registered path dispatches {@code
+ * ?actionLink=} requests to the matching {@code @ConfiguratorAction} method, and an unregistered
+ * path forwards, by name, to the still-installed {@code click-servlet} - proving the mixed-engine
+ * fallback this whole approach depends on. {@code wizard.htm} (not yet migrated - see
+ * docs/migration/click-to-freemarker/03-migration-plan.md, increment 5) stands in for "still on
  * Click" below; update this to whichever page is next in line as increments land.
  */
 public class ConfiguratorServletTest {
@@ -95,7 +95,7 @@ public class ConfiguratorServletTest {
 
     @Test
     public void unregisteredPathForwardsToClickByName() throws Exception {
-        when(request.getServletPath()).thenReturn("/config/wizard/step7.htm");
+        when(request.getServletPath()).thenReturn("/config/wizard/wizard.htm");
         RequestDispatcher dispatcher = mock(RequestDispatcher.class);
         when(servletContext.getNamedDispatcher("click-servlet")).thenReturn(dispatcher);
 

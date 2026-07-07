@@ -36,6 +36,7 @@ import com.sun.identity.config.wizard.Step3;
 import com.sun.identity.config.wizard.Step4;
 import com.sun.identity.config.wizard.Step5;
 import com.sun.identity.config.wizard.Step6;
+import com.sun.identity.config.wizard.Step7;
 import com.sun.identity.shared.debug.Debug;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -71,6 +72,7 @@ public class ConfiguratorServlet extends HttpServlet {
         PAGES.put("/config/wizard/step4.htm", Step4.class);
         PAGES.put("/config/wizard/step5.htm", Step5.class);
         PAGES.put("/config/wizard/step6.htm", Step6.class);
+        PAGES.put("/config/wizard/step7.htm", Step7.class);
     }
 
     private volatile Configuration freemarkerConfig;

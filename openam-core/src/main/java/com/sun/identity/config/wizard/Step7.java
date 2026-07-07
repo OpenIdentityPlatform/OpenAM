@@ -25,27 +25,37 @@
  * $Id: Step7.java,v 1.15 2009/10/27 05:31:45 hengming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
 
-import org.openidentityplatform.openam.click.Context;
-
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorContext;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 
 /**
  * This is the summary page for the values entered during the configuration
  * process. No actual work is done here except setting the page elements.
  */
-public class Step7 extends ProtectedPage {
+public class Step7 extends SetupPage {
 
-    private static final String DISABLED = "Disabled";
-    private static final String ENABLED = "Enabled";
+    @Override
+    public boolean onSecurityCheck() {
+        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
+        // OpenAM has already been configured.
+        if (AMSetupServlet.isConfigured()) {
+            skipRender();
+            return false;
+        }
+        return true;
+    }
 
+    @Override
     public void onInit() {
-        Context ctx = getContext();
+        ConfiguratorContext ctx = getContext();
         String tmp = getAttribute(
                 SetupConstants.CONFIG_VAR_DATA_STORE,
                 SetupConstants.SMS_EMBED_DATASTORE);
@@ -141,7 +151,6 @@ public class Step7 extends ProtectedPage {
                 (String) ctx.getSessionAttribute(
                         SessionAttributeNames.LB_PRIMARY_URL));
 
-        // Initialize our Parent Object.
         super.onInit();
     }
 
