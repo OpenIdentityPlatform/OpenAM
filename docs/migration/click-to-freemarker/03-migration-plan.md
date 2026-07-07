@@ -201,29 +201,31 @@ Within each increment, one page = one commit where practical, so review stays pa
 - **Regression guard:** confirm a registered path renders FreeMarker while a sibling **un-registered**
   `.htm` still forwards to Click and renders identically to before (the named-dispatch fallback).
 
-## Final removal (increment 8)
+## Final removal (increment 8) — done
 
-- [ ] Delete `ConfiguratorServlet`'s Click-fallback branch (the named-dispatch `else`), so unknown
+- [x] Delete `ConfiguratorServlet`'s Click-fallback branch (the named-dispatch `else`), so unknown
   `.htm` now 404s instead of forwarding. The `*.htm` → `ConfiguratorServlet` mapping **stays** (it is
   now the sole `.htm` handler). Remove the leftover **unmapped** `click-servlet` `<servlet>`
   declaration from **both** `openam-server-only/.../WEB-INF/web.xml` and
   `openam-federation/OpenFM/.../noconsole/web.xml`. (The migrated-page registry is the durable
   allow-list of configurator URLs — no `/config/*` blanket mapping, which would swallow the `.jsp`
   under `/config/auth/default` and `/config/federation`.)
-- [ ] Delete `openam-core/src/main/java/org/openidentityplatform/openam/click/` (57 files) and the
+- [x] Delete `openam-core/src/main/java/org/openidentityplatform/openam/click/` (57 files) and the
   `org.openidentityplatform.openam.velocity` fork.
 - [x] `TemplatedPage.java` deleted in increment 6 (its only subclass, `Options`, migrated off it).
-- [ ] Delete `com/sun/identity/config/util/AjaxPage.java`, `ProtectedPage.java`
-  (all logic now in `SetupPage`/`SetupUtils`); fold `SetupUtils` back inline if the split is no longer
-  worth it.
-- [ ] Delete `WEB-INF/click.xml` and `WEB-INF/classes/click-page.properties`.
-- [ ] Delete the two Click error templates `click/error.htm`, `click/not-found.htm`; add a plain
-  `<error-page>` (or a small `ConfiguratorServlet` error render) if we still want styled 404/500.
-- [ ] `openam-core/pom.xml` — remove `click-nodeps` + `click-extras` (needed only by the fork).
-- [ ] Root `pom.xml` — remove `<click.version>`; drop the `org.apache.click` /
+- [x] Delete `com/sun/identity/config/util/AjaxPage.java`, `ProtectedPage.java`
+  (all logic now in `SetupPage`/`SetupUtils`); **`SetupUtils` was kept as a separate class**, not
+  folded back inline — see `04-implementation-notes.md` for why.
+- [x] Delete `WEB-INF/click.xml` and `WEB-INF/classes/click-page.properties`.
+- [x] Delete the two Click error templates `click/error.htm`, `click/not-found.htm` (plus the empty
+  `click/index.html` directory-listing blocker, removed along with the now-gone directory). **No**
+  `<error-page>` replacement was added — see `04-implementation-notes.md`, neither `web.xml` ever had
+  a servlet-spec `<error-page>` entry pointing at them, so there is nothing to preserve.
+- [x] `openam-core/pom.xml` — remove `click-nodeps` + `click-extras` (needed only by the fork).
+- [x] Root `pom.xml` — remove `<click.version>`; drop the `org.apache.click` /
   `org.openidentityplatform.openam.click` / `org.openidentityplatform.openam.velocity` packages from
   the javadoc/OSGi `excludePackageNames`.
-- [ ] Grep-sweep: zero `import ...click...` remain; no lingering Velocity `.htm` under
+- [x] Grep-sweep: zero `import ...click...` remain; no lingering Velocity `.htm` under
   `webapp/config/**`; all wizard URLs resolve to `ConfiguratorServlet`.
 
 ## Verification (end-to-end, after final removal)

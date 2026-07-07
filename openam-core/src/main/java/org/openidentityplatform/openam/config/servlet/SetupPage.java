@@ -90,9 +90,6 @@ public abstract class SetupPage {
     public void onGet() {
     }
 
-    public void onRender() {
-    }
-
     /** Replaces Click's {@code setPath(null)} idiom for handlers that write the response directly. */
     protected void skipRender() {
         skipRender = true;

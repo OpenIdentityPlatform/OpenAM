@@ -27,13 +27,6 @@
 -->
 
     <servlet>
-        <!-- Declared but intentionally unmapped below: reachable only via named RequestDispatcher
-             forward from ConfiguratorServlet, for *.htm pages not yet migrated off Click. -->
-        <servlet-name>click-servlet</servlet-name>
-        <servlet-class>org.openidentityplatform.openam.click.ClickServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>configurator-servlet</servlet-name>
         <servlet-class>org.openidentityplatform.openam.config.servlet.ConfiguratorServlet</servlet-class>
     </servlet>

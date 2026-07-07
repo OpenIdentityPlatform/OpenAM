@@ -30,12 +30,11 @@ import freemarker.cache.TemplateLoader;
  * {@code jakarta.servlet}. FreeMarker's own {@code freemarker.cache.WebappTemplateLoader} cannot
  * be used here: even in the latest FreeMarker release it is hard-wired to {@code javax.servlet
  * .ServletContext} and was never ported to Jakarta EE 9, so it doesn't compile against this
- * project's servlet API. This is the same problem the vendored Click fork hit with Velocity
- * Tools' {@code WebappResourceLoader}, which is why a Jakarta-clean copy of that class lives
- * under {@code org.openidentityplatform.openam.velocity}; this loader is the FreeMarker
- * equivalent, kept intentionally minimal since only {@code getResource}/{@code
- * getResourceAsStream} are needed (unlike the Velocity fork, no macro/webapp-attribute plumbing
- * is required).
+ * project's servlet API. The now-removed vendored Click fork hit the identical problem with
+ * Velocity Tools' {@code WebappResourceLoader} and carried its own Jakarta-clean copy for the
+ * same reason; this loader is the FreeMarker equivalent, kept intentionally minimal since only
+ * {@code getResource}/{@code getResourceAsStream} are needed (unlike that Velocity copy, no
+ * macro/webapp-attribute plumbing is required).
  */
 public class ServletContextTemplateLoader implements TemplateLoader {
 

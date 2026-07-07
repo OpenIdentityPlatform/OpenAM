@@ -257,18 +257,6 @@
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
 
         <dependency>
-            <groupId>org.apache.click</groupId>
-            <artifactId>click-nodeps</artifactId>
-            <version>${click.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.click</groupId>
-            <artifactId>click-extras</artifactId>
-            <version>${click.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>

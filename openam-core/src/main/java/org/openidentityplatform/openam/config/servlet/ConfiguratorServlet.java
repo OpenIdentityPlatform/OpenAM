@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,21 +46,16 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
- * Replacement for the Apache Click {@code ClickServlet} on the {@code *.htm} mapping.
- * Per-request it looks the request path up in a small, explicit migrated-page registry: a
- * registered path is instantiated as a {@link SetupPage} and rendered with FreeMarker; anything
- * else is forwarded, by name, to the still-installed (but no longer URL-mapped) {@code
- * click-servlet}, so unmigrated pages keep working exactly as before.
- *
- * <p>A named {@link RequestDispatcher#forward} does not rewrite the request path, so Click still
- * sees {@code getServletPath() == /config/wizard/stepN.htm} and resolves the page exactly as it
- * did when it owned the {@code *.htm} mapping directly.
+ * Sole handler for the configurator/upgrade wizard's {@code *.htm} mapping. Per-request it looks
+ * the request path up in a small, explicit migrated-page registry: a registered path is
+ * instantiated as a {@link SetupPage} and rendered with FreeMarker; an unregistered path 404s.
+ * Apache Click, the vendored fork, and every page's old Click base class are gone as of this
+ * increment - see {@code docs/migration/click-to-freemarker/03-migration-plan.md}.
  */
 public class ConfiguratorServlet extends HttpServlet {
 
     private static final Debug debug = Debug.getInstance("amConfigurator");
 
-    private static final String CLICK_SERVLET_NAME = "click-servlet";
     private static final String ACTION_LINK_PARAM = "actionLink";
     private static final String TEMPLATE_ROOT = "/WEB-INF/templates/config";
     private static final String CONFIG_PREFIX = "/config/";
@@ -98,7 +92,7 @@ public class ConfiguratorServlet extends HttpServlet {
         Class<? extends SetupPage> pageClass = PAGES.get(path);
 
         if (pageClass == null) {
-            forwardToClick(req, resp);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
@@ -123,16 +117,6 @@ public class ConfiguratorServlet extends HttpServlet {
         if (!page.isSkipRender()) {
             render(page, path, req, resp);
         }
-    }
-
-    private void forwardToClick(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = getServletContext().getNamedDispatcher(CLICK_SERVLET_NAME);
-        if (dispatcher == null) {
-            throw new ServletException("Named dispatcher '" + CLICK_SERVLET_NAME + "' is not available; "
-                    + "check that it is still declared (but unmapped) in web.xml");
-        }
-        dispatcher.forward(req, resp);
     }
 
     private SetupPage newPage(Class<? extends SetupPage> pageClass) throws ServletException {

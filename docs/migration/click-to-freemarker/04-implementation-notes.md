@@ -1,8 +1,8 @@
-# Implementation notes: increments 0-6
+# Implementation notes: increments 0-8
 
 Findings from actually building the pilot (0, 1), the Steps 2/4/5/6 batch (2), Step3 +
-LDAPStoreWizardPage (3), Step7 (4), the wizard shell (5), and Options + DefaultSummary (6), worth
-knowing before increment 7+. Background in `02-recommendation.md` / `03-migration-plan.md`.
+LDAPStoreWizardPage (3), Step7 (4), the wizard shell (5), Options + DefaultSummary (6), Upgrade (7),
+and the final Click removal (8). Background in `02-recommendation.md` / `03-migration-plan.md`.
 
 ## FreeMarker's `WebappTemplateLoader` cannot be used (javax vs jakarta)
 
@@ -800,3 +800,86 @@ ever added when true. Not kept as a checked-in test, same call as every prior pa
 check; re-run manually if `upgrade.ftl`'s var references change.
 
 This was the last page. What's left is increment 8, the final removal.
+
+## Increment 8: final removal
+
+By the time this increment started, every real page (`Step1`-`Step7`, `Wizard`, `Options`,
+`DefaultSummary`, `Upgrade`) had already been fully ported off Click across increments 1-7. A
+repo-wide grep before touching anything confirmed **zero** remaining subclasses of Click's `Page`
+(the only one was `AjaxPage` itself) and zero callers of `AjaxPage`/`ProtectedPage` outside those
+two files. So this increment was pure deletion of already-dead code, not a behavior-preserving
+port like every prior increment — there was no "does this change anything observable" question to
+answer for most of it, which is a different risk profile worth flagging for whoever reads this
+looking for the usual byte-identical-behavior caveats: they mostly don't apply here.
+
+### `ConfiguratorServlet.forwardToClick()` was unreachable before it was deleted
+
+Confirmed via the same grep: since every `PAGES`-eligible URL already resolved to a `SetupPage`,
+no real request could ever hit the `pageClass == null` branch that called `forwardToClick()` — Click
+was reachable only through direct URL-hacking to something outside the known configurator paths,
+which was never a real code path Click served correctly anyway (see `click.xml`'s `<excludes>` list,
+now also deleted). Replaced with a plain `resp.sendError(SC_NOT_FOUND)`, matching the plan's "unknown
+`.htm` now 404s instead of forwarding" instruction. `ConfiguratorServletTest`'s
+`unregisteredPathForwardsToClickByName` test became `unregisteredPathIsNotFound`, asserting the 404
+instead of a dispatcher forward — still using `/config/upgrade/upgrade.htm` as the example path, for
+the same module-boundary reason noted in increment 7 (openam-core's test classpath never has the
+`openam-upgrade` `ConfiguratorPageProvider` on it, so that path is genuinely unregistered *there*,
+even though it resolves in the real assembled WAR).
+
+### `SetupUtils` was kept as its own class, not folded back into `SetupPage`
+
+The plan flagged this as optional ("fold `SetupUtils` back inline if the split is no longer worth
+it") now that `AjaxPage` — its other consumer — is gone. Decided against folding it in: `SetupUtils`
+is a small (127-line), fully self-contained set of *pure* helpers (LDAP connection creation, LDAP
+`ResultCode` → i18n-key mapping, boolean/int parsing, the `{"valid":..,"body":..}` JSON template) with
+no request/response coupling, which is a meaningfully different concern from `SetupPage`'s
+request-bound instance methods. Merging it in would bloat `SetupPage` for no behavioral or
+readability benefit — the original reason for the split (byte-identical validation semantics shared
+with the now-deleted `AjaxPage`) no longer applies, but the class remains a reasonable seam on its
+own merits. If a future change wants to revisit this, `SetupPage` is the only remaining caller so
+it's a purely mechanical inline at that point.
+
+### `SetupPage.onRender()` deleted — confirmed dead per the increment-7 note that flagged it
+
+Increment 7's notes already identified `onRender()` as never called by `ConfiguratorServlet` and
+never overridden by any page, suggesting deletion "if nothing ever ends up using it" in the final
+cleanup. Re-confirmed with a fresh grep (`Upgrade`, the last page added after that note, doesn't
+override it either) before deleting. `Upgrade.java`'s comment explaining why it uses `onGet()`
+instead of the old Click `onRender()` lifecycle hook was left as-is — it's explaining Click's
+historical behavior for context, not referencing a still-live `SetupPage` method.
+
+### No `<error-page>` replacement added for the deleted Click error templates
+
+`click/error.htm` and `click/not-found.htm` were only ever reachable through Click's own internal
+`ErrorPage`/`ClickServlet` error handling — confirmed neither `web.xml` (server-only or
+OpenFM/noconsole) had a servlet-spec `<error-page>` element pointing at them, in this migration or,
+as far as `git log` shows, ever. Deleting them with no replacement is therefore not a behavior
+change; the plan's "if we still want styled 404/500" option was declined rather than silently
+skipped. `click/index.html` (a 0-byte directory-listing blocker, same convention used in ~10 other
+`webapp/**` directories) was removed along with the rest of the now-empty `click/` directory rather
+than kept — nothing serves from that path anymore.
+
+### Build/verification approach for this increment
+
+Unlike prior increments (which needed template-render harnesses and careful `$var`-vs-`addModel`
+diffing), verification here was: (1) a repo-wide grep sweep for `org.apache.click`,
+`org.openidentityplatform.openam.click`, `org.openidentityplatform.openam.velocity`, `click-servlet`,
+and `click-nodeps`/`click-extras` (excluding `target/` build output, which still had stale references
+from before the `pom.xml` edits and briefly caused false positives) — zero hits outside docs/comments
+and one unrelated pre-existing doc mention of a *different* URL pattern (`/ccversion/*`) that happens
+to also be named "click-servlet" in `openam-documentation`'s endpoint reference, left untouched as
+out of scope; (2) `mvn -pl openam-core test` (78 tests, all green) then `install -DskipTests` to
+refresh the local-repo jar for downstream modules (not `-am`, per this repo's standing rule against
+`-am` on the heavy server modules); (3) `mvn -pl openam-server-only package -DskipTests` and
+`mvn -pl openam-federation/OpenFM package -DskipTests` to confirm both `web.xml` edits are
+well-formed and the WARs still assemble; (4) `mvn -pl openam-upgrade test` (127 tests, all green,
+including `ConfiguratorServletUpgradeRoutingTest`, which now exercises the real `ConfiguratorServlet`
+with Click entirely absent from the classpath — the strongest available proof that the
+`ServiceLoader`-based routing never actually needed Click as a fallback).
+
+Not done as part of this increment (same category as every prior increment's manual-smoke gap):
+deploying the assembled WAR and clicking through the wizard end-to-end. Nothing in this increment
+touches template rendering or page logic — it only deletes already-unreachable code and edits
+`web.xml`/`pom.xml` — so the risk this would catch is narrower than in prior increments, but it's
+still the final item from `03-migration-plan.md`'s "Verification (end-to-end, after final removal)"
+section that remains genuinely unexercised by this session.
