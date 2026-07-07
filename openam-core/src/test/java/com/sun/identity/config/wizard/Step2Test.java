@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpSession;
 
 import com.sun.identity.config.SessionAttributeNames;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorContext;
+import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -100,6 +101,17 @@ public class Step2Test {
     public void validateConfigDirRejectsNoWritePermission() throws IOException {
         tempDir = Files.createTempDirectory("step2-nowrite");
         tempDir.toFile().setWritable(false);
+        if (tempDir.toFile().canWrite()) {
+            // File.setWritable(false) on a directory isn't enforced by every environment this
+            // suite runs in: Windows doesn't honor the read-only attribute for writes into a
+            // directory, and a privileged (e.g. root) test runner on POSIX bypasses permission
+            // checks entirely. Same "not reliably reproducible across environments" category as
+            // the other environment-dependent branches documented in
+            // docs/migration/click-to-freemarker/04-implementation-notes.md.
+            tempDir.toFile().setWritable(true);
+            throw new SkipException(
+                    "Cannot make " + tempDir + " non-writable in this environment (Windows or privileged test runner)");
+        }
         param("dir", tempDir.toString());
 
         step2.validateConfigDir();

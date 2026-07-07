@@ -237,6 +237,18 @@ calling this method from an `openam-core` test throws `ExceptionInInitializerErr
 the browser) is the only current coverage for that handler, same category as the still-open
 "real FreeMarker render of `step1.ftl` isn't unit-tested" gap above.
 
+### `Step2Test.validateConfigDirRejectsNoWritePermission` needed a Windows guard
+
+CI on a Windows agent failed this test: `File.setWritable(false)` on a directory isn't enforced
+there (Windows doesn't honor the read-only attribute for writes *into* a directory, only for the
+file itself), so `Step2.hasWritePermission()`'s `File.canWrite()` check kept returning `true` and
+`validateConfigDir()` took the happy path instead of the rejection branch. Same underlying
+category as this doc's other "not reliably reproducible across environments" gaps, just discovered
+post-merge via CI rather than while writing the test. Fixed by checking whether `setWritable(false)`
+actually took effect (`canWrite()` still `true` afterwards) and skipping via `SkipException` with an
+explanatory message when it didn't — also covers a privileged/root POSIX test runner, which would
+hit the same symptom for the same reason (permission checks bypassed).
+
 ## Increment 3: Step3 + LDAPStoreWizardPage
 
 Step3 is the heaviest page so far (many public-field/session pre-fills, the `LDAPStore` object,
