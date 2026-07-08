@@ -33,6 +33,7 @@ import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.util.Options;
 import org.forgerock.util.time.Duration;
+import org.json.JSONObject;
 
 /**
  * Pure, request/response-free helpers shared by the still-Click {@code AjaxPage} and the new
@@ -42,8 +43,6 @@ import org.forgerock.util.time.Duration;
  * the split is no longer worth it.
  */
 public final class SetupUtils {
-
-    public static final String RESPONSE_TEMPLATE = "{\"valid\":\"${valid}\", \"body\":\"${body}\"}";
 
     public static final int MIN_PASSWORD_SIZE = 8;
 
@@ -118,9 +117,9 @@ public final class SetupUtils {
     }
 
     public static String jsonResponse(String valid, String responseBody) {
-        String response = RESPONSE_TEMPLATE;
-        response = response.replaceFirst("\\$\\{valid\\}", valid);
-        response = response.replaceFirst("\\$\\{body\\}", responseBody);
-        return response;
+        JSONObject json = new JSONObject();
+        json.put("valid", valid);
+        json.put("body", responseBody);
+        return json.toString();
     }
 }
