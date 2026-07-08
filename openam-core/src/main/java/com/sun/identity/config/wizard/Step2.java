@@ -39,21 +39,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 import org.forgerock.openam.utils.StringUtils;
 
-public class Step2 extends SetupPage {
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
+public class Step2 extends ProtectedSetupPage {
 
     @Override
     public void onInit() {

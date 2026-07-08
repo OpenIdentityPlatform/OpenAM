@@ -36,7 +36,7 @@ import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
@@ -47,7 +47,7 @@ import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
 
-public class Wizard extends SetupPage implements Constants {
+public class Wizard extends ProtectedSetupPage implements Constants {
 
     public int startingTab = 1;
 
@@ -62,17 +62,6 @@ public class Wizard extends SetupPage implements Constants {
     public String defaultPort;
     public String defaultAdminPort;
     public String defaultJmxPort;
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onInit() {

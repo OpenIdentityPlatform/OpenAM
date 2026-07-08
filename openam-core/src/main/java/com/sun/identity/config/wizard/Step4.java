@@ -31,7 +31,6 @@
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import java.io.IOException;
 import java.net.Socket;
@@ -43,7 +42,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorContext;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
@@ -54,23 +53,12 @@ import org.forgerock.opendj.ldap.SearchScope;
 /**
  * Step 4 is the input of the remote user data store properties.
  */
-public class Step4 extends SetupPage {
+public class Step4 extends ProtectedSetupPage {
     public static final String LDAP_STORE_SESSION_KEY = "wizardCustomUserStore";
 
     private String responseString = "ok";
 
     private static final String ObjectClassFilter = "(objectclass=*)";
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onInit() {

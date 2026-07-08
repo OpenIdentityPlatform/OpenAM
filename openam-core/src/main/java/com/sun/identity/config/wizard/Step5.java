@@ -34,10 +34,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.setup.AMSetupServlet;
 
 /**
  * Wizard Step # 5: Site Name, URL and Session HA Failover indicator.
@@ -47,18 +46,7 @@ import com.sun.identity.setup.AMSetupServlet;
  * as this information will be replicated by the underlying store.
  *
  */
-public class Step5 extends SetupPage {
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
+public class Step5 extends ProtectedSetupPage {
 
     @Override
     public void onInit() {

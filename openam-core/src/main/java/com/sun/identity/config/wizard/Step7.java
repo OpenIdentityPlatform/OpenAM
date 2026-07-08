@@ -31,27 +31,15 @@
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorContext;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 /**
  * This is the summary page for the values entered during the configuration
  * process. No actual work is done here except setting the page elements.
  */
-public class Step7 extends SetupPage {
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
+public class Step7 extends ProtectedSetupPage {
 
     @Override
     public void onInit() {

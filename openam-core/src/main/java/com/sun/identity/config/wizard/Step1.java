@@ -32,26 +32,14 @@ package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
-import com.sun.identity.setup.AMSetupServlet;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 /**
  * This is the first step in the advanced configuration flow.
  * The user will be required to add the default admin password and
  * the agent passwords.
  */
-public class Step1 extends SetupPage {
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
+public class Step1 extends ProtectedSetupPage {
 
     // Not referenced by step1.htm/step1.ftl (the template posts to the base checkPasswords
     // handler instead), but kept web-invokable for byte-identical behavior with the old Click page.

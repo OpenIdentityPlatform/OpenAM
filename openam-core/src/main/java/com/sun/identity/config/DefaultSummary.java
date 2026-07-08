@@ -39,20 +39,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
 import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
-import org.openidentityplatform.openam.config.servlet.SetupPage;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
-public class DefaultSummary extends SetupPage {
-
-    @Override
-    public boolean onSecurityCheck() {
-        // Ported from the old com.sun.identity.config.util.ProtectedPage: block re-entry once
-        // OpenAM has already been configured.
-        if (AMSetupServlet.isConfigured()) {
-            skipRender();
-            return false;
-        }
-        return true;
-    }
+public class DefaultSummary extends ProtectedSetupPage {
 
     @ConfiguratorAction
     public boolean createDefaultConfig() {
