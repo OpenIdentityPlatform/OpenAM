@@ -86,7 +86,7 @@ public class Step6Test {
         step6.checkAgentPassword();
 
         assertThat(responseBody.toString())
-                .isEqualTo("{\"valid\":\"false\", \"body\":\"Missing Required Field\"}");
+                .isEqualTo("{\"valid\":\"false\",\"body\":\"Missing Required Field\"}");
         assertThat(sessionAttributes).isEmpty();
     }
 
@@ -99,7 +99,7 @@ public class Step6Test {
         step6.checkAgentPassword();
 
         assertThat(responseBody.toString())
-                .isEqualTo("{\"valid\":\"false\", \"body\":\"Agent password is same as Admin Password\"}");
+                .isEqualTo("{\"valid\":\"false\",\"body\":\"Agent password is same as Admin Password\"}");
         assertThat(sessionAttributes.get(SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD)).isNull();
     }
 
@@ -111,7 +111,7 @@ public class Step6Test {
         step6.checkAgentPassword();
 
         assertThat(responseBody.toString())
-                .isEqualTo("{\"valid\":\"false\", \"body\":\"Password must be at least 8 characters\"}");
+                .isEqualTo("{\"valid\":\"false\",\"body\":\"Password must be at least 8 characters\"}");
         assertThat(sessionAttributes).isEmpty();
     }
 
@@ -123,7 +123,7 @@ public class Step6Test {
         step6.checkAgentPassword();
 
         assertThat(responseBody.toString())
-                .isEqualTo("{\"valid\":\"false\", \"body\":\"Passwords do not match\"}");
+                .isEqualTo("{\"valid\":\"false\",\"body\":\"Passwords do not match\"}");
         assertThat(sessionAttributes).isEmpty();
     }
 
@@ -135,7 +135,7 @@ public class Step6Test {
 
         step6.checkAgentPassword();
 
-        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\", \"body\":\"OK\"}");
+        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\",\"body\":\"OK\"}");
         assertThat(sessionAttributes.get(SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD))
                 .isEqualTo("agentpassword1");
     }

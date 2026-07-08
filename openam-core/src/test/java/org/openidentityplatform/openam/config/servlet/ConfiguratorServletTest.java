@@ -85,7 +85,7 @@ public class ConfiguratorServletTest {
 
         servlet.service(request, response);
 
-        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\", \"body\":\"OK\"}");
+        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\",\"body\":\"OK\"}");
     }
 
     @Test

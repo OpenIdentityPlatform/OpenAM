@@ -93,7 +93,7 @@ public class Step5Test {
         boolean invalid = step5.validateSite();
 
         assertThat(invalid).isTrue();
-        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"false\", \"body\":\"Site Name Missing\"}");
+        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"false\",\"body\":\"Site Name Missing\"}");
         assertThat(sessionAttributes).isEmpty();
     }
 
@@ -104,7 +104,7 @@ public class Step5Test {
         boolean invalid = step5.validateSite();
 
         assertThat(invalid).isFalse();
-        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\", \"body\":\"ok.label\"}");
+        assertThat(responseBody.toString()).isEqualTo("{\"valid\":\"true\",\"body\":\"ok.label\"}");
         assertThat(sessionAttributes.get(SessionAttributeNames.LB_SITE_NAME)).isEqualTo("site1");
     }
 
