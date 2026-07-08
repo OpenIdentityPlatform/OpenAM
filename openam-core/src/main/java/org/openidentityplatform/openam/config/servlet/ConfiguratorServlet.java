@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import freemarker.template.TemplateExceptionHandler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -211,6 +212,8 @@ public class ConfiguratorServlet extends HttpServlet {
                     config = new Configuration(Configuration.VERSION_2_3_31);
                     config.setTemplateLoader(new ServletContextTemplateLoader(getServletContext(), TEMPLATE_ROOT));
                     config.setDefaultEncoding("UTF-8");
+                    config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+                    config.setLogTemplateExceptions(false);
                     freemarkerConfig = config;
                 }
             }
