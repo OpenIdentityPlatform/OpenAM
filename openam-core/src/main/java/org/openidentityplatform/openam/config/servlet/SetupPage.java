@@ -320,7 +320,7 @@ public abstract class SetupPage {
         } else if (otherPassword != null && otherPassword.equals(password)) {
             responseString = getLocalizedString("agent.admin.password.same");
         } else {
-            if (type.equals("agent")) {
+            if ("agent".equals(type)) {
                 type = SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD;
             } else {
                 type = SetupConstants.CONFIG_VAR_ADMIN_PWD;
