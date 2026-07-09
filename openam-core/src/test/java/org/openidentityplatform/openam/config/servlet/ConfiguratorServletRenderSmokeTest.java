@@ -67,6 +67,11 @@ public class ConfiguratorServletRenderSmokeTest extends PowerMockTestCase {
             "../openam-server-only/src/main/webapp/WEB-INF/templates/config";
     private static final String RESOURCE_PREFIX = "/WEB-INF/templates/config";
 
+    private static final String STEP7_PATH = "/config/wizard/step7.htm";
+    private static final String CONFIG_PORT = "50389";
+    private static final String ADMIN_PORT = "4444";
+    private static final String JMX_PORT = "1689";
+
     private ConfiguratorServlet servlet;
     private ServletContext servletContext;
     private HttpServletRequest request;
@@ -163,6 +168,54 @@ public class ConfiguratorServletRenderSmokeTest extends PowerMockTestCase {
         assertThat(responseBody.toString())
                 .as("Non-empty response for %s", servletPath)
                 .isNotEmpty();
+    }
+
+    /**
+     * {@code Step7.onInit()} adds {@code isEmbedded} only for an embedded config store, and
+     * {@code step7.ftl} guards the admin/JMX port rows on it. The template originally tested
+     * {@code embedded} - a name nothing ever adds - so these rows never rendered.
+     */
+    @Test
+    public void step7SummaryShowsAdminAndJmxPortsWhenConfigStoreIsEmbedded() throws Exception {
+        populateSessionForPage(STEP7_PATH);
+        sessionAttributes.put(SetupConstants.CONFIG_VAR_DATA_STORE, SetupConstants.SMS_EMBED_DATASTORE);
+        pinConfigStorePorts();
+
+        when(request.getServletPath()).thenReturn(STEP7_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString())
+                .contains("Admin Port")
+                .contains("JMX Port")
+                .contains(ADMIN_PORT)
+                .contains(JMX_PORT);
+    }
+
+    /**
+     * The ports stay in the session, so their absence proves the {@code isEmbedded} guard suppressed
+     * them rather than the model simply lacking the keys.
+     */
+    @Test
+    public void step7SummaryHidesAdminAndJmxPortsWhenConfigStoreIsExternal() throws Exception {
+        populateSessionForPage(STEP7_PATH);
+        sessionAttributes.put(SetupConstants.CONFIG_VAR_DATA_STORE, SetupConstants.SMS_DS_DATASTORE);
+        pinConfigStorePorts();
+
+        when(request.getServletPath()).thenReturn(STEP7_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString())
+                .doesNotContain("Admin Port")
+                .doesNotContain("JMX Port")
+                .doesNotContain(ADMIN_PORT)
+                .doesNotContain(JMX_PORT);
+    }
+
+    /** Pins otherwise free-port-derived values so the assertions above can match exact strings. */
+    private void pinConfigStorePorts() {
+        sessionAttributes.put("configStorePort", CONFIG_PORT);
+        sessionAttributes.put("configStoreAdminPort", ADMIN_PORT);
+        sessionAttributes.put("configStoreJmxPort", JMX_PORT);
     }
 
     private void populateSessionForPage(String servletPath) {

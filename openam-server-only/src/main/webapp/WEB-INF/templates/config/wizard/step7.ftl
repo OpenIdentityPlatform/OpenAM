@@ -21,7 +21,7 @@
                             ${page.getLocalizedString('ssl.label')} <br>
                             ${page.getLocalizedString('host.name.label')} <br>
                             ${page.getLocalizedString('local.port.label')} <br>
-                            <#if embedded??>
+                            <#if isEmbedded??>
                             ${page.getLocalizedString('local.admin.port.label')} <br>
                             ${page.getLocalizedString('local.jmx.port.label')} <br>
                             </#if>
@@ -33,7 +33,7 @@
                             ${displayConfigStoreSSL} <br>
                             ${configStoreHost} <br>
                             ${configStorePort} <br>
-                            <#if embedded??>
+                            <#if isEmbedded??>
                             ${configStoreAdminPort} <br>
                             ${configStoreJmxPort} <br>
                             </#if>
