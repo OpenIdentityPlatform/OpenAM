@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,6 +51,37 @@ import org.forgerock.opendj.ldap.ResultCode;
 public abstract class SetupPage {
 
     private static final String RB_NAME = "amConfigurator";
+
+    /**
+     * The only session attributes {@link #validateInput} may write.
+     *
+     * <p>The old {@code AjaxPage} stored whatever attribute the {@code key} request parameter named,
+     * and {@code validateInput} is exposed on every page, so a hand-built
+     * {@code ?actionLink=validateInput&key=...&value=...} could seed any setup value at all. That
+     * sidesteps the per-field actions that exist precisely to validate before storing - {@code
+     * validateRootSuffix}, {@code validateConfigDir}, {@code validateLocalPort} - and, worst,
+     * {@code ADMIN_PWD} and {@code AMLDAPUSERPASSWD}, which {@link #checkPasswords} only writes after
+     * a length and confirmation check.
+     *
+     * <p>These eight are every key the wizard's own JavaScript sends. Each other field the templates
+     * validate goes to a dedicated {@code @ConfiguratorAction} instead:
+     * <ul>
+     *   <li>{@code serverURL}, {@code platformLocale} - step2.ftl's {@code validateInput()}
+     *   <li>{@code configStoreSSL} - step3.ftl's {@code validateConfigStoreSSL()}
+     *   <li>{@code configStoreLoginId}, {@code localRepPort}, {@code existingPort},
+     *       {@code existingRepPort} - wizard.ftl's {@code validate()}, called from step3.ftl
+     *   <li>{@code configStorePassword} - wizard.ftl's {@code validatePost()}, called from step3.ftl
+     * </ul>
+     */
+    private static final Set<String> ALLOWED_INPUT_KEYS = Set.of(
+            SessionAttributeNames.SERVER_URL,
+            SessionAttributeNames.PLATFORM_LOCALE,
+            SessionAttributeNames.CONFIG_STORE_SSL,
+            SessionAttributeNames.CONFIG_STORE_LOGIN_ID,
+            SessionAttributeNames.CONFIG_STORE_PWD,
+            SessionAttributeNames.LOCAL_REPL_PORT,
+            SessionAttributeNames.EXISTING_PORT,
+            SessionAttributeNames.EXISTING_REPL_PORT);
 
     public static Debug debug = Debug.getInstance("amConfigurator");
 
@@ -268,6 +300,11 @@ public abstract class SetupPage {
         String value = toString("value");
 
         if (value == null) {
+            responseString = "missing.required.field";
+        } else if (key == null || !ALLOWED_INPUT_KEYS.contains(key)) {
+            // Unreachable from the shipped wizard, so the response text need not distinguish this
+            // from an empty field - only the refusal to store matters. See ALLOWED_INPUT_KEYS.
+            debug.warning("SetupPage.validateInput: refusing to store session attribute '" + key + "'");
             responseString = "missing.required.field";
         } else {
             getContext().setSessionAttribute(key, value);

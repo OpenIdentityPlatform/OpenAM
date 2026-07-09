@@ -16,12 +16,17 @@
 package org.openidentityplatform.openam.config.servlet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
@@ -49,11 +54,16 @@ import org.testng.annotations.Test;
  */
 public class ConfiguratorServletTest {
 
+    /** Any page would do - validateInput is inherited by all of them - and Step1's onInit() is cheap. */
+    private static final String ANY_PAGE = "/config/wizard/step1.htm";
+    private static final String MISSING_FIELD = "Missing Required Field";
+
     private ConfiguratorServlet servlet;
     private ServletContext servletContext;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private StringWriter responseBody;
+    private Map<String, Object> sessionAttributes;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -65,7 +75,11 @@ public class ConfiguratorServletTest {
         when(servletConfig.getServletName()).thenReturn("configurator-servlet");
         servlet.init(servletConfig);
 
+        sessionAttributes = new HashMap<>();
         HttpSession session = mock(HttpSession.class);
+        doAnswer(inv -> sessionAttributes.put(inv.getArgument(0), inv.getArgument(1)))
+                .when(session).setAttribute(anyString(), any());
+
         request = mock(HttpServletRequest.class);
         when(request.getSession()).thenReturn(session);
         when(request.getSession(false)).thenReturn(session);
@@ -74,6 +88,62 @@ public class ConfiguratorServletTest {
         responseBody = new StringWriter();
         response = mock(HttpServletResponse.class);
         when(response.getWriter()).thenReturn(new PrintWriter(responseBody));
+    }
+
+    private void callValidateInput(String key, String value) throws Exception {
+        when(request.getServletPath()).thenReturn(ANY_PAGE);
+        when(request.getParameter("actionLink")).thenReturn("validateInput");
+        when(request.getParameter("key")).thenReturn(key);
+        when(request.getParameter("value")).thenReturn(value);
+
+        servlet.service(request, response);
+    }
+
+    @Test
+    public void validateInputStoresAKeyTheWizardActuallySends() throws Exception {
+        callValidateInput("serverURL", "https://openam.example.com:8443/openam");
+
+        assertThat(responseBody.toString()).isEqualTo("true");
+        assertThat(sessionAttributes).containsEntry("serverURL", "https://openam.example.com:8443/openam");
+    }
+
+    /**
+     * {@code checkPasswords} writes ADMIN_PWD only after a length and confirmation check. Before the
+     * key was constrained, {@code ?actionLink=validateInput&key=ADMIN_PWD&value=x} set a one-character
+     * admin password directly.
+     */
+    @Test
+    public void validateInputRefusesToSetTheAdminPassword() throws Exception {
+        callValidateInput("ADMIN_PWD", "x");
+
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
+        assertThat(sessionAttributes).isEmpty();
+    }
+
+    /** rootSuffix has its own validating action (validateRootSuffix); validateInput must not bypass it. */
+    @Test
+    public void validateInputRefusesAKeyThatHasItsOwnValidatingAction() throws Exception {
+        callValidateInput("rootSuffix", "dc=evil,dc=com");
+
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
+        assertThat(sessionAttributes).isEmpty();
+    }
+
+    /** An absent key must be refused, not passed to the allow-list (Set.of rejects null with an NPE). */
+    @Test
+    public void validateInputWithoutAKeyStoresNothing() throws Exception {
+        callValidateInput(null, "somevalue");
+
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
+        assertThat(sessionAttributes).isEmpty();
+    }
+
+    @Test
+    public void validateInputWithoutAValueStoresNothing() throws Exception {
+        callValidateInput("serverURL", null);
+
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
+        assertThat(sessionAttributes).isEmpty();
     }
 
     @Test
