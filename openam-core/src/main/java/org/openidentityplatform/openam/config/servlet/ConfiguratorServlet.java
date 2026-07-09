@@ -179,7 +179,20 @@ public class ConfiguratorServlet extends HttpServlet {
         }
     }
 
-    /** Reproduces Click's auto-exposure of a page's public fields into the template model. */
+    /**
+     * Reproduces Click's auto-exposure of a page's public fields into the template model.
+     *
+     * <p>Runs after the model is seeded on purpose: a public field overrides an
+     * {@link SetupPage#addModel} entry of the same name, and a null-valued field overrides nothing.
+     * Click behaved identically - its {@code createTemplateModel()} pushed every non-null public
+     * field through {@code page.addModel(name, value)}, which was a plain {@code Map.put}. The one
+     * live collision is {@link com.sun.identity.config.wizard.LDAPStoreWizardPage}, whose
+     * {@code public LDAPStore store} and {@code addModel("store", store)} hold the same object.
+     *
+     * <p>By the same rule a public field named {@code context} or {@code path} would shadow the keys
+     * {@link #render} seeds. Click reserved those names and failed loudly instead; no page declares
+     * them today.
+     */
     private void copyPublicFields(SetupPage page, Map<String, Object> model) {
         for (Field field : page.getClass().getFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
